@@ -345,45 +345,6 @@ species:
         value: 18.7
         units: kJ/mol
         value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t4_co2sio4_1_heat_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: &id001
-        pdf_page_index: 5
-        page: 6
-        published_page: 2688
-        table: '4'
-        row: Co2SiO4 row 1
-      phase: crystalline_olivine_to_liquid
-      units: kJ/mol
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_reduced
-        delta_H_fus_kJ_mol-1: 103
-        sigma: 15
-        T_fus_K: 1688
-        source_as_printed: This study
-      uncertainty:
-        reported_status: printed
-        value: 15
-        units: kJ/mol
-      source_note: Calculated at Tm from measured calorimetry and heat capacities; see Eq. (3) and text.
-    - observation_id: suga03_t4_co2sio4_1_entropy_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: *id001
-      phase: crystalline_olivine_to_liquid
-      units: J/mol/K
-      values:
-        quantity: entropy_of_fusion
-        method_class: measured_reduced
-        delta_S_fus_J_mol-1_K-1: 61
-        sigma: 9
-        T_fus_K: 1688
-        source_as_printed: This study
-      uncertainty:
-        reported_status: printed
-        value: 9
-        units: J/mol/K
-      source_note: Calculated as fusion enthalpy divided by Tm; author-computed in Table 4.
     - observation_id: suga03_t4_co2sio4_2_heat_fusion
       type: heat_capacity_and_heat_content_series
       locator: &id002
@@ -392,7 +353,7 @@ species:
         published_page: 2688
         table: '4'
         row: Co2SiO4 row 2
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -401,13 +362,14 @@ species:
         sigma: null
         T_fus_K: 1688
         source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
       uncertainty:
         reported_status: not_reported
       attribution: Hirschmann and Ghiorso (1994)
     - observation_id: suga03_t4_co2sio4_2_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id002
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -416,10 +378,38 @@ species:
         sigma: null
         T_fus_K: 1688
         source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
       uncertainty:
         reported_status: not_reported
       attribution: Hirschmann and Ghiorso (1994)
     context:
+    - observation_id: suga03_t4_co2sio4_1_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id001
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Co2SiO4 row 1
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 103
+        sigma: 15
+        melting_temperature_K: 1688
+        source: This study
+        note: Calculated from measured calorimetry and heat capacities; see Eq. (1) and text. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_co2sio4_1_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id001
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 61
+        sigma: 9
+        melting_temperature_K: 1688
+        source: This study
+        note: Calculated as fusion enthalpy divided by Tm. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
     - observation_id: suga03_t4_co2sio4_3_heat_fusion
       type: fusion_enthalpy_context
       locator: &id003
@@ -653,45 +643,6 @@ species:
         value: 11.3
         units: kJ/mol
         value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t4_ni2sio4_1_heat_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: &id004
-        pdf_page_index: 5
-        page: 6
-        published_page: 2688
-        table: '4'
-        row: Ni2SiO4 row 1
-      phase: crystalline_olivine_to_liquid
-      units: kJ/mol
-      values:
-        quantity: heat_of_fusion
-        method_class: measured_reduced
-        delta_H_fus_kJ_mol-1: 221
-        sigma: 26
-        T_fus_K: 1923
-        source_as_printed: This study
-      uncertainty:
-        reported_status: printed
-        value: 26
-        units: kJ/mol
-      source_note: Calculated at Tm from measured calorimetry and heat capacities; see Eq. (3) and text.
-    - observation_id: suga03_t4_ni2sio4_1_entropy_fusion
-      type: heat_capacity_and_heat_content_series
-      locator: *id004
-      phase: crystalline_olivine_to_liquid
-      units: J/mol/K
-      values:
-        quantity: entropy_of_fusion
-        method_class: measured_reduced
-        delta_S_fus_J_mol-1_K-1: 115
-        sigma: 13
-        T_fus_K: 1923
-        source_as_printed: This study
-      uncertainty:
-        reported_status: printed
-        value: 13
-        units: J/mol/K
-      source_note: Calculated as fusion enthalpy divided by Tm; author-computed in Table 4.
     - observation_id: suga03_t4_ni2sio4_2_heat_fusion
       type: heat_capacity_and_heat_content_series
       locator: &id005
@@ -700,7 +651,7 @@ species:
         published_page: 2688
         table: '4'
         row: Ni2SiO4 row 2
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -709,13 +660,14 @@ species:
         sigma: null
         T_fus_K: 1923
         source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
       uncertainty:
         reported_status: not_reported
       attribution: Hirschmann and Ghiorso (1994)
     - observation_id: suga03_t4_ni2sio4_2_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id005
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -724,10 +676,38 @@ species:
         sigma: null
         T_fus_K: 1923
         source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
       uncertainty:
         reported_status: not_reported
       attribution: Hirschmann and Ghiorso (1994)
     context:
+    - observation_id: suga03_t4_ni2sio4_1_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id004
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Ni2SiO4 row 1
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 221
+        sigma: 26
+        melting_temperature_K: 1923
+        source: This study
+        note: Calculated using Eq. (3) from calorimetry and estimated heat capacities. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_ni2sio4_1_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id004
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 115
+        sigma: 13
+        melting_temperature_K: 1923
+        source: This study
+        note: Calculated as fusion enthalpy divided by Tm. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
     - observation_id: suga03_t4_ni2sio4_3_heat_fusion
       type: fusion_enthalpy_context
       locator: &id006
@@ -2469,7 +2449,7 @@ species:
         published_page: 2688
         table: '4'
         row: Mg2SiO4 row 1
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2478,6 +2458,7 @@ species:
         sigma: 14
         T_fus_K: 2174
         source_as_printed: Richet et al. (1993)
+        attribution: Richet et al. (1993)
       uncertainty:
         reported_status: printed
         value: 14
@@ -2486,7 +2467,7 @@ species:
     - observation_id: suga03_t4_mg2sio4_1_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id007
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2495,6 +2476,7 @@ species:
         sigma: 6.4
         T_fus_K: 2174
         source_as_printed: Richet et al. (1993)
+        attribution: Richet et al. (1993)
       uncertainty:
         reported_status: printed
         value: 6.4
@@ -2508,7 +2490,7 @@ species:
         published_page: 2688
         table: '4'
         row: Mg2SiO4 row 2
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2517,6 +2499,7 @@ species:
         sigma: 20
         T_fus_K: 2163
         source_as_printed: Navrotsky et al. (1989)
+        attribution: Navrotsky et al. (1989)
       uncertainty:
         reported_status: printed
         value: 20
@@ -2525,7 +2508,7 @@ species:
     - observation_id: suga03_t4_mg2sio4_2_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id008
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2534,6 +2517,7 @@ species:
         sigma: 9.2
         T_fus_K: 2163
         source_as_printed: Navrotsky et al. (1989)
+        attribution: Navrotsky et al. (1989)
       uncertainty:
         reported_status: printed
         value: 9.2
@@ -2547,7 +2531,7 @@ species:
         published_page: 2688
         table: '4'
         row: Mg2SiO4 row 3
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2556,13 +2540,14 @@ species:
         sigma: null
         T_fus_K: 2163
         source_as_printed: Tangeman et al. (2001)
+        attribution: Tangeman et al. (2001)
       uncertainty:
         reported_status: not_reported
       attribution: Tangeman et al. (2001)
     - observation_id: suga03_t4_mg2sio4_3_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id009
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2571,6 +2556,7 @@ species:
         sigma: null
         T_fus_K: 2163
         source_as_printed: Tangeman et al. (2001)
+        attribution: Tangeman et al. (2001)
       uncertainty:
         reported_status: not_reported
       attribution: Tangeman et al. (2001)
@@ -2582,7 +2568,7 @@ species:
         published_page: 2688
         table: '4'
         row: Mg2SiO4 row 4
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2591,6 +2577,7 @@ species:
         sigma: 13
         T_fus_K: 2163
         source_as_printed: Stebbins et al. (1984)
+        attribution: Stebbins et al. (1984)
       uncertainty:
         reported_status: printed
         value: 13
@@ -2599,7 +2586,7 @@ species:
     - observation_id: suga03_t4_mg2sio4_4_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id010
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2608,6 +2595,7 @@ species:
         sigma: 6.0
         T_fus_K: 2163
         source_as_printed: Stebbins et al. (1984)
+        attribution: Stebbins et al. (1984)
       uncertainty:
         reported_status: printed
         value: 6.0
@@ -2649,7 +2637,7 @@ species:
         published_page: 2688
         table: '4'
         row: Fe2SiO4 row 1
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2658,6 +2646,7 @@ species:
         sigma: 1.1
         T_fus_K: 1490
         source_as_printed: Stebbins and Carmichael (1984)
+        attribution: Stebbins and Carmichael (1984)
       uncertainty:
         reported_status: printed
         value: 1.1
@@ -2666,7 +2655,7 @@ species:
     - observation_id: suga03_t4_fe2sio4_1_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id012
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2675,6 +2664,7 @@ species:
         sigma: 0.7
         T_fus_K: 1490
         source_as_printed: Stebbins and Carmichael (1984)
+        attribution: Stebbins and Carmichael (1984)
       uncertainty:
         reported_status: printed
         value: 0.7
@@ -2688,7 +2678,7 @@ species:
         published_page: 2688
         table: '4'
         row: Fe2SiO4 row 2
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2697,6 +2687,7 @@ species:
         sigma: 0.3
         T_fus_K: 1490
         source_as_printed: Orr (1953)
+        attribution: Orr (1953)
       uncertainty:
         reported_status: printed
         value: 0.3
@@ -2705,7 +2696,7 @@ species:
     - observation_id: suga03_t4_fe2sio4_2_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id013
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2714,6 +2705,7 @@ species:
         sigma: 0.2
         T_fus_K: 1490
         source_as_printed: Orr (1953)
+        attribution: Orr (1953)
       uncertainty:
         reported_status: printed
         value: 0.2
@@ -2755,7 +2747,7 @@ species:
         published_page: 2688
         table: '4'
         row: Mn2SiO4 row 1
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: kJ/mol
       values:
         quantity: heat_of_fusion
@@ -2764,6 +2756,7 @@ species:
         sigma: 0.5
         T_fus_K: 1620
         source_as_printed: Mah (1960)
+        attribution: Mah (1960)
       uncertainty:
         reported_status: printed
         value: 0.5
@@ -2772,7 +2765,7 @@ species:
     - observation_id: suga03_t4_mn2sio4_1_entropy_fusion
       type: heat_capacity_and_heat_content_series
       locator: *id015
-      phase: crystalline_olivine_to_liquid
+      phase: cr
       units: J/mol/K
       values:
         quantity: entropy_of_fusion
@@ -2781,6 +2774,7 @@ species:
         sigma: 0.3
         T_fus_K: 1620
         source_as_printed: Mah (1960)
+        attribution: Mah (1960)
       uncertainty:
         reported_status: printed
         value: 0.3
