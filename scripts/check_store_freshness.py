@@ -198,8 +198,6 @@ CODE_INPUTS = (
 #     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
-# New acknowledgements go in scripts/store_neutral_acks/ as separate files,
-# so parallel batches can add receipts without editing this shared block.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
@@ -223,28 +221,35 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
 
 
 def _store_neutral_ack_commits() -> set[str]:
-    """Read and validate independently mergeable store-neutral receipts."""
+    """Resolve validated receipt files; separate files avoid shared-set conflicts."""
     directory = ROOT / "scripts" / "store_neutral_acks"
     if not directory.exists():
         return set()
 
     acknowledgements: set[str] = set()
     for path in sorted(directory.iterdir()):
-        sha = path.stem
+        stem = path.stem
         if (
             path.suffix != ".txt"
-            or not 7 <= len(sha) <= 12
-            or any(char not in "0123456789abcdefABCDEF" for char in sha)
+            or (not 7 <= len(stem) <= 12 and len(stem) != 40)
+            or any(char not in "0123456789abcdefABCDEF" for char in stem)
             or not stat.S_ISREG(path.lstat().st_mode)
         ):
             raise ValueError(f"malformed store-neutral ack file: {path}")
-        reason = path.read_text(encoding="utf-8").strip()
-        if not reason or len(reason.splitlines()) != 1:
+        reason_lines = [
+            line for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(reason_lines) != 1:
             raise ValueError(f"store-neutral ack must contain one reason line: {path}")
-        sha = sha.lower()
-        if sha in STORE_NEUTRAL_INPUT_COMMITS:
-            raise ValueError(f"duplicate store-neutral acknowledgement: {sha}")
-        acknowledgements.add(sha)
+        commit = _git(
+            "rev-parse", "--verify", "--end-of-options", f"{stem}^{{commit}}"
+        ).strip().lower()
+        if commit[:9] in STORE_NEUTRAL_INPUT_COMMITS:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit[:9]}")
+        if commit in acknowledgements:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit}")
+        acknowledgements.add(commit)
     return acknowledgements
 
 
@@ -328,7 +333,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
             line.strip()
             and commit is not None
             and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
-            and not any(commit.lower().startswith(sha) for sha in ack_shas)
+            and commit.lower() not in ack_shas
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
