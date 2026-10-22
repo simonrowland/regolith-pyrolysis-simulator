@@ -30,6 +30,34 @@ from simulator.battery.score import headline_payload_records, residual_to_plain
 from tests.battery.factories import migrate_one_extract
 
 
+def test_kress91_calibration_scope_migrates_as_model_work():
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts/kress-carmichael-1991-iron-redox-calibration.yaml"
+    )
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+
+    result = migrator.result
+    work_id = "10.1007/bf00307328"
+    assert not result.validation.hard_issues
+    assert result.observations == {}
+    assert result.works[work_id].doi == work_id
+    assert (
+        "kress-carmichael-1991-iron-redox-calibration"
+        in result.works[work_id].source_ids
+    )
+
+    context = result.context_by_work[work_id][0]
+    fit_scope = context["values"]["fit_data_scope"]
+    assert fit_scope["data_count"] == 228
+    assert len(fit_scope["sources"]) == 7
+    assert fit_scope["sources"][-1]["source_id"] == (
+        "kress-carmichael-1991-iron-redox-calibration"
+    )
+
+
 def test_borisov_2018_rows_reach_redox_scoring_population():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
