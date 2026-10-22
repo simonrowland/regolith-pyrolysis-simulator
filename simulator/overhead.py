@@ -776,7 +776,23 @@ class OverheadGasModel:
                 'effective_transport_capacity.effective_capacity_kg_hr',
             )
             conductance = pipe_conductance_kg_hr / 3600.0
-            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+            controlled_gas_floors_mbar = (
+                self._controlled_o2_partial_pressure_floors_mbar(melt)
+            )
+            # Premise: allowed total pressure is shared by commanded O2,
+            # the declared carrier, and evaporating species. Algebra: reserve
+            # P_O2 and P_carrier=(P_total-P_O2)*x_carrier, then
+            # P_vapor=max(0, P_total-P_O2-P_carrier); species_partial_pressures
+            # assigns p_i=(n_dot_i/sum(n_dot_vapor))*P_vapor. Unit check:
+            # all pressure terms are mbar and both x_carrier and y_i are
+            # dimensionless. Limit: with no carrier or O2 floor, P_vapor is
+            # today's P_total; when a large carrier fills the remaining
+            # pressure budget, every p_i tends to zero at fixed evaporation
+            # flow instead of charging the carrier pressure to each vapor.
+            vapor_pressure_mbar = max(
+                0.0,
+                allowed_pressure_mbar - sum(controlled_gas_floors_mbar.values()),
+            )
         else:
             conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
                 allowed_pressure_Pa,
@@ -1291,19 +1307,32 @@ class OverheadGasModel:
     ) -> dict[str, float]:
         """Return the commanded O2 and background partial-pressure floors."""
 
+        total_pressure_mbar = _required_finite_nonnegative_float(
+            melt.p_total_mbar,
+            'melt.p_total_mbar',
+        )
+        oxygen_pressure_mbar = _required_finite_nonnegative_float(
+            melt.pO2_mbar,
+            'melt.pO2_mbar',
+        )
         floors_mbar: dict[str, float] = {}
-        if melt.pO2_mbar > 0.0:
-            floors_mbar['O2'] = melt.pO2_mbar
+        if oxygen_pressure_mbar > 0.0:
+            floors_mbar['O2'] = oxygen_pressure_mbar
 
         background_species = str(
             getattr(melt, 'background_gas_species', '') or '').strip()
         if background_species and background_species.upper() != 'O2':
-            background_fraction = float(
-                getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0
+            background_fraction = _required_finite_float(
+                getattr(melt, 'background_gas_mole_fraction', None),
+                'melt.background_gas_mole_fraction',
             )
-            background_fraction = min(1.0, max(0.0, background_fraction))
+            if not 0.0 < background_fraction <= 1.0:
+                raise OverheadConfigurationError(
+                    'melt.background_gas_mole_fraction must be in (0, 1] '
+                    'when a background gas species is declared'
+                )
             floors_mbar[background_species] = (
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+                max(0.0, total_pressure_mbar - oxygen_pressure_mbar)
                 * background_fraction
             )
         return floors_mbar

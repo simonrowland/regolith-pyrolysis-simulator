@@ -1596,6 +1596,39 @@ def test_controlled_o2_species_partial_excludes_n2_carrier_pressure():
     assert no_carrier_partials["Fe"] == pytest.approx(10.2)
 
 
+def test_controlled_o2_transport_refuses_missing_carrier_fraction():
+    from simulator.overhead import OverheadConfigurationError, OverheadGasModel
+    from simulator.state import EvaporationFlux, MeltState
+    from simulator.thermal_train import NoColdTrain
+
+    model = OverheadGasModel({"enabled": False})
+    flux = EvaporationFlux(total_kg_hr=1.0, species_kg_hr={"Fe": 1.0})
+    melt = MeltState(
+        temperature_C=1700.0,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+        pO2_mbar=0.2,
+        p_total_mbar=10.2,
+        background_gas_species="N2",
+        background_gas_mole_fraction=None,
+    )
+    capacity = model.controlled_o2_transport_capacity(
+        flux,
+        melt,
+        cold_train_capacity=NoColdTrain(),
+    )
+
+    assert capacity is not None
+    with pytest.raises(
+        OverheadConfigurationError,
+        match="melt.background_gas_mole_fraction must be finite",
+    ):
+        model.estimate_transport_state(
+            flux,
+            melt,
+            effective_transport_capacity=capacity,
+        )
+
+
 def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     sim = _gas_train_sim()
     sim.vapor_pressures["oxide_vapors"]["FeO"] = {
