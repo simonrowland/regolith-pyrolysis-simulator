@@ -11,7 +11,7 @@ extraction:
     is absent from the MinerU chunk; every numeric cell on PDF page 13 was checked
     against a pdftoppm render because pdftotext lost or garbled exponents. The
     staged standalone MinerU converter was used for the required presence compare:
-    /private/tmp/claude-501/main-review/tools/mineru_table_draft.py.
+    tools/mineru_table_draft.py (offer-21 line; run standalone).
   date: '2026-10-22'
   worker: codex
   provenance_path: raw/neumann-1954-liquid-k-evaporation-coefficient/neumann-1954-liquid-k-evaporation-coefficient.pdf
@@ -53,12 +53,11 @@ extraction:
       completed with total=0 because this tool version does not scan alpha values;
       p13 has no MinerU table. p2 numeric assignment was separately checked against
       the render; p13 numeric cells are all recorded above as render-checked.
-    identity_mapping_gap: >-
-      The real migrator preserves every Table 2 row's temperature_K and located
-      total_pressure_Pa in point_conditions, but its existing alpha identity path
-      does not bind point_conditions.total_pressure_Pa to Identity.total_pressure_Pa.
-      The task requires that printed P reach identity and also forbids migrator
-      changes in an extraction task; this is escalated as a scope blocker.
+    table_2_pressure_interpretation: >-
+      The paper's p is saturation pressure calculated from equation (11), not
+      chamber pressure. The runs are described as high vacuum; no chamber pressure
+      is printed. The p column is retained as published context, with no total
+      pressure stored in point_conditions or bound to identity.
     schema_gaps:
     - 'Table 1 delta: free angular ratio has no schema quantity token; kept as printed context.'
     - 'Table 2 pressure p is model-derived, but its Neumann–Völker equation inputs are not stored in this source; retained as context, not a typed pressure observation.'
@@ -109,7 +108,6 @@ species:
           B_cm3_per_s: '1.6e-10'
           l_minus_2a0_cm: 0.55
           point_conditions:
-            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1.5999e-4'}}, locator: {page: 13, table: '2', note: 'Printed p = 1.20×10^-6 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
             fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
         - alpha: 0.93
           T_C: 66.7
@@ -121,7 +119,6 @@ species:
           B_cm3_per_s: '0.7e-10'
           l_minus_2a0_cm: 0.18
           point_conditions:
-            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1.6132e-4'}}, locator: {page: 13, table: '2', note: 'Printed p = 1.21×10^-6 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
             fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
         - alpha: 1.01
           T_C: 104.5
@@ -133,7 +130,6 @@ species:
           B_cm3_per_s: '2.7e-9'
           l_minus_2a0_cm: 0.38
           point_conditions:
-            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0035464'}}, locator: {page: 13, table: '2', note: 'Printed p = 2.66×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
             fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
         - alpha: 1.00
           T_C: 111.0
@@ -145,7 +141,6 @@ species:
           B_cm3_per_s: '2.7e-9'
           l_minus_2a0_cm: 0.29
           point_conditions:
-            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0056395'}}, locator: {page: 13, table: '2', note: 'Printed p = 4.23×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
             fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
         - alpha: 0.95
           T_C: 119.2
@@ -157,7 +152,6 @@ species:
           B_cm3_per_s: '6.0e-9'
           l_minus_2a0_cm: 0.38
           point_conditions:
-            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0098659'}}, locator: {page: 13, table: '2', note: 'Printed p = 7.4×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
             fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
   Hg:
     observations:

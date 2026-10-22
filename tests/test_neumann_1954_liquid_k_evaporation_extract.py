@@ -66,9 +66,12 @@ def test_neumann_1954_table_2_rows_match_rendered_page_13() -> None:
         Decimal("384.15"),
         Decimal("392.35"),
     ]
-    assert all(
-        row.point_conditions
-        and row.point_conditions["total_pressure_Pa"].state.is_value
-        and row.point_conditions["total_pressure_Pa"].locator.page == 13
-        for row in rows
-    )
+    assert [point["p_mmHg_as_published"] for point in points] == [
+        "1.20e-6",
+        "1.21e-6",
+        "2.66e-5",
+        "4.23e-5",
+        "7.4e-5",
+    ]
+    assert all("total_pressure_Pa" not in row.point_conditions for row in rows)
+    assert all(not row.identity.total_pressure_Pa.is_value for row in rows)

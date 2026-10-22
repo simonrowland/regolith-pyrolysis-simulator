@@ -14,7 +14,7 @@ recorded below.
 | 2 | Hg | 1.00 | — | Volmer and Estermann 1921 [2] | MinerU + pdftotext; render row/column check |
 | 3 | K | 1 | — | Neumann, this work | MinerU + pdftotext; render row/column check |
 | 4 | CCl4 | 1 | 1 | Alty 1931 [3], Prüger 1940 [4], Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
-| 5 | C9H6 | 0.9 | 0.85 | Baranaev 1939 [5] | MinerU + pdftotext; rendered page resolves pdftotext `CCI,` as C9H6 |
+| 5 | C9H6 | 0.9 | 0.85 | Baranaev 1939 [5] | Render identifies row 5 as C9H6; pdftotext `CCI,` is an OCR error. It is distinct from row 4 CCl4. |
 | 6 | CHCl3 | 0.16 | 0.54 | Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
 | 7 | C2H5OH | 0.02 | 0.02 | Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
 | 8 | C2H5OH | 0.024 | 0.02 | Bucka 1950 [6] | MinerU + pdftotext; render row/column check |
@@ -23,7 +23,8 @@ recorded below.
 | 11 | H2O | 0.04 | 0.04 | Alty and Mackay 1935 [3] | MinerU + pdftotext; render row/column check |
 | 12 | H2O | 0.02 ± 0.04 | 0.04 | Prüger 1940 [4] | MinerU + pdftotext; render confirms ± and row/column assignment |
 
-The `C9H6` formula is retained as printed without a chemical reinterpretation.
+The row 5 `C9H6` formula is distinct from row 4 `CCl4`; the render resolves the
+pdftotext OCR error and confirms `C9H6` as printed, without chemical reinterpretation.
 Delta is retained as source context; the schema has no free-angular-ratio
 quantity token. The K row is Neumann's own result, not an attribution to prior
 work.
@@ -46,15 +47,14 @@ render. Listed cell order is theta (°C), p (mm), 2a0 (cm), 2b0 (cm), t, A
 The printed row count is five. `Std` is Stunden (hours). The five alpha values
 are retained as printed and classified measured_reduced: the paper says A and B
 are evaluated from equations (4)–(6), and alpha is calculated from those
-measured droplet evaporation results. p is the paper's Neumann–Völker equation
-context; its inputs are not all stored in this extract, so p is not promoted to
-a separate model-derived observation. The printed p values are retained, and
-their converted values are attached as located total-pressure point conditions.
+measured droplet evaporation results. p is the saturation pressure calculated
+from equation (11), not a measured chamber pressure. The paper describes the
+runs as high vacuum and prints no chamber pressure. The p values remain in the
+`p_mmHg_as_published` column as context and are not stored as total pressure.
 
 ## MinerU draft and compare
 
-Used the controller-staged standalone tool, not a tool added to this branch:
-`/private/tmp/claude-501/main-review/tools/mineru_table_draft.py`.
+Used `tools/mineru_table_draft.py` (offer-21 line; run standalone).
 The converter produced the p2 draft at
 `tables/tables/neumann-1954-liquid-k-evaporation-coefficient/p002-t01.csv` with the
 associated `index.yaml`. The p13 table is outside the MinerU chunk.
@@ -88,16 +88,14 @@ For the Table 2 rows, the migrated identity axes are:
 
 | theta °C | composition | total_pressure_Pa | fO2_Pa | temperature_K |
 |---:|---|---|---|---:|
-| 66.6 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: not_published | 339.75 |
-| 66.7 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: not_published | 339.85 |
-| 104.5 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: not_published | 377.65 |
+| 66.6 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: no fO2_Pa mapped from source | 339.75 |
+| 66.7 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: no fO2_Pa mapped from source | 339.85 |
+| 104.5 | unknown: no composition mapped from source | unknown: no total_pressure_Pa mapped from source | unknown: no fO2_Pa mapped from source | 377.65 |
 
-The row conditions do retain temperature and located total pressure; the latter
-does not reach the alpha identity. The source reports pure K but not a melt
-composition, and reports no fO2. The required identity binding for the printed
-pressure has no existing alpha migrator path. The extraction brief forbids
-migrator changes, so adding such a path requires scope approval before this
-extract can meet the identity-binding acceptance criterion.
+The row conditions retain the printed temperatures and mark fO2 unknown because
+no oxygen fugacity is reported. The source reports pure K but not a melt
+composition. Total pressure remains unknown because printed p is equation-derived
+saturation-pressure context, not chamber pressure.
 
 No battery-store regeneration was committed. Expected store delta after
 regeneration: 17 observations from this source.
