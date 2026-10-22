@@ -912,3 +912,69 @@ def test_vacuum_relaxation_did_not_leak_into_the_shared_positive_guard():
     with pytest.raises(Exception) as excinfo:
         poiseuille_conductance_m3_s(0.12, 2.0, 0.0, 4.0e-5)
     assert "invalid_pressure" in str(excinfo.value)
+
+
+def _independent_molecular_species_flow_mol_s(
+    *, area_m2, transmission_probability, temperature_K, molar_mass_kg_mol,
+    upstream_partial_pressure_Pa, downstream_partial_pressure_Pa,
+):
+    """Reference: Clausing conductance times each species' own Δp/(RT)."""
+    conductance_m3_s = (
+        area_m2
+        * transmission_probability
+        * math.sqrt(
+            8.0 * tr.GAS_CONSTANT_J_MOL_K * temperature_K
+            / (math.pi * molar_mass_kg_mol)
+        )
+        / 4.0
+    )
+    return conductance_m3_s * (
+        upstream_partial_pressure_Pa - downstream_partial_pressure_Pa
+    ) / (tr.GAS_CONSTANT_J_MOL_K * temperature_K)
+
+
+def test_molecular_two_species_reference_uses_independent_partial_pressures():
+    """Pin the molecular limit against species conductance, not bulk routing."""
+    masses_kg_mol = {"O2": 0.031998, "Kr": 0.083798}
+    common = {
+        "area_m2": 0.01,
+        "transmission_probability": 0.7,
+        "temperature_K": 1200.0,
+    }
+
+    equal_partial_flows = {
+        species: _independent_molecular_species_flow_mol_s(
+            **common,
+            molar_mass_kg_mol=mass,
+            upstream_partial_pressure_Pa=50.0,
+            downstream_partial_pressure_Pa=0.0,
+        )
+        for species, mass in masses_kg_mol.items()
+    }
+    assert equal_partial_flows["O2"] / equal_partial_flows["Kr"] == pytest.approx(
+        math.sqrt(masses_kg_mol["Kr"] / masses_kg_mol["O2"]), rel=1e-12
+    )
+
+    counterflow = {
+        "O2": _independent_molecular_species_flow_mol_s(
+            **common,
+            molar_mass_kg_mol=masses_kg_mol["O2"],
+            upstream_partial_pressure_Pa=80.0,
+            downstream_partial_pressure_Pa=20.0,
+        ),
+        "Kr": _independent_molecular_species_flow_mol_s(
+            **common,
+            molar_mass_kg_mol=masses_kg_mol["Kr"],
+            upstream_partial_pressure_Pa=20.0,
+            downstream_partial_pressure_Pa=80.0,
+        ),
+    }
+    assert counterflow["O2"] > 0.0
+    assert counterflow["Kr"] < 0.0
+    assert sum((80.0, 20.0)) == sum((20.0, 80.0))
+
+    # The existing scalar total-pressure law sees ΔP_total = 0 and cannot
+    # represent the two opposed independent molecular species flows above.
+    assert tr.pipe_mass_flow_kg_s(
+        0.01, 0.1, 0.057898, 1.0e-5, common["temperature_K"], 100.0, 100.0
+    ) == 0.0
