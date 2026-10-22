@@ -1,0 +1,1906 @@
+schema_version: literature_extract.v1
+source_id: shilov-2025-sro-al2o3-sio2-kems-supplement
+source:
+  citation: Shilov, A. L., Vorozhtcov, V. A., Stolyarova, V. L., Fedorova, A. V., Lopatin, S. I., Shugurov, S. M.,
+    et al. (2025). High-temperature mass spectrometric study and modeling of thermodynamic properties in the SrO-Al2O3-SiO2
+    system. Journal of the American Ceramic Society, 108(10), e70056. Supporting Information, Table S1.
+  doi: 10.1111/jace.70056
+  year: 2025
+  corpus_asset: raw/shilov-2025-sro-al2o3-sio2-kems-supplement/shilov-2025-sro-al2o3-sio2-kems-supplement.pdf
+extraction:
+  method: The expected corpus PDF and pdftotext export are absent. The original 4-page supplementary Word .doc is
+    held in regolith-sources; its table was transcribed from the textutil HTML table export. A 600-dpi render of
+    the source document could not be produced in this seat, so the table awaits render verification. Figure S1 and
+    Figure S2 are point-free and deferred.
+  date: '2026-10-22'
+  worker: codex-fam42-1022
+review_status: draft
+experiments:
+- experiment_id: shilov-2025-kems-supplement
+  method: knudsen_effusion
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: S1
+fidelity_samples:
+- path: species.Sr.observations[shilov_2025_table_s1_sample1_Sr_at_1883K].values.ion_intensity
+  value: '0.3'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: S1
+    row: sample 1, 1883 K
+    column_header: Sr+
+- path: species.SiO.observations[shilov_2025_table_s1_sample2_SiO_at_2081K].values.ion_intensity
+  value: '170'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: S1
+    row: sample 2, 2081 K
+    column_header: SiO+
+- path: species.Sr.observations[shilov_2025_table_s1_pure_SrO_reference_for_sample3_at_2030K].values.ion_intensity
+  value: '1582'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: S1
+    row: sample 3, 2030 K
+    column_header: Pure SrO Sr+
+species:
+  Sr:
+    observations:
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_1883K
+      type: gas_speciation
+      locator: &id001
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1883 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '1883'
+      - '1883'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1883'
+          locator: *id001
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '0.3'
+        temperature_K: '1883'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_1883K
+      type: gas_speciation
+      locator: &id002
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1883 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '1883'
+      - '1883'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1883'
+          locator: *id002
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '240'
+        temperature_K: '1883'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_1943K
+      type: gas_speciation
+      locator: &id003
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1943 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '1943'
+      - '1943'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1943'
+          locator: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '0.7'
+        temperature_K: '1943'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_1943K
+      type: gas_speciation
+      locator: &id004
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1943 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '1943'
+      - '1943'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1943'
+          locator: *id004
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '412'
+        temperature_K: '1943'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_1987K
+      type: gas_speciation
+      locator: &id005
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1987 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '1987'
+      - '1987'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1987'
+          locator: *id005
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1.7'
+        temperature_K: '1987'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_1987K
+      type: gas_speciation
+      locator: &id006
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1987 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '1987'
+      - '1987'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1987'
+          locator: *id006
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '598'
+        temperature_K: '1987'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_2052K
+      type: gas_speciation
+      locator: &id007
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2052 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2052'
+      - '2052'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2052'
+          locator: *id007
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '4.5'
+        temperature_K: '2052'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_2052K
+      type: gas_speciation
+      locator: &id008
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2052 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2052'
+      - '2052'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2052'
+          locator: *id008
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1006'
+        temperature_K: '2052'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_2081K
+      type: gas_speciation
+      locator: &id009
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2081 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id009
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '6.6'
+        temperature_K: '2081'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_2081K
+      type: gas_speciation
+      locator: &id010
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2081 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id010
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1256'
+        temperature_K: '2081'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_Sr_at_2105K
+      type: gas_speciation
+      locator: &id011
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2105 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2105'
+      - '2105'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2105'
+          locator: *id011
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '9.6'
+        temperature_K: '2105'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample1_at_2105K
+      type: gas_speciation
+      locator: &id012
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2105 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2105'
+      - '2105'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2105'
+          locator: *id012
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1502'
+        temperature_K: '2105'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample1
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_Sr_at_2037K
+      type: gas_speciation
+      locator: &id013
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2037 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2037'
+      - '2037'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2037'
+          locator: *id013
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '5.0'
+        temperature_K: '2037'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample2_at_2037K
+      type: gas_speciation
+      locator: &id014
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2037 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2037'
+      - '2037'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2037'
+          locator: *id014
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '2298'
+        temperature_K: '2037'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample2
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_Sr_at_1964K
+      type: gas_speciation
+      locator: &id015
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 1964 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '1964'
+      - '1964'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1964'
+          locator: *id015
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1.8'
+        temperature_K: '1964'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample2_at_1964K
+      type: gas_speciation
+      locator: &id016
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 1964 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '1964'
+      - '1964'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1964'
+          locator: *id016
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1099'
+        temperature_K: '1964'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample2
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_Sr_at_2002K
+      type: gas_speciation
+      locator: &id017
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2002 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2002'
+      - '2002'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2002'
+          locator: *id017
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '3.6'
+        temperature_K: '2002'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample2_at_2002K
+      type: gas_speciation
+      locator: &id018
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2002 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2002'
+      - '2002'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2002'
+          locator: *id018
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1625'
+        temperature_K: '2002'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample2
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_Sr_at_2081K
+      type: gas_speciation
+      locator: &id019
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2081 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id019
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '9.0'
+        temperature_K: '2081'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample2_at_2081K
+      type: gas_speciation
+      locator: &id020
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2081 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id020
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '3495'
+        temperature_K: '2081'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample2
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_Sr_at_2012K
+      type: gas_speciation
+      locator: &id021
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2012 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2012'
+      - '2012'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2012'
+          locator: *id021
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1.3'
+        temperature_K: '2012'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample3_at_2012K
+      type: gas_speciation
+      locator: &id022
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2012 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2012'
+      - '2012'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2012'
+          locator: *id022
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1346'
+        temperature_K: '2012'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample3
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_Sr_at_2065K
+      type: gas_speciation
+      locator: &id023
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2065 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2065'
+      - '2065'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2065'
+          locator: *id023
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '4.5'
+        temperature_K: '2065'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample3_at_2065K
+      type: gas_speciation
+      locator: &id024
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2065 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2065'
+      - '2065'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2065'
+          locator: *id024
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '2149'
+        temperature_K: '2065'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample3
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_Sr_at_1944K
+      type: gas_speciation
+      locator: &id025
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 1944 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '1944'
+      - '1944'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1944'
+          locator: *id025
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '0.5'
+        temperature_K: '1944'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample3_at_1944K
+      type: gas_speciation
+      locator: &id026
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 1944 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '1944'
+      - '1944'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1944'
+          locator: *id026
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '711'
+        temperature_K: '1944'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample3
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_Sr_at_2030K
+      type: gas_speciation
+      locator: &id027
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2030 K
+        column_header: Sample under study Sr+
+      T_range_K:
+      - '2030'
+      - '2030'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2030'
+          locator: *id027
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '2.0'
+        temperature_K: '2030'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study Sr+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_pure_SrO_reference_for_sample3_at_2030K
+      type: gas_speciation
+      locator: &id028
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2030 K
+        column_header: Pure SrO Sr+
+      T_range_K:
+      - '2030'
+      - '2030'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2030'
+          locator: *id028
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: Sr(g)
+        ion_as_printed: Sr+
+        ion_intensity: '1582'
+        temperature_K: '2030'
+        sample_id: pure_SrO_reference
+        composition_mol_percent_as_printed:
+          SrO: '100'
+        composition_mol:
+          basis: pure_SrO_as_printed
+          SrO: '1.0'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Pure SrO Sr+
+        paired_sample_row_id: sample3
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    context:
+    - observation_id: shilov_2025_figure_s1_xrd_deferred
+      what: figure_record
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: S1
+      units: 2theta and intensity, as printed
+      values:
+        quantity: x_ray_diffraction_pattern
+        quantity_token: unavailable
+        schema_gap: No store token represents the diffraction traces; no peak positions are transcribed.
+        species:
+        - SrO
+        - Al2O3
+        - SiO2
+        phase: crystalline phases of samples 1-3, as printed
+        temperature_K: null
+        axes_as_printed:
+          x: 2theta, units not stated in held text export
+          y: intensity, units not stated in held text export
+        caption_as_printed: X-ray diffraction patterns of samples NN 1-3 in the SrO-Al2O3-SiO2 system.
+        panel: whole figure
+        series:
+        - label: sample 1
+          marker: diffraction trace
+          marker_count: 0
+        - label: sample 2
+          marker: diffraction trace
+          marker_count: 0
+        - label: sample 3
+          marker: diffraction trace
+          marker_count: 0
+        attribution: Shilov et al. (2025), present study, Supporting Information Figure S1.
+        digitisation: deferred to a figure pass
+    - observation_id: shilov_2025_figure_s2_mass_spectra_deferred
+      what: figure_record
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: S2
+      units: ion-current intensity as plotted
+      values:
+        quantity: ion_intensity
+        method_class: figure_only
+        species:
+        - SiO
+        - Sr
+        - WO2
+        - WO3
+        phase: gas
+        temperature_K:
+        - 1883
+        - 2105
+        axes_as_printed:
+          x: m/e (axis title unavailable in held text export)
+          y: ion-current intensity (axis title unavailable in held text export)
+        caption_as_printed: Mass spectra of vapor over sample N 1, containing SrO:Al2O3:SiO2 = 0.33:0.33:0.33, obtained
+          by KEMS at the temperatures 1883 K and 2105 K. 1 is SiO+, 2 is Sr+, 3 is WO2+, and 4 is WO3+. The WO2+
+          and WO3+ ions are produced by ionization of the WO2 and WO3 vapor species, which are formed as a result
+          of the interaction between the sample and material of the cell made from tungsten. At the higher temperature
+          2105 K, tungsten oxides are unstable and were not observed in the mass spectra of vapor over sample N
+          1. The ion current intensities of i-species are presented with the correction for the background signal
+          and without corrections for the sensitivity coefficient of the secondary electron multiplier as well as
+          the ionization cross-sections of the corresponding vapor species. The Sr+, WO2+, and WO3+ ion current
+          intensities in Figure S2(a) were multiplied by 10.
+        panel: whole figure; Figure S2(a) scaling is stated in the caption; temperature-to-panel mapping awaits
+          render review
+        series:
+        - label: SiO+
+          marker: mass-spectrum trace
+          marker_count: 0
+        - label: Sr+
+          marker: mass-spectrum trace
+          marker_count: 0
+        - label: WO2+
+          marker: mass-spectrum trace
+          marker_count: 0
+        - label: WO3+
+          marker: mass-spectrum trace
+          marker_count: 0
+        attribution: Shilov et al. (2025), present study, Supporting Information Figure S2.
+        digitisation: deferred to a figure pass
+        note: The caption says Figure S2(a) currents for Sr+, WO2+, and WO3+ are multiplied by 10; no figure values
+          were digitised.
+  SiO:
+    observations:
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_1883K
+      type: gas_speciation
+      locator: &id029
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1883 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '1883'
+      - '1883'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1883'
+          locator: *id029
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '3'
+        temperature_K: '1883'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_1943K
+      type: gas_speciation
+      locator: &id030
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1943 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '1943'
+      - '1943'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1943'
+          locator: *id030
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '6'
+        temperature_K: '1943'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_1987K
+      type: gas_speciation
+      locator: &id031
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 1987 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '1987'
+      - '1987'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1987'
+          locator: *id031
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '9'
+        temperature_K: '1987'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_2052K
+      type: gas_speciation
+      locator: &id032
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2052 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2052'
+      - '2052'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2052'
+          locator: *id032
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '15'
+        temperature_K: '2052'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_2081K
+      type: gas_speciation
+      locator: &id033
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2081 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id033
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '20'
+        temperature_K: '2081'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample1_SiO_at_2105K
+      type: gas_speciation
+      locator: &id034
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 1 / 2105 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2105'
+      - '2105'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2105'
+          locator: *id034
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '25'
+        temperature_K: '2105'
+        sample_id: sample1
+        composition_mol_percent_as_printed:
+          SrO: '33'
+          Al2O3: '33'
+          SiO2: '33'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.33'
+          Al2O3: '0.33'
+          SiO2: '0.33'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_SiO_at_2037K
+      type: gas_speciation
+      locator: &id035
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2037 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2037'
+      - '2037'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2037'
+          locator: *id035
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '80'
+        temperature_K: '2037'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_SiO_at_1964K
+      type: gas_speciation
+      locator: &id036
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 1964 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '1964'
+      - '1964'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1964'
+          locator: *id036
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '21'
+        temperature_K: '1964'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_SiO_at_2002K
+      type: gas_speciation
+      locator: &id037
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2002 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2002'
+      - '2002'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2002'
+          locator: *id037
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '42'
+        temperature_K: '2002'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample2_SiO_at_2081K
+      type: gas_speciation
+      locator: &id038
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 2 / 2081 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2081'
+      - '2081'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2081'
+          locator: *id038
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '170'
+        temperature_K: '2081'
+        sample_id: sample2
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '50'
+          SiO2: '20'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.50'
+          SiO2: '0.20'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_SiO_at_2012K
+      type: gas_speciation
+      locator: &id039
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2012 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2012'
+      - '2012'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2012'
+          locator: *id039
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '18'
+        temperature_K: '2012'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_SiO_at_2065K
+      type: gas_speciation
+      locator: &id040
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2065 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2065'
+      - '2065'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2065'
+          locator: *id040
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '30'
+        temperature_K: '2065'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_SiO_at_1944K
+      type: gas_speciation
+      locator: &id041
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 1944 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '1944'
+      - '1944'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1944'
+          locator: *id041
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '9'
+        temperature_K: '1944'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    - observation_id: shilov_2025_table_s1_sample3_SiO_at_2030K
+      type: gas_speciation
+      locator: &id042
+        page: 4
+        pdf_page_index: 3
+        table: S1
+        row: 3 / 2030 K
+        column_header: Sample under study SiO+
+      T_range_K:
+      - '2030'
+      - '2030'
+      phase: g
+      experiment: shilov-2025-kems-supplement
+      regime: knudsen_effusion_mass_spectrometry
+      units: arbitrary units as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2030'
+          locator: *id042
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: SiO(g)
+        ion_as_printed: SiO+
+        ion_intensity: '21.5'
+        temperature_K: '2030'
+        sample_id: sample3
+        composition_mol_percent_as_printed:
+          SrO: '30'
+          Al2O3: '20'
+          SiO2: '50'
+        composition_mol:
+          basis: printed_mol_percent_as_mole_fraction
+          SrO: '0.30'
+          Al2O3: '0.20'
+          SiO2: '0.50'
+        signal_processing: background corrected; no correction for secondary-electron-multiplier sensitivity or
+          ionization cross-section is stated in the table note
+        table_column_as_printed: Sample under study SiO+
+      note: Table S1 current is a background-corrected measured signal; it is not converted to a partial pressure.
+    context: []
