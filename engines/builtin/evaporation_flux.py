@@ -52,7 +52,6 @@ the VAPOR_PRESSURE provider declares, and the same one the legacy
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
 from collections.abc import Mapping
 from typing import Any
 
@@ -69,149 +68,21 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile, Chemistry
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.config_flags import bool_feature_flag
+from simulator.transport_regime import (
+    DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+    DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+    _EVAPORATION_LJ_PROXY_PARAMS,
+    EvaporationFluxConfigurationError,
+    SeriesEvaporationFlux,
+    _finite_float,
+    hertz_knudsen_mass_conductance,
+    series_evaporation_flux,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
 _DEFAULT_EVAPORATION_ALPHA = 1.0
 _NONTRIVIAL_FLUX_KG_HR = 1.0e-12
-DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 0.0
-DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
-    "disabled:missing-species-state-dependent-melt-transfer-inputs"
-)
-# EVAPORATION-only class proxies: systematically composed refractory carriers borrow
-# SiO sigma and epsilon/k because direct high-temperature transport data are
-# absent, but each retains its formula molar mass. Premise: Chapman-Enskog
-# D_AB scales as sqrt(1/M_A+1/M_B)/(sigma_AB^2*Omega_D); copying SiO's
-# (sigma, epsilon/k) therefore changes only the unknown collision class while
-# preserving the exactly derivable mass term. Units are Angstrom, K, g/mol.
-# Sanity: SiO itself is the closest measured rail carrier; this proxy affects
-# only continuum gas resistance, never K(T), P_eq, stoichiometry, or the
-# condensation/deposition transport table. Outputs remain status-bearing and
-# direct collision data remain acquisition targets.
-_EVAPORATION_LJ_PROXY_PARAMS = {
-    # t-609/t-622: keep the diagnostic monoxide upper-screen flux computable without
-    # pretending direct transport authority. The SiO collision class is a
-    # status-bearing continuum-resistance proxy; exact formula masses remain
-    # species-specific, and the request gate never admits inventory debit.
-    "FeO_association_gas": (3.374, 71.4, 71.8440),
-    "NiO_gas": (3.374, 71.4, 74.6924),
-    "MnO_gas": (3.374, 71.4, 70.937044),
-    "CoO_gas": (3.374, 71.4, 74.932194),
-    "CrO2": (3.374, 71.4, 83.9941),
-    "CrO": (3.374, 71.4, 67.9951),
-    "Al2": (3.374, 71.4, 53.9630770),
-    "AlO": (3.374, 71.4, 42.9805385),
-    "Al2O": (3.374, 71.4, 69.9620770),
-    "Al2O2": (3.374, 71.4, 85.9610770),
-    "Al2O3_gas": (3.374, 71.4, 101.9600770),
-    "AlO2": (3.374, 71.4, 58.9795385),
-    "Ca2": (3.374, 71.4, 80.1560),
-    "CaO_gas": (3.374, 71.4, 56.0770),
-    "TiO": (3.374, 71.4, 63.8660),
-    "TiO2_gas": (3.374, 71.4, 79.8650),
-    "CrO3": (3.374, 71.4, 99.9931),
-    "K2": (3.374, 71.4, 78.1966),
-    "K2O_gas": (3.374, 71.4, 94.1956),
-    "Mg2": (3.374, 71.4, 48.6100),
-    "MgO_gas": (3.374, 71.4, 40.3040),
-    "Na2": (3.374, 71.4, 45.97953856),
-    "Na2O_gas": (3.374, 71.4, 61.97853856),
-    "P2O5_gas": (3.374, 71.4, 141.942523996),
-    "Si2": (3.374, 71.4, 56.1700),
-    "Si3": (3.374, 71.4, 84.2550),
-    "SiO2_gas": (3.374, 71.4, 60.0830),
-}
-
-
-class EvaporationFluxConfigurationError(ValueError):
-    """Invalid or unsupported transport inputs for authoritative flux."""
-
-
-@dataclass(frozen=True)
-class SeriesEvaporationFlux:
-    flux_kg_s_m2: float
-    alpha_intrinsic: float
-    alpha_effective: float
-    k_hk_kg_s_m2_pa: float
-    r_interface: float
-    r_gas: float
-    r_melt: float
-    knudsen_number: float
-    gas_resistance_weight: float
-    axial_stir_applied: float
-    radial_stir_applied: float
-    axial_stir_clamped: bool
-    radial_stir_clamped: bool
-    frozen_skull_stir_clamped: bool
-    frozen_skull_stir_ceiling: float | str
-    melt_resistance_enabled: bool
-    melt_surface_renewal_base_kg_s_m2_pa: float
-    melt_surface_renewal_source: str
-    k_mt_kg_s_m2_pa: float
-    d_ab_m2_s: float
-    transport_length_m: float
-
-    def as_diagnostic(self) -> dict[str, float | str | bool]:
-        denominator = self.r_interface + self.r_gas + self.r_melt
-        if math.isfinite(denominator) and denominator > 0.0:
-            r_interface_fraction = self.r_interface / denominator
-            r_gas_fraction = self.r_gas / denominator
-            r_melt_fraction = self.r_melt / denominator
-            limiting_resistance_label = max(
-                (
-                    ("interface", r_interface_fraction),
-                    ("gas", r_gas_fraction),
-                    ("melt", r_melt_fraction),
-                ),
-                key=lambda item: item[1],
-            )[0]
-        elif math.isinf(self.r_melt):
-            r_interface_fraction = 0.0
-            r_gas_fraction = 0.0
-            r_melt_fraction = 1.0
-            limiting_resistance_label = "melt"
-        else:
-            r_interface_fraction = 0.0
-            r_gas_fraction = 0.0
-            r_melt_fraction = 0.0
-            limiting_resistance_label = "none"
-        return {
-            "flux_kg_s_m2": self.flux_kg_s_m2,
-            "alpha_intrinsic": self.alpha_intrinsic,
-            "alpha_effective": self.alpha_effective,
-            "alpha_eff": self.alpha_effective,
-            "k_hk_kg_s_m2_pa": self.k_hk_kg_s_m2_pa,
-            "r_interface": self.r_interface,
-            "r_gas": self.r_gas,
-            "r_melt": self.r_melt,
-            "R_interface_fraction": r_interface_fraction,
-            "R_gas_fraction": r_gas_fraction,
-            "R_melt_fraction": r_melt_fraction,
-            "limiting_resistance_label": limiting_resistance_label,
-            "knudsen_number": self.knudsen_number,
-            "Kn": self.knudsen_number,
-            "gas_resistance_weight": self.gas_resistance_weight,
-            "axial_stir_applied": self.axial_stir_applied,
-            "radial_stir_applied": self.radial_stir_applied,
-            "axial_stir_clamped": self.axial_stir_clamped,
-            "radial_stir_clamped": self.radial_stir_clamped,
-            "frozen_skull_stir_clamped": self.frozen_skull_stir_clamped,
-            "frozen_skull_stir_ceiling": self.frozen_skull_stir_ceiling,
-            "melt_resistance_enabled": self.melt_resistance_enabled,
-            "melt_surface_renewal_base_kg_s_m2_pa": (
-                self.melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            "melt_surface_renewal_source": self.melt_surface_renewal_source,
-            "k_mt_kg_s_m2_pa": self.k_mt_kg_s_m2_pa,
-            "d_ab_m2_s": self.d_ab_m2_s,
-            "transport_length_m": self.transport_length_m,
-            # HKL upper-bound authority (matrix policy i): R_m=0 until
-            # species/state melt-transfer inputs exist. Not certified flux.
-            "authority_class": "upper-bound",
-            "authority_reason": (
-                "missing-species-state-dependent-melt-transfer-inputs"
-            ),
-        }
 
 
 def _coerce_alpha_by_species(alpha_control) -> dict[str, Any]:
@@ -346,18 +217,6 @@ def _flux_uncertainty_pct(
     return relative_span * 100.0
 
 
-def _finite_float(value, default: float) -> float:
-    try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        raw = float(value)
-    except (TypeError, ValueError):
-        return default
-    if not math.isfinite(raw):
-        return default
-    return raw
-
-
 def _stir_was_clamped(value, applied: float) -> bool:
     if isinstance(value, bool):
         return True
@@ -449,57 +308,6 @@ def _coerce_frozen_skull_stir_ceiling(
     return float(MAX_STIR_FACTOR), "not_certified"
 
 
-def _zero_series_evaporation_flux(
-    *,
-    alpha_intrinsic: float,
-    k_hk_kg_s_m2_pa: float = 0.0,
-    r_interface: float = math.inf,
-    r_gas: float = 0.0,
-    r_melt: float = 0.0,
-    knudsen_number: float = math.inf,
-    gas_resistance_weight: float = 0.0,
-    axial_stir_applied: float = 0.0,
-    radial_stir_applied: float = 1.0,
-    axial_stir_clamped: bool = False,
-    radial_stir_clamped: bool = False,
-    frozen_skull_stir_clamped: bool = False,
-    frozen_skull_stir_ceiling: float | str = "not_certified",
-    melt_resistance_enabled: bool = False,
-    melt_surface_renewal_base_kg_s_m2_pa: float = (
-        DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
-    ),
-    melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
-    k_mt_kg_s_m2_pa: float = 0.0,
-    d_ab_m2_s: float = 0.0,
-    transport_length_m: float = 0.0,
-) -> SeriesEvaporationFlux:
-    return SeriesEvaporationFlux(
-        flux_kg_s_m2=0.0,
-        alpha_intrinsic=max(0.0, alpha_intrinsic),
-        alpha_effective=0.0,
-        k_hk_kg_s_m2_pa=max(0.0, k_hk_kg_s_m2_pa),
-        r_interface=r_interface,
-        r_gas=max(0.0, r_gas),
-        r_melt=max(0.0, r_melt),
-        knudsen_number=knudsen_number,
-        gas_resistance_weight=max(0.0, min(1.0, gas_resistance_weight)),
-        axial_stir_applied=max(0.0, axial_stir_applied),
-        radial_stir_applied=max(0.0, radial_stir_applied),
-        axial_stir_clamped=axial_stir_clamped,
-        radial_stir_clamped=radial_stir_clamped,
-        frozen_skull_stir_clamped=frozen_skull_stir_clamped,
-        frozen_skull_stir_ceiling=frozen_skull_stir_ceiling,
-        melt_resistance_enabled=bool(melt_resistance_enabled),
-        melt_surface_renewal_base_kg_s_m2_pa=(
-            max(0.0, melt_surface_renewal_base_kg_s_m2_pa)
-        ),
-        melt_surface_renewal_source=melt_surface_renewal_source,
-        k_mt_kg_s_m2_pa=max(0.0, k_mt_kg_s_m2_pa),
-        d_ab_m2_s=max(0.0, d_ab_m2_s),
-        transport_length_m=max(0.0, transport_length_m),
-    )
-
-
 def _series_resistance_evaporation_flux_kg_m2_s(
     species: str,
     P_eq_pa: float,
@@ -524,255 +332,31 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
 ) -> SeriesEvaporationFlux:
-    """Series-resistance evaporation source in kg/(m^2*s).
+    """Translate operator controls to the shared L1 series owner."""
+    from simulator.state import clamp_stir_factor
 
-    The sole driving pressure is ``max(0, P_eq_pa - P_bulk_pa)``. External
-    pressure regime and stirring terms only add or remove resistances; they
-    never inflate the intrinsic Hertz-Knudsen alpha.
-    """
-
-    from simulator.condensation import (
-        DEFAULT_CARRIER_GAS,
-        GAS_CONSTANT_J_MOL_K,
-        _chapman_enskog_d_ab_m2_s,
-        _knudsen_number,
-        _stirring_enhanced_sherwood,
-    )
-    from simulator.state import MAX_STIR_FACTOR, clamp_stir_factor
-
-    alpha_intrinsic = max(0.0, _finite_float(alpha_i, 0.0))
-    P_eq = _finite_float(P_eq_pa, 0.0)
-    P_bulk = _finite_float(P_bulk_pa, 0.0)
-    T_surface = _finite_float(T_surface_K, 0.0)
-    M_kg_mol = _finite_float(molar_mass_kg_mol, 0.0)
-    diameter_m = _finite_float(pipe_diameter_m, 0.12)
-    overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
-    effective_T_gas_K = _finite_float(T_gas_K, T_surface)
-
-    axial_stir_validated = _validated_stir_factor(
-        axial_stir_factor,
-        axis="axial",
-    )
-    radial_stir_validated = _validated_stir_factor(
-        radial_stir_factor,
-        axis="radial",
-    )
-    axial_clamped = clamp_stir_factor(axial_stir_validated)
-    radial_clamped = clamp_stir_factor(radial_stir_validated)
-    axial_stir_ceiling, ceiling_diag = _coerce_frozen_skull_stir_ceiling(
-        cold_skull_envelope
-    )
-    axial_stir_applied = min(axial_clamped, axial_stir_ceiling)
-    radial_stir_applied = radial_clamped
-    axial_was_clamped = _stir_was_clamped(axial_stir_validated, axial_clamped)
-    radial_was_clamped = _stir_was_clamped(radial_stir_validated, radial_clamped)
-    frozen_skull_clamped = axial_stir_applied < axial_clamped
-
-    if (
-        P_eq <= 0.0
-        or T_surface <= 0.0
-        or M_kg_mol <= 0.0
-        or alpha_intrinsic <= 0.0
-        or diameter_m <= 0.0
-    ):
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=(
-                melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
-        )
-
-    delta_p_pa = max(0.0, P_eq - P_bulk)
-    k_hk_kg_s_m2_pa = math.sqrt(
-        M_kg_mol / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_surface)
-    )
-    r_interface = 1.0 / (alpha_intrinsic * k_hk_kg_s_m2_pa)
-    if delta_p_pa <= 0.0:
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=(
-                melt_surface_renewal_base_kg_s_m2_pa
-            ),
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            transport_length_m=max(0.0, diameter_m),
-        )
-
-    base_k_melt = _finite_float(melt_surface_renewal_base_kg_s_m2_pa, 0.0)
-    if melt_resistance_enabled:
-        # Premise: liquid transport is J=M_i*k_L,i*(C_b-C_s). Linearising
-        # p_eq(C) with H_i=dp_eq/dC_i gives the pressure-basis conductance
-        # k_m,i=M_i*k_L,i/H_i [kg Pa^-1 m^-2 s^-1 = s/m], hence
-        # R_m,i=H_i/(M_i*k_L,i) [m/s]. k_L,i itself requires a species- and
-        # composition-dependent D_i plus measured melt renewal/geometry.
-        # None of D_i, H_i, C_i, or a physical renewal rate exists in this
-        # request, so any positive universal coefficient (formerly 1e-4 s/m)
-        # is dimensionally shaped but ungrounded. Refuse it; R_m=0 below is
-        # explicitly the reconstructible HKL upper bound, consistent with
-        # Hashimoto/Fedkin vacuum free-evaporation being interface-controlled.
-        raise EvaporationFluxConfigurationError(
-            "authoritative melt resistance requires species- and state-specific "
-            "D_i, k_L,i, and dp_eq/dC_i; universal pressure conductance disabled"
-        )
-
-    if knudsen_number is None:
-        knudsen = _knudsen_number(
-            overhead_pa,
-            max(effective_T_gas_K, 1.0),
-            diameter_m,
-            carrier_gas=str(carrier_gas or DEFAULT_CARRIER_GAS),
-        )
-    else:
-        try:
-            knudsen = float(knudsen_number)
-        except (TypeError, ValueError):
-            knudsen = math.inf
-    from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN, VISCOUS_KNUDSEN_MAX
-
-    if math.isnan(knudsen) or knudsen < 0.0:
-        raise EvaporationFluxConfigurationError(
-            "knudsen_number must be finite non-negative or positive infinity"
-        )
-
-    gas_weight = 0.0
-    if gas_resistance_enabled:
-        if knudsen < VISCOUS_KNUDSEN_MAX or (
-            extrapolate_continuum
-            and VISCOUS_KNUDSEN_MAX <= knudsen < FREE_MOLECULAR_KNUDSEN_MIN
-        ):
-            gas_weight = 1.0
-        # Premise: an open free-molecular vacuum has no stagnant carrier-gas
-        # film. Therefore R_g=0 locally. Continuum branch: k_g=M*Sh*D/(L*R*T)
-        # [s/m], R_g=1/k_g [m/s], only for Kn < VISCOUS_KNUDSEN_MAX (0.01).
-        # The provider and its Pareto replay may continue this same finite
-        # continuum expression into transitional Kn, carrying extrapolated
-        # authority. This is not a transitional conductance fit. Keep the
-        # existing free-molecular HKL branch and unflagged diagnostic sweeps.
-
-    r_gas = 0.0
-    k_mt_kg_s_m2_pa = 0.0
-    d_ab_m2_s = 0.0
-    if gas_weight > 0.0:
-        sherwood_eff = _stirring_enhanced_sherwood(
-            radial_stir_factor=radial_stir_applied
-        )
-        if overhead_pa <= 0.0:
-            raise EvaporationFluxConfigurationError(
-                "gas resistance requires positive overhead_pressure_pa"
-            )
-        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
-            species,
-            max(effective_T_gas_K, 1.0),
-            overhead_pa,
-            carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
-            species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
-        )
-        if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
-            raise EvaporationFluxConfigurationError(
-                "missing Chapman-Enskog transport parameters for "
-                f"species={species!r} carrier_gas={carrier_gas!r}"
-            )
-        k_mt_mol_s_m2_pa = (
-            sherwood_eff
-            * d_ab_m2_s
-            / (diameter_m * GAS_CONSTANT_J_MOL_K * max(effective_T_gas_K, 1.0))
-        )
-        k_mt_kg_s_m2_pa = k_mt_mol_s_m2_pa * M_kg_mol
-        if not math.isfinite(k_mt_kg_s_m2_pa) or k_mt_kg_s_m2_pa <= 0.0:
-            return _zero_series_evaporation_flux(
-                alpha_intrinsic=alpha_intrinsic,
-                k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-                r_interface=r_interface,
-                knudsen_number=knudsen,
-                gas_resistance_weight=gas_weight,
-                axial_stir_applied=axial_stir_applied,
-                radial_stir_applied=radial_stir_applied,
-                axial_stir_clamped=axial_was_clamped,
-                radial_stir_clamped=radial_was_clamped,
-                frozen_skull_stir_clamped=frozen_skull_clamped,
-                frozen_skull_stir_ceiling=ceiling_diag,
-                melt_resistance_enabled=melt_resistance_enabled,
-                melt_surface_renewal_base_kg_s_m2_pa=(
-                    melt_surface_renewal_base_kg_s_m2_pa
-                ),
-                melt_surface_renewal_source=melt_surface_renewal_source,
-                d_ab_m2_s=d_ab_m2_s,
-                transport_length_m=diameter_m,
-            )
-        r_gas = gas_weight / k_mt_kg_s_m2_pa
-
-    r_melt = 0.0
-
-    denominator = r_interface + r_gas + r_melt
-    if not math.isfinite(denominator) or denominator <= 0.0:
-        return _zero_series_evaporation_flux(
-            alpha_intrinsic=alpha_intrinsic,
-            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-            r_interface=r_interface,
-            r_gas=r_gas,
-            r_melt=r_melt,
-            knudsen_number=knudsen,
-            gas_resistance_weight=gas_weight,
-            axial_stir_applied=axial_stir_applied,
-            radial_stir_applied=radial_stir_applied,
-            axial_stir_clamped=axial_was_clamped,
-            radial_stir_clamped=radial_was_clamped,
-            frozen_skull_stir_clamped=frozen_skull_clamped,
-            frozen_skull_stir_ceiling=ceiling_diag,
-            melt_resistance_enabled=melt_resistance_enabled,
-            melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
-            melt_surface_renewal_source=melt_surface_renewal_source,
-            k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
-            d_ab_m2_s=d_ab_m2_s,
-            transport_length_m=diameter_m,
-        )
-
-    k_total_kg_s_m2_pa = 1.0 / denominator
-    flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
-    alpha_effective = k_total_kg_s_m2_pa / k_hk_kg_s_m2_pa
-    if not math.isfinite(flux_kg_s_m2) or not math.isfinite(alpha_effective):
-        flux_kg_s_m2 = 0.0
-        alpha_effective = 0.0
-
-    return SeriesEvaporationFlux(
-        flux_kg_s_m2=max(0.0, flux_kg_s_m2),
-        alpha_intrinsic=alpha_intrinsic,
-        alpha_effective=max(0.0, min(alpha_intrinsic, alpha_effective)),
-        k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
-        r_interface=r_interface,
-        r_gas=r_gas,
-        r_melt=r_melt,
-        knudsen_number=knudsen,
-        gas_resistance_weight=gas_weight,
-        axial_stir_applied=axial_stir_applied,
-        radial_stir_applied=radial_stir_applied,
-        axial_stir_clamped=axial_was_clamped,
-        radial_stir_clamped=radial_was_clamped,
-        frozen_skull_stir_clamped=frozen_skull_clamped,
-        frozen_skull_stir_ceiling=ceiling_diag,
-        melt_resistance_enabled=bool(melt_resistance_enabled),
-        melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
+    axial = _validated_stir_factor(axial_stir_factor, axis="axial")
+    radial = _validated_stir_factor(radial_stir_factor, axis="radial")
+    axial_clamped = clamp_stir_factor(axial)
+    radial_clamped = clamp_stir_factor(radial)
+    ceiling, ceiling_diag = _coerce_frozen_skull_stir_ceiling(cold_skull_envelope)
+    applied = min(axial_clamped, ceiling)
+    return series_evaporation_flux(
+        species, P_eq_pa, P_bulk_pa, T_surface_K, molar_mass_kg_mol, alpha_i,
+        knudsen_number, pipe_diameter_m, overhead_pressure_pa,
+        axial_stir_factor, radial_stir_factor, cold_skull_envelope, carrier_gas,
+        T_gas_K=T_gas_K, melt_resistance_enabled=melt_resistance_enabled,
+        melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base_kg_s_m2_pa,
         melt_surface_renewal_source=melt_surface_renewal_source,
-        k_mt_kg_s_m2_pa=k_mt_kg_s_m2_pa,
-        d_ab_m2_s=d_ab_m2_s,
-        transport_length_m=diameter_m,
+        gas_resistance_enabled=gas_resistance_enabled,
+        extrapolate_continuum=extrapolate_continuum,
+        stir_diagnostic={
+            "axial_stir_applied": applied, "radial_stir_applied": radial_clamped,
+            "axial_stir_clamped": _stir_was_clamped(axial, axial_clamped),
+            "radial_stir_clamped": _stir_was_clamped(radial, radial_clamped),
+            "frozen_skull_stir_clamped": applied < axial_clamped,
+            "frozen_skull_stir_ceiling": ceiling_diag,
+        },
     )
 
 
@@ -1005,7 +589,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             )
         )
         from simulator.condensation import (
-            GAS_CONSTANT_J_MOL_K,
             _knudsen_number as _kn_eval,
         )
 
@@ -1082,10 +665,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     M_kg_mol = molar_mass_g_mol / 1000.0
                 hkl_upper_bound_rate_kg_hr = (
                     alpha
-                    * math.sqrt(
-                        M_kg_mol
-                        / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_K)
-                    )
+                    * hertz_knudsen_mass_conductance(M_kg_mol, T_K)
                     * delta_p_Pa
                     * melt_surface_area_m2
                     * 3600.0

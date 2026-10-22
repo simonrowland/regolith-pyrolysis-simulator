@@ -111,9 +111,22 @@ from simulator.transport_constants import (
     VISCOUS_KNUDSEN_MAX,
 )
 from simulator.transport_regime import (
+    DEFAULT_CARRIER_GAS,
+    DEFAULT_SHERWOOD_LAMINAR,
+    SUPPORTED_CARRIER_GAS_LABELS,
+    SURFACE_GAS_CONSTANT_J_MOL_K as GAS_CONSTANT_J_MOL_K,
+    _LENNARD_JONES_PARAMS,
+    _unsupported_carrier_gas_error,
+    _canonical_carrier_gas_key,
+    carrier_gas_properties,
+    _carrier_collision_diameter_m,
+    _chapman_enskog_d_ab_m2_s,
+    _mean_free_path_m,
+    _knudsen_number,
+    film_pressure_conductance,
+    pipe_wall_sherwood,
     KnudsenRegime,
     _minimum_pressure_pa_for_knudsen,
-    _single_species_mean_free_path_m_unchecked,
     classify_knudsen_regime,
 )
 from simulator.physical_constants import (
@@ -219,13 +232,11 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 # species-specific result at this T is several times that scaled
 # anchor. The 1.0e-2 constant is the legacy fallback when Chapman-
 # Enskog is not used, not a recomputed CE value.
-DEFAULT_SHERWOOD_LAMINAR = 3.66
 # Per-species Chapman-Enskog diffusion is preferred when pressure and collision
 # data produce a finite positive value. This constant remains the live fallback
 # when pressure is absent/invalid or that computation fails, anchored to the
 # historical SiO/N2 operating point at 10 mbar and 1700 C.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
-GAS_CONSTANT_J_MOL_K = 8.314462618
 
 
 def _finite_nonnegative_value(value: Any, *, label: str) -> float:
@@ -236,62 +247,6 @@ def _finite_nonnegative_value(value: Any, *, label: str) -> float:
         raise ValueError(f'{label} must be finite and non-negative')
     return numeric
 
-
-def _carrier_collision_diameter_angstrom(species: str) -> float:
-    return round(COLLISION_DIAMETERS_M[species] * 1e10, 3)
-
-
-def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
-    properties = CARRIER_GAS_PROPERTIES[species]
-    sigma_angstrom = (
-        properties.collision_diameter_m * 1e10
-        if species == 'N2'
-        else _carrier_collision_diameter_angstrom(species)
-    )
-    return (
-        sigma_angstrom,
-        properties.lennard_jones_epsilon_over_k_K,
-        properties.lennard_jones_molar_mass_g_mol,
-    )
-
-
-# Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
-# Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
-# Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
-# Table E.1 for noble gases + Na/K/Ca; remaining species use the Svehla
-# 1962 (NASA TR R-132) or Hirschfelder/Curtiss/Bird canonical estimates.
-# Vapor-phase Fe/Cr/Mn/Al/Ti are proxy estimates because direct kinetic-
-# theory measurements for transition-metal vapor are sparse. Their exact
-# derivation is not established here: in particular, the stored epsilon/k_B
-# rows do not reproduce ``1.3 * T_boiling`` and must not be described as if
-# they do. The Chapman-Enskog result is moderately sensitive to sigma (Ω_D
-# ~constant in the high-T limit, D_AB ∝ 1/σ_AB²) and weakly sensitive
-# to ε (collision integral Ω_D varies <30% across the simulator's T
-# range). At the typical C2A operating point (10 mbar = 1000 Pa,
-# 1973.15 K) ``_chapman_enskog_d_ab_m2_s('SiO', ...)`` returns
-# 0.0491 m²/s vs the legacy 0.01 constant (about 5×). The previously
-# quoted ~0.042 m²/s is the same formula at 1773 K (1500 C), not at
-# 1973 K.
-_LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
-    # (sigma Angstrom, eps/k_B K, M g/mol)
-    # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
-    'N2':  _carrier_lennard_jones_params('N2'),  # BSL Table E.1
-    'Ar':  _carrier_lennard_jones_params('Ar'),  # BSL Table E.1
-    'Kr':  _carrier_lennard_jones_params('Kr'),  # BSL Table E.1 (t-395)
-    'CO2': _carrier_lennard_jones_params('CO2'),  # BSL Table E.1
-    'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
-    'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
-    'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
-    'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
-    'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
-    'Fe':  (2.940, 6026.0, 55.845),  # Estimated (transition-metal vapor)
-    'Mg':  (3.060, 1614.0, 24.305),  # Estimated
-    'Mn':  (2.950, 1100.0, 54.938),  # Estimated
-    'Cr':  (2.880, 6000.0, 51.996),  # Estimated
-    'Al':  (2.940, 3093.0, 26.982),  # Estimated
-    'Ti':  (2.890, 6000.0, 47.867),  # Estimated
-    'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
-}
 
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'N2': {
@@ -366,7 +321,6 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     # here would falsely report proxy authority for deposition transport.
 }
 
-DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     1: 'fe_stage1',
     2: 'cr_stage2',
@@ -374,9 +328,6 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = (
-    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'
-)
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
     DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
@@ -1552,8 +1503,7 @@ def _stirring_enhanced_sherwood(
     # Physics floor: Sherwood must not drop below the laminar
     # asymptote. ``operator_value=0`` (halt-evap signal) maps here
     # to Sh = sherwood_laminar, not Sh = 0.
-    sh_input = max(1.0, operator_value)
-    return float(sherwood_laminar) * math.sqrt(sh_input)
+    return pipe_wall_sherwood(operator_value, sherwood_laminar)
 
 
 def gram_lab_exposed_melt_area_bridge(
@@ -1592,181 +1542,6 @@ def gram_lab_exposed_melt_area_bridge(
     }
 
 
-def _neufeld_collision_integral_omega_d(T_star: float) -> float:
-    """Neufeld 1972 correlation for the dimensionless collision integral
-    ``Ω_D`` as a function of the reduced temperature
-    ``T* = k_B * T / ε_AB``.
-
-    Premise: ``T* = T / sqrt((ε_A/k_B)(ε_B/k_B))`` with this module's
-    ``_LENNARD_JONES_PARAMS`` and N2 ``ε/k_B = 71.4 K``. At 1500-2000 K
-    that gives T* ≈ 2.3-3.1 for Fe/Cr/Ti, ≈ 3.2-4.3 for Al, ≈ 5.4-7.1
-    for Mn, and 21-28 for SiO. T* = 50 is unreachable on this table
-    (would need ε_AB/k_B ≈ 30-40 K, below N2's own 71.4 K).
-
-    The Neufeld, Janzen & Aziz (1972) correlation interval is
-    ``0.3 <= T* <= 100`` (J. Chem. Phys. 57, 1100), with probable error
-    below 0.1% inside that interval. This helper still evaluates T* <= 0
-    as 1.0 and does not refuse out-of-interval T*.
-
-    Reference: Neufeld, P.D., Janzen, A.R., Aziz, R.A.,
-    "Empirical equations to calculate 16 of the transport collision
-    integrals for the Lennard-Jones (12-6) potential",
-    J. Chem. Phys. 57, 1100 (1972).
-    """
-    if T_star <= 0.0:
-        return 1.0
-    return (
-        1.06036 / (T_star ** 0.1561)
-        + 0.193 / math.exp(0.47635 * T_star)
-        + 1.03587 / math.exp(1.52996 * T_star)
-        + 1.76474 / math.exp(3.89411 * T_star)
-    )
-
-
-# Bird, Stewart & Lightfoot, Transport Phenomena, 2nd ed., the working
-# Chapman–Enskog equation (their Eq. 17.3-10): D_AB in cm²/s with the
-# sqrt(1/M_A + 1/M_B) mass grouping and P in atm. The reduced-mass form
-# below multiplies by √2. See _chapman_enskog_d_ab_m2_s.
-_CHAPMAN_ENSKOG_BSL_SQRT_MASS_PREFACTOR = 0.0018583
-_CHAPMAN_ENSKOG_REDUCED_MASS_PREFACTOR = (
-    _CHAPMAN_ENSKOG_BSL_SQRT_MASS_PREFACTOR * math.sqrt(2.0)
-)
-
-
-def _chapman_enskog_d_ab_m2_s(
-    species: str,
-    T_K: float,
-    pressure_pa: float,
-    carrier: str = DEFAULT_CARRIER_GAS,
-    *,
-    species_params: tuple[float, float, float] | None = None,
-) -> float:
-    """Binary diffusion coefficient ``D_AB`` for ``species`` in
-    ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
-
-    Premise. Bird, Stewart & Lightfoot, *Transport Phenomena*, 2nd ed.,
-    Eq. 17.3-10 (the Hirschfelder / Chapman–Enskog working equation):
-
-        D_AB [cm²/s] = 0.0018583 * T[K]^{3/2} * sqrt(1/M_A + 1/M_B)
-                       / (P[atm] * σ_AB[Å]² * Ω_D)
-
-    M_A and M_B are g/mol. Ω_D is the dimensionless Neufeld collision
-    integral (Neufeld, Janzen & Aziz, J. Chem. Phys. 57, 1100, 1972).
-    The constant 0.0018583 is defined for pressure in atmospheres, not bar.
-
-    Algebra. This function groups the mass as the Reid reduced mass
-
-        M_AB = 2 / (1/M_A + 1/M_B)          [g/mol]
-
-    so sqrt(1/M_A + 1/M_B) = sqrt(2/M_AB) = √2 / sqrt(M_AB). Substituting:
-
-        D_AB [cm²/s] = (0.0018583 * √2) * T^{3/2}
-                       / (P[atm] * sqrt(M_AB) * σ_AB² * Ω_D)
-
-        prefactor = 0.0018583 * √2 = 0.002628033
-
-        P[atm] = P[Pa] / 101325
-        D_AB [m²/s] = D_AB [cm²/s] * 1e-4
-
-    σ_AB = (σ_A + σ_B) / 2 in Å. Ω_D is evaluated at T* = T / ε_AB.
-
-    Unit check. With T in K, P in atm, M in g/mol and σ in Å, the
-    0.0018583 quotient is cm²/s. Multiplying by √2 only rewrites the
-    mass grouping; it does not change dimensions. The trailing ×1e-4
-    converts cm² to m² (1 m² = 10^4 cm²).
-
-    The constant 0.00266 is that same prefactor rounded for pressure in
-    bar: 0.002628033 * (101325/100000) = 0.00266285 ≈ 0.00266 (Reid,
-    Prausnitz & Poling, *The Properties of Gases and Liquids*, Eq. 11-3.2).
-    Using 0.00266 together with P in atm overstated D_AB by
-    0.00266 / 0.002628033 = 1.216%.
-
-    Sanity. O2 self-diffusion at 1 atm from these BSL Table E.1 Lennard-Jones
-    parameters (σ = 3.467 Å, ε/k = 106.7 K, M = 31.998 g/mol): 0.2054 cm²/s
-    at 298.15 K and 1.630 cm²/s at 1000 K. NIST TN 2279 (Burgess 2024),
-    ln(D/cm² s⁻¹) = −10.787 − 44.220/T + 1.649 ln(T), fit to Hellmann's
-    O2–O2 ab initio values over 55–2000 K, gives 0.2144 cm²/s and
-    1.750 cm²/s. The helper is 4.2% and 6.9% low. That is inside
-    Chapman–Enskog accuracy for a Lennard-Jones pair; the collision
-    diameter is not adjusted to close the gap.
-
-    ``species_params`` lets a caller supply a path-local proxy without adding
-    it to the shared condensation table. Returns 0 on unknown species (caller
-    falls back to the legacy constant via the explicit
-    ``diffusion_coefficient_m2_s`` parameter on the flux callers).
-    """
-    if species_params is None:
-        species_params = _LENNARD_JONES_PARAMS.get(species)
-    carrier_key = _canonical_carrier_gas_key(carrier)
-    carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
-    if species_params is None or carrier_params is None:
-        return 0.0
-    if T_K <= 0.0 or pressure_pa <= 0.0:
-        return 0.0
-    sigma_a, eps_a, M_a = species_params
-    sigma_b, eps_b, M_b = carrier_params
-    sigma_ab = 0.5 * (sigma_a + sigma_b)            # Angstrom
-    eps_ab = math.sqrt(eps_a * eps_b)               # K
-    M_ab_reduced = 2.0 / (1.0 / M_a + 1.0 / M_b)    # g/mol
-    T_star = T_K / eps_ab
-    omega_d = _neufeld_collision_integral_omega_d(T_star)
-    pressure_atm = pressure_pa / 101325.0
-    if pressure_atm <= 0.0:
-        return 0.0
-    # cm²/s by the reduced-mass BSL form, then convert to m²/s (1 cm² = 1e-4 m²)
-    D_AB_cm2_s = (
-        _CHAPMAN_ENSKOG_REDUCED_MASS_PREFACTOR * (T_K ** 1.5)
-        / (pressure_atm * math.sqrt(M_ab_reduced)
-           * (sigma_ab ** 2) * omega_d)
-    )
-    return D_AB_cm2_s * 1.0e-4
-
-
-def _unsupported_carrier_gas_error(carrier_gas: Any) -> ValueError:
-    return ValueError(
-        f'Unsupported condensation carrier_gas {carrier_gas!r}; '
-        f'supported carrier gases: {SUPPORTED_CARRIER_GAS_LABELS}'
-    )
-
-
-def _canonical_carrier_gas_key(
-    carrier_gas: Any,
-    *,
-    allow_unset: bool = False,
-) -> str:
-    if carrier_gas is None:
-        return '' if allow_unset else DEFAULT_CARRIER_GAS
-    text = str(carrier_gas).strip()
-    if not text:
-        if allow_unset:
-            return ''
-        raise ValueError(
-            'condensation carrier_gas must be non-empty when provided'
-        )
-    upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
-    if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
-        return 'N2'
-    if upper in {'HE', 'PHE'}:
-        return 'He'
-    if upper in {'AR', 'PAR'}:
-        return 'Ar'
-    # Kr (t-395): recommended fallback buffer replacing Ar (legacy kept).
-    if upper in {'KR', 'PKR'}:
-        return 'Kr'
-    if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
-        return 'O2'
-    if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
-        return 'CO2'
-    if upper.endswith('%CO2'):
-        try:
-            co2_percent = float(upper[:-4])
-        except ValueError:
-            co2_percent = 0.0
-        if 0.0 < co2_percent <= 100.0:
-            return 'CO2'
-    raise _unsupported_carrier_gas_error(carrier_gas)
-
-
 def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
     requested_key = _canonical_carrier_gas_key(carrier_gas)
     requested = (
@@ -1786,18 +1561,6 @@ def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
             'carrier_collision_diameter_source': provenance.get('source', ''),
         }
     raise _unsupported_carrier_gas_error(carrier_gas)
-
-
-def carrier_gas_properties(carrier_gas: str | None) -> CarrierGasProperties:
-    key = _canonical_carrier_gas_key(carrier_gas)
-    try:
-        return CARRIER_GAS_PROPERTIES[key]
-    except KeyError:
-        raise _unsupported_carrier_gas_error(carrier_gas) from None
-
-
-def _carrier_collision_diameter_m(carrier_gas: str) -> float:
-    return carrier_gas_properties(carrier_gas).collision_diameter_m
 
 
 def _transport_parameter_notice(
@@ -6981,8 +6744,8 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # branch. Codex pre-0.5.2 Phase B P1+P2.
         return 0.0
     k_mt_per_pa = (
-        sherwood_eff * d_ab_m2_s
-        / (pipe_diameter_m * GAS_CONSTANT_J_MOL_K * effective_T_gas_K)
+        film_pressure_conductance(sherwood_eff, d_ab_m2_s,
+                                  pipe_diameter_m, effective_T_gas_K)
     )
     if not math.isfinite(k_mt_per_pa) or k_mt_per_pa <= 0.0:
         # Same fail-closed rationale.
@@ -7015,51 +6778,6 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if diagnostic_out is not None:
         diagnostic_out.update(rate.to_dict())
     return flux
-
-
-def _mean_free_path_m(
-    pressure_pa: float,
-    T_K: float,
-    molecular_diameter_m: float | None = None,
-    carrier_gas: str = DEFAULT_CARRIER_GAS,
-) -> float:
-    if molecular_diameter_m is None:
-        molecular_diameter_m = _carrier_collision_diameter_m(carrier_gas)
-    if pressure_pa <= 0.0:
-        return math.inf
-    if T_K <= 0.0 or molecular_diameter_m <= 0.0:
-        return 0.0
-    try:
-        return _single_species_mean_free_path_m_unchecked(
-            pressure_pa,
-            T_K,
-            molecular_diameter_m,
-        )
-    except ZeroDivisionError:
-        # Preserve the prior limit when positive finite inputs underflow to a
-        # zero denominator.
-        return math.inf
-
-
-def _knudsen_number(
-    pressure_pa: float,
-    T_K: float,
-    characteristic_length_m: float,
-    *,
-    carrier_gas: str = DEFAULT_CARRIER_GAS,
-    molecular_diameter_m: float | None = None,
-) -> float:
-    if characteristic_length_m <= 0.0:
-        return math.inf
-    return (
-        _mean_free_path_m(
-            pressure_pa,
-            T_K,
-            molecular_diameter_m=molecular_diameter_m,
-            carrier_gas=carrier_gas,
-        )
-        / characteristic_length_m
-    )
 
 
 def minimum_pressure_mbar_for_knudsen(
