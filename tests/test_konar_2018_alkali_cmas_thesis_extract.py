@@ -39,7 +39,7 @@ def test_dsc_and_quench_rows_migrate_with_printed_values_and_coordinates() -> No
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     observations = migrator.result.observations
-    assert len(observations) == 51
+    assert len(observations) == 25
     assert not migrator.result.validation.hard_issues
 
     s0 = observations[f"{EXTRACT.stem}::konar_t5_2_s0_3_melting_point"]
@@ -77,10 +77,51 @@ def test_table_rows_match_published_cells_and_distinguish_blank_cells() -> None:
         for species in document["species"].values()
         for row in species.get("observations", [])
     ]
-    assert len([row for row in rows if row["locator"].get("table") == "5.2"]) == 13
+    assert len([row for row in rows if row["locator"].get("table") == "5.2"]) == 5
     assert len([row for row in rows if row["locator"].get("table") == "A.1"]) == 12
-    assert len([row for row in rows if row["locator"].get("table") == "B.2"]) == 14
-    assert len([row for row in rows if row["locator"].get("table") == "D.3"]) == 9
+    assert len([row for row in rows if row["locator"].get("table") == "B.2"]) == 5
+    assert len([row for row in rows if row["locator"].get("table") == "D.3"]) == 0
+
+    transitions = document["species"]["SiO2"]["context"]
+    mixed_boundaries = [row for row in transitions if row["type"] == "transition_context"]
+    assert len(mixed_boundaries) == 26
+    assert {
+        table: sum(row["locator"].get("table") == table for row in mixed_boundaries)
+        for table in ("5.2", "B.2", "D.3")
+    } == {"5.2": 8, "B.2": 9, "D.3": 9}
+    assert all(
+        row["values"].get("composition_mol")
+        and ("temperature_K" in row["values"] or "T_C" in row["values"])
+        and row["locator"]["page"] == row["locator"]["pdf_page_index"] + 1
+        for row in mixed_boundaries
+    )
+    assert all(
+        row["values"]["property_kind"] in {
+            "solidus", "liquidus", "eutectic", "phase_transition", "phase_field_boundary"
+        }
+        for row in mixed_boundaries
+    )
+    typed_ids = {row["observation_id"] for row in rows}
+    assert {
+        "konar_t5_2_s0_3_melting_point",
+        "konar_t5_2_s2_3_li3nasi4_transition",
+        "konar_t5_2_s3_3_li3nasi4_transition",
+        "konar_t5_2_s4_3_li3nasi4_transition",
+        "konar_t5_2_s4_3_li4sio4_transition",
+        "konar_b2_lsm0_melting",
+        "konar_b2_lsm3_li2mg_sio4_transition",
+        "konar_b2_lsm4_li2mg_sio4_transition",
+        "konar_b2_lsm5_li2mg_sio4_transition",
+        "konar_b2_lsm5_melting",
+    } <= typed_ids
+    typed_transitions = document["species"]["SiO2"]["observations"]
+    assert all("composition_mol" not in row["values"] for row in typed_transitions)
+    assert all(
+        "starting_composition_as_printed" in row["values"]
+        or "starting_MgO_mole_fraction" in row["values"]
+        or "starting_Li2O_mole_fraction" in row["values"]
+        for row in typed_transitions
+    )
 
     glass = [row for row in rows if row["locator"].get("table") == "C.3"]
     assert [row["values"]["component_amount"] for row in glass] == [0.168, 0.344, 0.488]

@@ -42,32 +42,6 @@ species:
           pressure_as_printed: 1 atm
           pressure_basis_Pa: 101325
           starting_composition_as_printed: '0.0 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
-      - observation_id: konar_t5_2_s1_3_solidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S1-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: solidus
-          temperature_K: 1017
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.1, Na2SiO3: 0.9}
-          starting_composition_as_printed: '0.1 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
-      - observation_id: konar_t5_2_s1_3_liquidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S1-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: liquidus
-          temperature_K: 1219
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.1, Na2SiO3: 0.9}
-          starting_composition_as_printed: '0.1 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
       - observation_id: konar_t5_2_s2_3_li3nasi4_transition
         type: transition_point
         locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S2-3}
@@ -79,35 +53,8 @@ species:
           temperature_K: 747
           pressure_as_printed: 1 atm
           pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.3, Na2SiO3: 0.7}
           starting_composition_as_printed: '0.3 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
           printed_assignment: polymorphic transition of Li3NaSiO4
-      - observation_id: konar_t5_2_s2_3_solidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S2-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: solidus
-          temperature_K: 1006
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.3, Na2SiO3: 0.7}
-          starting_composition_as_printed: '0.3 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
-      - observation_id: konar_t5_2_s2_3_liquidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S2-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: liquidus
-          temperature_K: 1091
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.3, Na2SiO3: 0.7}
-          starting_composition_as_printed: '0.3 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
       - observation_id: konar_t5_2_s3_3_li3nasi4_transition
         type: transition_point
         locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S3-3}
@@ -119,35 +66,8 @@ species:
           temperature_K: 765
           pressure_as_printed: 1 atm
           pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.7, Na2SiO3: 0.3}
           starting_composition_as_printed: '0.7 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
           printed_assignment: polymorphic transition of Li3NaSiO4
-      - observation_id: konar_t5_2_s3_3_solidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S3-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: solidus
-          temperature_K: 1051
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.7, Na2SiO3: 0.3}
-          starting_composition_as_printed: '0.7 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
-      - observation_id: konar_t5_2_s3_3_liquidus
-        type: transition_point
-        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S3-3}
-        units: K
-        values:
-          formula: Li2O-Na2O-SiO2
-          method_class: measured_direct
-          property_kind: liquidus
-          temperature_K: 1193
-          pressure_as_printed: 1 atm
-          pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.7, Na2SiO3: 0.3}
-          starting_composition_as_printed: '0.7 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
       - observation_id: konar_t5_2_s4_3_li3nasi4_transition
         type: transition_point
         locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S4-3}
@@ -159,7 +79,6 @@ species:
           temperature_K: 743
           pressure_as_printed: 1 atm
           pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.9, Na2SiO3: 0.1}
           starting_composition_as_printed: '0.9 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
           printed_assignment: polymorphic transition of Li3NaSiO4
       - observation_id: konar_t5_2_s4_3_li4sio4_transition
@@ -173,11 +92,181 @@ species:
           temperature_K: 940
           pressure_as_printed: 1 atm
           pressure_basis_Pa: 101325
-          composition_mol: {Li4SiO4: 0.9, Na2SiO3: 0.1}
           starting_composition_as_printed: '0.9 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
           printed_assignment: polymorphic transition of Li4SiO4
-      - observation_id: konar_t5_2_s4_3_solidus
+      - observation_id: konar_a1_lm1_1_heat1
         type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1700, T_C_as_printed: 1427, heating_cooling_cycle: first_heating, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lm1_1_cool1
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1699, T_C_as_printed: 1426, heating_cooling_cycle: first_cooling, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lm1_1_heat2
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1692, T_C_as_printed: 1419, heating_cooling_cycle: second_heating, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lm1_1_cool2
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1702, T_C_as_printed: 1429, heating_cooling_cycle: second_cooling, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lm1_1_average_heat
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1_average_heating}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1696, T_C_as_printed: 1423, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
+      - observation_id: konar_a1_lm1_1_average_cool
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1_average_cooling}
+        units: K
+        values: {formula: Li2O-MgO, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1700.5, T_C_as_printed: 1427.5, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
+      - observation_id: konar_a1_lc1_1_heat1
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1619, T_C_as_printed: 1346, heating_cooling_cycle: first_heating, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lc1_1_cool1
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1614, T_C_as_printed: 1341, heating_cooling_cycle: first_cooling, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lc1_1_heat2
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1615, T_C_as_printed: 1342, heating_cooling_cycle: second_heating, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lc1_1_cool2
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_direct, property_kind: thermal_incident, T_K: 1613, T_C_as_printed: 1340, heating_cooling_cycle: second_cooling, starting_Li2O_mole_fraction: 0.2}
+      - observation_id: konar_a1_lc1_1_average_heat
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1_average_heating}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1617, T_C_as_printed: 1344, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
+      - observation_id: konar_a1_lc1_1_average_cool
+        type: transition_point
+        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1_average_cooling}
+        units: K
+        values: {formula: Li2O-CaO, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1613.5, T_C_as_printed: 1340.5, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
+      - observation_id: konar_b2_lsm0_melting
+        type: transition_point
+        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-0}
+        units: °C
+        values: {formula: Li2SiO3, method_class: measured_direct, property_kind: melting_point, T_C: 1204, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.0, phase: congruent melting}
+      - observation_id: konar_b2_lsm3_li2mg_sio4_transition
+        type: transition_point
+        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-3}
+        units: °C
+        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 994, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.3, printed_assignment: polymorphic transition in Li2MgSiO4}
+      - observation_id: konar_b2_lsm4_li2mg_sio4_transition
+        type: transition_point
+        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-4}
+        units: °C
+        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 997, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.4, printed_assignment: polymorphic transition in Li2MgSiO4}
+      - observation_id: konar_b2_lsm5_li2mg_sio4_transition
+        type: transition_point
+        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
+        units: °C
+        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 1004, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, printed_assignment: polymorphic transition in Li2MgSiO4}
+      - observation_id: konar_b2_lsm5_melting
+        type: transition_point
+        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
+        units: °C
+        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: melting_point, T_C: 1465, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, melting_kind_as_printed: peritectic}
+    context:
+      - observation_id: konar_t5_2_s1_3_solidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S1-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: solidus
+          temperature_K: 1017
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.1, Na2SiO3: 0.9}
+          starting_composition_as_printed: '0.1 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s1_3_liquidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S1-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: liquidus
+          temperature_K: 1219
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.1, Na2SiO3: 0.9}
+          starting_composition_as_printed: '0.1 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s2_3_solidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S2-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: solidus
+          temperature_K: 1006
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.3, Na2SiO3: 0.7}
+          starting_composition_as_printed: '0.3 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s2_3_liquidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S2-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: liquidus
+          temperature_K: 1091
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.3, Na2SiO3: 0.7}
+          starting_composition_as_printed: '0.3 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s3_3_solidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S3-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: solidus
+          temperature_K: 1051
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.7, Na2SiO3: 0.3}
+          starting_composition_as_printed: '0.7 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s3_3_liquidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
+        locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S3-3}
+        units: K
+        values:
+          formula: Li2O-Na2O-SiO2
+          method_class: measured_direct
+          property_kind: liquidus
+          temperature_K: 1193
+          pressure_as_printed: 1 atm
+          pressure_basis_Pa: 101325
+          composition_mol: {Li4SiO4: 0.7, Na2SiO3: 0.3}
+          starting_composition_as_printed: '0.7 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
+      - observation_id: konar_t5_2_s4_3_solidus
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S4-3}
         units: K
         values:
@@ -190,7 +279,8 @@ species:
           composition_mol: {Li4SiO4: 0.9, Na2SiO3: 0.1}
           starting_composition_as_printed: '0.9 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
       - observation_id: konar_t5_2_s4_3_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 183, page: 184, published_page: 153, table: '5.2', row: S4-3}
         units: K
         values:
@@ -202,182 +292,114 @@ species:
           pressure_basis_Pa: 101325
           composition_mol: {Li4SiO4: 0.9, Na2SiO3: 0.1}
           starting_composition_as_printed: '0.9 mol fraction Li4SiO4 in Na2SiO3-Li4SiO4'
-      - observation_id: konar_a1_lm1_1_heat1
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1700, T_C_as_printed: 1427, heating_cooling_cycle: first_heating, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lm1_1_cool1
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1699, T_C_as_printed: 1426, heating_cooling_cycle: first_cooling, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lm1_1_heat2
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1692, T_C_as_printed: 1419, heating_cooling_cycle: second_heating, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lm1_1_cool2
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1702, T_C_as_printed: 1429, heating_cooling_cycle: second_cooling, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lm1_1_average_heat
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1_average_heating}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1696, T_C_as_printed: 1423, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
-      - observation_id: konar_a1_lm1_1_average_cool
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LM1-1_average_cooling}
-        units: K
-        values: {formula: Li2O-MgO, composition_mol: {Li2O: 0.2, MgO: 0.8}, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1700.5, T_C_as_printed: 1427.5, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
-      - observation_id: konar_a1_lc1_1_heat1
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1619, T_C_as_printed: 1346, heating_cooling_cycle: first_heating, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lc1_1_cool1
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1614, T_C_as_printed: 1341, heating_cooling_cycle: first_cooling, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lc1_1_heat2
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1615, T_C_as_printed: 1342, heating_cooling_cycle: second_heating, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lc1_1_cool2
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_direct, property_kind: thermal_incident, T_K: 1613, T_C_as_printed: 1340, heating_cooling_cycle: second_cooling, starting_Li2O_mole_fraction: 0.2}
-      - observation_id: konar_a1_lc1_1_average_heat
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1_average_heating}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1617, T_C_as_printed: 1344, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
-      - observation_id: konar_a1_lc1_1_average_cool
-        type: transition_point
-        locator: {pdf_page_index: 369, page: 370, published_page: 339, table: 'A.1', row: LC1-1_average_cooling}
-        units: K
-        values: {formula: Li2O-CaO, composition_mol: {Li2O: 0.2, CaO: 0.8}, method_class: measured_tabulated, property_kind: thermal_incident_average, T_K: 1613.5, T_C_as_printed: 1340.5, starting_Li2O_mole_fraction: 0.2, source_uncertainty_K: 6, sigma: 6}
-      - observation_id: konar_b2_lsm0_melting
-        type: transition_point
-        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-0}
-        units: °C
-        values: {formula: Li2SiO3, method_class: measured_direct, property_kind: melting_point, T_C: 1204, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.0, phase: congruent melting}
       - observation_id: konar_b2_lsm1_solidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-1}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: solidus, T_C: 1147, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.1, composition_mol: {Li2SiO3: 0.9, MgO: 0.1}}
       - observation_id: konar_b2_lsm1_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-1}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: liquidus, T_C: 1174, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.1, composition_mol: {Li2SiO3: 0.9, MgO: 0.1}}
       - observation_id: konar_b2_lsm2_eutectic
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-2}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: eutectic, T_C: 1145, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.2, composition_mol: {Li2SiO3: 0.8, MgO: 0.2}}
-      - observation_id: konar_b2_lsm3_li2mg_sio4_transition
-        type: transition_point
-        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-3}
-        units: °C
-        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 994, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.3, composition_mol: {Li2SiO3: 0.7, MgO: 0.3}, printed_assignment: polymorphic transition in Li2MgSiO4}
       - observation_id: konar_b2_lsm3_solidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-3}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: solidus, T_C: 1136, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.3, composition_mol: {Li2SiO3: 0.7, MgO: 0.3}}
       - observation_id: konar_b2_lsm3_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-3}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: liquidus, T_C: 1337, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.3, composition_mol: {Li2SiO3: 0.7, MgO: 0.3}}
-      - observation_id: konar_b2_lsm4_li2mg_sio4_transition
-        type: transition_point
-        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-4}
-        units: °C
-        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 997, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.4, composition_mol: {Li2SiO3: 0.6, MgO: 0.4}, printed_assignment: polymorphic transition in Li2MgSiO4}
       - observation_id: konar_b2_lsm4_phase_transition
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-4}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: phase_transition, T_C: 1084, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.4, composition_mol: {Li2SiO3: 0.6, MgO: 0.4}}
       - observation_id: konar_b2_lsm4_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-4}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: liquidus, T_C: 1394, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.4, composition_mol: {Li2SiO3: 0.6, MgO: 0.4}}
-      - observation_id: konar_b2_lsm5_li2mg_sio4_transition
-        type: transition_point
-        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
-        units: °C
-        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: solid_solid_transition, T_C: 1004, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, composition_mol: {Li2SiO3: 0.5, MgO: 0.5}, printed_assignment: polymorphic transition in Li2MgSiO4}
       - observation_id: konar_b2_lsm5_phase_transition
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: phase_transition, T_C: 1387, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, composition_mol: {Li2SiO3: 0.5, MgO: 0.5}}
-      - observation_id: konar_b2_lsm5_melting
-        type: transition_point
-        locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
-        units: °C
-        values: {formula: Li2MgSiO4, method_class: measured_direct, property_kind: melting_point, T_C: 1465, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, composition_mol: {Li2SiO3: 0.5, MgO: 0.5}, melting_kind_as_printed: peritectic}
       - observation_id: konar_b2_lsm5_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 401, page: 402, published_page: 371, table: 'B.2', row: LSM-5}
         units: °C
         values: {formula: Li2O-SiO2-MgO, method_class: measured_direct, property_kind: liquidus, T_C: 1501, heating_cycle: second_heating, starting_MgO_mole_fraction: 0.5, composition_mol: {Li2SiO3: 0.5, MgO: 0.5}}
       - observation_id: konar_d3_pyrx1_solidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-1}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: solidus, T_C: 903, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.1, composition_mol: {LiAlSi2O6: 0.9, CaMgSi2O6: 0.1}}
       - observation_id: konar_d3_pyrx1_phase_boundary
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-1}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: phase_field_boundary, T_C: 1131, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.1, composition_mol: {LiAlSi2O6: 0.9, CaMgSi2O6: 0.1}}
       - observation_id: konar_d3_pyrx1_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-1}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: liquidus, T_C: 1308, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.1, composition_mol: {LiAlSi2O6: 0.9, CaMgSi2O6: 0.1}}
       - observation_id: konar_d3_pyrx2_solidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-2}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: solidus, T_C: 914, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.5, composition_mol: {LiAlSi2O6: 0.5, CaMgSi2O6: 0.5}}
       - observation_id: konar_d3_pyrx2_phase_boundary
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-2}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: phase_field_boundary, T_C: 1158, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.5, composition_mol: {LiAlSi2O6: 0.5, CaMgSi2O6: 0.5}}
       - observation_id: konar_d3_pyrx2_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-2}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: liquidus, T_C: 1201, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.5, composition_mol: {LiAlSi2O6: 0.5, CaMgSi2O6: 0.5}}
       - observation_id: konar_d3_pyrx3_solidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-3}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: solidus, T_C: 856, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.9, composition_mol: {LiAlSi2O6: 0.1, CaMgSi2O6: 0.9}}
       - observation_id: konar_d3_pyrx3_phase_boundary
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-3}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: phase_field_boundary, T_C: 1070, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.9, composition_mol: {LiAlSi2O6: 0.1, CaMgSi2O6: 0.9}}
       - observation_id: konar_d3_pyrx3_liquidus
-        type: transition_point
+        type: transition_context
+        context_reason: mixed-composition phase-boundary temperature; no composition axis in transition-temperature identity
         locator: {pdf_page_index: 485, page: 486, published_page: 455, table: 'D.3', row: Pyrx-3}
         units: °C
         values: {formula: LiAlSi2O6-CaMgSi2O6, method_class: measured_direct, property_kind: liquidus, T_C: 1333, pressure_as_printed: 1 atm, pressure_basis_Pa: 101325, starting_CaMgSi2O6_mole_fraction: 0.9, composition_mol: {LiAlSi2O6: 0.1, CaMgSi2O6: 0.9}}
-    context:
       - observation_id: konar_figure5_3_nasi_lisi_phase_diagram
         type: figure_context
         locator: {pdf_page_index: 182, page: 183, published_page: 152, figure: '5.3'}
