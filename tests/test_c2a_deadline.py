@@ -1,4 +1,4 @@
-"""Thermal-input pins and automatic C2A deadline regressions."""
+"""Thermal-input pins, C2A depletion arming and runaway-guard regressions."""
 from pathlib import Path
 
 import pytest
@@ -33,20 +33,21 @@ def test_c6_composition_and_hold_clock_pin(refractory_pct, hour, expected):
     (1670, 2200, 99), (1150, 2200, 157), (2200, 2200, 28),
     (1670, 1843, 52), (1200, 1300, 35),
 ])
-def test_automatic_deadline_covers_acquisition_and_declared_window(entry_C, ceiling_C, expected):
-    # Hand-integrated constant-rate segments in C/(C/h), rounded up once
-    # before adding the declared 28 h extraction-window endpoint.
+def test_automatic_guard_is_separate_from_acquisition(entry_C, ceiling_C, expected):
+    # Historical deadlines minus the 28 h window independently pin the
+    # acquisition time; the window no longer ends extraction.
     # E.g. 1150->1320 at 15 C/h + 1320->2200 at 7.5 C/h = 128 2/3 h.
     manager = _manager()
     manager.furnace_max_T_C = ceiling_C
     melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=entry_C)
     manager.configure_campaign(melt, CampaignPhase.C2A)
-    assert manager._max_hold_hr(CampaignPhase.C2A) == expected
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
+    assert manager._campaign_overrides(CampaignPhase.C2A)['min_hold_hr'] == max(18, expected - 28)
     # The budget is anchored at entry, and must not recede as the melt heats.
     melt.temperature_C = ceiling_C
-    assert manager._max_hold_hr(CampaignPhase.C2A) == expected
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
     manager.configure_campaign(melt, CampaignPhase.C2A)
-    assert manager._max_hold_hr(CampaignPhase.C2A) == 28
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
 
 
 @pytest.mark.parametrize("hours", [18, 30, 40, 160])
@@ -63,16 +64,16 @@ def test_automatic_deadline_uses_runtime_ramp_and_retains_operator_cap():
     manager = _manager()
     manager.overrides["C2A"] = {"ramp_rate": 10}
     manager.configure_campaign(MeltState(temperature_C=1670), CampaignPhase.C2A)
-    assert manager._max_hold_hr(CampaignPhase.C2A) == 81
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
     manager.overrides["C2A"]["max_hours"] = 40
     assert manager._max_hold_hr(CampaignPhase.C2A) == 40
 
 
-def test_automatic_deadline_reads_extraction_window_owner():
+def test_automatic_guard_does_not_use_extraction_window():
     manager = _manager()
     manager.setpoints["campaigns"]["C2A_continuous"]["duration_h"] = [18, 40]
     manager.configure_campaign(MeltState(temperature_C=1670), CampaignPhase.C2A)
-    assert manager._max_hold_hr(CampaignPhase.C2A) == 111
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
 
 
 @pytest.mark.parametrize(('band', 'rate', 'entry_C', 'expected'), [
@@ -85,7 +86,8 @@ def test_automatic_deadline_reads_the_active_band_owner(band, rate, entry_C, exp
     manager = _manager()
     manager.setpoints['campaigns']['C2A_continuous']['dT_dt_C_per_hr'][band] = [rate, rate]
     manager.configure_campaign(MeltState(temperature_C=entry_C), CampaignPhase.C2A)
-    assert manager._max_hold_hr(CampaignPhase.C2A) == expected
+    assert manager._max_hold_hr(CampaignPhase.C2A) == 10_000
+    assert manager._campaign_overrides(CampaignPhase.C2A)['min_hold_hr'] == expected - 28
 
 
 @pytest.mark.parametrize("temperature_C", [float("nan"), float("inf")])
@@ -102,6 +104,46 @@ def test_automatic_deadline_keeps_soft_endpoint_and_safety_timeout_distinct():
     manager.configure_campaign(melt, CampaignPhase.C2A)
     record = BatchRecord(snapshots=[HourSnapshot(
         campaign=CampaignPhase.C2A, evap_flux=EvaporationFlux(total_kg_hr=1))])
-    for hour, rate, expected in [(30, 0, False), (71, 0, True), (71, 1, False), (98, 1, True)]:
+    for hour, rate, expected in [(30, 0, False), (71, 0, True), (71, 1, False), (98, 1, False), (9999, 1, True)]:
         melt.campaign_hour = hour
         assert manager.check_endpoint(melt, EvaporationFlux(total_kg_hr=rate), CondensationTrain(), record) is expected
+
+
+def test_automatic_runaway_guard_is_flagged_and_depletion_is_not():
+    manager = _manager()
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=2200)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    melt.campaign_hour = 9999
+    assert manager.check_endpoint(melt, EvaporationFlux(total_kg_hr=1), CondensationTrain(), BatchRecord())
+    assert manager.last_c2a_termination['safety_cap_bound'] is True
+    assert manager.last_c2a_termination['reason'] == 'runaway_guard'
+    melt.campaign_hour = 200
+    from simulator.state import HourSnapshot
+    record = BatchRecord(snapshots=[HourSnapshot(campaign=CampaignPhase.C2A,
+        evap_flux=EvaporationFlux(total_kg_hr=1))])
+    threshold = manager._endpoint_float(CampaignPhase.C2A,
+        manager._configured_endpoint(CampaignPhase.C2A, 'soft_endpoint'), 'threshold_kg_hr')
+    assert manager.check_endpoint(melt, EvaporationFlux(total_kg_hr=threshold/2), CondensationTrain(), record)
+    assert manager.last_c2a_termination['reason'] == 'soft_depletion'
+    assert manager.last_c2a_termination['safety_cap_bound'] is False
+
+
+@pytest.mark.parametrize('key', ['max_hours', 'hold_time_h', 'duration_h'])
+def test_live_duration_equal_to_guard_remains_an_operator_command(key):
+    manager = _manager()
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=2200, campaign_hour=9999)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    manager.overrides['C2A'] = {key: 10_000}
+    assert manager.check_endpoint(melt, EvaporationFlux(total_kg_hr=1), CondensationTrain(), BatchRecord())
+    assert manager.last_c2a_termination['reason'] == 'declared_duration'
+    assert manager.last_c2a_termination['safety_cap_bound'] is False
+
+
+def test_zero_runtime_max_hours_falls_back_to_flagged_runaway_guard():
+    manager = _manager()
+    manager.overrides['C2A'] = {'max_hours': 0}
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=2200, campaign_hour=9999)
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert manager.check_endpoint(melt, EvaporationFlux(total_kg_hr=1), CondensationTrain(), BatchRecord())
+    assert manager.last_c2a_termination['reason'] == 'runaway_guard'
+    assert manager.last_c2a_termination['safety_cap_bound'] is True

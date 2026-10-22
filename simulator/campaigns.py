@@ -339,6 +339,7 @@ class CampaignManager:
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
         self._active_c2a_default_limits: dict | None = None
+        self.last_c2a_termination: dict[str, object] | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
 
@@ -637,7 +638,7 @@ class CampaignManager:
             campaign == CampaignPhase.C2A
             and self._active_c2a_default_limits
         ):
-            merged.update(self._active_c2a_default_limits)
+            merged['min_hold_hr'] = self._active_c2a_default_limits['min_hold_hr']
         if (
             campaign == CampaignPhase.C3_NA
             and self._active_c3_na_scoped_overrides
@@ -1562,6 +1563,7 @@ class CampaignManager:
             self._active_c3_na_scoped_overrides = None
 
         self._active_c2a_default_limits = None
+        self.last_c2a_termination = None
         if campaign == CampaignPhase.C2A:
             cfg = self._campaign_config(campaign)
             overrides = self._campaign_overrides(campaign)
@@ -1827,27 +1829,17 @@ class CampaignManager:
             next_C = min(upper_C, target_C)
             acquisition_hr += (next_C - temperature_C) / rate
             temperature_C = next_C
-        cfg = self._campaign_config(CampaignPhase.C2A)
-        window = cfg.get('duration_h')
-        if not isinstance(window, (list, tuple)) or len(window) != 2:
-            raise MalformedRecipeError('C2A automatic deadline requires a two-element duration_h window')
-        margin_hr = self._required_float(window[1], 'C2A.duration_h[1]')
         minimum_hr = self._endpoint_float(
             CampaignPhase.C2A, self._configured_endpoint(CampaignPhase.C2A, 'soft_endpoint'),
             'min_hold_hr')
-        if not math.isfinite(margin_hr) or margin_hr < minimum_hr:
-            raise MalformedRecipeError('C2A extraction window must cover the depletion minimum hold')
-        # Premise: the cap is a safety deadline, not the depletion endpoint.
-        # t_acquire = sum(delta_T / active_rate): C / (C/h) = h.
-        # Round acquisition UP to whole simulator ticks, then add the YAML
-        # extraction-window upper endpoint as the depletion margin. At entry
-        # 1670 C, target 2200 C, rate 7.5 C/h: ceil(530/7.5) + 28 = 99 h.
-        # An already-hot charge has zero acquisition time; its cap is just
-        # the extraction window. Numeric max_hold_hr requests bypass this
-        # default, including requests equal to the former 30 h default.
         acquisition_ticks = math.ceil(acquisition_hr)
+        # Runaway guard only: 10,000 h (> one year) is over 60 times the
+        # historical 160 h extraction budget. No extraction duration window
+        # sets the normal endpoint: the configured soft flux threshold does.
+        # Acquisition still arms depletion only after sum(delta_T/rate),
+        # C/(C/h) = h, rounded up to complete ticks. Hot entry adds zero.
         return {
-            'max_hours': acquisition_ticks + margin_hr,
+            'max_hours': 10_000.0,
             # A quiet sample during acquisition is not proof that the
             # charge depleted at its selected operating temperature.
             'min_hold_hr': max(minimum_hr, acquisition_ticks),
@@ -2353,7 +2345,7 @@ class CampaignManager:
         # hold-acquisition refusal below so the wall clock cannot claim a
         # successful reaction without provider dispatch.
         ovr = self._campaign_overrides(campaign)
-        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
+        if campaign not in (CampaignPhase.C2A, CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
             raw_max_hours = ovr['max_hours']
             if not is_declared_real_scalar(
                 raw_max_hours,
@@ -2412,8 +2404,21 @@ class CampaignManager:
                     unit='kg/hr',
                 )
                 if total_rate < threshold_kg_hr:
+                    self.last_c2a_termination = {
+                        'reason': 'soft_depletion', 'safety_cap_bound': False,
+                        'total_kg_hr': total_rate,
+                        'threshold_kg_hr': threshold_kg_hr,
+                    }
                     return True
             if completed_campaign_hour >= max_hold_hr:
+                automatic = (self._active_c2a_default_limits is not None
+                             and 'hold_time_h' not in ovr and 'duration_h' not in ovr
+                             and self._float(ovr.get('max_hours'), 0.0) <= 0.0)
+                self.last_c2a_termination = {
+                    'reason': 'runaway_guard' if automatic else 'declared_duration',
+                    'safety_cap_bound': automatic, 'max_hours': max_hold_hr,
+                    'total_kg_hr': total_rate,
+                }
                 return True
 
         elif campaign == CampaignPhase.C2A_STAGED:

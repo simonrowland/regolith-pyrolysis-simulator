@@ -13722,7 +13722,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'species_extracted': species_extracted,
             'rump_expectation': rump_expectation,
         }
-        if campaign_name == 'C7_CA_ALUMINOTHERMIC':
+        if campaign_name == 'C2A':
+            summary['c2a_termination'] = dict(
+                self.campaign_mgr.last_c2a_termination or {})
+        elif campaign_name == 'C7_CA_ALUMINOTHERMIC':
             summary['c7_product_report'] = dict(
                 getattr(self, '_c7_product_report', {}) or {})
         elif campaign_name == 'C4':
