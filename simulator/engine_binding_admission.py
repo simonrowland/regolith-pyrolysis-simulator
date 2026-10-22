@@ -1777,19 +1777,6 @@ def install_provenance(
         )
         if identity.transport == "subprocess":
             binary = getattr(runtime_backend, "_binary_path", None)
-            if binary is None:
-                from simulator.engine_local_config import find_alphamelts_binary
-
-                engine_root = repo_root / "engines" / "alphamelts"
-                binary = find_alphamelts_binary(engine_root)
-                if binary is None:
-                    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-
-                    binary = AlphaMELTSBackend()._find_project_binary(engine_root)
-                if binary is None:
-                    import shutil
-
-                    binary = shutil.which("alphamelts")
             binary_path = selected_path(binary)
             resolved_paths["alphamelts_selected_binary"] = (
                 str(binary_path) if binary_path is not None else None
@@ -1798,9 +1785,6 @@ def install_provenance(
                 binary_path
             )
             launcher = getattr(runtime_backend, "_engine_path", None)
-            if launcher is None:
-                candidate = repo_root / "engines" / "alphamelts" / "run_alphamelts.command"
-                launcher = candidate if candidate.is_file() else None
             launcher_path = selected_path(launcher)
             resolved_paths["alphamelts_selected_launcher"] = (
                 str(launcher_path) if launcher_path is not None else None

@@ -433,19 +433,24 @@ def _default_engine_root() -> Path:
 
 def _default_pristine_dylib_dir() -> Path:
     """Pristine staged dylib dir from engines.local.toml (no env mutation)."""
-    from simulator.engine_local_config import load_config
+    from simulator.engine_local_config import (
+        EngineInstallRequiredError,
+        load_config,
+    )
 
-    config = load_config()
-    candidates: list[Path] = []
-    if config is not None and config.paths.thermoengine_dylib_dir is not None:
-        candidates.append(Path(config.paths.thermoengine_dylib_dir).expanduser())
-    candidates.append(Path.home() / "lib")
-    for candidate in candidates:
+    try:
+        config = load_config(required=True)
+    except EngineInstallRequiredError as exc:
+        raise AbortWMutator(str(exc)) from exc
+    assert config is not None
+    candidate = config.paths.thermoengine_dylib_dir
+    if candidate is not None:
+        candidate = candidate.expanduser()
         if all((candidate / name).is_file() for name in _DYLIB_NAMES):
             return candidate
     raise AbortWMutator(
-        f"no pristine dylib directory holding {list(_DYLIB_NAMES)}; version "
-        "identity cannot be established"
+        f"locked ThermoEngine dylib directory is missing required files "
+        f"{list(_DYLIB_NAMES)}; run install-engines.py"
     )
 
 

@@ -368,8 +368,9 @@ explicit source-selection change. The per-intent authority table is in `AGENTS.m
 The supported alphaMELTS path is `alphamelts_binary_path` in the generated,
 machine-local `engines/engines.local.toml`; it points to the locked app under
 `~/repos/engine-bin/alphaMELTS/<archive-sha>/`. `install-dependencies.py`
-downloads and verifies the release archive, and `install-engines.py` writes the
-shared local config from the lock.
+downloads and verifies the release archive, then writes the base local config
+from the lock. `install-engines.py` refreshes it after the pinned source engines
+are built and publishes ThermoEngine's dylibs as symlinks in `~/lib`.
 
 ## Model Status
 

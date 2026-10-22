@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 import sqlite3
-import warnings
 from pathlib import Path
 
 import pytest
 
 from simulator.engine_local_config import (
     EngineIdentity,
+    EngineInstallRequiredError,
     EngineLocalConfig,
     EnginePaths,
     cache_version_for,
@@ -17,7 +17,6 @@ from simulator.engine_local_config import (
     load_config,
     render_toml,
     setup_thermoengine_dylib_path,
-    warn_legacy_once,
     write_config,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -66,7 +65,7 @@ def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLoc
         },
     )
     monkeypatch.setattr(
-        "simulator.engine_local_config.config_path",
+        "engine_install_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
@@ -98,37 +97,22 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
 
 
-def test_config_absent_legacy_fallback_emits_warning(
+def test_config_absent_refuses_alpha_binary_discovery(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
-        "simulator.engine_local_config.config_path",
+        "engine_install_config.config_path",
         lambda: missing,
     )
-    backend = AlphaMELTSBackend()
-    backend._mode = "subprocess"
-    backend._binary_path = tmp_path / "alphamelts2"
-    backend._engine_path = backend._binary_path
+    from engine_install_config import find_alphamelts_binary
 
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        version = backend.get_engine_version()
-
-    assert version == f"alphaMELTS subprocess ({backend._binary_path})"
-    assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
-
-
-def test_warn_legacy_once_is_single_shot() -> None:
-    from simulator import engine_local_config as module
-
-    module._LEGACY_WARNED.clear()
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        warn_legacy_once("alphamelts", "legacy once")
-        warn_legacy_once("alphamelts", "legacy once")
-    assert len(caught) == 1
+    legacy = tmp_path / "engines" / "alphamelts" / "alphamelts2"
+    legacy.parent.mkdir(parents=True)
+    legacy.write_bytes(b"legacy binary")
+    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
+        find_alphamelts_binary()
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(
@@ -142,12 +126,12 @@ def test_thermoengine_dylib_dir_fail_loud_when_missing(
         identities={},
     )
     monkeypatch.setattr(
-        "simulator.engine_local_config.config_path",
+        "engine_install_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
 
-    with pytest.raises(ImportError, match="ThermoEngine dylibs missing"):
+    with pytest.raises(EngineInstallRequiredError, match="ThermoEngine dylibs missing"):
         setup_thermoengine_dylib_path()
 
 
@@ -165,7 +149,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
         identities={},
     )
     monkeypatch.setattr(
-        "simulator.engine_local_config.config_path",
+        "engine_install_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
@@ -380,7 +364,7 @@ def test_load_config_returns_none_when_absent(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "simulator.engine_local_config.config_path",
+        "engine_install_config.config_path",
         lambda: tmp_path / "missing.toml",
     )
     assert load_config() is None

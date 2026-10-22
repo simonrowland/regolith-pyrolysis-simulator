@@ -28,13 +28,11 @@ files, no ``setup.py``, no ``pyproject.toml``.  Its primary interface is
 Julia (``MAGEMin_C.jl``); from Python it is reached either through that
 Julia bridge or by driving the compiled ``MAGEMin`` binary over a
 subprocess.  This adapter's supported, default path is **subprocess**:
-``initialize()`` locates the compiled binary (sibling clone
-``../MAGEMin/MAGEMin`` or ``engines/magemin/{,bin/}MAGEMin``) and
-``_call_magemin`` invokes it with ``--Verb=0`` single-point arguments,
-parsing the compact ``Phase :`` / ``Mode :`` stdout block.  The optional
-``pymagemin`` / ``julia`` bridges are opt-in; the binary is the canonical
-route.  See
-``pyproject.toml`` ``[magemin]`` for the build path.
+``initialize()`` reads the locked binary path from
+``engines/engines.local.toml`` and ``_call_magemin`` invokes it with
+``--Verb=0`` single-point arguments, parsing the compact ``Phase :`` /
+``Mode :`` stdout block.  The optional ``pymagemin`` / ``julia`` bridges
+are opt-in; the binary is the canonical route.
 
 Intended call site
 ------------------
@@ -1032,8 +1030,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     Configuration (all optional):
         binary_path:       explicit path to the MAGEMin binary.  If
-                           omitted, the adapter probes ``engines/magemin``
-                           and then ``PATH``.
+                           omitted, the adapter requires the path generated
+                           by the engine lock in ``engines.local.toml``.
         database:          MAGEMin internal database identifier (e.g.
                            ``'ig'`` for the igneous database).  Defaults
                            to ``'ig'``.
@@ -1085,12 +1083,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
 
         binary_path = self._resolve_binary_path()
-        if binary_path is None:
-            self._warn(
-                'MAGEMin binary not found in engines/magemin or PATH; '
-                'backend disabled'
-            )
-            return False
         self._binary_path = binary_path
 
         bridge, module = self._import_magemin_bridge(
@@ -1780,100 +1772,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
 
     # ------------------------------------------------------------------
-    # Discovery
+    # Locked binary resolution
     # ------------------------------------------------------------------
 
     @staticmethod
     def _locate_binary(explicit: Optional[Any]) -> Optional[Path]:
-        """
-        Find the compiled MAGEMin binary.
-
-        Order of preference:
-            1. explicit path from config (``binary_path``)
-            2. ``engines/magemin/{,bin/}MAGEMin`` relative to repo root
-            3. ``../MAGEMin/MAGEMin`` — a sibling clone built in place
-               (the documented build location, see ``pyproject.toml``
-               ``[magemin]``)
-            4. ``MAGEMin`` on the system PATH
-
-        ``initialize()`` probes ``engines.local.toml`` before this helper when
-        no explicit ``binary_path`` is supplied.
-        """
         if explicit:
             path = Path(str(explicit)).expanduser()
             if path.exists():
                 return path
             return None
+        from simulator.engine_local_config import configured_magemin_binary_path
 
-        project_root = Path(__file__).resolve().parent.parent.parent
-        candidates = [
-            project_root / 'engines' / 'magemin' / 'MAGEMin',
-            project_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
-            project_root.parent / 'MAGEMin' / 'MAGEMin',
-        ]
-        for candidate in candidates:
-            if candidate.exists() and os.access(candidate, os.X_OK):
-                return candidate
-
-        which = shutil.which('MAGEMin')
-        if which:
-            return Path(which)
-
-        return None
+        return configured_magemin_binary_path()
 
     def _resolve_binary_path(self) -> Optional[Path]:
         explicit_path = self._config.get('binary_path')
         if explicit_path:
             return self._locate_binary(explicit_path)
 
-        from simulator.engine_local_config import configured_magemin_binary_path
-
-        binary_path = configured_magemin_binary_path()
-        if binary_path is None:
-            binary_path = self._locate_binary(None)
-        return binary_path
+        return self._locate_binary(None)
 
     def get_engine_version(self) -> str:
-        from simulator.engine_local_config import (
-            cache_version_for,
-            warn_legacy_once,
-        )
+        from simulator.engine_local_config import cache_version_for
 
-        config_version = cache_version_for('magemin')
-        if config_version is not None:
-            return config_version
-
-        binary_path = self._binary_path or self._resolve_binary_path()
-        if binary_path is None:
-            return 'unavailable'
-        resolved_binary_path = binary_path.resolve()
-        try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                result = subprocess.run(
-                    [
-                        str(resolved_binary_path),
-                        '--version',
-                        '--db',
-                        self._database,
-                    ],
-                    cwd=tmpdir,
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                )
-            lines = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and lines:
-                legacy = lines[0].strip()
-            else:
-                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-        except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-        warn_legacy_once(
-            'magemin',
-            'engines.local.toml absent; using legacy MAGEMin '
-            'path-based identity for cache comparison',
-        )
-        return legacy
+        return cache_version_for('magemin', required=True)
 
     def _import_magemin_bridge(
         self, *, requested: Optional[Any]

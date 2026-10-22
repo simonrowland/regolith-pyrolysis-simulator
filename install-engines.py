@@ -10,7 +10,7 @@ thermodynamic engines:
   * MAGEMin - C library + executable, compiled from source.
   * ThermoEngine - Objective-C/C dylibs + a Cython package, compiled from source.
     VapoRock cannot be imported without it.
-  * alphaMELTS - the pinned macOS arm64 app, when a verified release URL is set.
+  * alphaMELTS - the pinned app artifact installed by install-dependencies.py.
 
 Engine source pins and build commands live in engines/engines.lock.toml.
 Versioned installs live under ~/repos/engine-bin/<engine>/<pin>/ and are shared
@@ -35,16 +35,17 @@ import subprocess
 import sys
 from pathlib import Path
 
-from simulator.engine_local_config import (
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from engine_install_config import (
     EngineCheckReport,
     EngineLock,
-    THERMOENGINE_DYLIBS,
     checkout_matches_pin,
     check_engine_install,
     engine_install_path,
     engine_install_root,
-    git_rev,
     load_engine_lock,
+    thermoengine_artifact_names,
     write_locked_config,
 )
 
@@ -162,11 +163,10 @@ def clone_locked_sources(lock: EngineLock, root: Path) -> None:
         dest = engine_install_path(lock, root, key)
         dest.parent.mkdir(parents=True, exist_ok=True)
         if dest.exists():
-            actual_commit = git_rev(dest)
-            if actual_commit != pin.pin:
+            if not checkout_matches_pin(pin, dest):
                 _record(
-                    f"{pin.name}: REFUSED - {dest} is at {actual_commit}, "
-                    f"expected {pin.pin}; existing data was preserved"
+                    f"{pin.name}: REFUSED - {dest} does not match locked "
+                    f"commit {pin.pin}; existing data was preserved"
                 )
                 continue
             _record(f"{pin.name}: pinned clone preexisting ({dest})")
@@ -291,15 +291,30 @@ def build_thermoengine(python: Path, lock: EngineLock, root: Path) -> None:
     dylib_dir = src / (pin.runtime_directory or "lib")
     dylib_dir.mkdir(parents=True, exist_ok=True)
     staged = []
-    for dylib in THERMOENGINE_DYLIBS:
+    dylib_names = thermoengine_artifact_names(lock)
+    for artifact, dylib in zip(pin.artifacts, dylib_names, strict=True):
         built = src / "src" / dylib
         if built.exists():
-            shutil.copy2(built, dylib_dir / dylib)
+            target = src / artifact
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(built, target)
             staged.append(dylib)
-    if len(staged) != len(THERMOENGINE_DYLIBS):
-        _record(f"ThermoEngine: only staged {staged} - expected {list(THERMOENGINE_DYLIBS)}")
+    expected_dylibs = list(dylib_names)
+    if len(staged) != len(expected_dylibs):
+        _record(f"ThermoEngine: only staged {staged} - expected {expected_dylibs}")
         return
     _record(f"ThermoEngine: dylibs built and staged in {dylib_dir}")
+
+    home_lib = Path.home() / "lib"
+    home_lib.mkdir(parents=True, exist_ok=True)
+    for artifact, dylib in zip(pin.artifacts, dylib_names, strict=True):
+        target = (src / artifact).resolve()
+        link = home_lib / dylib
+        if link.is_symlink() and link.resolve() == target:
+            continue
+        if link.exists() or link.is_symlink():
+            link.unlink()
+        link.symlink_to(target)
 
     try:
         _run([python, "-m", "pip", "install", "-e", str(src / "thermoengine")],
@@ -311,9 +326,10 @@ def build_thermoengine(python: Path, lock: EngineLock, root: Path) -> None:
 
 def alpha_artifact_notice(lock: EngineLock, root: Path) -> None:
     pin = lock.engines["alphamelts"]
-    artifact = engine_install_path(lock, root, "alphamelts") / (
-        pin.runtime_artifact or "alphamelts2"
-    )
+    from engine_install_config import artifact_for_platform
+
+    asset = artifact_for_platform(pin)
+    artifact = engine_install_path(lock, root, "alphamelts") / asset.runtime_artifact
     if artifact.is_file():
         _record(f"alphaMELTS: staged at {artifact}")
     else:
@@ -350,14 +366,22 @@ def verify(python: Path, lock: EngineLock, root: Path) -> None:
         ("thermoengine",   "import thermoengine; print(getattr(thermoengine,'__version__','ok'))"),
         ("vaporock",       "import vaporock; print(getattr(vaporock,'__version__','ok'))"),
     ]
+    env = os.environ.copy()
+    home_lib = Path.home() / "lib"
+    existing_library_path = env.get("DYLD_FALLBACK_LIBRARY_PATH", "")
+    env["DYLD_FALLBACK_LIBRARY_PATH"] = ":".join(
+        part for part in (str(home_lib), existing_library_path) if part
+    )
+    failed = False
     for label, code in checks:
         proc = subprocess.run([str(python), "-c", code],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, env=env)
         if proc.returncode == 0:
             # packages may print banners on import; the version is the last line
             out = (proc.stdout.strip().splitlines() or ["ok"])[-1]
             _record(f"{label}: import ok ({out})")
         else:
+            failed = True
             tail = (proc.stderr.strip().splitlines() or ["unknown error"])[-1]
             _record(f"{label}: import FAILED - {tail}")
 
@@ -376,6 +400,9 @@ def verify(python: Path, lock: EngineLock, root: Path) -> None:
     else:
         _record("MAGEMin: executable not built")
 
+    if failed:
+        raise SystemExit("Engine verification failed; see failed imports above")
+
 
 # --------------------------------------------------------------------------
 # Entry point
@@ -393,7 +420,9 @@ def main() -> int:
         if args != {"--check"}:
             raise SystemExit("--check cannot be combined with installer options")
         lock = load_engine_lock()
-        report = check_engine_install(lock, ENGINE_ROOT)
+        from engine_install_config import config_path
+
+        report = check_engine_install(lock, ENGINE_ROOT, local_config=config_path())
         return print_check_report(report)
 
     ensure_platform()

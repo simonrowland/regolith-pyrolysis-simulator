@@ -360,9 +360,9 @@ def test_python_api_initialization_refuses_raw_model_before_worker_creation(
     )
     monkeypatch.setattr(
         'simulator.engine_local_config.find_alphamelts_binary',
-        lambda _root: None,
+        lambda: None,
     )
-    backend._find_project_binary = lambda _root: None
+    backend._configured_alphamelts_binary = lambda: None
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
@@ -2383,8 +2383,8 @@ def test_builtin_subprocess_vapor_projection_separates_melt_fo2_from_transport_p
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
     assert backend.initialize({
         'mode': 'subprocess',
@@ -4528,8 +4528,8 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
     assert backend.initialize({'mode': 'subprocess', 'timeout_s': 37.5}) is True
     seen = {}
@@ -4570,8 +4570,8 @@ def test_alphamelts_timeout_config_must_be_finite_and_positive(
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
 
     with pytest.raises(
@@ -4841,8 +4841,8 @@ def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
 
     def fake_import(name):
@@ -4965,12 +4965,39 @@ def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
 
     assert backend.initialize({}) is True
     assert backend._mode == 'subprocess'
+
+
+def test_alphamelts_auto_mode_refuses_missing_lock_before_python_api_fallback(
+    monkeypatch,
+):
+    from simulator.engine_local_config import EngineInstallRequiredError
+
+    backend = AlphaMELTSBackend()
+    backend._initialize_vapor_transport = lambda _config: None
+    backend._vaporock_helper = types.SimpleNamespace(
+        initialize=lambda _config: None,
+        is_available=lambda: False,
+    )
+    api_attempts = []
+    backend._initialize_petthermotools = lambda **_kwargs: api_attempts.append(True)
+
+    def missing_locked_binary():
+        raise EngineInstallRequiredError(
+            'locked alphaMELTS binary is missing; run install-dependencies.py'
+        )
+
+    backend._configured_alphamelts_binary = missing_locked_binary
+
+    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
+        backend.initialize({})
+
+    assert api_attempts == []
 
 
 def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch):
@@ -5967,8 +5994,8 @@ def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
         backend,
-        '_find_project_binary',
-        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+        '_configured_alphamelts_binary',
+        lambda: Path('/tmp/fake-alphamelts'),
     )
 
     assert backend.initialize({'mode': 'subprocess'}) is True
@@ -10080,8 +10107,8 @@ def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
         )
     else:
         monkeypatch.setattr(
-            backend, '_find_project_binary',
-            lambda _engine_root: Path('/tmp/fake-alphamelts'),
+            backend, '_configured_alphamelts_binary',
+            lambda: Path('/tmp/fake-alphamelts'),
         )
     return backend.initialize(config)
 

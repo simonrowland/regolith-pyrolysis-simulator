@@ -11,14 +11,17 @@ import sys
 import urllib.request
 import venv
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
-from simulator.engine_local_config import (
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from engine_install_config import (
     artifact_for_platform,
     engine_install_path,
     engine_install_root,
     load_engine_lock,
     sha256_file,
+    write_locked_config,
 )
 
 
@@ -144,7 +147,7 @@ def _install_alphamelts() -> None:
         raise SystemExit(f"No locked alphaMELTS app asset for {system}/{machine}") from exc
     filename = asset.archive_filename
     expected_hash = asset.pin
-    binary_name = asset.binary_name
+    binary_name = PurePosixPath(asset.runtime_artifact).name
     version = pin.version
     url = asset.url
     engine_dir = engine_install_path(
@@ -153,7 +156,7 @@ def _install_alphamelts() -> None:
         "alphamelts",
         platform_key=f"{system}-{machine}",
     )
-    package_dir = engine_dir / Path(asset.runtime_artifact).parent
+    package_dir = engine_dir / PurePosixPath(asset.runtime_artifact).parent
     binary = package_dir / binary_name
 
     engine_dir.mkdir(parents=True, exist_ok=True)
@@ -188,6 +191,12 @@ def _install_alphamelts() -> None:
             )
 
     _write_runner(engine_dir, package_dir, binary_name)
+    local_config = write_locked_config(
+        lock,
+        engine_install_root(),
+        platform_key=f"{system}-{machine}",
+    )
+    print(f"Engine paths written from lock: {local_config}", flush=True)
     print(f"alphaMELTS installed: {engine_dir / 'run_alphamelts.command'}")
 
 

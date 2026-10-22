@@ -125,6 +125,9 @@ markers = [
 # enumerating the simulator subpackages here documents the on-disk tree
 # (and pins what counts as "the simulator") -- especially useful as the
 # `simulator.chemistry.kernel` scaffold lands ahead of any wiring.
+[tool.setuptools]
+py-modules = ["engine_install_config"]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = [

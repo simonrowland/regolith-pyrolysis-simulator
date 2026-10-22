@@ -318,6 +318,23 @@ def test_default_seams_mint_production_build_records(tmp_path, monkeypatch) -> N
     assert lock["record_type"] == "MutationBuild"
 
 
+def test_default_pristine_dylib_dir_does_not_fall_back_to_home_lib(
+    tmp_path, monkeypatch
+) -> None:
+    home_lib = tmp_path / "home" / "lib"
+    home_lib.mkdir(parents=True)
+    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+        (home_lib / name).write_bytes(b"legacy dylib")
+    monkeypatch.setenv("HOME", str(home_lib.parent))
+    monkeypatch.setattr(
+        "engine_install_config.config_path",
+        lambda: tmp_path / "missing" / "engines.local.toml",
+    )
+
+    with pytest.raises(AbortWMutator, match="run install-engines.py"):
+        w_mutator._default_pristine_dylib_dir()
+
+
 def test_zero_j_control_build_reads_back_exactly_zero(tmp_path) -> None:
     build = _mutator(tmp_path).make_build(CONTROL_J, row_id="row-1")
     assert build.readback_J == CONTROL_J

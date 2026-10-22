@@ -11,7 +11,8 @@ All commands assume you are **in the repo root** and use the project venv
 ## Install and check pinned engines
 
 `install-dependencies.py` installs the base Python environment and the
-checksum-verified alphaMELTS app. Then run:
+checksum-verified alphaMELTS app, then writes this checkout's
+`engines/engines.local.toml` from the lock and shared install root. Then run:
 
 ```bash
 python3 install-engines.py
@@ -25,8 +26,20 @@ root and this checkout's `engines/engines.local.toml`, and scans `~/repos` for
 extra engine builds. It reports wrong source revisions, missing artifacts, and
 config path or identity-digest drift. It also prints artifact SHA-256 values
 for comparison across hosts. Different native artifact hashes are warnings;
-the locked source pin remains authoritative. Change a reviewed lock entry to
-bump an engine; `--update` no longer follows upstream HEAD.
+the locked source pin remains authoritative. ThermoEngine's three libraries
+are built under the shared root and published as symlinks in `~/lib`, where
+upstream `ctypes` lookup expects them; `--check` reports missing, regular-file,
+or misdirected links without changing them. `install-engines.py` verifies
+ThermoEngine and VapoRock imports in a fresh process with that library path and
+fails if verification fails.
+
+Runtime engine paths come only from the generated TOML. If it is missing or a
+locked binary is absent, the runtime reports which installer to run instead of
+searching sibling checkouts or `PATH`. Identity versions come from the lock;
+identity digests use the installed executable bytes (or the combined
+ThermoEngine libraries), while Python-only engines use their pinned commit.
+Change a reviewed lock entry to bump an engine; `--update` no longer follows
+upstream HEAD.
 
 ---
 
