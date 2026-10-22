@@ -94,8 +94,10 @@ library is called.
 from __future__ import annotations
 
 import builtins
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
+import json
 import math
 import os
 import re
@@ -168,6 +170,11 @@ from simulator.feedstock_composition import iron_oxide_values, total_fe
 # when the hard wall fires. 15.0 s gives ~8x headroom over the measured p99
 # while staying well inside the 60.0 s finder aggregate budget below.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 # 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
 # liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
 # freeze-gate curve scans under the same 6-way + full-gate load: p50 =
@@ -1121,9 +1128,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     raise ValueError(f'MAGEMin {field_name} must be numeric')
             warm_timeout_s = float(raw_warm_timeout_s)
             pool_size = int(raw_pool_size)
+            startup_timeout_s = float(raw_startup_timeout_s)
             if not math.isfinite(warm_timeout_s) or warm_timeout_s <= 0.0:
                 raise ValueError(
                     'MAGEMin warm_call_timeout_s must be finite and positive'
+                )
+            if (
+                not math.isfinite(startup_timeout_s)
+                or startup_timeout_s <= 0.0
+            ):
+                raise ValueError(
+                    'MAGEMin worker_startup_timeout_s must be finite and positive'
                 )
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
@@ -1138,7 +1153,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._database,
                         self._config,
                     ),
-                    startup_timeout_s=float(raw_startup_timeout_s),
+                    startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
                     diagnostic_log_path=diagnostic_path.with_name(
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
@@ -1397,6 +1412,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                composition_mol=composition_mol,
             )
         except EngineWorkerTimeout:
             # A hang is a control-plane event, not an equilibrium refusal.
@@ -2094,6 +2110,204 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """Convert pressure from GPa to kilobar.  1 GPa = 10 kbar."""
         return float(pressure_GPa) * 10.0
 
+    def _magemin_timeout_diagnostic_detail(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        composition_mol: Optional[Mapping[str, float]],
+        temperature_C: float,
+        pressure_bar: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> str:
+        """Return a bounded record of the exact timed-out MAGEMin request."""
+        args, buffer_name, buffer_n, _buffer_warnings = (
+            self._build_magemin_subprocess_args(
+                bulk_projection=bulk_projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        )
+        payload = {
+            'composition_mol': composition_mol or {},
+            'composition_wt_pct': bulk_projection.composition_wt_pct,
+            'projected_bulk_vector_wt_pct': bulk_projection.vector,
+            'oxide_names': bulk_projection.order,
+            'temperature_C': temperature_C,
+            'pressure_bar': pressure_bar,
+            'pressure_kbar': pressure_kbar,
+            'fO2_log': fO2_log,
+            'buffer': buffer_name,
+            'buffer_n': buffer_n,
+            'database': self._database,
+            'argv': args,
+        }
+        return self._encode_magemin_timeout_diagnostic(payload)
+
+    def _magemin_timeout_diagnostic_detail_safely(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        composition_mol: Optional[Mapping[str, float]],
+        temperature_C: float,
+        pressure_bar: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> str:
+        try:
+            return self._magemin_timeout_diagnostic_detail(
+                bulk_projection=bulk_projection,
+                composition_mol=composition_mol,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        except Exception as exc:
+            try:
+                return self._encode_magemin_timeout_diagnostic({
+                    'diagnostic_capture_error': type(exc).__name__,
+                    'composition_mol': composition_mol or {},
+                    'composition_wt_pct': bulk_projection.composition_wt_pct,
+                    'projected_bulk_vector_wt_pct': bulk_projection.vector,
+                    'oxide_names': bulk_projection.order,
+                    'temperature_C': temperature_C,
+                    'pressure_bar': pressure_bar,
+                    'pressure_kbar': pressure_kbar,
+                    'fO2_log': fO2_log,
+                    'buffer': None,
+                    'buffer_n': None,
+                    'database': self._database,
+                    'argv': [],
+                    'argv_truncated': True,
+                })
+            except Exception:
+                return '{"diagnostic_capture_error":"capture_failed"}'
+
+    @staticmethod
+    def _encode_magemin_timeout_diagnostic(
+        payload: Dict[str, Any],
+    ) -> str:
+        """Encode one fixed-shape request record under the log-line cap."""
+
+        def text(value: Any, limit: int) -> tuple[str, bool]:
+            rendered = str(value)
+            if len(rendered) <= limit:
+                return rendered, False
+            return rendered[:limit - 14] + '...[truncated]', True
+
+        def value(raw: Any) -> tuple[Any, bool]:
+            if raw is None:
+                return None, False
+            try:
+                number = float(raw)
+            except (TypeError, ValueError):
+                return text(raw, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS)
+            return (number, False) if math.isfinite(number) else (str(number), False)
+
+        def entries(raw: Any) -> tuple[list[list[Any]], bool]:
+            if not isinstance(raw, Mapping):
+                return [], bool(raw)
+            ordered = sorted(raw.items(), key=lambda pair: str(pair[0]))
+            truncated = len(ordered) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            bounded = []
+            for name, raw_value in ordered[
+                :_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            ]:
+                safe_name, name_cut = text(
+                    name,
+                    _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS,
+                )
+                safe_value, value_cut = value(raw_value)
+                bounded.append([safe_name, safe_value])
+                truncated = truncated or name_cut or value_cut
+            return bounded, truncated
+
+        mol, mol_truncated = entries(payload.get('composition_mol') or {})
+        wt_pct, wt_pct_truncated = entries(
+            payload.get('composition_wt_pct') or {}
+        )
+        vectors = payload.get('projected_bulk_vector_wt_pct', ())
+        vectors = vectors if isinstance(vectors, (list, tuple)) else ()
+        vector_truncated = len(vectors) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+        vector = [
+            value(item)[0]
+            for item in vectors[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        names = payload.get('oxide_names', ())
+        names = names if isinstance(names, (list, tuple)) else ()
+        argv = payload.get('argv', ())
+        argv = argv if isinstance(argv, (list, tuple)) else ()
+        oxide_names = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS)[0]
+            for item in names[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        argv_out = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS)[0]
+            for item in argv[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        database, database_cut = text(
+            payload.get('database', ''),
+            _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS,
+        )
+        buffer = payload.get('buffer')
+        if buffer is not None:
+            buffer = text(buffer, 48)[0]
+
+        # The fixed entry and string caps keep this record below 8 KiB even
+        # when a configured path, database name, or input mapping is huge.
+        record = {
+            'composition_mol': mol,
+            'composition_mol_truncated': mol_truncated,
+            'composition_wt_pct': dict(wt_pct),
+            'composition_wt_pct_truncated': wt_pct_truncated,
+            'projected_bulk_vector_wt_pct': vector,
+            'projected_bulk_vector_truncated': vector_truncated,
+            'oxide_names': oxide_names,
+            'temperature_C': value(payload.get('temperature_C'))[0],
+            'pressure_bar': value(payload.get('pressure_bar'))[0],
+            'pressure_kbar': value(payload.get('pressure_kbar'))[0],
+            'fO2_log': value(payload.get('fO2_log'))[0],
+            'buffer': buffer,
+            'buffer_n': value(payload.get('buffer_n'))[0],
+            'database': database,
+            'database_truncated': database_cut,
+            'argv': argv_out,
+            'argv_truncated': (
+                len(argv) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+                or bool(payload.get('argv_truncated'))
+                or database_cut
+                or any(
+                    len(str(item)) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS
+                    for item in argv
+                )
+            ),
+        }
+        if payload.get('diagnostic_capture_error'):
+            record['diagnostic_capture_error'] = str(
+                payload['diagnostic_capture_error']
+            )[:64]
+        detail = json.dumps(
+            record,
+            ensure_ascii=True,
+            allow_nan=False,
+            separators=(',', ':'),
+            sort_keys=True,
+        )
+        if len(detail) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
+            raise ValueError('bounded MAGEMin timeout record exceeded its cap')
+        return detail
+
+    @staticmethod
+    def _attach_magemin_timeout_diagnostic(
+        timeout: EngineWorkerTimeout,
+        detail: str,
+    ) -> EngineWorkerTimeout:
+        timeout.diagnostic_detail = detail
+        timeout.args = (f'{timeout}; MAGEMin request: {detail}',)
+        return timeout
+
     def _call_magemin(
         self,
         bulk_projection: _MAGEMinBulkProjection,
@@ -2101,6 +2315,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        composition_mol: Optional[Mapping[str, float]] = None,
     ) -> Any:
         """
         Invoke MAGEMin via whichever bridge ``initialize`` selected.
@@ -2249,18 +2464,78 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 )
+                startup_timeout_s = float(self._config.get(
+                    'worker_startup_timeout_s', 30.0
+                ))
+                future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
+                    timeout_s,
+                    startup_timeout_s,
+                )
+                if call_timeout_s is not None:
+                    future_timeout_s = min(
+                        future_timeout_s,
+                        float(call_timeout_s),
+                    )
                 try:
                     future = self._subprocess_pool.submit({
                         'bulk_projection': bulk_projection,
                         'temperature_C': temperature_C,
                         'pressure_kbar': pressure_kbar,
                         'fO2_log': fO2_log,
-                        # Let the pool's typed hard wall fire first. The inner
-                        # subprocess timeout is only a secondary containment
-                        # wall for platforms without process-group cleanup.
+                        # The pool's job wall starts after worker startup;
+                        # Future.result below also bounds queue/startup waits.
+                        # This subprocess wall is secondary containment for
+                        # platforms without process-group cleanup.
                         'call_timeout_s': timeout_s + 0.5,
                     }, timeout_s=timeout_s)
-                    return future.result()
+                    try:
+                        return future.result(timeout=future_timeout_s)
+                    except EngineWorkerTimeout as timeout:
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
+                            )
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=diagnostic_detail,
+                        )
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
+                        )
+                        raise
+                    except FutureTimeoutError as exc:
+                        future.cancel()
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
+                            )
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=diagnostic_detail,
+                        )
+                        timeout = EngineWorkerTimeout(
+                            'MAGEMin subprocess pool',
+                            future_timeout_s,
+                            phase='job',
+                        )
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
+                        )
+                        raise timeout from exc
                 except EngineWorkerTimeout:
                     raise
                 except (
@@ -2373,6 +2648,37 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         warnings_out = tuple(raw.get('buffer_warnings') or ())
         return {**raw, 'buffer_warnings': (message, *warnings_out)}
 
+    def _build_magemin_subprocess_args(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        temperature_C: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
+        """Build the canonical MAGEMin argv and resolved buffer values."""
+        if self._binary_path is None:
+            raise RuntimeError('MAGEMin subprocess bridge has no binary path')
+        binary_path = self._binary_path.resolve()
+        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=fO2_log,
+        )
+        args = [
+            str(binary_path),
+            '--Verb=0',
+            f'--db={self._database}',
+            f'--Temp={temperature_C:.6f}',
+            f'--Pres={pressure_kbar:.6f}',
+            '--sys_in=wt',
+            '--Bulk=' + ','.join(
+                f'{value:.6f}' for value in bulk_projection.vector
+            ),
+            f'--buffer={buffer_name}',
+            f'--buffer_n={buffer_n:.6f}',
+        ]
+        return args, buffer_name, buffer_n, tuple(buffer_warnings)
+
     def _call_magemin_subprocess(
         self,
         *,
@@ -2404,14 +2710,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
         """
-        if self._binary_path is None:
-            raise RuntimeError('MAGEMin subprocess bridge has no binary path')
-
-        binary_path = self._binary_path.resolve()
-
-        bulk = bulk_projection.vector
-        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
-            temperature_C=temperature_C, fO2_log=fO2_log,
+        args, buffer_name, buffer_n, buffer_warnings = (
+            self._build_magemin_subprocess_args(
+                bulk_projection=bulk_projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
         )
         solved_fO2_log: Optional[float]
         if buffer_name == 'qfm':
@@ -2442,18 +2747,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status': 'out_of_domain',
                 'backend_status_reason': 'clamped_operating_point',
             })
-
-        args = [
-            str(binary_path),
-            '--Verb=0',
-            f'--db={self._database}',
-            f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar:.6f}',
-            '--sys_in=wt',
-            '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk),
-            f'--buffer={buffer_name}',
-            f'--buffer_n={buffer_n:.6f}',
-        ]
 
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:

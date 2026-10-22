@@ -6,15 +6,14 @@ import pytest
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
 from simulator.battery.records import Bench, BenchIdentity, Composition, Located, Sample, State, Value
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, oxygen_condition, pressure_boundary, thermal_path
 from tests.battery import factories
 
 
 def test_sossi_2020_table_s4_oxygen_values_migrate_to_all_observation_waypoints():
     extract = Path(__file__).resolve().parents[2] / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
-    migrator = Migrator()
-    migrator._migrate_extract(extract)
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
     migrator.finalize()
     result = migrator.result
 

@@ -231,6 +231,10 @@ def wall_deposit_candidate_for_surface_kg(
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     surface_area_m2 = _deposition_finite_scalar("surface_area_m2", surface_area_m2)
+    if surface_area_m2 < 0.0:
+        raise DepositionInputRefusal(
+            "surface_area_m2", surface_area_m2, "must be non-negative"
+        )
     if rate_kg_hr <= 0.0 or surface_area_m2 <= 0.0:
         return 0.0
 

@@ -113,6 +113,7 @@ def _deterministic_liquidus_gate(monkeypatch, tmp_path):
 # here) and no float drift between runs. The decision-gate state machine is
 # backend-independent, so internal-analytical is correct and fast here.
 START_PARAMS = {
+    'payload_version': 4,
     'feedstock': 'lunar_mare_low_ti',
     'mass_kg': 1000,
     'backend': 'internal-analytical',
@@ -263,7 +264,7 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
                 decisions.append(d['type'])
                 if perturb_each_gate:
                     client.emit('pause_simulation')
-                    client.emit('resume_simulation')
+                    client.emit('resume_simulation', {'payload_version': 4})
                     _wait_loop_settled(sid)
                 client.emit('make_decision', {'choice': d['recommendation']})
             elif msg['name'] == 'simulation_complete':
@@ -291,10 +292,10 @@ def test_resume_while_parked_at_decision_does_not_re_emit(client):
     # Hammer the pacing controls -- repeated resume is the exact gesture the
     # discarded bug re-emitted on. Correct code must NOT restart the loop.
     client.emit('pause_simulation')
-    client.emit('resume_simulation')
-    client.emit('resume_simulation')
+    client.emit('resume_simulation', {'payload_version': 4})
+    client.emit('resume_simulation', {'payload_version': 4})
     client.emit('pause_simulation')
-    client.emit('resume_simulation')
+    client.emit('resume_simulation', {'payload_version': 4})
     # Deterministic sync: wait until the loop is provably dead again. In correct
     # code resume never restarts it (returns at once); a re-coupled resume spawns
     # a live thread we wait out, whose stray decision_required the drain catches.

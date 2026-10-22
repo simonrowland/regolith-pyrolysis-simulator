@@ -74,7 +74,7 @@ def normalize_uncertainty(value):
         return {"status": "missing", "source_value": value}
     if not any(finite(v) or isinstance(v, (list, dict)) and bool(v) for v in value.values()):
         return {"status": "missing", "source_value": value}
-    return {"status": "reported", **value}
+    return {**value, "status": "reported"}
 
 
 def envelope(*, dataset_id, observation_id, species, observable, units,

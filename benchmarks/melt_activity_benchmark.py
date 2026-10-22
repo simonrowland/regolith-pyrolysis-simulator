@@ -210,9 +210,9 @@ def _wt_to_mol(values: Mapping[str, Any]) -> dict[str, float]:
 
 
 def _oxide_mole_fractions(values: Mapping[str, Any]) -> dict[str, float]:
-    mol = _wt_to_mol(values)
-    total = sum(mol.values())
-    return {key: value / total for key, value in mol.items()} if total else {}
+    from simulator.accounting.formulas import project_oxide_composition
+
+    return project_oxide_composition(_positive_finite(values), source_basis="wt_pct")
 
 
 def _oxide_cations_per_formula(parent_oxide: str) -> float:

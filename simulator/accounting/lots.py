@@ -24,6 +24,30 @@ POOL_WITHDRAWAL_RELATIVE_TOLERANCE = 5.0e-14
 POOL_WITHDRAWAL_FLOAT_EPS = 1.0e-18
 
 
+def _species_moles_from_kg(
+    species: str,
+    kg: float,
+    registry: Mapping[str, Any] | None,
+    *,
+    amount_basis: Any = None,
+    retained_moles: Mapping[str, Any] | None = None,
+) -> float:
+    formula = resolve_species_formula(species, registry)
+    if (
+        amount_basis == "mol"
+        and isinstance(retained_moles, Mapping)
+        and species in retained_moles
+    ):
+        amount = float(retained_moles[species])
+        if not math.isfinite(amount) or amount < 0.0:
+            raise AccountingError(
+                f"mol-basis amount for species {species!r} must be "
+                "finite and non-negative"
+            )
+        return amount
+    return kg / formula.molar_mass_kg_per_mol()
+
+
 def allocate_pool_withdrawal(
     balances: Mapping[str, float],
     withdrawal: float,
@@ -356,8 +380,13 @@ class MaterialLot:
     def species_moles_for(self, registry: Mapping[str, Any] | None = None) -> dict[str, float]:
         moles: dict[str, float] = {}
         for species, kg in self.species_kg.items():
-            formula = resolve_species_formula(species, registry)
-            moles[species] = kg / formula.molar_mass_kg_per_mol()
+            moles[species] = _species_moles_from_kg(
+                species,
+                kg,
+                registry,
+                amount_basis=self.meta.get("amount_basis"),
+                retained_moles=self.meta.get("species_mol"),
+            )
         return moles
 
     def atom_moles_for(self, registry: Mapping[str, Any] | None = None) -> dict[str, float]:

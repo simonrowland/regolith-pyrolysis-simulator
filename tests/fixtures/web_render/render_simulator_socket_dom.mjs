@@ -80,7 +80,28 @@ const context = {
   io() {
     return socket;
   },
+  fetch: async (url, options) => {
+    if (url !== '/api/simulation-history' || !input.simulation_history_response) {
+      return { ok: false, status: 404 };
+    }
+    context.fetchCalls.push({ url, options });
+    if (input.defer_simulation_history_response) {
+      return new Promise(resolve => {
+        context.resolveSimulationHistoryFetch = () => resolve({
+          ok: true,
+          status: 200,
+          json: async () => input.simulation_history_response,
+        });
+      });
+    }
+    return {
+      ok: true,
+      status: 200,
+      json: async () => input.simulation_history_response,
+    };
+  },
   window: {},
+  fetchCalls: [],
 };
 
 vm.createContext(context);
@@ -95,6 +116,24 @@ function emitEvent(event, payload) {
 }
 
 emitEvent('connect');
+for (const tick of input.simulation_ticks || []) {
+  emitEvent('simulation_tick', tick);
+}
+const statusAfterSimulationTicks = findById(body, 'status-text').textContent;
+const simulationPerHourSummaryHistoryBeforeFetch = [
+  ...(context.window.simulationPerHourSummaryHistory || []),
+];
+const latestPerHourSummaryBeforeFetch = context.window.latestPerHourSummary || null;
+if (input.simulation_history_response) {
+  emitEvent('simulation_complete', {});
+  if (input.simulation_tick_during_history_fetch) {
+    emitEvent('simulation_tick', input.simulation_tick_during_history_fetch);
+  }
+  if (context.resolveSimulationHistoryFetch) {
+    context.resolveSimulationHistoryFetch();
+  }
+  await new Promise(resolve => setTimeout(resolve, 0));
+}
 const start = findById(body, 'btn-start');
 const pause = findById(body, 'btn-pause');
 const resume = findById(body, 'btn-resume');
@@ -134,4 +173,14 @@ const afterReconnect = {
   decisionModalPresent: Boolean(findById(body, 'decision-modal')),
 };
 
-console.log(JSON.stringify({ afterDisconnect, afterReconnect, decisionModalStyles }));
+console.log(JSON.stringify({
+  afterDisconnect,
+  afterReconnect,
+  decisionModalStyles,
+  statusAfterSimulationTicks,
+  statusText: findById(body, 'status-text').textContent,
+  simulationPerHourSummaryHistoryBeforeFetch,
+  latestPerHourSummaryBeforeFetch,
+  simulationPerHourSummaryHistory: context.window.simulationPerHourSummaryHistory || [],
+  simulationHistoryFetches: context.fetchCalls,
+}));

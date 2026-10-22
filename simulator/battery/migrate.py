@@ -34,6 +34,7 @@ on ``Species.phase`` and queued; they are never stored as gas.
 
 from __future__ import annotations
 
+import ast
 import collections.abc
 import fnmatch
 import hashlib
@@ -1408,18 +1409,24 @@ def _standard_state_from_extract_text(
     species_formula: str,
     *,
     phase_raw: object = None,
+    primary: State[StandardState] | None = None,
 ) -> StandardState | None:
-    """Map only an explicit, single-convention extract standard state.
+    """Legacy prose override for an explicit, single-convention standard state.
 
-    Extracts predate the v2 ``StandardState`` record and store this field as
-    source prose.  The mapper accepts the closed Raoultian convention only
-    when that prose names one liquid or solid endmember.  ``phase_raw`` is the
+    Applies only when the primary mapper had no opinion (``primary is None``).
+    A primary ``State``, including UNKNOWN, is never replaced.  Extracts
+    predate the v2 ``StandardState`` record and store this field as source
+    prose.  The mapper accepts the closed Raoultian convention only when that
+    prose names one liquid or solid endmember.  ``phase_raw`` is the
     measurement phase (the alloy or melt).  It is not a printed standard-state
     phase and never supplies the endmember.  Vapor-pressure ratios, mixed
     Raoultian/Henrian claims, and rows that name more than one endmember stay
-    unresolved.
+    unresolved.  Reference pressure is a printed bar number, never a default
+    of 1 bar.
     """
 
+    if primary is not None:
+        return None
     if not isinstance(raw, str):
         return None
     text = " ".join(raw.split())
@@ -1465,9 +1472,7 @@ def _standard_state_from_extract_text(
         convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
         endmember=make_species(endmember, phase),
         component_basis=endmember,
-        # Required Decimal. Same default as _standard_state_from_plain when
-        # the payload omits a pressure. The activity prose does not print it.
-        reference_pressure_bar=Decimal("1"),
+        reference_pressure_bar=_printed_reference_pressure_bar(lowered),
     )
 
 
@@ -4858,15 +4863,50 @@ def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
     if not form or not values.get("coefficients"):
         return False
     output = form.split("=", 1)[0].strip()
-    function = re.fullmatch(r"([A-Za-z_]\w*)\s*\((.*)\)", output)
-    if function and function.group(1).lower() not in {"ln", "log", "log10"}:
-        output = function.group(1)
-    if "=" in form and not re.search(r"\bP(?:_|\b)|pressure", output, re.I):
+    try:
+        expression = ast.parse(output, mode="eval").body
+    except SyntaxError:
         return False
-    return bool(re.search(r"\bP_(?:bar|mmHg|Pa|atm|Torr)\b", output, re.I)) or (
-        bool(re.search(r"\bP\b|pressure", output, re.I))
-        and str(units or "").lower() in {"bar", "mmhg", "pa", "atm", "torr"}
-    )
+
+    pressure_units = {"bar", "mmhg", "pa", "atm", "torr"}
+
+    def is_pressure_name(name: str) -> bool:
+        name = name.casefold()
+        return name in {"p_bar", "p_mmhg", "p_pa", "p_atm", "p_torr"} or (
+            (name == "p" or "pressure" in name)
+            and str(units or "").lower() in pressure_units
+        )
+
+    pending = [expression]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, ast.Subscript):
+            continue
+        if isinstance(node, ast.Call):
+            function = (
+                node.func.id
+                if isinstance(node.func, ast.Name)
+                else node.func.attr
+                if isinstance(node.func, ast.Attribute)
+                else ""
+            )
+            normalized_function = function.casefold()
+            if normalized_function in {"psat", "p_sat"} or is_pressure_name(function):
+                return True
+            if normalized_function in {"ln", "log", "log10"}:
+                pending.extend(node.args)
+            continue
+        if isinstance(node, ast.Name):
+            if is_pressure_name(node.id):
+                return True
+            continue
+        if isinstance(node, ast.Attribute):
+            if is_pressure_name(node.attr):
+                return True
+            pending.append(node.value)
+            continue
+        pending.extend(ast.iter_child_nodes(node))
+    return False
 
 
 def _quantity_contradiction(
@@ -8092,6 +8132,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
+    Quantity.ISOTOPE_DELTA: ("isotope_delta_isotope_delta",),
     Quantity.RESIDUE_COMPONENT_COMPOSITION: (
         "residue_ppm",
         "SiO2_wt_pct",
@@ -14119,6 +14160,7 @@ class Migrator:
                 obs.get("standard_state"),
                 species.formula,
                 phase_raw=phase_raw,
+                primary=source_reference_state,
             )
             if reference_state is not None:
                 ident_kwargs["reference_state"] = State.of(reference_state)

@@ -3,7 +3,8 @@
 from decimal import Decimal
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT, Migrator, select_declared_source
+from simulator.battery.migrate import REPO_ROOT, select_declared_source
+from tests.battery.factories import migrate_one_extract
 
 
 def test_specific_gas_yield_numeric_value_uses_each_printed_species() -> None:
@@ -17,8 +18,8 @@ def test_specific_gas_yield_numeric_value_uses_each_printed_species() -> None:
         ("COS", "10.9", "0.0001814549692025969702014316631"),
         ("H2O", "2890.0", "0.1604218706633361087982237025"),
     ]
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(
+    migrator = migrate_one_extract(
+        REPO_ROOT,
         REPO_ROOT / "data/literature/extracts/murchison-degassing-2023-springer.yaml"
     )
     rows = [
@@ -44,8 +45,8 @@ def test_specific_gas_yield_numeric_value_uses_each_printed_species() -> None:
 
 
 def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() -> None:
-    migrator = Migrator(REPO_ROOT)
-    migrator._migrate_extract(
+    migrator = migrate_one_extract(
+        REPO_ROOT,
         REPO_ROOT / "data/literature/extracts/murchison-degassing-2023-springer.yaml"
     )
 

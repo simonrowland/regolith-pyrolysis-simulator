@@ -88,7 +88,10 @@ from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
-from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.environment import (
+    DEFAULT_VACUUM_FLOOR_BAR,
+    vacuum_floor_bar_for_environment,
+)
 from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.liquidus import (
@@ -98,7 +101,11 @@ from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
+    PA_PER_BAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -154,7 +161,7 @@ _MELT_MODEL_ID = 'MELTS-v1.0'
 
 def _h2_melt_envelope_diagnostics(temperature_C: float) -> dict[str, Any]:
     return melt_extrapolation_diagnostic(
-        float(temperature_C) + 273.15,
+        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         _MELT_MODEL_ID,
     )
 
@@ -1048,7 +1055,48 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
+        self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
+        self._vapor_transport_floor_bar = vacuum_floor_bar_for_environment()
+        self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
+
+    def _set_vapor_transport_pO2_bar(
+        self, value: object, *, floor_bar: object,
+    ) -> None:
+        from engines.builtin._common import (
+            resolve_request_vacuum_floor_bar,
+            resolve_transport_pO2_bar,
+        )
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={}, species_formula_registry={},
+            ),
+            temperature_C=0.0, pressure_bar=0.0, fO2_log=None,
+            control_inputs={'pO2_bar': float(value), 'vacuum_floor_bar': floor_bar},
+        )
+        try:
+            resolved_floor = resolve_request_vacuum_floor_bar(request)
+            resolved_pO2 = resolve_transport_pO2_bar(request)
+        except ValueError as exc:
+            raise ValueError(
+                'vapor_transport_pO2_bar must be finite and > 0 and at least '
+                f'the active environment floor; {exc}'
+            ) from exc
+        self._vapor_transport_pO2_bar = resolved_pO2
+        self._vapor_transport_floor_bar = resolved_floor
+
+    def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
+        self._set_vapor_transport_pO2_bar(config.get(
+            'vapor_transport_pO2_bar', DEFAULT_VACUUM_FLOOR_BAR,
+        ), floor_bar=config.get(
+            'vapor_transport_floor_bar', vacuum_floor_bar_for_environment(),
+        ))
+        self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
+        self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
 
     def initialize(self, config: dict) -> bool:
         """
@@ -1092,20 +1140,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
-        self._vapor_transport_pO2_bar = float(
-            config.get(
-                'vapor_transport_pO2_bar',
-                DEFAULT_VACUUM_FLOOR_BAR,
-            )
-        )
-        if (
-            not math.isfinite(self._vapor_transport_pO2_bar)
-            or self._vapor_transport_pO2_bar < DEFAULT_VACUUM_FLOOR_BAR
-        ):
-            raise ValueError(
-                'vapor_transport_pO2_bar must be finite and at least the '
-                f'transport model floor {DEFAULT_VACUUM_FLOOR_BAR:g} bar'
-            )
+        self._initialize_vapor_transport(config)
         require_petthermotools = bool(
             config.get('require_petthermotools')
             or requested_mode == 'python_api'
@@ -1444,12 +1479,25 @@ class _MELTSBackendSupport(MeltBackend):
                     species_formula_registry: Optional[Mapping[str, object]] = None,
                     redox_mode: Optional[str] = None,
                     subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None = None,
+                    vapor_transport_pO2_bar: Optional[float] = None,
+                    vapor_transport_floor_bar: Optional[float] = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
 
         Routes to the configured alphaMELTS transport.
+        ``vapor_transport_pO2_bar`` overrides the configured gas environment
+        for this call only; it does not change the intrinsic melt fO2.
+        ``vapor_transport_floor_bar`` carries the environment owner's floor.
         """
+        self._set_vapor_transport_pO2_bar(
+            self._configured_vapor_transport_pO2_bar
+            if vapor_transport_pO2_bar is None else vapor_transport_pO2_bar,
+            floor_bar=(
+                self._configured_vapor_transport_floor_bar
+                if vapor_transport_floor_bar is None else vapor_transport_floor_bar
+            ),
+        )
         if redox_mode not in (None, REDOX_MODE_NOT_AN_INPUT):
             raise ValueError(f'unsupported redox_mode={redox_mode!r}')
         if redox_mode == REDOX_MODE_NOT_AN_INPUT and fO2_log is not None:
@@ -1825,7 +1873,9 @@ class _MELTSBackendSupport(MeltBackend):
             return LiquidusSolidusResult(
                 liquidus_T_C=liquidus_C,
                 liquidus_T_K=(
-                    liquidus_C + 273.15 if liquidus_C is not None else None
+                    liquidus_C + CELSIUS_TO_KELVIN_OFFSET
+                    if liquidus_C is not None
+                    else None
                 ),
                 liquid_fraction=result.liquid_fraction,
                 status=result.status,
@@ -5109,7 +5159,7 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if not mu or not mu0:
             return {}
-        T_K = float(temperature_C) + 273.15
+        T_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         raw_activities: Dict[str, float] = {}
         for species, mu_i in mu.items():
             if species not in mu0:
@@ -5349,11 +5399,10 @@ class _MELTSBackendSupport(MeltBackend):
             fO2_log=gas_fO2_log,
             control_inputs={
                 # The alphaMELTS fO2 is the melt-redox constraint. This
-                # diagnostic has no live headspace ledger, so overhead-
-                # transport pO2 comes from its independent environment
-                # setpoint: the unknown-body model floor until CF-1b supplies
-                # body-aware floors. It must not be derived from melt fO2.
+                # Transport pO2 and its floor come from the live environment
+                # or configured diagnostic fallback, independently of melt fO2.
                 'pO2_bar': self._vapor_transport_pO2_bar,
+                'vacuum_floor_bar': self._vapor_transport_floor_bar,
                 'intrinsic_fO2_log': gas_fO2_log,
             },
         )
@@ -5386,7 +5435,7 @@ class _MELTSBackendSupport(MeltBackend):
         try:
             commanded_pO2_bar = 10.0 ** float(gas_fO2_log)
             oxygen_atom_p_bar = _oxygen_atom_partial_pressure_bar(
-                eq.temperature_C + 273.15,
+                eq.temperature_C + CELSIUS_TO_KELVIN_OFFSET,
                 commanded_pO2_bar,
                 extract_path=(
                     Path(__file__).resolve().parents[2]
@@ -5404,8 +5453,8 @@ class _MELTSBackendSupport(MeltBackend):
         # With ideal gases fO2 = pO2. For O2 ⇌ 2O, CEA gives
         # ΔG° = 2G°(O) − G°(O2), Kp = exp(−ΔG°/RT), and
         # pO = P° sqrt(Kp * (pO2/P°)); both channels are returned in Pa.
-        pressures['O2'] = commanded_pO2_bar * 1.0e5
-        pressures['O'] = oxygen_atom_p_bar * 1.0e5
+        pressures['O2'] = commanded_pO2_bar * PA_PER_BAR
+        pressures['O'] = oxygen_atom_p_bar * PA_PER_BAR
         sources['O2'] = 'commanded_fO2_ideal_gas'
         sources['O'] = 'NASA_CEA_O2_dissociation_equilibrium'
         diagnostic['vapor_pressures_Pa'] = dict(pressures)
@@ -5436,13 +5485,9 @@ class _MELTSBackendSupport(MeltBackend):
         through any normalizer — a stray 1e5 here silently inflates the
         Hertz-Knudsen evaporation flux).
 
-        fO2 convention: the simulator's ``fO2_log`` is absolute
-        log10(fO2/bar) (``core.py::_compute_intrinsic_melt_fO2``), and
-        VapoRock's ``System.eval_gas_abundances(T_K, logfO2)`` consumes
-        the same absolute log10(fO2/bar).  No buffer/offset conversion is
-        applied — the alphaMELTS ``fO2_buffer``/``fO2_offset`` are a
-        SEPARATE config input to the MELTS silicate solve, not this
-        absolute quantity, and are deliberately NOT forwarded here.
+        VapoRock consumes absolute log10(fO2/bar) for the gas. Resolve it
+        through the shadow provider's existing transport-pO2 boundary;
+        ``fO2_log`` is the independent intrinsic melt-redox provenance.
 
         The melt fed to VapoRock is the composition alphaMELTS SOLVED
         (the equilibrium liquid), never the pre-equilibrium bulk. A zero
@@ -5500,6 +5545,28 @@ class _MELTSBackendSupport(MeltBackend):
                 'liquid_fraction > 0 but solved_melt_wt_pct is empty; '
                 'refusing bulk-composition vapor fallback'
             )
+
+        from engines.vaporock import VapoRockProvider
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        # Both potentials are log10(bar), but they describe different reservoirs.
+        # For P_i ∝ (fO2/bar)^(-1/2), using melt -12 instead of gas -6
+        # gives P_wrong/P_gas = 10^((-12 - (-6)) * -1/2) = 1000.
+        # The ratio is dimensionless and tends to 1 when the potentials agree.
+        fO2_log = VapoRockProvider._resolve_fO2_log(IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={}, species_formula_registry={},
+            ),
+            temperature_C=T_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            control_inputs={
+                'pO2_bar': self._vapor_transport_pO2_bar,
+                'vacuum_floor_bar': self._vapor_transport_floor_bar,
+            },
+        ))
 
         helper = self._vaporock_helper
         if helper is None or not helper.is_available():
@@ -5643,13 +5710,11 @@ class _MELTSBackendSupport(MeltBackend):
     ) -> Dict[str, str]:
         from engines.builtin.vapor_pressure import (
             FIT_TARGET_STANDARD_REACTION,
-            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
             vapor_pressure_source_label,
         )
 
         table = self._load_vapor_pressure_table()
         notices = getattr(self, "_antoine_floor_inversion_notices", {}) or {}
-        token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         labels: Dict[str, str] = {}
         for species in pressures:
             spec = table.get(str(species), {})
@@ -5659,8 +5724,11 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(spec, fit_target=FIT_TARGET_STANDARD_REACTION) if reaction_source else spec,
                 coefficient_block="compiled_reference_pressure_model" if reaction_source else None,
             )
-            if str(species) in notices and token not in str(label).split(":"):
-                label = f"{label}:{token}"
+            notice = notices.get(str(species))
+            if notice is not None:
+                token = notice["reason"]
+                if token not in str(label).split(":"):
+                    label = f"{label}:{token}"
             labels[str(species)] = label
         return labels
 
@@ -5786,9 +5854,11 @@ class _MELTSBackendSupport(MeltBackend):
             melt_dissociation_pO2_floor_inversion_notice,
             warn_pseudo_vapor_pressure_fallback,
         )
-        from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
+        from simulator.vapour_rail.channels import (
+            validate_physical_pO2_bar, _pO2_evaluation_notice,
+        )
 
-        T_K = float(T_C) + 273.15
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures: Dict[str, float] = {}
         self._antoine_floor_inversion_notices = {}
         for species, spec in table.items():
@@ -5808,7 +5878,7 @@ class _MELTSBackendSupport(MeltBackend):
                     f'{species} melt-source reaction without pO2_bar; '
                     'refusing activity-only vapor pressure'
                 )
-            pO2_value = float(pO2_bar) if pO2_bar is not None else 1.0
+            pO2_value = validate_physical_pO2_bar(pO2_bar) if pO2_bar is not None else 1.0
             if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
                 p_i = effective_equilibrium_pressure_Pa(
@@ -5831,12 +5901,12 @@ class _MELTSBackendSupport(MeltBackend):
             if p_i <= 0.0 or not math.isfinite(p_i):
                 continue
             pressures[str(species)] = p_i
-            notice = melt_dissociation_pO2_floor_inversion_notice(
+            notice = _pO2_evaluation_notice(pO2_value) or melt_dissociation_pO2_floor_inversion_notice(
                 species=str(species), pressure_Pa=p_i,
                 pO2_bar_used=pO2_value, pO2_exponent=pO2_exponent,
                 pressure_rail="liquid_oxide_standard_reaction",
-                fO2_log=math.log10(max(pO2_value, 1e-30)),
-                was_clamped=pO2_value < MELT_DISSOCIATION_PO2_MIN_BAR,
+                fO2_log=math.log10(pO2_value),
+                was_clamped=False,
             )
             if notice is not None:
                 self._antoine_floor_inversion_notices[str(species)] = notice

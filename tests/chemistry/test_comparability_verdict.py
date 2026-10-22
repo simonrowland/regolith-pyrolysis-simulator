@@ -105,14 +105,8 @@ def test_every_returned_verdict_is_in_the_closed_vocabulary():
         )
 
 
-def test_rail_verdict_separates_untyped_from_comparable():
-    """b-190's site: the boolean says True for BOTH; the verdict must not.
-
-    This is the defect in one assertion. `rail_system_class_comparability`
-    deliberately keeps returning True for an untyped observation (silent
-    exclusion would hide coverage drift), so the ONLY thing distinguishing
-    "verified comparable" from "never typed" is this verdict.
-    """
+def test_rail_verdict_preserves_unknown_class_as_undeterminable():
+    """Unknown class evidence stays distinct from both match and mismatch."""
 
     from simulator.diagnostic_helpers.extract_reproduction import (
         RAIL_COMPARABLE_SYSTEM_CLASSES,
