@@ -563,6 +563,14 @@ def _is_raw_element_label(formula: str) -> bool:
     return element != "O" and count == 1
 
 
+# Inverse of simulator.melt_backend.vaporock._GAS_NAMESPACE_SUFFIX.
+# The vapour adapter appends this exact suffix when a gas formula collides
+# with a melt oxide (SiO2(g) -> SiO2_gas). The scorer does not import the
+# vapour backend to read a four-character suffix. The emitter constant stays
+# in the adapter.
+_GAS_PHASE_SUFFIX = "_gas"
+
+
 def match_reported_species(
     formula: str,
     reported: Mapping[str, float],
@@ -574,6 +582,13 @@ def match_reported_species(
     ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
     map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
     ``Na`` when this flag is false.
+
+    Vapour rows also accept one explicit alias: a reported key that is exactly
+    the requested formula plus ``_gas``, and only when that stem's closed
+    formula equals the target. ``SiO2_gas`` matches ``SiO2``. ``SiO2gas``,
+    ``SiO2_gaseous``, and a stem that does not parse do not. An exact formula
+    hit in the first pass wins over the suffixed key. Oxide activity does
+    not use this alias.
     """
 
     target = parse_species_formula(formula)
@@ -588,6 +603,14 @@ def match_reported_species(
         if parsed == target:
             return str(name), float(value)
     if not oxide_activity:
+        suffix = _GAS_PHASE_SUFFIX
+        for name, value in reported.items():
+            text = str(name)
+            if len(text) <= len(suffix) or not text.endswith(suffix):
+                continue
+            stem = text[: -len(suffix)]
+            if parse_species_formula(stem) == target:
+                return text, float(value)
         return None
     from engines.alphamelts.domain import canonical_oxide_activity_map
 
