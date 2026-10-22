@@ -2004,6 +2004,36 @@ class CondensationRouteResult:
         return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
 
 
+def _stage0_cleanup_offgas_evidence(
+    species, status, reason, authority, campaign, vapor_pressure_data,
+):
+    """Existing P-cleanup authorization; it supplies no wall saturation law."""
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+        VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+    )
+    from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
+
+    evidence = authority.get('extra', {}).get('applicability_evidence', {})
+    expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
+    if (
+        reason == REFUSAL_INAPPLICABLE_PREDICATE
+        and status in {
+            VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+            VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+        }
+        and evidence.get('active') is True
+        and evidence.get('predicate') == 'stage0_only'
+        and expected_stage is not None
+        and evidence.get('stage') == expected_stage
+        and evidence.get('process_phase') == 'hot_train'
+        and 'P2O5' in evidence.get('parent_species_ids', ())
+        and not _species_is_flux_dormant(species, vapor_pressure_data=vapor_pressure_data)
+    ):
+        return copy.deepcopy(evidence)
+    return {}
+
+
 class CondensationModel:
     """
     Routes evaporated species through the condensation train.
@@ -2892,7 +2922,6 @@ class CondensationModel:
             vapour_carrier_authority_severity,
             vapour_carrier_authority_status,
         )
-        from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
@@ -2934,28 +2963,14 @@ class CondensationModel:
                 current_status,
                 vapor_pressure_data=self.vapor_pressure_data,
             )
-            extra = carrier_authority_by_species.get(species, {}).get('extra', {})
-            evidence = extra.get('applicability_evidence', {})
-            campaign = str(getattr(getattr(melt, 'campaign', None), 'name', ''))
-            expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
-            if (
-                reason == REFUSAL_INAPPLICABLE_PREDICATE
-                and current_status in {
-                    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
-                    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
-                }
-                and evidence.get('active') is True
-                and evidence.get('predicate') == 'stage0_only'
-                and expected_stage is not None
-                and evidence.get('stage') == expected_stage
-                and evidence.get('process_phase') == 'hot_train'
-                and 'P2O5' in evidence.get('parent_species_ids', ())
-                and not _species_is_flux_dormant(species, vapor_pressure_data=self.vapor_pressure_data)
-            ):
-                # The source predicate authorizes cleanup evaporation, while
-                # hot-train condensation remains inapplicable. Carry vapor
-                # through the declared offgas route; never promote a refusal.
-                cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
+            evidence = _stage0_cleanup_offgas_evidence(
+                species, current_status, reason,
+                carrier_authority_by_species.get(species, {}),
+                str(getattr(getattr(melt, 'campaign', None), 'name', '')),
+                self.vapor_pressure_data,
+            )
+            if evidence:
+                cleanup_offgas_authorization[species] = evidence
                 promoted, reason = current_status, None
             carrier_authority_status_by_species[species] = promoted
             if reason is not None:
