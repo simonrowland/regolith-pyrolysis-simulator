@@ -320,7 +320,7 @@ def test_rowdiff_duplicate_base_key_is_an_input_error(tmp_path: Path, capsys: py
 
 
 def test_rowdiff_duplicate_tip_key_is_an_input_error(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    """A repeated tip-only key names that key and line and writes nothing."""
+    """A repeated tip key names that key and line and marks earlier lines invalid."""
 
     base = tmp_path / "base.jsonl"
     tip = tmp_path / "tip.jsonl"
@@ -333,40 +333,23 @@ def test_rowdiff_duplicate_tip_key_is_an_input_error(tmp_path: Path, capsys: pyt
 
     assert raised.value.line == 4
     assert raised.value.key == "dup"
-    assert sink.getvalue() == ""
+    text = sink.getvalue()
+    assert "added_row\topenimcc\tok\t" in text
+    assert "rowdiff_invalid\t4\tdup" in text
+    assert "base_rows" not in text
     assert main(["rowdiff", str(base), str(tip)]) == 1
     captured = capsys.readouterr()
-    assert captured.out == ""
+    assert "rowdiff_invalid\t4\tdup" in captured.out
     assert "duplicate residual key dup" in captured.err
 
-    # The repeated key is in the first uniqueness chunk and again after it.
-    long_tip = tmp_path / "long-tip.jsonl"
-    with long_tip.open("w", encoding="utf-8") as handle:
-        handle.write('{"kind":"battery_store_stamp","revision":"dup"}\n')
-        handle.write(
-            '{"key":"dup","status":"match","rail":"melt_activity",'
-            '"candidate_request":{"engine":"openimcc"},'
-            '"numeric":{"operation":"dex","unit":"1","value":"1"}}\n'
-        )
-        for index in range(4998):
-            handle.write(
-                '{"key":"u'
-                f'{index}'
-                '","status":"match","rail":"melt_activity",'
-                '"candidate_request":{"engine":"openimcc"},'
-                '"numeric":{"operation":"dex","unit":"1","value":"1"}}\n'
-            )
-        handle.write(
-            '{"key":"dup","status":"match","rail":"melt_activity",'
-            '"candidate_request":{"engine":"openimcc"},'
-            '"numeric":{"operation":"dex","unit":"1","value":"1"}}\n'
-        )
-    long_sink = io.StringIO()
-    with pytest.raises(DuplicateResidualKey, match=r":5001: duplicate residual key dup$") as spanned:
-        rowdiff_report(base, long_tip, out=long_sink)
-    assert spanned.value.line == 5001
-    assert spanned.value.key == "dup"
-    assert long_sink.getvalue() == ""
+    _write_values(base, (("m", "1"),))
+    _write_values(tip, (("m", "1"), ("m", "2")))
+    seen = io.StringIO()
+    with pytest.raises(DuplicateResidualKey, match=r":3: duplicate residual key m$") as repeated:
+        rowdiff_report(base, tip, out=seen)
+    assert repeated.value.line == 3
+    assert repeated.value.key == "m"
+    assert seen.getvalue() == "rowdiff_invalid\t3\tm\n"
 
 
 def _write_ledger(path: Path, n: int, value: str) -> None:
@@ -389,7 +372,8 @@ def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
     That index is key to (status code, float). On this fixture it traces
     about 21 MB. The previous nine-field union of both sides traced
     28_871_392 bytes here and is over this cap, as is a full list of the
-    100_000 moves or a pair of RowView indexes. The band bound is unchanged.
+    100_000 moves or a pair of RowView indexes. Keys only in the tip are a
+    separate set; this fixture has none. The band bound is unchanged.
     """
 
     n = 100_000
@@ -422,43 +406,3 @@ def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
     assert band.stats[0].n == n
     assert band.stats[0].median == Decimal("0.2")
     assert band_peak < 20_000_000
-
-
-class _AddedCount:
-    """Count added-row lines without retaining them."""
-
-    def __init__(self) -> None:
-        self.added = 0
-
-    def write(self, text: str) -> int:
-        if text.startswith("added_row"):
-            self.added += 1
-        return len(text)
-
-
-@pytest.mark.nightly
-def test_rowdiff_empty_base_and_unique_tip_stay_compact(tmp_path: Path) -> None:
-    """An empty base and 100_000 unique tip keys are streamed, not stored.
-
-    This run traces about 0.80 MB (measured 803_300 bytes). A Python set of
-    those tip keys traces 13_384_300 bytes and is over this cap.
-    """
-
-    n = 100_000
-    base = tmp_path / "base.jsonl"
-    tip = tmp_path / "tip.jsonl"
-    base.write_text('{"kind":"battery_store_stamp","revision":"mem"}\n', encoding="utf-8")
-    _write_ledger(tip, n, "0.4")
-    sink = _AddedCount()
-
-    tracemalloc.start()
-    report = rowdiff_report(base, tip, show=5, out=sink)
-    _current, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-
-    assert report.base_rows == 0
-    assert report.tip_rows == n
-    assert report.value_move_count == 0
-    assert report.added == ()
-    assert sink.added == n
-    assert peak < 2_000_000
