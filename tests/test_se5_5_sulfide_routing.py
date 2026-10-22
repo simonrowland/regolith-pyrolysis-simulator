@@ -130,7 +130,14 @@ def test_se5_5_sulfide_stage0_never_leaks_into_cleaned_melt(
     ledger_matte = session.simulator.atom_ledger.kg_by_account(
         "terminal.stage0_sulfide_matte"
     )
-    if expect_matte:
+    if stage0_carrier == "FeS_troilite":
+        salt_feed = session.simulator.atom_ledger.kg_by_account(
+            "process.stage0_salt_feed"
+        )
+        assert inventory_matte.get(stage0_carrier, 0.0) > 0.0
+        assert salt_feed.get(stage0_carrier, 0.0) > 0.0
+        assert ledger_matte.get(stage0_carrier, 0.0) == pytest.approx(0.0, abs=1e-12)
+    elif expect_matte:
         assert inventory_matte.get(stage0_carrier, 0.0) > 0.0
         assert ledger_matte.get(stage0_carrier, 0.0) > 0.0
     else:

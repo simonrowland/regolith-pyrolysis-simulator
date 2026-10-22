@@ -791,6 +791,11 @@ FLOW_MASS_ACCOUNTS = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     SOLID_CHAR_CARBON_ACCOUNT,
     'process.raw_feedstock',
+    # Retained C0 subsolidus hosts and their solid oxide coproducts stay
+    # here through the bake. Paths that debit these accounts during seed
+    # leave them empty, so those snapshots are unchanged.
+    'process.stage0_salt_feed',
+    'process.stage0_foulant',
     'process.condensation_train',
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     WALL_DEPOSIT_ACCOUNT,
@@ -820,13 +825,7 @@ FLOW_MASS_ACCOUNTS = (
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_carbonate_feed',
     'process.stage0_perchlorate_feed',
-    'process.stage0_salt_feed',
     'process.stage0_volatile_feed',
-    # 2026-08-05 MC-4 wave 1B: Stage-0 foulant staging account (seeded from
-    # feedstock, debited by the kernel-committed volatilization transitions
-    # to terminal.offgas) -- same transient-staging exclusion as its
-    # stage0_*_feed siblings above.
-    'process.stage0_foulant',
 )
 BACKEND_REACTIVE_ACCOUNTS = (
     'process.cleaned_melt',
@@ -1258,6 +1257,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
         self._target_inventory_depletion_hour: int | str | None = None
+        self._stage0_bakeout_reserved_carbon_kg = 0.0
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
         self._non_feedstock_reagent_element_kg_by_account: Dict[
@@ -8564,6 +8564,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cation_sulfate_sulfide_kg,
             context=f'{label} Stage 0 sulfide matte products',
         )
+        from simulator.subsolidus_bakeout import (
+            BAKEOUT_SULFATE_HOSTS,
+            BAKEOUT_SULFIDE_HOSTS,
+            SALT_FEED_ACCOUNT,
+        )
+
+        # Exact hosts stay in the inventory denominator fields. Live moles
+        # move to the mutable salt account; the terminal load must not
+        # keep a second copy.
+        retained_bakeout_hosts_kg: Dict[str, float] = {}
+        for species in sorted(BAKEOUT_SULFIDE_HOSTS):
+            kg = float(terminal_sulfide_external.pop(species, 0.0) or 0.0)
+            if kg > 1e-12:
+                retained_bakeout_hosts_kg[species] = kg
+        for species in sorted(BAKEOUT_SULFATE_HOSTS):
+            kg = float(
+                self.inventory.cation_sulfate_feed_kg.get(species, 0.0) or 0.0
+            )
+            if kg > 1e-12:
+                retained_bakeout_hosts_kg[species] = (
+                    retained_bakeout_hosts_kg.get(species, 0.0) + kg
+                )
 
         self._load_ledger_account(
             'process.cleaned_melt',
@@ -8603,6 +8625,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'terminal.stage0_sulfide_matte',
             terminal_sulfide_external,
             source=f'{label} Stage 0 sulfide matte',
+        )
+        self._load_ledger_account(
+            SALT_FEED_ACCOUNT,
+            retained_bakeout_hosts_kg,
+            source=f'{label} subsolidus bakeout hosts',
         )
         self._load_ledger_account(
             'terminal.drain_tap_material',
@@ -10280,6 +10307,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
         additives_kg: Dict[str, float],
     ) -> None:
+        self._stage0_bakeout_reserved_carbon_kg = 0.0
         required_kg = max(0.0, float(
             self.inventory.carbon_reductant_required_kg))
         if required_kg <= 1e-12:
@@ -10428,6 +10456,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         })
         return carbon_mol_remaining - extent_mol
 
+    def _reserve_stage0_bakeout_sulfate_carbon(
+        self,
+        species: str,
+        extent_mol: float,
+        c_per_mol: float,
+        molar_c_kg: float,
+        carbon_mol_remaining: float,
+    ) -> tuple[bool, float]:
+        """Hold the carbon a Ca/Mg sulfate cleanup would have consumed.
+
+        The host stays in ``cation_sulfate_feed_kg`` and is seeded onto
+        ``process.stage0_salt_feed``. Decrementing the carbon counter keeps
+        FeSO4 and later reactions on the same remaining-carbon footing.
+        The reserved mass stays in the reagent reservoir; it is not emitted
+        as SO2, CO, oxide, or sulfide.
+        """
+        from simulator.subsolidus_bakeout import BAKEOUT_SULFATE_HOSTS
+
+        if species not in BAKEOUT_SULFATE_HOSTS:
+            return False, carbon_mol_remaining
+        carbon_mol = float(extent_mol) * float(c_per_mol)
+        self._stage0_bakeout_reserved_carbon_kg = (
+            float(getattr(self, '_stage0_bakeout_reserved_carbon_kg', 0.0))
+            + carbon_mol * float(molar_c_kg)
+        )
+        return True, carbon_mol_remaining - carbon_mol
+
     def _apply_stage0_cation_sulfate_carbon_reactions(
         self,
         feedstock: Mapping[str, Any],
@@ -10485,6 +10540,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
                 if extent_mol <= 1e-12:
                     continue
+                reserved, carbon_mol_remaining = (
+                    self._reserve_stage0_bakeout_sulfate_carbon(
+                        species,
+                        extent_mol,
+                        c_per_mol,
+                        molar['C'],
+                        carbon_mol_remaining,
+                    )
+                )
+                if reserved:
+                    continue
                 c_consumed_kg = extent_mol * c_per_mol * molar['C']
                 products_kg = {'CO': co_per_mol * extent_mol * molar['CO']}
                 sulfide_products_kg = {
@@ -10514,6 +10580,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 oxide_per_mol = stoich['oxide'] / feed_coeff
                 extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
                 if extent_mol <= 1e-12:
+                    continue
+                reserved, carbon_mol_remaining = (
+                    self._reserve_stage0_bakeout_sulfate_carbon(
+                        species,
+                        extent_mol,
+                        c_per_mol,
+                        molar['C'],
+                        carbon_mol_remaining,
+                    )
+                )
+                if reserved:
                     continue
                 c_consumed_kg = extent_mol * c_per_mol * molar['C']
                 products_kg = {

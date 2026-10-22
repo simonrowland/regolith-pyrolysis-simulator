@@ -378,30 +378,67 @@ def test_na2co3_below_nist_silicate_displacement_onset_stays_salt_phase():
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
 
 
-def test_caso4_carbothermal_routes_cation_to_melt_not_salt_bucket(
+def test_caso4_bakeout_host_is_retained_and_carbon_cleanup_does_not_credit_it(
     mars_caso4_feedstock,
 ):
+    """CaSO4 stays a mutable host. SO3 carbon cleanup still runs.
+
+    Carbon that the old CaSO4 + C cleanup would have taken is reserved, so
+    the SO3 reaction and the following Boudouard step see the same remaining
+    carbon. No CaO, SO2, or CO is credited from CaSO4.
+    """
     sim = _sim({"mars_caso4": mars_caso4_feedstock})
     mass_kg = 1000.0
     required_c = PyrolysisSimulator._carbon_reductant_required_kg(
         mars_caso4_feedstock, mass_kg)
     sim.load_batch("mars_caso4", mass_kg=mass_kg, additives_kg={"C": required_c})
 
-    caso4_kg = sim.inventory.raw_components_kg["CaSO4"]
     registry = sim.species_formula_registry
-    expected = _expected_caso4_carbon_cleanup(caso4_kg, registry)
+    caso4_kg = sim.inventory.raw_components_kg["CaSO4"]
+    so3_kg = sim.inventory.raw_components_kg["SO3"]
+    caso4_mol = caso4_kg / resolve_species_formula(
+        "CaSO4", registry).molar_mass_kg_per_mol()
+    so3_mol = so3_kg / resolve_species_formula(
+        "SO3", registry).molar_mass_kg_per_mol()
+    c_molar = resolve_species_formula("C", registry).molar_mass_kg_per_mol()
+    co_molar = resolve_species_formula("CO", registry).molar_mass_kg_per_mol()
+    so2_molar = resolve_species_formula("SO2", registry).molar_mass_kg_per_mol()
+    carbon_mol = required_c / c_molar
+    so3_extent = min(carbon_mol, so3_mol)
+    carbon_after_so3 = carbon_mol - so3_extent
+    caso4_reserved_mol = min(carbon_after_so3, caso4_mol)
+    boudouard_mol = carbon_after_so3 - caso4_reserved_mol
 
-    ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
-    assert ledger_offgas.get("SO2", 0.0) >= expected["SO2"] - 1e-9
-    assert ledger_offgas.get("CO", 0.0) >= expected["CO"] - 1e-9
+    salt_feed = sim.atom_ledger.kg_by_account("process.stage0_salt_feed")
+    assert salt_feed.get("CaSO4", 0.0) == pytest.approx(caso4_kg, rel=0, abs=1e-9)
+    assert sim.inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == pytest.approx(
+        caso4_kg, rel=0, abs=1e-9
+    )
+    assert sim.record.initial_inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == (
+        pytest.approx(caso4_kg, rel=0, abs=1e-9)
+    )
 
     ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     baseline_cao = mars_caso4_feedstock["composition_wt_pct"]["CaO"] / 100.0 * mass_kg
-    assert ledger_melt.get("CaO", 0.0) >= baseline_cao + expected["CaO"] - 1e-9
+    assert ledger_melt.get("CaO", 0.0) == pytest.approx(baseline_cao, rel=0, abs=1e-6)
+
+    ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
+    assert ledger_offgas.get("SO2", 0.0) == pytest.approx(
+        so3_extent * so2_molar, rel=0, abs=1e-6
+    )
+    assert ledger_offgas.get("CO", 0.0) == pytest.approx(
+        so3_extent * co_molar + 2.0 * boudouard_mol * co_molar,
+        rel=0,
+        abs=1e-6,
+    )
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(
+        caso4_reserved_mol * c_molar, rel=0, abs=1e-9
+    )
 
     assert "CaSO4" not in sim.inventory.salt_phase_kg
     salt_ledger = sim.atom_ledger.kg_by_account("terminal.stage0_salt_phase")
     assert "CaSO4" not in salt_ledger
+    assert ledger_offgas.get("CaSO4", 0.0) == pytest.approx(0.0, abs=1e-12)
 
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
@@ -468,9 +505,14 @@ def test_feso4_sulfide_carbothermal_route_balances_fes_and_four_co(
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
 
 
-def test_caso4_sulfide_carbothermal_routes_s_to_matte_and_four_co_per_sulfate(
+def test_caso4_sulfide_cleanup_is_replaced_by_a_retained_host(
     mars_caso4_sulfide_feedstock,
 ):
+    """The CaSO4 + 4C sulfide credit does not fire. The host stays mutable.
+
+    The carbon that reaction would have consumed is reserved and remains in
+    the reagent reservoir. FeSO4's sulfide branch is covered separately.
+    """
     mass_kg = 1000.0
     feedstock = dict(mars_caso4_sulfide_feedstock)
     feedstock["stage0_carbon_cleanup"] = dict(feedstock["stage0_carbon_cleanup"])
@@ -489,23 +531,22 @@ def test_caso4_sulfide_carbothermal_routes_s_to_matte_and_four_co_per_sulfate(
         "mars_caso4_sulfide", mass_kg=mass_kg, additives_kg={"C": exact_c_kg})
 
     caso4_kg = sim.inventory.raw_components_kg["CaSO4"]
-    expected = _expected_caso4_sulfide_carbon_cleanup(caso4_kg, registry)
+    salt_feed = sim.atom_ledger.kg_by_account("process.stage0_salt_feed")
+    assert salt_feed.get("CaSO4", 0.0) == pytest.approx(caso4_kg, rel=0, abs=1e-9)
+    assert sim.inventory.cation_sulfate_feed_kg.get("CaSO4", 0.0) == pytest.approx(
+        caso4_kg, rel=0, abs=1e-9
+    )
 
     ledger_matte = sim.atom_ledger.kg_by_account("terminal.stage0_sulfide_matte")
-    assert ledger_matte.get("CaS", 0.0) == pytest.approx(expected["CaS"], rel=0, abs=1e-9)
+    assert ledger_matte.get("CaS", 0.0) == pytest.approx(0.0, abs=1e-12)
+    assert ledger_matte.get("CaSO4", 0.0) == pytest.approx(0.0, abs=1e-12)
 
-    caso4_formula = resolve_species_formula("CaSO4", registry)
-    caso4_atoms = caso4_formula.atom_moles(expected["extent_mol"])
-    cas_formula = resolve_species_formula("CaS", registry)
-    cas_atoms = cas_formula.atom_moles(expected["extent_mol"])
-    assert cas_atoms.get("S", 0.0) == pytest.approx(caso4_atoms.get("S", 0.0), rel=0, abs=1e-12)
-
-    co_formula = resolve_species_formula("CO", registry)
-    co_molar = co_formula.molar_mass_kg_per_mol()
     ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
-    assert ledger_offgas.get("CO", 0.0) == pytest.approx(expected["CO"], rel=0, abs=1e-9)
-    assert ledger_offgas.get("CO", 0.0) / co_molar == pytest.approx(
-        4.0 * expected["extent_mol"], rel=0, abs=1e-9
+    assert ledger_offgas.get("CO", 0.0) == pytest.approx(0.0, abs=1e-12)
+    reagent_c = sim.atom_ledger.kg_by_account("reservoir.reagent.C")
+    assert reagent_c.get("C", 0.0) == pytest.approx(exact_c_kg, rel=0, abs=1e-9)
+    assert sim._stage0_bakeout_reserved_carbon_kg == pytest.approx(
+        exact_c_kg, rel=0, abs=1e-9
     )
 
     assert "CaSO4" not in sim.inventory.salt_phase_kg
