@@ -276,7 +276,7 @@ def continuous_sweep_balance(
     turnover = total_dose / target
     replaced = -math.expm1(-turnover)
     survival = math.exp(-turnover)
-    species = initial.keys() | generated.keys() | {carrier}
+    species = sorted(initial.keys() | generated.keys() | {carrier})
     final = {
         s: prepared.get(s, 0.0) * survival
         + (target * (dose.get(s, 0.0) / total_dose) * replaced if total_dose else 0.0)
@@ -472,7 +472,7 @@ def sweep_boundary_partials_bar(species_mol: Mapping[str, float], *, pressure_ba
             p_inert_initial_bar=sum(p for s, p in partials.items() if s not in {'CO2', 'O2'}),
         )
         inert_before = sum(p for s, p in partials.items() if s not in {'CO2', 'O2'})
-        for s in partials.keys() - {'CO2', 'O2'}:
+        for s in sorted(partials.keys() - {'CO2', 'O2'}):
             partials[s] = partials[s] / inert_before * result['p_inert_bar'] if inert_before else 0.0
         partials.update({s: result[f'p_{s}_bar'] for s in ('CO2', 'CO', 'O2')})
         notices = result['notices']
