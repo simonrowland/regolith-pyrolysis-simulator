@@ -31,6 +31,7 @@ def equilibrate_via_subprocess(
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any],
     run_mode: AlphaMELTSSubprocessRunMode | str,
+    backend_kwargs: Mapping[str, Any] | None = None,
 ) -> Any:
     """Run AlphaMELTS via the binary subprocess path.
 
@@ -57,6 +58,7 @@ def equilibrate_via_subprocess(
         composition_mol_by_account=composition_mol_by_account,
         species_formula_registry=species_formula_registry,
         subprocess_run_mode=run_mode,
+        **(backend_kwargs or {}),
     )
 
 
