@@ -81,6 +81,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.source_oxygen import (
+    CO_MEASURED_CONSISTENCY_ORIGIN,
     SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
@@ -7588,6 +7589,31 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
+def _printed_fo2_names_observation(reference: Observation) -> bool:
+    """The printed fO2 derivation lists this observation. A number does not.
+
+    identity.fO2_Pa is a State and has no inputs. The name is the Located
+    inference on fO2_Pa or oxygen_partial_pressure_Pa. Inputs that do not
+    list this observation_id are not a name, including a unit conversion.
+    """
+    point = oxygen_pressure_point(reference)
+    if point is None or point.inference is None:
+        return False
+    return reference.observation_id in point.inference.inputs
+
+
+def _is_selected_condition_observation(
+    reference: Observation, oxygen: SourceOxygenCondition
+) -> bool:
+    """Identity with the selected condition: an input, or the condition itself."""
+    if reference.observation_id == oxygen.observation.observation_id:
+        return True
+    if reference.observation_id in oxygen.used_observations:
+        return True
+    derivation = oxygen.observation.derivation
+    return derivation is not None and reference.observation_id in derivation.inputs
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -7878,41 +7904,68 @@ def compile_residual(
         if (
             predictor is predict_with_engine
             and _knudsen_vapour_equilibrium(quantity, experiment)
-            and not _has_printed_fo2(reference, reference.identity)
         ):
+            # Identity, whether fO2 is printed or supplied by the selector.
+            # A printed command is not overwritten. A row is a condition
+            # input when its observation_id is in the selected derivation,
+            # when it is the condition observation, or when the printed
+            # fO2 derivation names it. A matching pressure is not that name.
             recorded = _bench_for_score(experiment, context.benches)
             oxygen = resolve_source_oxygen(
                 reference,
                 point_observations if point_observations is not None else context.observations.values(),
                 recorded,
             )
-            if isinstance(oxygen, SourceOxygenCondition):
-                if reference.observation_id in oxygen.used_observations:
-                    return _refused(
-                        RefusalReason.UNSUPPORTED,
-                        {
-                            "reason": "used_as_scoring_condition",
-                            "derivation": to_plain(oxygen.observation.derivation),
-                            "derived_from": list(oxygen.observation.derived_from or ()),
-                        },
-                        execution=Execution(state=ExecutionState.NOT_PROBED),
-                    )
-                reference = replace(
-                    reference,
-                    point_conditions={
-                        **(reference.point_conditions or {}),
-                        "fO2_Pa": Located(
-                            State.of(oxygen.observation.value),
-                            locator=oxygen.observation.locator,
-                            inference=oxygen.observation.derivation,
-                        ),
+            printed_fo2 = _has_printed_fo2(reference, reference.identity)
+            if (
+                isinstance(oxygen, SourceOxygenCondition)
+                and _is_selected_condition_observation(reference, oxygen)
+            ):
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "used_as_scoring_condition",
+                        "derivation": to_plain(oxygen.observation.derivation),
+                        "derived_from": list(oxygen.observation.derived_from or ()),
                     },
-                    provenance={
-                        **(reference.provenance or {}),
-                        "source_oxygen_condition": to_plain(oxygen.observation),
-                    },
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
-            else:
+            if _printed_fo2_names_observation(reference):
+                detail: dict[str, object] = {
+                    "reason": "used_as_scoring_condition",
+                    "match": "printed_fo2_names_observation",
+                }
+                if isinstance(oxygen, SourceOxygenCondition):
+                    detail["derivation"] = to_plain(oxygen.observation.derivation)
+                    detail["derived_from"] = list(oxygen.observation.derived_from or ())
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    detail,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            if isinstance(oxygen, SourceOxygenCondition):
+                consistency = tuple(
+                    notice for notice in oxygen.observation.notices
+                    if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
+                )
+                notices = union_notices(notices, consistency)
+                if not printed_fo2:
+                    reference = replace(
+                        reference,
+                        point_conditions={
+                            **(reference.point_conditions or {}),
+                            "fO2_Pa": Located(
+                                State.of(oxygen.observation.value),
+                                locator=oxygen.observation.locator,
+                                inference=oxygen.observation.derivation,
+                            ),
+                        },
+                        provenance={
+                            **(reference.provenance or {}),
+                            "source_oxygen_condition": to_plain(oxygen.observation),
+                        },
+                    )
+            elif not printed_fo2:
                 reference = replace(
                     reference,
                     provenance={
