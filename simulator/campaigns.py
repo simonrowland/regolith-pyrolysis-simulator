@@ -343,6 +343,19 @@ class CampaignManager:
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
 
+    @staticmethod
+    def apply_pressure_request(
+        melt: MeltState,
+        pO2_mbar: float,
+        *,
+        controlled_o2: bool,
+    ) -> None:
+        """Apply a caller-validated pO2 request and its atmosphere intent."""
+        melt.pO2_mbar = pO2_mbar
+        melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
+        if controlled_o2:
+            melt.atmosphere = Atmosphere.CONTROLLED_O2
+
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
         CampaignPhase.C2A: 'C2A_continuous',
@@ -1707,10 +1720,11 @@ class CampaignManager:
             ):
                 raise ValueError("C2A pO2_mbar override must be numeric")
             override_pO2 = float(raw_override_pO2)
-            melt.pO2_mbar = override_pO2
-            melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
-            if override_pO2 > 0.0:
-                melt.atmosphere = Atmosphere.CONTROLLED_O2
+            self.apply_pressure_request(
+                melt,
+                override_pO2,
+                controlled_o2=override_pO2 > 0.0,
+            )
         self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)
         self.apply_c2a_staged_gas_controls(melt, campaign)
         # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis

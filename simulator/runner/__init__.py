@@ -4129,8 +4129,11 @@ def _apply_sio_wall_sweep_controls(
         if pO2_value < 0.0:
             raise ValueError("pO2_mbar must be non-negative")
         runtime_override["pO2_mbar"] = pO2_value
-        sim.melt.pO2_mbar = pO2_value
-        sim.melt.p_total_mbar = max(float(sim.melt.p_total_mbar), pO2_value)
+        CampaignManager.apply_pressure_request(
+            sim.melt,
+            pO2_value,
+            controlled_o2=True,
+        )
         sim.overhead.composition["O2"] = max(
             float(sim.overhead.composition.get("O2", 0.0)),
             pO2_value,
@@ -4147,7 +4150,6 @@ def _apply_sio_wall_sweep_controls(
         # CONTROLLED_O2 when the wall-sweep operator commands a pO2
         # — this is the design-intent semantic of "1 mbar pO2 glass"
         # (operator is dosing oxygen, NOT just sweeping with N2).
-        sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         sim._refresh_oxygen_reservoir_without_exchange(
             melt_intrinsic_fO2_log=sim._current_melt_redox_fO2_log(),
             exchange_direction='none:sio_wall_sweep_control',
