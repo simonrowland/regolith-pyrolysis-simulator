@@ -106,11 +106,9 @@ def _assert_table9_grid(document: dict[str, object], grid: str = TABLE9_GRID) ->
         oxygen = conditions["pO2_Pa"]
         assert oxygen["state"]["value"] == pO2_pa[pO2]
         assert oxygen["locator"]["page"] == 80
-        composition = conditions["composition"]
-        assert composition["locator"]["page"] == 75
-        assert composition["state"]["value"]["components"] == [
-            ["CaO", charge[1]], ["SiO2", charge[2]], ["V2O3", charge[3]]
-        ]
+        assert values["composition_wt_pct"] == {
+            "CaO": charge[1], "SiO2": charge[2], "V2O3": charge[3]
+        }
         assert row["note"].startswith(f"Table 9 reports {v_percent} mol% V")
 
 
@@ -194,7 +192,7 @@ def test_scored_table9_rows_migrate_as_points_with_printed_identity_axes() -> No
         assert observation.identity.fO2_Pa.value == expected_pressure
         assert observation.point_conditions["pO2_Pa"].state.value == expected_pressure
         assert observation.point_conditions["pO2_Pa"].locator.page == 80
-        assert observation.point_conditions["composition"].locator.page == 75
+        assert observation.point_conditions["composition"].locator.page == 80
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
 

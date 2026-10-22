@@ -270,25 +270,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '50.0'
-                - - SiO2
-                  - '45.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV01.
+        composition_wt_pct:
+          CaO: '50.0'
+          SiO2: '45.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv02_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -325,25 +310,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '47.5'
-                - - SiO2
-                  - '47.5'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV02.
+        composition_wt_pct:
+          CaO: '47.5'
+          SiO2: '47.5'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv03_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -380,25 +350,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '45.0'
-                - - SiO2
-                  - '50.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV03.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv04_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -435,25 +390,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '42.5'
-                - - SiO2
-                  - '52.5'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV04.
+        composition_wt_pct:
+          CaO: '42.5'
+          SiO2: '52.5'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv05_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -490,25 +430,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '40.0'
-                - - SiO2
-                  - '55.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV05.
+        composition_wt_pct:
+          CaO: '40.0'
+          SiO2: '55.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv06_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -545,25 +470,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '46.2'
-                - - SiO2
-                  - '51.3'
-                - - V2O3
-                  - '2.5'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV06.
+        composition_wt_pct:
+          CaO: '46.2'
+          SiO2: '51.3'
+          V2O3: '2.5'
     - observation_id: park_2021_table9_csv07_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -600,25 +510,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.242 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '43.8'
-                - - SiO2
-                  - '48.7'
-                - - V2O3
-                  - '7.5'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV07.
+        composition_wt_pct:
+          CaO: '43.8'
+          SiO2: '48.7'
+          V2O3: '7.5'
     - observation_id: park_2021_table9_csv08_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -655,25 +550,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '50.0'
-                - - SiO2
-                  - '45.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV08.
+        composition_wt_pct:
+          CaO: '50.0'
+          SiO2: '45.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv09_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -710,25 +590,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '47.5'
-                - - SiO2
-                  - '47.5'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV09.
+        composition_wt_pct:
+          CaO: '47.5'
+          SiO2: '47.5'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv10_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -765,25 +630,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '45.0'
-                - - SiO2
-                  - '50.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV10.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv11_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -820,25 +670,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '42.5'
-                - - SiO2
-                  - '52.5'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV11.
+        composition_wt_pct:
+          CaO: '42.5'
+          SiO2: '52.5'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv12_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -875,25 +710,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.124 × 10^-7 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '40.0'
-                - - SiO2
-                  - '55.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV12.
+        composition_wt_pct:
+          CaO: '40.0'
+          SiO2: '55.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv13_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -930,25 +750,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.205 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '45.0'
-                - - SiO2
-                  - '50.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV13.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
     - observation_id: park_2021_table9_csv14_metal_v_mole_fraction
       type: composition_series
       units: mole fraction (dimensionless); source reports mol%
@@ -985,25 +790,10 @@ species:
               page: 80
               table: '9'
               note: Table 9 prints pO2 = 3.127 × 10^-9 atm.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '45.0'
-                - - SiO2
-                  - '50.0'
-                - - V2O3
-                  - '5.0'
-            locator:
-              source_path: raw/park-2021-vanadium-thermodynamics-thesis/park-2021-vanadium-thermodynamics-thesis.pdf
-              pdf_page_index: 74
-              page: 75
-              table: '4'
-              note: Table 4 nominal starting slag composition for CSV14.
+        composition_wt_pct:
+          CaO: '45.0'
+          SiO2: '50.0'
+          V2O3: '5.0'
     context:
     - observation_id: park_2021_table4_context
       type: table_context
