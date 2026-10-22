@@ -724,12 +724,16 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
 
 @pytest.mark.parametrize("units", ("atm", "Pa"))
 @pytest.mark.parametrize("qualified", (False, True), ids=("local-id", "qualified-id"))
-def test_migrated_printed_fo2_source_link_is_read_by_identity(tmp_path, units, qualified):
+def test_migrated_printed_fo2_source_is_excluded_by_scorer(tmp_path, monkeypatch, units, qualified):
+    """Real migrated rows/provenance, with complete synthetic KEMS apparatus.
+
+    Ca's typed width comes from its preserved published percent envelope.
+    """
     import yaml
 
     from simulator.battery.migrate import convert_pressure_to_pa
-    from simulator.battery.score import _has_printed_fo2, _printed_fo2_names_observation
-    from tests.battery.factories import migrate_one_extract
+    from simulator.battery.score import ScoreContext, _convert_uncertainty_width, _has_printed_fo2, _printed_fo2_names_observation
+    from tests.battery.factories import kems_experiment, migrate_one_extract
 
     root = Path(__file__).resolve().parents[2]
     path = root / "data/literature/extracts/shornikov-2020-cao-tio2-melts.yaml"
@@ -757,6 +761,31 @@ def test_migrated_printed_fo2_source_link_is_read_by_identity(tmp_path, units, q
     fixture.write_text(yaml.safe_dump(document, sort_keys=False))
     migrated = migrate_one_extract(root, fixture).result
     assert not migrated.registry_issues
+    sample_row = migrated.observations[f"{source_id}::{sample['observation_id']}"]
+    printed_width = sample_row.uncertainty.verbatim["relative_error_percent"]
+    width, basis = _convert_uncertainty_width(
+        Quantity.P_PARTIAL, Decimal(str(printed_width["bound_value"])), printed_width["units"],
+    )
+    sample_row = replace(sample_row, uncertainty=replace(sample_row.uncertainty, value=width, basis=basis))
+    prerequisites = kems_experiment()
+    context = ScoreContext(
+        works=migrated.works,
+        experiments={
+            key: replace(
+                experiment,
+                apparatus=prerequisites.apparatus,
+                pressure_environment=replace(
+                    experiment.pressure_environment,
+                    regime=prerequisites.pressure_environment.regime,
+                ),
+            )
+            for key, experiment in migrated.experiments.items()
+        },
+        observations={**migrated.observations, sample_row.observation_id: sample_row},
+        benches=migrated.benches, root=root,
+    )
+    requests, handles = _capture_engine(monkeypatch, sample_row)
+    point_rows = tuple(context.observations.values())
     for original in oxygen_rows:
         row = migrated.observations[f"{source_id}::{original['observation_id']}"]
         assert _has_printed_fo2(row, row.identity)
@@ -767,10 +796,27 @@ def test_migrated_printed_fo2_source_link_is_read_by_identity(tmp_path, units, q
         parameters = dict(inference.parameters)
         assert parameters["factor"].state.value == (Decimal("101325") if units == "atm" else Decimal(1))
         assert parameters["original"].state.value == Decimal(str(original["values"]["oxygen_partial_pressure"]["value"]))
-    row = migrated.observations[f"{source_id}::{sample['observation_id']}"]
+        residual, candidate = compile_residual(
+            row, Engine.OPENIMCC, context=context, handles=handles,
+            point_observations=point_rows,
+        )
+        assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
+        assert residual.refusal.detail["match"] == "printed_fo2_names_observation"
+        assert residual.numeric is None and candidate is None
+    assert requests == []
+    row = sample_row
     assert _has_printed_fo2(row, row.identity)
     assert f"{source_id}::{oxygen_rows[0]['observation_id']}" in row.point_conditions["fO2_Pa"].inference.inputs
     assert not _printed_fo2_names_observation(row)
+    residual, candidate = compile_residual(
+        row, Engine.OPENIMCC, context=context, handles=handles,
+        point_observations=point_rows,
+    )
+    assert residual.refusal is None
+    assert residual.numeric is not None and candidate is not None
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(float(row.identity.fO2_Pa.value) / 1e5)
 
 
 @pytest.mark.parametrize(
