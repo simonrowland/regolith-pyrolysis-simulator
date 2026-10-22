@@ -508,6 +508,44 @@ def test_requested_pure_phase_nan_refuses_with_typed_reason():
     )
 
 
+def test_signed_pure_phase_factor_keeps_printed_token():
+    """A leading plus on the factor is part of the raw token."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+        _unrelated_gbase_nonfinite_fields,
+    )
+
+    stdout = (
+        "  cor:  -2034.776231  +0.999740\n"
+        "    q:  -981.191364  +nan\n"
+        "  trd:  -981.191364  +inf\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["cor"], stdout, notes
+    )
+    assert got == pytest.approx(-2034.776231)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase q, field factor, raw token '+nan'",
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase trd, field factor, raw token '+inf'",
+    ]
+    assert _unrelated_gbase_nonfinite_fields(notes[0]) == ("q", "factor", "+nan")
+    assert _unrelated_gbase_nonfinite_fields(notes[1]) == ("trd", "factor", "+inf")
+    for token in ("+nan", "+inf"):
+        with pytest.raises(PurePhaseAccessError) as raised:
+            _magemin_endmember_gbase_kJ(
+                _MAGEMIN_PURE_PHASES["cor"],
+                f"  cor:  -2034.776231  {token}\n",
+            )
+        assert str(raised.value) == (
+            "MAGEMin gbase table value for cor factor is not finite: "
+            f"{token!r}; refusing engine output"
+        )
+
+
 def test_unscoped_pure_phase_nan_still_refuses():
     with pytest.raises(PurePhaseAccessError) as raised:
         _parse_magemin_gbase_tables("    q:  nan  +1.000000\n")

@@ -793,10 +793,12 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
 # Decimal shape is the printed gbase/factor. nan/inf must reach the
 # finiteness gate; a decimal-only match dropped those pure-phase tokens
 # before any diagnostic existed. Case follows the engine's own spelling.
+# The sign stays inside the capture. An outer \+? used to eat the factor's
+# leading plus, so the recorded raw token for '+nan' was 'nan'.
 _MAGEMIN_GBASE_TOKEN = r'[+-]?(?:\d+\.\d+|nan|inf)'
 _MAGEMIN_PP_GBASE_RE = re.compile(
     rf'^\s*([A-Za-z0-9_]+):\s+({_MAGEMIN_GBASE_TOKEN})\s+'
-    rf'\+?({_MAGEMIN_GBASE_TOKEN})\s*$',
+    rf'({_MAGEMIN_GBASE_TOKEN})\s*$',
     re.IGNORECASE,
 )
 _MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
@@ -843,6 +845,29 @@ def _unrelated_gbase_nonfinite_notes(warnings: Sequence[str]) -> Tuple[str, ...]
         for item in warnings
         if item.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX)
     )
+
+
+_UNRELATED_GBASE_FIELDS_RE = re.compile(
+    r'^phase (?P<phase>\S+), field (?P<field>\S+), '
+    r"raw token '(?P<raw>[^']*)'$"
+)
+
+
+def _unrelated_gbase_nonfinite_fields(
+    text: str,
+) -> Optional[Tuple[str, str, str]]:
+    """(phase, field, raw token) from one diagnostic sentence.
+
+    The raw token is the engine's printed spelling, sign included.
+    """
+    if not text.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX):
+        return None
+    match = _UNRELATED_GBASE_FIELDS_RE.match(
+        text[len(_UNRELATED_GBASE_NONFINITE_PREFIX):]
+    )
+    if match is None:
+        return None
+    return match.group('phase'), match.group('field'), match.group('raw')
 
 
 def _read_gbase_token(
