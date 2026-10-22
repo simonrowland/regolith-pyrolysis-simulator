@@ -2516,11 +2516,11 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
 
 
-def test_condensed_partial_pressure_is_answered_from_the_gas_map(monkeypatch) -> None:
-    """A condensed P_PARTIAL identity currently reads gas_partial_pressures_Pa.
+def test_condensed_partial_pressure_is_not_read_from_the_gas_map(monkeypatch) -> None:
+    """A condensed P_PARTIAL identity is not a gas-map partial pressure.
 
-    Captured from predict_with_engine with a fake equilibrate_cell. Gas and
-    an undeclared species phase take the same number from that map.
+    Gas and an undeclared species phase still read gas_partial_pressures_Pa.
+    The condensed identity refuses before equilibrate_cell.
     """
 
     from simulator.diagnostic_helpers import binary_pot_battery as battery
@@ -2586,18 +2586,31 @@ def test_condensed_partial_pressure_is_answered_from_the_gas_map(monkeypatch) ->
             isolated=False,
         )
 
-    crystal = predict(Species("H2O", Phase.CR, polymorph=State.of(Polymorph.CRYSTALLINE)))
-    assert crystal.refusal_reason is None
-    assert crystal.value == _GAS_MAP_PARTIAL_PA
-    assert calls["n"] == 1
+    def assert_condensed_refusal(species: Species, basis: str) -> None:
+        before = calls["n"]
+        refused = predict(species)
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+        assert refused.refusal_detail["reason"] == (
+            "partial-pressure-condensed-species-not-on-gas-map"
+        )
+        assert refused.refusal_detail["observation_basis"] == basis
+        assert refused.refusal_detail["map_basis"] == "gas_partial_pressures_Pa(g)"
+        assert calls["n"] == before
+
+    assert_condensed_refusal(
+        Species("H2O", Phase.CR, polymorph=State.of(Polymorph.CRYSTALLINE)),
+        "H2O(cr)",
+    )
+    assert_condensed_refusal(Species("H2O", Phase.GLASS), "H2O(glass)")
     gas = predict(Species("H2O", Phase.G))
     assert gas.refusal_reason is None
     assert gas.value == _GAS_MAP_PARTIAL_PA
-    assert calls["n"] == 2
+    assert calls["n"] == 1
     unknown = predict(Species("H2O", State.unknown("phase not printed")))
     assert unknown.refusal_reason is None
     assert unknown.value == _GAS_MAP_PARTIAL_PA
-    assert calls["n"] == 3
+    assert calls["n"] == 2
 
 
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(

@@ -6429,6 +6429,34 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
+    species_phase = (
+        phase_token(identity.species) if isinstance(identity, Identity) else None
+    )
+    if quantity is Quantity.P_PARTIAL and species_phase in CONDENSED_PHASES:
+        # gas_partial_pressures_Pa is a gas map. A condensed species is a
+        # different basis. Refuse before the engine is opened; the formula
+        # matcher stays formula-only for activities and oxide maps.
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            notices=tuple(input_notices),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+            refusal_detail={
+                "reason": "partial-pressure-condensed-species-not-on-gas-map",
+                "observation_basis": (
+                    f"{identity.species.formula}({species_phase.value})"
+                ),
+                "map_basis": "gas_partial_pressures_Pa(g)",
+                "formula": identity.species.formula,
+                "species_phase": species_phase.value,
+            },
+            identity=identity,
+            requested_composition=requested,
+        )
+
     handle_map = handles if handles is not None else {}
     handle = handle_map.get(engine.value)
     if handle is not None and (
