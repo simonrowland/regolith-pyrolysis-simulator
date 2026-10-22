@@ -8,7 +8,11 @@ import pytest
 
 from simulator.config import load_config_bundle
 from simulator.cost_ledger import run_pumping_input_cost
-from simulator.environment import MARS_DATUM_PRESSURE_BAR, MARS_OLYMPUS_PRESSURE_BAR
+from simulator.environment import (
+    MARS_DATUM_PRESSURE_BAR,
+    MARS_OLYMPUS_PRESSURE_BAR,
+    vacuum_floor_bar_for_body,
+)
 from simulator.pumping_cost import (
     ASTEROID_AMBIENT_PA,
     MARS_DATUM_AMBIENT_PA,
@@ -33,16 +37,23 @@ def test_moon_vent_free_zero_cost():
     assert r.feasible is True
 
 
-@pytest.mark.parametrize("feedstock_id", ["mars_basalt", "unmapped_future_feedstock"])
-def test_pumping_uses_resolved_environment_instead_of_origin(feedstock_id):
+@pytest.mark.parametrize(
+    ("feedstock_id", "body"),
+    [("mars_basalt", "moon"), ("lunar_mare_low_ti", "asteroid")],
+)
+def test_pumping_uses_resolved_environment_instead_of_origin(feedstock_id, body):
     context = pumping_context_from_sim(SimpleNamespace(
         record=SimpleNamespace(feedstock_key=feedstock_id),
-        melt=SimpleNamespace(body="moon", ambient_pressure_mbar=0.0),
+        melt=SimpleNamespace(body=body, ambient_pressure_mbar=0.0),
     ), ())
     assert context["status"] == "ok"
-    assert context["body"] == "moon"
-    assert context["ambient_pressure_pa"] == 0.0
-    assert context["ambient_pressure_source"] == "melt.ambient_pressure_mbar"
+    assert context["body"] == body
+    assert context["ambient_pressure_pa"] == pytest.approx(
+        vacuum_floor_bar_for_body(body) * 100_000.0
+    )
+    assert context["ambient_pressure_source"] == (
+        f"environment.vacuum_floor_bar_for_body:{body}"
+    )
 
 
 

@@ -39,6 +39,7 @@ from simulator.environment import (
     MARS_OLYMPUS_PRESSURE_BAR,
     MOON_VACUUM_FLOOR_BAR,
     normalize_body_name,
+    vacuum_floor_bar_for_body,
 )
 
 # Universal gas constant, J/(mol*K). CODATA 2018.
@@ -533,6 +534,11 @@ def pumping_context_from_sim(
         ),
     )
     ambient_pressure_source = "melt.ambient_pressure_mbar"
+    if ambient_pressure_pa == 0.0 and body in {"moon", "asteroid"}:
+        # Airless feedstocks have no tabulated surface pressure; zero in that
+        # field must not erase their body-specific ambient vacuum floor.
+        ambient_pressure_pa = vacuum_floor_bar_for_body(body) * _PA_PER_BAR
+        ambient_pressure_source = f"environment.vacuum_floor_bar_for_body:{body}"
     if not math.isfinite(ambient_pressure_pa) or ambient_pressure_pa < 0.0:
         return _pumping_context_refusal(
             "missing-ambient-pressure", body=body, feedstock_id=feedstock_id,
