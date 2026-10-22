@@ -1494,6 +1494,149 @@ def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
     assert abs((atm_attempt.value - bar_attempt.value) - expected_shift) < Decimal("1e-12")
 
 
+# Production attempt at the pin commit. Fe(gamma) is the 1200 K segment's
+# allotrope; Fe(alpha) and Fe(reference) are not, and Ca(cr) is not the
+# 1800 K Ca(g) segment. All of them still receive the segment number.
+_FEO_LIQUID_ALPHA_2000K = Decimal("-148.4464525")
+_FEO_CRYSTAL_1200K = Decimal("-194.25060000000002")
+_FEO_CRYSTAL_1200K_ATM = Decimal("-194.3162658956496301986338624")
+_CAO_CRYSTAL_CA_CR_1800K = Decimal("-440.1469291")
+_CAO_LOG10_CA_CR_1800K = Decimal("12.77248193991250291197131722")
+
+
+def _with_reactant_basis(
+    identity,
+    phase: Phase,
+    polymorph: Polymorph | None,
+):
+    """Replace the negative non-O2 reactant phase and allotrope."""
+
+    reaction = identity.reaction.value
+    assert reaction is not None
+
+    def species_for(formula: str) -> Species:
+        return Species(
+            formula,
+            phase,
+            polymorph=None if polymorph is None else State.of(polymorph),
+        )
+
+    terms = tuple(
+        replace(term, species=species_for(term.species.formula))
+        if term.coefficient < 0 and term.species.formula != "O2"
+        else term
+        for term in reaction.terms
+    )
+    elements = tuple(
+        (name, species_for(species.formula)) if species.formula != "O2" else (name, species)
+        for name, species in identity.formation_elements.value
+    )
+    return replace(
+        identity,
+        reaction=State.of(replace(reaction, terms=terms)),
+        formation_elements=State.of(elements),
+    )
+
+
+def _assert_ellingham_number(observation_id: str, identity, value: Decimal, evidence: str):
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(observation_id, "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.refusal_reason is None
+    assert attempt.refusal_detail == {}
+    assert attempt.value == value
+    assert attempt.call_evidence == evidence
+    return attempt
+
+
+def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressure() -> None:
+    feo_liquid = F.oxide_identity(
+        "FeO",
+        Phase.L,
+        T_K=Decimal("2000"),
+        metal_formula="Fe",
+        metal_phase=Phase.L,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    fe_alpha_liquid = _with_reactant_basis(feo_liquid, Phase.CR, Polymorph.ALPHA)
+    _assert_ellingham_number(
+        "feo-alpha-liquid-1bar",
+        fe_alpha_liquid,
+        _FEO_LIQUID_ALPHA_2000K,
+        "ellingham:Fe:l:T=2000",
+    )
+    _assert_ellingham_number(
+        "feo-alpha-liquid-missing-pressure",
+        replace(fe_alpha_liquid, standard_pressure_Pa=State.unknown("pressure not printed")),
+        _FEO_LIQUID_ALPHA_2000K,
+        "ellingham:Fe:l:T=2000",
+    )
+
+    feo_crystal = F.oxide_identity(
+        "FeO",
+        Phase.CR,
+        T_K=Decimal("1200"),
+        metal_formula="Fe",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline",
+    )
+    crystal_evidence = "ellingham:Fe:s:T=1200:generic-solid"
+    for name, polymorph in (
+        ("reference", Polymorph.REFERENCE),
+        ("alpha", Polymorph.ALPHA),
+        ("gamma", Polymorph.GAMMA),
+        ("omitted", None),
+    ):
+        _assert_ellingham_number(
+            f"feo-crystal-{name}-1bar",
+            _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
+            _FEO_CRYSTAL_1200K,
+            crystal_evidence,
+        )
+    fe_alpha_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA)
+    _assert_ellingham_number(
+        "feo-crystal-alpha-1atm",
+        replace(fe_alpha_crystal, standard_pressure_Pa=State.of(Decimal("101325"))),
+        _FEO_CRYSTAL_1200K_ATM,
+        crystal_evidence,
+    )
+    fe_gamma_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.GAMMA)
+    _assert_ellingham_number(
+        "feo-crystal-gamma-1atm",
+        replace(fe_gamma_crystal, standard_pressure_Pa=State.of(Decimal("101325"))),
+        _FEO_CRYSTAL_1200K_ATM,
+        crystal_evidence,
+    )
+
+    cao_crystal = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    _assert_ellingham_number(
+        "cao-cr-1bar",
+        cao_crystal,
+        _CAO_CRYSTAL_CA_CR_1800K,
+        "ellingham:Ca:s:T=1800:generic-solid",
+    )
+    _assert_ellingham_number(
+        "cao-cr-log10-1bar",
+        replace(cao_crystal, quantity=Quantity.LOG10_KF),
+        _CAO_LOG10_CA_CR_1800K,
+        "ellingham:Ca:s:T=1800:generic-solid",
+    )
+
+
 def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
     identity = F.cao_identity(
         Phase.CR,
