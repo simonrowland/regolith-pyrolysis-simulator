@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import ast
+import inspect
+
 import pytest
 
 from simulator.state import CampaignPhase
@@ -54,18 +57,41 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # entry, so it consumes the residual that the old lot materialization lost.
     # b-894/t-1236 merged-tree measurement: the matching mol-basis credit
     # retains that parcel in terminal.offgas, leaving overhead empty.
-    expected_overhead: dict[str, float] = {}
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
-        expected_overhead,
-        rel=1.0e-12,
-        abs=0.0,
-    )
-    assert sim.atom_ledger.project_account_kg(
-        "process.overhead_gas"
-    ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
+    assert set(sim.atom_ledger.kg_by_account("process.overhead_gas")) == set()
+    assert set(sim.atom_ledger.project_account_kg("process.overhead_gas")) == set()
     assert sim.atom_ledger.kg_by_account("terminal.offgas")["SiO2_gas"] == pytest.approx(
         9.409239449650439e-14, rel=1.0e-12, abs=0.0,
     )
+
+
+def test_empty_overhead_expectations_do_not_use_numeric_approx():
+    function = ast.parse(
+        inspect.getsource(test_toggle_off_existing_path_keeps_mass_balance_closed)
+    )
+    empty_mapping_names = {
+        node.target.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and isinstance(node.value, ast.Dict)
+        and not node.value.keys
+    }
+    approx_calls_with_empty_mapping = [
+        node
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "approx"
+        and node.args
+        and (
+            isinstance(node.args[0], ast.Dict)
+            and not node.args[0].keys
+            or isinstance(node.args[0], ast.Name)
+            and node.args[0].id in empty_mapping_names
+        )
+    ]
+
+    assert not approx_calls_with_empty_mapping
 
 
 def test_finite_headspace_keeps_oxygen_bins_distinct():
