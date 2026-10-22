@@ -18,9 +18,9 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import profile_for
-from simulator.battery.migrate import Migrator
 from simulator.battery.records import Value
 from simulator.battery.validate import _validate_activity_coefficient_temperature_fit
+from tests.battery.factories import migrate_one_extract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,8 +99,10 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
 
 
 def _migrate_extract(name: str):
-    migrator = Migrator(root=ROOT)
-    migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator = migrate_one_extract(
+        root=ROOT,
+        path=ROOT / "data/literature/extracts" / f"{name}.yaml",
+    )
     migrator.finalize()
     assert migrator.result.registry_issues == []
     return migrator.result

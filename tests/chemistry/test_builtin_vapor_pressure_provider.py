@@ -2106,6 +2106,18 @@ def test_equilibrium_reports_skipped_oxide_vapor_antoine_A(
     assert "SiO" not in result.vapor_pressures_Pa
 
 
+def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
+    model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
+    monkeypatch.setattr(model, "_vacuum_floor_bar", lambda: 1.3e-12)
+    answers = {}
+    for oxygen in (1.3e-12, 1e-9):
+        monkeypatch.setattr(model, "_headspace_transport_pO2_bar", lambda: oxygen)
+        answers[oxygen] = model._internal_analytical_equilibrium().vapor_pressures_Pa["SiO"]
+    # Fixed source/temperature: the SiO reaction's -1/2 oxygen exponent must
+    # continue below the reference, independently of the simulated body floor.
+    assert answers[1.3e-12] / answers[1e-9] == pytest.approx((1.3e-12 / 1e-9) ** -0.5)
+
+
 def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
     vapor_pressure_data,
 ):

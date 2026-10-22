@@ -54,13 +54,15 @@ import re
 
 from simulator.scalar_boundary import is_declared_real_scalar
 
-# Same coefficients as engines.builtin.cco_redox_buffer (Jakobsson & Oskarsson
-# 1994 via LEPR). Kept here so oxygen_condition can import without pulling the
-# heavy engines.builtin package root.
+# Jakobsson & Oskarsson 1994 CCO point coefficients via LEPR / ThermoEngine.
 _CCO_A = -21_803.0
 _CCO_B = 4.325
 _CCO_C = 0.171
 _REFERENCE_PRESSURE_BAR = 1.01325
+_CCO_EQUATION = (
+    f"log10(fO2/bar) = {_CCO_A:g}/T_K + {_CCO_B:g} + "
+    f"{_CCO_C:g}*(P_bar - 1)/T_K"
+)
 
 C_CO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
 C_CO_SOURCE = (
@@ -99,6 +101,22 @@ def is_c_co_buffer_token(token: str) -> bool:
     return _normalize_buffer_token(token) in _C_CO_BUFFER_TOKENS
 
 
+def _require_finite_positive(value: float, label: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f"{label} must be numeric")
+    parsed = float(value)
+    if not math.isfinite(parsed) or parsed <= 0.0:
+        raise ValueError(f"{label} must be finite and positive")
+    return parsed
+
+
+def cco_log10_fO2_bar(temperature_K: float, pressure_bar: float = 1.0) -> float:
+    """Return Jakobsson & Oskarsson CCO log10(fO2/bar) at T and pressure."""
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    pressure = _require_finite_positive(pressure_bar, "pressure_bar")
+    return _CCO_A / temperature + _CCO_B + _CCO_C * (pressure - 1.0) / temperature
+
+
 def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
     """Return log10(fO2/bar) for graphite / C–CO at T and P_CO.
 
@@ -115,10 +133,9 @@ def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
         raise ValueError("temperature_K must be finite and positive")
     if not math.isfinite(pressure) or pressure <= 0.0:
         raise ValueError("p_co_bar must be finite and positive")
-    reference_log10_fo2 = (
-        _CCO_A / temperature
-        + _CCO_B
-        + _CCO_C * (_REFERENCE_PRESSURE_BAR - 1.0) / temperature
+    reference_log10_fo2 = cco_log10_fO2_bar(
+        temperature,
+        _REFERENCE_PRESSURE_BAR,
     )
     return reference_log10_fo2 + 2.0 * math.log10(
         pressure / _REFERENCE_PRESSURE_BAR
@@ -128,6 +145,7 @@ def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
 __all__ = [
     "C_CO_FORMULATION",
     "C_CO_SOURCE",
+    "cco_log10_fO2_bar",
     "is_c_co_buffer_token",
     "log10_fo2_c_co_bar",
 ]

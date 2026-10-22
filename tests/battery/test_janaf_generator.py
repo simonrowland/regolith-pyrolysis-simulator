@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import re
 import shutil
 import time
@@ -20,6 +19,7 @@ from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity
 from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
 from tests.battery import compilation_shard_observation_count
+from tests.helpers.corpus_paths import regolith_corpus_root
 from simulator.battery.identity import (
     Identity,
     identity_equal,
@@ -1199,9 +1199,7 @@ _NON_DATA_MARKER_LINES = (
     ("Cu-021", (21,)),
     ("S-021", (18,)),
 )
-_JANAF_SOURCE_DIR = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-) / "raw" / "janaf-nist-txt"
+_JANAF_SOURCE_DIR = regolith_corpus_root() / "raw" / "janaf-nist-txt"
 
 
 def _raw_table_path(table_id: str) -> Path:
