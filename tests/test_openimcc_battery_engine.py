@@ -1945,16 +1945,17 @@ def test_openimcc_typed_gas_table_mutation_changes_prediction(monkeypatch, tmp_p
 
     monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
     packaged = _OpenImccBatteryBackend("openimcc")
+    assert packaged._gas is not None, packaged._gas_error
     # openimcc c280dcc requires typed validity columns. Mutate the packaged
     # tables so the explicit/inert/reactive omission paths remain exercised.
     import csv
 
-    table_dir = tmp_path / "src/vaporock/data"
-    table_dir.mkdir(parents=True)
-    for source, filename, removed in (
-        (packaged._gas.gas_path, "JANAF-vapor-data-full.csv", {"Na2O(g)", "K2O(g)"}),
-        (packaged._gas.oxide_path, "condensate-thermo-data.csv", {"TiO2(l)"}),
+    for source, relative_path, removed in (
+        (packaged._gas.gas_path, "src/vaporock/data/JANAF-vapor-data-full.csv", {"Na2O(g)", "K2O(g)"}),
+        (packaged._gas.oxide_path, "data/condensate-thermo-data.csv", {"TiO2(l)"}),
     ):
+        target = tmp_path / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
         with source.open(newline="", encoding="utf-8") as handle:
             reader = csv.DictReader(handle)
             columns = reader.fieldnames
@@ -1962,12 +1963,27 @@ def test_openimcc_typed_gas_table_mutation_changes_prediction(monkeypatch, tmp_p
         for table_row in rows:
             if table_row["species_name"] == "K(g)":
                 table_row["F"] = str(float(table_row["F"]) + 1.0)
-        with (table_dir / filename).open("w", newline="", encoding="utf-8") as handle:
+        with target.open("w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=columns)
             writer.writeheader()
             writer.writerows(rows)
     monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(tmp_path))
     mutated = _OpenImccBatteryBackend("openimcc")
+    assert mutated._gas is not None, mutated._gas_error
+    assert mutated._gas.gas_path == (tmp_path / "src/vaporock/data/JANAF-vapor-data-full.csv").resolve()
+    assert mutated._gas.oxide_path == (tmp_path / "data/condensate-thermo-data.csv").resolve()
+    assert (
+        mutated._identity["engine_binding_identity"]["gas_table_digest"]
+        != packaged._identity["engine_binding_identity"]["gas_table_digest"]
+    )
+    assert (
+        mutated._identity["engine_binding_identity"]["engine_binding_digest"]
+        != packaged._identity["engine_binding_identity"]["engine_binding_digest"]
+    )
+    assert (
+        mutated._identity["engine_binding_identity"]["condensate_table_digest"]
+        != packaged._identity["engine_binding_identity"]["condensate_table_digest"]
+    )
     temperature_K = float(row["T_K"])
     evaluate_gas = openimcc.evaluate_gas
     gas_results = []
@@ -1990,14 +2006,6 @@ def test_openimcc_typed_gas_table_mutation_changes_prediction(monkeypatch, tmp_p
         composition_kg=composition_kg,
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
-    )
-    assert (
-        mutated._identity["engine_binding_identity"]["gas_table_digest"]
-        != packaged._identity["engine_binding_identity"]["gas_table_digest"]
-    )
-    assert (
-        mutated._identity["engine_binding_identity"]["engine_binding_digest"]
-        != packaged._identity["engine_binding_identity"]["engine_binding_digest"]
     )
     assert len(gas_results) == 2
     _packaged_gas_result, mutated_gas_result = gas_results
