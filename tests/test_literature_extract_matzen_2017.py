@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import os
 import shutil
 from decimal import Decimal
 from pathlib import Path
@@ -14,10 +13,10 @@ import yaml
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/matzen-2017-ni-olivine-composition.yaml"
-DEFAULT_CORPUS = Path("/Users/simonrowland/Repos/regolith-corpus")
 PINS = {
     "matzen2017_run_49_glass_sio2": "48.71",
     "matzen2017_run_49_glass_tio2": "1.68",
@@ -57,7 +56,7 @@ def test_matzen_table_2_render_pins_and_both_mutations_fail() -> None:
 
 
 def test_matzen_rows_migrate_as_points_with_run_axes(tmp_path: Path) -> None:
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS))
+    corpus = regolith_corpus_root()
     if not (corpus / "raw/matzen-2017-ni-olivine-composition/matzen-2017-ni-olivine-composition.pdf").is_file():
         pytest.skip("Matzen 2017 source PDF is absent")
 

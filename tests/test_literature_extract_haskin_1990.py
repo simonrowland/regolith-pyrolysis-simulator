@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import copy
-import os
 from decimal import Decimal
 from pathlib import Path
 
@@ -12,10 +11,10 @@ import yaml
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.yaml"
-DEFAULT_CORPUS = Path("/Users/simonrowland/Repos/regolith-corpus")
 PINS = {
     "haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_fe": "92.13",
     "haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_sio2": "49.48",
@@ -52,7 +51,7 @@ def test_table1_8_render_pins_and_both_mutations_fail() -> None:
 
 
 def test_metal_and_glass_rows_migrate_as_points_with_temperature(tmp_path: Path) -> None:
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS))
+    corpus = regolith_corpus_root()
     if not (corpus / "raw/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.pdf").is_file():
         pytest.skip("Haskin report PDF is absent")
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))

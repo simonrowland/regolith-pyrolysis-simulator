@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import copy
-import os
 from pathlib import Path
 
 import pytest
@@ -10,11 +9,11 @@ import yaml
 
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "cacciatore-zajacz-2026-v-sc-oxybarometer-supplement"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-DEFAULT_CORPUS = Path("/Users/simonrowland/Repos/regolith-corpus")
 
 
 def _context(document: dict, worksheet: str) -> dict:
@@ -70,7 +69,7 @@ def test_supplement_context_migrates_without_scored_observations(tmp_path: Path)
 
 
 def test_supplement_external_workbook_check_skips_without_corpus() -> None:
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS))
+    corpus = regolith_corpus_root()
     source = corpus / f"raw/{SID}/{SID}.zip"
     if not source.is_file():
         pytest.skip("Cacciatore and Zajacz supplement archive is absent")

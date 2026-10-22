@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import copy
 import csv
-import os
+import re
 from decimal import Decimal
 from pathlib import Path
 
@@ -13,12 +13,13 @@ import yaml
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "cacciatore-zajacz-2026-v-sc-oxybarometer"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
+SUPPLEMENT_EXTRACT = ROOT / f"data/literature/extracts/{SID}-supplement.yaml"
 GRID = ROOT / f"tests/fixtures/{SID}-table3.csv"
-DEFAULT_CORPUS = Path("/Users/simonrowland/Repos/regolith-corpus")
 
 
 def _rows(document: dict) -> dict[str, dict]:
@@ -40,12 +41,63 @@ def _assert_table3_grid(document: dict, grid: list[dict[str, str]]) -> None:
         assert values["sigma"] == expected["sigma"]
 
 
+def _assert_fO2_control_glosses(document: dict) -> None:
+    for observation in _rows(document).values():
+        experiment = observation["experiment"].lower()
+        atmosphere = observation["values"]["point_conditions"]["atmosphere"]["state"]["value"]
+        if "-h2l-" in experiment:
+            assert atmosphere == "H2L (hydrogen loading)"
+        elif "-h2-" in experiment:
+            assert atmosphere == "H2 (hydrogen membrane)"
+        elif "-sb-" in experiment:
+            assert atmosphere == "solid buffer"
+        else:
+            raise AssertionError(f"unrecognised fO2 control in {experiment}")
+
+
+def _assert_fO2_log_uncertainties(document: dict, supplement: dict) -> None:
+    table = next(
+        context
+        for item in supplement["species"].values()
+        for context in item.get("context", [])
+        if context.get("locator", {}).get("table") == "Table_2_Exp_cond"
+    )
+    uncertainty_by_run = {}
+    for record in table["values"]["rows"][1:]:
+        cells = record["cells"]
+        series = {
+            "A&B": ("a", "b"),
+            "A": ("a",),
+            "B": ("b",),
+            "A_2": ("a2",),
+            "B_2": ("b2",),
+        }.get(cells.get("B"))
+        if series:
+            for letter in series:
+                uncertainty_by_run[(cells["A"].lower(), letter)] = cells["J"]
+
+    for observation in _rows(document).values():
+        experiment = observation["experiment"].removeprefix(f"{SID}-")
+        suffix = re.search(r"([ab])2?(-f)?$", experiment)
+        assert suffix, experiment
+        letter = suffix.group(1) + ("2" if experiment.endswith("2-f") else "")
+        sample = re.sub(r"-[ab]2?(-f)?$", "", experiment).replace("-", "_").lower()
+        if experiment.endswith("-f"):
+            sample += "_f"
+        expected = uncertainty_by_run[(sample, letter)]
+        note = observation["values"]["point_conditions"]["fO2_log"]["state"]["note"]
+        assert f"±{expected} uncertainty" in note, observation["observation_id"]
+
+
 def test_table3_render_grid_and_both_mutations_fail() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     with GRID.open(encoding="utf-8", newline="") as handle:
         grid = list(csv.DictReader(handle))
     assert len(grid) == 682
     _assert_table3_grid(document, grid)
+    _assert_fO2_control_glosses(document)
+    supplement = yaml.safe_load(SUPPLEMENT_EXTRACT.read_text(encoding="utf-8"))
+    _assert_fO2_log_uncertainties(document, supplement)
 
     changed_extract = copy.deepcopy(document)
     observation = _rows(changed_extract)[
@@ -60,9 +112,24 @@ def test_table3_render_grid_and_both_mutations_fail() -> None:
     with pytest.raises(AssertionError):
         _assert_table3_grid(document, changed_grid)
 
+    changed_control = copy.deepcopy(document)
+    _rows(changed_control)[f"{SID}_e1_0_ii_h2_a_f_glass_sio2"]["values"]["point_conditions"]["atmosphere"]["state"]["value"] = "H2 (hydrogen loading)"
+    with pytest.raises(AssertionError):
+        _assert_fO2_control_glosses(changed_control)
+    changed_h2l = copy.deepcopy(document)
+    _rows(changed_h2l)[f"{SID}_e4_0_iii_h2l_a_f_glass_sio2"]["values"]["point_conditions"]["atmosphere"]["state"]["value"] = "H2L (hydrogen membrane)"
+    with pytest.raises(AssertionError):
+        _assert_fO2_control_glosses(changed_h2l)
+
+
+def test_fO2_log_note_uses_printed_uncertainty() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    supplement = yaml.safe_load(SUPPLEMENT_EXTRACT.read_text(encoding="utf-8"))
+    _assert_fO2_log_uncertainties(document, supplement)
+
 
 def test_table3_glass_rows_migrate_with_sample_conditions(tmp_path: Path) -> None:
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS))
+    corpus = regolith_corpus_root()
     if not (corpus / f"raw/{SID}/{SID}.pdf").is_file():
         pytest.skip("Cacciatore and Zajacz source PDF is absent")
 
