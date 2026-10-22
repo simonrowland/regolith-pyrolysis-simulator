@@ -3315,6 +3315,9 @@ def test_native_fe_saturation_uses_upstream_total_pressure(
         fe3_over_sigma_fe=0.1,
     )
 
+    assert seen_pressure_bar == pytest.approx(
+        [seen_pressure_bar[0]] * len(seen_pressure_bar)
+    )
     assert seen_pressure_bar == pytest.approx([0.005, 0.005])
 
 
