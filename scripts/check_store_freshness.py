@@ -22,6 +22,7 @@ Usage: scripts/check_store_freshness.py [--head REF]
 from __future__ import annotations
 
 import argparse
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -272,6 +273,39 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
 })
 
 
+def _store_neutral_ack_commits() -> set[str]:
+    """Resolve validated receipt files; separate files avoid shared-set conflicts."""
+    directory = ROOT / "scripts" / "store_neutral_acks"
+    if not directory.exists():
+        return set()
+
+    acknowledgements: set[str] = set()
+    for path in sorted(directory.iterdir()):
+        stem = path.stem
+        if (
+            path.suffix != ".txt"
+            or (not 7 <= len(stem) <= 12 and len(stem) != 40)
+            or any(char not in "0123456789abcdefABCDEF" for char in stem)
+            or not stat.S_ISREG(path.lstat().st_mode)
+        ):
+            raise ValueError(f"malformed store-neutral ack file: {path}")
+        reason_lines = [
+            line for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(reason_lines) != 1:
+            raise ValueError(f"store-neutral ack must contain one reason line: {path}")
+        commit = _git(
+            "rev-parse", "--verify", "--end-of-options", f"{stem}^{{commit}}"
+        ).strip().lower()
+        if commit[:9] in STORE_NEUTRAL_INPUT_COMMITS:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit[:9]}")
+        if commit in acknowledgements:
+            raise ValueError(f"duplicate store-neutral acknowledgement: {commit}")
+        acknowledgements.add(commit)
+    return acknowledgements
+
+
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
@@ -336,8 +370,9 @@ def _untraced_extracts(head: str) -> list[str]:
 
 def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     """Migrate-input commits after the last store-output commit, keyed
-    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
+    "<sha9> <subject>", minus the acknowledged store-neutral commits."""
     stale: dict[str, list[str]] = {}
+    ack_shas = _store_neutral_ack_commits()
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
         "data/literature", "simulator/battery", *CODE_INPUTS,
@@ -351,6 +386,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
             line.strip()
             and commit is not None
             and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
+            and commit.lower() not in ack_shas
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
