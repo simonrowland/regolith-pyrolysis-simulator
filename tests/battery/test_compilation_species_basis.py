@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from simulator.battery import migrate as migrate_module
-from simulator.battery.enums import PerBasis, Phase, Quantity
+from simulator.battery.enums import PerBasis, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, compilation_column_series_from_record
 
 
@@ -142,6 +142,25 @@ def test_kelley_king_table_6_gas_row_uses_mol_species(migrated_compilations):
         "kelley-king-1961-usbm-b592:table-006-0003:S:entropy_recommended",
         "Al(g)",
     )
+
+
+def test_kelley_king_page_101_entropy_cells_migrate_from_the_correct_rows(
+    migrated_compilations,
+):
+    observations = migrated_compilations["kelley-king-1961-usbm-b592"]
+    assert (
+        "kelley-king-1961-usbm-b592:table-006-0003:S:entropy_other_sources"
+        not in observations
+    )
+
+    al_ion = observations[
+        "kelley-king-1961-usbm-b592:table-006-0004:S:entropy_other_sources"
+    ]
+    assert al_ion.value.kind is ValueKind.POINT
+    assert al_ion.value.point == Decimal("-317.984")
+    assert al_ion.identity.per is not None
+    assert al_ion.identity.per.is_value
+    assert al_ion.identity.per.value is PerBasis.MOL_SPECIES
 
 
 def test_kelley_king_table_4_without_printed_basis_stays_unknown(

@@ -165,7 +165,7 @@
         "5.11",
         "",
         "39.30±0.01",
-        "-76±10",
+        "",
         "39.30±0.01"
       ],
       "cells": {
@@ -273,19 +273,13 @@
           "column": "entropy_spectrographic_or_molecular_constants"
         },
         "entropy_other_sources": {
-          "raw": "-76±10",
-          "value": -76.0,
-          "parsed_values": [
-            -76.0,
-            10.0
-          ],
-          "numeric_tokens": [
-            "-76",
-            "10"
-          ],
+          "raw": "",
+          "value": null,
+          "parsed_values": [],
+          "numeric_tokens": [],
           "footnote_markers": [],
           "ocr_suspect": true,
-          "ocr_check": "raster_ocr_token_disagreement",
+          "ocr_check": "image_verified_token_correction",
           "column": "entropy_other_sources"
         },
         "entropy_recommended": {
@@ -316,7 +310,19 @@
     "sha256": "5a6c79ae4e1f3d9b5eb3c8a1536af2672f78f0495e1963c04a556edaf2c52348"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_token_correction",
+      "pdf_page": 105,
+      "page": 101,
+      "source_row_index": 6,
+      "column": "entropy_other_sources",
+      "ocr_token": "-76±10",
+      "printed_token": "",
+      "quote": "Al(g) ... ",
+      "basis": "Original-resolution page image proves the printed token."
+    }
+  ],
   "heading_context_as_published": "Aluminum:",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

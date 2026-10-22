@@ -1561,12 +1561,12 @@ summary:
   numeric_cell_count: 15127
   parsed_value_count: 7416
   temperature_grid_token_count: 9416
-  row_numeric_ocr_suspect_count: 4781
+  row_numeric_ocr_suspect_count: 4782
   temperature_grid_ocr_suspect_count: 1002
   metadata_ocr_suspect_count: 1202
-  ocr_suspect_count: 6985
+  ocr_suspect_count: 6986
   identity_check_disagreement_count: 8
-  correction_count: 308
+  correction_count: 310
 ocr_policy:
   primary: MinerU table HTML from five page-aligned chunks
   second_reading: Tesseract on every MinerU table crop; exact token sequence agreement required for a clean numeric cell
@@ -1705,6 +1705,26 @@ corrections:
   printed_token: 15.0±1.0
   quote: 'Actinium: / Ac(c) ... 15.0±1.0'
   basis: MinerU table crop inspected at original resolution; value is printed on the Ac(c) row.
+- record_id: table-006-0003
+  kind: image_verified_token_correction
+  pdf_page: 105
+  page: 101
+  source_row_index: 6
+  column: entropy_other_sources
+  ocr_token: -76±10
+  printed_token: ''
+  quote: 'Al(g) ... '
+  basis: Original-resolution page image proves the printed token.
+- record_id: table-006-0004
+  kind: image_verified_token_correction
+  pdf_page: 105
+  page: 101
+  source_row_index: 7
+  column: entropy_other_sources
+  ocr_token: ''
+  printed_token: -76±10
+  quote: Al+++(aq) ... -76±10
+  basis: Original-resolution page image proves the printed token.
 - record_id: table-006-0010
   kind: image_verified_metadata_token_correction
   pdf_page: 105
@@ -5490,7 +5510,7 @@ entries:
     table_number: 6
   path: records/table-006-0004.json
   row_count: 1
-  ocr_suspect_count: 3
+  ocr_suspect_count: 4
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
