@@ -22,8 +22,8 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.environment import _capacity_partial_pressures_pa
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.physical_constants import GAS_CONSTANT
 from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
 from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
 from simulator.transport_regime import (
@@ -291,8 +291,10 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 capacity_shortfall = {
                     'reason': 'duct_capacity_shortfall',
                     'requested_outlet_kg': requested_mass, 'allowed_outlet_kg': allowed_mass,
-                    'achieved_pressure_pa': residual_mol * GAS_CONSTANT
-                    * float(controls['headspace_temperature_K']) / float(controls['headspace_volume_m3']),
+                    'achieved_pressure_pa': _capacity_partial_pressures_pa(
+                        {'residual': residual_mol}, float(controls['headspace_volume_m3']),
+                        float(controls['headspace_temperature_K']),
+                    )['residual'],
                 }
         else:
             candidate_bled_mol = self._bled_species_mol(
