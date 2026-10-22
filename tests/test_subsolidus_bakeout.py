@@ -588,7 +588,7 @@ def test_ordinary_gas_and_solid_share_one_throughput():
     )
 
 
-def test_joint_admission_scales_ordinary_gas_before_routing():
+def test_joint_release_stays_within_pipe_capacity():
     temperature_K = 1000.0
     alpha = 0.4
     p_eq = 20.0
@@ -645,6 +645,7 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
     real_estimate = sim.overhead_model.estimate_transport_state
 
     def _estimate(flux, melt, *args, **kwargs):
+        state = real_estimate(flux, melt, *args, **kwargs)
         transport_calls.append({
             "species": {
                 str(name): float(rate)
@@ -654,8 +655,10 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
             "salt_mol": sim.atom_ledger.mol_by_account(
                 SALT_FEED_ACCOUNT
             ).get("CaSO4"),
+            "total_kg_hr": float(flux.total_kg_hr),
+            "state": state,
         })
-        return real_estimate(flux, melt, *args, **kwargs)
+        return state
 
     sim.overhead_model.estimate_transport_state = _estimate
     real_route = sim._route_to_condensation
@@ -694,24 +697,38 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
     sim._apply_c0_bakeout = _bakeout
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
     sim.step()
-    accepted = 2.0 * scale
-    fe_kg_hr = admitted * scale
-    so2_kg_hr = accepted * _molar("SO2")
-    o2_kg_hr = accepted * 0.5 * _molar("O2")
-    assert seen["fe_kg_hr"] == pytest.approx(fe_kg_hr)
-    assert "SO2" not in seen["species"]
-    assert "O2" not in seen["species"]
-    assert seen["salt_mol"] == pytest.approx(salt_before - accepted)
-    assert seen["salt_mol"] < salt_before
-    combined_before_commit = [
+    pump_admitted = 2.0 * scale
+    decision = [
         call for call in transport_calls
         if set(call["species"]) >= {"Fe", "SO2", "O2"}
         and call["salt_mol"] == pytest.approx(salt_before)
     ]
-    assert combined_before_commit
-    assert combined_before_commit[0]["species"]["Fe"] == pytest.approx(fe_kg_hr)
-    assert combined_before_commit[0]["species"]["SO2"] == pytest.approx(so2_kg_hr)
-    assert combined_before_commit[0]["species"]["O2"] == pytest.approx(o2_kg_hr)
+    assert decision
+    demand_kg_hr = decision[0]["total_kg_hr"]
+    capacity_kg_hr = decision[0]["state"]["pipe_conductance_kg_hr"]
+    assert demand_kg_hr > capacity_kg_hr
+    transport_scale = capacity_kg_hr / demand_kg_hr
+    accepted = pump_admitted * transport_scale
+    fe_kg_hr = admitted * scale * transport_scale
+    so2_kg_hr = accepted * _molar("SO2")
+    o2_kg_hr = accepted * 0.5 * _molar("O2")
+    assert fe_kg_hr + so2_kg_hr + o2_kg_hr == pytest.approx(capacity_kg_hr)
+    assert decision[0]["species"]["Fe"] == pytest.approx(admitted * scale)
+    assert decision[0]["species"]["SO2"] == pytest.approx(
+        pump_admitted * _molar("SO2")
+    )
+    assert decision[0]["species"]["O2"] == pytest.approx(
+        pump_admitted * 0.5 * _molar("O2")
+    )
+    assert seen["fe_kg_hr"] == pytest.approx(fe_kg_hr)
+    assert "SO2" not in seen["species"]
+    assert "O2" not in seen["species"]
+    assert seen["salt_mol"] == pytest.approx(salt_before - accepted)
+    assert salt_before > seen["salt_mol"] > 0.0
+    cap_record = sim._last_subsolidus_bakeout["transport_cap"]
+    assert cap_record["demand_kg_hr"] == pytest.approx(demand_kg_hr)
+    assert cap_record["capacity_kg_hr"] == pytest.approx(capacity_kg_hr)
+    assert cap_record["scale"] == pytest.approx(transport_scale)
     ordinary = EvaporationFlux(species_kg_hr={"Fe": fe_kg_hr})
     ordinary.update_totals()
     combined = EvaporationFlux(species_kg_hr={
@@ -720,19 +737,20 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
         "O2": o2_kg_hr,
     })
     combined.update_totals()
-    capacity = sim._effective_transport_capacity_this_tick
-    downstream = sim._headspace_downstream_pressure_bar(capacity)
+    assert combined.total_kg_hr == pytest.approx(capacity_kg_hr)
+    held = sim._effective_transport_capacity_this_tick
+    downstream = sim._headspace_downstream_pressure_bar(held)
     ordinary_state = real_estimate(
         ordinary,
         sim.melt,
         p_downstream_bar=downstream,
-        effective_transport_capacity=capacity,
+        effective_transport_capacity=held,
     )
     combined_state = real_estimate(
         combined,
         sim.melt,
         p_downstream_bar=downstream,
-        effective_transport_capacity=capacity,
+        effective_transport_capacity=held,
     )
     headspace = sim._melt_headspace_composition_mbar
     assert set(headspace) >= {"Fe", "SO2", "O2"}
@@ -747,14 +765,9 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
     assert sim.overhead.pipe_conductance_kg_hr == pytest.approx(
         combined_state["pipe_conductance_kg_hr"]
     )
-    assert combined_state["pipe_conductance_kg_hr"] != pytest.approx(
-        ordinary_state["pipe_conductance_kg_hr"]
+    assert sim.record.snapshots[-1].mass_balance_error_pct == pytest.approx(
+        0.0, abs=5e-12
     )
-    assert sim.overhead.transport_saturation_pct == pytest.approx(
-        combined.total_kg_hr / combined_state["pipe_conductance_kg_hr"] * 100.0
-    )
-    assert sim.overhead.transport_saturation_pct > 100.0
-    assert sim.overhead.evap_exceeds_transport is True
     assert sim._subsolidus_pending_release is None
     assert sim._last_subsolidus_bakeout["committed"] is True
     assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True

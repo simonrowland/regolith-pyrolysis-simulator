@@ -13654,6 +13654,119 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     diagnostic[key] = provider_diagnostic[key]
         return self._record_subsolidus_bakeout(diagnostic)
 
+    def _cap_c0_joint_release_to_pipe_capacity(
+        self,
+        evap_flux: EvaporationFlux,
+    ) -> EvaporationFlux:
+        """Scale this C0 step's joint release down to pipe capacity.
+
+        Physics ruling A (2026-10-22). Gas that cannot leave would raise
+        the headspace partial pressure and suppress further release in
+        the same step. Under fiat ledgering the reduced form is: release
+        beyond this step's capacity stays in the melt. It is not
+        released, not ledgered, and not carried as an overshoot.
+
+        Capacity is ``pipe_conductance_kg_hr`` from
+        ``OverheadGasModel.estimate_transport_state`` (the pressure-branch
+        pipe owner). This method does not compute a conductance.
+
+        Outside C0 the flux is returned unchanged. Ordinary evaporation
+        there is still not clipped to pipe kg/h; saturation above 100%
+        remains a next-step flag.
+        """
+        if self.melt.campaign != CampaignPhase.C0:
+            return evap_flux
+        inlet = self._subsolidus_transport_inlet_flux(evap_flux)
+        demand = float(inlet.total_kg_hr)
+        if not math.isfinite(demand) or demand <= 0.0:
+            return evap_flux
+        state = self.overhead_model.estimate_transport_state(
+            inlet,
+            self.melt,
+            p_downstream_bar=self._headspace_downstream_pressure_bar(None),
+        )
+        capacity = float(state["pipe_conductance_kg_hr"])
+        if not math.isfinite(capacity) or capacity < 0.0:
+            raise ValueError(
+                "pipe_conductance_kg_hr must be finite and non-negative; "
+                f"got {capacity!r}"
+            )
+        if demand <= capacity:
+            return evap_flux
+        scale = 0.0 if capacity == 0.0 else capacity / demand
+        self._scale_c0_joint_release(evap_flux, scale, demand, capacity)
+        return evap_flux
+
+    def _scale_c0_joint_release(
+        self,
+        evap_flux: EvaporationFlux,
+        scale: float,
+        demand_kg_hr: float,
+        capacity_kg_hr: float,
+    ) -> None:
+        """Apply one joint scale to ordinary gas and the pending solid release."""
+
+        def _positive(mapping: Mapping[str, Any] | None) -> dict[str, float]:
+            scaled: dict[str, float] = {}
+            for key, value in (mapping or {}).items():
+                if isinstance(value, bool) or not isinstance(value, (int, float)):
+                    continue
+                amount = float(value) * scale
+                if math.isfinite(amount) and amount > 0.0:
+                    scaled[str(key)] = amount
+            return scaled
+
+        def _positive_accounts(
+            mapping: Mapping[str, Any] | None,
+        ) -> dict[str, dict[str, float]]:
+            scaled_accounts: dict[str, dict[str, float]] = {}
+            for account, species_mol in (mapping or {}).items():
+                if not isinstance(species_mol, Mapping):
+                    continue
+                species_scaled = _positive(species_mol)
+                if species_scaled:
+                    scaled_accounts[str(account)] = species_scaled
+            return scaled_accounts
+
+        evap_flux.species_kg_hr = {
+            species: rate * scale
+            for species, rate in evap_flux.species_kg_hr.items()
+            if rate * scale > 1.0e-15
+        }
+        evap_flux.update_totals()
+        pending = getattr(self, "_subsolidus_pending_release", None)
+        if scale <= 0.0 or not pending:
+            self._subsolidus_pending_release = None
+        else:
+            debits, credits = pending
+            scaled_debits = _positive_accounts(debits)
+            scaled_credits = _positive_accounts(credits)
+            self._subsolidus_pending_release = (
+                (scaled_debits, scaled_credits)
+                if scaled_debits or scaled_credits
+                else None
+            )
+        solid = _positive(
+            getattr(self, "_subsolidus_committed_kg_hr_by_species", None)
+        )
+        self._subsolidus_committed_kg_hr_by_species = solid
+        diagnostic = getattr(self, "_last_subsolidus_bakeout", None)
+        if isinstance(diagnostic, dict):
+            diagnostic["released_kg_hr_by_species"] = dict(solid)
+            for key in (
+                "accepted_extent_mol_by_reaction",
+                "released_mol_by_species",
+                "release_mol_hr_by_species",
+            ):
+                value = diagnostic.get(key)
+                if isinstance(value, Mapping):
+                    diagnostic[key] = _positive(value)
+            diagnostic["transport_cap"] = {
+                "demand_kg_hr": demand_kg_hr,
+                "capacity_kg_hr": capacity_kg_hr,
+                "scale": scale,
+            }
+
     def _subsolidus_transport_inlet_flux(self, evap_flux: EvaporationFlux) -> EvaporationFlux:
         """Ordinary gas plus admitted solid-host gas, for transport only.
 
@@ -14563,16 +14676,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if rate * joint_scale > 1.0e-15
                 }
                 evap_flux.update_totals()
+        # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
+        # is capped this step. Outside C0 this leaves the flux alone.
+        evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
-        if inlet_flux is not evap_flux:
-            # Existing transport decision, before either release commits.
-            # Ordinary evaporation does not clip this hour to pipe kg/h.
-            self.overhead_model.estimate_transport_state(
-                inlet_flux,
-                self.melt,
-                p_downstream_bar=self._headspace_downstream_pressure_bar(None),
-            )
         self._commit_pending_subsolidus_release()
         effective_transport_capacity = (
             self._controlled_o2_transport_capacity(inlet_flux)
