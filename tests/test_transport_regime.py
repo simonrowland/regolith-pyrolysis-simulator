@@ -1,5 +1,7 @@
 import math
 
+from scipy.constants import R as UNIVERSAL_GAS_CONSTANT
+from scipy.integrate import quad
 import pytest
 
 from simulator import transport_regime as tr
@@ -914,23 +916,32 @@ def test_vacuum_relaxation_did_not_leak_into_the_shared_positive_guard():
     assert "invalid_pressure" in str(excinfo.value)
 
 
-def _independent_molecular_species_flow_mol_s(
+def _maxwellian_half_space_species_flow_mol_s(
     *, area_m2, transmission_probability, temperature_K, molar_mass_kg_mol,
     upstream_partial_pressure_Pa, downstream_partial_pressure_Pa,
 ):
-    """Reference: Clausing conductance times each species' own Δp/(RT)."""
-    conductance_m3_s = (
+    """Independent Maxwellian half-space integral for signed molar flow."""
+    velocity_sigma_m_s = math.sqrt(
+        UNIVERSAL_GAS_CONSTANT * temperature_K / molar_mass_kg_mol
+    )
+    positive_mean_velocity_m_s, _ = quad(
+        lambda velocity_m_s: (
+            velocity_m_s
+            * math.exp(-0.5 * (velocity_m_s / velocity_sigma_m_s) ** 2)
+            / (math.sqrt(2.0 * math.pi) * velocity_sigma_m_s)
+        ),
+        0.0,
+        math.inf,
+    )
+    delta_molar_density_mol_m3 = (
+        upstream_partial_pressure_Pa - downstream_partial_pressure_Pa
+    ) / (UNIVERSAL_GAS_CONSTANT * temperature_K)
+    return (
         area_m2
         * transmission_probability
-        * math.sqrt(
-            8.0 * tr.GAS_CONSTANT_J_MOL_K * temperature_K
-            / (math.pi * molar_mass_kg_mol)
-        )
-        / 4.0
+        * delta_molar_density_mol_m3
+        * positive_mean_velocity_m_s
     )
-    return conductance_m3_s * (
-        upstream_partial_pressure_Pa - downstream_partial_pressure_Pa
-    ) / (tr.GAS_CONSTANT_J_MOL_K * temperature_K)
 
 
 def test_molecular_two_species_reference_uses_independent_partial_pressures():
@@ -943,7 +954,7 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
     }
 
     equal_partial_flows = {
-        species: _independent_molecular_species_flow_mol_s(
+        species: _maxwellian_half_space_species_flow_mol_s(
             **common,
             molar_mass_kg_mol=mass,
             upstream_partial_pressure_Pa=50.0,
@@ -958,18 +969,18 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
         downstream_partial_pressures_Pa={"O2": 0.0, "Kr": 0.0},
     )
     assert actual_equal_partial_flows == pytest.approx(equal_partial_flows)
-    assert equal_partial_flows["O2"] / equal_partial_flows["Kr"] == pytest.approx(
+    assert actual_equal_partial_flows["O2"] / actual_equal_partial_flows["Kr"] == pytest.approx(
         math.sqrt(masses_kg_mol["Kr"] / masses_kg_mol["O2"]), rel=1e-12
     )
 
     counterflow = {
-        "O2": _independent_molecular_species_flow_mol_s(
+        "O2": _maxwellian_half_space_species_flow_mol_s(
             **common,
             molar_mass_kg_mol=masses_kg_mol["O2"],
             upstream_partial_pressure_Pa=80.0,
             downstream_partial_pressure_Pa=20.0,
         ),
-        "Kr": _independent_molecular_species_flow_mol_s(
+        "Kr": _maxwellian_half_space_species_flow_mol_s(
             **common,
             molar_mass_kg_mol=masses_kg_mol["Kr"],
             upstream_partial_pressure_Pa=20.0,
@@ -983,8 +994,8 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
         downstream_partial_pressures_Pa={"O2": 20.0, "Kr": 80.0},
     )
     assert actual_counterflow == pytest.approx(counterflow)
-    assert counterflow["O2"] > 0.0
-    assert counterflow["Kr"] < 0.0
+    assert actual_counterflow["O2"] > 0.0
+    assert actual_counterflow["Kr"] < 0.0
     assert sum({"O2": 80.0, "Kr": 20.0}.values()) == sum(
         {"O2": 20.0, "Kr": 80.0}.values()
     )
@@ -994,6 +1005,47 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
     assert tr.pipe_mass_flow_kg_s(
         0.01, 0.1, 0.057898, 1.0e-5, common["temperature_K"], 100.0, 100.0
     ) == 0.0
+    equal_partial_equilibrium = tr.independent_molecular_species_molar_flows_mol_s(
+        **common,
+        molar_masses_kg_mol=masses_kg_mol,
+        upstream_partial_pressures_Pa={"O2": 25.0, "Kr": 75.0},
+        downstream_partial_pressures_Pa={"O2": 25.0, "Kr": 75.0},
+    )
+    assert equal_partial_equilibrium == {"O2": 0.0, "Kr": 0.0}
+
+
+def test_molecular_species_reference_uses_clausing_owner_for_real_tube_geometry():
+    diameter_m = 0.12
+    length_m = 0.60
+    area_m2 = math.pi * diameter_m**2 / 4.0
+    transmission_probability = tr.clausing_transmission_probability(
+        diameter_m, length_m
+    )
+    assert 0.0 < transmission_probability < 1.0
+
+    actual = tr.independent_molecular_species_molar_flows_mol_s(
+        area_m2=area_m2,
+        transmission_probability=transmission_probability,
+        temperature_K=1200.0,
+        molar_masses_kg_mol={"O2": 0.031998, "Kr": 0.083798},
+        upstream_partial_pressures_Pa={"O2": 40.0, "Kr": 15.0},
+        downstream_partial_pressures_Pa={"O2": 10.0, "Kr": 5.0},
+    )
+    expected = {
+        species: _maxwellian_half_space_species_flow_mol_s(
+            area_m2=area_m2,
+            transmission_probability=transmission_probability,
+            temperature_K=1200.0,
+            molar_mass_kg_mol=molar_mass,
+            upstream_partial_pressure_Pa=upstream_pressure,
+            downstream_partial_pressure_Pa=downstream_pressure,
+        )
+        for species, molar_mass, upstream_pressure, downstream_pressure in (
+            ("O2", 0.031998, 40.0, 10.0),
+            ("Kr", 0.083798, 15.0, 5.0),
+        )
+    }
+    assert actual == pytest.approx(expected)
 
 
 def test_mean_mixture_bulk_fraction_routing_approximation_starts_at_molecular_limit():
