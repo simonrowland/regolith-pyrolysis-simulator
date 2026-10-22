@@ -151,15 +151,21 @@ def _projected_weights(*, over_threshold: bool = False) -> dict[str, float]:
 
 def _cr_mn_projection_weights(
     *,
-    p2o5_wt_pct: float = 0.0,
+    nio_wt_pct: float = 0.0,
     include_cr_mn: bool = True,
 ) -> dict[str, float]:
     cr2o3_wt_pct = 1.0 if include_cr_mn else 0.0
     mno_wt_pct = 0.5 if include_cr_mn else 0.0
-    return {
+    # NiO is the component the projection still drops. The classifier
+    # puts it in the 1 wt% count on the recorded pin and on eeea7b2:
+    # it is outside the IMCC parents, the Fe2O3 fold, the Cr/Mn
+    # relaxation, and every opt-in extension. P2O5 is not, once the
+    # dilute extension evaluates. A zero NiO amount leaves this map
+    # unchanged for the Cr/Mn relaxation fixture.
+    weights = {
         "Na2O": 5.0,
         "K2O": 1.0,
-        "SiO2": 50.5 - cr2o3_wt_pct - mno_wt_pct - p2o5_wt_pct,
+        "SiO2": 50.5 - cr2o3_wt_pct - mno_wt_pct - nio_wt_pct,
         "FeO": 10.0,
         "MgO": 10.0,
         "CaO": 15.0,
@@ -167,8 +173,11 @@ def _cr_mn_projection_weights(
         "TiO2": 0.5,
         "Cr2O3": cr2o3_wt_pct,
         "MnO": mno_wt_pct,
-        "P2O5": p2o5_wt_pct,
+        "P2O5": 0.0,
     }
+    if nio_wt_pct:
+        weights["NiO"] = nio_wt_pct
+    return weights
 
 
 def _element_inventory_mol(sim, balances: dict[str, dict[str, float]], element: str) -> float:
@@ -1726,7 +1735,7 @@ def test_cr_mn_projection_relaxes_threshold_and_reaches_provenance() -> None:
 
 def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
     composition = _moles_from_wt(
-        _cr_mn_projection_weights(p2o5_wt_pct=1.5, include_cr_mn=False)
+        _cr_mn_projection_weights(nio_wt_pct=1.5, include_cr_mn=False)
     )
 
     with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
@@ -1735,6 +1744,7 @@ def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
     assert refusal.value.code == "openimcc_projection_over_threshold"
     classifier = refusal.value.diagnostics["composition_projection_classification"]
     assert classifier["projection_verdict"] == "over_threshold"
+    assert set(classifier["dropped_components"]) == {"NiO"}
     assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
     result = _provider().dispatch(
         _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
@@ -1747,29 +1757,35 @@ def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
 
 
 @pytest.mark.parametrize(
-    ("p2o5_wt_pct", "should_project"),
+    ("nio_wt_pct", "should_project"),
     ((0.8, True), (1.2, False)),
 )
 def test_cr_mn_relaxation_does_not_change_other_projection_gate(
-    p2o5_wt_pct: float,
+    nio_wt_pct: float,
     should_project: bool,
 ) -> None:
     composition = _moles_from_wt(
-        _cr_mn_projection_weights(p2o5_wt_pct=p2o5_wt_pct)
+        _cr_mn_projection_weights(nio_wt_pct=nio_wt_pct)
     )
 
     if should_project:
         result = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
         classifier = result.policy["composition_projection_classification"]
         assert classifier["projection_verdict"] == "within_threshold"
+        assert classifier["thresholded_dropped_components"] == ["NiO"]
         assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(
-            p2o5_wt_pct
+            nio_wt_pct
         )
         return
 
     with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
         evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
     assert refusal.value.code == "openimcc_projection_over_threshold"
+    classifier = refusal.value.diagnostics["composition_projection_classification"]
+    assert classifier["thresholded_dropped_components"] == ["NiO"]
+    assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(
+        nio_wt_pct
+    )
 
 
 def test_projection_over_one_percent_refuses_and_provider_solves_projected(
@@ -1841,13 +1857,14 @@ def test_projected_solve_warns_above_five_percent_without_a_ceiling(
     omitted_wt_pct, high_omission,
 ) -> None:
     # Preserve the retained oxide ratios while allocating the specified
-    # wt% to P2O5. The original weights sum to 100 wt%; scaling them by
-    # the dimensionless retained fraction leaves 100 - omitted wt%.
+    # wt% to NiO, the component the projection classifier still drops.
+    # The original weights sum to 100 wt%; scaling them by the
+    # dimensionless retained fraction leaves 100 - omitted wt%.
     weights = {
         parent: wt * (100.0 - omitted_wt_pct) / 100.0
         for parent, wt in _cr_mn_projection_weights(include_cr_mn=False).items()
     }
-    weights["P2O5"] = omitted_wt_pct
+    weights["NiO"] = omitted_wt_pct
     result = _provider().dispatch(_request(_moles_from_wt(weights), CAP_PLUS_T_K))
     authority = result.diagnostic["high_t_melt_activity"]
     assert authority["provider"] == "openimcc"
