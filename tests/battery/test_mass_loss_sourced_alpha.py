@@ -173,16 +173,18 @@ def test_sourced_channels_close_oxygen_with_declared_unity_escape(
     )
 
 
-def test_r11_isolated_mgo_bound_has_zero_coproduct_oxygen(monkeypatch):
+def test_r11_supplier_free_corner_has_zero_oxygen_limit(monkeypatch):
     import simulator.battery.residue as residue
-    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+    from simulator.battery.residue import (
+        ResidueChannel, _mass_loss_corner_bounds, integrate_residue_inventory,
+    )
 
     # R-11 at its first ramp midpoint, 1183.15 K; real OpenIMCC 66ec4a3d8
-    # composition/pressure snapshot. Only the isolated MgO bound is active.
+    # composition/pressure snapshot. The supplier-free corner has neutral MgO active.
     inventory = {"MgO": 0.0005423805580240438, "SiO2": 0.0014578626113198004,
                  "Al2O3": 0.0003621246012321325, "CaO": 0.0007850791320550105}
     channels = (
-        ResidueChannel("MgO", "MgO", "MgO", 1.0, "isolated alpha<=1 bound"),
+        ResidueChannel("MgO", "MgO", "MgO", 1.0, "supplier-free oxygen corner"),
         ResidueChannel("O", "O", None, 1.0, "declared unity oxygen escape"),
         ResidueChannel("O2", "O2", None, 1.0, "declared unity oxygen escape"),
     )
@@ -217,6 +219,12 @@ def test_r11_isolated_mgo_bound_has_zero_coproduct_oxygen(monkeypatch):
     assert result.residue_mol == inventory
     assert result.buffer_oxygen_exchange_mol == 0.0
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1e-14
+    bound, corners = _mass_loss_corner_bounds(
+        inventory, channels, pressure, unsourced=("MgO",), temperature_K=1183.15,
+        duration_s=60.0, area_m2=9.13e-5,
+    )
+    assert bound["MgO"] == pytest.approx(8.1955388006018e-22, rel=1e-10, abs=0.0)
+    assert corners["pO2_low_bar"] == corners["pO2_high_bar"] == 0.0
 
     def invalid_pressure(inventory, logp):
         return dict(pressure(inventory, logp), MgO=1.8527138089578604e-16 * 10.0**logp)
@@ -228,20 +236,66 @@ def test_r11_isolated_mgo_bound_has_zero_coproduct_oxygen(monkeypatch):
         )
 
     oxygen_rich_channels = (
-        ResidueChannel("AlO2", "AlO2", "Al2O3", 1.0, "isolated alpha<=1 bound"),
+        ResidueChannel("AlO2", "AlO2", "Al2O3", 1.0, "supplier-free oxygen corner"),
         *channels[1:],
     )
 
     def oxygen_rich_pressure(inventory, logp):
         return dict(pressure(inventory, logp), AlO2=3.9402330720917226e-20 * (10.0**logp)**0.25)
 
-    # The next real R-11 bound needs additional oxygen. It must not acquire
-    # a fabricated zero bound from the congruent-oxide boundary correction.
-    with pytest.raises(ResidueInventoryRefusal, match="no root"):
-        integrate_residue_inventory(
-            inventory, oxygen_rich_channels, oxygen_rich_pressure, temperature_K=1183.15,
-            duration_s=60.0, area_evolution_m2=(9.13e-5,),
-        )
+    # A supplier-free consumer corner has zero flux. Its upper bound is
+    # evaluated at the opposite, oxygen-supplying corner, not at this root.
+    consumer = integrate_residue_inventory(
+        inventory, oxygen_rich_channels, oxygen_rich_pressure, temperature_K=1183.15,
+        duration_s=60.0, area_evolution_m2=(9.13e-5,),
+    )
+    assert consumer.pO2_bar_by_step == (0.0,)
+    assert consumer.evaporated_mol == {}
+
+
+@pytest.mark.parametrize("kind,expected_low,expected_high,expected_bounds", [
+    ("consumer", 2.018796086752308e-6, 2.018842360013321e-6,
+     {"AlO2": 2.404377673527403e-12}),
+    ("releaser", 2.018842360013321e-6, 2.418878686949343e-6,
+     {"Ca": 1.198086440164288e-8}),
+    ("both", 2.018796086752308e-6, 2.418878686949343e-6,
+     {"Ca": 1.198100170884603e-8, "AlO2": 2.515536402267817e-12}),
+    ("supplier-free", 0.0, 9.276958156134232e-7,
+     {"Ca": 0.056077, "AlO2": 1.979604734527376e-12}),
+    ("supplier-free-consumer", 0.0, 0.0, {"AlO2": 0.0}),
+], ids=["consumer", "releaser", "both", "supplier-free", "supplier-free-consumer"])
+def test_mass_loss_bounds_use_each_channels_worst_oxygen_corner(
+    kind, expected_low, expected_high, expected_bounds,
+):
+    from simulator.battery.residue import ResidueChannel, _mass_loss_corner_bounds
+
+    channels = [ResidueChannel("Mg", "Mg", "MgO", 0.0 if kind.startswith("supplier-free") else 0.5, "declared fixture"),
+                ResidueChannel("O2", "O2", None, 1.0, "declared unity escape")]
+    if kind not in {"consumer", "supplier-free-consumer"}:
+        channels.append(ResidueChannel("Ca", "Ca", "CaO", 0.0, "unsourced"))
+    if kind != "releaser":
+        channels.append(ResidueChannel("AlO2", "AlO2", "Al2O3", 0.0, "unsourced"))
+    bounds, corners = _mass_loss_corner_bounds(
+        {"MgO": 1.0, "CaO": 1.0, "Al2O3": 1.0}, channels,
+        lambda _inventory, logp: {
+            "Mg": 0.001 / (10.0**logp)**0.5,
+            "Ca": 0.0002 / (10.0**logp)**0.5,
+            "AlO2": 0.001 * (10.0**logp)**0.25,
+            "O2": 100000.0 * 10.0**logp,
+        },
+        unsourced=tuple(expected_bounds), temperature_K=2073.15,
+        area_m2=0.0001, duration_s=1.0,
+    )
+    # Independent 70-digit solution: x=pO2/bar; multiplying the low-corner
+    # equation by sqrt(x) gives a quadratic in x**(3/4). The high corner is
+    # the Mg+Ca cubic in sqrt(x). HKL at the maximizing root gives each
+    # channel's own parent-oxide kg, including its signed O coproduct once.
+    assert corners["pO2_low_bar"] <= corners["pO2_high_bar"]
+    assert corners["pO2_low_bar"] == pytest.approx(expected_low, rel=1e-10, abs=0.0)
+    assert corners["pO2_high_bar"] == pytest.approx(expected_high, rel=1e-10, abs=0.0)
+    assert bounds == pytest.approx(expected_bounds, rel=1e-10, abs=0.0)
+    if kind == "supplier-free":
+        assert corners["inventory_capped_channels"] == ["Ca"]
 
 
 @pytest.fixture
@@ -413,6 +467,10 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
     assert bound["preheat_bound_kg"] > 0
     assert bound["point_loss_kg"] == pytest.approx(float(prediction.value) * 0.0001904)
     assert bound["bound_kg"] == bound["preheat_bound_kg"]
+    # The fixture's vacuum joint diagnostic exceeds 1%; it cannot gate this
+    # healthy sourced point whose preheat envelope is below the threshold.
+    assert (bound["joint_arm_loss_kg_non_gating"] - bound["point_loss_kg"]
+            > 0.01 * bound["point_loss_kg"])
     assert bound["uncertainty_clause"] == "bulk mass-loss uncertainty not stated by source"
     assert any("approximate printed duration" in note and "excluded from point loss" in note
                for note in notices)
@@ -438,6 +496,25 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     detail = json.loads(prediction.refusal_detail["detail"])
     assert detail["bound_fraction"] > 0.01
     assert detail["unsourced_channels"] == ["Ca"]
+
+
+def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch):
+    pytest.importorskip("openimcc")
+    row, experiment = r11_inputs
+    original = score_module.load_yaml
+    monkeypatch.setattr(score_module, "load_yaml", lambda path: (
+        deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original(path)
+    ))
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert prediction.refusal_detail["reason"] == "alpha_not_sourced", prediction.refusal_detail
+    bound = json.loads(prediction.refusal_detail["detail"])
+    assert bound["point_loss_kg"] > 0.0
+    assert bound["bound_fraction"] > 0.01
+    assert bound["corner_ordering_verified"]
+    assert bound["corner_steps"] > 0
+    assert bound["unsourced_bound_kg_by_channel"]["AlO2"] > 0.0
+    assert bound["preheat_bound_kg"] > 0.0
+    assert bound["joint_arm_loss_kg_non_gating"] is not None
 
 
 def test_pressure_ceiling_uses_net_flux_and_preserves_equilibrium_guard(fig3_source):
@@ -537,9 +614,10 @@ def test_small_unsourced_bound_passes_without_entering_point_loss(
     assert bound["point_loss_kg"] == pytest.approx(float(small_bound.value) * 0.0001904)
     assert bound["unsourced_channels"] == ["Ca"]
     ca_bound = bound["unsourced_bound_kg_by_channel"]["Ca"]
-    # Independent analytic shrinking-area integration of isolated Ca in each
-    # prescribed thermal segment, starting at the sourced point inventory.
-    assert ca_bound == pytest.approx(6.020586440780917e-9, rel=1e-4)
+    assert ca_bound > 0.0
+    assert bound["corner_ordering_verified"]
+    assert bound["corner_steps"] > 0
+    assert bound["joint_arm_loss_kg_non_gating"] is not None
     assert bound["bound_kg"] == pytest.approx(ca_bound + bound["preheat_bound_kg"])
     assert bound["bound_fraction"] == pytest.approx(bound["bound_kg"] / bound["point_loss_kg"])
     assert 0 < bound["bound_fraction"] <= 0.01

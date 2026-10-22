@@ -9,7 +9,7 @@ import multiprocessing
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -513,6 +513,7 @@ def _finite_step_fluxes(
     area_m2: float,
     pressures_Pa: Mapping[str, float],
     background_pressure_Pa: float = 0.0,
+    include_below_threshold: bool = False,
 ) -> dict[str, float]:
     """Run the authoritative HKL provider at the solved channel pressures."""
     parent_channels = [term for term in terms if term.parent_moles_per_product > 0.0]
@@ -578,10 +579,10 @@ def _finite_step_fluxes(
             "missing_evaporation_alpha",
             f"catalog channels have no executable alpha: {sorted(diagnostic['missing_alpha'])}",
         )
-    return {
-        str(species): float(rate) / _SECONDS_PER_HOUR
-        for species, rate in dict(diagnostic.get("evaporation_flux_kg_hr") or {}).items()
-    }
+    rates = dict(diagnostic.get("evaporation_flux_kg_hr") or {})
+    if include_below_threshold:
+        rates.update((diagnostic.get("below_threshold_evaporation_flux") or {}).get("fluxes_kg_hr") or {})
+    return {str(species): float(rate) / _SECONDS_PER_HOUR for species, rate in rates.items()}
 
 
 def integrate_residue_inventory(
@@ -1213,8 +1214,8 @@ def _mass_loss_bound_gate(
     *, channels: Sequence[str], preheat_bound_kg: float,
 ) -> dict[str, Any]:
     # L is the sourced-channel point loss on the documented schedule [kg].
-    # Each unsourced channel is bounded separately at alpha=1 with its O2
-    # coproduct; other parent channels are off to avoid suppressing its flux.
+    # Each unsourced channel uses its alpha=1 worst-pO2-corner flux, including
+    # its stoichiometric oxygen mass. Sourced loss never cancels that envelope.
     # Their summed parent-oxide removal plus the WHOLE preheat rectangle is
     # extra loss B [kg], an envelope, not a jointly realizable trajectory.
     # The gate B/L has units kg/kg. Neither unsourced removal nor preheat
@@ -1241,6 +1242,83 @@ def _mass_loss_bound_gate(
         reason = "alpha_not_sourced" if channels else "preheat_bound_not_negligible"
         raise ResidueInventoryRefusal(reason, json.dumps(diagnostics, sort_keys=True))
     return diagnostics
+
+
+def _mass_loss_corner_bounds(
+    inventory: Mapping[str, float], channels: Sequence[ResidueChannel],
+    pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
+    *, unsourced: Sequence[str], temperature_K: float, area_m2: float, duration_s: float,
+    include_sourced: bool = False,
+) -> tuple[dict[str, float], dict[str, Any]]:
+    terms = _channel_terms(channels)
+    oxygen_channels = _residue_oxygen_channels(terms, inventory)
+    # At fixed composition P_i is proportional to pO2**nu_i. The closure is
+    # monotone: adding a releaser (nu<0) raises its root; adding a consumer
+    # (nu>0) lowers it. Thus all alpha_i in [0,1] lie between the low corner
+    # (releasers off, consumers on) and high corner (the reverse). Evaluate
+    # each unsourced alpha=1 flux at its maximizing corner: low for nu<0,
+    # high for nu>0, either for nu=0. Sum its OWN parent-oxide kg over dt;
+    # sourced-flux suppression cannot cancel B. This envelope is not a joint
+    # trajectory. The point arm and its original area/inventory remain L.
+    roots = []
+    for low_corner in (True, False):
+        selected = tuple(
+            replace(channel, alpha=(
+                1.0 if channel.pO2_exponent == 0.0
+                or (channel.pO2_exponent > 0.0) == low_corner else 0.0
+            ), alpha_source="alpha<=1 oxygen-corner bound")
+            if channel.species in unsourced else channel
+            for channel in oxygen_channels
+        )
+        try:
+            roots.append(_solve_vacuum_oxygen_balance(
+                lambda logp: pressure_model(inventory, logp), selected,
+                temperature_K=temperature_K,
+            ).pO2_bar)
+        except ValueError as exc:
+            raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
+    low, high = roots
+    if low > high:
+        raise ResidueInventoryRefusal("mass_loss_corner_order_invalid", str(roots))
+    pressures = [pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
+                 for root in roots]
+    selected_pressures = {}
+    inventory_caps = {}
+    for term, channel in zip(terms, oxygen_channels):
+        if (term.source.parent_oxide is None or not channel.active
+                or (channel.species not in unsourced and not include_sourced)):
+            continue
+        index = 0 if channel.pO2_exponent <= 0.0 else 1
+        if roots[index] == 0.0 and channel.pO2_exponent < 0.0:
+            # A negative-power pressure diverges at a supplier-free low
+            # corner. Its physical finite-step ceiling is all available
+            # parent, never a zero flux or a clipped logarithmic root.
+            inventory_caps[channel.species] = (
+                float(inventory.get(term.source.parent_oxide, 0.0))
+                * _formula_terms(term.source.parent_oxide)[1]
+            )
+        else:
+            selected_pressures[channel.species] = (
+                0.0 if roots[index] == 0.0 and channel.pO2_exponent > 0.0
+                else pressures[index][channel.species]
+            )
+    bound_terms = tuple(replace(term, source=replace(
+        term.source, alpha=(1.0 if term.source.species in unsourced else term.source.alpha)
+        if term.source.species in selected_pressures else 0.0,
+        alpha_source="worst-corner envelope; sourced alphas retained",
+    )) for term in terms)
+    rates = _finite_step_fluxes(
+        bound_terms, inventory, temperature_K=temperature_K, area_m2=area_m2,
+        pressures_Pa=selected_pressures, include_below_threshold=True,
+    )
+    bounds = {
+        term.source.species: rates.get(term.source.species, 0.0)
+        * duration_s * term.oxide_per_product_kg
+        for term in terms if term.source.species in selected_pressures
+    }
+    bounds.update(inventory_caps)
+    return bounds, {"pO2_low_bar": low, "pO2_high_bar": high,
+                    "inventory_capped_channels": sorted(inventory_caps)}
 
 
 def predict_mass_loss_fraction(
@@ -1377,11 +1455,14 @@ def predict_mass_loss_fraction(
     unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
                       if parent and str(species) not in fits)
 
+    bounds_by_channel = {species: 0.0 for species in unsourced}
+    corner_records = []
+    preheat_capped_channels = set()
+
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
-        rectangle: bool = False, upper_bound: bool = False,
-        bound_channel: str | None = None,
-    ) -> tuple[Mapping[str, float], float, dict[str, float]]:
+        rectangle: bool = False, unsourced_unity: bool = False,
+    ) -> tuple[Mapping[str, float], float]:
         at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
         for species, fit in at_fits.items():
             if fit["extrapolated"]:
@@ -1391,15 +1472,12 @@ def predict_mass_loss_fraction(
             species = str(species)
             if not parent:
                 alpha, provenance = 1.0, "declared unity oxygen escape; stoichiometric coproduct"
-            elif bound_channel is not None:
-                alpha = 1.0 if species == bound_channel else 0.0
-                provenance = "isolated alpha<=1 channel bound; other parent channels off"
             elif species in at_fits:
                 alpha = at_fits[species]["alpha"]
                 provenance = at_fits[species]["source_observation_id"]
             else:
-                alpha = 1.0 if upper_bound else 0.0
-                provenance = ("alpha<=1 preheat bound; not sourced coefficient" if upper_bound
+                alpha = 1.0 if unsourced_unity else 0.0
+                provenance = ("alpha<=1 joint/preheat arm; not sourced coefficient" if unsourced_unity
                               else "unsourced channel excluded from point loss")
             channels.append(ResidueChannel(species, species, parent or None, alpha, provenance))
         pressure_model = _make_residue_pressure_model(
@@ -1408,12 +1486,30 @@ def predict_mass_loss_fraction(
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
+        preheat_ceiling_kg = 0.0
+
+        def measure(incoming, active_channels, area, duration):
+            nonlocal preheat_ceiling_kg
+            bounds, corners = _mass_loss_corner_bounds(
+                incoming, active_channels, pressure_model, unsourced=unsourced,
+                temperature_K=at_K, area_m2=area, duration_s=duration,
+                include_sourced=rectangle,
+            )
+            if rectangle:
+                preheat_ceiling_kg += math.fsum(bounds.values())
+                preheat_capped_channels.update(corners["inventory_capped_channels"])
+                return
+            for species, amount in bounds.items():
+                bounds_by_channel[species] += amount
+            corner_records.append(corners)
+
         result = _hashimoto_integrate_geometry(
             inventory, channels, pressure_model, temperature_K=at_K,
             duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
             geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
             initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
-            background_pressure_Pa=0.0 if upper_bound else total_pressure_Pa,
+            background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
+            **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
         )
         if result.refusal is not None:
             raise result.refusal
@@ -1423,29 +1519,31 @@ def predict_mass_loss_fraction(
             * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
             for term in terms if term.source.parent_oxide is not None
         }
-        return result.inventory_mol, math.fsum(parent_loss.values()), {
-            species: amount for species, amount in parent_loss.items() if species in unsourced
-        }
+        return result.inventory_mol, (preheat_ceiling_kg if rectangle else math.fsum(parent_loss.values()))
 
     # The unknown preheat is an upper rectangle only: do not debit it as a
     # measured trajectory. All its removal, not just unsourced channels, joins B.
-    _unused_inventory, preheat_bound_kg, _unused_bound = run_segment(
+    _unused_inventory, preheat_bound_kg = run_segment(
         initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
-        rectangle=True, upper_bound=True
+        rectangle=True, unsourced_unity=True
     )
     inventory = initial_inventory_mol
+    joint_inventory = initial_inventory_mol
     documented_loss_kg = 0.0
-    bounds_by_channel = {species: 0.0 for species in unsourced}
+    joint_loss_kg = 0.0
+    joint_refusal = None
     for at_K, seconds in segments:
-        incoming = inventory
-        inventory, loss, _unused_bounds = run_segment(incoming, at_K, seconds)
-        for species in unsourced:
-            # Each independent vacuum ceiling uses the point arm's incoming
-            # state and area, with only this unsourced parent and its O2 active.
-            _, _, channel_bounds = run_segment(
-                incoming, at_K, seconds, upper_bound=True, bound_channel=species,
-            )
-            bounds_by_channel[species] += channel_bounds.get(species, 0.0)
+        inventory, loss = run_segment(
+            inventory, at_K, seconds,
+        )
+        if joint_refusal is None:
+            try:
+                joint_inventory, joint_loss = run_segment(
+                    joint_inventory, at_K, seconds, unsourced_unity=True,
+                )
+                joint_loss_kg += joint_loss
+            except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+                joint_refusal = {"reason": exc.reason, "detail": exc.detail}
         documented_loss_kg += loss
     unsourced_bound_kg = math.fsum(bounds_by_channel.values())
     point_loss_kg = documented_loss_kg
@@ -1464,12 +1562,34 @@ def predict_mass_loss_fraction(
             raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_basis_not_stated")
         if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
             raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
-    diagnostics = _mass_loss_bound_gate(
-        unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
-        channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
-        preheat_bound_kg=preheat_bound_kg,
-    )
-    diagnostics["unsourced_bound_kg_by_channel"] = bounds_by_channel
+    evidence = {
+        "unsourced_bound_kg_by_channel": bounds_by_channel,
+        "joint_arm_loss_kg_non_gating": joint_loss_kg if joint_refusal is None else None,
+        "joint_arm_refusal_non_gating": joint_refusal,
+        "joint_arm_background_pressure_Pa": 0.0,
+        "corner_steps": len(corner_records),
+        "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
+        "pO2_corner_ranges_bar": {
+            name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
+            for name in ("pO2_low_bar", "pO2_high_bar")
+        } if corner_records else {},
+        "inventory_capped_channels": sorted(preheat_capped_channels | {
+            species for c in corner_records for species in c["inventory_capped_channels"]
+        }),
+    }
+    try:
+        diagnostics = _mass_loss_bound_gate(
+            unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
+            channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
+            preheat_bound_kg=preheat_bound_kg,
+        )
+    except ResidueInventoryRefusal as exc:
+        if exc.reason not in {"alpha_not_sourced", "preheat_bound_not_negligible"}:
+            raise
+        diagnostics = json.loads(exc.detail)
+        diagnostics.update(evidence)
+        raise ResidueInventoryRefusal(exc.reason, json.dumps(diagnostics, sort_keys=True)) from exc
+    diagnostics.update(evidence)
     flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
     metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
     metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
@@ -1602,6 +1722,7 @@ def _hashimoto_integrate_geometry(
     initial_area_m2: float,
     initial_sample_mass_kg: float | None = None,
     background_pressure_Pa: float = 0.0,
+    on_step: Callable[[Mapping[str, float], Sequence[ResidueChannel], float, float], None] | None = None,
 ) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
@@ -1665,16 +1786,19 @@ def _hashimoto_integrate_geometry(
             if channel.parent_oxide is None
             or channel.parent_oxide not in exhausted_mol
         )
+        area_m2 = area_for_current_inventory()
         step = integrate_residue_inventory(
             inventory,
             active_channels,
             pressure_model,
             temperature_K=temperature_K,
             duration_s=duration,
-            area_evolution_m2=(area_for_current_inventory(),),
+            area_evolution_m2=(area_m2,),
             **({"background_pressure_Pa": background_pressure_Pa}
                if background_pressure_Pa else {}),
         )
+        if on_step is not None:
+            on_step(inventory, active_channels, area_m2, duration)
         inventory = dict(step.residue_mol)
         for species, amount in step.evaporated_mol.items():
             evaporated_mol[str(species)] += float(amount)

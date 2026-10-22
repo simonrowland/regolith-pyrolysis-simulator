@@ -179,17 +179,18 @@ def _solve_vacuum_oxygen_balance(
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
     parent_channels = [channel for channel in active_channels if channel.parent_oxygen_demand > 0.0]
-    neutral_parents_only = background_pressure_Pa == 0.0 and bool(parent_channels) and all(
-        channel.oxygen_atoms == channel.parent_oxygen_demand and channel.pO2_exponent == 0.0
+    zero_oxygen_boundary = background_pressure_Pa == 0.0 and all(
+        channel.oxygen_atoms >= channel.parent_oxygen_demand and channel.pO2_exponent >= 0.0
+        and (channel.oxygen_atoms == channel.parent_oxygen_demand or channel.pO2_exponent > 0.0)
         for channel in parent_channels
     ) and all(
         channel.pO2_exponent > 0.0
         for channel in active_channels if channel.parent_oxygen_demand == 0.0
     )
-    if neutral_parents_only:
-        # Congruent oxide gases release no coproduct oxygen: the root is the
-        # pO2=0 boundary. Validate every pressure exponent at a finite anchor
-        # before taking that limit; neutral-parent pressures have exponent 0.
+    if zero_oxygen_boundary:
+        # Without an oxygen supplier the root is pO2=0. Neutral oxide gases
+        # retain their pressures; oxygen-consuming gases and free O/O2 vanish.
+        # Validate every exponent at a finite anchor before taking the limit.
         root = low
     elif f_low == 0.0:
         root = low
@@ -231,10 +232,10 @@ def _solve_vacuum_oxygen_balance(
                 f"declared {channel.pO2_exponent}, observed {observed_exponent}"
             )
 
-    if neutral_parents_only:
+    if zero_oxygen_boundary:
         residual, pressures, oxygen_flux, parent_flux = evaluate(root, {
             channel.species: (
-                0.0 if channel.parent_oxygen_demand == 0.0 else pressures[channel.species]
+                0.0 if channel.pO2_exponent > 0.0 else pressures[channel.species]
             )
             for channel in active_channels
         })
@@ -244,7 +245,7 @@ def _solve_vacuum_oxygen_balance(
         for channel in active_channels
     }
     return _VacuumOxygenBalance(
-        pO2_bar=0.0 if neutral_parents_only else 10.0**root,
+        pO2_bar=0.0 if zero_oxygen_boundary else 10.0**root,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
         oxygen_atom_flux_mol_m2_s=oxygen_flux,
