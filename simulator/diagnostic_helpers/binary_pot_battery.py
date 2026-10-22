@@ -37,6 +37,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     CELSIUS_TO_KELVIN_OFFSET,
@@ -415,7 +416,7 @@ class EquilibrateCell:
                 if isinstance(payload.get("activities_standard_state"), Mapping)
                 else None
             ),
-            liquid_fraction=_finite_float(payload.get("liquid_fraction")),
+            liquid_fraction=finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
             hostname=str(payload.get("hostname") or ""),
@@ -725,7 +726,7 @@ def classify_reported_value(
     exploded Si cell is ~4.5e20 Pa.
     """
 
-    number = _finite_float(value)
+    number = finite_float(value)
     if number is None or number <= 0.0:
         return None
     if quantity != QUANTITY_PRESSURE:
@@ -906,16 +907,6 @@ def pairwise_residuals(
 # ---------------------------------------------------------------------------
 
 
-def _finite_float(value: Any) -> float | None:
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(number):
-        return None
-    return number
-
-
 def _optional_int(value: Any) -> int | None:
     if value is None or value is False:
         return None
@@ -940,7 +931,7 @@ def extract_reported_quantities(
 
     activities: dict[str, float] = {}
     for name, value in dict(getattr(result, "activity_coefficients", None) or {}).items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             activities[str(name)] = number
     raw_pressures = (
@@ -951,7 +942,7 @@ def extract_reported_quantities(
     pressures: dict[str, float] = {}
     invalid_pressure_components: list[str] = []
     for name, value in dict(raw_pressures).items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
         elif number is None or number < 0.0:
@@ -976,7 +967,7 @@ def reported_activity_coefficients(result: Any) -> dict[str, float]:
     if not isinstance(source, Mapping):
         return gammas
     for name, value in source.items():
-        number = _finite_float(value)
+        number = finite_float(value)
         if number is not None and number > 0.0:
             gammas[str(name)] = number
     return gammas
@@ -1301,7 +1292,7 @@ def _composition_projected_notice(
         ]
         if fraction is None:
             fraction = projection.get("dropped_mass_fraction")
-    fraction_number = _finite_float(fraction)
+    fraction_number = finite_float(fraction)
     return {
         "dropped_components": dropped,
         "dropped_mass_fraction": fraction_number,
@@ -1408,7 +1399,7 @@ def classify_equilibrate_outcome(
         if assemblage:
             if raw_liquid_fraction is None:
                 return "refusal", "liquid_fraction_missing", engine_reason
-            liquid_fraction = _finite_float(raw_liquid_fraction)
+            liquid_fraction = finite_float(raw_liquid_fraction)
             if legacy_raw_liquid_fraction_is_zero(liquid_fraction):
                 return (
                     "refusal",
@@ -2506,7 +2497,7 @@ class _OpenImccBatteryBackend:
                 ]
             notices.append(solved_notice)
             for name, value in gas_pressures.items():
-                number = _finite_float(value)
+                number = finite_float(value)
                 if number is None or number <= 0.0:
                     continue
                 pressures[str(name)] = number * PA_PER_BAR
@@ -2563,7 +2554,7 @@ class _OpenImccBatteryBackend:
                     "provenance_class": dict(gas_result.provenance_class),
                 }
                 for name, value in dict(gas_result).items():
-                    number = _finite_float(value)
+                    number = finite_float(value)
                     if number is None or number <= 0.0:
                         continue
                     pressures[str(name)] = number * PA_PER_BAR
@@ -2678,7 +2669,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "observation carries no usable oxide composition",
         )
 
-    temperature = _finite_float(temperature_C)
+    temperature = finite_float(temperature_C)
     if (
         isinstance(temperature_C, bool)
         or temperature is None
@@ -2689,7 +2680,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_temperature",
             f"temperature_C must be finite and above absolute zero; got {temperature_C!r}",
         )
-    pressure = _finite_float(pressure_bar)
+    pressure = finite_float(pressure_bar)
     if isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0:
         raise _InternalAnalyticalInputRefusal(
             2,
@@ -2700,7 +2691,7 @@ def _internal_analytical_vapor_pressure_adapter(
     validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():
-            value = _finite_float(raw)
+            value = finite_float(raw)
             if isinstance(raw, bool) or value is None or value < 0.0:
                 raise _InternalAnalyticalInputRefusal(
                     2,
@@ -2713,7 +2704,7 @@ def _internal_analytical_vapor_pressure_adapter(
         from simulator.accounting.formulas import resolve_species_formula
 
         for species, raw in (composition_mol or {}).items():
-            amount = _finite_float(raw)
+            amount = finite_float(raw)
             if isinstance(raw, bool) or amount is None or amount < 0.0:
                 raise _InternalAnalyticalInputRefusal(
                     2,
@@ -2754,7 +2745,7 @@ def _internal_analytical_vapor_pressure_adapter(
         )
     oxygen_notices: list[dict[str, Any]] = []
     if po2_request.mode == PO2_COMMANDED:
-        po2_bar = _finite_float(po2_request.po2_bar)
+        po2_bar = finite_float(po2_request.po2_bar)
         if (
             isinstance(po2_request.po2_bar, bool)
             or po2_bar is None
@@ -2798,7 +2789,7 @@ def _internal_analytical_vapor_pressure_adapter(
             ),
             None,
         )
-        po2_bar = None if solved is None else _finite_float(solved.get("pO2_bar"))
+        po2_bar = None if solved is None else finite_float(solved.get("pO2_bar"))
         if oxygen_result.status != "ok" or po2_bar is None or po2_bar <= 0.0:
             raise _InternalAnalyticalInputRefusal(
                 1,
@@ -2856,11 +2847,14 @@ def _internal_analytical_vapor_pressure_adapter(
         liquid_fraction=None,
     )
     if include_diagnostic_shadows:
-        core._refresh_vapor_pressures_from_kernel(equilibrium)
+        core._refresh_vapor_pressures_from_kernel(
+            equilibrium, observation_pO2_bar=po2_bar,
+        )
     else:
         core._refresh_vapor_pressures_from_kernel(
             equilibrium,
             include_diagnostic_shadows=False,
+            observation_pO2_bar=po2_bar,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []
@@ -3348,7 +3342,7 @@ def run_isolated_cell_worker(
         pot,
         temperature_K=float(payload["temperature_K"]),
         po2=po2,
-        timeout_s=_finite_float(payload.get("timeout_s")),
+        timeout_s=finite_float(payload.get("timeout_s")),
         physical_pressure_bar=(
             None
             if payload.get("physical_pressure_bar") is None
@@ -4134,7 +4128,7 @@ def equilibrate_cell(
             melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,
             invalid_gas_partial_pressure_components=invalid_pressure_components,
-            liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
+            liquid_fraction=finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
             vapor_pressure_backend_status=vapor_authority[
                 "vapor_pressure_backend_status"

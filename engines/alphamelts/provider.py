@@ -85,6 +85,7 @@ from simulator.melt_backend.liquidus import (
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.melt_regime import MeltRegime, liquid_fraction_invalidity, melt_regime
+from simulator.scalar_boundary import is_finite
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
@@ -453,7 +454,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             result[account] = {
                 str(sp): float(mol)
                 for sp, mol in species_mol.items()
-                if _is_finite(mol) and float(mol) > 0.0
+                if is_finite(mol) and float(mol) > 0.0
             }
         return result
 
@@ -977,18 +978,6 @@ class AlphaMELTSProvider(ChemistryProvider):
         return 'unavailable'
 
 
-def _is_finite(value: Any) -> bool:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return False
-    if numeric != numeric:
-        return False
-    if numeric in (float('inf'), float('-inf')):
-        return False
-    return True
-
-
 def _out_of_domain_diagnostics(
     request: IntentRequest,
     *,
@@ -1048,7 +1037,7 @@ def _with_backend_status_reason(
 def _finite_positive_mapping(values: Mapping[str, float]) -> dict[str, float]:
     result: dict[str, float] = {}
     for key, value in dict(values or {}).items():
-        if _is_finite(value) and float(value) > 0.0:
+        if is_finite(value) and float(value) > 0.0:
             result[str(key)] = float(value)
     return result
 
