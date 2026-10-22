@@ -1373,7 +1373,10 @@ class PyrolysisRun:
             "kernel_commit_sha", _resolve_kernel_commit_sha()
         )
 
-        engines_used = self._engines_used(sim)
+        engines_used = _safe_failure_value(
+            lambda: _json_safe(self._engines_used(sim)),
+            section="run_metadata.engines_used",
+        )
         session_config = getattr(execution.session, "_config", None)
         if session_config is None:
             raise RuntimeError("run execution session missing config")
@@ -1384,7 +1387,7 @@ class PyrolysisRun:
             "feedstock_id": self.feedstock_id,
             "campaign": self.campaign,
             "hours_requested": int(self.hours),
-            "hours_completed": int(sim.melt.hour),
+            "hours_completed": _execution_hours_completed(execution),
             "mass_kg": float(self.mass_kg),
             "additives_kg": {
                 k: float(v) for k, v in sorted(applied_additives_kg.items())
@@ -1427,15 +1430,29 @@ class PyrolysisRun:
             run_metadata["reduced_real_cache"] = _json_safe(
                 execution.reduced_real_cache
             )
-        lab_area_bridge = self._lab_area_bridge()
+        lab_area_bridge = _safe_failure_value(
+            lambda: _json_safe(self._lab_area_bridge()),
+            section="run_metadata.lab_area_bridge",
+        )
         if lab_area_bridge:
-            run_metadata.update(_json_safe(lab_area_bridge))
+            if (
+                isinstance(lab_area_bridge, Mapping)
+                and lab_area_bridge.get("status") == "unavailable"
+                and lab_area_bridge.get("section")
+                == "run_metadata.lab_area_bridge"
+            ):
+                run_metadata["lab_area_bridge"] = lab_area_bridge
+            else:
+                run_metadata.update(lab_area_bridge)
         # Anything left in metadata_overrides is propagated verbatim --
         # callers can stuff extra provenance (CI run id, etc.) without
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
-        run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
+        run_metadata["campaigns_elapsed"] = _safe_failure_value(
+            lambda: float(execution.campaigns_elapsed),
+            section="run_metadata.campaigns_elapsed",
+        )
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -1461,21 +1478,34 @@ class PyrolysisRun:
             lambda: _json_safe(_final_state_from_ledger(sim)),
             section="final_state",
         )
-        refusal_diagnostic = dict(execution.refusal_diagnostic or {})
+        refusal_diagnostic = _safe_failure_value(
+            lambda: _json_safe(dict(execution.refusal_diagnostic or {})),
+            section="run_metadata.refusal_diagnostic",
+        )
         if refusal_diagnostic:
-            run_metadata["refusal_diagnostic"] = _json_safe(
+            run_metadata["refusal_diagnostic"] = refusal_diagnostic
+        knudsen_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                dict(
+                    refusal_diagnostic
+                    if execution.reason == KNUDSEN_REFUSAL_REASON
+                    else _knudsen_regime_diagnostic_from_sim(sim)
+                )
+            ),
+            section="run_metadata.knudsen_regime_diagnostic",
+            upstream=(
                 refusal_diagnostic
-            )
-        knudsen_diagnostic = dict(
-            refusal_diagnostic
-            if execution.reason == KNUDSEN_REFUSAL_REASON
-            else _knudsen_regime_diagnostic_from_sim(sim)
+                if execution.reason == KNUDSEN_REFUSAL_REASON
+                else None
+            ),
         )
         if knudsen_diagnostic:
-            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
-                knudsen_diagnostic)
-        run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
-            pressure_coating_pareto_diagnostic(sim, execution.per_hour)
+            run_metadata["knudsen_regime_diagnostic"] = knudsen_diagnostic
+        run_metadata["pressure_coating_pareto_diagnostic"] = _safe_failure_value(
+            lambda: _json_safe(
+                pressure_coating_pareto_diagnostic(sim, execution.per_hour)
+            ),
+            section="run_metadata.pressure_coating_pareto_diagnostic",
         )
         alpha_authority_status_by_species = dict(
             getattr(sim, "_alpha_authority_status_by_species_engaged", {}) or {}
@@ -1491,17 +1521,26 @@ class PyrolysisRun:
             run_metadata["c3_na_hold_adjustment"] = _json_safe(
                 c3_na_hold_adjustment
             )
-        cost_rollup_diagnostic = build_cost_rollup_diagnostic(
-            cost_ledger=sim.cost_ledger,
-            per_hour=execution.per_hour,
-            products_kg=sim.product_ledger(),
-            pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-            snapshots=execution.snapshots,
+        cost_rollup_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                {
+                    **build_cost_rollup_diagnostic(
+                        cost_ledger=sim.cost_ledger,
+                        per_hour=execution.per_hour,
+                        products_kg=sim.product_ledger(),
+                        pumping_context=pumping_context_from_sim(
+                            sim, execution.snapshots
+                        ),
+                        snapshots=execution.snapshots,
+                    ),
+                    "price_basis": (
+                        "legacy_placeholder_awaiting_owner_ratification"
+                    ),
+                }
+            ),
+            section="run_metadata.cost_rollup_diagnostic",
         )
-        cost_rollup_diagnostic["price_basis"] = (
-            "legacy_placeholder_awaiting_owner_ratification"
-        )
-        run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
+        run_metadata["cost_rollup_diagnostic"] = cost_rollup_diagnostic
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Liner-life temperature-ceiling diagnostic (b-107 / t-478 wire):
@@ -1522,7 +1561,7 @@ class PyrolysisRun:
             or ""
         ).strip()
         if furnace_material_id:
-            try:
+            def build_liner_life_diagnostic() -> dict[str, Any]:
                 # Melt pO2 is stored in mbar; the liner-life evaluator takes bar.
                 # Premise: 1 mbar = 1e-3 bar. Algebra: bar = mbar * 1e-3.
                 # Unit check: mbar * (bar/1000 mbar) = bar. Sanity: 1 mbar -> 0.001 bar.
@@ -1541,25 +1580,17 @@ class PyrolysisRun:
                 )
                 if not math.isfinite(hot_hours) or hot_hours <= 0.0:
                     hot_hours = 10.0
-                run_metadata["liner_life_diagnostic"] = _json_safe(
-                    build_liner_life_run_diagnostic(
-                        material_id=furnace_material_id,
-                        hot_hours_per_run=hot_hours,
-                        pO2_bar=diagnostic_pO2_bar,
-                    )
+                return build_liner_life_run_diagnostic(
+                    material_id=furnace_material_id,
+                    hot_hours_per_run=hot_hours,
+                    pO2_bar=diagnostic_pO2_bar,
                 )
-            except Exception:  # noqa: BLE001 -- instrument-only; never abort the run
-                run_metadata["liner_life_diagnostic"] = {
-                    "status": "failed",
-                    "authority": "diagnostic_only",
-                    "level": "info",
-                    "binding": False,
-                    "gating": False,
-                    "material_id": furnace_material_id,
-                    "refusal": {
-                        "reason": "liner_life_diagnostic_attachment_failed",
-                    },
-                }
+
+            run_metadata["liner_life_diagnostic"] = _safe_failure_value(
+                lambda: _json_safe(build_liner_life_diagnostic()),
+                section="run_metadata.liner_life_diagnostic",
+                upstream=run_metadata.get("hours_completed"),
+            )
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
         # ``status='refused'`` returned by the C3 K-shuttle / Na-shuttle
@@ -1605,6 +1636,7 @@ class PyrolysisRun:
                 )
             ),
             section="final",
+            upstream=final_state,
         )
         _attach_wall_deposit_report_refusal(
             run_metadata,
@@ -1766,21 +1798,41 @@ class PyrolysisRun:
             "reason": reason,
             "error_message": error_message,
         }
-        c0_char_diagnostic = _c0_char_diagnostic(
-            sim,
-            execution.snapshots,
-            feedstock_id=self.feedstock_id,
+        c0_char_diagnostic = _safe_failure_value(
+            lambda: _json_safe(
+                _c0_char_diagnostic(
+                    sim,
+                    execution.snapshots,
+                    feedstock_id=self.feedstock_id,
+                )
+            ),
+            section="run_metadata.c0_char_diagnostic",
         )
         if c0_char_diagnostic:
-            run_metadata["c0_char_diagnostic"] = _json_safe(
-                c0_char_diagnostic
+            run_metadata["c0_char_diagnostic"] = c0_char_diagnostic
+        organics_source = _safe_failure_value(
+            lambda: _json_safe(getattr(sim, "_last_organics_source", None) or {}),
+            section="run_metadata.organics_source",
+        )
+        if (
+            isinstance(organics_source, Mapping)
+            and organics_source.get("status") == "unavailable"
+        ):
+            run_metadata["organics_source"] = organics_source
+            run_metadata["organics_evolved_gas"] = (
+                _unavailable_report_from_upstream(
+                    organics_source,
+                    section="run_metadata.organics_evolved_gas",
+                )
             )
-        organics_source = getattr(sim, "_last_organics_source", None) or {}
-        if organics_source:
-            run_metadata["organics_evolved_gas"] = _json_safe(
-                organics_source.get("evolved_gas_combined") or {}
+        elif organics_source:
+            run_metadata["organics_evolved_gas"] = _safe_failure_value(
+                lambda: _json_safe(
+                    organics_source.get("evolved_gas_combined") or {}
+                ),
+                section="run_metadata.organics_evolved_gas",
             )
-            run_metadata["organics_source"] = _json_safe(organics_source)
+            run_metadata["organics_source"] = organics_source
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -3561,13 +3613,28 @@ def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
     return dict(notice)
 
 
+def _attach_run_metadata_report(
+    run_metadata: dict[str, Any],
+    key: str,
+    builder: Any,
+) -> None:
+    report = _safe_failure_value(
+        lambda: _json_safe(builder()),
+        section=f"run_metadata.{key}",
+    )
+    if report:
+        run_metadata[key] = report
+
+
 def _attach_engine_commissioning_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _engine_commissioning_notice(sim)
-    if notice:
-        run_metadata["engine_commissioning_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "engine_commissioning_notice",
+        lambda: _engine_commissioning_notice(sim),
+    )
 
 
 def _attach_engine_binding_admission_notice(
@@ -3576,9 +3643,11 @@ def _attach_engine_binding_admission_notice(
 ) -> None:
     from simulator.engine_binding_admission import binding_admission_run_notice
 
-    notice = binding_admission_run_notice(sim)
-    if notice:
-        run_metadata["engine_binding_admission_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "engine_binding_admission_notice",
+        lambda: binding_admission_run_notice(sim),
+    )
 
 
 def _diagnostic_gate_authority_notice(sim: Any) -> dict[str, Any] | None:
@@ -3595,9 +3664,11 @@ def _attach_diagnostic_gate_authority_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _diagnostic_gate_authority_notice(sim)
-    if notice:
-        run_metadata["diagnostic_gate_authority_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "diagnostic_gate_authority_notice",
+        lambda: _diagnostic_gate_authority_notice(sim),
+    )
 
 
 def _sulfur_saturation_notice(sim: Any) -> dict[str, Any] | None:
@@ -3614,9 +3685,11 @@ def _attach_sulfur_saturation_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _sulfur_saturation_notice(sim)
-    if notice:
-        run_metadata["sulfur_saturation_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "sulfur_saturation_notice",
+        lambda: _sulfur_saturation_notice(sim),
+    )
 
 
 def _rump_expectation_notice(sim: Any) -> dict[str, Any] | None:
@@ -3633,9 +3706,11 @@ def _attach_rump_expectation_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _rump_expectation_notice(sim)
-    if notice:
-        run_metadata["rump_expectation_notice"] = _json_safe(notice)
+    _attach_run_metadata_report(
+        run_metadata,
+        "rump_expectation_notice",
+        lambda: _rump_expectation_notice(sim),
+    )
 
 
 def _composition_projected_liquidus_notice(sim: Any) -> dict[str, Any] | None:
@@ -3654,22 +3729,22 @@ def _attach_composition_projected_liquidus_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = _composition_projected_liquidus_notice(sim)
-    if notice:
-        run_metadata["composition_projected_liquidus_notice"] = _json_safe(
-            notice
-        )
+    _attach_run_metadata_report(
+        run_metadata,
+        "composition_projected_liquidus_notice",
+        lambda: _composition_projected_liquidus_notice(sim),
+    )
 
 
 def _attach_high_t_melt_activity_fallback_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    notice = read_high_t_melt_activity_fallback_notice(sim)
-    if notice:
-        run_metadata["high_t_melt_activity_fallback_notice"] = _json_safe(
-            notice
-        )
+    _attach_run_metadata_report(
+        run_metadata,
+        "high_t_melt_activity_fallback_notice",
+        lambda: read_high_t_melt_activity_fallback_notice(sim),
+    )
 
 
 def _engine_commissioning_sentence(notice: Mapping[str, Any]) -> str:
@@ -5348,7 +5423,17 @@ def _parse_runtime_campaign_overrides_json(
     return parsed
 
 
-def _safe_failure_value(builder: Any, *, section: str) -> Any:
+def _safe_failure_value(
+    builder: Any,
+    *,
+    section: str,
+    upstream: Any = None,
+) -> Any:
+    if (
+        isinstance(upstream, Mapping)
+        and upstream.get("status") == "unavailable"
+    ):
+        return _unavailable_report_from_upstream(upstream, section=section)
     try:
         return builder()
     except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
@@ -5360,6 +5445,27 @@ def _safe_failure_value(builder: Any, *, section: str) -> Any:
             "exception_type": type(exc).__name__,
             "reason": message if separator else failure,
         }
+
+
+def _unavailable_report_from_upstream(
+    upstream: Mapping[str, Any],
+    *,
+    section: str,
+) -> dict[str, str]:
+    upstream_section = str(upstream.get("section") or "unknown")
+    upstream_exception = str(
+        upstream.get("exception_type") or "UpstreamReportUnavailable"
+    )
+    upstream_reason = str(upstream.get("reason") or "no reason provided")
+    return {
+        "status": "unavailable",
+        "section": section,
+        "exception_type": upstream_exception,
+        "reason": (
+            f"upstream section {upstream_section} unavailable: "
+            f"{upstream_reason}"
+        ),
+    }
 
 
 def _execution_hours_completed(execution: RunExecution | None) -> Any:
@@ -5454,16 +5560,19 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
-    run_metadata["campaigns_elapsed"] = _json_safe(
-        float(
-            getattr(
-                execution,
-                "campaigns_elapsed",
-                overrides.get("campaigns_elapsed", 1.0),
+    run_metadata["campaigns_elapsed"] = _safe_failure_value(
+        lambda: _json_safe(
+            float(
+                getattr(
+                    execution,
+                    "campaigns_elapsed",
+                    overrides.get("campaigns_elapsed", 1.0),
+                )
+                if execution is not None
+                else overrides.get("campaigns_elapsed", 1.0)
             )
-            if execution is not None
-            else overrides.get("campaigns_elapsed", 1.0)
-        )
+        ),
+        section="run_metadata.campaigns_elapsed",
     )
     run_metadata.update(
         canonicalize_fidelity_emission(
@@ -5472,18 +5581,21 @@ def _runner_failure_result(
             backend_authoritative=backend_authoritative,
         )
     )
-    refusal_diagnostic = (
-        dict(getattr(execution, "refusal_diagnostic", {}) or {})
-        if execution is not None
-        else {}
+    refusal_diagnostic = _safe_failure_value(
+        lambda: _json_safe(
+            dict(getattr(execution, "refusal_diagnostic", {}) or {})
+            if execution is not None
+            else {}
+        ),
+        section="run_metadata.refusal_diagnostic",
     )
     if refusal_diagnostic:
-        run_metadata["refusal_diagnostic"] = _json_safe(
-            refusal_diagnostic
-        )
+        run_metadata["refusal_diagnostic"] = refusal_diagnostic
         if str(reason or "") == KNUDSEN_REFUSAL_REASON:
-            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
-                refusal_diagnostic
+            run_metadata["knudsen_regime_diagnostic"] = _safe_failure_value(
+                lambda: _json_safe(dict(refusal_diagnostic)),
+                section="run_metadata.knudsen_regime_diagnostic",
+                upstream=refusal_diagnostic,
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
     _attach_engine_commissioning_notice(run_metadata, sim)
@@ -5518,6 +5630,7 @@ def _runner_failure_result(
                 )
             ),
             section="final",
+            upstream=final_state,
         )
         _attach_wall_deposit_report_refusal(
             run_metadata,

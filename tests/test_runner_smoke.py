@@ -332,6 +332,46 @@ def test_completed_run_preserves_success_when_stage_purity_raises(
     }
 
 
+def test_completed_run_marks_final_unavailable_when_ledger_projection_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_ledger_projection_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "RuntimeError",
+        "reason": "injected ledger projection failure",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "RuntimeError",
+        "reason": (
+            "upstream section final_state unavailable: "
+            "injected ledger projection failure"
+        ),
+    }
+
+
 def test_completed_run_reports_unresolved_wall_species_without_aborting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2643,6 +2683,18 @@ def test_runner_failure_preserves_primary_when_atom_ledger_lookup_raises() -> No
         "section": "yield_disposition",
         "exception_type": "LookupError",
         "reason": "ledger unavailable",
+    }
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "LookupError",
+        "reason": "upstream section final_state unavailable: ledger unavailable",
     }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
