@@ -263,7 +263,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert zero_residuals[0].refusal.reason is RefusalReason.METRIC_DOMAIN
 
 
-def test_borisov_redox_headline_splits_calibration_overlap_from_accuracy(tmp_path):
+def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
     migrator = migrate_one_extract(root, extract)
