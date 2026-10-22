@@ -305,6 +305,35 @@ Rules:
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
 
+#### Printed oxygen condition source
+
+An observation may identify the printed O/O2 observation used for its oxygen
+condition with `values.oxygen_partial_pressure.source_observation_id`:
+
+```yaml
+values:
+  oxygen_partial_pressure:
+    value: 1.24e-8
+    units: atm
+    locator: {published_page: 1295, table: '3', note: row 1}
+    source_observation_id: shornikov_2020_table3_o2_partial_pressure_2278k
+```
+
+The optional field is a nonempty string naming a migrated O or O2
+partial-pressure observation in the **same source**. Local observation IDs
+and fully qualified `<source_id>::<observation_id>` IDs are accepted.
+Migration validates the reference after all observations in the extract have
+been emitted, qualifies it, and appends it to the stamped condition's existing
+`Located.inference.inputs`, preserving pressure conversion metadata. An invalid
+reference produces a typed `referential_integrity` issue and no source link.
+The printed node must be the condition actually stamped on that observation.
+
+Omission or null preserves the existing unlinked provenance. Never infer this
+field from matching pressures, species names, or locator notes. A condition
+may explicitly name its own O2 observation; scoring then excludes that input
+as `used_as_scoring_condition`. Other sample species using that same condition
+remain scoring targets.
+
 ### Uncertainty (first-class)
 
 Each observation **retains stated uncertainty verbatim** under `uncertainty`

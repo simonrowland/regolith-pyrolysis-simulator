@@ -27,7 +27,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.environment import (
     DEFAULT_VACUUM_FLOOR_BAR,
-    vacuum_floor_bar_for_environment,
+    oxygen_numerical_floor_bar_for_body,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -420,7 +420,11 @@ def resolve_request_vacuum_floor_bar(
     *,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Resolve the applicable vacuum floor from controls or caller default."""
+    """Resolve the oxygen numerical guard from controls or caller default.
+
+    This legacy control name is consumed by oxygen/vapour calculations, never
+    by vessel total-pressure feasibility. Ambient CO2 cannot set this guard.
+    """
 
     controls = request.control_inputs or {}
     explicit_floor = controls.get("vacuum_floor_bar")
@@ -441,10 +445,7 @@ def resolve_request_vacuum_floor_bar(
     body = controls.get("body")
     ambient_pressure_bar = controls.get("ambient_pressure_bar")
     if body is not None or ambient_pressure_bar is not None:
-        return vacuum_floor_bar_for_environment(
-            body=body,
-            ambient_pressure_bar=ambient_pressure_bar,
-        )
+        return oxygen_numerical_floor_bar_for_body(body)
 
     try:
         if not is_declared_real_scalar(floor_bar, allow_numeric_str=True):

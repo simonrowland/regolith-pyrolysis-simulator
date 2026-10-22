@@ -383,6 +383,23 @@ PHASE_MAP: dict[str, Phase] = {
     "(c)": Phase.CR,
 }
 
+
+def phase_for_sample_form(form: str | None) -> Phase | None:
+    """Closed phase for a sample form token. Untyped prose is None.
+
+    Same lookup the p_sat reservoir fill uses: strip, casefold, then
+    PHASE_MAP. A miss is not a phase. ``map_phase`` stays separate: it
+    records the original species-phase spelling on an unknown.
+    """
+
+    if form is None:
+        return None
+    token = form.strip().casefold()
+    if not token:
+        return None
+    return PHASE_MAP.get(token)
+
+
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
     "fugacity_series": Quantity.FUGACITY,
@@ -527,6 +544,7 @@ REGIME_TO_METHOD = {
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+    "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "transpiration": MethodToken.TRANSPIRATION,
     "tga": MethodToken.TGA,
@@ -1871,11 +1889,18 @@ def _sample_from_plain(
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
-    owner_initial = _owner_initial_from_printed(
-        printed_located,
-        initial_located,
-        declared_start=printed_from_initial,
-    )
+    composition_role, _role_refusal = _declared_composition_role(payload)
+    owner_initial = None
+    if (
+        not (initial_located is not None and initial_located.state.is_value)
+        and (
+            printed_from_initial
+            or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        )
+    ):
+        owner_initial = _owner_initial_from_printed(
+            printed_located, proxy_flag=composition_role
+        )
     if owner_initial is not None:
         initial_located = owner_initial
     return Sample(
@@ -2967,6 +2992,7 @@ def convert_volume_to_m3(
 
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
+    "Pa_to_Pa": (Decimal("1"), "P_Pa = P_Pa", "Pa", "Pa"),
     "Torr_to_Pa": (
         PA_PER_TORR,
         "P_Pa = P_Torr × 101325 / 760",
@@ -3566,7 +3592,10 @@ def _catalogue_composition_located_from_values(
 
     if not isinstance(values, Mapping) or values.get("composition_from_sample_catalog") is not True:
         return None
-    wt = _initial_oxide_map_from_values(values)
+    wt = _initial_oxide_map_from_values(
+        values,
+        declared_map=_declared_wt_composition_point_map(values, None),
+    )
     if not wt or len(wt) < 2:
         return None
     source_raw = values.get("composition_source") or values.get("composition_source_locator")
@@ -3600,7 +3629,11 @@ def _catalogue_composition_located_from_values(
     return Located(
         State.of(composition),
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        inference=wt_pct_to_mole_fraction_derivation(
+            wt,
+            locator,
+            source_note=values.get("composition_derivation"),
+        ),
     )
 
 
@@ -3739,6 +3772,8 @@ def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
 def wt_pct_to_mole_fraction_derivation(
     wt: Mapping[str, Decimal],
     locator: Locator | None,
+    *,
+    source_note: object = None,
 ) -> Derivation:
     params: list[tuple[str, Located[Decimal]]] = []
     for oxide, weight in wt.items():
@@ -3759,6 +3794,8 @@ def wt_pct_to_mole_fraction_derivation(
     inputs = [_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC, "original_unit=wt_pct"]
     if any(str(oxide).strip() == "FeOT" for oxide in wt):
         inputs.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
+    if isinstance(source_note, str) and source_note.strip():
+        inputs.append(source_note)
     return Derivation(
         relation="wt_pct_to_mole_fraction",
         inputs=tuple(inputs),
@@ -3770,10 +3807,23 @@ def wt_pct_to_mole_fraction_derivation(
 def _composition_located_from_values(
     values: object,
     locator: Locator | None,
+    role_refusal: list[str] | None = None,
 ) -> Located[Composition] | None:
-    """Retain provenance for declared complements and FeOT basis conversions."""
+    """Convert a typed role or a structurally signaled FeOT map.
+
+    A ``composition_derivation`` note does not admit a map. ``add271eb0``
+    requires the role token or FeOT. Green omitted the note text from
+    derivation inputs. ``initial_charge_only`` still keeps it, and so does a
+    ``datum_state`` note that states the K2O/SiO2 complement (the Plante
+    provenance green recorded as the literal ``values.composition_derivation``).
+    Any other ``datum_state`` note stays out, so a measured map matches the
+    note-free derivation green produced.
+    """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
+    role, _refusal = _declared_composition_role(values)
+    if _refusal is not None and role_refusal is not None:
+        role_refusal.append(_refusal)
     wt = _initial_oxide_map_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
@@ -3781,25 +3831,34 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    if not has_feot and (not isinstance(source_note, str) or not source_note.strip()):
+    if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
         return None
-    derivation = wt_pct_to_mole_fraction_derivation(wt, locator)
-    if (
+    complement_note = (
         isinstance(source_note, str)
         and "SiO2" in source_note
         and "K2O" in source_note
         and "100" in source_note
-    ):
-        # Plante prints K2O and declares SiO2 as 100-K2O; retain that source
-        # rule in the typed lineage instead of presenting the complement as a
-        # second measured oxide.
+    )
+    pass_note = role == INITIAL_CHARGE_ONLY_PROXY_FLAG or has_feot or (
+        role == "datum_state" and complement_note
+    )
+    derivation = wt_pct_to_mole_fraction_derivation(
+        wt,
+        locator,
+        source_note=source_note if pass_note else None,
+    )
+    if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
+        # The relation follows from the printed Decimal values. pass_note
+        # decides whether the note text is also an input.
         derivation = replace(
             derivation,
-            relation=f"SiO2_wt_pct=100-K2O_wt_pct;{derivation.relation}",
-            inputs=(*derivation.inputs, "values.composition_derivation"),
+            relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
         )
+    composition = wt_pct_to_mole_fraction(wt)
+    if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        composition = replace(composition, proxy_flag=role)
     return Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
+        State.of(composition),
         locator=locator,
         inference=derivation,
     )
@@ -3877,16 +3936,19 @@ def _located_printed_and_initial(
     return printed, initial
 
 
-_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG})
+_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, "datum_state"})
 
 
 def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
-    The row is read before its parent values block. A role is either the bare
-    token or a mapping whose ``value`` is the token (with its page locator and
-    quote kept beside it in the extract). A token outside the closed set is a
-    refusal, never a guess.
+    The row is read before its parent values block. ``initial_charge_only``
+    marks a printed starting charge that must carry the initial-charge proxy
+    flag. ``datum_state`` marks the sample composition at this datum's
+    measurement state, including a bulk two-phase sample; it applies to the
+    observation's point conditions and never marks the experiment's starting charge. Each typed
+    declaration is a bare token or a mapping with its page locator and quote.
+    A token outside the closed set is a refusal, never a guess.
     """
 
     for root in roots:
@@ -3906,66 +3968,24 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
 
 def _owner_initial_from_printed(
     printed: Located[Any] | None,
-    selected_initial: Located[Composition] | None = None,
     *,
-    declared_start: bool = False,
+    proxy_flag: str | None = None,
 ) -> Located[Composition] | None:
-    """Derive the sample initial from its printed wt% through the owner."""
+    """Convert the printed map already selected by the typed-role owner."""
 
     if printed is None or not printed.state.is_value:
         return None
     raw = printed.state.value
     locator = printed.locator
-    selected_column = None
-    if selected_initial is not None:
-        selection_text = " ".join(
-            (
-                selected_initial.locator.note
-                if selected_initial.locator is not None
-                and selected_initial.locator.note is not None
-                else "",
-                *(
-                    selected_initial.inference.inputs
-                    if selected_initial.inference is not None
-                    else ()
-                ),
-            )
-        ).casefold()
-        selected_column = next(
-            (
-                column
-                for column in ("analytical", "nominal")
-                if re.search(rf"\b{column}\b.*\bcolumn selected\b", selection_text)
+    if isinstance(raw, Mapping) and sum(
+        isinstance(value, Mapping) for value in raw.values()
+    ) > 1:
+        return Located(
+            State.unknown(
+                "printed composition has multiple columns and no typed selection"
             ),
-            None,
-    )
-    if selected_column is not None:
-        if not isinstance(raw, Mapping) or not isinstance(
-            raw.get(selected_column), Mapping
-        ):
-            return Located(
-                State.unknown(
-                    f"selected {selected_column} composition column is absent from printed map"
-                ),
-                locator=(selected_initial.locator if selected_initial else None)
-                or printed.locator,
-            )
-        raw = raw[selected_column]
-        locator = selected_initial.locator or printed.locator
-    else:
-        note = (
-            printed.locator.note.casefold()
-            if printed.locator is not None and printed.locator.note is not None
-            else ""
+            locator=locator,
         )
-        if (
-            "residue" in note
-            or "final state" in note
-            or "not the starting material" in note
-        ):
-            return None
-        if not declared_start and "starting" not in note and "initial charge" not in note:
-            return None
     refusal_reason: list[str] = []
     pairs = _mass_percent_pairs(raw)
     if pairs is not None:
@@ -3994,6 +4014,17 @@ def _owner_initial_from_printed(
         )
     if wt:
         _printed, initial = _located_printed_and_initial(wt, locator)
+        if (
+            initial is not None
+            and initial.state.is_value
+            and proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ):
+            initial = replace(
+                initial,
+                state=State.of(
+                    replace(initial.state.value, proxy_flag=proxy_flag)
+                ),
+            )
         return initial
     if refusal_reason:
         return Located(
@@ -5465,6 +5496,11 @@ _MASS_LOSS_YIELD_FIELDS = (
     "mass_loss_pct",
     "mass_loss_fraction",
     "non_condensed_mass_loss_fraction",
+    "total_integrated_mass_loss_wt_pct",
+    "total_loss_wt_pct",
+    "mass_loss_percent",
+    "water_released_wt_pct_as_printed",
+    "mass_loss_wt_pct_range",
 )
 _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("mass_yield_percent", Quantity.YIELD_FRACTION),
@@ -8296,12 +8332,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "o2_yield",
         "fraction_of_feedstock_oxygen_percent",
     ),
-    Quantity.MASS_LOSS_FRACTION: (
-        "mass_loss_fraction",
-        "non_condensed_mass_loss_fraction",
-        "mass_loss_wt_pct",
-        "mass_loss_pct",
-    ),
+    Quantity.MASS_LOSS_FRACTION: _MASS_LOSS_YIELD_FIELDS,
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
@@ -9149,6 +9180,47 @@ def _selection_from_named_field(
                 )
             continue
         amount = _numeric_field(payload, key)
+        if (
+            amount is None
+            and q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "mass_loss_wt_pct_range"
+        ):
+            raw_range = payload.get(key)
+            if isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
+                low, high = (_as_dec_or_none(value) for value in raw_range)
+                if low is not None and high is not None and low <= high:
+                    # The field is explicitly wt%; divide each published bound by 100
+                    # to store the same interval on the dimensionless fraction basis.
+                    return _interval_selection(
+                        low / Decimal("100"),
+                        high / Decimal("100"),
+                        key,
+                        payload,
+                        condition_ranges,
+                    )
+        approximate_payload = payload
+        if (
+            amount is None
+            and q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "water_released_wt_pct_as_printed"
+        ):
+            raw_approximate = payload.get(key)
+            if isinstance(raw_approximate, str):
+                stripped = raw_approximate.strip()
+                if stripped.startswith(("~", "≈")):
+                    amount = _as_dec_or_none(stripped[1:].strip())
+                    if amount is not None:
+                        approximate_payload = {**payload, "approximate": True}
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and key == "mass_loss_percent"
+            and "approximately"
+            in " ".join(
+                str(payload.get(label) or "").lower()
+                for label in ("as_printed", "note", "qualifier")
+            )
+        ):
+            approximate_payload = {**payload, "approximate": True}
         if amount is None:
             continue
         if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
@@ -9187,10 +9259,16 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
-        } and _percent_named_fraction_field(key, units):
+        } and (
+            _percent_named_fraction_field(key, units)
+            or key == "water_released_wt_pct_as_printed"
+        ):
+            # Percent-valued yield fields use the scorer's dimensionless fraction basis.
             amount = amount / Decimal("100")
             trail = "percent_to_fraction"
-        return _point_selection(amount, key, trail, payload, condition_ranges)
+        return _point_selection(
+            amount, key, trail, approximate_payload, condition_ranges
+        )
     decorated_prefix = f"{q_token.value}_"
     decorated = [
         (key, _numeric_field(payload, key))
@@ -10627,6 +10705,41 @@ def _is_printed_initial_charge(
     ) == _printed_fingerprint(printed.state.value)
 
 
+def _printed_map_is_typed_initial(
+    printed: Located[Mapping[str, Any]] | None,
+    *,
+    equipment: object,
+    values: object,
+    vocabulary: tuple[VocabEntry, ...],
+    locator: Locator | None,
+    declared_map: bool = False,
+) -> bool:
+    """Recognize only source-typed starting compositions and the selected T0 charge."""
+
+    if printed is None or not printed.state.is_value:
+        return False
+    if _is_printed_initial_charge(printed, values, declared_map=declared_map):
+        return True
+    role, _refusal = _declared_composition_role(equipment, values)
+    if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        return True
+    target = _printed_fingerprint(printed.state.value)
+    if target is None:
+        return False
+    if (
+        isinstance(values, Mapping)
+        and values.get("composition_material_state") == "starting_glass"
+        and _printed_fingerprint(values.get("composition_wt_pct")) == target
+    ):
+        return True
+    return any(
+        fingerprint == target and name == "starting_glass_wt_pct"
+        for fingerprint, _located, name in _printed_composition_candidates(
+            _lab_roots(equipment, values), vocabulary, fallback_locator=locator
+        )
+    )
+
+
 def _values_without_row_lists(values: object) -> object:
     """``values`` with every nested list of row mappings removed.
 
@@ -10893,13 +11006,95 @@ def _merge_pressure(
     )
 
 
+def _initial_compositions_conflict(
+    old: Located[Composition] | None,
+    new: Located[Composition] | None,
+) -> bool:
+    if (
+        old is None
+        or new is None
+        or not old.state.is_value
+        or not new.state.is_value
+    ):
+        return False
+    old_value = old.state.value
+    new_value = new.state.value
+    old_components = old_value.as_map()
+    new_components = new_value.as_map()
+    if old_components.keys() != new_components.keys():
+        return True
+
+    if (
+        old_value.amount_basis is AmountBasis.MOL_INVENTORY
+        and new_value.amount_basis is AmountBasis.MOL_INVENTORY
+    ):
+        # Twelve significant serialized digits have a half-ulp relative
+        # precision of 5e-13. Apply that relative tolerance to each absolute
+        # amount; these values do not pass through a basis converter here.
+        relative_tolerance = Decimal("5e-13")
+        for oxide, old_amount in old_components.items():
+            new_amount = new_components[oxide]
+            tolerance = max(abs(old_amount), abs(new_amount)) * relative_tolerance
+            if abs(old_amount - new_amount) > tolerance:
+                return True
+        return False
+
+    def mole_fraction_map(value: Composition) -> dict[str, Decimal] | None:
+        components = value.as_map()
+        if value.amount_basis is AmountBasis.MOLE_FRACTION:
+            return components
+        if value.amount_basis is AmountBasis.MASS_PERCENT:
+            try:
+                return wt_pct_to_mole_fraction(components).as_map()
+            except (ArithmeticError, ValueError):
+                return None
+        if value.amount_basis is AmountBasis.MOL_INVENTORY:
+            total = sum(components.values(), Decimal("0"))
+            if total <= 0:
+                return None
+            return {oxide: amount / total for oxide, amount in components.items()}
+        return None
+
+    old_fractions = mole_fraction_map(old_value)
+    new_fractions = mole_fraction_map(new_value)
+    if (
+        old_fractions is None
+        or new_fractions is None
+        or old_fractions.keys() != new_fractions.keys()
+    ):
+        return True
+
+    # A 12-decimal serialized mole fraction can differ from its source by at
+    # most half an ulp (5e-13). The converter's 28-digit Decimal divisions and
+    # sum add less than 1e-26 absolute error for normalized components; include
+    # that rounding margin in the component-wise comparison.
+    tolerance = Decimal("5e-13") + Decimal("1e-26")
+    for oxide in old_fractions:
+        difference = abs(old_fractions[oxide] - new_fractions[oxide])
+        if difference > tolerance:
+            return True
+    return False
+
+
+def _initial_composition_authority(initial: Located[Composition]) -> int:
+    """Return the ordered authority of an equivalent typed starting value."""
+
+    composition = initial.state.value
+    # Composition has no typed measured-versus-nominal marker. Owner-selected
+    # source values, including initial charges, therefore tie; only the typed
+    # catalogue marker and proxy flag can lower or raise their authority.
+    if composition.proxy_flag == "composition_from_sample_catalog":
+        return 2
+    if composition.proxy_flag not in (None, INITIAL_CHARGE_ONLY_PROXY_FLAG):
+        return 1
+    return 3
+
+
 def _merge_experiment_lab_params(
     existing: Experiment,
     sample: Sample,
     apparatus: Apparatus | None,
     pressure_env: PressureEnvironment,
-    *,
-    prefer_existing_initial: bool = False,
 ) -> Experiment:
     existing_initial = existing.sample.initial_composition
     incoming_initial = sample.initial_composition
@@ -10908,20 +11103,33 @@ def _merge_experiment_lab_params(
         sample.printed_composition,
         numeric_mapping=True,
     )
-    if (
-        prefer_existing_initial
-        and existing_initial is not None
+    if _initial_compositions_conflict(existing_initial, incoming_initial):
+        initial_composition = None
+    elif (
+        existing_initial is not None
+        and incoming_initial is not None
         and existing_initial.state.is_value
+        and incoming_initial.state.is_value
     ):
-        initial_composition = existing_initial
-    else:
-        owner_initial = _owner_initial_from_printed(
-            printed_composition, incoming_initial
+        existing_is_absolute = (
+            existing_initial.state.value.amount_basis is AmountBasis.MOL_INVENTORY
         )
-        if owner_initial is not None:
-            initial_composition = owner_initial
+        incoming_is_absolute = (
+            incoming_initial.state.value.amount_basis is AmountBasis.MOL_INVENTORY
+        )
+        if existing_is_absolute != incoming_is_absolute:
+            initial_composition = (
+                existing_initial if existing_is_absolute else incoming_initial
+            )
         else:
-            initial_composition = _prefer_located(existing_initial, incoming_initial)
+            initial_composition = (
+                incoming_initial
+                if _initial_composition_authority(incoming_initial)
+                > _initial_composition_authority(existing_initial)
+                else existing_initial
+            )
+    else:
+        initial_composition = _prefer_located(existing_initial, incoming_initial)
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
@@ -11014,6 +11222,7 @@ def sample_from_equipment(
 
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
+    role, _role_refusal = _declared_composition_role(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
@@ -11032,27 +11241,33 @@ def sample_from_equipment(
     initial = catalogue
     if printed is None and catalogue is None and not catalogue_marked:
         refusal_reason: list[str] = []
+        declared_map = _declared_wt_composition_point_map(
+            values, composition_units
+        )
         oxide_map = _initial_oxide_map_from_values(
             values,
             refusal_reason=refusal_reason,
-            declared_map=_declared_wt_composition_point_map(
-                values, composition_units
-            ),
+            declared_map=declared_map,
         )
         printed, _ = _located_printed_and_initial(oxide_map, locator)
-        if oxide_map is None and refusal_reason:
+        if oxide_map is None and refusal_reason and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
             initial = Located(
                 State.unknown(
                     f"mass-percent composition is not usable: {refusal_reason[0]}"
                 ),
                 locator=locator,
             )
-    if initial is None and printed is not None and printed.state.is_value:
-        raw = printed.state.value
-        if isinstance(raw, Mapping):
-            _, initial = _located_printed_and_initial(
-                raw, printed.locator or locator
-            )
+    if initial is None and _printed_map_is_typed_initial(
+        printed,
+        equipment=equipment,
+        values=values,
+        vocabulary=vocab,
+        locator=locator,
+        declared_map=_declared_wt_composition_point_map(
+            values, composition_units
+        ),
+    ):
+        initial = _owner_initial_from_printed(printed, proxy_flag=role)
     if (
         mass_located is None
         and volume_located is None
@@ -12172,9 +12387,7 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
-        # Only an initial composition declared as a registry value may take
-        # precedence over later legacy lab-parameter rows.
-        self._registry_value_initial_experiments: set[str] = set()
+        self._initial_composition_conflicts: set[str] = set()
         self._registry_printed_composition_experiments: set[str] = set()
         # b-718 ROR: exploded children whose printed map is their own row's
         # (not the parent observation's). A row-local map describes that row
@@ -12323,7 +12536,6 @@ class Migrator:
         conditions: dict[str, Located[Decimal]] | None = None,
         observation_id: str | None = None,
         source: str | None = None,
-        prefer_existing_initial: bool = False,
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
         cond = conditions or {
@@ -12351,36 +12563,77 @@ class Migrator:
             locator=locator,
             composition_units=composition_units,
         )
+        if experiment_id in self._initial_composition_conflicts:
+            sample = replace(sample, initial_composition=None)
+            if existing is not None:
+                existing = replace(
+                    existing,
+                    sample=replace(existing.sample, initial_composition=None),
+                )
+        elif existing is not None and _initial_compositions_conflict(
+            existing.sample.initial_composition,
+            sample.initial_composition,
+        ):
+            self._initial_composition_conflicts.add(experiment_id)
+            candidates = []
+            for label, initial in (
+                ("existing", existing.sample.initial_composition),
+                ("incoming", sample.initial_composition),
+            ):
+                composition = initial.state.value
+                inference = initial.inference
+                candidates.append(
+                    f"{label}: basis={composition.basis!r}, "
+                    f"amount_basis={composition.amount_basis.value!r}, "
+                    f"components={composition.as_map()!r}, "
+                    f"proxy_flag={composition.proxy_flag!r}, "
+                    f"proxy_source={composition.proxy_source!r}, "
+                    f"selection={composition.analysis_selection_rule!r}, "
+                    f"locator={initial.locator!r}, "
+                    f"inference={None if inference is None else inference.relation!r}"
+                )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=(
+                        f"experiment[{experiment_id}].sample.initial_composition"
+                    ),
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=(
+                        "initial_composition_conflict: different typed starting "
+                        "inventories were selected; neither is authoritative; "
+                        + "; ".join(candidates)
+                    ),
+                )
+            )
+            existing = replace(
+                existing,
+                sample=replace(existing.sample, initial_composition=None),
+            )
+            sample = replace(sample, initial_composition=None)
+
         # b-718: observation-row printed maps stay on the observation
         # (attached by the caller). Promote to experiment.sample only from an
         # explicit registry declaration, or later when every row shares one map.
         row_printed = sample.printed_composition
         if experiment_id in self._registry_printed_composition_experiments:
             sample = replace(sample, printed_composition=None)
-            if row_printed is not None and not self._repeats_declared_sample_map(
-                experiment_id, row_printed
-            ):
-                sample = replace(sample, initial_composition=None)
-        elif row_printed is not None and not _is_printed_initial_charge(
+        elif row_printed is not None and not _printed_map_is_typed_initial(
             row_printed,
-            values,
+            equipment=equipment,
+            values=values,
+            vocabulary=self._vocab,
+            locator=locator,
             declared_map=_declared_wt_composition_point_map(
                 values, composition_units
             ),
         ):
-            sample = replace(
-                sample,
-                printed_composition=None,
-                initial_composition=None,
-            )
+            sample = replace(sample, printed_composition=None)
         if existing is not None:
             merged = _merge_experiment_lab_params(
                 existing,
                 sample,
                 apparatus,
                 pressure_env,
-                prefer_existing_initial=prefer_existing_initial
-                or experiment_id in self._registry_printed_composition_experiments,
             )
             self.result.experiments[experiment_id] = merged
             return merged
@@ -12604,11 +12857,11 @@ class Migrator:
             # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
-                sample.form.state.value.strip().casefold()
+                sample.form.state.value
                 if sample.form is not None and sample.form.state.is_value
                 else None
             )
-            sample_phase = PHASE_MAP.get(form) if form is not None else None
+            sample_phase = phase_for_sample_form(form)
             initial = sample.initial_composition
             pure_sample = has_pure_component_composition(
                 initial.state if initial is not None else None
@@ -13104,11 +13357,6 @@ class Migrator:
                         )
                     )
                 continue
-            if (
-                experiment.sample.initial_composition is not None
-                and experiment.sample.initial_composition.state.is_value
-            ):
-                self._registry_value_initial_experiments.add(experiment.experiment_id)
             # Only a declared oxide map owns the sample. A prose string
             # ("12 MgO, 46 SiO2, ...") is not a composition the readers can
             # use, so it must not block the parsed observation map (ROR fix:
@@ -13279,8 +13527,11 @@ class Migrator:
 
         Registry declarations already own experiment.sample.printed_composition
         and are left untouched. Experiments whose observations all carry one
-        identical printed fingerprint receive that map at sample level so
-        normalized_composition can fall back without subset leakage.
+        identical printed fingerprint receive that map as sample-level printed
+        composition so normalized_composition can fall back without subset
+        leakage. Observation rows do not retain the source roots needed to
+        establish a starting-charge role, so this promotion never creates an
+        initial_composition.
 
         ROR fix: only observation-level maps count. A child carrying its own
         series-row map (``_row_local_printed_observations``) blocks promotion:
@@ -13322,21 +13573,118 @@ class Migrator:
                 continue
             located = fingerprints[0][1]
             experiment = self.result.experiments[experiment_id]
-            printed = located
-            initial = None
-            raw = located.state.value
-            if isinstance(raw, Mapping):
-                _, initial = _located_printed_and_initial(raw, located.locator)
             sample = replace(
                 experiment.sample,
-                printed_composition=printed,
-                initial_composition=initial
-                if experiment.sample.initial_composition is None
-                else experiment.sample.initial_composition,
+                printed_composition=located,
             )
             self.result.experiments[experiment_id] = replace(
                 experiment, sample=sample
             )
+
+    @staticmethod
+    def _richter_table1_sample_inputs(doc: Mapping[str, Any]) -> Mapping[str, Any]:
+        """Lift Richter Table 1's run-specific mass and starting area to experiments."""
+        if doc.get("source_id") != "kems-010-richter-2007":
+            return doc
+        samples: dict[str, tuple[Decimal, Decimal, Mapping[str, Any]]] = {}
+        species = doc.get("species") or {}
+        if not isinstance(species, Mapping):
+            return doc
+        for block in species.values():
+            if not isinstance(block, Mapping):
+                continue
+            for observation in block.get("observations") or ():
+                if not isinstance(observation, Mapping):
+                    continue
+                equipment = observation.get("equipment") or {}
+                surface_area = (
+                    equipment.get("sample_surface_area")
+                    if isinstance(equipment, Mapping)
+                    else None
+                )
+                rows = (
+                    surface_area.get("value")
+                    if isinstance(surface_area, Mapping)
+                    else None
+                )
+                if not isinstance(rows, list):
+                    continue
+                for row in rows:
+                    if not isinstance(row, Mapping) or not row.get("sample"):
+                        continue
+                    try:
+                        area_mm2 = Decimal(str(row["initial_area_mm2"]))
+                        mass_mg = Decimal(str(row["initial_weight_mg"]))
+                    except (KeyError, ArithmeticError, ValueError):
+                        continue
+                    if (
+                        not area_mm2.is_finite()
+                        or area_mm2 <= 0
+                        or not mass_mg.is_finite()
+                        or mass_mg <= 0
+                    ):
+                        continue
+                    name = str(row["sample"])
+                    value = (mass_mg, area_mm2, row.get("locator") or {})
+                    if name in samples and samples[name][:2] != value[:2]:
+                        raise ValueError(
+                            f"Richter Table 1 has conflicting mass/area for {name}"
+                        )
+                    samples[name] = value
+
+        experiments = doc.get("experiments")
+        if not isinstance(experiments, list):
+            return doc
+        enriched = []
+        for experiment in experiments:
+            if not isinstance(experiment, Mapping):
+                enriched.append(experiment)
+                continue
+            experiment = dict(experiment)
+            experiment_locator = experiment.get("locator") or {}
+            row_name = (
+                experiment_locator.get("row")
+                if isinstance(experiment_locator, Mapping)
+                else None
+            )
+            measurement = samples.get(str(row_name))
+            if measurement is not None:
+                mass_mg, area_mm2, source_locator = measurement
+                source_locator = dict(source_locator)
+                # Exact SI conversions: 1 mg = 10^-6 kg; 1 mm^2 = 10^-6 m^2.
+                mass_kg = mass_mg * Decimal("0.000001")
+                area_m2 = area_mm2 * Decimal("0.000001")
+                sample = dict(experiment.get("sample") or {})
+                sample["mass_kg"] = {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": str(mass_kg)},
+                    },
+                    "locator": {
+                        **source_locator,
+                        "note": "Table 1 initial_weight_mg; exact mg-to-kg conversion",
+                    },
+                }
+                experiment["sample"] = sample
+                apparatus = dict(experiment.get("apparatus") or {})
+                geometry = dict(apparatus.get("geometry") or {})
+                geometry["exposed_area_m2"] = {
+                    "state": {
+                        "tag": "value",
+                        "value": {"kind": "point", "point": str(area_m2)},
+                    },
+                    "locator": {
+                        **source_locator,
+                        "note": (
+                            "Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; "
+                            "exposed sample area for free evaporation"
+                        ),
+                    },
+                }
+                apparatus["geometry"] = geometry
+                experiment["apparatus"] = apparatus
+            enriched.append(experiment)
+        return {**doc, "experiments": enriched}
 
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
@@ -13352,6 +13700,7 @@ class Migrator:
                 source=rel,
             )
             return
+        doc = self._richter_table1_sample_inputs(doc)
         source = doc.get("source") or {}
         if not isinstance(source, Mapping):
             source = {}
@@ -13446,10 +13795,58 @@ class Migrator:
                 provenance=extract_provenance,
                 fusion_transition_rows=fusion_transition_rows,
             )
+        self._link_extract_oxygen_sources(rows, source_id)
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
         )
+
+    def _link_extract_oxygen_sources(
+        self, rows: Iterable[tuple[str, Mapping[str, Any]]], source_id: str,
+    ) -> None:
+        for _formula, obs in rows:
+            values = obs.get("values")
+            node = values.get("oxygen_partial_pressure") if isinstance(values, Mapping) else None
+            if not isinstance(node, Mapping) or node.get("source_observation_id") is None:
+                continue
+            raw = node["source_observation_id"]
+            source_ref = raw.strip() if isinstance(raw, str) else ""
+            if source_ref and "::" not in source_ref:
+                source_ref = f"{source_id}::{source_ref}"
+            source = self.result.observations.get(source_ref)
+            target_id = f"{source_id}::{obs.get('observation_id')}"
+            target = self.result.observations.get(target_id)
+            point = (target.point_conditions or {}).get("fO2_Pa") if target is not None else None
+            printed = collect_printed_oxygen(
+                (values,), target.locator if target is not None else None, skip_tables=True,
+            ).oxygen_partial_pressure_Pa
+            if (
+                source is None or source.source_id != source_id
+                or source.identity.species.formula not in {"O", "O2"}
+                or _quantity_token(source.identity.quantity) is not Quantity.P_PARTIAL
+                or point is None or point != printed
+            ):
+                self.result.registry_issues.append(ValidationIssue(
+                    path=f"observations.{target_id}.values.oxygen_partial_pressure.source_observation_id",
+                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                    detail=(
+                        "source_observation_id must resolve to an O/O2 partial-pressure "
+                        "observation in the same source, and identify the stamped printed condition"
+                    ),
+                ))
+                continue
+            inference = point.inference or conversion_derivation(
+                "Pa_to_Pa", point.state.value.point, point.locator,
+            )
+            self.result.observations[target_id] = replace(
+                target,
+                point_conditions={
+                    **target.point_conditions,
+                    "fO2_Pa": replace(point, inference=replace(
+                        inference, inputs=(*inference.inputs, source_ref),
+                    )),
+                },
+            )
 
     def _point_phase_field(
         self,
@@ -13828,7 +14225,19 @@ class Migrator:
         total_iron_notice = _total_iron_reported_as_feo_notice(
             initial_oxide_map, q_token, obs_id
         )
-        composition_located = _composition_located_from_values(values, locator)
+        composition_role_refusal: list[str] = []
+        composition_located = _composition_located_from_values(
+            values, locator, role_refusal=composition_role_refusal
+        )
+        if composition_role_refusal:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["composition"],
+                composition_role_refusal[0],
+                source=source_key,
+                observation_id=obs_id,
+            )
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         malformed_composition_amount: str | None = None
         try:
@@ -14291,21 +14700,6 @@ class Migrator:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
             initial_composition = wt_pct_to_mole_fraction(initial_oxide_map)
-            if Path(source_key).name == "kems-020-hastie-1981-nbsir.yaml":
-                composition_role, role_refusal = _declared_composition_role(values)
-                if role_refusal is not None:
-                    self.result.add_queue(
-                        work.work_id,
-                        locator,
-                        ["composition"],
-                        role_refusal,
-                        source=source_key,
-                        observation_id=obs_id,
-                    )
-                if composition_role is not None:
-                    initial_composition = replace(
-                        initial_composition, proxy_flag=composition_role
-                    )
             ident_kwargs["composition"] = State.of(initial_composition)
         elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(
@@ -14644,19 +15038,71 @@ class Migrator:
                 experiment_id, row_sample.printed_composition
             )
         ):
+            # An observation-level printed wt% map is the datum's composition.
+            # A typed experiment initial is copied when this row owns one.
+            # Otherwise derive the mole-fraction point here. sample_from_equipment
+            # no longer invents an experiment initial from an untyped map
+            # (bad7fd5eb); that gate must not drop the point composition.
+            # A refused composition_role stays queued and untyped (b716).
+            # A row with no role still derives, which is the Basu recovery.
+            derived = None
+            declared_order = False
+            if "composition" not in (point_conditions or {}) and not composition_role_refusal:
+                derived = row_sample.initial_composition
+                if derived is None:
+                    printed = row_sample.printed_composition
+                    # The printed fingerprint sorts keys so two maps compare
+                    # equal. Mole conversion adds in that order, and the last
+                    # digit follows it. A declared derivation names this wt%
+                    # map, so convert that map in printed order and record
+                    # composition before printed_composition, which is the
+                    # typed-path order. A row with no derivation keeps the
+                    # fingerprint order.
+                    wt_for_conversion = printed.state.value
+                    declared_note = (
+                        values.get("composition_derivation")
+                        if isinstance(values, Mapping)
+                        else None
+                    )
+                    if (
+                        isinstance(declared_note, str)
+                        and declared_note.strip()
+                        and initial_oxide_map
+                        and _printed_fingerprint(initial_oxide_map)
+                        == _printed_fingerprint(wt_for_conversion)
+                    ):
+                        wt_for_conversion = initial_oxide_map
+                        declared_order = True
+                    _printed, derived = _located_printed_and_initial(
+                        wt_for_conversion,
+                        printed.locator or locator,
+                    )
+            if (
+                declared_order
+                and derived is not None
+                and derived.state.is_value
+            ):
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": derived,
+                }
             point_conditions = {
                 **(point_conditions or {}),
                 "printed_composition": row_sample.printed_composition,
             }
             if (
-                row_sample.initial_composition is not None
-                and row_sample.initial_composition.state.is_value
+                not declared_order
+                and derived is not None
+                and derived.state.is_value
                 and "composition" not in point_conditions
             ):
-                point_conditions["composition"] = row_sample.initial_composition
+                point_conditions["composition"] = derived
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
-            and bool(obs.get("equipment"))
+            and (
+                bool(obs.get("equipment"))
+                or row_sample.initial_composition is not None
+            )
         ):
             self._ensure_experiment(
                 work_id=work.work_id,
@@ -14668,9 +15114,6 @@ class Migrator:
                 composition_units=obs.get("units"),
                 observation_id=obs_id,
                 source=source_key,
-                prefer_existing_initial=(
-                    declared_experiment_id in self._registry_value_initial_experiments
-                ),
             )
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):
@@ -16089,7 +16532,7 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
-            if residual is not None and role is not None:
+            if residual is not None and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
                 residual = replace(
                     residual,
                     state=State.of(replace(residual.state.value, proxy_flag=role)),

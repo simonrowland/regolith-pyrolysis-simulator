@@ -215,6 +215,27 @@ def test_grounded_coating_summary_distinguishes_zero_from_absence() -> None:
     )
 
 
+def test_grounded_coating_summary_keeps_unavailable_unpriced() -> None:
+    unavailable = coating_summary_with_grounded_authority(
+        {
+            "wall_deposit_kg_by_segment_species": {
+                "hot_wall": {"SiO": 0.0},
+            },
+            "coating_status": "unavailable",
+            "coating_verdict": "unavailable",
+            "coating_unavailable_reason": "wall saturation pressure refused",
+            "furnace_amortization_cost_per_run_usd": None,
+        }
+    )
+
+    assert unavailable["coating_status"] == "unavailable"
+    assert unavailable["coating_authoritative"] is False
+    assert unavailable["coating_unavailable_reason"] == (
+        "wall saturation pressure refused"
+    )
+    assert unavailable["furnace_amortization_cost_per_run_usd"] is None
+
+
 def test_lifespan_snapshot_distinguishes_zero_from_absence() -> None:
     proven_zero = FoulingTerminalSnapshot.from_trace(
         SimpleNamespace(
