@@ -1,0 +1,477 @@
+{
+  "bleed_False_0.0_False": {
+    "credits": null,
+    "debits": null,
+    "diagnostic": {
+      "bled_species_mol": {},
+      "candidate_bled_species_mol": {},
+      "o2_held_mol": "0x0.0p+0"
+    },
+    "preview": {}
+  },
+  "bleed_False_1e-05_False": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.542af4df21f3ep-4"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.cee67d02cdccfp-7"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.29942bcaf203cp-5"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.9d4dcb0ba5770p-5"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.a7325c5104358p-10",
+      "bled_o2_mol": "0x1.9d4dcb0ba5770p-5",
+      "bled_species_mol": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.9d4dcb0ba5770p-5"
+      },
+      "bled_total_kg": "0x1.43393ab430f4ap-8",
+      "candidate_bled_o2_mol": "0x1.9d4dcb0ba5770p-5",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.9d4dcb0ba5770p-5"
+      },
+      "external_o2_bled_mol": "0x1.cee67d02cdccfp-7",
+      "external_o2_holdup_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_vented_kg": "0x1.d9faf6c1236f2p-12",
+      "external_o2_vented_mol": "0x1.cee67d02cdccfp-7",
+      "melt_o2_bled_mol": "0x1.29942bcaf203cp-5",
+      "melt_o2_vented_mol": "0x0.0p+0",
+      "o2_admitted_mol": "0x1.29942bcaf203cp-5",
+      "o2_held_mol": "0x0.0p+0",
+      "o2_relieved_mol": "0x0.0p+0",
+      "o2_stored_mol": "0x1.29942bcaf203cp-5",
+      "o2_vented_kg": "0x1.d9faf6c1236f2p-12",
+      "o2_vented_mol": "0x1.cee67d02cdccfp-7",
+      "p_ref_Pa": null
+    },
+    "preview": {
+      "Ar": "0x1.542af4df21f3ep-4",
+      "O2": "0x1.9d4dcb0ba5770p-5"
+    }
+  },
+  "bleed_False_1e-05_True": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.542af4df21f3ep-4"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.cee67d02cdccfp-7"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.59214aff7aca3p-8"
+      },
+      "terminal.oxygen_melt_offgas_vented_to_vacuum": {
+        "O2": "0x1.269f8af311680p-7"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.d10b56bace4d0p-6"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.dc2cf39e3b107p-11",
+      "bled_o2_mol": "0x1.d10b56bace4d0p-6",
+      "bled_species_mol": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.d10b56bace4d0p-6"
+      },
+      "bled_total_kg": "0x1.14f24213b7495p-8",
+      "candidate_bled_o2_mol": "0x1.9d4dcb0ba5770p-5",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.542af4df21f3ep-4",
+        "O2": "0x1.9d4dcb0ba5770p-5"
+      },
+      "external_o2_bled_mol": "0x1.cee67d02cdccfp-7",
+      "external_o2_holdup_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_vented_kg": "0x1.d9faf6c1236f2p-12",
+      "external_o2_vented_mol": "0x1.cee67d02cdccfp-7",
+      "melt_o2_bled_mol": "0x1.d3303072cecd2p-7",
+      "melt_o2_vented_mol": "0x1.269f8af311680p-7",
+      "o2_admitted_mol": "0x1.59214aff7aca3p-8",
+      "o2_held_mol": "0x1.0d2e2085e2d95p-1",
+      "o2_relieved_mol": "0x1.269f8af311680p-7",
+      "o2_stored_mol": "0x1.59214aff7aca3p-8",
+      "o2_vented_kg": "0x1.83d3ec1b0ef69p-11",
+      "o2_vented_mol": "0x1.7ac303faef9a8p-6",
+      "p_ref_Pa": "0x1.3100000000000p+9"
+    },
+    "preview": {
+      "Ar": "0x1.542af4df21f3ep-4",
+      "O2": "0x1.9d4dcb0ba5770p-5"
+    }
+  },
+  "bleed_True_0.0_False": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.3c0ca4283de1bp+0"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.ae147ae147ae1p-3"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.147ae147ae148p-1"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.8000000000000p-1"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.89310129cbab6p-6",
+      "bled_o2_mol": "0x1.8000000000000p-1",
+      "bled_species_mol": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.8000000000000p-1"
+      },
+      "bled_total_kg": "0x1.2c4e772d9852ep-4",
+      "candidate_bled_o2_mol": "0x1.8000000000000p-1",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.8000000000000p-1"
+      },
+      "external_o2_bled_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_holdup_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_vented_kg": "0x1.b85fd857c563cp-8",
+      "external_o2_vented_mol": "0x1.ae147ae147ae1p-3",
+      "melt_o2_bled_mol": "0x1.147ae147ae148p-1",
+      "melt_o2_vented_mol": "0x0.0p+0",
+      "o2_admitted_mol": "0x1.147ae147ae148p-1",
+      "o2_held_mol": "0x0.0p+0",
+      "o2_relieved_mol": "0x0.0p+0",
+      "o2_stored_mol": "0x1.147ae147ae148p-1",
+      "o2_vented_kg": "0x1.b85fd857c563cp-8",
+      "o2_vented_mol": "0x1.ae147ae147ae1p-3",
+      "p_ref_Pa": null
+    },
+    "preview": {
+      "Ar": "0x1.3c0ca4283de1bp+0",
+      "O2": "0x1.8000000000000p-1"
+    }
+  },
+  "bleed_True_0.0_True": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.3c0ca4283de1bp+0"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.ae147ae147ae1p-3"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.59214aff7aca3p-8"
+      },
+      "terminal.oxygen_melt_offgas_vented_to_vacuum": {
+        "O2": "0x1.269f8af311680p-7"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.cb477de8749aep-3"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.d645c75f7a8eep-8",
+      "bled_o2_mol": "0x1.cb477de8749aep-3",
+      "bled_species_mol": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.cb477de8749aep-3"
+      },
+      "bled_total_kg": "0x1.cecd26b23a21fp-5",
+      "candidate_bled_o2_mol": "0x1.8000000000000p-1",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.3c0ca4283de1bp+0",
+        "O2": "0x1.8000000000000p-1"
+      },
+      "external_o2_bled_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_holdup_mol": "0x1.ae147ae147ae1p-3",
+      "external_o2_vented_kg": "0x1.b85fd857c563cp-8",
+      "external_o2_vented_mol": "0x1.ae147ae147ae1p-3",
+      "melt_o2_bled_mol": "0x1.d3303072cecd2p-7",
+      "melt_o2_vented_mol": "0x1.269f8af311680p-7",
+      "o2_admitted_mol": "0x1.59214aff7aca3p-8",
+      "o2_held_mol": "0x1.0d2e2085e2d95p-1",
+      "o2_relieved_mol": "0x1.269f8af311680p-7",
+      "o2_stored_mol": "0x1.59214aff7aca3p-8",
+      "o2_vented_kg": "0x1.cb3aa66f150bap-8",
+      "o2_vented_mol": "0x1.c07e739078c49p-3",
+      "p_ref_Pa": "0x1.3100000000000p+9"
+    },
+    "preview": {
+      "Ar": "0x1.3c0ca4283de1bp+0",
+      "O2": "0x1.8000000000000p-1"
+    }
+  },
+  "flow_0.0": {
+    "binding_cause": "controlled_o2_no_equipment",
+    "demand_flux_kg_hr": "0x1.845105e7a21eep+0",
+    "downstream_pressure_bar": "0x1.8fc504816f007p-8",
+    "effective_capacity_kg_hr": "0x0.0p+0",
+    "equipment_capacity_kg_hr": "0x0.0p+0",
+    "evolved_flux_kg_hr": "0x1.0a3d70a3d70a4p-3",
+    "pipe_capacity_kg_hr": "0x1.147ae147ae148p-2",
+    "retained_holdup_kg": "0x1.851eb851eb852p-3",
+    "saturation": "inf",
+    "swallowed_flux_kg_hr": "0x0.0p+0",
+    "upstream_pressure_bar": "0x1.8fc504816f007p-8"
+  },
+  "flow_0.123456789": {
+    "binding_cause": "controlled_o2_equipment",
+    "demand_flux_kg_hr": "0x1.845105e7a21eep+0",
+    "downstream_pressure_bar": "0x1.25dbe1496379dp-8",
+    "effective_capacity_kg_hr": "0x1.f9add3739635fp-4",
+    "equipment_capacity_kg_hr": "0x1.f9add3739635fp-4",
+    "evolved_flux_kg_hr": "0x1.0a3d70a3d70a4p-3",
+    "pipe_capacity_kg_hr": "0x1.147ae147ae148p-2",
+    "retained_holdup_kg": "0x1.851eb851eb852p-3",
+    "saturation": "0x1.892ba3035ae6ap+3",
+    "swallowed_flux_kg_hr": "0x1.f9add3739635fp-4",
+    "upstream_pressure_bar": "0x1.8fc504816f007p-8"
+  },
+  "mars_0.0": {
+    "capacity_shortfall": {
+      "achieved_pressure_pa": "0x1.17ec71662ea76p+18",
+      "capacity_at_request_mol_per_s": "0x0.0p+0",
+      "reason": "duct_capacity_shortfall",
+      "requested_outlet_mol_per_s": "0x1.db7d80ef78dabp-7",
+      "requested_pressure_pa": "0x1.3100000000000p+9",
+      "source_model": "constant_generation_over_transport_step"
+    },
+    "external_o2_outflow_mol": "0x0.0p+0",
+    "final_species_mol": {
+      "Ar": "0x1.5f188507106a8p+0",
+      "CO2": "0x1.147ae147ae147p-2",
+      "O2": "0x1.c28f5c28f5c29p-1"
+    },
+    "inlet_species_mol": {
+      "Ar": "0x1.185f06f694467p-3"
+    },
+    "outflow_species_mol": {
+      "Ar": "0x0.0p+0",
+      "CO2": "0x1.0000000000000p-54",
+      "O2": "0x0.0p+0"
+    },
+    "pressure_bar": "0x1.6ee6c69b1152bp+1"
+  },
+  "mars_0.007": {
+    "capacity_shortfall": {
+      "achieved_pressure_pa": "0x1.f65742516d46dp+17",
+      "capacity_at_request_mol_per_s": "0x1.cac083126e979p-8",
+      "reason": "duct_capacity_shortfall",
+      "requested_outlet_mol_per_s": "0x1.db7d80ef78dabp-7",
+      "requested_pressure_pa": "0x1.3100000000000p+9",
+      "source_model": "constant_generation_over_transport_step"
+    },
+    "external_o2_outflow_mol": "0x1.cd6e16b5cce70p-6",
+    "final_species_mol": {
+      "Ar": "0x1.38bed9b62eb6ap+0",
+      "CO2": "0x1.049bf0bd60b64p-2",
+      "O2": "0x1.9296852c8be4ep-1"
+    },
+    "inlet_species_mol": {
+      "Ar": "0x1.185f06f694467p-3"
+    },
+    "outflow_species_mol": {
+      "Ar": "0x1.32cd5a870d9efp-3",
+      "CO2": "0x1.fbde1149abc80p-7",
+      "O2": "0x1.7fc6b7e34eed8p-4"
+    },
+    "pressure_bar": "0x1.4936cf774f3bfp+1"
+  },
+  "mars_None": {
+    "capacity_shortfall": null,
+    "external_o2_outflow_mol": "0x1.1e00ecb4e29c0p-2",
+    "final_species_mol": {
+      "Ar": "0x1.66ab3f547fc0cp-10",
+      "CO2": "0x1.61b0e95dfc342p-9",
+      "O2": "0x1.54976576f2dcdp-10"
+    },
+    "inlet_species_mol": {
+      "Ar": "0x1.185f06f694467p-3"
+    },
+    "outflow_species_mol": {
+      "Ar": "0x1.5ebeda373b4a9p+0",
+      "CO2": "0x1.11b77f74f21c2p-2",
+      "O2": "0x1.c1e510763a493p-1"
+    },
+    "pressure_bar": "0x1.8fc504816f006p-8"
+  },
+  "mars_commit_0.0": {
+    "credits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.185f06f694467p-3"
+      },
+      "terminal.offgas": {
+        "CO2": "0x1.0000000000000p-54"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "CO2": "0x1.0000000000000p-54"
+      },
+      "reservoir.reagent.sweep_gas": {
+        "Ar": "0x1.185f06f694467p-3"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x0.0p+0",
+      "bled_o2_mol": "0x0.0p+0",
+      "bled_species_mol": {
+        "CO2": "0x1.0000000000000p-54"
+      },
+      "bled_total_kg": "0x1.68858ff759685p-59",
+      "candidate_bled_o2_mol": "0x0.0p+0",
+      "candidate_bled_species_mol": {
+        "CO2": "0x1.0000000000000p-54"
+      },
+      "capacity_shortfall": {
+        "achieved_pressure_pa": "0x1.17ec71662ea76p+18",
+        "capacity_at_request_mol_per_s": "0x0.0p+0",
+        "reason": "duct_capacity_shortfall",
+        "requested_outlet_mol_per_s": "0x1.db7d80ef78dabp-7",
+        "requested_pressure_pa": "0x1.3100000000000p+9",
+        "source_model": "constant_generation_over_transport_step"
+      },
+      "external_o2_bled_mol": "0x0.0p+0",
+      "external_o2_holdup_mol": "0x1.1eb851eb851ecp-2",
+      "external_o2_vented_kg": "0x0.0p+0",
+      "external_o2_vented_mol": "0x0.0p+0",
+      "melt_o2_bled_mol": "0x0.0p+0",
+      "melt_o2_vented_mol": "0x0.0p+0",
+      "o2_admitted_mol": "0x0.0p+0",
+      "o2_held_mol": "0x0.0p+0",
+      "o2_relieved_mol": "0x0.0p+0",
+      "o2_stored_mol": "0x0.0p+0",
+      "o2_vented_kg": "0x0.0p+0",
+      "o2_vented_mol": "0x0.0p+0",
+      "p_ref_Pa": null
+    }
+  },
+  "mars_commit_0.007": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.32cd5a870d9efp-3",
+        "CO2": "0x1.fbde1149abc80p-7"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.cd6e16b5cce70p-6"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.0c6b3235dbb3cp-4"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.a6e5390795880p-7",
+        "CO2": "0x1.fbde1149abc80p-7",
+        "O2": "0x1.7fc6b7e34eed8p-4"
+      },
+      "reservoir.reagent.sweep_gas": {
+        "Ar": "0x1.185f06f694467p-3"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.88f65a0d0e5d0p-9",
+      "bled_o2_mol": "0x1.7fc6b7e34eed8p-4",
+      "bled_species_mol": {
+        "Ar": "0x1.32cd5a870d9efp-3",
+        "CO2": "0x1.fbde1149abc80p-7",
+        "O2": "0x1.7fc6b7e34eed8p-4"
+      },
+      "bled_total_kg": "0x1.3cb07f382eec6p-7",
+      "candidate_bled_o2_mol": "0x1.7fc6b7e34eed8p-4",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.32cd5a870d9efp-3",
+        "CO2": "0x1.fbde1149abc80p-7",
+        "O2": "0x1.7fc6b7e34eed8p-4"
+      },
+      "capacity_shortfall": {
+        "achieved_pressure_pa": "0x1.f65742516d46dp+17",
+        "capacity_at_request_mol_per_s": "0x1.cac083126e979p-8",
+        "reason": "duct_capacity_shortfall",
+        "requested_outlet_mol_per_s": "0x1.db7d80ef78dabp-7",
+        "requested_pressure_pa": "0x1.3100000000000p+9",
+        "source_model": "constant_generation_over_transport_step"
+      },
+      "external_o2_bled_mol": "0x1.cd6e16b5cce70p-6",
+      "external_o2_holdup_mol": "0x1.1eb851eb851ecp-2",
+      "external_o2_vented_kg": "0x1.d8798e05781efp-11",
+      "external_o2_vented_mol": "0x1.cd6e16b5cce70p-6",
+      "melt_o2_bled_mol": "0x1.0c6b3235dbb3cp-4",
+      "melt_o2_vented_mol": "0x0.0p+0",
+      "o2_admitted_mol": "0x1.0c6b3235dbb3cp-4",
+      "o2_held_mol": "0x0.0p+0",
+      "o2_relieved_mol": "0x0.0p+0",
+      "o2_stored_mol": "0x1.0c6b3235dbb3cp-4",
+      "o2_vented_kg": "0x1.d8798e05781efp-11",
+      "o2_vented_mol": "0x1.cd6e16b5cce70p-6",
+      "p_ref_Pa": null
+    }
+  },
+  "mars_commit_None": {
+    "credits": {
+      "terminal.offgas": {
+        "Ar": "0x1.5ebeda373b4a9p+0",
+        "CO2": "0x1.11b77f74f21c2p-2"
+      },
+      "terminal.oxygen_bubbler_external_vented_to_vacuum": {
+        "O2": "0x1.1e00ecb4e29c0p-2"
+      },
+      "terminal.oxygen_melt_offgas_stored": {
+        "O2": "0x1.32e49a1bc8fb3p-1"
+      }
+    },
+    "debits": {
+      "process.overhead_gas": {
+        "Ar": "0x1.3bb2f95868c1cp+0",
+        "CO2": "0x1.11b77f74f21c2p-2",
+        "O2": "0x1.c1e510763a493p-1"
+      },
+      "reservoir.reagent.sweep_gas": {
+        "Ar": "0x1.185f06f694467p-3"
+      }
+    },
+    "diagnostic": {
+      "bled_o2_kg": "0x1.cca9d8c5ff30fp-6",
+      "bled_o2_mol": "0x1.c1e510763a493p-1",
+      "bled_species_mol": {
+        "Ar": "0x1.5ebeda373b4a9p+0",
+        "CO2": "0x1.11b77f74f21c2p-2",
+        "O2": "0x1.c1e510763a493p-1"
+      },
+      "bled_total_kg": "0x1.838901e7d0733p-4",
+      "candidate_bled_o2_mol": "0x1.c1e510763a493p-1",
+      "candidate_bled_species_mol": {
+        "Ar": "0x1.5ebeda373b4a9p+0",
+        "CO2": "0x1.11b77f74f21c2p-2",
+        "O2": "0x1.c1e510763a493p-1"
+      },
+      "external_o2_bled_mol": "0x1.1e00ecb4e29c0p-2",
+      "external_o2_holdup_mol": "0x1.1eb851eb851ecp-2",
+      "external_o2_vented_kg": "0x1.24d971e7cb692p-7",
+      "external_o2_vented_mol": "0x1.1e00ecb4e29c0p-2",
+      "melt_o2_bled_mol": "0x1.32e49a1bc8fb3p-1",
+      "melt_o2_vented_mol": "0x0.0p+0",
+      "o2_admitted_mol": "0x1.32e49a1bc8fb3p-1",
+      "o2_held_mol": "0x0.0p+0",
+      "o2_relieved_mol": "0x0.0p+0",
+      "o2_stored_mol": "0x1.32e49a1bc8fb3p-1",
+      "o2_vented_kg": "0x1.24d971e7cb692p-7",
+      "o2_vented_mol": "0x1.1e00ecb4e29c0p-2",
+      "p_ref_Pa": null
+    }
+  }
+}
