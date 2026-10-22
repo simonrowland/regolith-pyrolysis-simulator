@@ -798,36 +798,78 @@ def _p2o5_gas_unavailable_notice(exc: BaseException) -> dict[str, str]:
     }
 
 
+def _without_p2o5(
+    activities: Mapping[str, float],
+    parent_oxides: tuple[str, ...] | list[str],
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    return (
+        {
+            name: value
+            for name, value in activities.items()
+            if name != "P2O5"
+        },
+        tuple(name for name in parent_oxides if name != "P2O5"),
+    )
+
+
 def call_with_p2o5_parents(
     fn: Any,
     activities: Mapping[str, float],
     parent_oxides: tuple[str, ...] | list[str],
     extension: Mapping[str, Any] | None,
-) -> tuple[Any, list[dict[str, Any]]]:
+) -> tuple[Any, list[dict[str, Any]], tuple[str, ...]]:
     """Call ``fn(activities, parent_oxides)`` with a(P2O5) when evaluated.
 
     A refusal retries without that parent and returns
-    ``openimcc_p2o5_gas_unavailable``. Callers that did not attach P2O5
-    still raise.
+    ``openimcc_p2o5_gas_unavailable`` plus the parent tuple that call
+    used. Callers that did not attach P2O5 still raise.
     """
 
     attached_activities, oxides, attached = parent_maps_with_p2o5(
         activities, parent_oxides, extension
     )
     try:
-        return fn(attached_activities, oxides), []
+        return fn(attached_activities, oxides), [], oxides
     except Exception as exc:
         if not attached:
             raise
-        bare_activities = {
-            name: value
-            for name, value in attached_activities.items()
-            if name != "P2O5"
-        }
-        bare_oxides = tuple(name for name in oxides if name != "P2O5")
+        bare_activities, bare_oxides = _without_p2o5(
+            attached_activities, oxides
+        )
         return fn(bare_activities, bare_oxides), [
             _p2o5_gas_unavailable_notice(exc)
+        ], bare_oxides
+
+
+def attached_gas_parents(
+    activities: Mapping[str, float],
+    parent_oxides: tuple[str, ...] | list[str],
+    extension: Mapping[str, Any] | None,
+    probe: Any,
+) -> tuple[dict[str, float], tuple[str, ...], list[dict[str, Any]]]:
+    """Parent set a gas call will actually use.
+
+    ``probe(activities, oxides)`` is attempted with a(P2O5) attached.
+    A refusal returns the unattached parents and
+    ``openimcc_p2o5_gas_unavailable``. Channel metadata and the pressure
+    model must both use the returned maps, including on that refusal.
+    """
+
+    attached_activities, oxides, attached = parent_maps_with_p2o5(
+        activities, parent_oxides, extension
+    )
+    if not attached:
+        return attached_activities, oxides, []
+    try:
+        probe(attached_activities, oxides)
+    except Exception as exc:
+        bare_activities, bare_oxides = _without_p2o5(
+            attached_activities, oxides
+        )
+        return bare_activities, bare_oxides, [
+            _p2o5_gas_unavailable_notice(exc)
         ]
+    return attached_activities, oxides, []
 
 
 def evaluate_openimcc_gas_with_p2o5(
@@ -857,7 +899,7 @@ def evaluate_openimcc_gas_with_p2o5(
             **kwargs,
         )
 
-    result, notices = call_with_p2o5_parents(
+    result, notices, _oxides = call_with_p2o5_parents(
         _call, activities, parent_oxides, extension
     )
     if notices:
@@ -1010,6 +1052,147 @@ def p2o5_vapour_pressures_pa(
     record["flux_species"] = list(P2O5_FLUX_SPECIES)
     record["inject"] = True
     return record
+
+
+# The CEA carrier activity_input already declares this identity. openimcc's
+# published value is the Turkdogan-Pearson hypothetical liquid at 1 atm
+# after the gas-pack shift 3.5 R T ln(1.01325) onto 1 bar. That shifted
+# number is what the carrier's Raoultian liquid standard state names.
+_P2O5_RAOULTIAN_LIQUID_1BAR = {
+    "convention": "raoultian_pure_endmember",
+    "phase": "liquid",
+    "reference_pressure_bar": 1.0,
+    "reference_temperature_K": None,
+    "component_basis": "raoultian_pure_endmember",
+}
+_P2O5_STANDARD_STATE_RECONCILIATION = (
+    "openimcc a(P2O5) is the Turkdogan-Pearson hypothetical-liquid "
+    "activity at 1 atm after the published shift 3.5*R*T*ln(1.01325) "
+    "onto the gas-pack Jung-Hudon 1 bar standard. That shifted value "
+    "is the Raoultian pure-liquid P2O5 activity declared by the CEA "
+    "carrier activity_input. It is not an unshifted Turkdogan gamma "
+    "and not pure-endmember a=1."
+)
+
+
+def _p2o5_domain_notice(extension: Mapping[str, Any]) -> dict[str, Any]:
+    for notice in extension.get("notices") or []:
+        if (
+            isinstance(notice, Mapping)
+            and notice.get("code") == "imcc_p2o5_activity_domain_notice"
+        ):
+            return dict(notice)
+    return {}
+
+
+def p2o5_flux_activity_evidence(
+    extension: Mapping[str, Any] | None,
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """a(P2O5) and provenance for the six existing flux carriers.
+
+    The value is openimcc's shifted hypothetical-liquid activity. The
+    catalog already declares that Raoultian liquid 1 bar state, so the
+    reported activity shares it. Provenance names the shift. Elemental
+    P is not a flux carrier and is omitted. Violated regression axes,
+    or components the regression cannot accept, label the authority
+    extrapolated; a clean evaluation is flagged. The metallic-iron and
+    Fe(III) limitations stay on the warning.
+    """
+
+    if not isinstance(extension, Mapping) or not extension.get("evaluated"):
+        return {}, {}
+    try:
+        activity = float(extension.get("activity"))
+    except (TypeError, ValueError):
+        return {}, {}
+    if not math.isfinite(activity) or activity <= 0.0:
+        return {}, {}
+    domain = _p2o5_domain_notice(extension)
+    violated = [str(item) for item in (domain.get("violated_axes") or ())]
+    warning_parts = [
+        str(item) for item in (domain.get("limitations") or ()) if str(item)
+    ]
+    for notice in extension.get("notices") or []:
+        if not isinstance(notice, Mapping):
+            continue
+        code = str(notice.get("code") or "")
+        if code in {
+            "p2o5_feiii_phosphate_chemistry_not_modelled",
+            "p2o5_activity_basis_omitted_components",
+        }:
+            message = str(notice.get("message") or code)
+            if message and message not in warning_parts:
+                warning_parts.append(message)
+    omitted = bool(extension.get("omitted_components"))
+    extrapolated = bool(violated) or omitted
+    provenance = {
+        "parent_oxide": "P2O5",
+        "source_label": "openimcc_p2o5_gas",
+        "equivalent_parent_oxide_activity": activity,
+        "melt_parent_oxide_activity": activity,
+        "melt_oxide_activity": activity,
+        "melt_oxide_activity_authority_status": (
+            "extrapolated" if extrapolated else "flagged"
+        ),
+        "melt_oxide_activity_warning": " ".join(warning_parts),
+        "melt_oxide_activity_reference_state": dict(
+            _P2O5_RAOULTIAN_LIQUID_1BAR
+        ),
+        "activity_standard_state_reconciliation": (
+            _P2O5_STANDARD_STATE_RECONCILIATION
+        ),
+        "regression": str(domain.get("regression") or ""),
+        "gamma_domain_authority": {
+            "authority_status": (
+                "out_of_gamma_domain" if violated else "flagged"
+            ),
+            "violated_axes": list(violated),
+        },
+    }
+    activities = {species: activity for species in P2O5_FLUX_SPECIES}
+    provenances = {
+        species: {
+            **provenance,
+            "melt_oxide_activity_reference_state": dict(
+                _P2O5_RAOULTIAN_LIQUID_1BAR
+            ),
+            "gamma_domain_authority": {
+                "authority_status": provenance["gamma_domain_authority"][
+                    "authority_status"
+                ],
+                "violated_axes": list(violated),
+            },
+        }
+        for species in P2O5_FLUX_SPECIES
+    }
+    return activities, provenances
+
+
+def p2o5_activity_reference_state(
+    extension: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Liquid reference for a(P2O5) on a battery result, or None."""
+
+    if not isinstance(extension, Mapping):
+        return None
+    _activities, provenance = p2o5_flux_activity_evidence(extension)
+    if not provenance:
+        return None
+    row = next(iter(provenance.values()))
+    try:
+        activity = float(extension.get("activity"))
+    except (TypeError, ValueError):
+        return None
+    return {
+        **row["melt_oxide_activity_reference_state"],
+        "component": "P2O5",
+        "activity": activity,
+        "regression": row["regression"],
+        "reconciliation": row["activity_standard_state_reconciliation"],
+        "authority_status": row["melt_oxide_activity_authority_status"],
+        "limitations_warning": row["melt_oxide_activity_warning"],
+        "gamma": None if extension is None else extension.get("gamma"),
+    }
 
 
 def _cleaned_melt_policy(

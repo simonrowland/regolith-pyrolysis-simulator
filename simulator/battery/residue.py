@@ -1134,10 +1134,11 @@ def _predict_hashimoto_residue_cohort(
     if p2o5_moles > 0.0 and openimcc_bridge.p2o5_extension_callable() is not None:
         flux_species = set(openimcc_bridge.P2O5_FLUX_SPECIES)
         try:
-            discovered, discovered_omissions = (
-                _openimcc_gas_channels_and_omission_notices(
-                    channel_parents + ("P2O5",), gas_pack
-                )
+            # The notice helper returns typed omission notices, not the
+            # name→reason map. Channel admission needs that map so P gases
+            # the pack cannot emit are stripped instead of refusing the cohort.
+            discovered, omission_map = _default_reactions(
+                channel_parents + ("P2O5",), gas_pack
             )
         except Exception as exc:
             p2o5_channel_notices.append(
@@ -1159,12 +1160,12 @@ def _predict_hashimoto_residue_cohort(
                 gas_channels.append((species, reaction))
             p_omitted = {
                 str(name): str(reason)
-                for name, reason in dict(discovered_omissions).items()
+                for name, reason in omission_map.items()
                 if str(name) in flux_species or str(name) in {"P", "PS"}
             }
             channel_omissions = {
                 name: reason
-                for name, reason in dict(discovered_omissions).items()
+                for name, reason in omission_map.items()
                 if str(name) not in p_omitted
             }
             if diagnostic_only or p_omitted:
@@ -1415,11 +1416,30 @@ def _predict_hashimoto_residue_cohort(
                     current_composition = {
                         oxide: amount for oxide, amount in key if amount > 0.0
                     }
+                    # Assess before the parent solve. The default pack
+                    # refuses unprojected P2O5 through the old S/P API;
+                    # that pack stays off. Only a P-bearing inventory
+                    # uses the cleaned parent solve.
+                    extension = openimcc_bridge.assess_p2o5_extension(
+                        current_composition,
+                        temperature_K,
+                    )
+                    evaluate_composition = current_composition
+                    if float(extension.get("p2o5_moles") or 0.0) > 0.0:
+                        cleaned_mol, policy = openimcc_bridge._cleaned_melt_policy(
+                            current_composition,
+                            temperature_K=temperature_K,
+                            p2o5_extension=extension,
+                        )
+                        stored_extension = policy.get("p2o5_extension")
+                        if isinstance(stored_extension, Mapping):
+                            extension = stored_extension
+                        evaluate_composition = cleaned_mol
                     try:
                         state = _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,
                             timeout_s=_ENGINE_OUTER_TIMEOUT_S["openimcc"],
-                            composition_mol=current_composition,
+                            composition_mol=evaluate_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
@@ -1434,10 +1454,6 @@ def _predict_hashimoto_residue_cohort(
                             f"Hashimoto residue cohort OpenIMCC timeout: {exc}",
                             reason="engine_timeout:openimcc:hashimoto_residue_cohort",
                         ) from exc
-                    extension = openimcc_bridge.assess_p2o5_extension(
-                        current_composition,
-                        temperature_K,
-                    )
                     gas_result, gas_notices = (
                         openimcc_bridge.evaluate_openimcc_gas_with_p2o5(
                             evaluate_gas,

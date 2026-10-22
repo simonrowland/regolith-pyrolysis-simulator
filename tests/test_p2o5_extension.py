@@ -591,3 +591,777 @@ def test_p2o5_survived_stage0_cleanup_records_once() -> None:
     )
     assert host._p2o5_survived_stage0_cleanup["p2o5_mass_kg"] == mass_kg
     assert host._p2o5_survived_stage0_cleanup["entered_campaign"] == "C2A"
+
+
+_BAR_PA = 100_000.0
+_FLUX_PARTIAL_BAR = 0.2
+_FLUX_MOL = {
+    "Na2O": 0.20,
+    "K2O": 0.08,
+    "SiO2": 5.00,
+    "FeO": 1.00,
+    "MgO": 1.00,
+    "CaO": 1.00,
+    "Al2O3": 1.00,
+    "TiO2": 0.10,
+    "P2O5": 0.01,
+}
+
+
+class _PGas(dict):
+    """Mapping-shaped gas result. Pressures are bar, as openimcc returns them."""
+
+    domain_flags: dict = {}
+    provenance_class: dict = {}
+    omitted_channels: dict = {}
+
+    def __init__(self, pressures, notices=()):
+        super().__init__(pressures)
+        self.notices = notices
+
+
+def _patch_activity(monkeypatch, *, violated=True):
+    from simulator.melt_backend import openimcc_bridge
+
+    def evaluate_p2o5_activity(composition, temperature):
+        del temperature
+        axes = ("temperature_outside_1823_1923_K",) if violated else ()
+        feiii = float(composition.get("Fe2O3", 0.0) or 0.0) > 0.0
+        return SimpleNamespace(
+            activity=0.01,
+            log10_activity=-2.0,
+            gamma=4.0,
+            x_p2o5=0.01,
+            band_log10_activity=(-2.4, -1.6),
+            notice=SimpleNamespace(
+                code="imcc_p2o5_activity_domain_notice",
+                regression="Suito-Inoue-1984-Eq-14-no-Mn",
+                violated_axes=axes,
+                band_width_dex=0.8,
+                limitations=_PUBLISHED_LIMITATIONS,
+            ),
+            additional_notices=(
+                (
+                    SimpleNamespace(
+                        code="p2o5_feiii_phosphate_chemistry_not_modelled",
+                        message="Fe(III) phosphate chemistry is not modelled.",
+                    ),
+                )
+                if feiii
+                else ()
+            ),
+        )
+
+    monkeypatch.setattr(
+        openimcc_bridge._openimcc,
+        "evaluate_p2o5_activity",
+        evaluate_p2o5_activity,
+        raising=False,
+    )
+
+
+def test_flux_activity_authority_follows_domain_notices() -> None:
+    """Extrapolated when a regression axis or an omitted component is present.
+
+    A clean evaluation stays flagged. Gamma-domain status follows the
+    regression axes only. The reconciliation names the published shift.
+    """
+
+    from simulator.melt_backend.openimcc_bridge import p2o5_flux_activity_evidence
+
+    clean = {
+        "evaluated": True,
+        "activity": 0.01,
+        "omitted_components": {},
+        "notices": [{
+            "code": "imcc_p2o5_activity_domain_notice",
+            "regression": "Suito-Inoue-1984-Eq-14-no-Mn",
+            "violated_axes": [],
+            "limitations": list(_PUBLISHED_LIMITATIONS),
+        }],
+    }
+    _activities, provenance = p2o5_flux_activity_evidence(clean)
+    row = provenance["PO"]
+    assert row["melt_oxide_activity_authority_status"] == "flagged"
+    assert row["gamma_domain_authority"]["authority_status"] == "flagged"
+    assert row["equivalent_parent_oxide_activity"] == pytest.approx(0.01)
+    text = row["activity_standard_state_reconciliation"]
+    assert "3.5" in text
+    assert "1.01325" in text
+    assert "hypothetical-liquid" in text
+    assert "Turkdogan" in text
+    assert "1 bar" in text
+    assert row["melt_oxide_activity_reference_state"] == {
+        "convention": "raoultian_pure_endmember",
+        "phase": "liquid",
+        "reference_pressure_bar": 1.0,
+        "reference_temperature_K": None,
+        "component_basis": "raoultian_pure_endmember",
+    }
+
+    violated = {
+        **clean,
+        "notices": [{
+            **clean["notices"][0],
+            "violated_axes": ["temperature_outside_1823_1923_K"],
+        }],
+    }
+    _activities, provenance = p2o5_flux_activity_evidence(violated)
+    assert provenance["PO2"]["melt_oxide_activity_authority_status"] == "extrapolated"
+    assert (
+        provenance["PO2"]["gamma_domain_authority"]["authority_status"]
+        == "out_of_gamma_domain"
+    )
+
+    omitted = {**clean, "omitted_components": {"Cr2O3": 0.001}}
+    _activities, provenance = p2o5_flux_activity_evidence(omitted)
+    assert provenance["P2"]["melt_oxide_activity_authority_status"] == "extrapolated"
+    assert provenance["P2"]["gamma_domain_authority"]["authority_status"] == "flagged"
+
+
+def test_incomplete_p_gas_channel_writes_nothing(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    def evaluate_gas(activities, temperature_K, fo2, datapack, parent_oxides=None, **kwargs):
+        del activities, temperature_K, fo2, datapack, parent_oxides, kwargs
+        return _PGas({
+            species: _FLUX_PARTIAL_BAR
+            for species in ("P", "P2", "P4", "PO", "P4O6", "P4O10")
+        })
+
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            evaluate_gas=evaluate_gas,
+            load_gas_datapack=lambda: object(),
+        ),
+    )
+    record = openimcc_bridge.p2o5_vapour_pressures_pa(
+        {"evaluated": True, "activity": 0.01},
+        temperature_K=1873.0,
+        fo2_bar=1.0e-9,
+        process_phase="hot_train",
+    )
+    assert record["inject"] is False
+    assert record["flux_pressures_Pa"] == {}
+    assert record["notices"][-1]["code"] == "openimcc_p2o5_gas_incomplete"
+    assert "PO2" in record["notices"][-1]["message"]
+
+
+def test_p_carriers_become_flux_active_and_debit_p2o5_at_c2a(monkeypatch) -> None:
+    """Injected a(P2O5) makes the existing carriers debit at C2A above the cap.
+
+    The flux value is the injected partial, 0.2 bar * 1e5 Pa/bar. The
+    ledger debit removes one P2O5 molecule for every two PO molecules,
+    from the reaction P2O5 → 2 PO + 1.5 O2.
+    """
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+    from simulator.config import load_config_bundle
+    from simulator.core import PyrolysisSimulator
+    from simulator.evaporation import _pre_rg_effective_pressure_source
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
+    from simulator.state import CampaignPhase
+    from simulator.vapour_rail.instrumentation import flux_pressures_from_batch
+    import yaml
+    from pathlib import Path
+
+    _patch_activity(monkeypatch, violated=True)
+
+    def evaluate_gas(activities, temperature_K, fo2, datapack, parent_oxides=None, **kwargs):
+        del activities, temperature_K, fo2, datapack, parent_oxides, kwargs
+        return _PGas(
+            {
+                species: _FLUX_PARTIAL_BAR
+                for species in ("P", "P2", "P4", "PO", "PO2", "P4O6", "P4O10")
+            },
+            notices=(
+                SimpleNamespace(
+                    code="p_gas_exceeds_one_bar_complete_volatilisation",
+                    message=_ONE_BAR_MESSAGE,
+                    species=("PO", "PO2", "P2", "P4", "P4O6", "P4O10"),
+                    total_pressure_bar=1.4,
+                ),
+            ),
+        )
+
+    monkeypatch.setattr(
+        openimcc_bridge._openimcc, "evaluate_gas", evaluate_gas, raising=False
+    )
+    temperature_K = VAPOROCK_T_MAX_K + 523.0
+    assert temperature_K == pytest.approx(2473.0)
+    data_path = Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml"
+    provider = BuiltinVaporPressureProvider(yaml.safe_load(data_path.read_text()) or {})
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": dict(_FLUX_MOL)},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1.0e-6,
+        control_inputs={
+            "pO2_bar": 1.0e-9,
+            "intrinsic_fO2_log": -10.0,
+            "high_t_melt_activity": "openimcc",
+            "process_phase": "hot_train",
+        },
+    )
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic
+    expected_pa = _FLUX_PARTIAL_BAR * _BAR_PA
+    assert diagnostic["openimcc_p2o5_gas"]["inject"] is True
+    assert "P" not in diagnostic["vapor_pressures_Pa"]
+    assert "P" not in diagnostic["activities"]
+    for species in ("P2", "P4", "PO", "PO2", "P4O6", "P4O10"):
+        assert diagnostic["vapor_pressures_Pa"][species] == pytest.approx(expected_pa)
+        assert diagnostic["activities"][species] == pytest.approx(0.01)
+        provenance = diagnostic["vapor_pressure_numerator_provenance"][species]
+        assert provenance["equivalent_parent_oxide_activity"] == pytest.approx(0.01)
+        assert provenance["melt_oxide_activity_authority_status"] == "extrapolated"
+        assert "3.5" in provenance["activity_standard_state_reconciliation"]
+        assert "1.01325" in provenance["activity_standard_state_reconciliation"]
+    assert any(_ONE_BAR_MESSAGE in warning for warning in result.warnings)
+
+    # load_batch builds the chemistry kernel the debit commits through.
+    # The batch admits a carrier only when its parent is on the ledger.
+    bundle = load_config_bundle(Path(__file__).resolve().parents[1] / "data")
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        bundle.setpoints,
+        bundle.feedstocks,
+        bundle.vapor_pressures,
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        dict(_FLUX_MOL),
+        source="test seed",
+        material_origin="feedstock",
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = temperature_K - 273.15
+    sim._last_vapor_pressure_diagnostic = diagnostic
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa=dict(diagnostic["vapor_pressures_Pa"]),
+        activity_coefficients=dict(diagnostic["activities"]),
+        temperature_C=temperature_K - 273.15,
+        diagnostics={},
+    )
+    effective = _pre_rg_effective_pressure_source(sim.vapor_pressures, equilibrium)
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=temperature_K,
+        effective_pressure_source=effective,
+    )
+    assert batch is not None, sim._last_vapour_batch_resolve_error
+    flux, report = flux_pressures_from_batch(
+        batch, effective_pressure_source=effective
+    )
+    for species in ("P2", "P4", "PO", "PO2", "P4O6", "P4O10"):
+        assert report["batch_channel_states"].get(species) == "eligible", report
+        assert flux[species] == pytest.approx(expected_pa)
+        assert batch.channel(species).is_flux_active
+    assert "P" not in flux
+    # The P-extension stage wakes stage0_only P2O5 rules. It must not
+    # take the ordinary hot-train carriers out of the flux map.
+    assert batch.channel("SiO").is_flux_active
+    assert flux["SiO"] > 0.0
+
+    # The credit path reads the legacy oxide-vapour row, the same object
+    # evaporation passes into the transition.
+    po_row = sim.vapor_pressures["oxide_vapors"]["PO"]
+    rate_kg = 1.0e-3
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"P2O5": 1.0},
+        source="test seed",
+        material_origin="feedstock",
+    )
+    parent = resolve_species_formula("P2O5", sim.species_formula_registry)
+    carrier = resolve_species_formula("PO", sim.species_formula_registry)
+    # P2O5 → 2 PO: one phosphorus atom in PO, two in P2O5.
+    assert parent.elements["P"] == 2
+    assert carrier.elements["P"] == 1
+    expected_oxide_mol = (
+        rate_kg
+        / carrier.molar_mass_kg_per_mol()
+        * carrier.elements["P"]
+        / parent.elements["P"]
+    )
+    assert expected_oxide_mol * 2.0 == pytest.approx(
+        rate_kg / carrier.molar_mass_kg_per_mol()
+    )
+    before = sim.atom_ledger.mol_by_species("process.cleaned_melt")["P2O5"]
+    _credited, transition = sim._credit_evaporation_transition(
+        "PO",
+        rate_kg,
+        rate_kg,
+        po_row,
+        apply_evaporative_redox_source_terms=False,
+        return_transition=True,
+    )
+    assert transition is not None
+    after = sim.atom_ledger.mol_by_species("process.cleaned_melt").get("P2O5", 0.0)
+    assert before - after == pytest.approx(expected_oxide_mol, rel=1.0e-9)
+
+
+def _scoring_pot(pot_id: str):
+    from simulator.diagnostic_helpers.binary_pot_scoring import load_scoring_pots
+
+    pots = {pot.pot_id: pot for pot in load_scoring_pots()}
+    return pots[pot_id]
+
+
+def test_phosphorus_pots_are_assessed_before_the_parent_solve() -> None:
+    """The installed pin still refuses these pots, after the extension notice.
+
+    The refusal is the 1 wt% projection, not the old S/P pack.
+    """
+
+    import openimcc
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+        composition_kg_and_mol,
+    )
+    from simulator.melt_backend.openimcc_bridge import (
+        OpenImccCompositionPolicyRefusal,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    sp_error = openimcc.ImccSPComponentRequiresExtensionError
+    for pot_id in (
+        "kambayashi_1985_feto_p2o5_s01",
+        "ohara_1987_feto_p2o5_i_s14",
+    ):
+        pot = _scoring_pot(pot_id)
+        composition_kg, composition_mol = composition_kg_and_mol(
+            pot.composition_wt_pct
+        )
+        with pytest.raises(OpenImccCompositionPolicyRefusal) as caught:
+            backend.equilibrate(
+                1643.0 - 273.15,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                fO2_log=-9.0,
+            )
+        assert not isinstance(caught.value, sp_error)
+        assert caught.value.code == "openimcc_projection_over_threshold"
+        extension = caught.value.diagnostics["p2o5_extension"]
+        assert any(
+            notice.get("code") == "openimcc_p2o5_extension_unavailable"
+            for notice in extension["notices"]
+        )
+
+
+def test_phosphorus_pot_exposes_liquid_p2o5_activity(monkeypatch) -> None:
+    """A successful dilute call is returned as liquid-reference a(P2O5).
+
+    Gamma stays off the activity map. The parent solve sees folded iron
+    and no P2O5. The cell copies that reference when it has no vapour-rail
+    standard state of its own.
+    """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        PO2_COMMANDED,
+        Po2Request,
+        _OpenImccBatteryBackend,
+        composition_kg_and_mol,
+        equilibrate_cell,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    seen: list[dict[str, float]] = []
+    original = openimcc_bridge.evaluate
+
+    def track_evaluate(**kwargs):
+        seen.append(dict(kwargs["composition_mol"]))
+        return original(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", track_evaluate)
+    _patch_activity(monkeypatch, violated=False)
+    backend = _OpenImccBatteryBackend("openimcc")
+    pot = _scoring_pot("kambayashi_1985_feto_p2o5_s01")
+    composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
+    result = backend.equilibrate(
+        1643.0 - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        fO2_log=-9.0,
+    )
+    assert seen
+    assert "P2O5" not in seen[0]
+    assert "Fe2O3" not in seen[0]
+    assert "FeO" in seen[0]
+    assert result.activity_coefficients["P2O5"] == pytest.approx(0.01)
+    assert "P2O5" not in result.reported_activity_coefficients
+    reference = result.activities_standard_state
+    assert reference["phase"] == "liquid"
+    assert reference["convention"] == "raoultian_pure_endmember"
+    assert reference["reference_pressure_bar"] == pytest.approx(1.0)
+    assert reference["component"] == "P2O5"
+    assert reference["activity"] == pytest.approx(0.01)
+    assert reference["gamma"] == pytest.approx(4.0)
+    assert reference["authority_status"] == "flagged"
+    assert "3.5" in reference["reconciliation"]
+    assert "1.01325" in reference["reconciliation"]
+    assert "hypothetical-liquid" in reference["reconciliation"]
+    codes = [notice.get("code") for notice in result.imcc_notices]
+    assert "imcc_p2o5_activity_domain_notice" in codes
+    assert "p2o5_feiii_phosphate_chemistry_not_modelled" in codes
+
+    cell = equilibrate_cell(
+        EngineHandle(
+            name="openimcc",
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=True,
+            supports_intrinsic_fo2=False,
+        ),
+        pot.as_binary_pot(),
+        temperature_K=1643.0,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+    )
+    assert cell.status == "ok"
+    assert cell.melt_activities["P2O5"] == pytest.approx(0.01)
+    assert cell.activities_standard_state["phase"] == "liquid"
+    assert cell.activities_standard_state["component"] == "P2O5"
+    assert "3.5" in cell.activities_standard_state["reconciliation"]
+
+
+def test_solid_p2o5_reference_is_not_scored_against_the_liquid_activity() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EquilibrateCell,
+        Po2Request,
+    )
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        ActivityComparator,
+        _comparator_envelope,
+    )
+
+    pot = _scoring_pot("kambayashi_1985_feto_p2o5_s01")
+    cell = EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="openimcc",
+        temperature_K=1643.0,
+        po2=Po2Request(mode="commanded", po2_bar=1.0e-9),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason="",
+        melt_activities={"P2O5": 0.01},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+        activities_standard_state={
+            "phase": "liquid",
+            "convention": "raoultian_pure_endmember",
+            "reference_pressure_bar": 1.0,
+            "component": "P2O5",
+        },
+    )
+
+    def comparator(standard_state: str) -> ActivityComparator:
+        return ActivityComparator(
+            source_id="kems-057-kambayashi-1985",
+            observation_id="kambayashi_1985_table4_feto_p2o5_compositions",
+            species="P2O5",
+            observable="activity",
+            method_class="measured",
+            sample_no=1,
+            temperature_K=1643.0,
+            measured=1.0e-4,
+            units="1",
+            standard_state=standard_state,
+            uncertainty=None,
+            doi="10.2355/tetsutohagane1955.71.16_1911",
+            row={"field": "a_P2O5"},
+        )
+
+    def envelope(**kwargs):
+        return kwargs
+
+    solid = _comparator_envelope(
+        pot=pot,
+        cell=cell,
+        comparator=comparator("P2O5(s)"),
+        envelope=envelope,
+        rail_for=lambda *_args: "activity",
+    )
+    assert solid["score_allowed"] is False
+    assert any("liquid-reference" in str(notice) for notice in solid["notices"])
+    liquid = _comparator_envelope(
+        pot=pot,
+        cell=cell,
+        comparator=comparator("P2O5(l)"),
+        envelope=envelope,
+        rail_for=lambda *_args: "activity",
+    )
+    assert liquid["score_allowed"] is True
+    assert liquid["predicted"] == pytest.approx(0.01)
+
+
+def test_hashimoto_assesses_before_evaluate_and_cleans_only_p_bearing_melts(
+    monkeypatch,
+) -> None:
+    import copy
+
+    import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+    from tests.battery.test_hashimoto_residue_predictions import _source_data
+
+    experiments, _measured, preform = _source_data()
+    catalog_path = (
+        __import__("pathlib").Path(__file__).resolve().parents[1]
+        / "data"
+        / "vapor_pressures.yaml"
+    )
+    import yaml
+
+    catalog = yaml.safe_load(catalog_path.read_text())
+    real_assess = openimcc_bridge.assess_p2o5_extension
+
+    def _run(experiment, *, expect_cleaned: bool):
+        order: list[str] = []
+        evaluated: list[dict[str, float]] = []
+        inventories: list[dict[str, float]] = []
+
+        def track_assess(composition, temperature_K=None, **kwargs):
+            order.append("assess")
+            return real_assess(composition, temperature_K, **kwargs)
+
+        def track_isolated(evaluate, *, timeout_s, **kwargs):
+            del timeout_s
+            order.append("evaluate")
+            evaluated.append(dict(kwargs["composition_mol"]))
+            return evaluate(**kwargs)
+
+        def integrate(inventory, _channels, pressure_model, **_kwargs):
+            positive = {
+                str(oxide): float(amount)
+                for oxide, amount in inventory.items()
+                if float(amount) > 0.0
+            }
+            inventories.append(positive)
+            pressure_model(positive, -10.0)
+            values = residue._hashimoto_project_oxide_wt_pct(inventory)
+            return values, (1.0e-9,), (), None, {}
+
+        monkeypatch.setattr(openimcc_bridge, "assess_p2o5_extension", track_assess)
+        monkeypatch.setattr(residue, "_evaluate_openimcc_isolated", track_isolated)
+        monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
+        residue._predict_hashimoto_residue_cohort(
+            [experiment],
+            catalog,
+            preform_dimensions_mm=preform,
+            code_revision="t1430-r1-order",
+            _allow_partial_cohort_for_test=True,
+        )
+        assert order[0] == "assess"
+        assert "evaluate" in order
+        assert order.index("assess") < order.index("evaluate")
+        assert evaluated
+        inventory = inventories[0]
+        if expect_cleaned:
+            assert "P2O5" in inventory
+            assert "P2O5" not in evaluated[0]
+            assert set(evaluated[0]) == set(inventory) - {"P2O5"}
+        else:
+            assert "P2O5" not in inventory
+            assert set(evaluated[0]) == set(inventory)
+
+    _run(experiments[0], expect_cleaned=False)
+
+    phosphorus = copy.deepcopy(experiments[0])
+    phosphorus["sample"]["printed_composition"]["state"]["value"]["P2O5"] = 0.2
+    _patch_activity(monkeypatch, violated=False)
+    _run(phosphorus, expect_cleaned=True)
+
+
+def test_oxygen_balance_uses_one_parent_set_for_inert_and_reactive_cells(
+    monkeypatch,
+) -> None:
+    """Metadata and the pressure model share one parent tuple, including a refusal."""
+
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_OXYGEN_BALANCE_EFFUSION,
+        Po2Request,
+        _OpenImccBatteryBackend,
+    )
+
+    _patch_activity(monkeypatch, violated=False)
+    composition_mol = {
+        "SiO2": 0.50,
+        "MgO": 0.20,
+        "FeO": 0.10,
+        "CaO": 0.10,
+        "Al2O3": 0.10,
+        "P2O5": 0.002,
+    }
+    metadata_parents: list[tuple[str, ...]] = []
+    gas_parents: list[tuple[str, ...]] = []
+    balance_parents: list[tuple[str, ...]] = []
+    refuse = {"gas": False}
+
+    real_channels = battery._openimcc_gas_channels_and_omission_notices
+
+    def tracking_channels(parent_oxides, datapack, gas_result=None):
+        metadata_parents.append(tuple(parent_oxides))
+        return real_channels(parent_oxides, datapack, gas_result)
+
+    def evaluate_gas(activities, temperature_K, fo2, datapack, parent_oxides=None, **kwargs):
+        del activities, temperature_K, fo2, datapack, kwargs
+        oxides = tuple(parent_oxides or ())
+        gas_parents.append(oxides)
+        if refuse["gas"] and "P2O5" in oxides:
+            raise ValueError("unknown parent P2O5")
+        return _PGas({"SiO": 1.0e-8, "O2": 1.0e-8, "PO": _FLUX_PARTIAL_BAR})
+
+    def evaluate_balance(activities, temperature_K, datapack, parent_oxides=None, **kwargs):
+        del activities, temperature_K, datapack, kwargs
+        oxides = tuple(parent_oxides or ())
+        balance_parents.append(oxides)
+        if refuse["gas"] and "P2O5" in oxides:
+            raise ValueError("unknown parent P2O5")
+        return (
+            1.0e-9,
+            _PGas({"SiO": 1.0e-8, "O2": 1.0e-8, "PO": _FLUX_PARTIAL_BAR}),
+            {
+                "residual": 0.0,
+                "bracket": [-12.0, -6.0],
+                "dominant_O_carriers": [],
+                "dominant_metal_carriers": [],
+            },
+        )
+
+    def fake_solver(model, metadata, bracket=None):
+        del bracket
+        model(1.0e-9)
+        return (
+            1.0e-9,
+            {name: 1.0e-8 for name in metadata},
+            {
+                "residual": 0.0,
+                "bracket": [-12.0, -6.0],
+                "dominant_O_carriers": [],
+                "dominant_metal_carriers": [],
+            },
+        )
+
+    monkeypatch.setattr(
+        battery, "_openimcc_gas_channels_and_omission_notices", tracking_channels
+    )
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda material, temperature_K: ({}, None, {}),
+    )
+    monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
+    monkeypatch.setattr(
+        openimcc, "evaluate_gas_oxygen_balance", evaluate_balance, raising=False
+    )
+    monkeypatch.setattr(openimcc, "oxygen_balance_from_pressure_model", fake_solver)
+    backend = _OpenImccBatteryBackend("openimcc")
+
+    def equilibrate(cell_material):
+        metadata_parents.clear()
+        gas_parents.clear()
+        balance_parents.clear()
+        return backend.equilibrate(
+            1400.0,
+            composition_mol=composition_mol,
+            po2_request=Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material=cell_material,
+            ),
+        )
+
+    def gas_codes(result):
+        return [
+            notice.get("code")
+            for notice in result.imcc_notices
+            if notice.get("kind") == "openimcc_p2o5_gas"
+        ]
+
+    refuse["gas"] = False
+    inert = equilibrate(None)
+    assert inert.status == "ok"
+    assert balance_parents
+    assert all("P2O5" in oxides for oxides in balance_parents)
+    assert metadata_parents
+    assert all(oxides == balance_parents[-1] for oxides in metadata_parents)
+    assert "openimcc_p2o5_gas_unavailable" not in gas_codes(inert)
+
+    reactive = equilibrate("W")
+    assert reactive.status == "ok"
+    assert gas_parents
+    assert all("P2O5" in oxides for oxides in gas_parents)
+    assert metadata_parents
+    assert all(oxides == gas_parents[-1] for oxides in metadata_parents)
+    assert "openimcc_p2o5_gas_unavailable" not in gas_codes(reactive)
+
+    refuse["gas"] = True
+    inert_refused = equilibrate(None)
+    assert inert_refused.status == "ok"
+    assert any("P2O5" in oxides for oxides in balance_parents)
+    assert all("P2O5" not in oxides for oxides in metadata_parents)
+    assert metadata_parents[0] == balance_parents[-1]
+    assert gas_codes(inert_refused).count("openimcc_p2o5_gas_unavailable") == 1
+
+    reactive_refused = equilibrate("W")
+    assert reactive_refused.status == "ok"
+    assert gas_parents[0] and "P2O5" in gas_parents[0]
+    assert all("P2O5" not in oxides for oxides in gas_parents[1:])
+    assert metadata_parents
+    assert all("P2O5" not in oxides for oxides in metadata_parents)
+    assert all(oxides == gas_parents[-1] for oxides in metadata_parents)
+    assert gas_codes(reactive_refused).count("openimcc_p2o5_gas_unavailable") == 1
+
+
+def test_campaign_start_and_reset_record_p2o5_survival() -> None:
+    from pathlib import Path
+
+    from simulator.config import load_config_bundle
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.state import CampaignPhase
+
+    bundle = load_config_bundle(Path(__file__).resolve().parents[1] / "data")
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        bundle.setpoints,
+        bundle.feedstocks,
+        bundle.vapor_pressures,
+    )
+    mass_kg = 0.01 * _P2O5_MOLAR_MASS_G / 1000.0
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.melt.composition_kg["P2O5"] = mass_kg
+    sim.start_campaign(CampaignPhase.C0)
+    assert sim.p2o5_survived_stage0_cleanup() is None
+    sim.melt.composition_kg["P2O5"] = mass_kg
+    sim.start_campaign(CampaignPhase.C2A)
+    recorded = sim.p2o5_survived_stage0_cleanup()
+    assert recorded is not None
+    assert recorded["code"] == "P survived Stage-0 cleanup"
+    assert recorded["p2o5_mass_kg"] == pytest.approx(mass_kg)
+    assert recorded["left_campaign"] == "C0"
+    assert recorded["entered_campaign"] == "C2A"
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    assert sim.p2o5_survived_stage0_cleanup() is None

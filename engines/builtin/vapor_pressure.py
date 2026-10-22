@@ -4106,6 +4106,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     p2o5_extension = composition_policy.get("p2o5_extension")
         if isinstance(p2o5_extension, Mapping):
             from simulator.melt_backend.openimcc_bridge import (
+                p2o5_flux_activity_evidence,
                 p2o5_vapour_pressures_pa,
             )
 
@@ -4130,11 +4131,25 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 p2o5_vapour.get("inject")
                 and controls.get("process_phase") != "stage0"
             ):
-                for species, pressure_pa in p2o5_vapour[
-                    "flux_pressures_Pa"
-                ].items():
-                    vapor_pressures[str(species)] = float(pressure_pa)
-                    vapor_pressure_sources[str(species)] = "openimcc_p2o5_gas"
+                # Pressures without a(P2O5) become a Henrian upper bound
+                # and never debit. The evidence shares the catalog's
+                # Raoultian liquid 1 bar state; provenance names the shift.
+                carrier_activities, carrier_provenance = (
+                    p2o5_flux_activity_evidence(p2o5_extension)
+                )
+                if carrier_activities:
+                    for species, pressure_pa in p2o5_vapour[
+                        "flux_pressures_Pa"
+                    ].items():
+                        vapor_pressures[str(species)] = float(pressure_pa)
+                        vapor_pressure_sources[str(species)] = (
+                            "openimcc_p2o5_gas"
+                        )
+                    for species, activity in carrier_activities.items():
+                        activities[str(species)] = float(activity)
+                        vapor_pressure_provenance[str(species)] = (
+                            carrier_provenance[species]
+                        )
 
         _attach_high_t_activity_provenance(
             authority=high_t_activity_authority,
