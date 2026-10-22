@@ -1090,6 +1090,9 @@ def _independent_cell_record(result):
         "held_effective_gamma_by_parent": authority.get(
             "held_effective_gamma_by_parent"
         ),
+        "certified_effective_gamma_by_parent": authority.get(
+            "certified_effective_gamma_by_parent"
+        ),
         "notices": authority.get("notices"),
         "temperature_bridge": authority.get("temperature_bridge"),
     }
@@ -1148,6 +1151,7 @@ def test_independent_battery_cells_match_in_either_order(monkeypatch) -> None:
     forward = _score_independent_cells(("A", "B"))
     reverse = _score_independent_cells(("B", "A"))
     assert forward == reverse
+    assert "SiO2" in (forward["A"]["certified_effective_gamma_by_parent"] or {})
 
     refused = forward["B"]
     assert refused["status"] == "ok"
@@ -1197,6 +1201,92 @@ def test_cell_without_same_composition_bridge_keeps_typed_fallback(
         notice.get("method") == "same_composition_T_bridge"
         for notice in authority["notices"]
     )
+
+
+# A cold cell is below the 400 K refresh floor. The refresh returns
+# without replacing the previous vapour diagnostic, so a hot cell's
+# activities and notices would otherwise ride into the cold result.
+_COLD_CELL_MOL = {**BASE_MELT_MOL, "SiO2": 3.0}
+_COLD_CELL_T_K = 300.0
+
+
+def _stable_numbers(value):
+    if isinstance(value, bool) or value is None or isinstance(value, str):
+        return value
+    if isinstance(value, (int, float)):
+        return float(value).hex()
+    if isinstance(value, dict):
+        return {
+            str(key): _stable_numbers(item)
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+        }
+    if isinstance(value, (list, tuple)):
+        return [_stable_numbers(item) for item in value]
+    return value
+
+
+def _cold_path_record(result):
+    """Pressures, activities and notices a cold cell must not inherit."""
+
+    diagnostic = dict(result.diagnostics.get("vapor_pressure_diagnostic") or {})
+    return {
+        "status": result.status,
+        "pressures_hex": {
+            str(species): float(pressure).hex()
+            for species, pressure in sorted(result.vapor_pressures_Pa.items())
+        },
+        "activities": _stable_numbers(dict(result.activity_coefficients or {})),
+        "imcc_notices": _stable_numbers(result.diagnostics.get("imcc_notices")),
+        "diagnostics_authority": result.diagnostics.get("authority"),
+        "high_t_present": "high_t_melt_activity" in diagnostic,
+    }
+
+
+def _score_hot_and_cold(order):
+    cells = {
+        "hot": (_INDEPENDENT_CELL_A_MOL, _INDEPENDENT_CELL_A_T_K),
+        "cold": (_COLD_CELL_MOL, _COLD_CELL_T_K),
+    }
+    backend = _independent_cell_backend()
+    records = {}
+    for name in order:
+        composition, temperature_K = cells[name]
+        records[name] = _cold_path_record(
+            _equilibrate_independent_cell(backend, composition, temperature_K)
+        )
+    return records
+
+
+def test_independent_hot_and_cold_cells_match_in_either_order() -> None:
+    """A hot cell then a cold cell matches the cold cell scored first.
+
+    The cold refresh does not replace the vapour diagnostic. The cold
+    result must still be the fresh-core result: empty pressures, empty
+    activities, and no carried high-T authority.
+    """
+
+    forward = _score_hot_and_cold(("hot", "cold"))
+    reverse = _score_hot_and_cold(("cold", "hot"))
+    assert forward == reverse
+
+    hot = forward["hot"]
+    assert hot["high_t_present"] is True
+    assert hot["activities"]
+    assert hot["pressures_hex"]
+
+    cold = forward["cold"]
+    lone = _cold_path_record(
+        _equilibrate_independent_cell(
+            _independent_cell_backend(),
+            _COLD_CELL_MOL,
+            _COLD_CELL_T_K,
+        )
+    )
+    assert cold == lone
+    assert cold["pressures_hex"] == {}
+    assert cold["activities"] == {}
+    assert cold["high_t_present"] is False
+    assert cold["imcc_notices"] in ([], None)
 
 
 @pytest.mark.parametrize("silica_factor", [1.0, 0.99])
