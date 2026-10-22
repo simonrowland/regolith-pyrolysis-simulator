@@ -1108,8 +1108,18 @@ class ThermoEngineTransport:
         self._liq_phase = liq_phase
         self._melts_version = melts_version
         self._liq_model = liq_model
-        native_identity = cache_version_for('thermoengine', required=True)
-        assert native_identity is not None
+        native_identity = cache_version_for('thermoengine')
+        if native_identity is None:
+            module_path = getattr(thermoengine, '__file__', 'unknown')
+            native_identity = (
+                f'thermoengine MELTS {melts_version} '
+                f'(liq_mod {liq_model}; {module_path})'
+            )
+            warn_legacy_once(
+                'thermoengine',
+                'engines.local.toml absent; using legacy ThermoEngine '
+                'path-based identity for cache comparison',
+            )
         self.engine_version = _thermoengine_cache_identity(native_identity)
         return True
 

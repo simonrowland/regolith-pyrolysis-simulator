@@ -137,8 +137,6 @@ _BUILD_ENV_EXTRA = {
     "LIBRARY_PATH": "/opt/homebrew/lib",
 }
 
-_DYLIB_NAMES = ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib")
-
 # One initializer line: leading ws, a numeric literal, comma, then a
 # ``// <index> W(<comp>,<comp>)`` comment. Both components are padded; a
 # component may itself contain parentheses (e.g. Ca2(PO4)2), so the name
@@ -433,11 +431,16 @@ def _default_engine_root() -> Path:
 
 def _default_pristine_dylib_dir() -> Path:
     """Pristine staged dylib dir from engines.local.toml (no env mutation)."""
+    from engine_install_config import (
+        load_engine_lock,
+        thermoengine_artifact_names,
+    )
     from simulator.engine_local_config import (
         EngineInstallRequiredError,
         load_config,
     )
 
+    dylib_names = thermoengine_artifact_names(load_engine_lock())
     try:
         config = load_config(required=True)
     except EngineInstallRequiredError as exc:
@@ -446,11 +449,11 @@ def _default_pristine_dylib_dir() -> Path:
     candidate = config.paths.thermoengine_dylib_dir
     if candidate is not None:
         candidate = candidate.expanduser()
-        if all((candidate / name).is_file() for name in _DYLIB_NAMES):
+        if all((candidate / name).is_file() for name in dylib_names):
             return candidate
     raise AbortWMutator(
         f"locked ThermoEngine dylib directory is missing required files "
-        f"{list(_DYLIB_NAMES)}; run install-engines.py"
+        f"{list(dylib_names)}; run install-engines.py"
     )
 
 
@@ -608,6 +611,12 @@ class W0WMutator:
         self._identity = self._build_identity()
 
     def _build_identity(self) -> BuildIdentity:
+        from engine_install_config import (
+            load_engine_lock,
+            thermoengine_artifact_names,
+        )
+
+        dylib_names = thermoengine_artifact_names(load_engine_lock())
         spec = importlib.util.find_spec("thermoengine")
         module_sha256 = (
             _sha256_file(Path(spec.origin).resolve())
@@ -616,10 +625,10 @@ class W0WMutator:
         )
         pristine_hashes = {
             name: _sha256_file(self._pristine_dylib_dir / name)
-            for name in _DYLIB_NAMES
+            for name in dylib_names
             if (self._pristine_dylib_dir / name).is_file()
         }
-        if sorted(pristine_hashes) != sorted(_DYLIB_NAMES):
+        if sorted(pristine_hashes) != sorted(dylib_names):
             raise AbortWMutator(
                 f"pristine dylib dir {self._pristine_dylib_dir} is missing "
                 "staged dylibs; version identity cannot be established"
@@ -775,7 +784,14 @@ class W0WMutator:
         lib_dir = prefix / "lib"
         lib_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(build_root / "src" / "libphaseobjc.dylib", lib_dir)
-        for name in ("libswimdew.dylib", "libspeciation.dylib"):
+        from engine_install_config import (
+            load_engine_lock,
+            thermoengine_artifact_names,
+        )
+
+        for name in thermoengine_artifact_names(load_engine_lock()):
+            if name == "libphaseobjc.dylib":
+                continue
             shutil.copy2(self._pristine_dylib_dir / name, lib_dir)
         binary_sha256 = _sha256_file(lib_dir / "libphaseobjc.dylib")
 

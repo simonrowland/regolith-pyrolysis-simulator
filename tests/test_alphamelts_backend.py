@@ -4973,7 +4973,7 @@ def test_alphamelts_initialize_defaults_to_subprocess_when_binary_available(
     assert backend._mode == 'subprocess'
 
 
-def test_alphamelts_auto_mode_refuses_missing_lock_before_python_api_fallback(
+def test_alphamelts_auto_mode_falls_back_without_local_config(
     monkeypatch,
 ):
     from simulator.engine_local_config import EngineInstallRequiredError
@@ -4993,11 +4993,15 @@ def test_alphamelts_auto_mode_refuses_missing_lock_before_python_api_fallback(
         )
 
     backend._configured_alphamelts_binary = missing_locked_binary
+    backend._find_project_binary = lambda _root: None
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
+    )
 
-    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
-        backend.initialize({})
+    assert backend.initialize({}) is False
 
-    assert api_attempts == []
+    assert api_attempts == [True]
 
 
 def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch):

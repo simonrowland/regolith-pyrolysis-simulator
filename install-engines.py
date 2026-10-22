@@ -28,11 +28,14 @@ Usage: python3 install-engines.py
 
 from __future__ import annotations
 
+import sys
+
+sys.dont_write_bytecode = True
+
 import os
 import platform
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))

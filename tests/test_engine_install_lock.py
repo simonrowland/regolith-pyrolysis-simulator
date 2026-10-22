@@ -5,17 +5,18 @@ from pathlib import Path
 import pytest
 
 from engine_install_config import (
-    EngineInstallRequiredError,
+    EngineLocalConfig,
+    EnginePaths,
     artifact_for_platform,
-    cache_version_for,
     check_engine_install,
-    configured_magemin_binary_path,
     engine_install_path,
-    find_alphamelts_binary,
     load_engine_lock,
+    load_config,
     render_locked_config,
     render_toml,
-    setup_thermoengine_dylib_path,
+    thermoengine_artifact_names,
+    write_config,
+    write_locked_config,
 )
 
 
@@ -195,13 +196,47 @@ def test_lock_rendering_is_deterministic_and_pathless_in_identity_versions(
     )
 
 
+def test_render_toml_round_trips_windows_style_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import engine_install_config as module
+
+    windows_paths = {
+        "thermoengine_dylib_dir": (
+            r"C:\Users\operator\repos\engine-bin\thermoengine\pin\lib"
+        ),
+        "alphamelts_binary_path": (
+            r"C:\Users\operator\repos\engine-bin\alphamelts\pin\alphamelts.exe"
+        ),
+        "magemin_binary_path": (
+            r"C:\Users\operator\repos\engine-bin\magemin\pin\MAGEMin.exe"
+        ),
+    }
+    config = EngineLocalConfig(
+        paths=EnginePaths(
+            **{key: Path(value) for key, value in windows_paths.items()}
+        ),
+        identities={},
+    )
+    path = tmp_path / "engines.local.toml"
+    monkeypatch.setattr(module, "config_path", lambda: path)
+
+    write_config(config)
+    loaded = load_config(required=True)
+
+    assert loaded is not None
+    assert {
+        key: str(getattr(loaded.paths, key))
+        for key in windows_paths
+    } == windows_paths
+
+
 def test_lock_rendering_does_not_discover_legacy_engine_paths(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import engine_install_config as module
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-    from simulator.melt_backend.magemin import MAGEMinBackend
 
     lock = load_engine_lock(LOCK_PATH)
     checkout = tmp_path / "checkout"
@@ -223,19 +258,41 @@ def test_lock_rendering_does_not_discover_legacy_engine_paths(
         executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
         executable.chmod(0o755)
     (home / "lib").mkdir(parents=True)
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(lock):
         (home / "lib" / name).write_bytes(b"legacy dylib")
     monkeypatch.setenv("HOME", str(home))
     monkeypatch.setenv("PATH", str(path_bin))
-    monkeypatch.setattr(module, "repo_root", lambda: checkout)
     monkeypatch.setattr(
         module,
         "config_path",
         lambda: checkout / "engines" / "engines.local.toml",
     )
 
-    config = render_locked_config(lock, root)
+    for key, pin in lock.engines.items():
+        engine_dir = engine_install_path(lock, root, key)
+        if pin.source_kind == "git":
+            (engine_dir / ".git").mkdir(parents=True, exist_ok=True)
+            artifacts = pin.artifacts
+        else:
+            asset = artifact_for_platform(pin)
+            artifacts = asset.artifacts
+        for artifact in artifacts:
+            path = engine_dir / artifact
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(f"{key}/{artifact}".encode())
 
+    config_path = write_locked_config(lock, root)
+    config = load_config(required=True)
+    report = check_engine_install(
+        lock,
+        root,
+        repos_root=tmp_path,
+        local_config=config_path,
+        library_root=home / "lib",
+        host="fake-host",
+    )
+
+    assert config is not None
     assert config.paths.magemin_binary_path == (
         engine_install_path(lock, root, "magemin") / "MAGEMin"
     )
@@ -243,18 +300,27 @@ def test_lock_rendering_does_not_discover_legacy_engine_paths(
     assert config.paths.alphamelts_binary_path == engine_install_path(
         lock, root, "alphamelts"
     ) / alpha_asset.runtime_artifact
-    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
-        find_alphamelts_binary()
-    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
-        AlphaMELTSBackend()._configured_alphamelts_binary()
-    with pytest.raises(EngineInstallRequiredError, match="run install-engines.py"):
-        configured_magemin_binary_path()
-    with pytest.raises(EngineInstallRequiredError, match="run install-engines.py"):
-        cache_version_for("thermoengine", required=True)
-    with pytest.raises(EngineInstallRequiredError, match="run install-engines.py"):
-        MAGEMinBackend._locate_binary(None)
-    with pytest.raises(EngineInstallRequiredError, match="run install-engines.py"):
-        setup_thermoengine_dylib_path()
+    drift_codes = {drift.code for drift in report.drifts}
+    assert "extra_build" in drift_codes
+    assert "config_paths_drift" not in drift_codes
+    assert "config_digest_drift" not in drift_codes
+    extra_paths = {
+        drift.path for drift in report.drifts if drift.code == "extra_build"
+    }
+    assert legacy_magemin.parent in extra_paths
+    assert sibling_magemin.parent in extra_paths
+    assert legacy_alpha.parent in extra_paths
+    written = config_path.read_text(encoding="utf-8")
+    assert all(
+        str(path) not in written
+        for path in (
+            checkout,
+            sibling_magemin.parent,
+            legacy_alpha.parent,
+            path_bin,
+            home / "lib",
+        )
+    )
 
 
 def test_check_classifies_source_artifact_config_and_extra_build_drift(
@@ -462,13 +528,12 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
                     path.chmod(0o444)
 
     env = os.environ.copy()
-    env.update({"HOME": str(home), "PATH": str(bin_dir), "PYTHONDONTWRITEBYTECODE": "1"})
+    env.update({"HOME": str(home), "PATH": str(bin_dir)})
     checked = subprocess.run(
         [
             sys.executable,
             "-I",
             "-S",
-            "-B",
             str(fixture_repo / "install-engines.py"),
             "--check",
         ],

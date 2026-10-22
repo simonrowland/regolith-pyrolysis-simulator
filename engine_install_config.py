@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import platform
 import re
@@ -936,13 +937,21 @@ def resolve_magemin_binary_path(explicit: Any = None) -> Path | None:
 
 
 def setup_thermoengine_dylib_path() -> Path:
-    config = load_config(required=True)
-    assert config is not None
-    dylib_dir = config.paths.thermoengine_dylib_dir
+    config = load_config()
+    dylib_dir = (
+        config.paths.thermoengine_dylib_dir.expanduser()
+        if config is not None and config.paths.thermoengine_dylib_dir is not None
+        else None
+    )
+    if dylib_dir is None:
+        home_lib = Path.home() / "lib"
+        if home_lib.is_dir():
+            dylib_dir = home_lib
     if dylib_dir is None or not dylib_dir.is_dir():
         raise EngineInstallRequiredError(
-            f"locked ThermoEngine dylib directory is missing from {config_path()}; "
-            "run install-engines.py"
+            "ThermoEngine dylib directory is unavailable; configure "
+            f"{config_path()} [paths].thermoengine_dylib_dir or run "
+            "install-engines.py"
         )
     dylib_names = thermoengine_artifact_names(load_engine_lock())
 
@@ -970,11 +979,17 @@ def render_toml(config: EngineLocalConfig) -> str:
     lines = ["[paths]"]
     paths = config.paths
     if paths.thermoengine_dylib_dir is not None:
-        lines.append(f'thermoengine_dylib_dir = "{paths.thermoengine_dylib_dir}"')
+        lines.append(
+            f"thermoengine_dylib_dir = {json.dumps(str(paths.thermoengine_dylib_dir))}"
+        )
     if paths.alphamelts_binary_path is not None:
-        lines.append(f'alphamelts_binary_path = "{paths.alphamelts_binary_path}"')
+        lines.append(
+            f"alphamelts_binary_path = {json.dumps(str(paths.alphamelts_binary_path))}"
+        )
     if paths.magemin_binary_path is not None:
-        lines.append(f'magemin_binary_path = "{paths.magemin_binary_path}"')
+        lines.append(
+            f"magemin_binary_path = {json.dumps(str(paths.magemin_binary_path))}"
+        )
 
     for engine_key in sorted(config.identities):
         identity = config.identities[engine_key]

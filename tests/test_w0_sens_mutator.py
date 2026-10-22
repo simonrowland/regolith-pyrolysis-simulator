@@ -321,9 +321,11 @@ def test_default_seams_mint_production_build_records(tmp_path, monkeypatch) -> N
 def test_default_pristine_dylib_dir_does_not_fall_back_to_home_lib(
     tmp_path, monkeypatch
 ) -> None:
+    from engine_install_config import load_engine_lock, thermoengine_artifact_names
+
     home_lib = tmp_path / "home" / "lib"
     home_lib.mkdir(parents=True)
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(load_engine_lock()):
         (home_lib / name).write_bytes(b"legacy dylib")
     monkeypatch.setenv("HOME", str(home_lib.parent))
     monkeypatch.setattr(

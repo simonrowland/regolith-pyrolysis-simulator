@@ -1185,17 +1185,37 @@ class _MELTSBackendSupport(MeltBackend):
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
-            binary_path = self._configured_alphamelts_binary()
-            if binary_path is not None:
-                self._engine_path = binary_path
+            from simulator.engine_local_config import EngineInstallRequiredError
+
+            project_root = Path(__file__).parent.parent.parent
+            engine_root = project_root / 'engines' / 'alphamelts'
+            engine_path = engine_root / 'run_alphamelts.command'
+            try:
+                binary_path = self._configured_alphamelts_binary()
+            except EngineInstallRequiredError:
+                binary_path = None
+            if binary_path is None:
+                binary_path = self._find_project_binary(engine_root)
+            if engine_path.exists() or binary_path is not None:
+                self._engine_path = engine_path if engine_path.exists() else binary_path
                 self._binary_path = binary_path
                 self._mode = 'subprocess'
+            else:
+                try:
+                    result = _run_alphamelts_subprocess(
+                        ['alphamelts', '--version'],
+                        capture_output=True,
+                        text=True,
+                        timeout=5,
+                    )
+                    if result.returncode == 0:
+                        self._engine_path = Path('alphamelts')
+                        self._binary_path = Path('alphamelts')
+                        self._mode = 'subprocess'
+                except (FileNotFoundError, subprocess.TimeoutExpired):
+                    pass
             if self._mode is None and require_subprocess:
-                from simulator.engine_local_config import EngineInstallRequiredError
-
-                raise EngineInstallRequiredError(
-                    'locked alphaMELTS binary is unavailable; run install-dependencies.py'
-                )
+                raise ImportError('AlphaMELTS subprocess transport unavailable')
 
         if self._mode is None and requested_mode in (None, 'python_api'):
             self._initialize_petthermotools(
@@ -1367,10 +1387,10 @@ class _MELTSBackendSupport(MeltBackend):
         if self._engine_version:
             return self._engine_version
         if self._mode == 'subprocess':
-            from simulator.engine_local_config import cache_version_for
-
-            self._engine_version = cache_version_for('alphamelts', required=True)
-            return self._engine_version
+            binary_version = self._subprocess_engine_version()
+            if binary_version:
+                self._engine_version = binary_version
+                return self._engine_version
         if self._pet_module is not None:
             version = getattr(self._pet_module, '__version__', None)
             if version:
@@ -1383,7 +1403,45 @@ class _MELTSBackendSupport(MeltBackend):
                 return self._engine_version
             except importlib.metadata.PackageNotFoundError:
                 continue
+        binary_version = self._subprocess_engine_version()
+        if binary_version:
+            self._engine_version = binary_version
+            return self._engine_version
         return 'unavailable'
+
+    def _subprocess_engine_version(self) -> Optional[str]:
+        from simulator.engine_local_config import (
+            cache_version_for,
+            warn_legacy_once,
+        )
+
+        config_version = cache_version_for('alphamelts')
+        if config_version is not None:
+            return config_version
+
+        if self._binary_path is None and self._engine_path is None:
+            return None
+        binary = self._binary_path or self._engine_path
+        try:
+            result = _run_alphamelts_subprocess(
+                [str(binary), '--version'],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            text = (result.stdout or result.stderr).strip().splitlines()
+            if result.returncode == 0 and text:
+                legacy = text[0]
+            else:
+                legacy = f'alphaMELTS subprocess ({binary})'
+        except (OSError, subprocess.TimeoutExpired):
+            legacy = f'alphaMELTS subprocess ({binary})'
+        warn_legacy_once(
+            'alphamelts',
+            'engines.local.toml absent; using legacy alphaMELTS '
+            'path-based identity for cache comparison',
+        )
+        return legacy
 
     def capabilities(self) -> Dict[str, object]:
         caps = super().capabilities()

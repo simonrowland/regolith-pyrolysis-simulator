@@ -2125,6 +2125,32 @@ def test_magemin_absent_binary_marks_backend_unavailable(monkeypatch):
     assert backend.is_available() is False
 
 
+def test_magemin_discovers_legacy_checkout_binary_without_local_config(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import engine_install_config
+    import simulator.melt_backend.magemin as magemin_module
+
+    project = tmp_path / "project"
+    module_file = project / "simulator" / "melt_backend" / "magemin.py"
+    module_file.parent.mkdir(parents=True)
+    monkeypatch.setattr(magemin_module, "__file__", str(module_file))
+    monkeypatch.setattr(
+        engine_install_config,
+        "config_path",
+        lambda: tmp_path / "missing" / "engines.local.toml",
+    )
+    binary = project / "engines" / "magemin" / "MAGEMin"
+    binary.parent.mkdir(parents=True)
+    binary.write_bytes(b"legacy MAGEMin")
+    binary.chmod(0o755)
+
+    backend = MAGEMinBackend()
+
+    assert backend._resolve_binary_path() == binary
+
+
 def test_magemin_absent_equilibrate_returns_empty_result_with_warning(
     monkeypatch,
 ):

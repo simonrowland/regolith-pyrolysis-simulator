@@ -14,9 +14,11 @@ from simulator.engine_local_config import (
     cache_version_for,
     config_path,
     is_legacy_cache_version,
+    load_engine_lock,
     load_config,
     render_toml,
     setup_thermoengine_dylib_path,
+    thermoengine_artifact_names,
     write_config,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -31,7 +33,7 @@ from scripts.rekey_cache_engine_identity import rekey_cache
 def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLocalConfig:
     dylib_dir = tmp_path / "lib"
     dylib_dir.mkdir()
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(load_engine_lock()):
         (dylib_dir / name).write_bytes(b"dylib-" + name.encode())
 
     alpha_bin = tmp_path / "alphamelts2"
@@ -97,22 +99,37 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
 
 
-def test_config_absent_refuses_alpha_binary_discovery(
+def test_alpha_backend_discovers_checkout_binary_without_local_config(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    import simulator.melt_backend.alphamelts as alphamelts_module
+
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "engine_install_config.config_path",
         lambda: missing,
     )
-    from engine_install_config import find_alphamelts_binary
-
-    legacy = tmp_path / "engines" / "alphamelts" / "alphamelts2"
-    legacy.parent.mkdir(parents=True)
+    legacy = tmp_path / "alphamelts2"
     legacy.write_bytes(b"legacy binary")
-    with pytest.raises(EngineInstallRequiredError, match="run install-dependencies.py"):
-        find_alphamelts_binary()
+
+    class UnavailableVapoRock:
+        def initialize(self, _config: dict) -> bool:
+            return False
+
+        def is_available(self) -> bool:
+            return False
+
+    monkeypatch.setattr(
+        alphamelts_module,
+        "VapoRockBackend",
+        UnavailableVapoRock,
+    )
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(backend, "_find_project_binary", lambda _root: legacy)
+
+    assert backend.initialize({"mode": "subprocess"}) is True
+    assert backend._binary_path == legacy
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(
@@ -141,7 +158,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
 ) -> None:
     dylib_dir = tmp_path / "lib"
     dylib_dir.mkdir()
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(load_engine_lock()):
         (dylib_dir / name).write_bytes(b"x")
 
     config = EngineLocalConfig(
@@ -158,6 +175,24 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
     resolved = setup_thermoengine_dylib_path()
     assert resolved == dylib_dir
     assert str(dylib_dir) in __import__("os").environ["DYLD_FALLBACK_LIBRARY_PATH"]
+
+
+def test_thermoengine_uses_home_lib_without_local_config(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    home_lib = tmp_path / "home" / "lib"
+    home_lib.mkdir(parents=True)
+    for name in thermoengine_artifact_names(load_engine_lock()):
+        (home_lib / name).write_bytes(b"legacy dylib")
+    monkeypatch.setenv("HOME", str(home_lib.parent))
+    monkeypatch.setattr(
+        "engine_install_config.config_path",
+        lambda: tmp_path / "missing" / "engines.local.toml",
+    )
+    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+
+    assert setup_thermoengine_dylib_path() == home_lib
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:

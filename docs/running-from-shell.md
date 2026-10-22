@@ -33,13 +33,15 @@ or misdirected links without changing them. `install-engines.py` verifies
 ThermoEngine and VapoRock imports in a fresh process with that library path and
 fails if verification fails.
 
-Runtime engine paths come only from the generated TOML. If it is missing or a
-locked binary is absent, the runtime reports which installer to run instead of
-searching sibling checkouts or `PATH`. Identity versions come from the lock;
-identity digests use the installed executable bytes (or the combined
-ThermoEngine libraries), while Python-only engines use their pinned commit.
-Change a reviewed lock entry to bump an engine; `--update` no longer follows
-upstream HEAD.
+Runtime readers prefer the generated TOML. Before every checkout has a local
+TOML, the adapters retain their legacy fallback locations: alphaMELTS in the
+checkout or on `PATH`, MAGEMin in the checkout, a sibling clone, or on `PATH`,
+and ThermoEngine libraries in `~/lib`. The installer, TOML writer, and
+`--check` remain lock-only; the checker reports extra builds under `~/repos`
+without selecting or deleting them. Generated identity versions come from the
+lock; digests use installed executable bytes (or the combined ThermoEngine
+libraries), while Python-only engines use their pinned commit. Change a reviewed
+lock entry to bump an engine; `--update` no longer follows upstream HEAD.
 
 ---
 
