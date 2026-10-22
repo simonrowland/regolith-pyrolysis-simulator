@@ -6,12 +6,14 @@ produced by calling the counter under test a second way.
 
 from __future__ import annotations
 
+import io
 import tracemalloc
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
+import scripts.battery_residuals_report as residuals_report
 from scripts.battery_residuals_report import band_report, funnel_report, main, rowdiff_report
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "battery_residuals_report"
@@ -220,6 +222,73 @@ def _write_values(path: Path, rows: tuple[tuple[str, str], ...]) -> None:
             )
 
 
+def test_rowdiff_disjoint_keys_are_added_or_only_in_base(tmp_path: Path) -> None:
+    base = tmp_path / "base.jsonl"
+    tip = tmp_path / "tip.jsonl"
+    _write_values(base, (("a", "1"), ("b", "1")))
+    _write_values(tip, (("c", "4"), ("d", "5")))
+
+    report = rowdiff_report(base, tip, retain_details=True)
+
+    assert [item.key for item in report.added] == ["c", "d"]
+    assert [item.key for item in report.removed] == ["a", "b"]
+    assert report.value_move_count == 0
+    assert report.newly_scored == ()
+    assert report.newly_refused == ()
+
+
+def test_rowdiff_writes_tip_changes_before_the_tip_ledger_ends(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An added tip key is written while tip rows remain; base-only keys wait."""
+
+    base = tmp_path / "base.jsonl"
+    tip = tmp_path / "tip.jsonl"
+    _write_values(
+        base,
+        (
+            ("a::activity::melt_activity::openimcc", "1"),
+            ("r::activity::melt_activity::openimcc", "1"),
+        ),
+    )
+    _write_values(
+        tip,
+        (
+            ("b::activity::melt_activity::openimcc", "1"),
+            ("a::activity::melt_activity::openimcc", "2"),
+            ("c::activity::melt_activity::openimcc", "1"),
+        ),
+    )
+    state = {"tip_done": False, "wrote_during": False, "removed_early": False}
+    real_iter = residuals_report.iter_residual_rows
+
+    def wrapped(path: Path):
+        if path == tip:
+            yield from real_iter(path)
+            state["tip_done"] = True
+        else:
+            yield from real_iter(path)
+
+    monkeypatch.setattr(residuals_report, "iter_residual_rows", wrapped)
+
+    class Sink(io.StringIO):
+        def write(self, text: str) -> int:
+            if text.startswith("added_row") and not state["tip_done"]:
+                state["wrote_during"] = True
+            if text.startswith("removed_row") and not state["tip_done"]:
+                state["removed_early"] = True
+            return super().write(text)
+
+    sink = Sink()
+    report = rowdiff_report(base, tip, show=5, out=sink)
+
+    assert state["wrote_during"]
+    assert not state["removed_early"]
+    assert [item.key for item in report.value_moves] == ["a::activity::melt_activity::openimcc"]
+    assert "added_row\topenimcc\tb::activity::melt_activity::openimcc\t" in sink.getvalue()
+    assert "removed_row\topenimcc\tr::activity::melt_activity::openimcc\t" in sink.getvalue()
+
+
 def test_rowdiff_show_keeps_the_largest_relative_moves(tmp_path: Path) -> None:
     """show=2 keeps the two largest |relative| moves, b=3 and c=2.5, not a=2."""
 
@@ -286,13 +355,12 @@ def _write_ledger(path: Path, n: int, value: str) -> None:
 
 @pytest.mark.nightly
 def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
-    """100_000 rows stay under a RowView-per-key working set.
+    """100_000 overlapping keys stay within the one-side base index.
 
-    Traced peaks for this shape: the compact rowdiff map was 29 MB, and
-    keeping all 100_000 value moves was 88 MB. A pair of RowView indexes was
-    89 MB. The band's float64 array plus its one-group Decimal median was
-    13 MB. The bounds sit above those compact peaks and below the RowView
-    index and the full move list.
+    That index is key to (status code, float). On this fixture it traces
+    about 21 MB. The previous nine-field union of both sides traced
+    28_871_392 bytes here and is over this cap, as is a full list of the
+    100_000 moves or a pair of RowView indexes. The band bound is unchanged.
     """
 
     n = 100_000
@@ -313,7 +381,7 @@ def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
     assert report.newly_scored == ()
     assert report.added == ()
     assert report.removed == ()
-    assert rowdiff_peak < 48_000_000
+    assert rowdiff_peak < 24_000_000
 
     tracemalloc.start()
     band = band_report(base, t_min=Decimal("0"), t_max=Decimal("2000"))

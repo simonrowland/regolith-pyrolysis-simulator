@@ -33,15 +33,17 @@ transitions per engine, numeric value changes, keys that were refused and
 are now scored, keys that were scored and are now refused, and keys added
 or removed inside the same filter. Newly scored and newly refused require
 the key in both files. A filter that drops a key does not count it as added
-or removed. One map holds the union: each distinct key stores a status code
-and a float64 value for each side that contained it. The tip file is folded
-into that map and is not a second index. Duplicate keys in one file keep
-the last row. A hundred thousand distinct keys of the fixture shape use
-about 29 MB; about 290 MB per million distinct keys, dominated by the key
-text. Detail rows are written from that map. At most ``show``
-value moves are kept, the largest relative changes; the counts include
-every change. A float64 value that does not round-trip through decimal text
-can hide a difference smaller than float64.
+or removed. Only the base ledger is indexed, as key to a status code and a
+float64 value or none. The tip ledger is streamed against that index and is
+not stored. Each tip change is written when that row is read. After the
+stream, keys still in the base index are only in the base ledger and are
+written then. Duplicate keys in one file keep the last row. The base index
+of the 100_000-key fixture traces about 21 MB, about 210 MB per million
+base keys, dominated by the key text. A nine-field record holding both
+sides traced 28_871_392 bytes on that same fixture. At most ``show`` value
+moves are kept, in a bounded heap of the largest relative changes; the
+counts include every change. A float64 value that does not round-trip
+through decimal text can hide a difference smaller than float64.
 
 ``band`` reports, inside the temperature window, status counts and the
 median and root-mean-square of stored numeric values grouped by engine,
@@ -94,11 +96,15 @@ _RELATIVE_BUCKETS: tuple[Decimal, ...] = (
 )
 _STATUS_NAMES = tuple(status.value for status in ResidualStatus)
 _STATUS_CODE = {name: index for index, name in enumerate(_STATUS_NAMES)}
-_ABSENT = -1
 _UNKNOWN = -2
-# base code, base value, base reason, base detail,
-# tip code, tip value, tip reason, tip detail, engine
-_Record = tuple[int, float | None, str, str, int, float | None, str, str, str]
+# Added to a base status code once the tip stream has seen that key.
+# The marked codes are created once. A per-key sum would retain an int per key.
+_SEEN = 1000
+_MARKED_CODE = {
+    code: (code + _SEEN if code >= 0 else code - _SEEN)
+    for code in (*_STATUS_CODE.values(), _UNKNOWN)
+}
+_BaseSlot = tuple[int, float | None]
 
 
 @dataclass(frozen=True)
@@ -385,32 +391,90 @@ def _status_code(status: str) -> int:
 
 
 def _status_text(code: int, raw: str) -> str:
-    if code == _ABSENT:
-        return ""
     if code == _UNKNOWN:
         return raw
+    if code < 0 or code >= len(_STATUS_NAMES):
+        return ""
     return _STATUS_NAMES[code]
 
 
-def _blank_record() -> _Record:
-    return (_ABSENT, None, "", "", _ABSENT, None, "", "", "")
+def _mark_seen(code: int) -> int:
+    marked = _MARKED_CODE.get(code)
+    if marked is None:
+        marked = code + _SEEN if code >= 0 else code - _SEEN
+        _MARKED_CODE[code] = marked
+    return marked
 
 
-def _index_side(
+def _is_seen(code: int) -> bool:
+    return code >= _SEEN or code <= -_SEEN
+
+
+def _base_code(code: int) -> int:
+    if code >= _SEEN:
+        return code - _SEEN
+    if code <= -_SEEN:
+        return code + _SEEN
+    return code
+
+
+@dataclass
+class _Running:
+    show: int
+    transitions: Counter[tuple[str, str, str]]
+    heap: list[tuple[Decimal, _ReverseKey, ValueMove]]
+    above: dict[Decimal, int]
+    move_count: int
+    appeared: int
+    cleared: int
+    scored: list[KeyChange]
+    refused: list[KeyChange]
+    added: list[KeyChange]
+    removed: list[KeyChange]
+    scored_n: int
+    refused_n: int
+    added_n: int
+    removed_n: int
+
+
+def _running(show: int) -> _Running:
+    return _Running(
+        show=show,
+        transitions=Counter(),
+        heap=[],
+        above={threshold: 0 for threshold in _RELATIVE_BUCKETS},
+        move_count=0,
+        appeared=0,
+        cleared=0,
+        scored=[],
+        refused=[],
+        added=[],
+        removed=[],
+        scored_n=0,
+        refused_n=0,
+        added_n=0,
+        removed_n=0,
+    )
+
+
+def _index_base(
     path: Path,
     *,
     engine: str | None,
     t_min: Decimal | None,
     t_max: Decimal | None,
-    index: dict[str, _Record],
-    raw_status: dict[tuple[str, str], str],
-    side: str,
-) -> tuple[int, int]:
-    """Fold one ledger into ``index``. Last row for a key wins."""
+) -> tuple[dict[str, _BaseSlot], int, int, dict[str, str], dict[str, tuple[str, str]]]:
+    """Index the base ledger as key to (status code, float or none).
 
+    Last row for a key wins. Refusal text and unknown status spellings are
+    kept only for keys that have them, not on the value slot.
+    """
+
+    index: dict[str, _BaseSlot] = {}
+    unknown: dict[str, str] = {}
+    reasons: dict[str, tuple[str, str]] = {}
     rows = 0
     duplicates = 0
-    code_at = 0 if side == "base" else 4
     for _number, row in iter_residual_rows(path):
         view = _view(row)
         if not _accept(view, engine, t_min, t_max):
@@ -419,54 +483,124 @@ def _index_side(
         if not view.key:
             continue
         code = _status_code(view.status)
-        if code == _UNKNOWN:
-            raw_status[(view.key, side)] = view.status
-        value = None if view.value is None else float(view.value)
-        current = index.get(view.key)
-        if current is None:
-            current = _blank_record()
-        elif current[code_at] != _ABSENT:
+        if view.key in index:
             duplicates += 1
-        engine_name = view.engine or current[8]
-        if side == "base":
-            updated = (
-                code,
-                value,
-                view.reason,
-                view.detail,
-                current[4],
-                current[5],
-                current[6],
-                current[7],
-                engine_name,
-            )
-        else:
-            updated = (
-                current[0],
-                current[1],
-                current[2],
-                current[3],
-                code,
-                value,
-                view.reason,
-                view.detail,
-                engine_name,
-            )
-        index[view.key] = updated
-    return rows, duplicates
+        if code == _UNKNOWN:
+            unknown[view.key] = view.status
+        elif view.key in unknown:
+            del unknown[view.key]
+        if view.reason or view.detail:
+            reasons[view.key] = (view.reason, view.detail)
+        elif view.key in reasons:
+            del reasons[view.key]
+        value = None if view.value is None else float(view.value)
+        index[view.key] = (code, value)
+    return index, rows, duplicates, unknown, reasons
 
 
-def _change_of(key: str, record: _Record, raw_status: Mapping[tuple[str, str], str]) -> KeyChange:
-    return KeyChange(
+def _note_matched(
+    running: _Running,
+    key: str,
+    base_code: int,
+    base_value: float | None,
+    view: RowView,
+    base_reason: str,
+    base_detail: str,
+    base_raw: str,
+    *,
+    retain: bool,
+    out: TextIO | None,
+) -> None:
+    base_status = _status_text(base_code, base_raw)
+    change = KeyChange(
         key=key,
-        engine=record[8],
-        base_status=_status_text(record[0], raw_status.get((key, "base"), "")),
-        tip_status=_status_text(record[4], raw_status.get((key, "tip"), "")),
-        base_reason=record[2],
-        tip_reason=record[6],
-        base_detail=record[3],
-        tip_detail=record[7],
+        engine=view.engine,
+        base_status=base_status,
+        tip_status=view.status,
+        base_reason=base_reason,
+        tip_reason=view.reason,
+        base_detail=base_detail,
+        tip_detail=view.detail,
     )
+    if base_status != view.status:
+        running.transitions[(view.engine, base_status, view.status)] += 1
+    tip_value = None if view.value is None else float(view.value)
+    if base_value is not None and tip_value is not None and base_value != tip_value:
+        base_dec = Decimal(str(base_value))
+        tip_dec = Decimal(str(tip_value))
+        relative = _relative(base_dec, tip_dec)
+        running.move_count += 1
+        _keep_move(
+            running.heap,
+            ValueMove(view.engine, key, base_dec, tip_dec, relative),
+            running.show,
+        )
+        for threshold in _RELATIVE_BUCKETS:
+            if relative > threshold:
+                running.above[threshold] += 1
+    elif base_value is None and tip_value is not None:
+        running.appeared += 1
+    elif base_value is not None and tip_value is None:
+        running.cleared += 1
+    kind = numeric_comparison_transition(base_status, view.status)
+    if kind == "scored":
+        running.scored_n += 1
+        if retain:
+            running.scored.append(change)
+        if out is not None:
+            _print_change("newly_scored_row", change, out)
+    elif kind == "refused":
+        running.refused_n += 1
+        if retain:
+            running.refused.append(change)
+        if out is not None:
+            _print_change("newly_refused_row", change, out)
+
+
+def _note_added(running: _Running, view: RowView, *, retain: bool, out: TextIO | None) -> None:
+    change = KeyChange(
+        key=view.key,
+        engine=view.engine,
+        base_status="",
+        tip_status=view.status,
+        base_reason="",
+        tip_reason=view.reason,
+        base_detail="",
+        tip_detail=view.detail,
+    )
+    running.added_n += 1
+    if retain:
+        running.added.append(change)
+    if out is not None:
+        _print_change("added_row", change, out)
+
+
+def _note_removed(
+    running: _Running,
+    key: str,
+    code: int,
+    reasons: Mapping[str, tuple[str, str]],
+    unknown: Mapping[str, str],
+    *,
+    retain: bool,
+    out: TextIO | None,
+) -> None:
+    reason, detail = reasons.get(key, ("", ""))
+    change = KeyChange(
+        key=key,
+        engine=_engine_of({"key": key}),
+        base_status=_status_text(code, unknown.get(key, "")),
+        tip_status="",
+        base_reason=reason,
+        tip_reason="",
+        base_detail=detail,
+        tip_detail="",
+    )
+    running.removed_n += 1
+    if retain:
+        running.removed.append(change)
+    if out is not None:
+        _print_change("removed_row", change, out)
 
 
 class _ReverseKey:
@@ -505,88 +639,85 @@ def _keep_move(
         heapq.heapreplace(chosen, item)
 
 
-def _summarize(
-    index: Mapping[str, _Record],
-    raw_status: Mapping[tuple[str, str], str],
+def _replay_last_tip(
+    tip: Path,
+    index: Mapping[str, _BaseSlot],
+    reasons: Mapping[str, tuple[str, str]],
+    unknown: Mapping[str, str],
     *,
+    engine: str | None,
+    t_min: Decimal | None,
+    t_max: Decimal | None,
     show: int,
+    retain: bool,
+) -> _Running:
+    """Rebuild aggregates from the last tip row of each key.
+
+    Used only when a tip key repeats. The first pass already counted rows.
+    """
+
+    running = _running(show)
+    last: dict[str, RowView] = {}
+    for _number, row in iter_residual_rows(tip):
+        view = _view(row)
+        if not _accept(view, engine, t_min, t_max):
+            continue
+        if view.key:
+            last[view.key] = view
+    for key, view in last.items():
+        slot = index.get(key)
+        if slot is None:
+            _note_added(running, view, retain=retain, out=None)
+            continue
+        code, value = slot
+        reason, detail = reasons.get(key, ("", ""))
+        _note_matched(
+            running,
+            key,
+            _base_code(code),
+            value,
+            view,
+            reason,
+            detail,
+            unknown.get(key, ""),
+            retain=retain,
+            out=None,
+        )
+    return running
+
+
+def _report_from(
+    running: _Running,
+    *,
+    base_rows: int,
+    tip_rows: int,
+    base_duplicates: int,
+    tip_duplicates: int,
     retain_details: bool,
-) -> tuple[RowDiffReport, int, int, int, int]:
-    transitions: Counter[tuple[str, str, str]] = Counter()
-    moves: list[tuple[Decimal, _ReverseKey, ValueMove]] = []
-    above = {threshold: 0 for threshold in _RELATIVE_BUCKETS}
-    appeared = 0
-    cleared = 0
-    move_count = 0
-    newly_scored: list[KeyChange] = []
-    newly_refused: list[KeyChange] = []
-    added: list[KeyChange] = []
-    removed: list[KeyChange] = []
-    scored_n = 0
-    refused_n = 0
-    added_n = 0
-    removed_n = 0
-    for key, record in index.items():
-        change = _change_of(key, record, raw_status)
-        if record[0] == _ABSENT:
-            added_n += 1
-            if retain_details:
-                added.append(change)
-            continue
-        if record[4] == _ABSENT:
-            removed_n += 1
-            if retain_details:
-                removed.append(change)
-            continue
-        if change.base_status != change.tip_status:
-            transitions[(change.engine, change.base_status, change.tip_status)] += 1
-        base_value = record[1]
-        tip_value = record[5]
-        if base_value is not None and tip_value is not None and base_value != tip_value:
-            base_dec = Decimal(str(base_value))
-            tip_dec = Decimal(str(tip_value))
-            relative = _relative(base_dec, tip_dec)
-            move_count += 1
-            _keep_move(moves, ValueMove(change.engine, key, base_dec, tip_dec, relative), show)
-            for threshold in _RELATIVE_BUCKETS:
-                if relative > threshold:
-                    above[threshold] += 1
-        elif base_value is None and tip_value is not None:
-            appeared += 1
-        elif base_value is not None and tip_value is None:
-            cleared += 1
-        kind = numeric_comparison_transition(change.base_status, change.tip_status)
-        if kind == "scored":
-            scored_n += 1
-            if retain_details:
-                newly_scored.append(change)
-        elif kind == "refused":
-            refused_n += 1
-            if retain_details:
-                newly_refused.append(change)
-    ordered = sorted((item[2] for item in moves), key=lambda item: (-item.relative, item.key))
+) -> RowDiffReport:
+    ordered = sorted((item[2] for item in running.heap), key=lambda item: (-item.relative, item.key))
     if retain_details:
-        for bucket in (newly_scored, newly_refused, added, removed):
+        for bucket in (running.scored, running.refused, running.added, running.removed):
             bucket.sort(key=lambda item: item.key)
     return RowDiffReport(
-        base_rows=0,
-        tip_rows=0,
-        base_duplicate_keys=0,
-        tip_duplicate_keys=0,
+        base_rows=base_rows,
+        tip_rows=tip_rows,
+        base_duplicate_keys=base_duplicates,
+        tip_duplicate_keys=tip_duplicates,
         transitions=tuple(
             StatusTransition(eng, base_status, tip_status, n)
-            for (eng, base_status, tip_status), n in sorted(transitions.items())
+            for (eng, base_status, tip_status), n in sorted(running.transitions.items())
         ),
-        value_move_count=move_count,
-        value_moves_above=tuple((threshold, above[threshold]) for threshold in _RELATIVE_BUCKETS),
+        value_move_count=running.move_count,
+        value_moves_above=tuple((threshold, running.above[threshold]) for threshold in _RELATIVE_BUCKETS),
         value_moves=tuple(ordered),
-        value_appeared=appeared,
-        value_cleared=cleared,
-        newly_scored=tuple(newly_scored),
-        newly_refused=tuple(newly_refused),
-        added=tuple(added),
-        removed=tuple(removed),
-    ), scored_n, refused_n, added_n, removed_n
+        value_appeared=running.appeared,
+        value_cleared=running.cleared,
+        newly_scored=tuple(running.scored) if retain_details else (),
+        newly_refused=tuple(running.refused) if retain_details else (),
+        added=tuple(running.added) if retain_details else (),
+        removed=tuple(running.removed) if retain_details else (),
+    )
 
 
 def rowdiff_report(
@@ -602,10 +733,13 @@ def rowdiff_report(
 ) -> RowDiffReport:
     """Compare two residual ledgers by key.
 
-    ``show`` limits the listed value moves to the largest relative changes.
+    The base ledger is indexed as key to (status code, float or none).
+    The tip ledger is streamed against that index. A change row is written
+    as soon as the tip row that produces it is read. Keys still in the
+    index after that stream are only in the base ledger and are written
+    then. ``show`` keeps the largest relative value moves in a bounded heap.
     Counts include every change. ``retain_details`` keeps every changed key
-    on the report. The command path leaves that false and writes the rows
-    to ``out`` from the index instead.
+    on the returned report. The command path leaves that false.
     """
 
     if show < 0:
@@ -614,47 +748,91 @@ def rowdiff_report(
     _require_file(tip)
     engine_value = _engine_value(engine)
     _check_bounds(t_min, t_max, both=False)
-    index: dict[str, _Record] = {}
-    raw_status: dict[tuple[str, str], str] = {}
-    base_rows, base_duplicates = _index_side(
+    index, base_rows, base_duplicates, unknown, reasons = _index_base(
         base,
         engine=engine_value,
         t_min=t_min,
         t_max=t_max,
-        index=index,
-        raw_status=raw_status,
-        side="base",
     )
-    tip_rows, tip_duplicates = _index_side(
-        tip,
-        engine=engine_value,
-        t_min=t_min,
-        t_max=t_max,
-        index=index,
-        raw_status=raw_status,
-        side="tip",
-    )
-    partial, scored_n, refused_n, added_n, removed_n = _summarize(
-        index, raw_status, show=show, retain_details=retain_details
-    )
-    report = RowDiffReport(
+    running = _running(show)
+    added_seen: set[str] = set()
+    tip_rows = 0
+    tip_duplicates = 0
+    duplicate_tip_key = False
+    for _number, row in iter_residual_rows(tip):
+        view = _view(row)
+        if not _accept(view, engine_value, t_min, t_max):
+            continue
+        tip_rows += 1
+        if not view.key:
+            continue
+        slot = index.get(view.key)
+        if slot is not None:
+            code, value = slot
+            if _is_seen(code):
+                tip_duplicates += 1
+                duplicate_tip_key = True
+                continue
+            index[view.key] = (_mark_seen(code), value)
+            if not duplicate_tip_key:
+                reason, detail = reasons.get(view.key, ("", ""))
+                _note_matched(
+                    running,
+                    view.key,
+                    code,
+                    value,
+                    view,
+                    reason,
+                    detail,
+                    unknown.get(view.key, ""),
+                    retain=retain_details,
+                    out=out,
+                )
+            continue
+        if view.key in added_seen:
+            tip_duplicates += 1
+            duplicate_tip_key = True
+            continue
+        added_seen.add(view.key)
+        if not duplicate_tip_key:
+            _note_added(running, view, retain=retain_details, out=out)
+    if duplicate_tip_key:
+        # The incremental notes describe the first tip row. Counts and the
+        # bounded move list are rebuilt from the last row. A detail line
+        # already written for the earlier row is left as it was.
+        running = _replay_last_tip(
+            tip,
+            index,
+            reasons,
+            unknown,
+            engine=engine_value,
+            t_min=t_min,
+            t_max=t_max,
+            show=show,
+            retain=retain_details,
+        )
+    # Unseen base keys were not in the tip ledger.
+    index = {key: slot for key, slot in index.items() if not _is_seen(slot[0])}
+    for key, (code, _value) in index.items():
+        _note_removed(
+            running,
+            key,
+            code,
+            reasons,
+            unknown,
+            retain=retain_details,
+            out=out,
+        )
+    report = _report_from(
+        running,
         base_rows=base_rows,
         tip_rows=tip_rows,
-        base_duplicate_keys=base_duplicates,
-        tip_duplicate_keys=tip_duplicates,
-        transitions=partial.transitions,
-        value_move_count=partial.value_move_count,
-        value_moves_above=partial.value_moves_above,
-        value_moves=partial.value_moves,
-        value_appeared=partial.value_appeared,
-        value_cleared=partial.value_cleared,
-        newly_scored=partial.newly_scored,
-        newly_refused=partial.newly_refused,
-        added=partial.added,
-        removed=partial.removed,
+        base_duplicates=base_duplicates,
+        tip_duplicates=tip_duplicates,
+        retain_details=retain_details,
     )
     if out is not None:
-        _print_rowdiff(report, index, raw_status, out, scored_n, refused_n, added_n, removed_n)
+        _print_rowdiff(report, out, running.scored_n, running.refused_n, running.added_n, running.removed_n)
     return report
 
 
@@ -737,8 +915,6 @@ def _print_change(label: str, change: KeyChange, out: TextIO) -> None:
 
 def _print_rowdiff(
     report: RowDiffReport,
-    index: Mapping[str, _Record],
-    raw_status: Mapping[tuple[str, str], str],
     out: TextIO,
     scored_n: int,
     refused_n: int,
@@ -769,23 +945,6 @@ def _print_rowdiff(
             f"{_num(item.tip_value)}\t{_num(item.relative)}",
             file=out,
         )
-    for key, record in index.items():
-        if record[0] == _ABSENT or record[4] == _ABSENT:
-            continue
-        change = _change_of(key, record, raw_status)
-        kind = numeric_comparison_transition(change.base_status, change.tip_status)
-        if kind == "scored":
-            _print_change("newly_scored_row", change, out)
-        elif kind == "refused":
-            _print_change("newly_refused_row", change, out)
-    for key, record in index.items():
-        if record[0] != _ABSENT:
-            continue
-        _print_change("added_row", _change_of(key, record, raw_status), out)
-    for key, record in index.items():
-        if record[4] != _ABSENT or record[0] == _ABSENT:
-            continue
-        _print_change("removed_row", _change_of(key, record, raw_status), out)
 
 
 def _print_band(report: BandReport, out: TextIO) -> None:
