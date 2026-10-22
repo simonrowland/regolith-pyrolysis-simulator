@@ -6375,6 +6375,13 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         d066_v3_source
     )
     assert lineage_complete_for(d066_v3_source) is True
+    # openimcc 2064476 promotes d066-v4 and retains the SF04 ancestor.
+    d066_v4_source = openimcc_pack_coefficient_sources("1.0.6-d066-v4")
+    assert d066_v4_source == ("openimcc-v1.0.6-d066-v4",)
+    assert expand_coefficient_sources(d066_v4_source) == (
+        "sf04-magma-companion-workbook",
+    )
+    assert lineage_complete_for(d066_v4_source) is True
 
 
 @pytest.mark.parametrize(

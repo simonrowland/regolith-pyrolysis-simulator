@@ -1007,14 +1007,16 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
     # against these anchors. Both corrections stabilise competing
     # associates, so free alkali oxide rises. The rel 1e-2 band is the
     # anchor tolerance, not the size of the move.
+    # 2064476 promotes the measured SiO2/Na2O Cp defaults. The anchors
+    # below are independent production bridge evaluations on D066-v4.
     expected = {
         1473.15: {
-            "KO0.5": 2.137531039892675e-6,
-            "NaO0.5": 0.0001676673829753759,
+            "KO0.5": 2.1891401806319048e-6,
+            "NaO0.5": 0.00017560125503048718,
         },
         1673.15: {
-            "KO0.5": 1.122088678316465e-5,
-            "NaO0.5": 0.0005741281312713278,
+            "KO0.5": 1.133192718678085e-5,
+            "NaO0.5": 0.0005829856233241274,
         },
     }
     for temperature_K, anchors in expected.items():

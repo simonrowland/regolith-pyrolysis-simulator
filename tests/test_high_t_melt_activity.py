@@ -240,7 +240,7 @@ def _run_fe2o3_lookup_only_case(mode: str) -> dict[str, object]:
 
 # Captured calls 60/61/62, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
 # These are the projected OpenIMCC inputs (eight parents), not a reconstruction
-# of the full trace-bearing ledger. Activities are independently logged solves.
+# of the full trace-bearing ledger. The activities below use the current pack.
 _LUNAR_CALL_60 = {
     "Al2O3": 1360.0091160900367, "CaO": 2014.8647042450932,
     "K2O": 8.321603960594533, "MgO": 2291.8132822153393,
@@ -271,38 +271,40 @@ _LUNAR_CALL_64 = {
     "Na2O": 1.9086093358233833e-07, "SiO2": 1148.9258228745186,
     "TiO2": 192.8967375771004, "FeO": 0.02787490262712387,
 }
-# Logged parent activities, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
-# These are the solved OpenIMCC parent activities (x*), not a continuation.
+# openimcc 2064476 D066-v4 parent activities, independently resolved at the
+# historical call coordinates above. These are direct solves, not continuation
+# outputs. Keeping both on the same physics epoch isolates continuation error.
+# The original c2b7b4e records remain in openimcc_temperature_bridge.json.
 _LUNAR_SOLVED_ACTIVITY = {
     60: {
-        "SiO2": 0.00491910632589734, "MgO": 0.29003803439475734,
-        "FeO": 7.6081001780881665e-06, "CaO": 0.020298134754009073,
-        "Al2O3": 0.019497982908272645, "TiO2": 0.0015332892917718512,
-        "Na2O": 8.975956307200665e-23, "K2O": 3.895324724042545e-09,
+        "SiO2": 0.004834116466729471, "MgO": 0.28896362538613685,
+        "FeO": 7.5668338536106184e-06, "CaO": 0.020479453072354097,
+        "Al2O3": 0.019148206763755223, "TiO2": 0.0015332163734111304,
+        "Na2O": 8.594296009807818e-23, "K2O": 3.974656138098117e-09,
     },
     61: {
-        "SiO2": 0.004107876381715498, "MgO": 0.3069501381169543,
-        "FeO": 7.564477722792486e-06, "CaO": 0.0232759536601634,
-        "Al2O3": 0.018185272341414004, "TiO2": 0.001387386098867267,
-        "Na2O": 1.0440512588493435e-22, "K2O": 4.7504875012812956e-09,
+        "SiO2": 0.004042101799369685, "MgO": 0.3063916670208272,
+        "FeO": 7.524204155774839e-06, "CaO": 0.023377473116215616,
+        "Al2O3": 0.018024937523354496, "TiO2": 0.001387382341152718,
+        "Na2O": 9.891214394943488e-23, "K2O": 4.797225271245882e-09,
     },
     62: {
-        "SiO2": 0.0034549055949816875, "MgO": 0.32269118913215145,
-        "FeO": 7.557748782306461e-06, "CaO": 0.02647372170951418,
-        "Al2O3": 0.017056218137053623, "TiO2": 0.0012651960434469285,
-        "Na2O": 1.1901243047466535e-22, "K2O": 5.637959524195314e-09,
+        "SiO2": 0.0034053030256761888, "MgO": 0.3226773657739232,
+        "FeO": 7.518157210391188e-06, "CaO": 0.026464028691049104,
+        "Al2O3": 0.01706265506939395, "TiO2": 0.0012655341349412977,
+        "Na2O": 1.1157536853761791e-22, "K2O": 5.635339511602109e-09,
     },
     63: {
-        "SiO2": 0.002922487950859203, "MgO": 0.3372778580135101,
-        "FeO": 7.542008809495907e-06, "CaO": 0.029900010771698942,
-        "Al2O3": 0.01607812602659893, "TiO2": 0.001161825240157193,
-        "Na2O": 1.3344162376079728e-22, "K2O": 6.544378404416625e-09,
+        "SiO2": 0.002886324793725183, "MgO": 0.33783972368768145,
+        "FeO": 7.503101414404428e-06, "CaO": 0.029745219287347895,
+        "Al2O3": 0.01623190726788628, "TiO2": 0.0011626707217464866,
+        "Na2O": 1.2381811651682245e-22, "K2O": 6.476129239314186e-09,
     },
     64: {
-        "SiO2": 0.0024835135180372647, "MgO": 0.35073146643562825,
-        "FeO": 7.5193910058890244e-06, "CaO": 0.033564239286234934,
-        "Al2O3": 0.015225486004163104, "TiO2": 0.001073551039351885,
-        "Na2O": 1.4757610544606816e-22, "K2O": 7.458665140677511e-09,
+        "SiO2": 0.0024584060054944176, "MgO": 0.3519018684791352,
+        "FeO": 7.481194680618617e-06, "CaO": 0.03322815352494884,
+        "Al2O3": 0.015509889090127738, "TiO2": 0.0010750027372074626,
+        "Na2O": 1.3556692765700723e-22, "K2O": 7.309583815384233e-09,
     },
 }
 _LUNAR_CALL_66 = {
@@ -318,18 +320,18 @@ _LUNAR_SOLVED_COMPOSITION = {
 _LUNAR_SOLVED_T_K = {
     60: 2393.15, 61: 2400.65, 62: 2408.15, 63: 2415.65, 64: 2423.15, 66: 2438.15,
 }
-_LUNAR_SOLVED_ACTIVITY[66] = {"SiO2": 0.0018117532732782316}
+_LUNAR_SOLVED_ACTIVITY[66] = {"SiO2": 0.0018029135011558004}
 # Parents whose one-step continuation is inside the 1% bound. Na2O's cap is
 # zero. K2O stays on the constant-gamma table by the existing exclusion.
 _ONE_STEP_PARENTS = ("SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2")
 
 
 def _solved_effective_gamma(call_index: int, oxide: str) -> float:
-    """Bulk single-cation gamma of a logged solve.
+    """Current-pack single-cation gamma at a historical call coordinate.
 
-    a(MO) = a(parent) ** (1/c) and X is the cation fraction of the logged
+    a(MO) = a(parent) ** (1/c) and X is the cation fraction of the captured
     composition. gamma = a/X is the coefficient the high-T owner certifies.
-    This is the solved call, not the continuation formula.
+    The anchor is an independent direct solve, not the continuation output.
     """
 
     activity, fraction = single_cation_activity_and_fraction(
@@ -362,9 +364,11 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # 0f90f3fd… is the ccabd0b hash. Pressures and the printed gammas are
     # unchanged. The hash moves because the exclusion reason embeds the
     # ec31045 pack version and digest. JSON round-trips preserve float bits.
+    # 2064476 promotes D066-v4 Cp: numeric activities and the digest-keyed
+    # exclusion provenance change. This hash is from the production dispatch.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "2690da4be47509125e25b8ad9051677f62f64b9db095aa43b39a5a57374d14a8"
+    ).hexdigest() == "a24b21f9a12c5d7e43da409e5a5fee46f7e7a40f8094ec933c07349246f2818c"
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -641,9 +645,10 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
         if call_index == 63:
             # d-071. The d066-v1 ratio -0.01951927876547091 is outside this
             # band. The move is the MgAl2O4 fusion correction (249fde5);
-            # the FeO re-anchor shifts the seventh digit.
+            # the FeO re-anchor shifts the seventh digit. 2064476 re-resolves
+            # both the live certificate and direct-solve anchor on D066-v4.
             assert (live_gamma[63] - solved) / solved == pytest.approx(
-                -0.018338553406669098, abs=0.0005
+                -0.020612781781071236, abs=0.0005
             )
     # Past the cap, gamma is the last in-cap extrapolation, not a new step.
     assert live_gamma[64] == live_gamma[63]
@@ -653,7 +658,8 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     # old −3.7% ± 0.15 percentage-point band. d-071 249fde5 (MgAl2O4
     # fusion) moves the live certificate slope to −3.40%. 100df4f shifts
     # the eighth digit and ccabd0b holds −0.03402765742046241. The logged
-    # call-64 gamma does not move, so the ratio tracks the live slope.
+    # call-64 gamma described that historical epoch. 2064476 changes both
+    # the live slope and the independently resolved current-epoch anchor.
     in_cap = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
     s_three = (
         (_LUNAR_SOLVED_T_K[64] - in_cap["temperature_K"])
@@ -663,7 +669,7 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     predicted = math.exp(in_cap["ln_gamma_last"] + in_cap["ln_gamma_slope"] * s_three)
     solved_64 = _solved_effective_gamma(64, "SiO2")
     assert (predicted - solved_64) / solved_64 == pytest.approx(
-        -0.03402765742046241, abs=0.0005
+        -0.038713615313014746, abs=0.0005
     )
 
     # Call 66 is five thermal steps from call 61: the SiO2 cap plus two.
@@ -714,8 +720,8 @@ def _reference_regular_solution_gamma(
 def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> None:
     """Force historical e975edd refusals; the bridge is the primary gamma.
 
-    Call 62 has the same composition in the solved c2b7b4e log, so that
-    log is the truth. Call 65's trajectories have diverged, and c2b7b4e
+    Call 62 uses the current default's independently resolved activity at
+    its historical coordinates. Call 65's trajectories have diverged, and c2b7b4e
     also refuses that composition at 2430.65 K, so its truth is the
     regular-solution line through c2b7b4e solves at the bridge temperatures.
     """
@@ -748,9 +754,10 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
     assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
     bridge_parents = _ONE_STEP_PARENTS + ("Na2O",)
     errors = {}
-    solved_activity = dict(zip(
-        solved_62["parent_oxides"], solved_62["parent_activity"],
-    ))
+    # 2064476 changes the default standards; compare interpolation with a
+    # direct solve on that same epoch, preserving the frozen historical log.
+    assert solved_62["T_K"] == _LUNAR_SOLVED_T_K[62]
+    solved_activity = _LUNAR_SOLVED_ACTIVITY[62]
     for oxide in bridge_parents:
         activity = vapor_pressure_module._high_t_activity_for_parent(
             oxide, refused_62["composition"],
@@ -816,10 +823,11 @@ def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> N
     # the old ±0.01 band around 0. Live probe gammas move at 249fde5 to
     # 0.011330388717366009, which lies outside that band (0.01133 > 0.01).
     # 100df4f changes it to 0.011330355283529284; ccabd0b and ec31045 hold
-    # that value. The melt coefficients are unchanged at ec31045.
-    # This abs=0.0005 band excludes 0.
+    # that value. 2064476 changes the default liquid standards and moves the
+    # live-vs-historical ratio to the negative value below. The frozen reference
+    # remains unchanged; abs=0.0005 still excludes zero.
     assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
-        0.011330355283529284, abs=0.0005,
+        -0.004181910676721093, abs=0.0005,
     )
     assert activity_65.activity != melt_oxide_activity(
         "SiO2", refused_65["composition"],
@@ -984,10 +992,9 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
 
     assert high_t["provider"] == "openimcc"
     assert high_t["temperature_domain_status"] == "in_domain"
-    # d-008 default. openimcc ec31045 promotes 1.0.5-d066-v3. 100df4f used
-    # that version string briefly for different bytes; this digest is
-    # 252f8705….
-    assert high_t["openimcc_pack_version"] == "1.0.5-d066-v3"
+    # openimcc 2064476 promotes measured SiO2/Na2O Cp in D066-v4,
+    # digest 0879f5a8….
+    assert high_t["openimcc_pack_version"] == "1.0.6-d066-v4"
     assert high_t["openimcc_pack_digest"]
     assert set(high_t["activities_by_oxide"]) == {
         "Na2O",
@@ -1144,9 +1151,10 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     # 249fde5, and -0.2320801850936827 from 100df4f onward (6.5% less
     # negative than the d066-v1 pin). Constant-gamma K is fixed, so the
     # step tracks the openimcc K2O activity. The FeO re-anchor is the
-    # step that reaches this value; ccabd0b does not move it.
+    # step that reaches this value; ccabd0b does not move it. 2064476 then
+    # moves the default activity again through the measured liquid standards.
     assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] == pytest.approx(
-        -0.2320801850936827
+        -0.23315363445010703
     )
     assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
     reason = high_t["authority_exclusions"]["K2O"]["reason"]
@@ -1238,9 +1246,10 @@ def test_ae95_depleted_melt_continuation_root_is_selected_by_provider() -> None:
     # 3.4859611072197934e-9 through 1942696. 249fde5 (MgAl2O4 fusion)
     # moves it to 3.553418291524387e-9 (+1.93%). 100df4f then moves it
     # by a further -0.008% to this value, and ccabd0b holds it. Under
-    # 10%, and still the MgAl2O4 correction.
+    # 10%, and still the MgAl2O4 correction. 2064476 then promotes the
+    # measured liquid standards; the independently resolved v4 value is below.
     assert high_t["activities_by_oxide"]["SiO2"] == pytest.approx(
-        3.5531167084043982e-9,
+        3.4974271192541507e-09,
         rel=1e-9,
         abs=0.0,
     )

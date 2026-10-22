@@ -595,7 +595,7 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # printed 2.14e-6 / 1.12e-5. openimcc ec31045 re-keys that row to digest
 # 252f8705… (pack 1.0.5-d066-v3) and keeps the same printed gammas. On the
 # Zhang N-MORB wt% basis the 1473 K single-cation gamma was
-# 1.6697561241999281e-6 under d066-v1 and is 2.137531039892675e-6 now
+# 1.6697561241999281e-6 under d066-v1 and was 2.137531039892675e-6 on d066-v3
 # (+28.0%). The move splits at the Gale-type N-MORB proxy, 1673 K, as
 # parent a(K2O): openimcc 249fde5 (MgAl2O4 fusion from Shornikov 2017)
 # multiplies it by 1.106, and 100df4f (FeO(l) Darken-Gurry/Masson
@@ -604,7 +604,9 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # stabilise competing associates and draw Al2O3 and SiO2 away from the
 # K associates, so free K2O rises. The content digest keys each
 # evaluation so packs sharing a model id cannot reuse one another's
-# numbers.
+# numbers. openimcc 2064476 promotes measured SiO2/Na2O Cp in d066-v4:
+# the default row now has digest 0879f5a8 and Zhang-basis KO0.5 gammas
+# 2.1891401806319048e-6 / 1.133192718678085e-5, printed at three figures.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
     "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c": {
         "pack_alias": "published-core",
@@ -619,13 +621,13 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "252f8705a3d04799ab9131836785992ffbedb6e01c98780c849498f4836804f2": {
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.5-d066-v3",
+        "pack_version": "1.0.6-d066-v4",
         "gamma_ko0_5_by_temperature_K": {
-            1473.15: "2.14e-6",
-            1673.15: "1.12e-5",
+            1473.15: "2.19e-6",
+            1673.15: "1.13e-5",
         },
         "kcaal_si2o7_active_by_temperature_K": {
             1473.15: False,

@@ -395,18 +395,21 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     # moves it to 0.9594349509429656 Pa (-6.43%, -0.0288 dex versus
     # 66ec4a3) and alpha=0.25 from 0.374487438845255 Pa to
     # 0.34960889447255017 Pa. ccabd0b, 86cbc45, and ec31045 hold both.
-    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.3542a12f3caa5p-17"
+    # 2064476 promotes measured SiO2/Na2O Cp: both engines
+    # use the new melt activities at this temperature. Reproduced through
+    # each production pressure model and the alpha-weighted root resolver.
+    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.3513b82737769p-17"
     assert (
         solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
-    ).hex() == "0x1.d7e4cb32b3f16p-1"
+    ).hex() == "0x1.d79d36ded7015p-1"
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.33536809943014373, rel=2.0e-5
+        0.33516228514113056, rel=2.0e-5
     )
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.9594349509429656, rel=2.0e-5
+        0.9588658646241638, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.34960889447255017, rel=2.0e-5
+        0.3493942093235164, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's

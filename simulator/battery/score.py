@@ -386,6 +386,8 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     # would become unknown. The alias stays the SF04 workbook. The per-row
     # DOI is pinned in the openimcc bridge test.
     "openimcc-v1.0.5-d066-v3": ("sf04-magma-companion-workbook",),
+    # 2064476 promotes measured SiO2/Na2O Cp; the SF04 ancestor is retained.
+    "openimcc-v1.0.6-d066-v4": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases

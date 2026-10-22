@@ -531,10 +531,9 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert handle.available, handle.unavailable_reason
     backend = handle.backend
     assert backend is not None
-    # d-008 default melt digest at openimcc ec31045. The d066-v2 digest
-    # was ac88aa2272c50d1cbf300634737c5d0071bddee0cd0f0483a6530c4a4992c393.
+    # openimcc 2064476 promotes D066-v4 and measured SiO2/Na2O Cp.
     assert handle.identity["pack_digest"] == (
-        "252f8705a3d04799ab9131836785992ffbedb6e01c98780c849498f4836804f2"
+        "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     )
     assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
@@ -1562,7 +1561,7 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:252f8705a3d04799ab9131836785992ffbedb6e01c98780c849498f4836804f2"
+    "openimcc-pack-digest:0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None
@@ -1571,6 +1570,7 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
+# 2064476 D066-v4/condensate outputs; production Plante cohort, same printed band.
 # d-128 keeps the printed band score-eligible and adds an informational notice.
 assert summary["n_score_eligible"] == 160
 assert all(
@@ -1579,8 +1579,8 @@ assert all(
     if candidate.observation_id.startswith("engine:openimcc:")
 )
 assert summary["n_inside_band"] == 56
-assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
-assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
+assert abs(float(summary["median_dex"]) - (-0.19068295517973282)) < 0.00000001
+assert abs(float(summary["rms_dex"]) - 0.206343183334054424) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -1600,14 +1600,15 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
+    # 2064476 changes default liquid standards; this is the production cohort.
     # d-128 keeps the printed band score-eligible and adds an informational notice.
     assert result["headline"]["n_score_eligible"] == 160
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.19068295517973282, abs=1e-8
     )
     assert float(result["headline"]["rms_dex"]) == pytest.approx(
-        0.2097386994979764836, abs=1e-8
+        0.206343183334054424, abs=1e-8
     )
     assert result["lineage"] == "independent"
 
@@ -1837,8 +1838,10 @@ def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
             math.log10(predicted / float(row["measured_P_K_Pa"]))
         )
     assert len(deltas) == 162
+    # 2064476: commanded-pO2 predictions through the promoted defaults;
+    # independently measured Plante pressures and the historical hand rows stay.
     assert statistics_median(measured_residuals) == pytest.approx(
-        -0.24152433249838257, abs=0.01
+        -0.23902736183865586, abs=0.01
     )
 
 
@@ -1909,11 +1912,12 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     assert float(openimcc["band_width_dex"]) == pytest.approx(
         0.14612803567823803, abs=1e-12
     )
+    # 2064476: independently scored existing Plante-only fixture on D066-v4.
     assert float(openimcc["median_dex"]) == pytest.approx(
-        -0.193144973432544415, abs=1e-8
+        -0.19068295517973282, abs=1e-8
     )
     assert float(openimcc["rms_dex"]) == pytest.approx(
-        0.209738699497976484, abs=1e-8
+        0.206343183334054424, abs=1e-8
     )
 
     solved_openimcc_notice = next(
