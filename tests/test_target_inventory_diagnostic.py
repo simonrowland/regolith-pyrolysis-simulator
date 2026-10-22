@@ -83,8 +83,8 @@ def test_lunar_c0_depleted_from_load_with_kinetics_gap() -> None:
     _assert_kinetics_gap(record)
     assert record["campaign"] == "C0"
     assert record["depleted"] is True
-    assert record["depletion_hour"] == "load"
-    assert record["would_be_inventory_advance"] is True
+    assert record["depletion_hour"] is None
+    assert record["would_be_inventory_advance"] is False
     assert record["exclude_elements"] == ["P"]
     assert "P" not in record["chnops_expansion"]["included_elements"]
     assert record["chnops_expansion"]["map"]["P"] == "excluded"
@@ -127,7 +127,7 @@ def test_ci_c0_larger_denominators_still_depleted_from_load() -> None:
     record = sim._last_target_inventory_diagnostic
     _assert_kinetics_gap(record)
     assert record["depleted"] is True
-    assert record["depletion_hour"] == "load"
+    assert record["depletion_hour"] is None
     assert "P" not in record["chnops_expansion"]["included_elements"]
     assert record["chnops_expansion"]["map"]["P"] == "excluded"
 
@@ -180,7 +180,7 @@ def test_runner_envelope_omits_target_inventory_keys() -> None:
     assert run._target_inventory_by_hour
     for record in run._target_inventory_by_hour:
         _assert_kinetics_gap(record)
-        assert record["depletion_hour"] == "load"
+        assert record["depletion_hour"] is None
 
 
 def test_sibling_artifact_written_only_with_flag(tmp_path: Path) -> None:
