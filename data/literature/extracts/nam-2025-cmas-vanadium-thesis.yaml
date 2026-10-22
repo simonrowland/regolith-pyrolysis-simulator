@@ -20,8 +20,8 @@ review_status: draft
 fidelity_samples:
 - species: SiO2
   observation_id: nam2025_t101_s1_l_v2o5
-  field: component_amount
-  value: '75.84'
+  field: component_amount_as_published
+  value: 75.84 mol%
   locator:
     source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
     pdf_page_index: 195
@@ -373,7 +373,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '800'
-        component_amount: '2.96'
+        component_amount: '0.0296'
         component_amount_as_published: 2.96 mol%
         analysis_count_as_published: 12
         method_class: measured_direct
@@ -427,7 +427,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '800'
-        component_amount: '97.04'
+        component_amount: '0.9704'
         component_amount_as_published: 97.04 mol%
         analysis_count_as_published: 12
         method_class: measured_direct
@@ -679,7 +679,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '11.84'
+        component_amount: '0.1184'
         component_amount_as_published: 11.84 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -726,7 +726,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '37.79'
+        component_amount: '0.3779'
         component_amount_as_published: 37.79 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -773,7 +773,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '50.37'
+        component_amount: '0.5037'
         component_amount_as_published: 50.37 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -820,7 +820,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '11.55'
+        component_amount: '0.1155'
         component_amount_as_published: 11.55 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -871,7 +871,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '47.34'
+        component_amount: '0.4734'
         component_amount_as_published: 47.34 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -922,7 +922,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '41.11'
+        component_amount: '0.4111'
         component_amount_as_published: 41.11 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -1467,7 +1467,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '76.3'
+        component_amount: '0.763'
         component_amount_as_published: 76.3 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1509,7 +1509,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '23.7'
+        component_amount: '0.237'
         component_amount_as_published: 23.7 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1551,7 +1551,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1500'
-        component_amount: '74.54'
+        component_amount: '0.7454'
         component_amount_as_published: 74.54 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1593,7 +1593,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1500'
-        component_amount: '25.46'
+        component_amount: '0.2546'
         component_amount_as_published: 25.46 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1635,7 +1635,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1350'
-        component_amount: '77.09'
+        component_amount: '0.7709'
         component_amount_as_published: 77.09 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1677,7 +1677,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1350'
-        component_amount: '22.91'
+        component_amount: '0.2291'
         component_amount_as_published: 22.91 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1719,7 +1719,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '76.94'
+        component_amount: '0.7694'
         component_amount_as_published: 76.94 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -1761,7 +1761,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '23.06'
+        component_amount: '0.2306'
         component_amount_as_published: 23.06 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -2847,6 +2847,121 @@ species:
           V2O3: 14.54 (1.5381)
         duration_days_as_printed: '10'
         row_note: Printed dashes for MgSiO3 analyses are retained as dashes.
+    - observation_id: nam2025_t92_s1_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 1, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '1'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1000'
+        analysis_count_as_printed: 9
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s2_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 2, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '2'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + V2O5 + L
+        temperature_C_as_printed: '1200'
+        analysis_count_as_printed: 24
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s3_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 3, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '3'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1300'
+        analysis_count_as_printed: 15
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s4_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 4, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '4'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1400'
+        analysis_count_as_printed: 20
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s5_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 5, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '5'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + VO2 + L
+        temperature_C_as_printed: '1600'
+        analysis_count_as_printed: 10
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
   SiO2:
     observations:
     - observation_id: nam2025_t61_s14_l_cao
@@ -2873,7 +2988,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1350'
-        component_amount: '74.80'
+        component_amount: '0.748'
         component_amount_as_published: 74.80 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -2915,7 +3030,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1350'
-        component_amount: '25.20'
+        component_amount: '0.252'
         component_amount_as_published: 25.20 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -2957,7 +3072,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1000'
-        component_amount: '5.11'
+        component_amount: '0.0511'
         component_amount_as_published: 5.11 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -3006,7 +3121,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1000'
-        component_amount: '94.89'
+        component_amount: '0.9489'
         component_amount_as_published: 94.89 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -3055,7 +3170,7 @@ species:
         phase_label_as_published: L#1
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '6.06'
+        component_amount: '0.0606'
         component_amount_as_published: 6.06 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -3104,7 +3219,7 @@ species:
         phase_label_as_published: L#1
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '93.94'
+        component_amount: '0.9394'
         component_amount_as_published: 93.94 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -3153,7 +3268,7 @@ species:
         phase_label_as_published: L#2
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '6.74'
+        component_amount: '0.0674'
         component_amount_as_published: 6.74 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -3202,7 +3317,7 @@ species:
         phase_label_as_published: L#2
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '93.26'
+        component_amount: '0.9326'
         component_amount_as_published: 93.26 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -3248,7 +3363,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '658'
-        component_amount: '98'
+        component_amount: '0.98'
         component_amount_as_published: 98 mol%
         method_class: quoted_attributed
         attribution: '[5]'
@@ -3279,7 +3394,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '658'
-        component_amount: '98.14'
+        component_amount: '0.9814'
         component_amount_as_published: 98.14 mol%
         method_class: quoted_attributed
         attribution: '[4]'
@@ -3307,7 +3422,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '640'
-        component_amount: '70'
+        component_amount: '0.7'
         component_amount_as_published: 70 mol%
         method_class: quoted_attributed
         attribution: '[1]'
@@ -3335,7 +3450,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '640'
-        component_amount: '98'
+        component_amount: '0.98'
         component_amount_as_published: 98 mol%
         method_class: quoted_attributed
         attribution: '[3]'
@@ -3363,7 +3478,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '675'
-        component_amount: '95.3'
+        component_amount: '0.953'
         component_amount_as_published: 95.3 mol%
         method_class: quoted_attributed
         attribution: '[6]'
@@ -3391,7 +3506,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '654'
-        component_amount: '96.7'
+        component_amount: '0.967'
         component_amount_as_published: 96.7 mol%
         method_class: quoted_attributed
         attribution: '[3]'
@@ -3419,7 +3534,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '570'
-        component_amount: '41.2'
+        component_amount: '0.412'
         component_amount_as_published: 41.2 mol%
         method_class: quoted_attributed
         attribution: '[5]'
@@ -3528,53 +3643,6 @@ species:
         liquid_composition_as_published: '41.2'
       uncertainty:
         note: No numerical temperature uncertainty printed.
-    - observation_id: nam2025_t92_s1_l_sio2
-      type: composition_series
-      units: mol% oxide component as printed
-      experiment: nam2025_t92_s1
-      regime: quench_equilibration
-      assemblage_id: nam2025_t92_s1
-      phase_assemblage_as_printed: SiO2 + L
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 1, EPMA L row; SiO2 component.
-      phase: l
-      note: EPMA composition represents the liquid at equilibration temperature; the printed zero uncertainty is
-        not stored as an uncertainty value.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: melt
-        phase_label_as_published: L
-        basis: mole_fraction
-        T_C: '1000'
-        component_amount: '0'
-        component_amount_as_published: 0 mol%
-        analysis_count_as_published: 9
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          pO2_Pa:
-            state:
-              tag: value
-              value: '21278.25'
-            locator: *id021
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id021
-        pO2_as_published: 0.21 atm (air)
-        uncertainty_as_published: sigma = 0; zero uncertainty omitted
-        duration_days_as_published: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          SiO2: '0.7'
-          V2O3: '0.3'
     - observation_id: nam2025_t92_s1_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3599,7 +3667,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1000'
-        component_amount: '9.23'
+        component_amount: '0.0923'
         component_amount_as_published: 9.23 mol%
         analysis_count_as_published: 9
         method_class: measured_direct
@@ -3624,53 +3692,6 @@ species:
           V2O3: '0.3'
       uncertainty:
         sigma: '0.4466'
-    - observation_id: nam2025_t92_s2_l_sio2
-      type: composition_series
-      units: mol% oxide component as printed
-      experiment: nam2025_t92_s2
-      regime: quench_equilibration
-      assemblage_id: nam2025_t92_s2
-      phase_assemblage_as_printed: SiO2 + V2O5 + L
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 2, EPMA L row; SiO2 component.
-      phase: l
-      note: EPMA composition represents the liquid at equilibration temperature; the printed zero uncertainty is
-        not stored as an uncertainty value.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: melt
-        phase_label_as_published: L
-        basis: mole_fraction
-        T_C: '1200'
-        component_amount: '0'
-        component_amount_as_published: 0 mol%
-        analysis_count_as_published: 24
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          pO2_Pa:
-            state:
-              tag: value
-              value: '21278.25'
-            locator: *id021
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id021
-        pO2_as_published: 0.21 atm (air)
-        uncertainty_as_published: sigma = 0; zero uncertainty omitted
-        duration_days_as_published: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          SiO2: '0.5'
-          V2O3: '0.5'
     - observation_id: nam2025_t92_s2_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3695,7 +3716,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1200'
-        component_amount: '9.61'
+        component_amount: '0.0961'
         component_amount_as_published: 9.61 mol%
         analysis_count_as_published: 24
         method_class: measured_direct
@@ -3720,53 +3741,6 @@ species:
           V2O3: '0.5'
       uncertainty:
         sigma: '0.8494'
-    - observation_id: nam2025_t92_s3_l_sio2
-      type: composition_series
-      units: mol% oxide component as printed
-      experiment: nam2025_t92_s3
-      regime: quench_equilibration
-      assemblage_id: nam2025_t92_s3
-      phase_assemblage_as_printed: SiO2 + L
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 3, EPMA L row; SiO2 component.
-      phase: l
-      note: EPMA composition represents the liquid at equilibration temperature; the printed zero uncertainty is
-        not stored as an uncertainty value.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: melt
-        phase_label_as_published: L
-        basis: mole_fraction
-        T_C: '1300'
-        component_amount: '0'
-        component_amount_as_published: 0 mol%
-        analysis_count_as_published: 15
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          pO2_Pa:
-            state:
-              tag: value
-              value: '21278.25'
-            locator: *id021
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id021
-        pO2_as_published: 0.21 atm (air)
-        uncertainty_as_published: sigma = 0; zero uncertainty omitted
-        duration_days_as_published: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          SiO2: '0.7'
-          V2O3: '0.3'
     - observation_id: nam2025_t92_s3_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3791,7 +3765,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1300'
-        component_amount: '11.47'
+        component_amount: '0.1147'
         component_amount_as_published: 11.47 mol%
         analysis_count_as_published: 15
         method_class: measured_direct
@@ -3816,53 +3790,6 @@ species:
           V2O3: '0.3'
       uncertainty:
         sigma: '0.1604'
-    - observation_id: nam2025_t92_s4_l_sio2
-      type: composition_series
-      units: mol% oxide component as printed
-      experiment: nam2025_t92_s4
-      regime: quench_equilibration
-      assemblage_id: nam2025_t92_s4
-      phase_assemblage_as_printed: SiO2 + L
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 4, EPMA L row; SiO2 component.
-      phase: l
-      note: EPMA composition represents the liquid at equilibration temperature; the printed zero uncertainty is
-        not stored as an uncertainty value.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: melt
-        phase_label_as_published: L
-        basis: mole_fraction
-        T_C: '1400'
-        component_amount: '0'
-        component_amount_as_published: 0 mol%
-        analysis_count_as_published: 20
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          pO2_Pa:
-            state:
-              tag: value
-              value: '21278.25'
-            locator: *id021
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id021
-        pO2_as_published: 0.21 atm (air)
-        uncertainty_as_published: sigma = 0; zero uncertainty omitted
-        duration_days_as_published: '3'
-        composition_mol:
-          basis: printed_mole_fraction
-          SiO2: '0.8'
-          V2O3: '0.2'
     - observation_id: nam2025_t92_s4_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3887,7 +3814,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '13.73'
+        component_amount: '0.1373'
         component_amount_as_published: 13.73 mol%
         analysis_count_as_published: 20
         method_class: measured_direct
@@ -3912,53 +3839,6 @@ species:
           V2O3: '0.2'
       uncertainty:
         sigma: '0.2733'
-    - observation_id: nam2025_t92_s5_l_sio2
-      type: composition_series
-      units: mol% oxide component as printed
-      experiment: nam2025_t92_s5
-      regime: quench_equilibration
-      assemblage_id: nam2025_t92_s5
-      phase_assemblage_as_printed: SiO2 + VO2 + L
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 5, EPMA L row; SiO2 component.
-      phase: l
-      note: EPMA composition represents the liquid at equilibration temperature; the printed zero uncertainty is
-        not stored as an uncertainty value.
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: melt
-        phase_label_as_published: L
-        basis: mole_fraction
-        T_C: '1600'
-        component_amount: '0'
-        component_amount_as_published: 0 mol%
-        analysis_count_as_published: 10
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          pO2_Pa:
-            state:
-              tag: value
-              value: '21278.25'
-            locator: *id021
-          gas_mix:
-            state:
-              tag: value
-              value: air
-            locator: *id021
-        pO2_as_published: 0.21 atm (air)
-        uncertainty_as_published: sigma = 0; zero uncertainty omitted
-        duration_days_as_published: '1'
-        composition_mol:
-          basis: printed_mole_fraction
-          SiO2: '0.7'
-          V2O3: '0.3'
     - observation_id: nam2025_t92_s5_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3983,7 +3863,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1600'
-        component_amount: '96.33'
+        component_amount: '0.9633'
         component_amount_as_published: 96.33 mol%
         analysis_count_as_published: 10
         method_class: measured_direct
@@ -4033,7 +3913,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '9.83'
+        component_amount: '0.0983'
         component_amount_as_published: 9.83 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4084,7 +3964,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '14.34'
+        component_amount: '0.1434'
         component_amount_as_published: 14.34 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4135,7 +4015,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '75.84'
+        component_amount: '0.7584'
         component_amount_as_published: 75.84 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4186,7 +4066,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '8.66'
+        component_amount: '0.0866'
         component_amount_as_published: 8.66 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4237,7 +4117,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '25.51'
+        component_amount: '0.2551'
         component_amount_as_published: 25.51 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4288,7 +4168,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '65.83'
+        component_amount: '0.6583'
         component_amount_as_published: 65.83 mol%
         analysis_count_as_published: 29
         pO2_as_published: 0.21 atm (air)
@@ -4339,7 +4219,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '6.01'
+        component_amount: '0.0601'
         component_amount_as_published: 6.01 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -4390,7 +4270,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '81.84'
+        component_amount: '0.8184'
         component_amount_as_published: 81.84 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -4441,7 +4321,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '12.15'
+        component_amount: '0.1215'
         component_amount_as_published: 12.15 mol%
         analysis_count_as_published: 14
         pO2_as_published: 0.21 atm (air)
@@ -4492,7 +4372,7 @@ species:
         phase_label_as_published: L#1
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '8.40'
+        component_amount: '0.084'
         component_amount_as_published: 8.40 mol%
         analysis_count_as_published: 19
         pO2_as_published: 0.21 atm (air)
@@ -4543,7 +4423,7 @@ species:
         phase_label_as_published: L#1
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '37.98'
+        component_amount: '0.3798'
         component_amount_as_published: 37.98 mol%
         analysis_count_as_published: 19
         pO2_as_published: 0.21 atm (air)
@@ -4594,7 +4474,7 @@ species:
         phase_label_as_published: L#1
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '53.62'
+        component_amount: '0.5362'
         component_amount_as_published: 53.62 mol%
         analysis_count_as_published: 19
         pO2_as_published: 0.21 atm (air)
@@ -4645,7 +4525,7 @@ species:
         phase_label_as_published: L#2
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '6.12'
+        component_amount: '0.0612'
         component_amount_as_published: 6.12 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -4696,7 +4576,7 @@ species:
         phase_label_as_published: L#2
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '53.21'
+        component_amount: '0.5321'
         component_amount_as_published: 53.21 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -4747,7 +4627,7 @@ species:
         phase_label_as_published: L#2
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '40.67'
+        component_amount: '0.4067'
         component_amount_as_published: 40.67 mol%
         analysis_count_as_published: 15
         pO2_as_published: 0.21 atm (air)
@@ -4798,7 +4678,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '7.23'
+        component_amount: '0.0723'
         component_amount_as_published: 7.23 mol%
         analysis_count_as_published: 20
         pO2_as_published: 0.21 atm (air)
@@ -4849,7 +4729,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '71.18'
+        component_amount: '0.7118'
         component_amount_as_published: 71.18 mol%
         analysis_count_as_published: 20
         pO2_as_published: 0.21 atm (air)
@@ -4900,7 +4780,7 @@ species:
         phase_label_as_published: L
         basis: mole_fraction
         T_C: '1400'
-        component_amount: '21.59'
+        component_amount: '0.2159'
         component_amount_as_published: 21.59 mol%
         analysis_count_as_published: 20
         pO2_as_published: 0.21 atm (air)

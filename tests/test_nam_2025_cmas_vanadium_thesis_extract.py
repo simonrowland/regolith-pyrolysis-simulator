@@ -157,7 +157,10 @@ def _table_grid(document: dict, table: str) -> list[str]:
             sigma = values.get("sigma_as_published")
             if sigma is None:
                 sigma = "0" if values.get("uncertainty_as_published") else str(row.get("uncertainty", {}).get("sigma", ""))
-            entry[str(values["formula"])] = f"{values['component_amount']} ({sigma})"
+            published = str(values.get("component_amount_as_published", values["component_amount"]))
+            if published.endswith(" mol%"):
+                published = published.removesuffix(" mol%")
+            entry[str(values["formula"])] = f"{published} ({sigma})"
         for row in body.get("context", []):
             if row.get("locator", {}).get("table") != table:
                 continue
@@ -203,7 +206,7 @@ def test_render_grid_and_extract_cell_mutations_fail() -> None:
         row for body in mutated["species"].values() for row in body.get("observations", [])
         if row.get("observation_id") == "nam2025_t101_s1_l_v2o5"
     )
-    raw["values"]["component_amount"] = "75.85"
+    raw["values"]["component_amount_as_published"] = "75.85 mol%"
     with pytest.raises(AssertionError):
         assert sorted(_table_grid(mutated, "10.1")) == sorted(_expected_grid("10.1"))
 
@@ -216,7 +219,7 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
         for row in body.get("observations", [])
         if row["values"].get("quantity") in {"equilibrium_phase_composition", "dta_transition_temperatures"}
     ]
-    assert len(source_rows) == 71
+    assert len(source_rows) == 66
     migrator = migrate_one_extract(REPO_ROOT, EXTRACT, index=None, aliases={})
     migrator.finalize()
     assert not migrator.result.registry_issues
@@ -229,11 +232,13 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
         values = raw["values"]
         observation = migrated[f"{SOURCE_ID}::{raw['observation_id']}"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
-        expected = (
-            Decimal(str(values["component_amount"]))
-            if values["quantity"] == "equilibrium_phase_composition"
-            else Decimal(str(values["T_C"])) + Decimal("273.15")
-        )
+        expected = Decimal(str(values["T_C"])) + Decimal("273.15")
+        if values["quantity"] == "equilibrium_phase_composition":
+            published = str(values.get("component_amount_as_published", ""))
+            if published.endswith(" mol%"):
+                expected = Decimal(published.removesuffix(" mol%")) / Decimal(100)
+            else:
+                expected = Decimal(str(values["component_amount"]))
         assert observation.value.point == expected, raw["observation_id"]
         assert not observation.notices, raw["observation_id"]
         formula = str(values.get("formula") or container)
@@ -244,6 +249,14 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
             assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             assert observation.identity.phase_role.value == values["phase_label"]
             assert observation.identity.subtype.value == values["basis"]
+            for key, condition in values.get("point_conditions", {}).items():
+                assert key in observation.point_conditions, raw["observation_id"]
+                assert str(observation.point_conditions[key].state.value) == str(condition["state"]["value"]), raw["observation_id"]
+            if values["basis"] == "mole_fraction":
+                assert Decimal(0) < observation.value.point <= Decimal(1), raw["observation_id"]
+                assert observation.value.point == Decimal(
+                    str(values["component_amount_as_published"]).removesuffix(" mol%")
+                ) / Decimal(100), raw["observation_id"]
             if "log_fO2" in values:
                 assert values["log_fO2"]["units"] == "log10(atm)"
                 assert "fO2_log" not in values.get("point_conditions", {})
@@ -266,12 +279,34 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
         else:
             assert observation.identity.quantity.value is Quantity.TRANSITION_TEMPERATURE
 
+    zero_context = [
+        row
+        for body in document["species"].values()
+        for row in body.get("context", [])
+        if row.get("observation_id", "").startswith("nam2025_t92_")
+        and row.get("values", {}).get("printed_zero_as_published") == "0 mol%"
+    ]
+    assert len(zero_context) == 5
+    assert all(row["locator"]["table"] == "9.2" for row in zero_context)
+    assert all(row["values"]["composition_cells_as_printed"]["SiO2"] == "0 (0)" for row in zero_context)
+    assert not any(
+        row.get("observation_id", "").startswith("nam2025_t92_")
+        and row.get("values", {}).get("component_amount_as_published") == "0 mol%"
+        for body in document["species"].values()
+        for row in body.get("observations", [])
+    )
+
 
 def test_solid_only_tables_remain_context_and_dta_invariant_kind_is_preserved() -> None:
     document = _document()
     all_context = [(container, row) for container, body in document["species"].items() for row in body.get("context", [])]
     for table in ("6.1", "7.1", "8.1", "9.2", "10.1", "10.3"):
-        solids = [row for _, row in all_context if row.get("locator", {}).get("table") == table and row.get("values", {}).get("quantity") == "equilibrium_phase_composition"]
+        solids = [
+            row for _, row in all_context
+            if row.get("locator", {}).get("table") == table
+            and row.get("values", {}).get("quantity") == "equilibrium_phase_composition"
+            and "PhaseRole" in row.get("values", {}).get("schema_gap_or_disposition", "")
+        ]
         assert solids
         assert all(row["values"]["candidate_tokens"] == ["equilibrium_phase_composition"] for row in solids)
         assert all("PhaseRole" in row["values"]["schema_gap_or_disposition"] for row in solids)
