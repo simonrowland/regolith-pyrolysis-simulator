@@ -208,6 +208,11 @@ CODE_INPUTS = (
 #   2458a9f46: decision band for phase rows uses metric_operation_for_identity;
 #     no store output change (decision bands are not store data; ror-bandfix:
 #     same output on green).
+#   3b4e68626: a refused composition_role is not projected onto point
+#     conditions. No extract declares a role outside datum_state and
+#     initial_charge_only. Regen on this tree (battery_migrate exit 1,
+#     observations 128946, queue 88695, hard issues 3278) left every store
+#     file byte-identical.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
@@ -229,6 +234,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "d6ccae4b4",
     "7e0508bb5", "b37e28bac", "297df02b9",
     "2458a9f46",
+    "3b4e68626",
 })
 
 
