@@ -4993,16 +4993,52 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
 
 
 def _installed_magemin_runtime_binaries():
-    from engine_install_config import (
-        EngineInstallRequiredError,
-        configured_magemin_binary_path,
-    )
+    import hashlib
+    from pathlib import Path
+    import subprocess
 
+    from simulator.engine_local_config import configured_magemin_binary_path
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    worktree_root = Path(__file__).resolve().parents[2]
+    candidates = [
+        configured_magemin_binary_path(),
+        MAGEMinBackend._locate_binary(None),
+    ]
     try:
-        binary = configured_magemin_binary_path().resolve()
-    except EngineInstallRequiredError:
-        return []
-    return [binary] if binary.is_file() and os.access(binary, os.X_OK) else []
+        common_dir = subprocess.run(
+            ['git', 'rev-parse', '--git-common-dir'],
+            cwd=worktree_root,
+            capture_output=True,
+            check=True,
+            text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    else:
+        if common_dir:
+            common_dir_path = Path(common_dir)
+            if not common_dir_path.is_absolute():
+                common_dir_path = worktree_root / common_dir_path
+            main_repo_root = common_dir_path.resolve().parent
+            candidates.extend((
+                main_repo_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
+                main_repo_root / 'engines' / 'magemin' / 'MAGEMin',
+            ))
+    runtime_binaries = []
+    seen_digests = set()
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        binary = Path(candidate).expanduser().resolve()
+        if not binary.is_file() or not os.access(binary, os.X_OK):
+            continue
+        with binary.open('rb') as stream:
+            digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+        if digest not in seen_digests:
+            runtime_binaries.append(binary)
+            seen_digests.add(digest)
+    return runtime_binaries
 
 
 def _write_delegating_magemin_launcher(tmp_path):
@@ -5040,19 +5076,106 @@ def _write_delegating_magemin_launcher(tmp_path):
     return target_file, launcher
 
 
-def test_gate_curve_memo_origin_uses_locked_identity_when_binary_reports_change(
+def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
     monkeypatch,
     tmp_path,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
+    from simulator import engine_local_config
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    runtime_binaries = _installed_magemin_runtime_binaries()
+    if len(runtime_binaries) < 2:
+        pytest.skip('requires two installed MAGEMin runtime builds')
+
+    monkeypatch.setattr(
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
+    )
+    target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
+
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    def build_sim(binary):
+        sim = _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        sim._register_freeze_gate_liquid_fraction_providers()
+        backend = MAGEMinBackend()
+        backend._binary_path = launcher
+        provider = sim._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        provider._backend = backend
+        target_file.write_text(f'{binary}\n')
+        return sim, backend
+
+    producer, producer_backend = build_sim(runtime_binaries[0])
+    producer_version = producer_backend.get_engine_version()
+    producer_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        producer,
+        curve,
+        evidence=producer_evidence,
+    )
+
+    receiver, receiver_backend = build_sim(runtime_binaries[1])
+    receiver_version = receiver_backend.get_engine_version()
+    receiver_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        receiver,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    assert producer_version != receiver_version
+    assert producer_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256']
+    assert not engine_binding_admission.gate_curve_memo_origin_matches(
+        receiver,
+        curve,
+        record['origin'],
+        fresh_evidence=True,
+        evidence=receiver_evidence,
+    )
+
+
+def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_install(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator import engine_local_config
     from simulator.melt_backend.magemin import MAGEMinBackend
 
     runtime_binaries = _installed_magemin_runtime_binaries()
     if not runtime_binaries:
         pytest.skip('requires one installed MAGEMin runtime')
 
+    monkeypatch.setattr(
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
+    )
     target_file, launcher = _write_delegating_magemin_launcher(tmp_path)
     curve = {
         'source': 'gate_liquid_fraction:fallback:magemin-shadow',
@@ -5104,13 +5227,16 @@ def test_gate_curve_memo_origin_uses_locked_identity_when_binary_reports_change(
         include_selected_bindings=False,
     )
 
-    assert producer_version == receiver_version
+    assert producer_version != receiver_version
     assert producer_evidence.provenance['runtime_artifacts'][
         'magemin_selected_binary'
     ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
         'magemin_selected_binary'
     ]['sha256']
-    assert engine_binding_admission.gate_curve_memo_origin_matches(
+    assert producer_evidence.producer_evidence != (
+        receiver_evidence.producer_evidence
+    )
+    assert not engine_binding_admission.gate_curve_memo_origin_matches(
         receiver,
         curve,
         record['origin'],

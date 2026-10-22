@@ -535,6 +535,10 @@ def _is_engine_checkout(candidate: Path, key: str, pin: EnginePin) -> bool:
         return False
     if (candidate / ".git").exists():
         return True
+    if key == "alphamelts" and any(
+        path.exists() for path in _legacy_alphamelts_binary_candidates(candidate)
+    ):
+        return True
     artifact_paths = list(pin.artifacts)
     artifact_paths.extend(
         relative
@@ -917,6 +921,20 @@ def warn_legacy_once(engine: str, message: str) -> None:
     logger.warning(message)
 
 
+def _legacy_alphamelts_binary_candidates(engine_root: Path) -> tuple[Path, ...]:
+    root = Path(engine_root)
+    if not root.exists():
+        return ()
+    candidates = [root / name for name in _ALPHAMELTS_BINARY_NAMES]
+    candidates.extend(
+        child / name
+        for child in sorted(root.iterdir())
+        if child.is_dir()
+        for name in _ALPHAMELTS_BINARY_NAMES
+    )
+    return tuple(candidates)
+
+
 def find_alphamelts_binary(engine_root: Path | None = None) -> Path | None:
     config = load_config()
     if config is not None and config.paths.alphamelts_binary_path is not None:
@@ -925,19 +943,9 @@ def find_alphamelts_binary(engine_root: Path | None = None) -> Path | None:
             return path
 
     root = engine_root or (repo_root() / "engines" / "alphamelts")
-    if not root.exists():
-        return None
-    for name in _ALPHAMELTS_BINARY_NAMES:
-        direct = root / name
-        if direct.exists():
-            return direct
-    for child in sorted(root.iterdir()):
-        if not child.is_dir():
-            continue
-        for name in _ALPHAMELTS_BINARY_NAMES:
-            candidate = child / name
-            if candidate.exists():
-                return candidate
+    for candidate in _legacy_alphamelts_binary_candidates(root):
+        if candidate.exists():
+            return candidate
     return None
 
 

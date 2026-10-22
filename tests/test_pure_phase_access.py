@@ -26,7 +26,6 @@ import pickle
 from pathlib import Path
 
 import pytest
-from engine_install_config import EngineInstallRequiredError
 
 from simulator.melt_backend.magemin import (
     MAGEMinBackend,
@@ -46,17 +45,13 @@ from simulator.melt_backend.pure_phase import (
 
 # --- availability guards (true skipif, resolved at collection) -------------
 
-if os.environ.get("REGOLITH_MAGEMIN_BINARY"):
-    _LIVE_MAGEMIN_BINARY = os.environ["REGOLITH_MAGEMIN_BINARY"]
-else:
-    try:
-        _LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
-    except EngineInstallRequiredError:
-        _LIVE_MAGEMIN_BINARY = None
+_LIVE_MAGEMIN_BINARY = os.environ.get("REGOLITH_MAGEMIN_BINARY") or (
+    lambda p: str(p) if p is not None else None
+)(MAGEMinBackend._locate_binary(None))
 
 needs_magemin_binary = pytest.mark.skipif(
     _LIVE_MAGEMIN_BINARY is None,
-    reason="no configured MAGEMin binary (run install-engines.py)",
+    reason="no MAGEMin binary (set REGOLITH_MAGEMIN_BINARY or build engines/magemin)",
 )
 
 
