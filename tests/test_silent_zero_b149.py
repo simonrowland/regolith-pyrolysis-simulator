@@ -642,7 +642,7 @@ def test_internal_analytical_shomate_out_of_range_predicts_and_flags() -> None:
     detail = note.get("detail") or ""
     assert "reason=temperature_outside_valid_range_K" in detail
     assert "authority_level=extrapolated" in detail
-    assert "certified_band_K=unavailable" in detail
+    assert "certified_band_K=[1519, 2273.15]" in detail
     assert "valid_range_K=[1519, 2273.15]" in detail
 
 

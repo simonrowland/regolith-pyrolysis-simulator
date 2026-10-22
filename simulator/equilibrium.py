@@ -1515,7 +1515,11 @@ class EquilibriumMixin:
             if out_of_range:
                 valid_low, valid_high = float(valid[0]), float(valid[1])
                 certified_band = data.get('source_certified_range_K')
-                if compiled_evaluator is None:
+                if compiled_evaluator is not None:
+                    certified_band = (
+                        certified_band or compiled_evaluator.valid_temperature_K
+                    )
+                else:
                     certified_band = certified_band or antoine.get(
                         'source_certified_range_K'
                     )

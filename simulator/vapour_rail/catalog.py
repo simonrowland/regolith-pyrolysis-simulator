@@ -887,6 +887,8 @@ class _ReferencePressureModel:
     # (t-538): direct van 't Hoff when C=0 / thermo-in-domain, else 1/T
     # tangent from the domain edge. No species-name branches (ADR-001).
     physical_composite_ood: bool = False
+    # Intersection of the gas-exchange polynomial domains for a composite.
+    composite_thermo_domain_K: tuple[float, float] | None = None
 
     def log10_pressure(self, temperature_K: float) -> float:
         if self.evaluator_family == "antoine":
@@ -1343,6 +1345,8 @@ class CompiledPressureEvaluator:
         1. **Physical composite** (``physical_composite_ood``): evaluate the
            compiled composite at the requested T. Constituent polynomial
            families and domains are row-specific (not a single CEA window).
+           When a constituent rejects T, continue from its domain edge with
+           the existing reciprocal-T tangent.
 
         2. **Direct van 't Hoff** (Antoine / standard_reaction_term ref with
            C = 0; pure thermo families while polys are in-domain): the
@@ -1380,7 +1384,16 @@ class CompiledPressureEvaluator:
             try:
                 return float(self.reference_model.log10_pressure(temperature_K))
             except (NasaCeaDomainError, ShomateDomainError):
-                return self._reciprocal_T_tangent_log10(temperature_K)
+                thermo_domain = self.reference_model.composite_thermo_domain_K
+                if thermo_domain is None:
+                    raise CatalogCompileError(
+                        f"{self.species_id}: physical composite lacks its "
+                        "constituent thermo domain"
+                    )
+                return self._reciprocal_T_tangent_log10(
+                    temperature_K,
+                    edge_domain_K=thermo_domain,
+                )
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
@@ -1439,8 +1452,13 @@ class CompiledPressureEvaluator:
         # linear-T slope invention.
         return "reciprocal_T_tangent"
 
-    def _reciprocal_T_tangent_log10(self, temperature_K: float) -> float:
-        """Continue log10 P as linear in 1/T from the fit-domain edge.
+    def _reciprocal_T_tangent_log10(
+        self,
+        temperature_K: float,
+        *,
+        edge_domain_K: tuple[float, float] | None = None,
+    ) -> float:
+        """Continue log10 P as linear in 1/T from the selected domain edge.
 
         Premise (Clausius–Clapeyron / van 't Hoff): near a local temperature
         where reaction ΔH is slowly varying,
@@ -1469,7 +1487,8 @@ class CompiledPressureEvaluator:
         at T=Tb, L matches the in-domain edge (no cliff); for pure van 't
         Hoff (C=0) L=A−B/T the Antoine tangent *is* that function.
         """
-        low, high = self.valid_temperature_K
+        fit_low, fit_high = self.valid_temperature_K
+        low, high = edge_domain_K or (fit_low, fit_high)
         boundary = low if temperature_K < low else high
         if not (math.isfinite(temperature_K) and temperature_K > 0.0):
             raise CatalogCompileError(
@@ -1537,7 +1556,7 @@ class CompiledPressureEvaluator:
         # General / thermo fallback: finite-difference dL/dT just inside the
         # domain, convert to dL/d(1/T), continue. Prefer analytic when the
         # reference surface is smooth.
-        span = max(high - low, 1.0)
+        span = max(fit_high - fit_low, 1.0)
         step = min(max(span * 1.0e-4, 1.0e-3), 1.0)
         inside = boundary + step if boundary == low else boundary - step
         if inside <= 0.0:
@@ -3205,6 +3224,15 @@ def _compile_thermo_reference_model(
                     domain_low=domain_low,
                     domain_high=domain_high,
                 )
+            composite_thermo_domain = (
+                max(poly.T_min_K for _, poly, _ in exchange_terms),
+                min(poly.T_max_K for _, poly, _ in exchange_terms),
+            )
+            if composite_thermo_domain[0] >= composite_thermo_domain[1]:
+                raise CatalogCompileError(
+                    f"{species_id}: gas-exchange thermochemistry has no "
+                    "shared temperature domain"
+                )
 
             # Melt-source SiO2(l) -> Si(g) + O2(g) combines the catalog's
             # SiO2 -> SiO + 0.5 O2 reference with the CEA gas-exchange
@@ -3274,6 +3302,7 @@ def _compile_thermo_reference_model(
                     points=(),
                     thermo_log10_pressure=_log10_from_composite,
                     physical_composite_ood=True,
+                    composite_thermo_domain_K=composite_thermo_domain,
                 ),
                 derived_pO2_exponent,
             )
