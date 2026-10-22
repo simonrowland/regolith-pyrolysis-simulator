@@ -158,26 +158,7 @@ experiments:
       state:
         tag: value
         value: {SiO2: 44.02, Al2O3: 4.56, FeO: 8.04, MgO: 36.44, CaO: 6.95}
-      locator: {published_page: 510, pdf_page_index: 2, table: '1', note: 'Table 1 printed starting charge for sample VI (lherzolite), wt%'}
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          amount_basis: mole_fraction
-          components:
-          - [SiO2, '0.3821173839269460708474485548']
-          - [Al2O3, '0.02332561240102551057000802657']
-          - [FeO, '0.05836653496472179772464472096']
-          - [MgO, '0.4715509074964332951841453868']
-          - [CaO, '0.06463956121087332567375331089']
-      locator: {published_page: 510, pdf_page_index: 2, table: '1', note: 'Table 1 printed starting charge for sample VI; wt% converted to mole fraction'}
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        output_unit: mole_fraction
+      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample VI (lherzolite), wt%'}
   apparatus:
     geometry:
       orifice_area_m2:
@@ -231,26 +212,7 @@ experiments:
       state:
         tag: value
         value: {SiO2: 52.32, Al2O3: 19.13, FeO: 9.37, MgO: 6.25, CaO: 12.93}
-      locator: {published_page: 510, pdf_page_index: 2, table: '1', note: 'Table 1 printed starting charge for sample V (alumina basalt), wt%'}
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          amount_basis: mole_fraction
-          components:
-          - [SiO2, '0.5554066995588290785432372544']
-          - [Al2O3, '0.1196543107311277100452550624']
-          - [FeO, '0.08314439057317960851869121678']
-          - [MgO, '0.09972691254773934515880416908']
-          - [CaO, '0.1420676865891242577340122973']
-      locator: {published_page: 510, pdf_page_index: 2, table: '1', note: 'Table 1 printed starting charge for sample V; wt% converted to mole fraction'}
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        output_unit: mole_fraction
+      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample V (alumina basalt), wt%'}
   apparatus:
     geometry:
       orifice_area_m2:
