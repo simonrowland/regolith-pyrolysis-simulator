@@ -112,7 +112,7 @@ extraction:
     - atmosphere: Ar
       attribution: Ni et al. (2021)
       element: Cu
-      alpha_evp: 0.996
+      alpha_evp: '0.9960'
       S: 0.7436
     - atmosphere: Ar
       attribution: Wimpenny et al. (2019)
@@ -269,10 +269,15 @@ species:
         pdf_page_index: 10
         published_page: 11
         section: Experimental methods
-        note: Quench by rapid withdrawal to subsolidus furnace zone; paper states chemical diffusion during runs
-          and quenching is not a concern (also p. 23).
+        note: Charge was quenched by rapid withdrawal to the subsolidus furnace zone.
+      quench_diffusion_statement_locator:
+        page: 18
+        pdf_page_index: 17
+        published_page: 18
+        section: Experimental methods
+        note: The paper states that chemical diffusion during the runs and quenching is not a concern.
       regime: 1_atm_gas_mixing_furnace
-      units: per mil; dimensionless ratio; RSD percent
+      units: per_mil
       uncertainty:
         note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
         confidence_level: not_stated
@@ -299,7 +304,7 @@ species:
           dIW: '10.07'
           delta_K_printed: '0.051'
           isotope_delta_isotope_delta: '0.051'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.959'
           fraction_remaining_RSD_percent_as_printed: '1.03'
           fraction_remaining_quantity_status: typed_refusal
@@ -375,7 +380,7 @@ species:
           dIW: '10.07'
           delta_K_printed: '0.026'
           isotope_delta_isotope_delta: '0.026'
-          two_SE_per_mil: '0.10'
+          sigma: '0.10'
           fraction_remaining_ratio_as_printed: '0.969'
           fraction_remaining_RSD_percent_as_printed: '0.86'
           fraction_remaining_quantity_status: typed_refusal
@@ -451,7 +456,7 @@ species:
           dIW: '10.07'
           delta_K_printed: '0.059'
           isotope_delta_isotope_delta: '0.059'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.975'
           fraction_remaining_RSD_percent_as_printed: '2.21'
           fraction_remaining_quantity_status: typed_refusal
@@ -527,7 +532,7 @@ species:
           dIW: '10.07'
           delta_K_printed: '0.071'
           isotope_delta_isotope_delta: '0.071'
-          two_SE_per_mil: '0.10'
+          sigma: '0.10'
           fraction_remaining_ratio_as_printed: '0.973'
           fraction_remaining_RSD_percent_as_printed: '1.47'
           fraction_remaining_quantity_status: typed_refusal
@@ -603,7 +608,7 @@ species:
           dIW: '10.07'
           delta_K_printed: '-0.005'
           isotope_delta_isotope_delta: '-0.005'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.996'
           fraction_remaining_RSD_percent_as_printed: '2.44'
           fraction_remaining_quantity_status: typed_refusal
@@ -679,7 +684,7 @@ species:
           dIW: '9.23'
           delta_K_printed: '0.101'
           isotope_delta_isotope_delta: '0.101'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.964'
           fraction_remaining_RSD_percent_as_printed: '1.09'
           fraction_remaining_quantity_status: typed_refusal
@@ -755,7 +760,7 @@ species:
           dIW: '9.23'
           delta_K_printed: '0.177'
           isotope_delta_isotope_delta: '0.177'
-          two_SE_per_mil: '0.06'
+          sigma: '0.06'
           fraction_remaining_ratio_as_printed: '0.947'
           fraction_remaining_RSD_percent_as_printed: '0.83'
           fraction_remaining_quantity_status: typed_refusal
@@ -831,7 +836,7 @@ species:
           dIW: '9.23'
           delta_K_printed: '0.153'
           isotope_delta_isotope_delta: '0.153'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.935'
           fraction_remaining_RSD_percent_as_printed: '0.83'
           fraction_remaining_quantity_status: typed_refusal
@@ -907,7 +912,7 @@ species:
           dIW: '9.23'
           delta_K_printed: '0.257'
           isotope_delta_isotope_delta: '0.257'
-          two_SE_per_mil: '0.09'
+          sigma: '0.09'
           fraction_remaining_ratio_as_printed: '0.937'
           fraction_remaining_RSD_percent_as_printed: '1.23'
           fraction_remaining_quantity_status: typed_refusal
@@ -983,7 +988,7 @@ species:
           dIW: '9.02'
           delta_K_printed: '0.150'
           isotope_delta_isotope_delta: '0.150'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.958'
           fraction_remaining_RSD_percent_as_printed: '0.94'
           fraction_remaining_quantity_status: typed_refusal
@@ -1059,7 +1064,7 @@ species:
           dIW: '6.82'
           delta_K_printed: '0.163'
           isotope_delta_isotope_delta: '0.163'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.965'
           fraction_remaining_RSD_percent_as_printed: '0.90'
           fraction_remaining_quantity_status: typed_refusal
@@ -1135,7 +1140,7 @@ species:
           dIW: '6.39'
           delta_K_printed: '0.229'
           isotope_delta_isotope_delta: '0.229'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.962'
           fraction_remaining_RSD_percent_as_printed: '0.86'
           fraction_remaining_quantity_status: typed_refusal
@@ -1211,7 +1216,7 @@ species:
           dIW: '2.88'
           delta_K_printed: '0.139'
           isotope_delta_isotope_delta: '0.139'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.949'
           fraction_remaining_RSD_percent_as_printed: '1.64'
           fraction_remaining_quantity_status: typed_refusal
@@ -1287,7 +1292,7 @@ species:
           dIW: '0.95'
           delta_K_printed: '0.181'
           isotope_delta_isotope_delta: '0.181'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.940'
           fraction_remaining_RSD_percent_as_printed: '0.86'
           fraction_remaining_quantity_status: typed_refusal
@@ -1363,7 +1368,7 @@ species:
           dIW: '-0.87'
           delta_K_printed: '0.494'
           isotope_delta_isotope_delta: '0.494'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.919'
           fraction_remaining_RSD_percent_as_printed: '1.45'
           fraction_remaining_quantity_status: typed_refusal
@@ -1439,7 +1444,7 @@ species:
           dIW: '6.50'
           delta_K_printed: '0.190'
           isotope_delta_isotope_delta: '0.190'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.951'
           fraction_remaining_RSD_percent_as_printed: '1.08'
           fraction_remaining_quantity_status: typed_refusal
@@ -1515,7 +1520,7 @@ species:
           dIW: '5.62'
           delta_K_printed: '0.145'
           isotope_delta_isotope_delta: '0.145'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.966'
           fraction_remaining_RSD_percent_as_printed: '0.90'
           fraction_remaining_quantity_status: typed_refusal
@@ -1591,7 +1596,7 @@ species:
           dIW: '2.31'
           delta_K_printed: '0.451'
           isotope_delta_isotope_delta: '0.451'
-          two_SE_per_mil: '0.10'
+          sigma: '0.10'
           fraction_remaining_ratio_as_printed: '0.931'
           fraction_remaining_RSD_percent_as_printed: '1.91'
           fraction_remaining_quantity_status: typed_refusal
@@ -1667,7 +1672,7 @@ species:
           dIW: '0.77'
           delta_K_printed: '0.637'
           isotope_delta_isotope_delta: '0.637'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.897'
           fraction_remaining_RSD_percent_as_printed: '1.52'
           fraction_remaining_quantity_status: typed_refusal
@@ -1743,7 +1748,7 @@ species:
           dIW: '-0.99'
           delta_K_printed: '1.373'
           isotope_delta_isotope_delta: '1.373'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.805'
           fraction_remaining_RSD_percent_as_printed: '0.83'
           fraction_remaining_quantity_status: typed_refusal
@@ -1822,7 +1827,7 @@ species:
       quench_status: asserted_preserved
       quench_statement_locator: *id006
       regime: 1_atm_gas_mixing_furnace
-      units: per mil; dimensionless ratio; RSD percent
+      units: per_mil
       uncertainty:
         note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
         confidence_level: not_stated
@@ -1849,7 +1854,7 @@ species:
           dIW: '10.07'
           delta_Cu_printed: '-0.153'
           isotope_delta_isotope_delta: '-0.153'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.031'
           fraction_remaining_RSD_percent_as_printed: '1.15'
           fraction_remaining_quantity_status: typed_refusal
@@ -1861,7 +1866,7 @@ species:
           dIW: '10.07'
           delta_Cu_printed: '-0.070'
           isotope_delta_isotope_delta: '-0.070'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.052'
           fraction_remaining_RSD_percent_as_printed: '1.58'
           fraction_remaining_quantity_status: typed_refusal
@@ -1873,7 +1878,7 @@ species:
           dIW: '10.07'
           delta_Cu_printed: '-0.198'
           isotope_delta_isotope_delta: '-0.198'
-          two_SE_per_mil: '0.02'
+          sigma: '0.02'
           fraction_remaining_ratio_as_printed: '1.002'
           fraction_remaining_RSD_percent_as_printed: '1.48'
           fraction_remaining_quantity_status: typed_refusal
@@ -1885,7 +1890,7 @@ species:
           dIW: '10.07'
           delta_Cu_printed: '-0.317'
           isotope_delta_isotope_delta: '-0.317'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '0.983'
           fraction_remaining_RSD_percent_as_printed: '0.44'
           fraction_remaining_quantity_status: typed_refusal
@@ -1897,7 +1902,7 @@ species:
           dIW: '10.07'
           delta_Cu_printed: '-0.202'
           isotope_delta_isotope_delta: '-0.202'
-          two_SE_per_mil: '0.02'
+          sigma: '0.02'
           fraction_remaining_ratio_as_printed: '1.032'
           fraction_remaining_RSD_percent_as_printed: '1.21'
           fraction_remaining_quantity_status: typed_refusal
@@ -1909,7 +1914,7 @@ species:
           dIW: '9.23'
           delta_Cu_printed: '-0.145'
           isotope_delta_isotope_delta: '-0.145'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.019'
           fraction_remaining_RSD_percent_as_printed: '0.44'
           fraction_remaining_quantity_status: typed_refusal
@@ -1921,7 +1926,7 @@ species:
           dIW: '9.23'
           delta_Cu_printed: '-0.449'
           isotope_delta_isotope_delta: '-0.449'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.155'
           fraction_remaining_RSD_percent_as_printed: '0.44'
           fraction_remaining_quantity_status: typed_refusal
@@ -1933,7 +1938,7 @@ species:
           dIW: '9.23'
           delta_Cu_printed: '-0.248'
           isotope_delta_isotope_delta: '-0.248'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.019'
           fraction_remaining_RSD_percent_as_printed: '0.87'
           fraction_remaining_quantity_status: typed_refusal
@@ -1945,7 +1950,7 @@ species:
           dIW: '9.23'
           delta_Cu_printed: '-0.373'
           isotope_delta_isotope_delta: '-0.373'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.218'
           fraction_remaining_RSD_percent_as_printed: '0.71'
           fraction_remaining_quantity_status: typed_refusal
@@ -1957,7 +1962,7 @@ species:
           dIW: '9.02'
           delta_Cu_printed: '-0.491'
           isotope_delta_isotope_delta: '-0.491'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '0.955'
           fraction_remaining_RSD_percent_as_printed: '0.44'
           fraction_remaining_quantity_status: typed_refusal
@@ -1969,7 +1974,7 @@ species:
           dIW: '6.82'
           delta_Cu_printed: '0.347'
           isotope_delta_isotope_delta: '0.347'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.018'
           fraction_remaining_RSD_percent_as_printed: '0.53'
           fraction_remaining_quantity_status: typed_refusal
@@ -1981,7 +1986,7 @@ species:
           dIW: '6.39'
           delta_Cu_printed: '0.537'
           isotope_delta_isotope_delta: '0.537'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '1.021'
           fraction_remaining_RSD_percent_as_printed: '0.42'
           fraction_remaining_quantity_status: typed_refusal
@@ -1993,7 +1998,7 @@ species:
           dIW: '2.88'
           delta_Cu_printed: '5.469'
           isotope_delta_isotope_delta: '5.469'
-          two_SE_per_mil: '0.02'
+          sigma: '0.02'
           fraction_remaining_ratio_as_printed: '0.414'
           fraction_remaining_RSD_percent_as_printed: '0.86'
           fraction_remaining_quantity_status: typed_refusal
@@ -2005,7 +2010,7 @@ species:
           dIW: '0.95'
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.072'
           fraction_remaining_RSD_percent_as_printed: '0.73'
           fraction_remaining_quantity_status: typed_refusal
@@ -2017,7 +2022,7 @@ species:
           dIW: '-0.87'
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.019'
           fraction_remaining_RSD_percent_as_printed: '0.80'
           fraction_remaining_quantity_status: typed_refusal
@@ -2029,7 +2034,7 @@ species:
           dIW: '6.50'
           delta_Cu_printed: '0.714'
           isotope_delta_isotope_delta: '0.714'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '0.853'
           fraction_remaining_RSD_percent_as_printed: '0.42'
           fraction_remaining_quantity_status: typed_refusal
@@ -2041,7 +2046,7 @@ species:
           dIW: '5.62'
           delta_Cu_printed: '1.534'
           isotope_delta_isotope_delta: '1.534'
-          two_SE_per_mil: '0.03'
+          sigma: '0.03'
           fraction_remaining_ratio_as_printed: '0.730'
           fraction_remaining_RSD_percent_as_printed: '0.60'
           fraction_remaining_quantity_status: typed_refusal
@@ -2053,7 +2058,7 @@ species:
           dIW: '2.31'
           delta_Cu_printed: '8.512'
           isotope_delta_isotope_delta: '8.512'
-          two_SE_per_mil: '0.02'
+          sigma: '0.02'
           fraction_remaining_ratio_as_printed: '0.094'
           fraction_remaining_RSD_percent_as_printed: '1.74'
           fraction_remaining_quantity_status: typed_refusal
@@ -2065,7 +2070,7 @@ species:
           dIW: '0.77'
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.029'
           fraction_remaining_RSD_percent_as_printed: '2.29'
           fraction_remaining_quantity_status: typed_refusal
@@ -2077,7 +2082,7 @@ species:
           dIW: '-0.99'
           delta_Cu_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.024'
           fraction_remaining_RSD_percent_as_printed: '0.67'
           fraction_remaining_quantity_status: typed_refusal
@@ -2092,7 +2097,7 @@ species:
       quench_status: asserted_preserved
       quench_statement_locator: *id006
       regime: 1_atm_gas_mixing_furnace
-      units: per mil; dimensionless ratio; RSD percent
+      units: per_mil
       uncertainty:
         note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
         confidence_level: not_stated
@@ -2119,7 +2124,7 @@ species:
           dIW: '10.07'
           delta_Zn_printed: '0.076'
           isotope_delta_isotope_delta: '0.076'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.610'
           fraction_remaining_RSD_percent_as_printed: '0.39'
           fraction_remaining_quantity_status: typed_refusal
@@ -2131,7 +2136,7 @@ species:
           dIW: '10.07'
           delta_Zn_printed: '0.203'
           isotope_delta_isotope_delta: '0.203'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.532'
           fraction_remaining_RSD_percent_as_printed: '1.73'
           fraction_remaining_quantity_status: typed_refusal
@@ -2143,7 +2148,7 @@ species:
           dIW: '10.07'
           delta_Zn_printed: '0.417'
           isotope_delta_isotope_delta: '0.417'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.436'
           fraction_remaining_RSD_percent_as_printed: '2.37'
           fraction_remaining_quantity_status: typed_refusal
@@ -2155,7 +2160,7 @@ species:
           dIW: '10.07'
           delta_Zn_printed: '0.513'
           isotope_delta_isotope_delta: '0.513'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.360'
           fraction_remaining_RSD_percent_as_printed: '0.63'
           fraction_remaining_quantity_status: typed_refusal
@@ -2167,7 +2172,7 @@ species:
           dIW: '10.07'
           delta_Zn_printed: '0.514'
           isotope_delta_isotope_delta: '0.514'
-          two_SE_per_mil: '0.11'
+          sigma: '0.11'
           fraction_remaining_ratio_as_printed: '0.353'
           fraction_remaining_RSD_percent_as_printed: '1.12'
           fraction_remaining_quantity_status: typed_refusal
@@ -2179,7 +2184,7 @@ species:
           dIW: '9.23'
           delta_Zn_printed: '0.178'
           isotope_delta_isotope_delta: '0.178'
-          two_SE_per_mil: '0.08'
+          sigma: '0.08'
           fraction_remaining_ratio_as_printed: '0.349'
           fraction_remaining_RSD_percent_as_printed: '0.58'
           fraction_remaining_quantity_status: typed_refusal
@@ -2191,7 +2196,7 @@ species:
           dIW: '9.23'
           delta_Zn_printed: '0.030'
           isotope_delta_isotope_delta: '0.030'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.328'
           fraction_remaining_RSD_percent_as_printed: '1.14'
           fraction_remaining_quantity_status: typed_refusal
@@ -2203,7 +2208,7 @@ species:
           dIW: '9.23'
           delta_Zn_printed: '0.063'
           isotope_delta_isotope_delta: '0.063'
-          two_SE_per_mil: '0.06'
+          sigma: '0.06'
           fraction_remaining_ratio_as_printed: '0.297'
           fraction_remaining_RSD_percent_as_printed: '0.60'
           fraction_remaining_quantity_status: typed_refusal
@@ -2215,7 +2220,7 @@ species:
           dIW: '9.23'
           delta_Zn_printed: '0.167'
           isotope_delta_isotope_delta: '0.167'
-          two_SE_per_mil: '0.09'
+          sigma: '0.09'
           fraction_remaining_ratio_as_printed: '0.261'
           fraction_remaining_RSD_percent_as_printed: '0.59'
           fraction_remaining_quantity_status: typed_refusal
@@ -2227,7 +2232,7 @@ species:
           dIW: '9.02'
           delta_Zn_printed: '0.084'
           isotope_delta_isotope_delta: '0.084'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.347'
           fraction_remaining_RSD_percent_as_printed: '1.09'
           fraction_remaining_quantity_status: typed_refusal
@@ -2239,7 +2244,7 @@ species:
           dIW: '6.82'
           delta_Zn_printed: '2.548'
           isotope_delta_isotope_delta: '2.548'
-          two_SE_per_mil: '0.07'
+          sigma: '0.07'
           fraction_remaining_ratio_as_printed: '0.446'
           fraction_remaining_RSD_percent_as_printed: '0.49'
           fraction_remaining_quantity_status: typed_refusal
@@ -2251,7 +2256,7 @@ species:
           dIW: '6.39'
           delta_Zn_printed: '4.400'
           isotope_delta_isotope_delta: '4.400'
-          two_SE_per_mil: '0.11'
+          sigma: '0.11'
           fraction_remaining_ratio_as_printed: '0.309'
           fraction_remaining_RSD_percent_as_printed: '0.54'
           fraction_remaining_quantity_status: typed_refusal
@@ -2263,7 +2268,7 @@ species:
           dIW: '2.88'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.059'
           fraction_remaining_RSD_percent_as_printed: '1.15'
           fraction_remaining_quantity_status: typed_refusal
@@ -2275,7 +2280,7 @@ species:
           dIW: '0.95'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.034'
           fraction_remaining_RSD_percent_as_printed: '0.65'
           fraction_remaining_quantity_status: typed_refusal
@@ -2287,7 +2292,7 @@ species:
           dIW: '-0.87'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.032'
           fraction_remaining_RSD_percent_as_printed: '1.60'
           fraction_remaining_quantity_status: typed_refusal
@@ -2299,7 +2304,7 @@ species:
           dIW: '6.50'
           delta_Zn_printed: '3.131'
           isotope_delta_isotope_delta: '3.131'
-          two_SE_per_mil: '0.06'
+          sigma: '0.06'
           fraction_remaining_ratio_as_printed: '0.203'
           fraction_remaining_RSD_percent_as_printed: '0.46'
           fraction_remaining_quantity_status: typed_refusal
@@ -2311,7 +2316,7 @@ species:
           dIW: '5.62'
           delta_Zn_printed: '5.960'
           isotope_delta_isotope_delta: '5.960'
-          two_SE_per_mil: '0.06'
+          sigma: '0.06'
           fraction_remaining_ratio_as_printed: '0.089'
           fraction_remaining_RSD_percent_as_printed: '0.42'
           fraction_remaining_quantity_status: typed_refusal
@@ -2323,7 +2328,7 @@ species:
           dIW: '2.31'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.034'
           fraction_remaining_RSD_percent_as_printed: '2.42'
           fraction_remaining_quantity_status: typed_refusal
@@ -2335,7 +2340,7 @@ species:
           dIW: '0.77'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.039'
           fraction_remaining_RSD_percent_as_printed: '1.67'
           fraction_remaining_quantity_status: typed_refusal
@@ -2347,7 +2352,7 @@ species:
           dIW: '-0.99'
           delta_Zn_printed: null
           isotope_delta_isotope_delta: null
-          two_SE_per_mil: null
+          sigma: null
           fraction_remaining_ratio_as_printed: '0.027'
           fraction_remaining_RSD_percent_as_printed: '5.27'
           fraction_remaining_quantity_status: typed_refusal
