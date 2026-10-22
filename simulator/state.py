@@ -1196,6 +1196,10 @@ class HourSnapshot:
     # Empty dict means the tick lacked enough melt-fraction or alkali pressure
     # context to compute the diagnostic. No gate, rate, or ledger path reads it.
 
+    subsolidus_bakeout_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    # This hour's C0 subsolidus admission record. In-process only. The runner
+    # per-hour summary does not emit it.
+
     # --- Silent-zero class instrumentation (b-149) ---
     silent_zero_diagnostic: Dict[str, Any] = field(default_factory=dict)
     # Typed zero_because notes for paths where an absent input previously

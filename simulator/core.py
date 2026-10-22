@@ -1262,6 +1262,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._subsolidus_joint_gas_kg_hr = 0.0
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout: Dict[str, Any] = {}
+        self._subsolidus_bakeout_by_hour: list[Dict[str, Any]] = []
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
         self._non_feedstock_reagent_element_kg_by_account: Dict[
@@ -1627,6 +1628,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._subsolidus_joint_gas_kg_hr = 0.0
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout = {}
+        self._subsolidus_bakeout_by_hour = []
         self.campaign_mgr.last_c0_exit = None
         self.campaign_mgr.c0_first_melt_backstop = False
         self._last_native_fe_partition_diagnostic = {}
@@ -13402,6 +13404,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 hard_regime_diagnostic
             )
 
+    def _record_subsolidus_bakeout(self, diagnostic: Dict[str, Any]) -> Dict[str, Any]:
+        """Keep C0 bakeout evidence. A later non-C0 hour must not wipe it."""
+        self._last_subsolidus_bakeout = diagnostic
+        if diagnostic.get("skipped") == "not_c0":
+            return diagnostic
+        history = getattr(self, "_subsolidus_bakeout_by_hour", None)
+        if not isinstance(history, list):
+            history = []
+            self._subsolidus_bakeout_by_hour = history
+        history.append(diagnostic)
+        return diagnostic
+
     def _apply_c0_bakeout(
         self,
         *,
@@ -13444,12 +13458,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         self._subsolidus_joint_gas_kg_hr = 0.0
-        if self.melt.campaign != CampaignPhase.C0:
-            self.campaign_mgr.c0_first_melt_backstop = False
-            diagnostic = {"skipped": "not_c0", "committed": False}
-            self._last_subsolidus_bakeout = diagnostic
-            return diagnostic
-
         if temperature_K is None:
             temperature_K = float(self.melt.temperature_C) + 273.15
         feedstock_key = str(
@@ -13457,6 +13465,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or getattr(self, "_batch_feedstock_key", "")
             or ""
         )
+        melting = first_melt_backstop(liquid_fraction)
+        if self.melt.campaign == CampaignPhase.C0:
+            self.campaign_mgr.c0_first_melt_backstop = melting
+        if melting and not self._subsolidus_handed_off:
+            debits, credits = handoff_mol_maps(
+                self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT),
+                self.atom_ledger.mol_by_account(FOULANT_ACCOUNT),
+            )
+            if debits or credits:
+                self._dispatch_and_commit(
+                    ChemistryIntent.STAGE0_PRETREATMENT,
+                    control_inputs={
+                        "reaction_family": REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
+                        "mol_debits": debits,
+                        "mol_credits": credits,
+                    },
+                    transition_source="subsolidus_handoff",
+                )
+            self._subsolidus_handed_off = True
+            self._subsolidus_committed_kg_hr_by_species = {}
+            return self._record_subsolidus_bakeout({
+                "temperature_K": float(temperature_K),
+                "kinetics": STAGE0_RELEASE_KINETICS,
+                "notice": redox_notice_for_feedstock(feedstock_key),
+                "reactions": [],
+                "provider_status": None,
+                "provider_reason": None,
+                "committed": False,
+                "handoff": True,
+                "released_kg_hr_by_species": {},
+            })
+        if self.melt.campaign != CampaignPhase.C0:
+            self._subsolidus_committed_kg_hr_by_species = {}
+            diagnostic = {
+                "skipped": "not_c0",
+                "committed": False,
+                "handoff": False,
+            }
+            self._last_subsolidus_bakeout = diagnostic
+            return diagnostic
+
         salt_mol = dict(self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT) or {})
         hosts = []
         host_remaining: Dict[str, float] = {}
@@ -13583,27 +13632,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         self._subsolidus_committed_kg_hr_by_species = released_kg
 
-        melting = first_melt_backstop(liquid_fraction)
-        self.campaign_mgr.c0_first_melt_backstop = melting
-        handed_off = False
-        if melting and not self._subsolidus_handed_off:
-            debits, credits = handoff_mol_maps(
-                self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT),
-                self.atom_ledger.mol_by_account(FOULANT_ACCOUNT),
-            )
-            if debits or credits:
-                self._dispatch_and_commit(
-                    ChemistryIntent.STAGE0_PRETREATMENT,
-                    control_inputs={
-                        "reaction_family": REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
-                        "mol_debits": debits,
-                        "mol_credits": credits,
-                    },
-                    transition_source="subsolidus_handoff",
-                )
-            self._subsolidus_handed_off = True
-            handed_off = True
-
         diagnostic = {
             "temperature_K": float(temperature_K),
             "kinetics": STAGE0_RELEASE_KINETICS,
@@ -13612,7 +13640,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "provider_status": provider_status,
             "provider_reason": provider_reason,
             "committed": committed,
-            "handoff": handed_off,
+            "handoff": False,
             "released_kg_hr_by_species": released_kg,
         }
         if provider_status == "ok":
@@ -13630,8 +13658,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 if key in provider_diagnostic:
                     diagnostic[key] = provider_diagnostic[key]
-        self._last_subsolidus_bakeout = diagnostic
-        return diagnostic
+        return self._record_subsolidus_bakeout(diagnostic)
 
     def _update_target_inventory_diagnostic(self) -> None:
         inventory = getattr(getattr(self, "record", None), "initial_inventory", None)
@@ -13909,6 +13936,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             c0_exit = getattr(self.campaign_mgr, 'last_c0_exit', None)
             if c0_exit:
                 summary['c0_exit'] = dict(c0_exit)
+            history = getattr(self, '_subsolidus_bakeout_by_hour', None) or []
+            if history:
+                summary['subsolidus_bakeout'] = [dict(item) for item in history]
         return summary
 
     def campaign_endpoint_refused(self) -> bool:
@@ -14748,6 +14778,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic
+        )
+        snapshot.subsolidus_bakeout_diagnostic = dict(
+            getattr(self, "_last_subsolidus_bakeout", {}) or {}
         )
         snapshot.fe_redox_split = fe_redox_split
         snapshot.redox_source_breakdown = self._redox_source_breakdown_diagnostic()
