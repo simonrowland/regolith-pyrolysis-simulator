@@ -40,17 +40,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from engine_install_config import (
-    EngineCheckReport,
-    EngineLock,
-    checkout_matches_pin,
-    check_engine_install,
-    engine_install_path,
-    engine_install_root,
-    load_engine_lock,
-    thermoengine_artifact_names,
-    write_locked_config,
-)
+from engine_local_config_loader import load_engine_local_config
+
+_engine_config = load_engine_local_config(Path(__file__).resolve().parent)
+EngineCheckReport = _engine_config.EngineCheckReport
+EngineLock = _engine_config.EngineLock
+artifact_for_platform = _engine_config.artifact_for_platform
+checkout_matches_pin = _engine_config.checkout_matches_pin
+check_engine_install = _engine_config.check_engine_install
+config_path = _engine_config.config_path
+engine_install_path = _engine_config.engine_install_path
+engine_install_root = _engine_config.engine_install_root
+load_engine_lock = _engine_config.load_engine_lock
+thermoengine_artifact_names = _engine_config.thermoengine_artifact_names
+write_locked_config = _engine_config.write_locked_config
 
 
 # --------------------------------------------------------------------------
@@ -329,8 +332,6 @@ def build_thermoengine(python: Path, lock: EngineLock, root: Path) -> None:
 
 def alpha_artifact_notice(lock: EngineLock, root: Path) -> None:
     pin = lock.engines["alphamelts"]
-    from engine_install_config import artifact_for_platform
-
     asset = artifact_for_platform(pin)
     artifact = engine_install_path(lock, root, "alphamelts") / asset.runtime_artifact
     if artifact.is_file():
@@ -423,8 +424,6 @@ def main() -> int:
         if args != {"--check"}:
             raise SystemExit("--check cannot be combined with installer options")
         lock = load_engine_lock()
-        from engine_install_config import config_path
-
         report = check_engine_install(lock, ENGINE_ROOT, local_config=config_path())
         return print_check_report(report)
 

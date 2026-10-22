@@ -1247,10 +1247,10 @@ def test_receiptless_live_fill_computes_without_cache_lookup_or_capture(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config
+    import simulator.engine_local_config as engine_config
 
     monkeypatch.setattr(
-        engine_install_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
@@ -1290,10 +1290,10 @@ def test_receiptless_replay_only_refuses_before_cache_lookup(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config
+    import simulator.engine_local_config as engine_config
 
     monkeypatch.setattr(
-        engine_install_config,
+        engine_config,
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )

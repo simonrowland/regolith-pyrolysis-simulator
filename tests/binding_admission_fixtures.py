@@ -14,15 +14,15 @@ def _set_engine_local_config_path(
     *,
     monkeypatch: Any | None = None,
 ) -> tuple[Any, Any]:
-    import engine_install_config
+    import simulator.engine_local_config as engine_config
 
-    original_config_path = engine_install_config.config_path
+    original_config_path = engine_config.config_path
     replacement = lambda: path
     if monkeypatch is None:
-        engine_install_config.config_path = replacement
+        engine_config.config_path = replacement
     else:
-        monkeypatch.setattr(engine_install_config, "config_path", replacement)
-    return engine_install_config, original_config_path
+        monkeypatch.setattr(engine_config, "config_path", replacement)
+    return engine_config, original_config_path
 
 
 @contextmanager
@@ -38,13 +38,13 @@ def isolate_engine_local_config(
         isolated_path.parent.mkdir(parents=True, exist_ok=True)
         isolated_path.write_bytes(source.read_bytes())
 
-    engine_install_config, original_config_path = _set_engine_local_config_path(
+    engine_config, original_config_path = _set_engine_local_config_path(
         isolated_path
     )
     try:
         yield isolated_path
     finally:
-        engine_install_config.config_path = original_config_path
+        engine_config.config_path = original_config_path
 
 
 def install_synthetic_binding_receipt(

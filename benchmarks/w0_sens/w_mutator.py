@@ -431,13 +431,11 @@ def _default_engine_root() -> Path:
 
 def _default_pristine_dylib_dir() -> Path:
     """Pristine staged dylib dir from engines.local.toml (no env mutation)."""
-    from engine_install_config import (
-        load_engine_lock,
-        thermoengine_artifact_names,
-    )
     from simulator.engine_local_config import (
         EngineInstallRequiredError,
         load_config,
+        load_engine_lock,
+        thermoengine_artifact_names,
     )
 
     dylib_names = thermoengine_artifact_names(load_engine_lock())
@@ -611,7 +609,7 @@ class W0WMutator:
         self._identity = self._build_identity()
 
     def _build_identity(self) -> BuildIdentity:
-        from engine_install_config import (
+        from simulator.engine_local_config import (
             load_engine_lock,
             thermoengine_artifact_names,
         )
@@ -784,7 +782,7 @@ class W0WMutator:
         lib_dir = prefix / "lib"
         lib_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(build_root / "src" / "libphaseobjc.dylib", lib_dir)
-        from engine_install_config import (
+        from simulator.engine_local_config import (
             load_engine_lock,
             thermoengine_artifact_names,
         )

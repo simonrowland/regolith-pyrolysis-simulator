@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from engine_install_config import load_engine_lock, thermoengine_artifact_names
 from simulator.engine_local_config import (
     EngineIdentity,
     EngineLocalConfig,
@@ -15,9 +14,11 @@ from simulator.engine_local_config import (
     cache_version_for,
     config_path,
     is_legacy_cache_version,
+    load_engine_lock,
     load_config,
     render_toml,
     setup_thermoengine_dylib_path,
+    thermoengine_artifact_names,
     warn_legacy_once,
     write_config,
 )
@@ -67,7 +68,7 @@ def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLoc
         },
     )
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
@@ -105,7 +106,7 @@ def test_config_absent_legacy_fallback_emits_warning(
 ) -> None:
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: missing,
     )
     backend = AlphaMELTSBackend()
@@ -140,7 +141,7 @@ def test_thermoengine_dylib_dir_fail_loud_when_missing(
         identities={},
     )
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
@@ -163,7 +164,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
         identities={},
     )
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: tmp_path / "engines.local.toml",
     )
     write_config(config)
@@ -378,7 +379,7 @@ def test_load_config_returns_none_when_absent(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: tmp_path / "missing.toml",
     )
     assert load_config() is None

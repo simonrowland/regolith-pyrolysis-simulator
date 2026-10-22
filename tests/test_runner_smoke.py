@@ -1658,13 +1658,13 @@ def test_runner_golden_output_ignores_host_binding_receipts(
     tmp_path,
     monkeypatch,
 ):
-    import engine_install_config
+    import simulator.engine_local_config as engine_config
     from simulator import engine_binding_admission
 
     host_config_path = tmp_path / "host" / "engines" / "engines.local.toml"
     host_config_path.parent.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr(
-        engine_install_config,
+        engine_config,
         "config_path",
         lambda: host_config_path,
     )

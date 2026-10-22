@@ -321,7 +321,7 @@ def test_default_seams_mint_production_build_records(tmp_path, monkeypatch) -> N
 def test_default_pristine_dylib_dir_does_not_fall_back_to_home_lib(
     tmp_path, monkeypatch
 ) -> None:
-    from engine_install_config import load_engine_lock, thermoengine_artifact_names
+    from simulator.engine_local_config import load_engine_lock, thermoengine_artifact_names
 
     home_lib = tmp_path / "home" / "lib"
     home_lib.mkdir(parents=True)
@@ -329,7 +329,7 @@ def test_default_pristine_dylib_dir_does_not_fall_back_to_home_lib(
         (home_lib / name).write_bytes(b"legacy dylib")
     monkeypatch.setenv("HOME", str(home_lib.parent))
     monkeypatch.setattr(
-        "engine_install_config.config_path",
+        "simulator.engine_local_config.config_path",
         lambda: tmp_path / "missing" / "engines.local.toml",
     )
 

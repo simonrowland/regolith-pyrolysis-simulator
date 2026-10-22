@@ -15,14 +15,15 @@ from pathlib import Path, PurePosixPath
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from engine_install_config import (
-    artifact_for_platform,
-    engine_install_path,
-    engine_install_root,
-    load_engine_lock,
-    sha256_file,
-    write_locked_config,
-)
+from engine_local_config_loader import load_engine_local_config
+
+_engine_config = load_engine_local_config(Path(__file__).resolve().parent)
+artifact_for_platform = _engine_config.artifact_for_platform
+engine_install_path = _engine_config.engine_install_path
+engine_install_root = _engine_config.engine_install_root
+load_engine_lock = _engine_config.load_engine_lock
+sha256_file = _engine_config.sha256_file
+write_locked_config = _engine_config.write_locked_config
 
 
 ROOT = Path(__file__).resolve().parent

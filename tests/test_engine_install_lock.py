@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from engine_install_config import (
+from simulator.engine_local_config import (
     EngineLocalConfig,
     EngineLock,
     EnginePaths,
@@ -96,7 +96,7 @@ def test_clone_locked_sources_refuses_a_wrong_commit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import importlib.util
-    import engine_install_config as engine_config
+    import simulator.engine_local_config as engine_config
 
     installer_path = LOCK_PATH.parents[1] / "install-engines.py"
     spec = importlib.util.spec_from_file_location("install_engines_test", installer_path)
@@ -222,7 +222,7 @@ def test_render_toml_round_trips_windows_style_paths(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
 
     windows_paths = {
         "thermoengine_dylib_dir": (
@@ -258,7 +258,7 @@ def test_lock_rendering_does_not_discover_legacy_engine_paths(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
 
     lock = load_engine_lock(LOCK_PATH)
     checkout = tmp_path / "checkout"
@@ -349,7 +349,7 @@ def test_check_reports_each_magemin_runtime_binary_candidate(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
     from simulator.melt_backend import magemin as runtime
 
     lock = load_engine_lock(LOCK_PATH)
@@ -418,7 +418,7 @@ def test_check_reports_each_alphamelts_runtime_binary_candidate(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
     lock = load_engine_lock(LOCK_PATH)
@@ -484,7 +484,6 @@ def test_check_reports_runtime_selected_alphamelts_launcher(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
     import simulator.engine_local_config as local_config
     from simulator.melt_backend import alphamelts as runtime
 
@@ -547,7 +546,7 @@ def test_check_reports_runtime_path_lookup_inside_repos(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
 
     lock = load_engine_lock(LOCK_PATH)
     repos_root = tmp_path / "repos"
@@ -612,7 +611,7 @@ def test_check_classifies_source_artifact_config_and_extra_build_drift(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import engine_install_config as module
+    import simulator.engine_local_config as module
 
     lock_text = LOCK_PATH.read_text(encoding="utf-8").replace(
         'reference_sha256 = "d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85"\n'
@@ -691,6 +690,27 @@ def test_check_classifies_source_artifact_config_and_extra_build_drift(
     assert report.artifact_shas
 
 
+def test_install_engines_loads_owner_by_path_without_simulator() -> None:
+    import subprocess
+    import sys
+
+    repo = Path(__file__).resolve().parents[1]
+    code = (
+        "import runpy, sys; "
+        f"runpy.run_path({str(repo / 'install-engines.py')!r}, "
+        "run_name='installer_import_check'); "
+        "assert '_regolith_engine_local_config' in sys.modules; "
+        "assert 'simulator' not in sys.modules"
+    )
+    loaded = subprocess.run(
+        [sys.executable, "-I", "-S", "-B", "-c", code],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert loaded.returncode == 0, loaded.stderr
+
+
 def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> None:
     import hashlib
     import os
@@ -702,7 +722,9 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
     import_code = (
         "import sys; "
         f"sys.path.insert(0, {str(repo)!r}); "
-        "import engine_install_config as config; "
+        "from pathlib import Path; "
+        "from engine_local_config_loader import load_engine_local_config; "
+        f"config = load_engine_local_config(Path({str(repo)!r})); "
         "config.load_engine_lock(); "
         "assert 'simulator' not in sys.modules"
     )
@@ -729,7 +751,15 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
 
     fixture_repo = tmp_path / "repo"
     (fixture_repo / "engines").mkdir(parents=True)
-    shutil.copyfile(repo / "engine_install_config.py", fixture_repo / "engine_install_config.py")
+    (fixture_repo / "simulator").mkdir()
+    shutil.copyfile(
+        repo / "simulator" / "engine_local_config.py",
+        fixture_repo / "simulator" / "engine_local_config.py",
+    )
+    shutil.copyfile(
+        repo / "engine_local_config_loader.py",
+        fixture_repo / "engine_local_config_loader.py",
+    )
     shutil.copyfile(repo / "install-engines.py", fixture_repo / "install-engines.py")
     lock_text = (repo / "engines" / "engines.lock.toml").read_text(encoding="utf-8")
     lock_text = "\n".join(
@@ -816,13 +846,22 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
     assert bytecode_enabled.returncode == 0, (
         bytecode_enabled.stdout + bytecode_enabled.stderr
     )
-    bytecode_cache = fixture_repo / "__pycache__"
-    assert bytecode_cache.is_dir()
-    assert any(
-        path.name.startswith("engine_install_config.") and path.suffix == ".pyc"
-        for path in bytecode_cache.iterdir()
+    bytecode_caches = (
+        fixture_repo / "__pycache__",
+        fixture_repo / "simulator" / "__pycache__",
     )
-    shutil.rmtree(bytecode_cache)
+    assert all(path.is_dir() for path in bytecode_caches)
+    assert any(
+        path.name.startswith("engine_local_config_loader.")
+        and path.suffix == ".pyc"
+        for path in bytecode_caches[0].iterdir()
+    )
+    assert any(
+        path.name.startswith("engine_local_config.") and path.suffix == ".pyc"
+        for path in bytecode_caches[1].iterdir()
+    )
+    for bytecode_cache in bytecode_caches:
+        shutil.rmtree(bytecode_cache)
     bytecode_enabled_entrypoint.unlink()
 
     def tree_contents(root: Path) -> dict[str, tuple[str, object]]:
@@ -847,7 +886,7 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
     assert writable_check.returncode == 0, (
         writable_check.stdout + writable_check.stderr
     )
-    assert not (fixture_repo / "__pycache__").exists()
+    assert not any(path.exists() for path in bytecode_caches)
     assert tree_contents(home) == home_before
     assert tree_contents(fixture_repo) == repo_before
 
@@ -890,7 +929,7 @@ def test_base_installer_writes_alpha_config_for_each_locked_platform(
     import importlib.util
     import io
     import zipfile
-    import engine_install_config as engine_config
+    import simulator.engine_local_config as engine_config
 
     repo = Path(__file__).resolve().parents[1]
     installer_path = repo / "install-dependencies.py"
