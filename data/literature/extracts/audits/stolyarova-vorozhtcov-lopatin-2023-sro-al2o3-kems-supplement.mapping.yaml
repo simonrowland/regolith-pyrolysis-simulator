@@ -1,0 +1,574 @@
+source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+source_file: raw/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.docx
+extract: data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml
+tool: No table-tool or MinerU table-draft command is installed on the assigned base. Table cells were parsed from
+  the DOCX OOXML grid and cross-checked against textutil's text export. The source PDF is absent, so page rendering
+  was unavailable.
+tables:
+- table: S1
+  xml_table: 1
+  row_count_including_headers: 28
+  sample_id_as_printed: '1'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^7
+      scale_factor:
+        header: aexp(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^7; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^7; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S2
+  xml_table: 2
+  row_count_including_headers: 21
+  sample_id_as_printed: '2'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^8
+      scale_factor:
+        header: aexp(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^8; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^8; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S3
+  xml_table: 3
+  row_count_including_headers: 29
+  sample_id_as_printed: '1'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^7
+      scale_factor:
+        header: aexp(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^7; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^7; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S4
+  xml_table: 4
+  row_count_including_headers: 20
+  sample_id_as_printed: '2'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^8
+      scale_factor:
+        header: aexp(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^8; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^8; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S5
+  xml_table: 5
+  row_count_including_headers: 18
+  sample_id_as_printed: '3'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^9
+      scale_factor:
+        header: aexp(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^9; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^9; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S6
+  xml_table: 6
+  row_count_including_headers: 16
+  sample_id_as_printed: '3'
+  columns:
+    T_K:
+      index: 0
+      header: Т, K
+    composition:
+    - component: SrO
+      index: 1
+      header: SrO
+    - component: Al2O3
+      index: 2
+      header: Al2O3
+    partial_pressure:
+    - formula: Sr
+      index: 3
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 4
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 5
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 6
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 7
+      header: O
+      units: Pa
+    a_exp_SrO:
+      index: 8
+      header: aexp(SrO) × 10^9
+      scale_factor:
+        header: aexp(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    a_cal_SrO:
+    - index: 9
+      header: acal(SrO) × 10^9; model I
+      model: Redlich-Kister polynomial (10)
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    - index: 10
+      header: acal(SrO) × 10^9; model II
+      model: Wilson polynomial (12)
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+    a_cal_Al2O3:
+    - index: 11
+      header: acal(Al2O3); model I
+      model: Redlich-Kister polynomial (10)
+    - index: 12
+      header: acal(Al2O3); model II
+      model: Wilson polynomial (12)
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Experimental a_exp and calculated a_cal SrO
+    columns carry the printed ×10^n header; stored activity is cell value multiplied by 10^-n. Al2O3 a_cal columns
+    have no printed scale factor.
+- table: S7
+  xml_table: 7
+  row_count_including_headers: 13
+  sample_id_as_printed: '1'
+  composition_as_printed: 33 mol% SrO
+  columns:
+    T_K:
+      index: 0
+      header: T, K
+    ion_intensity:
+    - gas_species: Sr
+      ion_as_printed: Sr+
+      index: 1
+      header: Sr+
+      units: arbitrary units
+    - gas_species: Al
+      ion_as_printed: Al+
+      index: 2
+      header: Al+
+      units: arbitrary units
+    - gas_species: AlO
+      ion_as_printed: AlO+
+      index: 3
+      header: AlO+
+      units: arbitrary units
+    - gas_species: Al2O
+      ion_as_printed: Al2O+
+      index: 4
+      header: Al2O+
+      units: arbitrary units
+    partial_pressure:
+    - formula: Sr
+      index: 5
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 6
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 7
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 8
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 9
+      header: O
+      units: Pa
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Table caption gives sample composition as
+    SrO only; no full melt composition is reconstructed.
+- table: S8
+  xml_table: 8
+  row_count_including_headers: 15
+  sample_id_as_printed: '2'
+  composition_as_printed: 20 mol% SrO
+  columns:
+    T_K:
+      index: 0
+      header: T, K
+    ion_intensity:
+    - gas_species: Sr
+      ion_as_printed: Sr+
+      index: 1
+      header: Sr+
+      units: arbitrary units
+    - gas_species: Al
+      ion_as_printed: Al+
+      index: 2
+      header: Al+
+      units: arbitrary units
+    - gas_species: AlO
+      ion_as_printed: AlO+
+      index: 3
+      header: AlO+
+      units: arbitrary units
+    - gas_species: Al2O
+      ion_as_printed: Al2O+
+      index: 4
+      header: Al2O+
+      units: arbitrary units
+    partial_pressure:
+    - formula: Sr
+      index: 5
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 6
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 7
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 8
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 9
+      header: O
+      units: Pa
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Table caption gives sample composition as
+    SrO only; no full melt composition is reconstructed.
+- table: S9
+  xml_table: 9
+  row_count_including_headers: 17
+  sample_id_as_printed: '3'
+  composition_as_printed: 10 mol% SrO
+  columns:
+    T_K:
+      index: 0
+      header: T, K
+    ion_intensity:
+    - gas_species: Sr
+      ion_as_printed: Sr+
+      index: 1
+      header: Sr+
+      units: arbitrary units
+    - gas_species: Al
+      ion_as_printed: Al+
+      index: 2
+      header: Al+
+      units: arbitrary units
+    - gas_species: AlO
+      ion_as_printed: AlO+
+      index: 3
+      header: AlO+
+      units: arbitrary units
+    - gas_species: Al2O
+      ion_as_printed: Al2O+
+      index: 4
+      header: Al2O+
+      units: arbitrary units
+    partial_pressure:
+    - formula: Sr
+      index: 5
+      header: Sr
+      units: Pa
+    - formula: Al
+      index: 6
+      header: Al
+      units: Pa
+    - formula: AlO
+      index: 7
+      header: AlO
+      units: Pa
+    - formula: Al2O
+      index: 8
+      header: Al2O
+      units: Pa
+    - formula: O
+      index: 9
+      header: O
+      units: Pa
+  cell_rules: Blank and '-' cells are omitted, not converted to zero. Table caption gives sample composition as
+    SrO only; no full melt composition is reconstructed.
