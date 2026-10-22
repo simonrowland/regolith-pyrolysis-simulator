@@ -96,7 +96,6 @@ def test_clone_locked_sources_refuses_a_wrong_commit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import importlib.util
-    import simulator.engine_local_config as engine_config
 
     installer_path = LOCK_PATH.parents[1] / "install-engines.py"
     spec = importlib.util.spec_from_file_location("install_engines_test", installer_path)
@@ -118,7 +117,11 @@ def test_clone_locked_sources_refuses_a_wrong_commit(
     marker.write_bytes(b"preserve wrong-pin checkout")
     commands: list[list[str]] = []
     revisions[destination] = "0" * 40
-    monkeypatch.setattr(engine_config, "git_rev", lambda path: revisions[Path(path)])
+    monkeypatch.setattr(
+        installer._engine_config,
+        "git_rev",
+        lambda path: revisions[Path(path)],
+    )
     monkeypatch.setattr(installer, "_run", lambda command, **_kwargs: commands.append(command))
 
     installer.clone_locked_sources(lock, root)
@@ -965,7 +968,9 @@ def test_base_installer_writes_alpha_config_for_each_locked_platform(
     monkeypatch.setattr(installer, "engine_install_root", lambda: root)
     monkeypatch.setattr(installer.platform, "system", lambda: system)
     monkeypatch.setattr(installer.platform, "machine", lambda: machine)
+    monkeypatch.setattr(installer._engine_config, "config_path", lambda: config_path)
     monkeypatch.setattr(engine_config, "config_path", lambda: config_path)
+    assert installer._engine_config.config_path() == config_path
     monkeypatch.setattr(
         installer,
         "_download",
@@ -974,6 +979,7 @@ def test_base_installer_writes_alpha_config_for_each_locked_platform(
 
     installer._install_alphamelts()
 
+    assert config_path.is_file()
     config = engine_config.load_config(required=True)
     assert config is not None
     expected_binary = engine_install_path(
