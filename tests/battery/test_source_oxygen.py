@@ -722,71 +722,90 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
     assert requests[0].mode == battery.PO2_COMMANDED
 
 
-def test_printed_fo2_naming_the_row_is_not_scored(source_context, monkeypatch):
-    """A matching pressure is scored. The same fO2 naming this observation is not.
+@pytest.mark.parametrize("units", ("atm", "Pa"))
+@pytest.mark.parametrize("qualified", (False, True), ids=("local-id", "qualified-id"))
+def test_migrated_printed_fo2_source_link_is_read_by_identity(tmp_path, units, qualified):
+    import yaml
 
-    measured_tabulated is not a selector candidate. The name is the Located
-    inference inputs, not the numeric residue between the row and its stamp.
-    """
-    from simulator.battery.records import Derivation, Located, Value
-    from simulator.battery.score import _has_printed_fo2
+    from simulator.battery.migrate import convert_pressure_to_pa
+    from simulator.battery.score import _has_printed_fo2, _printed_fo2_names_observation
+    from tests.battery.factories import migrate_one_extract
 
-    sio = _row(source_context, "kems-053-stolyarova-1991")
-    exact = Decimal("0.00125643")
-    widened = exact + Decimal("1E-19")
-    own = replace(
-        sio,
-        observation_id="tabulated-o2-own-value",
-        identity=replace(
-            sio.identity,
-            species=Species("O2", Phase.G),
-            fO2_Pa=State.of(widened),
-        ),
-        value=Value.point_of(exact),
-        evidence=replace(sio.evidence, class_=State.of(EvidenceClass.MEASURED_TABULATED)),
-        point_conditions={
-            "fO2_Pa": Located(State.of(Value.point_of(widened)), locator=sio.locator),
-        },
-        notices=(),
-        derived_from=None,
+    root = Path(__file__).resolve().parents[2]
+    path = root / "data/literature/extracts/shornikov-2020-cao-tio2-melts.yaml"
+    document = yaml.safe_load(path.read_text())
+    source_id = document["source_id"]
+    oxygen_rows = [
+        row for row in document["species"]["O2"]["observations"]
+        if row["locator"].get("table") == "3"
+    ]
+    assert len(oxygen_rows) == 15
+    for row in oxygen_rows:
+        node = row["values"]["oxygen_partial_pressure"]
+        token = row["observation_id"]
+        node["source_observation_id"] = f"{source_id}::{token}" if qualified else token
+        if units == "Pa":
+            pressure, _trail = convert_pressure_to_pa(Decimal(str(node["value"])), node["units"])
+            node.update(value=str(pressure), units="Pa")
+    sample = next(
+        row for row in document["species"]["Ca"]["observations"]
+        if row["observation_id"] == "shornikov_2020_table3_ca_partial_pressure_2278k"
     )
-    assert _has_printed_fo2(own, own.identity)
-    point_rows = tuple(
-        item for item in source_context.observations.values()
-        if item.experiment_id == sio.experiment_id
-    )
-    requests, handles = _capture_engine(monkeypatch, own)
-    residual, candidate = compile_residual(
-        own, Engine.OPENIMCC, context=source_context, handles=handles,
-        point_observations=point_rows,
-    )
-    assert residual.refusal is None
-    assert residual.numeric is not None and candidate is not None
-    assert len(requests) == 1
-    assert own.observation_id not in _resolve(source_context, own, point_rows).used_observations
+    source_ref = oxygen_rows[0]["values"]["oxygen_partial_pressure"]["source_observation_id"]
+    sample["values"]["oxygen_partial_pressure"]["source_observation_id"] = source_ref
+    fixture = tmp_path / path.name
+    fixture.write_text(yaml.safe_dump(document, sort_keys=False))
+    migrated = migrate_one_extract(root, fixture).result
+    assert not migrated.registry_issues
+    for original in oxygen_rows:
+        row = migrated.observations[f"{source_id}::{original['observation_id']}"]
+        assert _has_printed_fo2(row, row.identity)
+        inference = row.point_conditions["fO2_Pa"].inference
+        assert row.observation_id in inference.inputs
+        assert _printed_fo2_names_observation(row)
+        assert inference.relation == ("atm_to_Pa" if units == "atm" else "Pa_to_Pa")
+        parameters = dict(inference.parameters)
+        assert parameters["factor"].state.value == (Decimal("101325") if units == "atm" else Decimal(1))
+        assert parameters["original"].state.value == Decimal(str(original["values"]["oxygen_partial_pressure"]["value"]))
+    row = migrated.observations[f"{source_id}::{sample['observation_id']}"]
+    assert _has_printed_fo2(row, row.identity)
+    assert f"{source_id}::{oxygen_rows[0]['observation_id']}" in row.point_conditions["fO2_Pa"].inference.inputs
+    assert not _printed_fo2_names_observation(row)
 
-    named = replace(
-        own,
-        point_conditions={
-            "fO2_Pa": Located(
-                State.of(Value.point_of(widened)),
-                locator=sio.locator,
-                inference=Derivation(
-                    relation="printed fO2 from this observation",
-                    inputs=(own.observation_id,),
-                    parameters=(),
-                    output_unit="Pa",
-                ),
-            ),
-        },
-    )
-    residual, candidate = compile_residual(
-        named, Engine.OPENIMCC, context=source_context, handles=handles,
-        point_observations=point_rows,
-    )
-    assert residual.numeric is None and candidate is None
-    assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
-    assert residual.refusal.detail["match"] == "printed_fo2_names_observation"
+
+@pytest.mark.parametrize(
+    "source_ref",
+    (None, "", 123, "missing-oxygen", "another-source::oxygen",
+     "shornikov_2020_table3_ca_partial_pressure_2278k", "not-printed"),
+    ids=("unset", "empty", "wrong-type", "missing", "foreign-source", "sample-species", "not-printed"),
+)
+def test_migrated_printed_fo2_source_reference_validation(tmp_path, source_ref):
+    import yaml
+
+    from simulator.battery.enums import RefusalReason
+    from simulator.battery.score import _printed_fo2_names_observation
+    from tests.battery.factories import migrate_one_extract
+
+    root = Path(__file__).resolve().parents[2]
+    path = root / "data/literature/extracts/shornikov-2020-cao-tio2-melts.yaml"
+    document = yaml.safe_load(path.read_text())
+    row = document["species"]["O2"]["observations"][0]
+    node = row["values"]["oxygen_partial_pressure"]
+    node["source_observation_id"] = row["observation_id"] if source_ref == "not-printed" else source_ref
+    if source_ref == "not-printed":
+        node["inferred"] = True
+    fixture = tmp_path / path.name
+    fixture.write_text(yaml.safe_dump(document, sort_keys=False))
+    migrated = migrate_one_extract(root, fixture).result
+    target = migrated.observations[f"{document['source_id']}::{row['observation_id']}"]
+    assert not _printed_fo2_names_observation(target)
+    if source_ref is None:
+        assert not migrated.registry_issues
+    else:
+        assert len(migrated.registry_issues) == 1
+        issue = migrated.registry_issues[0]
+        assert issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        assert issue.path.endswith(".values.oxygen_partial_pressure.source_observation_id")
 
 
 def test_comeasured_consistency_notice_reaches_scored_residual(source_context, monkeypatch):

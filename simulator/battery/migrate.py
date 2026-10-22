@@ -2948,6 +2948,7 @@ def convert_volume_to_m3(
 
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
+    "Pa_to_Pa": (Decimal("1"), "P_Pa = P_Pa", "Pa", "Pa"),
     "Torr_to_Pa": (
         PA_PER_TORR,
         "P_Pa = P_Torr × 101325 / 760",
@@ -13220,10 +13221,58 @@ class Migrator:
                 provenance=extract_provenance,
                 fusion_transition_rows=fusion_transition_rows,
             )
+        self._link_extract_oxygen_sources(rows, source_id)
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
         )
+
+    def _link_extract_oxygen_sources(
+        self, rows: Iterable[tuple[str, Mapping[str, Any]]], source_id: str,
+    ) -> None:
+        for _formula, obs in rows:
+            values = obs.get("values")
+            node = values.get("oxygen_partial_pressure") if isinstance(values, Mapping) else None
+            if not isinstance(node, Mapping) or node.get("source_observation_id") is None:
+                continue
+            raw = node["source_observation_id"]
+            source_ref = raw.strip() if isinstance(raw, str) else ""
+            if source_ref and "::" not in source_ref:
+                source_ref = f"{source_id}::{source_ref}"
+            source = self.result.observations.get(source_ref)
+            target_id = f"{source_id}::{obs.get('observation_id')}"
+            target = self.result.observations.get(target_id)
+            point = (target.point_conditions or {}).get("fO2_Pa") if target is not None else None
+            printed = collect_printed_oxygen(
+                (values,), target.locator if target is not None else None, skip_tables=True,
+            ).oxygen_partial_pressure_Pa
+            if (
+                source is None or source.source_id != source_id
+                or source.identity.species.formula not in {"O", "O2"}
+                or _quantity_token(source.identity.quantity) is not Quantity.P_PARTIAL
+                or point is None or point != printed
+            ):
+                self.result.registry_issues.append(ValidationIssue(
+                    path=f"observations.{target_id}.values.oxygen_partial_pressure.source_observation_id",
+                    reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                    detail=(
+                        "source_observation_id must resolve to an O/O2 partial-pressure "
+                        "observation in the same source, and identify the stamped printed condition"
+                    ),
+                ))
+                continue
+            inference = point.inference or conversion_derivation(
+                "Pa_to_Pa", point.state.value.point, point.locator,
+            )
+            self.result.observations[target_id] = replace(
+                target,
+                point_conditions={
+                    **target.point_conditions,
+                    "fO2_Pa": replace(point, inference=replace(
+                        inference, inputs=(*inference.inputs, source_ref),
+                    )),
+                },
+            )
 
     def _point_phase_field(
         self,
