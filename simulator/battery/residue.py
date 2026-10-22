@@ -482,6 +482,15 @@ def _atom_totals(
     return dict(totals)
 
 
+def _check_residue_atom_residual(element, residual, scale, context):
+    """Shared atom-conservation acceptance; callers retain their arithmetic."""
+    if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
+        raise ResidueInventoryRefusal(
+            "residue_atom_balance_failed",
+            f"{element} atom residual {residual:.17g} mol {context}",
+        )
+
+
 def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_mol=0.0):
     """One scale-aware atom-closure check for both residue paths."""
     closure = {
@@ -492,11 +501,7 @@ def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_m
     }
     for element, residual in closure.items():
         scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
-        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
-            raise ResidueInventoryRefusal(
-                "residue_atom_balance_failed",
-                f"{element} atom residual {residual:.17g} mol exceeds scale-aware tolerance",
-            )
+        _check_residue_atom_residual(element, residual, scale, "exceeds scale-aware tolerance")
     return closure
 
 
@@ -1769,11 +1774,7 @@ def _hashimoto_integrate_geometry(
             abs(final_atoms.get(element, 0.0) + exhausted_atoms.get(element, 0.0)),
             1.0e-300,
         )
-        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
-            raise ResidueInventoryRefusal(
-                "residue_atom_balance_failed",
-                f"{element} atom residual {residual:.17g} mol after exhaustion projection",
-            )
+        _check_residue_atom_residual(element, residual, scale, "after exhaustion projection")
     return _HashimotoGeometryIntegration(
         composition_wt_pct=_hashimoto_project_oxide_wt_pct(inventory),
         pO2_steps=tuple(pO2_steps),
