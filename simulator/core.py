@@ -14694,9 +14694,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if self.melt.sweep_mol_per_s is not None else 0.0),
             )
         )
-        if sweep_plan is not None:
-            boundary = self._physical_sweep_boundary()
-            self._melt_headspace_composition_mbar = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
+        # b-1012: retain the C5 source-mixture plane for upstream P_bulk.
+        # The post-capture/bleed projection belongs to self.overhead; assigning
+        # that depleted outlet here would bypass the connected transport law.
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0

@@ -69,16 +69,26 @@ def test_frozen_mars_plane_pins(monkeypatch, flow):
     sim, upstream = frozen_mars(monkeypatch, flow)
     actual = hex_leaves(pressure_receipt(sim, upstream))
     pins = json.loads((Path(__file__).parent / 'fixtures' / 'pressure_planes_pins.json').read_text())
-    assert actual == pins[str(flow)]
+    expected = pins[str(flow)]
+    # Only the consumed plane changes in C6's value step. Keep the original
+    # fixture intact so every old -> new pressure leaf remains auditable.
+    expected['upstream_mbar'] = expected['source_plane_mbar']
+    assert actual == expected
 
 
 @pytest.mark.parametrize('flow', [0.01, 0.1])
 def test_b1012_postcapture_must_not_replace_upstream_pressure(monkeypatch, flow):
+    from simulator.physical_constants import PA_PER_MBAR
+
     sim, upstream = frozen_mars(monkeypatch, flow)
-    sim.step()
+    snapshot = sim.step()
     # Use the existing CSTR projection owner, not a second mixture formula.
     assert sim._melt_headspace_composition_mbar == upstream[-1]
     assert sim._melt_headspace_composition_mbar['SiO'] > sim.overhead.composition['SiO']
+    assert snapshot.melt_headspace_composition_mbar == upstream[-1]
+    assert sim._evaporation_bulk_partial_pressure_pa('SiO') == (
+        upstream[-1]['SiO'] * PA_PER_MBAR
+    )
 
 
 def test_named_views_preserve_lumped_volume_and_zero_storage_stages(monkeypatch):
