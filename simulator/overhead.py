@@ -78,7 +78,7 @@ from simulator.gas_balance import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
 )
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.transport_regime import (
     # Preserve the previously exported viscous helper/constant; physics lives
@@ -264,7 +264,7 @@ def continuous_sweep_balance(
     # n_i(t)=n_i(0)*exp(-Bt/N)+N*(g_i+F*delta_i)/B*(1-exp(-Bt/N)).
     # Bt/N is dimensionless; integrated outlet follows I+G+n0-n(t), mol.
     # B->0 leaves the prepared inventory; pure carrier tends to N as t->inf.
-    target = _headspace_moles_at_pressure_pa(pressure * 1e5, volume, temperature)
+    target = _headspace_moles_at_pressure_pa(pressure * PA_PER_BAR, volume, temperature)
     initial_total = sum(initial.values())
     startup = max(0.0, target - initial_total)
     inlet = {carrier: startup + flow * duration}
@@ -375,14 +375,14 @@ def continuous_sweep_balance(
             from simulator.pumping_cost import _process_transport_pressure_admitted
 
             achieved_pressure_pa = sum(OverheadGasModel._compute_partial_pressures(
-                final, volume, temperature).values()) * 1e5
+                final, volume, temperature).values()) * PA_PER_BAR
             if demand > capacity or not _process_transport_pressure_admitted(
-                    achieved_pressure_pa, pressure * 1e5):
+                    achieved_pressure_pa, pressure * PA_PER_BAR):
                 capacity_shortfall = {
                     'reason': 'duct_capacity_shortfall',
                     'requested_outlet_mol_per_s': demand,
                     'capacity_at_request_mol_per_s': capacity,
-                    'requested_pressure_pa': pressure * 1e5,
+                    'requested_pressure_pa': pressure * PA_PER_BAR,
                     'achieved_pressure_pa': achieved_pressure_pa,
                     'source_model': 'constant_generation_over_transport_step',
                 }
@@ -1215,7 +1215,7 @@ class OverheadGasModel:
             retained_holdup_kg=retained_holdup_kg,
             dt_hr=dt_hr,
             equipment_capacity_required=equipment_capacity_required,
-            upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
+            upstream_pressure_bar=allowed_pressure_Pa / PA_PER_BAR,
             pipe_diameter_m=self.pipe_diameter_m,
             pipe_length_m=self.pipe_length_m,
             gas_temperature_K=gas_temperature_K,
@@ -1227,7 +1227,7 @@ class OverheadGasModel:
             self.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
                 self.pipe_diameter_m, gas_molar_mass_kg_mol,
                 self._gas_dynamic_viscosity_Pa_s(gas_temperature_K), gas_temperature_K,
-                capacity.upstream_pressure_bar * 1.0e5, 0.0,
+                capacity.upstream_pressure_bar * PA_PER_BAR, 0.0,
             )
         return capacity
 
