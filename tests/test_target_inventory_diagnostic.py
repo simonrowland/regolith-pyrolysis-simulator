@@ -7,7 +7,10 @@ from pathlib import Path
 import yaml
 import pytest
 
-from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
+from simulator.accounting.stage0_inventory import (
+    STAGE0_RELEASE_KINETICS,
+    depletion_record,
+)
 from simulator.runner import PyrolysisRun, main
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
@@ -152,6 +155,48 @@ def test_ci_c0_larger_denominators_still_depleted_from_load() -> None:
     assert s2["primary_destination"] == "cleanup_sequestered"
     assert "P" not in record["chnops_expansion"]["elements"]
     assert float(sim.record.initial_inventory.melt_oxide_kg.get("P2O5") or 0.0) == 0.0
+
+
+def test_unavailable_target_after_hour_zero_is_not_depleted() -> None:
+    sim = _c0_sim("lunar_mare_low_ti")
+    common = {
+        "hour": 3,
+        "campaign": "C0",
+        "temperature_C": 200.0,
+        "ledger": sim.atom_ledger,
+        "initial_inventory": sim.record.initial_inventory,
+        "registry": sim.species_formula_registry,
+        "feedstocks": sim.feedstocks,
+        "feedstock_key": "lunar_mare_low_ti",
+    }
+    deferred = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["CHNOPS"]}}},
+    )
+    assert deferred["depleted"] is False
+    assert deferred["depletion_hour"] is None
+    assert deferred["target_evidence"] == "unavailable"
+    assert deferred["aggregate_remaining_fraction"] is None
+    assert deferred["would_be_inventory_advance"] is False
+    chnops = _target(deferred, "CHNOPS")
+    assert chnops["status"] == "deferred_semantic_split"
+
+    empty = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["H2O"]}}},
+    )
+    assert _target(empty, "H2O")["status"] == "zero_denominator"
+    assert empty["depleted"] is False
+    assert empty["depletion_hour"] is None
+    assert empty["target_evidence"] == "unavailable"
+
+    latched = depletion_record(
+        **common,
+        setpoints={"campaigns": {"C0": {"target_species": ["CHNOPS"]}}},
+        previous_depletion_hour=2,
+    )
+    assert latched["depleted"] is False
+    assert latched["depletion_hour"] == 2
 
 
 def test_target_inventory_not_on_hour_snapshot() -> None:

@@ -258,10 +258,14 @@ def depletion_record(
         if row.get("status") == STATUS_OK and row.get("remaining_fraction") is not None
     ]
     if present_fractions:
-        aggregate = max(present_fractions)
+        aggregate: float | None = max(present_fractions)
+        depleted = bool(aggregate <= float(epsilon))
+        target_evidence = "inventory"
     else:
-        aggregate = 0.0
-    depleted = bool(aggregate <= float(epsilon))
+        # Deferred, absent, or zero-denominator rows are not a release.
+        aggregate = None
+        depleted = False
+        target_evidence = "unavailable"
     if previous_depletion_hour is not None:
         depletion_hour: int | str | None = previous_depletion_hour
     elif depleted and int(hour) > 0:
@@ -283,6 +287,7 @@ def depletion_record(
             "elements": expansion_rows,
         },
         "aggregate_remaining_fraction": aggregate,
+        "target_evidence": target_evidence,
         "depleted": depleted,
         "depletion_hour": depletion_hour,
         # This kinetics class is a ceiling. It cannot advance C0.
