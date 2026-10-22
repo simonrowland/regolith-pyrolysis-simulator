@@ -3157,8 +3157,10 @@ def test_legacy_fallback_keeps_fe_pure_sidecar_above_pseudo_fit_range(
         and "species=Fe " in warning
         for warning in result.warnings
     )
+    # Token match, not substring: "species=Fe" is a prefix of
+    # "species=FeO_association_gas", whose skip notice is genuine.
     assert not any(
-        "species=Fe" in warning
+        "species=Fe" in warning.split()
         for warning in result.warnings
     )
 
