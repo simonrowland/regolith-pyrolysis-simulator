@@ -33,17 +33,21 @@ transitions per engine, numeric value changes, keys that were refused and
 are now scored, keys that were scored and are now refused, and keys added
 or removed inside the same filter. Newly scored and newly refused require
 the key in both files. A filter that drops a key does not count it as added
-or removed. Only the base ledger is indexed, as key to a status code and a
+or removed. A key may appear once in a ledger. A second appearance is an
+input error naming that key and its line, raised before any report line is
+written. Only the base ledger is indexed, as key to a status code and a
 float64 value or none. The tip ledger is streamed against that index and is
-not stored. Each tip change is written when that row is read. After the
-stream, keys still in the base index are only in the base ledger and are
-written then. Duplicate keys in one file keep the last row. The base index
-of the 100_000-key fixture traces about 21 MB, about 210 MB per million
-base keys, dominated by the key text. A nine-field record holding both
-sides traced 28_871_392 bytes on that same fixture. At most ``show`` value
-moves are kept, in a bounded heap of the largest relative changes; the
-counts include every change. A float64 value that does not round-trip
-through decimal text can hide a difference smaller than float64.
+not stored. Each tip change, including a key only in the tip, is written
+when that row is read. After the stream, keys still in the base index are
+only in the base ledger and are written then. The base index of the
+100_000-key fixture traces about 21 MB, about 210 MB per million base keys,
+dominated by the key text. A nine-field record holding both sides traced
+28_871_392 bytes on that same fixture. An empty base and those 100_000
+unique tip keys trace about 0.80 MB; a set of the tip keys traced
+13_384_300 bytes. At most ``show`` value moves are kept, in a bounded heap of the
+largest relative changes; the counts include every change. A float64 value
+that does not round-trip through decimal text can hide a difference smaller
+than float64.
 
 ``band`` reports, inside the temperature window, status counts and the
 median and root-mean-square of stored numeric values grouped by engine,
@@ -60,7 +64,10 @@ from __future__ import annotations
 import argparse
 import array
 import heapq
+import json
+import shutil
 import sys
+import tempfile
 from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
@@ -105,6 +112,20 @@ _MARKED_CODE = {
     for code in (*_STATUS_CODE.values(), _UNKNOWN)
 }
 _BaseSlot = tuple[int, float | None]
+# Uniqueness keeps one chunk of keys, then spills sorted runs. The empty-base
+# memory cap is below a full set of those keys.
+_DUP_CHUNK = 4096
+_DUP_FANIN = 32
+
+
+class DuplicateResidualKey(ValueError):
+    """A residual ledger repeats a key. One ledger has unique keys."""
+
+    def __init__(self, path: Path, line: int, key: str) -> None:
+        self.path = path
+        self.line = line
+        self.key = key
+        super().__init__(f"{path}:{line}: duplicate residual key {key}")
 
 
 @dataclass(frozen=True)
@@ -170,8 +191,6 @@ class KeyChange:
 class RowDiffReport:
     base_rows: int
     tip_rows: int
-    base_duplicate_keys: int
-    tip_duplicate_keys: int
     transitions: tuple[StatusTransition, ...]
     value_move_count: int
     value_moves_above: tuple[tuple[Decimal, int], ...]
@@ -271,6 +290,11 @@ def _refusal_of(row: Mapping[str, object]) -> tuple[str, str]:
     return (reason, detail_reason)
 
 
+def _row_key(row: Mapping[str, object]) -> str:
+    key = row.get("key")
+    return "" if key is None else str(key)
+
+
 def _view(row: Mapping[str, object]) -> RowView:
     _quantity, key_rail, _key_engine, temperature = residual_key_slots(row.get("key"))
     numeric = row.get("numeric")
@@ -285,9 +309,8 @@ def _view(row: Mapping[str, object]) -> RowView:
         unit = "" if unit_raw is None else str(unit_raw)
         value = _decimal_value(numeric.get("value"))
     reason, detail = _refusal_of(row)
-    key = row.get("key")
     return RowView(
-        key="" if key is None else str(key),
+        key=_row_key(row),
         status=_status_of(row),
         rail=_rail_of(row, key_rail),
         engine=_engine_of(row),
@@ -306,6 +329,101 @@ def iter_residual_rows(path: Path) -> Iterator[tuple[int, dict[str, object]]]:
     if not path.is_file():
         return
     yield from iter_residual_payloads(path, strict=True)
+
+
+def _write_key_run(path: Path, directory: str, index: int, chunk: list[tuple[str, int]]) -> Path:
+    chunk.sort()
+    for cursor in range(1, len(chunk)):
+        left_key, left_line = chunk[cursor - 1]
+        right_key, right_line = chunk[cursor]
+        if left_key == right_key:
+            raise DuplicateResidualKey(path, max(left_line, right_line), left_key)
+    run = Path(directory) / f"{index}.txt"
+    with run.open("w", encoding="utf-8") as handle:
+        for key, line in chunk:
+            handle.write(f"{json.dumps(key)}\t{line}\n")
+    return run
+
+
+def _read_run_row(handle: TextIO) -> tuple[str, int] | None:
+    raw = handle.readline()
+    if not raw:
+        return None
+    encoded, line_text = raw.rstrip("\n").split("\t", 1)
+    return json.loads(encoded), int(line_text)
+
+
+def _merge_key_group(path: Path, runs: list[Path], destination: Path) -> None:
+    handles = [run.open(encoding="utf-8") for run in runs]
+    try:
+        heap: list[tuple[str, int, int]] = []
+        for index, handle in enumerate(handles):
+            item = _read_run_row(handle)
+            if item is not None:
+                heapq.heappush(heap, (item[0], item[1], index))
+        previous_key: str | None = None
+        previous_line = 0
+        with destination.open("w", encoding="utf-8") as handle:
+            while heap:
+                key, line, index = heapq.heappop(heap)
+                if key == previous_key:
+                    raise DuplicateResidualKey(path, max(line, previous_line), key)
+                previous_key = key
+                previous_line = line
+                handle.write(f"{json.dumps(key)}\t{line}\n")
+                nxt = _read_run_row(handles[index])
+                if nxt is not None:
+                    heapq.heappush(heap, (nxt[0], nxt[1], index))
+    finally:
+        for handle in handles:
+            handle.close()
+
+
+def _merge_key_runs(path: Path, directory: str, runs: list[Path]) -> None:
+    generation = 0
+    while len(runs) > 1:
+        merged: list[Path] = []
+        for offset in range(0, len(runs), _DUP_FANIN):
+            group = runs[offset : offset + _DUP_FANIN]
+            if len(group) == 1:
+                merged.append(group[0])
+                continue
+            destination = Path(directory) / f"m{generation}-{offset}.txt"
+            _merge_key_group(path, group, destination)
+            for run in group:
+                run.unlink()
+            merged.append(destination)
+        runs = merged
+        generation += 1
+
+
+def _reject_duplicate_keys(path: Path) -> None:
+    """Raise when a residual key appears twice. The key set is not kept.
+
+    One chunk of keys is sorted and spilled, then the runs are merged. A long
+    unique tip does not become a second in-memory index. This runs before any
+    report line. A filter does not hide a repeated key.
+    """
+
+    directory = tempfile.mkdtemp(prefix="rowdiff-keys-")
+    try:
+        runs: list[Path] = []
+        chunk: list[tuple[str, int]] = []
+        for number, row in iter_residual_rows(path):
+            key = _row_key(row)
+            if not key:
+                continue
+            chunk.append((key, number))
+            if len(chunk) < _DUP_CHUNK:
+                continue
+            runs.append(_write_key_run(path, directory, len(runs), chunk))
+            chunk.clear()
+        if chunk:
+            runs.append(_write_key_run(path, directory, len(runs), chunk))
+            chunk.clear()
+        _merge_key_runs(path, directory, runs)
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 def _require_file(path: Path) -> None:
@@ -410,14 +528,6 @@ def _is_seen(code: int) -> bool:
     return code >= _SEEN or code <= -_SEEN
 
 
-def _base_code(code: int) -> int:
-    if code >= _SEEN:
-        return code - _SEEN
-    if code <= -_SEEN:
-        return code + _SEEN
-    return code
-
-
 @dataclass
 class _Running:
     show: int
@@ -463,18 +573,17 @@ def _index_base(
     engine: str | None,
     t_min: Decimal | None,
     t_max: Decimal | None,
-) -> tuple[dict[str, _BaseSlot], int, int, dict[str, str], dict[str, tuple[str, str]]]:
+) -> tuple[dict[str, _BaseSlot], int, dict[str, str], dict[str, tuple[str, str]]]:
     """Index the base ledger as key to (status code, float or none).
 
-    Last row for a key wins. Refusal text and unknown status spellings are
-    kept only for keys that have them, not on the value slot.
+    Keys are unique; a repeat was already rejected. Refusal text and unknown
+    status spellings are kept only for keys that have them, not on the value slot.
     """
 
     index: dict[str, _BaseSlot] = {}
     unknown: dict[str, str] = {}
     reasons: dict[str, tuple[str, str]] = {}
     rows = 0
-    duplicates = 0
     for _number, row in iter_residual_rows(path):
         view = _view(row)
         if not _accept(view, engine, t_min, t_max):
@@ -483,8 +592,6 @@ def _index_base(
         if not view.key:
             continue
         code = _status_code(view.status)
-        if view.key in index:
-            duplicates += 1
         if code == _UNKNOWN:
             unknown[view.key] = view.status
         elif view.key in unknown:
@@ -495,7 +602,7 @@ def _index_base(
             del reasons[view.key]
         value = None if view.value is None else float(view.value)
         index[view.key] = (code, value)
-    return index, rows, duplicates, unknown, reasons
+    return index, rows, unknown, reasons
 
 
 def _note_matched(
@@ -639,60 +746,11 @@ def _keep_move(
         heapq.heapreplace(chosen, item)
 
 
-def _replay_last_tip(
-    tip: Path,
-    index: Mapping[str, _BaseSlot],
-    reasons: Mapping[str, tuple[str, str]],
-    unknown: Mapping[str, str],
-    *,
-    engine: str | None,
-    t_min: Decimal | None,
-    t_max: Decimal | None,
-    show: int,
-    retain: bool,
-) -> _Running:
-    """Rebuild aggregates from the last tip row of each key.
-
-    Used only when a tip key repeats. The first pass already counted rows.
-    """
-
-    running = _running(show)
-    last: dict[str, RowView] = {}
-    for _number, row in iter_residual_rows(tip):
-        view = _view(row)
-        if not _accept(view, engine, t_min, t_max):
-            continue
-        if view.key:
-            last[view.key] = view
-    for key, view in last.items():
-        slot = index.get(key)
-        if slot is None:
-            _note_added(running, view, retain=retain, out=None)
-            continue
-        code, value = slot
-        reason, detail = reasons.get(key, ("", ""))
-        _note_matched(
-            running,
-            key,
-            _base_code(code),
-            value,
-            view,
-            reason,
-            detail,
-            unknown.get(key, ""),
-            retain=retain,
-            out=None,
-        )
-    return running
-
-
 def _report_from(
     running: _Running,
     *,
     base_rows: int,
     tip_rows: int,
-    base_duplicates: int,
-    tip_duplicates: int,
     retain_details: bool,
 ) -> RowDiffReport:
     ordered = sorted((item[2] for item in running.heap), key=lambda item: (-item.relative, item.key))
@@ -702,8 +760,6 @@ def _report_from(
     return RowDiffReport(
         base_rows=base_rows,
         tip_rows=tip_rows,
-        base_duplicate_keys=base_duplicates,
-        tip_duplicate_keys=tip_duplicates,
         transitions=tuple(
             StatusTransition(eng, base_status, tip_status, n)
             for (eng, base_status, tip_status), n in sorted(running.transitions.items())
@@ -734,10 +790,11 @@ def rowdiff_report(
     """Compare two residual ledgers by key.
 
     The base ledger is indexed as key to (status code, float or none).
-    The tip ledger is streamed against that index. A change row is written
-    as soon as the tip row that produces it is read. Keys still in the
-    index after that stream are only in the base ledger and are written
-    then. ``show`` keeps the largest relative value moves in a bounded heap.
+    The tip ledger is streamed against that index. A key only in the tip is
+    written when it is read and is not stored. Keys still in the index after
+    that stream are only in the base ledger and are written then. A repeated
+    key in either ledger raises ``DuplicateResidualKey`` before any report
+    line. ``show`` keeps the largest relative value moves in a bounded heap.
     Counts include every change. ``retain_details`` keeps every changed key
     on the returned report. The command path leaves that false.
     """
@@ -748,17 +805,16 @@ def rowdiff_report(
     _require_file(tip)
     engine_value = _engine_value(engine)
     _check_bounds(t_min, t_max, both=False)
-    index, base_rows, base_duplicates, unknown, reasons = _index_base(
+    _reject_duplicate_keys(base)
+    _reject_duplicate_keys(tip)
+    index, base_rows, unknown, reasons = _index_base(
         base,
         engine=engine_value,
         t_min=t_min,
         t_max=t_max,
     )
     running = _running(show)
-    added_seen: set[str] = set()
     tip_rows = 0
-    tip_duplicates = 0
-    duplicate_tip_key = False
     for _number, row in iter_residual_rows(tip):
         view = _view(row)
         if not _accept(view, engine_value, t_min, t_max):
@@ -767,49 +823,23 @@ def rowdiff_report(
         if not view.key:
             continue
         slot = index.get(view.key)
-        if slot is not None:
-            code, value = slot
-            if _is_seen(code):
-                tip_duplicates += 1
-                duplicate_tip_key = True
-                continue
-            index[view.key] = (_mark_seen(code), value)
-            if not duplicate_tip_key:
-                reason, detail = reasons.get(view.key, ("", ""))
-                _note_matched(
-                    running,
-                    view.key,
-                    code,
-                    value,
-                    view,
-                    reason,
-                    detail,
-                    unknown.get(view.key, ""),
-                    retain=retain_details,
-                    out=out,
-                )
-            continue
-        if view.key in added_seen:
-            tip_duplicates += 1
-            duplicate_tip_key = True
-            continue
-        added_seen.add(view.key)
-        if not duplicate_tip_key:
+        if slot is None:
             _note_added(running, view, retain=retain_details, out=out)
-    if duplicate_tip_key:
-        # The incremental notes describe the first tip row. Counts and the
-        # bounded move list are rebuilt from the last row. A detail line
-        # already written for the earlier row is left as it was.
-        running = _replay_last_tip(
-            tip,
-            index,
-            reasons,
-            unknown,
-            engine=engine_value,
-            t_min=t_min,
-            t_max=t_max,
-            show=show,
+            continue
+        code, value = slot
+        index[view.key] = (_mark_seen(code), value)
+        reason, detail = reasons.get(view.key, ("", ""))
+        _note_matched(
+            running,
+            view.key,
+            code,
+            value,
+            view,
+            reason,
+            detail,
+            unknown.get(view.key, ""),
             retain=retain_details,
+            out=out,
         )
     # Unseen base keys were not in the tip ledger.
     index = {key: slot for key, slot in index.items() if not _is_seen(slot[0])}
@@ -827,8 +857,6 @@ def rowdiff_report(
         running,
         base_rows=base_rows,
         tip_rows=tip_rows,
-        base_duplicates=base_duplicates,
-        tip_duplicates=tip_duplicates,
         retain_details=retain_details,
     )
     if out is not None:
@@ -923,8 +951,6 @@ def _print_rowdiff(
 ) -> None:
     print(f"base_rows\t{report.base_rows}", file=out)
     print(f"tip_rows\t{report.tip_rows}", file=out)
-    print(f"base_duplicate_keys\t{report.base_duplicate_keys}", file=out)
-    print(f"tip_duplicate_keys\t{report.tip_duplicate_keys}", file=out)
     print(f"value_moves\t{report.value_move_count}", file=out)
     for threshold, count in report.value_moves_above:
         print(f"value_moves_rel_gt_{_num(threshold)}\t{count}", file=out)

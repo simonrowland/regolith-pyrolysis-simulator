@@ -260,10 +260,12 @@ python scripts/battery_residuals_report.py band data/battery/residuals.jsonl \
 refusal-detail reason. `rowdiff` reports status transitions, numeric value
 changes, keys that moved between refused and scored, and keys added or
 removed. It indexes the base ledger as key to a status code and float value,
-streams the tip ledger, and writes each change as that row is read. Keys
-left only in the base ledger are written after that stream. `band` stores
-numeric values in a float64 array and reports per-engine status counts and
-the median and root-mean-square inside the band.
+streams the tip ledger, and writes each change as that row is read. A key
+only in the tip is written then and is not kept. Keys left only in the base
+ledger are written after that stream. A repeated key in either ledger is an
+input error naming the key and the line; the command writes no report.
+`band` stores numeric values in a float64 array and reports per-engine
+status counts and the median and root-mean-square inside the band.
 The median and root-mean-square are the score report's statistics.
 
 ## JUnit outcome compare
