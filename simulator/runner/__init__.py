@@ -1457,7 +1457,10 @@ class PyrolysisRun:
             )
         )
 
-        final_state = _final_state_from_ledger(sim)
+        final_state = _safe_failure_value(
+            lambda: _json_safe(_final_state_from_ledger(sim)),
+            section="final_state",
+        )
         refusal_diagnostic = dict(execution.refusal_diagnostic or {})
         if refusal_diagnostic:
             run_metadata["refusal_diagnostic"] = _json_safe(
@@ -1567,147 +1570,198 @@ class PyrolysisRun:
         # used to leave the run looking ``ok``/`partial`` with the C3
         # cleanup quietly missing.  Empty list when no refusals.
         shuttle_refusal_history = _safe_failure_value(
-            lambda: _shuttle_refusal_history_report(sim),
+            lambda: _json_safe(_shuttle_refusal_history_report(sim)),
             section="shuttle_refusal_history",
         )
         melt_redox_gate_floor_fallback_engagement = (
-            _melt_redox_gate_floor_fallback_engagement(sim)
+            _safe_failure_value(
+                lambda: _json_safe(
+                    _melt_redox_gate_floor_fallback_engagement(sim)
+                ),
+                section="melt_redox_gate_floor_fallback_engagement",
+            )
         )
-        degraded_path_engagement = _degraded_path_engagement(sim)
-        pO2_enforcement_by_hour = [
-            dict(row["pO2_enforcement"])
-            for row in execution.per_hour
-            if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
-        ]
+        degraded_path_engagement = _safe_failure_value(
+            lambda: _json_safe(_degraded_path_engagement(sim)),
+            section="degraded_path_engagement",
+        )
+        pO2_enforcement_by_hour = _safe_failure_value(
+            lambda: _execution_pO2_enforcement_by_hour(execution),
+            section="pO2_enforcement_by_hour",
+        )
         status, reason, error_message = _status_with_mass_balance_invariant(
             execution,
             strict_result_contract=self.strict_result_contract,
         )
 
         unresolved_wall_deposit_species_mol: dict[str, float] = {}
-        final_summary = _final_summary_report(
-            final_state,
-            execution,
-            sim.species_formula_registry,
-            unresolved_wall_deposit_species_mol,
+        final_summary = _safe_failure_value(
+            lambda: _json_safe(
+                _final_summary_report(
+                    final_state,
+                    execution,
+                    sim.species_formula_registry,
+                    unresolved_wall_deposit_species_mol,
+                )
+            ),
+            section="final",
         )
         _attach_wall_deposit_report_refusal(
             run_metadata,
             unresolved_wall_deposit_species_mol,
         )
-        per_hour_summary = list(execution.per_hour)
+        per_hour_summary = _safe_failure_value(
+            lambda: _json_safe(list(execution.per_hour)),
+            section="per_hour_summary",
+        )
         if self.include_wall_deposit_rate_diagnostics:
-            snapshots = tuple(execution.snapshots)
-            per_hour_summary = [
-                _with_wall_deposit_rate_diagnostics(
-                    row,
-                    snapshots[index],
-                    dt_h=float(snapshots[index].duration_h),
+            def build_wall_deposit_rate_report() -> dict[str, Any]:
+                snapshots = tuple(execution.snapshots)
+                rows = [
+                    _with_wall_deposit_rate_diagnostics(
+                        row,
+                        snapshots[index],
+                        dt_h=float(snapshots[index].duration_h),
+                    )
+                    if index < len(snapshots)
+                    else dict(row)
+                    for index, row in enumerate(execution.per_hour)
+                ]
+                duration_h = sum(float(item.duration_h) for item in snapshots)
+                execution_delta = _sum_wall_deposit_deltas(snapshots)
+                execution_nested = _nested_species_kg_from_segment_species(
+                    execution_delta
                 )
-                if index < len(snapshots)
-                else dict(row)
-                for index, row in enumerate(execution.per_hour)
-            ]
-            duration_h = sum(float(item.duration_h) for item in snapshots)
-            execution_delta = _sum_wall_deposit_deltas(snapshots)
-            execution_nested = _nested_species_kg_from_segment_species(
-                execution_delta
-            )
-            committed_rate = {}
-            if duration_h > 0.0:
-                committed_rate, _ = _wall_deposit_rate_from_delta(
-                    execution_nested,
-                    dt_h=duration_h,
+                committed_rate = {}
+                if duration_h > 0.0:
+                    committed_rate, _ = _wall_deposit_rate_from_delta(
+                        execution_nested,
+                        dt_h=duration_h,
+                    )
+                campaign_equivalents = max(
+                    0.0,
+                    float(execution.campaigns_elapsed)
+                    - float(execution.campaigns_elapsed_start),
                 )
-            final_summary["wall_deposition_rate_committed"] = {
-                "source": "committed_ledger_delta_divided_by_explicit_dt",
-                "dt_h": duration_h,
-                "by_segment_species": committed_rate,
-            }
-            campaign_equivalents = max(
-                0.0,
-                float(execution.campaigns_elapsed)
-                - float(execution.campaigns_elapsed_start),
+                per_campaign_delta = {
+                    key: amount / campaign_equivalents
+                    for key, amount in execution_delta.items()
+                } if campaign_equivalents > 0.0 else {}
+                cumulative = execution.trace.wall_deposit_by_segment_species_kg
+                existing_before = {
+                    key: max(0.0, float(amount) - execution_delta.get(key, 0.0))
+                    for key, amount in cumulative.items()
+                }
+                lifespan = _wall_fouling_lifespan_report(
+                    per_campaign_by_segment_species_kg=(
+                        _nested_species_kg_from_segment_species(per_campaign_delta)
+                    ),
+                    existing_by_segment_species_kg=(
+                        _nested_species_kg_from_segment_species(existing_before)
+                    ),
+                )
+                summary = final_summary
+                if not (
+                    isinstance(summary, Mapping)
+                    and summary.get("status") == "unavailable"
+                ):
+                    summary = dict(summary)
+                    summary["wall_deposition_rate_committed"] = {
+                        "source": "committed_ledger_delta_divided_by_explicit_dt",
+                        "dt_h": duration_h,
+                        "by_segment_species": committed_rate,
+                    }
+                    summary["wall_fouling_lifespan"] = {
+                        **lifespan,
+                        "campaign_equivalents_observed": campaign_equivalents,
+                    }
+                return {"final": summary, "per_hour_summary": rows}
+
+            wall_deposit_report = _safe_failure_value(
+                lambda: _json_safe(build_wall_deposit_rate_report()),
+                section="final",
             )
-            per_campaign_delta = {
-                key: amount / campaign_equivalents
-                for key, amount in execution_delta.items()
-            } if campaign_equivalents > 0.0 else {}
-            cumulative = execution.trace.wall_deposit_by_segment_species_kg
-            existing_before = {
-                key: max(0.0, float(amount) - execution_delta.get(key, 0.0))
-                for key, amount in cumulative.items()
-            }
-            lifespan = _wall_fouling_lifespan_report(
-                per_campaign_by_segment_species_kg=(
-                    _nested_species_kg_from_segment_species(per_campaign_delta)
-                ),
-                existing_by_segment_species_kg=(
-                    _nested_species_kg_from_segment_species(existing_before)
-                ),
-            )
-            final_summary["wall_fouling_lifespan"] = {
-                **lifespan,
-                "campaign_equivalents_observed": campaign_equivalents,
-            }
+            if (
+                isinstance(wall_deposit_report, Mapping)
+                and wall_deposit_report.get("status") == "unavailable"
+            ):
+                final_summary = wall_deposit_report
+            else:
+                final_summary = wall_deposit_report["final"]
+                per_hour_summary = wall_deposit_report["per_hour_summary"]
 
         payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": final_summary,
-            "yield_disposition": _json_safe(
-                _safe_failure_value(
-                    lambda: build_yield_disposition(
+            "yield_disposition": _safe_failure_value(
+                lambda: _json_safe(
+                    build_yield_disposition(
                         sim,
                         ledger_snapshots_from_sim(sim),
-                    ),
-                    section="yield_disposition",
+                    )
                 ),
+                section="yield_disposition",
             ),
-            "product_classification": _json_safe(
-                _safe_failure_value(
-                    lambda: _product_classification_report(
+            "product_classification": _safe_failure_value(
+                lambda: _json_safe(
+                    _product_classification_report(
                         sim,
                         feedstock_id=self.feedstock_id,
                         campaign=self.campaign,
-                    ),
-                    section="product_classification",
+                    )
                 ),
+                section="product_classification",
             ),
-            "terminal_product_taxonomy": _json_safe(
-                _safe_failure_value(
-                    lambda: _terminal_product_taxonomy_report(
+            "terminal_product_taxonomy": _safe_failure_value(
+                lambda: _json_safe(
+                    _terminal_product_taxonomy_report(
                         sim,
                         feedstock_id=self.feedstock_id,
-                    ),
-                    section="terminal_product_taxonomy",
+                    )
                 ),
+                section="terminal_product_taxonomy",
             ),
-            "thermal_train_report": _json_safe(
-                _safe_failure_value(
-                    lambda: _thermal_train_report(sim),
-                    section="thermal_train_report",
-                ),
+            "thermal_train_report": _safe_failure_value(
+                lambda: _json_safe(_thermal_train_report(sim)),
+                section="thermal_train_report",
             ),
-            "stage_purity_report": stage_purity_report(sim.train),
-            "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
-            "vapour_rail_instrumentation": _json_safe(
-                _vapour_rail_instrumentation_report(sim)
+            "stage_purity_report": _safe_failure_value(
+                lambda: _json_safe(stage_purity_report(sim.train)),
+                section="stage_purity_report",
             ),
-            "condensation_refusals_by_species": _json_safe(
-                _condensation_refusals_report(sim)
+            "vapor_pressure_source_report": _safe_failure_value(
+                lambda: _json_safe(_vapor_pressure_source_report(sim)),
+                section="vapor_pressure_source_report",
             ),
-            "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
-            "c7_product_report": _json_safe(_c7_product_report(sim)),
-            "c7_refusal_diagnostic": _json_safe(_c7_refusal_diagnostic(sim)),
+            "vapour_rail_instrumentation": _safe_failure_value(
+                lambda: _json_safe(_vapour_rail_instrumentation_report(sim)),
+                section="vapour_rail_instrumentation",
+            ),
+            "condensation_refusals_by_species": _safe_failure_value(
+                lambda: _json_safe(_condensation_refusals_report(sim)),
+                section="condensation_refusals_by_species",
+            ),
+            "shuttle_refusal_history": shuttle_refusal_history,
+            "c7_product_report": _safe_failure_value(
+                lambda: _json_safe(_c7_product_report(sim)),
+                section="c7_product_report",
+            ),
+            "c7_refusal_diagnostic": _safe_failure_value(
+                lambda: _json_safe(_c7_refusal_diagnostic(sim)),
+                section="c7_refusal_diagnostic",
+            ),
             "degraded_path_engagement": degraded_path_engagement,
             "melt_redox_gate_floor_fallback_engagement": (
                 melt_redox_gate_floor_fallback_engagement
             ),
-            "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
+            "pO2_enforcement_by_hour": pO2_enforcement_by_hour,
             "per_hour_summary": per_hour_summary,
-            "shadow_trace": list(execution.shadow_trace),
+            "shadow_trace": _safe_failure_value(
+                lambda: _execution_shadow_trace(execution),
+                section="shadow_trace",
+            ),
             "status": status,
             "reason": reason,
             "error_message": error_message,
@@ -5441,7 +5495,7 @@ def _runner_failure_result(
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(
-            lambda: _final_state_from_ledger(sim),
+            lambda: _json_safe(_final_state_from_ledger(sim)),
             section="final_state",
         )
         if sim is not None
@@ -5455,11 +5509,13 @@ def _runner_failure_result(
     if sim is not None:
         unresolved_wall_deposit_species_mol: dict[str, float] = {}
         final = _safe_failure_value(
-            lambda: _final_summary_report(
-                final_state,
-                execution,
-                sim.species_formula_registry,
-                unresolved_wall_deposit_species_mol,
+            lambda: _json_safe(
+                _final_summary_report(
+                    final_state,
+                    execution,
+                    sim.species_formula_registry,
+                    unresolved_wall_deposit_species_mol,
+                )
             ),
             section="final",
         )
@@ -5469,7 +5525,7 @@ def _runner_failure_result(
         )
     stage_report = (
         _safe_failure_value(
-            lambda: stage_purity_report(sim.train),
+            lambda: _json_safe(stage_purity_report(sim.train)),
             section="stage_purity_report",
         )
         if sim is not None
@@ -5477,7 +5533,7 @@ def _runner_failure_result(
     )
     vapor_report = (
         _safe_failure_value(
-            lambda: _vapor_pressure_source_report(sim),
+            lambda: _json_safe(_vapor_pressure_source_report(sim)),
             section="vapor_pressure_source_report",
         )
         if sim is not None
@@ -5485,7 +5541,7 @@ def _runner_failure_result(
     )
     degraded_path_engagement = (
         _safe_failure_value(
-            lambda: _degraded_path_engagement(sim),
+            lambda: _json_safe(_degraded_path_engagement(sim)),
             section="degraded_path_engagement",
         )
         if sim is not None
@@ -5493,7 +5549,9 @@ def _runner_failure_result(
     )
     melt_redox_gate_floor_fallback_engagement = (
         _safe_failure_value(
-            lambda: _melt_redox_gate_floor_fallback_engagement(sim),
+            lambda: _json_safe(
+                _melt_redox_gate_floor_fallback_engagement(sim)
+            ),
             section="melt_redox_gate_floor_fallback_engagement",
         )
         if sim is not None
@@ -5507,77 +5565,81 @@ def _runner_failure_result(
     payload = {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "run_metadata": run_metadata,
-        "final_state": _json_safe(final_state),
-        "final": _json_safe(final),
+        "final_state": final_state,
+        "final": final,
         "yield_disposition": None,
-        "product_classification": _json_safe(
+        "product_classification": (
             _safe_failure_value(
-                lambda: _product_classification_report(
-                    sim,
-                    feedstock_id=feedstock_id,
-                    campaign=campaign,
+                lambda: _json_safe(
+                    _product_classification_report(
+                        sim,
+                        feedstock_id=feedstock_id,
+                        campaign=campaign,
+                    )
                 ),
                 section="product_classification",
             )
             if sim is not None
             else {"classification": {}, "markdown": ""}
         ),
-        "terminal_product_taxonomy": _json_safe(
+        "terminal_product_taxonomy": (
             _safe_failure_value(
-                lambda: _terminal_product_taxonomy_report(
-                    sim,
-                    feedstock_id=feedstock_id,
+                lambda: _json_safe(
+                    _terminal_product_taxonomy_report(
+                        sim,
+                        feedstock_id=feedstock_id,
+                    )
                 ),
                 section="terminal_product_taxonomy",
             )
             if sim is not None
             else None
         ),
-        "thermal_train_report": _json_safe(
+        "thermal_train_report": (
             _safe_failure_value(
-                lambda: _thermal_train_report(sim),
+                lambda: _json_safe(_thermal_train_report(sim)),
                 section="thermal_train_report",
             )
             if sim is not None
             else {}
         ),
-        "stage_purity_report": _json_safe(stage_report),
-        "vapor_pressure_source_report": _json_safe(vapor_report),
-        "vapour_rail_instrumentation": _json_safe(
+        "stage_purity_report": stage_report,
+        "vapor_pressure_source_report": vapor_report,
+        "vapour_rail_instrumentation": (
             _safe_failure_value(
-                lambda: _vapour_rail_instrumentation_report(sim),
+                lambda: _json_safe(_vapour_rail_instrumentation_report(sim)),
                 section="vapour_rail_instrumentation",
             )
             if sim is not None
             else {}
         ),
-        "condensation_refusals_by_species": _json_safe(
+        "condensation_refusals_by_species": (
             _safe_failure_value(
-                lambda: _condensation_refusals_report(sim),
+                lambda: _json_safe(_condensation_refusals_report(sim)),
                 section="condensation_refusals_by_species",
             )
             if sim is not None
             else {}
         ),
-        "shuttle_refusal_history": _json_safe(
+        "shuttle_refusal_history": (
             _safe_failure_value(
-                lambda: _shuttle_refusal_history_report(sim),
+                lambda: _json_safe(_shuttle_refusal_history_report(sim)),
                 section="shuttle_refusal_history",
             )
             if sim is not None
             else []
         ),
-        "c7_product_report": _json_safe(
+        "c7_product_report": (
             _safe_failure_value(
-                lambda: _c7_product_report(sim),
+                lambda: _json_safe(_c7_product_report(sim)),
                 section="c7_product_report",
             )
             if sim is not None
             else {}
         ),
-        "c7_refusal_diagnostic": _json_safe(
+        "c7_refusal_diagnostic": (
             _safe_failure_value(
-                lambda: _c7_refusal_diagnostic(sim),
+                lambda: _json_safe(_c7_refusal_diagnostic(sim)),
                 section="c7_refusal_diagnostic",
             )
             if sim is not None
@@ -5587,22 +5649,33 @@ def _runner_failure_result(
         "melt_redox_gate_floor_fallback_engagement": (
             melt_redox_gate_floor_fallback_engagement
         ),
-        "pO2_enforcement_by_hour": _execution_pO2_enforcement_by_hour(execution),
-        "per_hour_summary": _execution_per_hour_summary(execution),
-        "shadow_trace": _execution_shadow_trace(execution),
+        "pO2_enforcement_by_hour": _safe_failure_value(
+            lambda: _execution_pO2_enforcement_by_hour(execution),
+            section="pO2_enforcement_by_hour",
+        ),
+        "per_hour_summary": _safe_failure_value(
+            lambda: _execution_per_hour_summary(execution),
+            section="per_hour_summary",
+        ),
+        "shadow_trace": _safe_failure_value(
+            lambda: _execution_shadow_trace(execution),
+            section="shadow_trace",
+        ),
         "status": status,
         "reason": reason,
         "error_message": error_message,
     }
     if sim is not None:
         yield_disposition = _safe_failure_value(
-            lambda: build_yield_disposition(
-                sim,
-                ledger_snapshots_from_sim(sim),
+            lambda: _json_safe(
+                build_yield_disposition(
+                    sim,
+                    ledger_snapshots_from_sim(sim),
+                )
             ),
             section="yield_disposition",
         )
-        payload["yield_disposition"] = _json_safe(yield_disposition)
+        payload["yield_disposition"] = yield_disposition
         if (
             isinstance(yield_disposition, Mapping)
             and yield_disposition.get("status") == "unavailable"

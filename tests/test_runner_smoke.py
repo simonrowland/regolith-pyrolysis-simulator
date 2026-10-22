@@ -301,6 +301,37 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     assert payload["terminal_product_taxonomy"] is not None
 
 
+def test_completed_run_preserves_success_when_stage_purity_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_stage_purity_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected stage-purity failure")
+
+    monkeypatch.setattr(
+        "simulator.runner.stage_purity_report",
+        raise_stage_purity_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["stage_purity_report"] == {
+        "status": "unavailable",
+        "section": "stage_purity_report",
+        "exception_type": "RuntimeError",
+        "reason": "injected stage-purity failure",
+    }
+
+
 def test_completed_run_reports_unresolved_wall_species_without_aborting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
