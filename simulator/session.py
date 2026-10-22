@@ -579,15 +579,11 @@ class SimSession:
             new_pO2 = _finite_float(value, "pO2_mbar")
             if new_pO2 < 0.0:
                 raise ValueError("pO2_mbar must be non-negative")
-            sim.melt.pO2_mbar = new_pO2
-            sim.melt.p_total_mbar = max(
-                sim.melt.p_total_mbar,
-                sim.melt.pO2_mbar,
+            sim.campaign_mgr.apply_pressure_request(
+                sim.melt,
+                new_pO2,
+                controlled_o2=new_pO2 > 0.0,
             )
-            if new_pO2 > 0.0:
-                # Only import locally to avoid a top-level cycle.
-                from simulator.state import Atmosphere
-                sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         elif param == "c4_max_temp":
             finite_value = _finite_float(value, "c4_max_temp")
             sim.c4_max_temp_C = finite_value
@@ -676,15 +672,11 @@ class SimSession:
                 # suppression becomes live. ``value == 0`` leaves
                 # atmosphere alone (clearing the setpoint, NOT
                 # requesting controlled-O2).
-                new_pO2 = finite_value
-                sim.melt.pO2_mbar = new_pO2
-                sim.melt.p_total_mbar = max(
-                    sim.melt.p_total_mbar,
-                    sim.melt.pO2_mbar,
+                sim.campaign_mgr.apply_pressure_request(
+                    sim.melt,
+                    finite_value,
+                    controlled_o2=finite_value > 0.0,
                 )
-                if new_pO2 > 0.0:
-                    from simulator.state import Atmosphere
-                    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
         sim.melt.validate_melt_pressures()
