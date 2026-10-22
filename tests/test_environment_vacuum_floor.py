@@ -123,6 +123,26 @@ def test_resolve_transport_po2_wraps_fo2_overflow_as_value_error() -> None:
         resolve_transport_pO2_bar(_fo2_request(309.0))
 
 
+@pytest.mark.parametrize('oxygen', [1.3e-12, 1e-20, 3.7e-7])
+def test_observation_oxygen_has_no_environment_admission_floor(oxygen) -> None:
+    request = _request({
+        'pO2_bar': oxygen,
+        'pO2_admission': 'observation',
+        'body': 'mars',
+        'vacuum_floor_bar': MARS_DATUM_PRESSURE_BAR,
+    })
+    assert resolve_transport_pO2_bar(request) == oxygen
+
+
+@pytest.mark.parametrize('oxygen', [0.0, -1.0, float('nan'), float('inf'), True])
+def test_observation_oxygen_still_refuses_invalid_scalars(oxygen) -> None:
+    error = TypeError if isinstance(oxygen, bool) else ValueError
+    with pytest.raises(error, match='pO2_bar'):
+        resolve_transport_pO2_bar(_request({
+            'pO2_bar': oxygen, 'pO2_admission': 'observation',
+        }))
+
+
 def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
     feedstocks = copy.deepcopy(_load_yaml("feedstocks.yaml"))
     feedstocks["lunar_mare_low_ti"]["body"] = "moon"
