@@ -23,9 +23,10 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
+from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Iterable, Literal, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Sequence
 
 import yaml
 
@@ -48,8 +49,11 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
+    PHASE_COMPOSITION_QUANTITIES,
+    PRINTED_CAPACITY_QUANTITIES,
     PerBasis,
     Phase,
+    PhaseRole,
     Polymorph,
     PolymorphRejectionKind,
     PURE_STANDARD_THERMO,
@@ -70,6 +74,7 @@ from simulator.battery.identity import (
     IdentityEqualOutcome,
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
+    _AXIS_NAMES,
     identity_equal,
     _same_row_redox_identity_equal,
     _same_row_knudsen_residue_identity_equal,
@@ -78,6 +83,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.source_oxygen import (
+    CO_MEASURED_CONSISTENCY_ORIGIN,
     SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
@@ -133,6 +139,7 @@ from simulator.battery.records import (
 )
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
+    EquilibriumResult,
     multivalent_components,
 )
 from simulator.battery.oxygen_balance import (
@@ -321,6 +328,13 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
+    # Printed component amounts and L_X are dex (both endpoints > 0).
+    # Printed log10 C_S / log10 C_Cl are already logs and are often negative,
+    # so they take absolute, the same shape as log10_Kf.
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: MetricOperation.DEX,
+    Quantity.DISTRIBUTION_RATIO: MetricOperation.DEX,
+    Quantity.SULFIDE_CAPACITY: MetricOperation.ABSOLUTE,
+    Quantity.CHLORIDE_CAPACITY: MetricOperation.ABSOLUTE,
 }
 
 # The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
@@ -334,23 +348,12 @@ DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
-_ALIGNMENT_AXES = (
-    "subtype",
-    "per",
-    "temperature_K",
-    "standard_pressure_Pa",
-    "reaction",
-    "formation_elements",
-    "reference_state",
-    "reservoir",
-    "composition",
-    "fO2_Pa",
-    "total_pressure_Pa",
-    "sweep_gas",
-    "exposure",
-    "sample_mass_kg",
-    "wall",
-)
+# Candidate axes, the same names identity equality walks, owned by identity.
+# The group key drops phase_role and counter_phase_role unless the quantity
+# profile names them. The stored ratchet tokens were built from the sixteen
+# axes that predate those two; adding them misses every stored key.
+_ALIGNMENT_AXES = _AXIS_NAMES
+_ROLE_ALIGNMENT_AXES = frozenset({"phase_role", "counter_phase_role"})
 _UNIT_DIMENSION: dict[str, str] = {
     "kJ_per_declared_mol_basis": "energy_per_mol",
     "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
@@ -365,8 +368,14 @@ _NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
         Quantity.ISOTOPE_DELTA,
         Quantity.ION_INTENSITY_RATIO,
         Quantity.ION_INTENSITY,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.DISTRIBUTION_RATIO,
+        Quantity.SULFIDE_CAPACITY,
+        Quantity.CHLORIDE_CAPACITY,
     }
 )
+_REDOX_DISTRIBUTION_ELEMENTS = frozenset({"Fe", "Cr", "Mn", "Ti", "P"})
+_LIQUID_PHASE_NAMES = frozenset({"liq", "liquid", "melt", "slag", "glass"})
 
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
@@ -654,6 +663,14 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
 
     if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return Rail.RESIDUE_COMPOSITION
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION or quantity in PRINTED_CAPACITY_QUANTITIES:
+        return Rail.MELT_ACTIVITY
+    if quantity is Quantity.DISTRIBUTION_RATIO:
+        # Fe, Cr, Mn, Ti, and P stay on redox. Every other distribution
+        # ratio is a melt-activity row. It is not left without a rail.
+        if _distribution_ratio_on_redox_rail(species_formula):
+            return Rail.REDOX
+        return Rail.MELT_ACTIVITY
     if quantity in _VAPOUR_EQUILIBRIUM:
         if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
@@ -696,7 +713,6 @@ def no_headline_rail_reason(
 ) -> str:
     """Why rail_for_quantity returned None. Not a rail token."""
 
-    del species_formula
     if quantity is None:
         return "quantity_unknown"
     if quantity in _NOT_VAPOUR_QUANTITIES:
@@ -704,6 +720,13 @@ def no_headline_rail_reason(
     if quantity in KINETIC_YIELD_QUANTITIES:
         return "non_alkali_kinetic"
     return f"no_headline_rail:{quantity.value}"
+
+
+# Spellings written by residual_key. Readers parse them with residual_key_slots.
+# A missing quantity in the key is not the refusal-detail reason of the same
+# spelling; that detail stays a refusal payload, not a key field.
+NO_HEADLINE_RAIL_TOKEN = "none"
+MISSING_QUANTITY_KEY_TOKEN = "quantity_unknown"
 
 
 def residual_key(
@@ -716,13 +739,13 @@ def residual_key(
 ) -> str:
     """Stable comparison slot: lineage + quantity + identity T + rail + engine.
 
-    Run/version are excluded (v2.1 pin_key_map). No headline rail is the
-    token ``none``, never a borrowed vapour or SiO label.
+    Run/version are excluded (v2.1 pin_key_map). No headline rail is
+    ``NO_HEADLINE_RAIL_TOKEN``, never a borrowed vapour or SiO label.
     """
 
-    q = "quantity_unknown" if quantity is None else quantity.value
+    q = MISSING_QUANTITY_KEY_TOKEN if quantity is None else quantity.value
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
-    rail_token = "none" if rail is None else rail.value
+    rail_token = NO_HEADLINE_RAIL_TOKEN if rail is None else rail.value
     return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
 
 
@@ -733,15 +756,74 @@ def _dec_token(value: Decimal) -> str:
     return text or "0"
 
 
+def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
+    """Split a residual key into head, quantity, rail, and engine.
+
+    None when the key is not four ``::`` fields. An empty quantity field
+    becomes ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = str(key or "").rsplit("::", 3)
+    if len(parts) != 4:
+        return None
+    head, quantity, rail, engine = parts
+    if not quantity:
+        quantity = MISSING_QUANTITY_KEY_TOKEN
+    return (head, quantity, rail, engine)
+
+
+def _temperature_token(head: str) -> Decimal | None:
+    """Identity temperature ``residual_key`` appends as ``:T=`` on the reference head."""
+
+    _prefix, marker, token = head.rpartition(":T=")
+    if not marker or not token:
+        return None
+    try:
+        value = Decimal(token)
+    except InvalidOperation:
+        return None
+    if not value.is_finite():
+        return None
+    return value
+
+
+def residual_key_slots(key: object) -> tuple[str, str, str, Decimal | None]:
+    """Return quantity, rail, engine, and identity temperature from a residual key.
+
+    A key that is not four ``::`` fields has no rail, engine, or temperature,
+    and its quantity is ``MISSING_QUANTITY_KEY_TOKEN``.
+    """
+
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return (MISSING_QUANTITY_KEY_TOKEN, "", "", None)
+    head, quantity, rail, engine = parts
+    return (quantity, rail, engine, _temperature_token(head))
+
+
 def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
     if quantity is None:
         return None
     return QUANTITY_METRIC.get(quantity)
 
 
+def _distribution_ratio_on_redox_rail(formula: str) -> bool:
+    """Fe, Cr, Mn, Ti, or P in the component. Oxygen does not count."""
+
+    parsed = parse_species_formula(formula)
+    if parsed is None:
+        return False
+    elements = {element for element, count in parsed if count > 0 and element != "O"}
+    return bool(elements & _REDOX_DISTRIBUTION_ELEMENTS)
+
+
 def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     """Select the stored residue metric from its measured subtype."""
     quantity = quantity_token(identity)
+    if quantity in PHASE_COMPOSITION_QUANTITIES:
+        return MetricOperation.DEX
+    if quantity in PRINTED_CAPACITY_QUANTITIES:
+        return MetricOperation.ABSOLUTE
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
         return metric_operation(quantity)
     subtype = identity.subtype.value if identity.subtype.is_value else None
@@ -3059,6 +3141,17 @@ def _printed_uncertainty_band(
     return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
 
 
+def _alignment_axes(profile: object) -> tuple[str, ...]:
+    """Group-key axes. Role axes stay out unless this profile names them."""
+
+    named = profile.required | profile.permitted_not_applicable
+    return tuple(
+        name
+        for name in _ALIGNMENT_AXES
+        if name not in _ROLE_ALIGNMENT_AXES or name in named
+    )
+
+
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
     state = getattr(identity, name)
     required = name in profile.required
@@ -3100,7 +3193,7 @@ def _source_alignment_group_key(
         return None
     profile = profile_for(identity)
     axes: dict[str, object] = {}
-    for name in _ALIGNMENT_AXES:
+    for name in _alignment_axes(profile):
         value = _axis_alignment_value(identity, name, profile)
         if value is None:
             return None
@@ -4714,6 +4807,920 @@ def _battery_hero_oxygen_condition(
     return mode, log10_fO2_bar, fO2_Pa, "observations-v2", mode, ""
 
 
+@dataclass(frozen=True)
+class _CapacitySolute:
+    element: str
+    pressure_key: str
+    fugacity_parameter: str
+    flag: str
+    refusal: RefusalReason
+
+
+# The scorer does not own a sulfide-capacity model. C_S and C_Cl are the
+# defining rearrangement of the dissolved amount the engine already returned.
+_CAPACITY_SOLUTES: dict[Quantity, _CapacitySolute] = {
+    Quantity.SULFIDE_CAPACITY: _CapacitySolute(
+        element="S",
+        pressure_key="pS2_Pa",
+        fugacity_parameter="sulfur_fugacity_bar",
+        flag="models_dissolved_sulfur",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR,
+    ),
+    Quantity.CHLORIDE_CAPACITY: _CapacitySolute(
+        element="Cl",
+        pressure_key="pCl2_Pa",
+        fugacity_parameter="chloride_fugacity_bar",
+        flag="models_dissolved_chloride",
+        refusal=RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE,
+    ),
+}
+
+
+def _capacity_solute(quantity: Quantity | None) -> _CapacitySolute | None:
+    if quantity is None:
+        return None
+    return _CAPACITY_SOLUTES.get(quantity)
+
+
+def _adapter_models_dissolved_solute(engine: Engine, solute: _CapacitySolute) -> bool:
+    """Read the adapter's declaration. No engine list lives here."""
+
+    from simulator.melt_backend.base import battery_adapter_class
+
+    adapter = battery_adapter_class(engine.value)
+    if adapter is None:
+        return False
+    return bool(getattr(adapter, solute.flag, False))
+
+
+def _printed_point_pa(observation: Observation, key: str) -> Decimal | None:
+    """A printed positive point pressure, in pascal. Never a default."""
+
+    located = (observation.point_conditions or {}).get(key)
+    if located is None or located.inference is not None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+            return None
+        raw = raw.point
+    if raw is None:
+        return None
+    try:
+        pa = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return pa
+
+
+@dataclass(frozen=True)
+class _CapacityLaw:
+    """Recognised capacity rearrangement. Dispatch is on this identity.
+
+    C = (wt% solute) * fO2**oxygen_exponent / fAnion**anion_exponent.
+    bar_standard_state: those fugacities are over the 1 bar standard state.
+    When false, the ratio is dimensionless in any shared pressure unit.
+    """
+
+    identity: str
+    oxygen_exponent: Fraction
+    anion_exponent: Fraction
+    bar_standard_state: bool
+
+
+# Fincham–Richardson: 1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt).
+_FINCHAM_RICHARDSON = _CapacityLaw(
+    "fincham_richardson", Fraction(1, 2), Fraction(1, 2), False
+)
+# Charge balance: 1/2 Cl2 + 1/2 O^2- = Cl- + 1/4 O2. See _log10_printed_capacity.
+_CHLORIDE_CHARGE_BALANCE = _CapacityLaw(
+    "chloride_charge_balance", Fraction(1, 4), Fraction(1, 2), True
+)
+_CAPACITY_LAWS: dict[Quantity, _CapacityLaw] = {
+    Quantity.SULFIDE_CAPACITY: _FINCHAM_RICHARDSON,
+    Quantity.CHLORIDE_CAPACITY: _CHLORIDE_CHARGE_BALANCE,
+}
+
+_FUGACITY_SPECIES = re.compile(r"^(?:[pf])_?\(?((?:cl|o|s)2)\)?$")
+_WEIGHT_PERCENT_SOLUTE = re.compile(r"^wt%_?(s|cl)$")
+_CAPACITY_SYMBOL = re.compile(r"^c_?(s|cl)$")
+
+
+def _matching_paren(text: str, open_at: int) -> int | None:
+    if open_at < 0 or open_at >= len(text) or text[open_at] != "(":
+        return None
+    depth = 0
+    for index in range(open_at, len(text)):
+        char = text[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return index
+    return None
+
+
+def _strip_wrapping_parens(token: str) -> str:
+    body = token
+    while (
+        body.startswith("(")
+        and body.endswith(")")
+        and _matching_paren(body, 0) == len(body) - 1
+    ):
+        body = body[1:-1]
+    return body
+
+
+def _fraction_token(token: str) -> Fraction | None:
+    body = _strip_wrapping_parens(token)
+    if not body or body[0] in "+-":
+        return None
+    try:
+        if "/" in body:
+            numerator, denominator = body.split("/", 1)
+            if not numerator.isdecimal() or not denominator.isdecimal():
+                return None
+            return Fraction(int(numerator), int(denominator))
+        if re.fullmatch(r"\d+(?:\.\d+)?", body) is None:
+            return None
+        return Fraction(body)
+    except (ValueError, ZeroDivisionError, ArithmeticError):
+        return None
+
+
+def _capacity_equation_text(relation: str) -> str | None:
+    """Equation body. A top-level comma or semicolon starts a citation note."""
+
+    depth = 0
+    cut = len(relation)
+    for index, char in enumerate(relation):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char in ",;" and depth == 0:
+            cut = index
+            break
+    if depth != 0 and cut == len(relation):
+        return None
+    text = relation[:cut]
+    text = (
+        text.replace("·", "*")
+        .replace("×", "*")
+        .replace("−", "-")
+        .replace("–", "-")
+        .replace("—", "-")
+    )
+    text = re.sub(r"\s+", "", text).casefold().replace("^", "**")
+    needle = "sqrt("
+    while True:
+        start = text.find(needle)
+        if start < 0:
+            return text or None
+        open_at = start + len(needle) - 1
+        close_at = _matching_paren(text, open_at)
+        if close_at is None:
+            return None
+        inner = text[open_at + 1 : close_at]
+        text = f"{text[:start]}({inner})**(1/2){text[close_at + 1 :]}"
+
+
+def _solute_of_capacity_symbol(lhs: str) -> str | None:
+    body = lhs[len("log10") :] if lhs.startswith("log10") else lhs
+    match = _CAPACITY_SYMBOL.fullmatch(_strip_wrapping_parens(body))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _weight_percent_solute(token: str) -> str | None:
+    match = _WEIGHT_PERCENT_SOLUTE.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _fugacity_species(token: str) -> str | None:
+    match = _FUGACITY_SPECIES.fullmatch(_strip_wrapping_parens(token))
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def _ratio_parts(token: str) -> tuple[str, str] | None:
+    depth = 0
+    slash: int | None = None
+    for index, char in enumerate(token):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+        elif char == "/" and depth == 0:
+            if slash is not None:
+                return None
+            slash = index
+    if depth != 0 or slash is None or slash == 0 or slash == len(token) - 1:
+        return None
+    return token[:slash], token[slash + 1 :]
+
+
+def _apply_fugacity(
+    token: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    species = _fugacity_species(token)
+    if species == "o2":
+        return oxygen + exponent, anion
+    if (species == "s2" and solute == "s") or (species == "cl2" and solute == "cl"):
+        return oxygen, anion + exponent
+    return None
+
+
+def _apply_gas_term(
+    argument: str,
+    exponent: Fraction,
+    solute: str,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[Fraction, Fraction] | None:
+    stripped = _strip_wrapping_parens(argument)
+    if "/" not in stripped:
+        return _apply_fugacity(stripped, exponent, solute, oxygen, anion)
+    parts = _ratio_parts(stripped)
+    if parts is None:
+        return None
+    left, right = parts
+    step = _apply_fugacity(left, exponent, solute, oxygen, anion)
+    if step is None:
+        return None
+    oxygen, anion = step
+    return _apply_fugacity(right, -exponent, solute, oxygen, anion)
+
+
+def _capacity_exponents(
+    solute: str,
+    weight_solute: str | None,
+    weight_exponent: Fraction,
+    oxygen: Fraction,
+    anion: Fraction,
+) -> tuple[str, Fraction, Fraction] | None:
+    # anion is the signed power. A capacity has it in the denominator.
+    if weight_solute != solute or weight_exponent != 1 or oxygen <= 0 or anion >= 0:
+        return None
+    return solute, oxygen, -anion
+
+
+def _split_power(factor: str) -> tuple[str, Fraction] | None:
+    if "**" not in factor:
+        return factor, Fraction(1)
+    base, exponent, *rest = factor.split("**")
+    if rest or not base or not exponent:
+        return None
+    parsed = _fraction_token(exponent)
+    if parsed is None:
+        return None
+    return base, parsed
+
+
+def _split_product(expr: str) -> list[tuple[int, str]] | None:
+    if not expr:
+        return None
+    parts: list[tuple[int, str]] = []
+    buf: list[str] = []
+    depth = 0
+    sign = 1
+    index = 0
+    while index < len(expr):
+        char = expr[index]
+        if char == "(":
+            depth += 1
+            buf.append(char)
+        elif char == ")":
+            depth -= 1
+            if depth < 0:
+                return None
+            buf.append(char)
+        elif (
+            char == "*"
+            and depth == 0
+            and index + 1 < len(expr)
+            and expr[index + 1] == "*"
+        ):
+            buf.append("**")
+            index += 1
+        elif char in {"*", "/"} and depth == 0:
+            parts.append((sign, "".join(buf)))
+            buf = []
+            sign = 1 if char == "*" else -1
+        else:
+            buf.append(char)
+        index += 1
+    if depth != 0:
+        return None
+    parts.append((sign, "".join(buf)))
+    if any(not factor for _sign, factor in parts):
+        return None
+    return parts
+
+
+def _parse_product_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    factors = _split_product(rhs)
+    if factors is None:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    weight_solute: str | None = None
+    weight_exponent = Fraction(0)
+    for sign, factor in factors:
+        powered = _split_power(factor)
+        if powered is None:
+            return None
+        base, power = powered
+        exponent = Fraction(sign) * power
+        stripped = _strip_wrapping_parens(base)
+        weight = _weight_percent_solute(stripped)
+        if weight is not None:
+            if weight_solute is not None:
+                return None
+            weight_solute = weight
+            weight_exponent = exponent
+            continue
+        step = _apply_gas_term(stripped, exponent, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(
+        solute, weight_solute, weight_exponent, oxygen, anion
+    )
+
+
+def _read_log_term(
+    text: str, index: int
+) -> tuple[Fraction, str, int] | None:
+    if index >= len(text) or text[index] not in "+-":
+        return None
+    sign = Fraction(1 if text[index] == "+" else -1)
+    index += 1
+    if index < len(text) and text[index] == "(":
+        close_at = _matching_paren(text, index)
+        if close_at is None:
+            return None
+        coeff = _fraction_token(text[index : close_at + 1])
+        index = close_at + 1
+    else:
+        fraction = re.match(r"(\d+)/(\d+)", text[index:])
+        decimal = re.match(r"\d+(?:\.\d+)?", text[index:])
+        if fraction is not None:
+            coeff = _fraction_token(fraction.group(0))
+            index += fraction.end()
+        elif decimal is not None:
+            coeff = _fraction_token(decimal.group(0))
+            index += decimal.end()
+        else:
+            return None
+    if coeff is None:
+        return None
+    if index < len(text) and text[index] == "*":
+        if index + 1 < len(text) and text[index + 1] == "*":
+            return None
+        index += 1
+    prefix = "log10("
+    if not text.startswith(prefix, index):
+        return None
+    open_at = index + len(prefix) - 1
+    close_at = _matching_paren(text, open_at)
+    if close_at is None:
+        return None
+    return sign * coeff, text[open_at + 1 : close_at], close_at + 1
+
+
+def _parse_log_capacity(
+    solute: str, rhs: str
+) -> tuple[str, Fraction, Fraction] | None:
+    prefix = "log10("
+    if not rhs.startswith(prefix):
+        return None
+    close_at = _matching_paren(rhs, len(prefix) - 1)
+    if close_at is None:
+        return None
+    weight = _weight_percent_solute(rhs[len(prefix) : close_at])
+    rest = rhs[close_at + 1 :]
+    if weight is None or not rest:
+        return None
+    oxygen = Fraction(0)
+    anion = Fraction(0)
+    index = 0
+    while index < len(rest):
+        term = _read_log_term(rest, index)
+        if term is None:
+            return None
+        coeff, argument, index = term
+        step = _apply_gas_term(argument, coeff, solute, oxygen, anion)
+        if step is None:
+            return None
+        oxygen, anion = step
+    return _capacity_exponents(solute, weight, Fraction(1), oxygen, anion)
+
+
+def _parse_printed_capacity(
+    relation: str,
+) -> tuple[str, Fraction, Fraction] | None:
+    """Exponents of one printed capacity equation, or None.
+
+    The result is (solute, oxygen_exponent, anion_exponent) for
+    C = (wt% solute) * fO2**oxygen / fAnion**anion. Citations are not read.
+    """
+
+    text = _capacity_equation_text(relation)
+    if text is None or text.count("=") != 1:
+        return None
+    lhs, rhs = text.split("=", 1)
+    solute = _solute_of_capacity_symbol(lhs)
+    if solute is None or not rhs:
+        return None
+    if lhs.startswith("log10"):
+        return _parse_log_capacity(solute, rhs)
+    return _parse_product_capacity(solute, rhs)
+
+
+def _recognised_capacity_law(
+    quantity: Quantity | None, relation: str
+) -> _CapacityLaw | None:
+    """Law whose exponent identity is the printed equation. Not a text search."""
+
+    parsed = _parse_printed_capacity(relation)
+    if parsed is None or quantity is None:
+        return None
+    solute, oxygen, anion = parsed
+    law = _CAPACITY_LAWS.get(quantity)
+    if law is None:
+        return None
+    expected = "s" if quantity is Quantity.SULFIDE_CAPACITY else "cl"
+    if solute != expected or oxygen != law.oxygen_exponent or anion != law.anion_exponent:
+        return None
+    return law
+
+
+def _log10_printed_capacity(
+    weight_percent: Decimal,
+    p_o2_pa: Decimal,
+    p_anion_pa: Decimal,
+    law: _CapacityLaw,
+) -> Decimal | None:
+    """log10 of the printed capacity the row's defining equation names.
+
+    The engine's dissolved amount is the only solute number. This is that
+    amount rearranged by the printed definition, not a second capacity model.
+    A non-positive weight percent has no logarithm and is refused. It is
+    not stored as zero.
+
+    Sulfide, Fincham and Richardson. Equilibrium
+    1/2 S2 + O2-(melt) = 1/2 O2 + S2-(melt), so
+    C_S = (wt% S) * (fO2 / fS2) ** (1/2). The ratio is dimensionless in
+    any shared unit, so the printed pascal values are used as printed.
+    One weight percent at pO2 = 10000 Pa and pS2 = 100 Pa is log10 C_S = 1.
+
+    Chloride, charge balance. Equilibrium
+    1/2 Cl2(g) + 1/2 O^2-(melt) = Cl^-(melt) + 1/4 O2(g), so
+    K is proportional to x_Cl * fO2**(1/4) / (fCl2**(1/2) * a_O^2-**(1/2)).
+    Folding a_O^2- into the capacity gives
+    C_Cl = (wt% Cl) * fO2**(1/4) / fCl2**(1/2).
+    Fugacities are in bar, dimensionless over the 1 bar standard state.
+    Sanity: fO2 = fCl2 = 10 Pa = 1e-4 bar and 1 wt% Cl give
+    C_Cl = 1 * (1e-4)**(1/4) / (1e-4)**(1/2) = 0.1 / 0.01 = 10,
+    so log10 C_Cl = 1.
+    """
+
+    if (
+        not weight_percent.is_finite()
+        or not p_o2_pa.is_finite()
+        or not p_anion_pa.is_finite()
+        or weight_percent <= 0
+        or p_o2_pa <= 0
+        or p_anion_pa <= 0
+    ):
+        return None
+    if law is _FINCHAM_RICHARDSON:
+        capacity = weight_percent * (p_o2_pa / p_anion_pa).sqrt()
+    elif law is _CHLORIDE_CHARGE_BALANCE:
+        f_o2 = p_o2_pa / PA_PER_BAR_DEC
+        f_cl2 = p_anion_pa / PA_PER_BAR_DEC
+        capacity = weight_percent * f_o2.sqrt().sqrt() / f_cl2.sqrt()
+    else:
+        return None
+    if not capacity.is_finite() or capacity <= 0:
+        return None
+    return Decimal(str(math.log10(float(capacity))))
+
+
+def _equilibrate_phase_assemblage(
+    engine: Engine,
+    *,
+    temperature_C: float,
+    composition_kg: Mapping[str, float],
+    fO2_log: float,
+    pressure_bar: float,
+    solute_fugacity_bar: float | None = None,
+    solute_fugacity_parameter: str | None = None,
+) -> EquilibriumResult:
+    """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
+
+    A capacity call passes the printed solute fugacity. An adapter that
+    declares the solute and cannot be told that fugacity fails closed.
+    """
+
+    import inspect
+
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+    handle = open_battery_engine(engine.value)
+    backend = getattr(handle, "backend", None)
+    if backend is None:
+        reason = getattr(handle, "unavailable_reason", None) or "backend unavailable"
+        raise RuntimeError(str(reason))
+    kwargs: dict[str, object] = {
+        "temperature_C": temperature_C,
+        "composition_kg": dict(composition_kg),
+        "fO2_log": fO2_log,
+        "pressure_bar": pressure_bar,
+    }
+    if solute_fugacity_bar is not None:
+        if not solute_fugacity_parameter:
+            raise RuntimeError("printed solute fugacity has no parameter name")
+        parameters = inspect.signature(backend.equilibrate).parameters
+        accepts = solute_fugacity_parameter in parameters or any(
+            item.kind is inspect.Parameter.VAR_KEYWORD for item in parameters.values()
+        )
+        if not accepts:
+            raise RuntimeError(
+                f"{type(backend).__name__} does not accept {solute_fugacity_parameter}"
+            )
+        kwargs[solute_fugacity_parameter] = solute_fugacity_bar
+    return backend.equilibrate(**kwargs)
+
+
+def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
+    state = getattr(identity, name, None)
+    if state is None or not isinstance(state, State) or not state.is_value:
+        return None
+    if isinstance(state.value, PhaseRole):
+        return state.value
+    return None
+
+
+def _printed_total_pressure_bar(
+    identity: Identity, observation: Observation
+) -> Decimal | None:
+    state = identity.total_pressure_Pa
+    raw: object = None
+    if state is not None and state.is_value and state.value is not None:
+        raw = state.value
+    else:
+        located = (observation.point_conditions or {}).get("total_pressure_Pa")
+        if located is None or located.inference is not None or not located.state.is_value:
+            return None
+        raw = located.state.value
+        if isinstance(raw, Value):
+            raw = raw.point
+    if raw is None:
+        return None
+    try:
+        pa = as_decimal(raw)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return pa / Decimal("1e5")
+
+
+def _printed_fo2_log10_bar(identity: Identity) -> float | None:
+    state = identity.fO2_Pa
+    if state is None or not state.is_value or state.value is None:
+        return None
+    try:
+        pa = as_decimal(state.value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not pa.is_finite() or pa <= 0:
+        return None
+    return float(pa.log10() - Decimal("1e5").log10())
+
+
+def _select_phase_composition(
+    result: EquilibriumResult, role: PhaseRole
+) -> tuple[Mapping[str, float] | None, str | None]:
+    comps = dict(result.phase_compositions or {})
+    exact = [name for name in comps if name.casefold() == role.value]
+    if len(exact) > 1:
+        return None, "ambiguous_phase"
+    if len(exact) == 1:
+        return comps[exact[0]], None
+    if role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}:
+        liquids = [name for name in comps if name.casefold() in _LIQUID_PHASE_NAMES]
+        if len(liquids) > 1:
+            return None, "ambiguous_phase"
+        if len(liquids) == 1:
+            return comps[liquids[0]], None
+        liquid = dict(result.liquid_composition_wt_pct or {})
+        if liquid:
+            return liquid, None
+        return None, "phase_not_in_assemblage"
+    needles = ("metal", "alloy") if role is PhaseRole.METAL else ("matte", "sulfide")
+    hits = [name for name in comps if any(needle in name.casefold() for needle in needles)]
+    if len(hits) > 1:
+        return None, "ambiguous_phase"
+    if len(hits) == 1:
+        return comps[hits[0]], None
+    return None, "phase_not_in_assemblage"
+
+
+def _component_wt(formula: str, phase_map: Mapping[str, float], *, oxide: bool) -> float | None:
+    matched = match_reported_species(formula, phase_map, oxide_activity=oxide)
+    if matched is None:
+        return None
+    return matched[1]
+
+
+def _predict_phase_row(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction:
+    """One printed component, or one printed L_X, from an assemblage."""
+
+    quantity = quantity_token(identity)
+
+    def refused(
+        reason: RefusalReason,
+        detail: dict[str, object],
+        *,
+        execution: ExecutionState = ExecutionState.UNSUPPORTED,
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    solute = _capacity_solute(quantity)
+    if solute is not None and not _adapter_models_dissolved_solute(engine, solute):
+        return refused(
+            solute.refusal,
+            {
+                "reason": solute.refusal.value,
+                "engine": engine.value,
+                "quantity": quantity.value if quantity is not None else "",
+                "detail": (
+                    "adapter does not model dissolved "
+                    f"{solute.element}; the scorer does not compute a capacity"
+                ),
+            },
+        )
+    if solute is None and engine not in MELTS_ENGINES:
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+            {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                "engine": engine.value,
+                "quantity": quantity.value if quantity is not None else "",
+                "detail": "engine does not report an equilibrium phase assemblage",
+            },
+        )
+
+    role = _phase_role_value(identity, "phase_role")
+    if role is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "phase_role"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    counter = _phase_role_value(identity, "counter_phase_role")
+    if quantity is Quantity.DISTRIBUTION_RATIO and counter is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "counter_phase_role"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
+    if solute is None:
+        if subtype == "mole_fraction":
+            return refused(
+                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                {
+                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                    "basis": "mole_fraction",
+                    "engine_basis": "wt_percent",
+                    "detail": "engine phase maps are wt%; mole_fraction rows are not converted",
+                },
+            )
+        if subtype != "wt_percent":
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "basis"},
+                execution=ExecutionState.NOT_PROBED,
+            )
+    temperature = temperature_of(identity)
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    composition_state = identity.composition
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    wt = composition_wt_pct(composition_state.value)
+    if not wt:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    fo2_log = _printed_fo2_log10_bar(identity)
+    if fo2_log is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "fO2_Pa"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    pressure_bar = _printed_total_pressure_bar(identity, observation)
+    if pressure_bar is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_pressure_Pa"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    anion_pa: Decimal | None = None
+    law: _CapacityLaw | None = None
+    if solute is not None:
+        relation = ""
+        if observation.derivation is not None and observation.derivation.relation:
+            relation = observation.derivation.relation.strip()
+        if not relation:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "defining_equation"},
+                execution=ExecutionState.NOT_PROBED,
+            )
+        law = _recognised_capacity_law(quantity, relation)
+        if law is None:
+            return refused(
+                RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED,
+                {
+                    "reason": RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED.value,
+                    "input": "defining_equation",
+                    "quantity": quantity.value if quantity is not None else "",
+                },
+            )
+        anion_pa = _printed_point_pa(observation, solute.pressure_key)
+        if anion_pa is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": solute.pressure_key},
+                execution=ExecutionState.NOT_PROBED,
+            )
+    try:
+        call_kwargs: dict[str, object] = {}
+        if solute is not None and anion_pa is not None:
+            call_kwargs["solute_fugacity_bar"] = float(anion_pa / Decimal("1e5"))
+            call_kwargs["solute_fugacity_parameter"] = solute.fugacity_parameter
+        result = _equilibrate_phase_assemblage(
+            engine,
+            temperature_C=float(temperature - Decimal("273.15")),
+            composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
+            fO2_log=fo2_log,
+            pressure_bar=float(pressure_bar),
+            **call_kwargs,
+        )
+    except Exception as exc:  # a backend failure is a counted refusal
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "phase_assemblage_unavailable",
+                "engine": engine.value,
+                "detail": f"{type(exc).__name__}: {exc}",
+            },
+            execution=ExecutionState.NOT_PROBED,
+        )
+
+    formula = identity.species.formula
+    phase_map, phase_issue = _select_phase_composition(result, role)
+    if phase_map is None:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": phase_issue or "phase_not_in_assemblage",
+                "phase_role": role.value,
+                "engine": engine.value,
+            },
+        )
+    # Capacity uses the solute weight percent, including an elemental label.
+    # Oxide matching would drop raw S and Cl.
+    oxide = solute is None and role in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+    amount = _component_wt(formula, phase_map, oxide=oxide)
+    if amount is None or not math.isfinite(amount):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "phase_component_absent",
+                "phase_role": role.value,
+                "formula": formula,
+            },
+        )
+    if quantity is Quantity.DISTRIBUTION_RATIO:
+        assert counter is not None
+        counter_map, counter_issue = _select_phase_composition(result, counter)
+        if counter_map is None:
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {
+                    "reason": counter_issue or "phase_not_in_assemblage",
+                    "phase_role": counter.value,
+                    "engine": engine.value,
+                },
+            )
+        counter_oxide = counter in {PhaseRole.MELT, PhaseRole.SLAG, PhaseRole.GLASS}
+        counter_amount = _component_wt(formula, counter_map, oxide=counter_oxide)
+        if counter_amount is None or not math.isfinite(counter_amount):
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {
+                    "reason": "phase_component_absent",
+                    "phase_role": counter.value,
+                    "formula": formula,
+                },
+            )
+        if amount <= 0 or counter_amount <= 0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "nonpositive_phase_amount",
+                    "numerator": str(amount),
+                    "denominator": str(counter_amount),
+                },
+            )
+        predicted = Decimal(str(amount)) / Decimal(str(counter_amount))
+    elif solute is not None:
+        assert anion_pa is not None and law is not None
+        p_o2_pa = as_decimal(identity.fO2_Pa.value)
+        predicted = _log10_printed_capacity(
+            Decimal(str(amount)), p_o2_pa, anion_pa, law
+        )
+        if predicted is None:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+            )
+    else:
+        if amount <= 0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "nonpositive_phase_amount", "amount": str(amount)},
+            )
+        predicted = Decimal(str(amount))
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED, call_evidence="phase_assemblage"
+        ),
+        value=predicted,
+        unit=QUANTITY_UNITS[quantity] if quantity is not None else None,
+        authority=Authority.BRIDGE,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
 def _predict_mass_loss_with_residue(
     engine: Engine,
     identity: Identity,
@@ -4874,6 +5881,8 @@ def predict_with_engine(
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
+    if quantity in PHASE_COMPOSITION_QUANTITIES or quantity in PRINTED_CAPACITY_QUANTITIES:
+        return _predict_phase_row(engine, observation, identity, channel, sources)
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -6777,6 +7786,31 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
+def _printed_fo2_names_observation(reference: Observation) -> bool:
+    """The printed fO2 derivation lists this observation. A number does not.
+
+    identity.fO2_Pa is a State and has no inputs. The name is the Located
+    inference on fO2_Pa or oxygen_partial_pressure_Pa. Inputs that do not
+    list this observation_id are not a name, including a unit conversion.
+    """
+    point = oxygen_pressure_point(reference)
+    if point is None or point.inference is None:
+        return False
+    return reference.observation_id in point.inference.inputs
+
+
+def _is_selected_condition_observation(
+    reference: Observation, oxygen: SourceOxygenCondition
+) -> bool:
+    """Identity with the selected condition: an input, or the condition itself."""
+    if reference.observation_id == oxygen.observation.observation_id:
+        return True
+    if reference.observation_id in oxygen.used_observations:
+        return True
+    derivation = oxygen.observation.derivation
+    return derivation is not None and reference.observation_id in derivation.inputs
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -7082,41 +8116,68 @@ def compile_residual(
         if (
             predictor is predict_with_engine
             and _knudsen_vapour_equilibrium(quantity, experiment)
-            and not _has_printed_fo2(reference, reference.identity)
         ):
+            # Identity, whether fO2 is printed or supplied by the selector.
+            # A printed command is not overwritten. A row is a condition
+            # input when its observation_id is in the selected derivation,
+            # when it is the condition observation, or when the printed
+            # fO2 derivation names it. A matching pressure is not that name.
             recorded = _bench_for_score(experiment, context.benches)
             oxygen = resolve_source_oxygen(
                 reference,
                 point_observations if point_observations is not None else context.observations.values(),
                 recorded,
             )
-            if isinstance(oxygen, SourceOxygenCondition):
-                if reference.observation_id in oxygen.used_observations:
-                    return _refused(
-                        RefusalReason.UNSUPPORTED,
-                        {
-                            "reason": "used_as_scoring_condition",
-                            "derivation": to_plain(oxygen.observation.derivation),
-                            "derived_from": list(oxygen.observation.derived_from or ()),
-                        },
-                        execution=Execution(state=ExecutionState.NOT_PROBED),
-                    )
-                reference = replace(
-                    reference,
-                    point_conditions={
-                        **(reference.point_conditions or {}),
-                        "fO2_Pa": Located(
-                            State.of(oxygen.observation.value),
-                            locator=oxygen.observation.locator,
-                            inference=oxygen.observation.derivation,
-                        ),
+            printed_fo2 = _has_printed_fo2(reference, reference.identity)
+            if (
+                isinstance(oxygen, SourceOxygenCondition)
+                and _is_selected_condition_observation(reference, oxygen)
+            ):
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "used_as_scoring_condition",
+                        "derivation": to_plain(oxygen.observation.derivation),
+                        "derived_from": list(oxygen.observation.derived_from or ()),
                     },
-                    provenance={
-                        **(reference.provenance or {}),
-                        "source_oxygen_condition": to_plain(oxygen.observation),
-                    },
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
-            else:
+            if _printed_fo2_names_observation(reference):
+                detail: dict[str, object] = {
+                    "reason": "used_as_scoring_condition",
+                    "match": "printed_fo2_names_observation",
+                }
+                if isinstance(oxygen, SourceOxygenCondition):
+                    detail["derivation"] = to_plain(oxygen.observation.derivation)
+                    detail["derived_from"] = list(oxygen.observation.derived_from or ())
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    detail,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            if isinstance(oxygen, SourceOxygenCondition):
+                consistency = tuple(
+                    notice for notice in oxygen.observation.notices
+                    if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
+                )
+                notices = union_notices(notices, consistency)
+                if not printed_fo2:
+                    reference = replace(
+                        reference,
+                        point_conditions={
+                            **(reference.point_conditions or {}),
+                            "fO2_Pa": Located(
+                                State.of(oxygen.observation.value),
+                                locator=oxygen.observation.locator,
+                                inference=oxygen.observation.derivation,
+                            ),
+                        },
+                        provenance={
+                            **(reference.provenance or {}),
+                            "source_oxygen_condition": to_plain(oxygen.observation),
+                        },
+                    )
+            elif not printed_fo2:
                 reference = replace(
                     reference,
                     provenance={
@@ -8271,29 +9332,45 @@ def write_residuals_jsonl(
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
-def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
-    rows: list[dict[str, object]] = []
-    if not path.is_file():
-        return ()
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-            rows.append(payload)
-    return tuple(rows)
+def iter_residual_payloads(
+    path: Path, *, strict: bool = False
+) -> Iterator[tuple[int, dict[str, object]]]:
+    """Yield ``(line_number, object)`` for one residual ledger.
 
+    Blank lines and the store-stamp line are skipped. A missing file yields
+    nothing. ``strict`` raises ``ValueError`` naming ``path:line`` when a
+    line is not JSON or not an object. Otherwise a non-object line is
+    skipped and invalid JSON propagates as ``JSONDecodeError``.
+    """
 
-def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
     if not path.is_file():
         return
     with path.open(encoding="utf-8") as stream:
-        for line in stream:
+        for number, line in enumerate(stream, start=1):
             if not line.strip():
                 continue
-            payload = json.loads(line)
-            if isinstance(payload, dict) and not is_store_stamp_payload(payload):
-                yield payload
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError as exc:
+                if strict:
+                    raise ValueError(f"{path}:{number}: {exc.msg}") from exc
+                raise
+            if not isinstance(payload, dict):
+                if strict:
+                    raise ValueError(f"{path}:{number}: residual row is not an object")
+                continue
+            if is_store_stamp_payload(payload):
+                continue
+            yield number, payload
+
+
+def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
+    return tuple(payload for _number, payload in iter_residual_payloads(path))
+
+
+def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
+    for _number, payload in iter_residual_payloads(path):
+        yield payload
 
 
 @dataclass(frozen=True)
@@ -8366,6 +9443,23 @@ def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
     return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
+
+
+def _median_rms_from_float64(values: Sequence[float]) -> tuple[Decimal, Decimal] | None:
+    """``_median`` and ``_rms`` for one ``array('d')`` group.
+
+    The resident store is float64. This builds one Decimal per sample so the
+    two definitions stay in ``_median`` and ``_rms``, then drops that vector.
+    """
+
+    if not values:
+        return None
+    decimals = tuple(Decimal(str(value)) for value in values)
+    median = _median(decimals)
+    rms = _rms(decimals)
+    if median is None or rms is None:
+        return None
+    return median, rms
 
 
 def _iqr(values: Sequence[Decimal]) -> Decimal | None:
@@ -10569,8 +11663,46 @@ class _AllNumericFact:
 def _residual_key_quantity(key: object) -> str:
     """Quantity token of a ``residual_key`` (``…::q::rail::engine``)."""
 
-    parts = str(key or "").rsplit("::", 3)
-    return parts[1] if len(parts) == 4 and parts[1] else "quantity_unknown"
+    parts = _residual_key_parts(key)
+    if parts is None:
+        return MISSING_QUANTITY_KEY_TOKEN
+    return parts[1]
+
+
+def numeric_comparison_available(status: object) -> bool:
+    """Whether this residual status stored a numeric comparison.
+
+    Match, mismatch, and no_band did. Refused did not, and neither did a
+    status that is not a ``ResidualStatus``. This is not score eligibility.
+    """
+
+    try:
+        token = status if isinstance(status, ResidualStatus) else ResidualStatus(str(status))
+    except ValueError:
+        return False
+    return token is not ResidualStatus.REFUSED
+
+
+def numeric_comparison_transition(base_status: object, tip_status: object) -> str | None:
+    """Name a refused/numeric status change.
+
+    ``"scored"`` when a refusal gains a numeric comparison, ``"refused"``
+    when a numeric comparison becomes a refusal. Any other pair, including
+    an unknown status, returns None.
+    """
+
+    base_refused = (
+        base_status is ResidualStatus.REFUSED
+        or base_status == ResidualStatus.REFUSED.value
+    )
+    tip_refused = (
+        tip_status is ResidualStatus.REFUSED or tip_status == ResidualStatus.REFUSED.value
+    )
+    if base_refused and numeric_comparison_available(tip_status):
+        return "scored"
+    if numeric_comparison_available(base_status) and tip_refused:
+        return "refused"
+    return None
 
 
 def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
@@ -11143,6 +12275,25 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
 
     rail = str(row.get("rail") or "")
     engine = _engine_from_payload(row)
+    refusal = row.get("refusal")
+    reason = ""
+    detail_reason = ""
+    if isinstance(refusal, Mapping):
+        reason = str(refusal.get("reason") or "")
+        detail = refusal.get("detail")
+        detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    # Phase-composition and capacity refusals stay in the ledger. They are
+    # counted, including when this engine is outside the melt-activity list.
+    if reason in {
+        RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
+    } or detail_reason in {
+        RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_SULFUR.value,
+        RefusalReason.ENGINE_DOES_NOT_MODEL_CHLORIDE.value,
+    }:
+        return True
     if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
         return False
     if rail == Rail.MELT_ACTIVITY.value:
@@ -11151,12 +12302,8 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
         if engine not in MELT_ACTIVITY_ENGINES:
             return False
 
-    refusal = row.get("refusal")
     if not isinstance(refusal, Mapping):
         return True
-    reason = str(refusal.get("reason") or "")
-    detail = refusal.get("detail")
-    detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
     if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
         return False
     if (
@@ -11280,7 +12427,7 @@ class _ResidualRowsPayloadView:
             engine = _engine_of(residual)
             relation = residual.source_relation.value
             family_values[(family, quantity.value, engine, relation)].add(value)
-            rail = residual.rail.value if residual.rail else "none"
+            rail = residual.rail.value if residual.rail else NO_HEADLINE_RAIL_TOKEN
             if numeric.operation is MetricOperation.DEX and numeric.decision_band.unit == "dimensionless":
                 headline_values[("compilation", rail, engine)].add(value)
             if numeric.operation is not None:
@@ -12789,7 +13936,7 @@ class _ScorePayloadAccumulator:
             )
             family = ""
             tier_quantity = "unknown"
-            tier_rail = "none"
+            tier_rail = NO_HEADLINE_RAIL_TOKEN
             tier_uncertainty = ""
             family_quantity = None
             if is_compilation and observation is not None:
