@@ -1932,15 +1932,11 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     )
 
 
-def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:
+def test_openimcc_typed_gas_table_mutation_changes_prediction(monkeypatch, tmp_path) -> None:
     _require_openimcc()
     scratch = _scratch_path()
-    if (
-        scratch is None
-        or VAPOROCK_ROOT is None
-        or not (VAPOROCK_ROOT / "src/vaporock/data/JANAF-vapor-data-full.csv").is_file()
-    ):
-        pytest.skip("Plante scratch data or VapoRock checkout is not present")
+    if scratch is None:
+        pytest.skip("Plante scratch data is not present")
     row = json.loads(scratch.read_text(encoding="utf-8"))["hand_rows"][0]
     composition_wt = {"K2O": float(row["K2O_wt_pct"]), "SiO2": float(row["SiO2_wt_pct"])}
     composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
@@ -1949,7 +1945,28 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
     monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
     packaged = _OpenImccBatteryBackend("openimcc")
-    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
+    # openimcc c280dcc requires typed validity columns. Mutate the packaged
+    # tables so the explicit/inert/reactive omission paths remain exercised.
+    import csv
+
+    table_dir = tmp_path / "src/vaporock/data"
+    table_dir.mkdir(parents=True)
+    for source, filename, removed in (
+        (packaged._gas.gas_path, "JANAF-vapor-data-full.csv", {"Na2O(g)", "K2O(g)"}),
+        (packaged._gas.oxide_path, "condensate-thermo-data.csv", {"TiO2(l)"}),
+    ):
+        with source.open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            columns = reader.fieldnames
+            rows = [row for row in reader if row["species_name"] not in removed]
+        for table_row in rows:
+            if table_row["species_name"] == "K(g)":
+                table_row["F"] = str(float(table_row["F"]) + 1.0)
+        with (table_dir / filename).open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=columns)
+            writer.writeheader()
+            writer.writerows(rows)
+    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(tmp_path))
     mutated = _OpenImccBatteryBackend("openimcc")
     temperature_K = float(row["T_K"])
     evaluate_gas = openimcc.evaluate_gas

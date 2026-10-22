@@ -29,6 +29,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 # outranks the gas JANAF fit (rank 3), and the channel keeps the
 # least-authoritative row. 249fde5 still reported janaf_transcribed. ccabd0b
 # keeps the 100df4f pressures and the new class. ec31045 keeps those pressures.
+# openimcc 0cb75c1 adds the hypothetical-reference warning below. Gas and
+# condensate identities also move at c280dcc/0cb75c1; numeric pins hold.
 # Float outputs are stored as float.hex strings so these are exact pins.
 # openimcc 8de0903. The band is the FeO(l) redox fit interval.
 _FEO_DG_MASSON_EXTRAPOLATION = (
@@ -48,7 +50,7 @@ _GOLDEN = {
         "residual": "0x1.0c60aacc06d05p-44", "iterations": 15,
         "O": (("SiO", "0x1.5615e032a1ad1p-51"), ("O2", "0x1.bd4e186b5803dp-52"), ("O", "0x1.ddbdd6fa4a886p-53"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("CaO", "0x1.d75c5be5cb0e5p-81")),
         "metal": (("SiO", "0x1.5615e032a1ad1p-50"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("Ca", "0x1.4383392738376p-68"), ("CaO", "0x1.d75c5be5cb0e5p-81"), ("Si", "0x1.b36ae6a7250e3p-94")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": None, "buffer": None,
     },
     ("cao_sio2_40_60", 1200.0, "W"): {
@@ -66,7 +68,7 @@ _GOLDEN = {
         "residual": "0x1.171ed7fd6e3b7p-48", "iterations": 20,
         "O": (("SiO", "0x1.f2e4702b5f64ap-48"), ("W2O6", "0x1.ab6b8dbfa2c60p-48"), ("W3O9", "0x1.9ee56ca719ba6p-51"), ("W3O8", "0x1.f769434b4fa00p-53"), ("WO3", "0x1.2fb9d8486522cp-55")),
         "metal": (("SiO", "0x1.f2e4702b5f64ap-47"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("Ca", "0x1.d7ce52d9a7dffp-65"), ("CaO", "0x1.d75c5be5cb0e5p-81"), ("Si", "0x1.cf0ac2fe0778cp-87")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": "0x1.fe6ee7d423bc6p-2", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("cao_sio2_40_60", 1700.0, None): {
@@ -81,7 +83,7 @@ _GOLDEN = {
         "residual": "0x1.2d4e0946544f0p-52", "iterations": 18,
         "O": (("SiO", "0x1.b00a1d94be1b5p-29"), ("O2", "0x1.3577ddb5b1599p-29"), ("O", "0x1.ea52a0ea98dbcp-31"), ("SiO2", "0x1.7c3453ac02456p-35"), ("CaO", "0x1.3dca999f183b8p-51")),
         "metal": (("SiO", "0x1.b00a1d94be1b5p-28"), ("SiO2", "0x1.7c3453ac02456p-35"), ("Ca", "0x1.342b165b6c4d4p-44"), ("CaO", "0x1.3dca999f183b8p-51"), ("Si", "0x1.5b2fa2bfeda04p-59")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": None, "buffer": None,
     },
     ("cao_sio2_40_60", 1700.0, "W"): {
@@ -99,7 +101,7 @@ _GOLDEN = {
         "residual": "0x1.1ddcdcff20961p-41", "iterations": 17,
         "O": (("SiO", "0x1.c049647ad77e1p-26"), ("W2O6", "0x1.874a22c4e86f4p-26"), ("W3O9", "0x1.cf19fe460307ep-30"), ("W3O8", "0x1.5a6b250aae229p-30"), ("WO3", "0x1.e5494405d3f23p-33")),
         "metal": (("SiO", "0x1.c049647ad77e1p-25"), ("SiO2", "0x1.7c3453ac02456p-35"), ("Ca", "0x1.3fc1d8cc5bf9cp-41"), ("CaO", "0x1.3dca999f183b8p-51"), ("Si", "0x1.75ca1a0e10920p-53")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": "0x1.fcd5aee174395p-2", "buffer": "0x1.673a0a0b49045p-30",
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, None): {
@@ -115,7 +117,7 @@ _GOLDEN = {
         "residual": "0x1.4ef3db7464879p-49", "iterations": 14,
         "O": (("O2", "0x1.201d633ce9e4ap-46"), ("O", "0x1.8047802a1b698p-50"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO", "0x1.1412ca2755b56p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
         "metal": (("Fe", "0x1.34b912c0475cfp-46"), ("SiO", "0x1.1412ca2755b56p-52"), ("FeO", "0x1.d0113db9f4368p-53"), ("Mg", "0x1.40a2eaf591fe9p-54"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, "W"): {
@@ -134,7 +136,7 @@ _GOLDEN = {
         "residual": "0x1.cc4a5858196f6p-47", "iterations": 22,
         "O": (("W2O6", "0x1.6f8369e6f2731p-42"), ("W3O9", "0x1.4acd05883a59fp-42"), ("W3O8", "0x1.9b9acff0f37a6p-45"), ("SiO", "0x1.4c1bfc6fe4d54p-48"), ("W4O12", "0x1.c4201126c5c3ap-51")),
         "metal": (("Fe", "0x1.7362ca3f477c1p-41"), ("SiO", "0x1.4c1bfc6fe4d54p-47"), ("Mg", "0x1.81b7ad0c6f85ap-49"), ("FeO", "0x1.d0113db9f4368p-53"), ("SiO2", "0x1.d98aa147c3c9ep-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Fe", _FEO_DG_MASSON_EXTRAPOLATION), ("FeO", _FEO_DG_MASSON_EXTRAPOLATION), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": "0x1.fc4c57904c896p-1", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, None): {
@@ -150,7 +152,7 @@ _GOLDEN = {
         "residual": "0x1.accb8a2bdc850p-50", "iterations": 16,
         "O": (("O2", "0x1.3d19ca56986a6p-27"), ("O", "0x1.f0551a765c21ap-30"), ("SiO", "0x1.d7574fbf080a2p-30"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
         "metal": (("Fe", "0x1.36b41762a4491p-27"), ("SiO", "0x1.d7574fbf080a2p-29"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("Mg", "0x1.30ad895022f98p-32"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, "W"): {
@@ -169,7 +171,7 @@ _GOLDEN = {
         "residual": "0x1.4f98b9ef123eap-48", "iterations": 21,
         "O": (("W2O6", "0x1.e259b9a654f36p-24"), ("SiO", "0x1.7b76d7ce4b86cp-26"), ("W3O9", "0x1.3cea40c187443p-26"), ("W3O8", "0x1.6b6bd919820fap-27"), ("FeO", "0x1.2ccdbcd9e77a6p-31")),
         "metal": (("Fe", "0x1.f4474029ba693p-24"), ("SiO", "0x1.7b76d7ce4b86cp-25"), ("Mg", "0x1.ea93829a0ae1dp-29"), ("FeO", "0x1.2ccdbcd9e77a6p-31"), ("SiO2", "0x1.a3dfe2028ae22p-35")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate")),
         "flux": "0x1.b8edd4f9643b1p-1", "buffer": "0x1.673a0a0b49045p-30",
     },
 }
@@ -187,8 +189,8 @@ _PROVENANCE_CLASSES = {
     "Si3": "janaf_fitted", "SiO": "janaf_fitted", "SiO2": "janaf_fitted",
     "Ti": "janaf_fitted", "TiO": "janaf_fitted", "TiO2": "janaf_fitted",
 }
-_COMMON_LOW_FLAGS = "Al2O3(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Al-100"
-_SILICA_LOW_FLAGS = "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"
+_COMMON_LOW_FLAGS = "Al2O3(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Al-100; this is a hypothetical reference, not a prediction of a liquid condensate"
+_SILICA_LOW_FLAGS = "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038; this is a hypothetical reference, not a prediction of a liquid condensate"
 _TITANIA_LOW_FLAGS = "TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044"
 _TITANIA_SUPERCOOLED_FLAGS = "TiO2(l) uses a source-tabulated supercooled liquid branch below the 2130 K fusion marker (O-044)"
 _POTASSIUM_OXIDE_LOW_FLAGS = "K2O(l) uses a tier-4 liquid_from_solid construction from K-012"
@@ -199,14 +201,14 @@ _DOMAIN_FLAGS = {
         "Al2": _COMMON_LOW_FLAGS,
         "Al2O": _COMMON_LOW_FLAGS, "Al2O2": _COMMON_LOW_FLAGS, "AlO": _COMMON_LOW_FLAGS,
         "AlO2": _COMMON_LOW_FLAGS,
-        "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
+        "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate",
+        "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate",
         "Fe": _FEO_DG_MASSON_EXTRAPOLATION,
         "FeO": _FEO_DG_MASSON_EXTRAPOLATION,
         "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
         "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
-        "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
-        "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
+        "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate",
+        "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate",
         "Na": _SODIUM_OXIDE_LOW_FLAGS, "Na2": _SODIUM_OXIDE_LOW_FLAGS,
         "Na2O": _SODIUM_OXIDE_LOW_FLAGS, "NaO": _SODIUM_OXIDE_LOW_FLAGS,
         "O": None, "O2": None,
@@ -220,13 +222,13 @@ _DOMAIN_FLAGS = {
     1700.0: {
         "Al": _COMMON_LOW_FLAGS, "Al2": _COMMON_LOW_FLAGS, "Al2O": _COMMON_LOW_FLAGS,
         "Al2O2": _COMMON_LOW_FLAGS, "AlO": _COMMON_LOW_FLAGS, "AlO2": _COMMON_LOW_FLAGS,
-        "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
+        "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate",
+        "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028; this is a hypothetical reference, not a prediction of a liquid condensate",
         "Fe": None, "FeO": None,
         "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
         "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
-        "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
-        "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
+        "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate",
+        "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009; this is a hypothetical reference, not a prediction of a liquid condensate",
         "Na": None, "Na2": None, "Na2O": None, "NaO": None, "O": None, "O2": None,
         "Si": _SILICA_LOW_FLAGS, "Si2": _SILICA_LOW_FLAGS, "Si3": _SILICA_LOW_FLAGS,
         "SiO": _SILICA_LOW_FLAGS, "SiO2": _SILICA_LOW_FLAGS,
