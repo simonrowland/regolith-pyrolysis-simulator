@@ -765,6 +765,7 @@ class OverheadGasModel:
         degraded_path_engagement_recorder: Optional[Callable[..., None]] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
     ):
+        self.last_pipe_conductance_authority_notice = None
         # Pipe geometry (default for 1-tonne batch)
         self.initial_throat_area_m2 = DEFAULT_INITIAL_THROAT_AREA_M2  # m² — configurable throat cross-section
         self.pipe_diameter_m = self.throat_diameter_m  # m — throat-equivalent inner diameter

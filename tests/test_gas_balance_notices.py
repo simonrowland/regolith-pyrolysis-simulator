@@ -97,3 +97,11 @@ def test_passive_pressure_admission_preserves_accepted_routing_notice():
     sim._admit_process_pressure()
     assert sim._process_pressure_diagnostic["transport_notices"] == [notice]
     assert notice in sim._latest_knudsen_summary()["warnings"]
+
+
+def test_mars_startup_before_first_pipe_evaluation():
+    from tests.test_mars_process_pressure import mars_sim
+
+    sim = mars_sim(sweep=0.0)
+    boundary = sim._physical_sweep_boundary()
+    assert boundary["partials_bar"].get("O2", 0.0) == 0.0
