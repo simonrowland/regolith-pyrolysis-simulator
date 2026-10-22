@@ -79,3 +79,33 @@ def test_b1012_postcapture_must_not_replace_upstream_pressure(monkeypatch, flow)
     # Use the existing CSTR projection owner, not a second mixture formula.
     assert sim._melt_headspace_composition_mbar == upstream[-1]
     assert sim._melt_headspace_composition_mbar['SiO'] > sim.overhead.composition['SiO']
+
+
+def test_named_views_preserve_lumped_volume_and_zero_storage_stages(monkeypatch):
+    from simulator.physical_constants import PA_PER_MBAR
+    from simulator.state_types import StateTag
+
+    sim, upstream = frozen_mars(monkeypatch, 0.01)
+    receipt = pressure_receipt(sim, upstream)
+    before = sim.atom_ledger.mol_by_account()
+    volumes = sim._gas_control_volumes()
+    planes = {plane.plane_id: plane for plane in sim._gas_stream_planes()}
+    assert sum(volume.volume_m3 for volume in volumes) == receipt['initial']['volume_m3']
+    assert len(volumes) == 1  # Duct interiors are already in the lumped volume.
+    assert volumes[0].volume_id == 'headspace_and_duct'
+    assert volumes[0].account_id == 'process.overhead_gas'
+    assert volumes[0].temperature_K == sim._headspace_temperature_K()
+    assert dict(volumes[0].species_mol) == sim._overhead_holdup_mol()
+    assert sum(plane.volume_m3 for plane in planes.values()) == 0.0
+    for stage in sim.train.stages:
+        assert planes[f'stage:{stage.stage_number}'].partial_pressure_Pa.tag is StateTag.UNKNOWN
+    for plane, field in [('upstream_headspace', 'upstream_mbar'),
+                         ('postcapture_outlet', 'postcapture_mbar')]:
+        assert dict(planes[plane].partial_pressure_Pa.value) == {
+            species: partial * PA_PER_MBAR for species, partial in receipt[field].items()
+        }
+        with pytest.raises(TypeError):
+            planes[plane].partial_pressure_Pa.value['SiO'] = 0.0
+    with pytest.raises(TypeError):
+        volumes[0].species_mol['Ar'] = 0.0
+    assert sim.atom_ledger.mol_by_account() == before

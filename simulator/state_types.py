@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, Mapping, TypeVar
 
 if TYPE_CHECKING:
     from simulator.battery.enums import PolymorphRejectionKind
@@ -17,6 +17,26 @@ class StateTag(StrEnum):
 
 
 T = TypeVar("T")
+
+
+@dataclass(frozen=True)
+class GasControlVolume:
+    """Read-only mol inventory view of an existing finite ledger volume."""
+
+    volume_id: str
+    account_id: str
+    volume_m3: float
+    temperature_K: float
+    species_mol: Mapping[str, float]
+
+
+@dataclass(frozen=True)
+class GasStreamPlane:
+    """Zero-storage observation section; absent pressure is not vacuum."""
+
+    plane_id: str
+    partial_pressure_Pa: State[Mapping[str, float]]
+    volume_m3: float = 0.0
 
 
 @dataclass(frozen=True)

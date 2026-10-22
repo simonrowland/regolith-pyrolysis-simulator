@@ -3596,6 +3596,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'finite headspace requires a positive configured volume_m3'
         )
 
+    def _gas_control_volumes(self):
+        """Keep the existing lumped headspace/duct inventory and total volume.
+
+        Equipment already includes duct interiors in this volume. Splitting
+        its inventory or adding finite stage holdup would require separately
+        authorized accounts and geometry; these views make no such split.
+        """
+        from simulator.state_types import GasControlVolume
+
+        species_mol = self._overhead_holdup_mol()
+        temperature_K = self._headspace_temperature_K()
+        volume_m3 = self._headspace_volume_m3()
+        return (GasControlVolume(
+            volume_id='headspace_and_duct',
+            account_id='process.overhead_gas',
+            volume_m3=volume_m3,
+            temperature_K=temperature_K,
+            species_mol=MappingProxyType(species_mol),
+        ),)
+
+    def _gas_stream_planes(self):
+        """Name upstream and post-capture projections without adding storage.
+
+        Intermediate stages retain the algebraic zero-storage approximation;
+        no stage pressure or residence time has been solved for them.
+        """
+        from simulator.physical_constants import PA_PER_MBAR
+        from simulator.state_types import GasStreamPlane, State
+
+        return (
+            GasStreamPlane('upstream_headspace', State.of(MappingProxyType({
+                species: partial * PA_PER_MBAR
+                for species, partial in self._melt_headspace_composition_mbar.items()
+            }))),
+            *(GasStreamPlane(
+                f'stage:{stage.stage_number}',
+                State.unknown('zero-storage stage: intermediate pressure unresolved'),
+            ) for stage in self.train.stages),
+            GasStreamPlane('postcapture_outlet', State.of(MappingProxyType({
+                species: partial * PA_PER_MBAR
+                for species, partial in self.overhead.composition.items()
+            }))),
+        )
+
     def _headspace_temperature_K(self) -> float:
         melt_T_K = float(self.melt.temperature_C) + 273.15
         offset = self._overhead_headspace_config.get('temperature_offset_K')
@@ -4348,9 +4392,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _physical_sweep_boundary(self):
         from simulator.overhead import sweep_source_split, OverheadConfigurationError
 
-        holdup = self._overhead_holdup_mol()
-        temperature = self._headspace_temperature_K()
-        volume = self._headspace_volume_m3()
+        gas_volume, = self._gas_control_volumes()
+        holdup = gas_volume.species_mol
+        temperature = gas_volume.temperature_K
+        volume = gas_volume.volume_m3
         plan = None
         step = getattr(self, '_sweep_transport_step', None)
         if step is not None:
