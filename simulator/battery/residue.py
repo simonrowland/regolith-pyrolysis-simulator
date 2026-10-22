@@ -1356,6 +1356,12 @@ def predict_mass_loss_fraction(
     )
     flags: set[str] = set()
     metadata: dict[str, str] = {}
+    flags.add(
+        "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
+        "declared free-desorption assumption, not independently sourced coefficients; "
+        "sensitivity: oxygen escape changes the shared alpha-weighted pO2 root "
+        "and therefore the sourced-channel loss"
+    )
     if pressure_is_bound:
         flags.add(f"mass_loss_pressure_upper_bound: evaluated at {total_pressure_Pa:.17g} Pa; "
                   "channel bulk partial ceiling; zero-pressure arms are bounds only")
@@ -1384,7 +1390,7 @@ def predict_mass_loss_fraction(
         for species, (parent, *_rest) in gas_channels:
             species = str(species)
             if not parent:
-                alpha, provenance = 1.0, "stoichiometric oxygen coproduct"
+                alpha, provenance = 1.0, "declared unity oxygen escape; stoichiometric coproduct"
             elif bound_channel is not None:
                 alpha = 1.0 if species == bound_channel else 0.0
                 provenance = "isolated alpha<=1 channel bound; other parent channels off"

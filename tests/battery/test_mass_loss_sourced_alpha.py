@@ -124,6 +124,47 @@ def test_vacuum_oxygen_root_pin_before_flux_refactor():
     assert result.pO2_bar == pytest.approx(0.0000020188591846109878, rel=1e-10)
 
 
+@pytest.mark.parametrize("with_sio,expected_po2,expected_mg,expected_sio", [
+    (False, 8.131046268682460e-7, 2.762438138455805e-7, 0.0),
+    (True, 1.462909125212295e-6, 2.059477816151990e-7, 2.910603362049900e-7),
+], ids=["mg-only", "mg-and-sio"])
+def test_sourced_channels_close_oxygen_with_declared_unity_escape(
+    fig3_source, with_sio, expected_po2, expected_mg, expected_sio,
+):
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    fits = _mass_loss_sourced_alphas(
+        SimpleNamespace(experiment_id="work::experiment::cai-r-11"), fig3_source, 2073.15
+    )
+    channels = [
+        ResidueChannel("Mg", "Mg", "MgO", fits["Mg"]["alpha"], "Richter Fig. 3"),
+        ResidueChannel("O2", "O2", None, 1.0, "declared unity oxygen escape"),
+    ]
+    if with_sio:
+        channels.append(ResidueChannel(
+            "SiO", "SiO", "SiO2", fits["SiO"]["alpha"], "Richter Fig. 3"
+        ))
+    result = integrate_residue_inventory(
+        {"MgO": 1.0, "SiO2": 1.0}, channels,
+        lambda _inventory, logp: {
+            "Mg": 0.001 / (10.0**logp)**0.5,
+            "SiO": 0.002 / (10.0**logp)**0.5,
+            "O2": 100000.0 * 10.0**logp,
+        },
+        temperature_K=2073.15, duration_s=1.0, area_evolution_m2=(0.0001,),
+    )
+    # Independent 70-digit Decimal solution of O conservation with the printed
+    # Fig. 3 alphas and CIAAW masses: 2*J_O2=J_Mg+J_SiO. One shared pO2,
+    # then the analytic one-second depletion of each one-mol parent at 1 cm2.
+    assert result.pO2_bar_by_step == pytest.approx((expected_po2,), rel=1e-10)
+    assert result.evaporated_mol["Mg"] == pytest.approx(expected_mg, rel=1e-10)
+    assert result.evaporated_mol.get("SiO", 0.0) == pytest.approx(expected_sio, rel=1e-10)
+    assert result.evaporated_mol["O2"] == pytest.approx(
+        (expected_mg + expected_sio) / 2.0, rel=1e-10
+    )
+    assert max(abs(value) for value in result.atom_closure_mol.values()) < 1e-14
+
+
 @pytest.fixture
 def r11_inputs():
     from simulator.battery.records import (
@@ -297,6 +338,11 @@ def test_sourced_r11_integrates_schedule_and_exposes_bounds(
     assert any("approximate printed duration" in note and "excluded from point loss" in note
                for note in notices)
     assert any(note.startswith("alpha_extrapolated:") for note in notices)
+    oxygen_note = next(note for note in notices
+                       if note.startswith("mass_loss_oxygen_escape_assumption:"))
+    assert "alpha_O=1.0; alpha_O2=1.0" in oxygen_note
+    assert "not independently sourced" in oxygen_note
+    assert "sensitivity:" in oxygen_note
     assert all(p == pytest.approx(0.00013332236842105263)
                for p in prescribed_pressure_engine["pressures"])
 
