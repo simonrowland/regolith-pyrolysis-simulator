@@ -59,7 +59,10 @@ from simulator.battery.score import (
     predict_with_engine,
     render_score_report,
 )
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_FIT_SEGMENTS,
+    ellingham_same_phase_extension,
+)
 from tests.battery import factories as F
 
 _PRINTED_DFG = Decimal("-3.886")
@@ -2884,9 +2887,9 @@ def test_out_of_range_reaction_is_not_formation_gibbs() -> None:
     assert past_end.refusal_detail["reason"] == "ellingham-formation-outside-segment"
 
 
-# t-1468 pin of the pre-extension refusal. Every row below is
-# ellingham-formation-outside-segment on this tree. The same-phase
-# candidates are marked so the behaviour change can move only those.
+# t-1468. same_phase rows are a same-phase continuation of the nearest
+# segment and predict-and-flag. The others cross a transition, or sit on
+# the CaO melting endpoint, and stay refused.
 _OUTSIDE_SEGMENT_PIN = (
     # formula, phase, T, polymorph, metal, range, phase fragment, same_phase
     ("CaO", Phase.CR, "1000", None, "Ca", (1100.0, 1115.0), "Ca(s)", True),
@@ -2940,13 +2943,8 @@ def test_outside_segment_refusals_are_pinned(
     fragment: str,
     same_phase: bool,
 ) -> None:
-    """Current output: outside a certified segment the formation value is refused.
+    """Same-phase rows predict and flag. A phase crossing stays refused."""
 
-    ``same_phase`` records the later extension class. It does not change
-    this pin: both classes refuse, with the clamped segment's band.
-    """
-
-    del same_phase
     # Generic crystal products match any identity polymorph. The factory
     # requires a value on a crystal polymorph axis.
     crystal_polymorph = polymorph
@@ -2971,12 +2969,49 @@ def test_outside_segment_refusals_are_pinned(
             source_id="nist-janaf-4th",
         ),
     )
-    assert attempt.value is None
-    assert attempt.notices == ()
-    assert attempt.authority is Authority.REFUSED
-    assert attempt.refusal_detail["reason"] == "ellingham-formation-outside-segment"
-    assert attempt.refusal_detail["segment_range_K"] == [segment[0], segment[1]]
-    assert fragment in str(attempt.refusal_detail["phase_basis"])
+    if not same_phase:
+        assert attempt.value is None
+        assert attempt.notices == ()
+        assert attempt.authority is Authority.REFUSED
+        assert attempt.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+        assert attempt.refusal_detail["segment_range_K"] == [segment[0], segment[1]]
+        assert fragment in str(attempt.refusal_detail["phase_basis"])
+        return
+    extension = ellingham_same_phase_extension(metal, float(temperature))
+    assert extension is not None
+    assert attempt.value is not None
+    assert attempt.authority is Authority.EXTRAPOLATED
+    assert attempt.refusal_reason is None
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert notice.reason == extension["notice_reason"]
+    assert notice.band == str(segment)
+    assert "authority=extrapolated" in notice.reason
+    assert "extension_distance_K=" in notice.reason
+    assert "original_refusal_reason=ellingham-formation-outside-segment" in notice.reason
+    assert fragment in extension["phase_basis"]
+    if formula == "CaO" and temperature == "1000":
+        # Hand: -1269.498 - 1000*(-0.208094545) = -1061.403455 kJ/mol O2.
+        # Divided by 2 mol CaO per mol O2: -530.7017275. The battery builds
+        # Decimal(str(float)), which keeps one binary residue.
+        assert attempt.value == Decimal("-530.70172750000005")
+        log_attempt = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(
+                f"{formula}-{temperature}-logk",
+                "exp-1",
+                replace(identity, quantity=Quantity.LOG10_KF),
+                Decimal("0"),
+                evidence=EvidenceClass.COMPILATION_ASSESSED,
+                source_id="nist-janaf-4th",
+            ),
+        )
+        assert log_attempt.value == log10K_from_delta_fG_kJ_mol(
+            attempt.value,
+            Decimal(temperature),
+        )
 
 
 def test_quoted_compilation_row_is_not_omitted() -> None:

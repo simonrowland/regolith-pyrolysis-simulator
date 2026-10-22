@@ -24,6 +24,10 @@ from typing import Any
 ELLINGHAM_FIT_RANGE_K = (1100.0, 1700.0)
 ELLINGHAM_MBAR_FIT_RANGE_K = (1100.0, 2200.0)
 ELLINGHAM_AUTHORITY_LIMIT_FLAG = "authority_limited_by_ellingham_fit_range"
+# Battery formation refusal when T is outside every certified segment.
+# Same-phase extension keeps this text as the original reason on the notice.
+ELLINGHAM_OUTSIDE_SEGMENT_REASON = "ellingham-formation-outside-segment"
+ELLINGHAM_EXTENSION_AUTHORITY = "extrapolated"
 ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG = (
     "authority_limited_by_reconstructed_ellingham_segment"
 )
@@ -936,6 +940,301 @@ def ellingham_segment_for_temperature(
     if T_K < selectable_segments[0].range_K[0]:
         return selectable_segments[0]
     return selectable_segments[-1]
+
+
+@dataclass(frozen=True)
+class _EllinghamPhaseInterval:
+    """One source phase field of a metal or oxide.
+
+    ``low_K`` is inclusive. A finite ``high_K`` is exclusive: that temperature
+    is the next transition and belongs to the following phase. That is the
+    same endpoint rule as ``ellingham_segment_for_temperature``, which uses
+    ``T < high`` on every non-final segment. CaO at 3200 K is the JANAF
+    crystal-to-liquid point, so it is the start of CaO(l), not a member of
+    the solid field. This fit has no CaO(l) segment, and the point stays
+    outside the solid domain.
+
+    ``high_K is None`` means the cited source records no further transition.
+    """
+
+    formula: str
+    low_K: float
+    high_K: float | None
+    source: str
+
+    def contains(self, temperature_K: float) -> bool:
+        if temperature_K < self.low_K:
+            return False
+        if self.high_K is None:
+            return True
+        return temperature_K < self.high_K
+
+
+def _phase_interval(
+    formula: str,
+    low_K: float,
+    high_K: float | None,
+    source: str,
+) -> _EllinghamPhaseInterval:
+    return _EllinghamPhaseInterval(formula, low_K, high_K, source)
+
+
+# Source phase fields that bound a same-phase continuation past a certified
+# fit. A segment's field is the interval that contains its midpoint. Magnetic
+# lambda points are phase boundaries here: the fit above the lambda is not
+# the same field as the fit below it. Intervals abut; the transition
+# temperature belongs to the higher field.
+_ELLINGHAM_PHASE_INTERVALS: dict[str, tuple[_EllinghamPhaseInterval, ...]] = {
+    "Ca": (
+        _phase_interval("Ca", 0.0, 716.0, "JANAF Ca-001 alpha <--> beta 716 K"),
+        _phase_interval("Ca", 716.0, 1115.0, "JANAF Ca-001 beta <--> liquid 1115 K"),
+        _phase_interval("Ca", 1115.0, 1773.658, "JANAF Ca-001 liquid <--> gas 1773.658 K"),
+        _phase_interval("Ca", 1773.658, None, "JANAF Ca-001 ideal gas above 1773.658 K"),
+    ),
+    "CaO": (
+        _phase_interval("CaO", 0.0, 3200.0, "JANAF Ca-029 crystal <--> liquid 3200 K"),
+        _phase_interval("CaO", 3200.0, None, "JANAF Ca-029 liquid above 3200 K"),
+    ),
+    "Al": (
+        _phase_interval("Al", 0.0, 933.450, "JANAF Al-001 crystal <--> liquid 933.450 K"),
+        _phase_interval("Al", 933.450, 2790.812, "JANAF Al-001 liquid <--> gas 2790.812 K"),
+        _phase_interval("Al", 2790.812, None, "JANAF Al-001 ideal gas above 2790.812 K"),
+    ),
+    "Al2O3": (
+        _phase_interval("Al2O3", 0.0, 2327.0, "JANAF Al-101 alpha <--> liquid 2327 K"),
+        _phase_interval("Al2O3", 2327.0, None, "JANAF Al-101 liquid above 2327 K"),
+    ),
+    "Fe": (
+        _phase_interval("Fe", 0.0, 1042.0, "JANAF Fe-003 Cp lambda maximum 1042 K"),
+        _phase_interval("Fe", 1042.0, 1184.0, "JANAF Fe-003 alpha <--> gamma 1184 K"),
+        _phase_interval("Fe", 1184.0, 1665.0, "JANAF Fe-003 gamma <--> delta 1665 K"),
+        _phase_interval("Fe", 1665.0, 1809.0, "JANAF Fe-003 delta <--> liquid 1809 K"),
+        _phase_interval("Fe", 1809.0, 3133.345, "JANAF Fe-003 liquid <--> gas 3133.345 K"),
+        _phase_interval("Fe", 3133.345, None, "JANAF Fe-003 ideal gas above 3133.345 K"),
+    ),
+    "FeO": (
+        _phase_interval("FeO", 0.0, 1650.0, "JANAF Fe-020 crystal <--> liquid 1650 K"),
+        _phase_interval("FeO", 1650.0, None, "JANAF Fe-020 liquid above 1650 K"),
+    ),
+    "Cr": (
+        _phase_interval("Cr", 0.0, 311.5, "JANAF Cr-001 Cp lambda maximum 311.5 K"),
+        _phase_interval("Cr", 311.5, 2130.0, "JANAF Cr-001 crystal <--> liquid 2130 K"),
+        _phase_interval("Cr", 2130.0, 2952.078, "JANAF Cr-001 liquid <--> gas 2952.078 K"),
+        _phase_interval("Cr", 2952.078, None, "JANAF Cr-001 ideal gas above 2952.078 K"),
+    ),
+    "Cr2O3": (
+        _phase_interval("Cr2O3", 0.0, 305.0, "JANAF Cr-016 Cp lambda maximum 305 K"),
+        _phase_interval("Cr2O3", 305.0, 2603.0, "JANAF Cr-016 crystal <--> liquid 2603 K"),
+        _phase_interval("Cr2O3", 2603.0, None, "JANAF Cr-016 liquid above 2603 K"),
+    ),
+    "K": (
+        _phase_interval("K", 0.0, 336.350, "JANAF K-001 crystal <--> liquid 336.350 K"),
+        _phase_interval("K", 336.350, 1039.540, "JANAF K-001 liquid <--> gas 1039.540 K"),
+        _phase_interval("K", 1039.540, None, "JANAF K-001 ideal gas above 1039.540 K"),
+    ),
+    # K-012 states crystal through its 2000 K table limit and records no transition.
+    "K2O": (
+        _phase_interval("K2O", 0.0, 2000.0, "JANAF K-012 crystal table through 2000 K"),
+    ),
+    "Mg": (
+        _phase_interval("Mg", 0.0, 923.0, "JANAF Mg-001 crystal <--> liquid 923 K"),
+        _phase_interval("Mg", 923.0, 1366.104, "JANAF Mg-001 liquid <--> gas 1366.104 K"),
+        _phase_interval("Mg", 1366.104, None, "JANAF Mg-001 ideal gas above 1366.104 K"),
+    ),
+    "MgO": (
+        _phase_interval("MgO", 0.0, 3105.0, "JANAF Mg-010 crystal <--> liquid 3105 K"),
+        _phase_interval("MgO", 3105.0, None, "JANAF Mg-010 liquid above 3105 K"),
+    ),
+    "Mn": (
+        _phase_interval("Mn", 0.0, 980.0, "JANAF Mn-001 alpha <--> beta 980 K"),
+        _phase_interval("Mn", 980.0, 1361.0, "JANAF Mn-001 beta <--> gamma 1361 K"),
+        _phase_interval("Mn", 1361.0, 1412.0, "JANAF Mn-001 gamma <--> delta 1412 K"),
+        _phase_interval("Mn", 1412.0, 1519.0, "JANAF Mn-001 delta <--> liquid 1519 K"),
+        _phase_interval("Mn", 1519.0, 2334.526, "JANAF Mn-001 liquid <--> gas 2334.526 K"),
+        _phase_interval("Mn", 2334.526, None, "JANAF Mn-001 ideal gas above 2334.526 K"),
+    ),
+    # Pankratz B672 states MnO(c). No oxide transition binds tighter than Mn alpha->beta.
+    "MnO": (
+        _phase_interval("MnO", 0.0, None, "Pankratz USBM B672 MnO(c) solid"),
+    ),
+    "Na": (
+        _phase_interval("Na", 0.0, 370.980, "JANAF Na-001 crystal <--> liquid 370.980 K"),
+        _phase_interval("Na", 370.980, 1170.525, "JANAF Na-001 liquid <--> gas 1170.525 K"),
+        _phase_interval("Na", 1170.525, None, "JANAF Na-001 ideal gas above 1170.525 K"),
+    ),
+    "Na2O": (
+        _phase_interval("Na2O", 0.0, 1023.150, "JANAF Na-014 gamma <--> beta 1023.150 K"),
+        _phase_interval("Na2O", 1023.150, 1243.150, "JANAF Na-014 beta <--> alpha 1243.150 K"),
+        _phase_interval("Na2O", 1243.150, 1405.200, "JANAF Na-014 alpha <--> liquid 1405.200 K"),
+        _phase_interval("Na2O", 1405.200, None, "JANAF Na-014 liquid; table has no further transition"),
+    ),
+    "Ni": (
+        _phase_interval("Ni", 0.0, 631.0, "JANAF Ni-001 magnetic transition 631 K"),
+        _phase_interval("Ni", 631.0, 1728.0, "JANAF Ni-001 crystal <--> liquid 1728 K"),
+        _phase_interval("Ni", 1728.0, 3156.584, "JANAF Ni-001 liquid <--> gas 3156.584 K"),
+        _phase_interval("Ni", 3156.584, None, "JANAF Ni-001 ideal gas above 3156.584 K"),
+    ),
+    # USBM Bulletin 668 states NiO(s) through 2000 K. The Ni Curie point binds the low side.
+    "NiO": (
+        _phase_interval("NiO", 0.0, 2000.0, "USBM Bulletin 668 NiO(s) table through 2000 K"),
+    ),
+    "Si": (
+        _phase_interval("Si", 0.0, 1685.0, "JANAF Si-001 crystal <--> liquid 1685 K"),
+        _phase_interval("Si", 1685.0, 3504.616, "JANAF Si-001 liquid <--> gas 3504.616 K"),
+        _phase_interval("Si", 3504.616, None, "JANAF Si-001 ideal gas above 3504.616 K"),
+    ),
+    "SiO2": (
+        _phase_interval("SiO2", 0.0, 847.0, "JANAF O-039 I <--> II 847 K"),
+        _phase_interval("SiO2", 847.0, 1696.0, "JANAF O-039 II <--> liquid 1696 K"),
+        _phase_interval("SiO2", 1696.0, None, "JANAF O-039 liquid above 1696 K"),
+    ),
+    "Ti": (
+        _phase_interval("Ti", 0.0, 1166.0, "JANAF Ti-001 alpha <--> beta 1166 K"),
+        _phase_interval("Ti", 1166.0, 1939.0, "JANAF Ti-001 beta <--> liquid 1939 K"),
+        _phase_interval("Ti", 1939.0, 3630.956, "JANAF Ti-001 liquid <--> gas 3630.956 K"),
+        _phase_interval("Ti", 3630.956, None, "JANAF Ti-001 ideal gas above 3630.956 K"),
+    ),
+    "TiO2": (
+        _phase_interval("TiO2", 0.0, 2130.0, "JANAF O-045 crystal <--> liquid 2130 K"),
+        _phase_interval("TiO2", 2130.0, None, "JANAF O-045 liquid above 2130 K"),
+    ),
+    "Zr": (
+        _phase_interval("Zr", 300.0, 1135.0, "NASA CEA Zr(a) 300-1135 K"),
+        _phase_interval("Zr", 1135.0, 2125.0, "NASA CEA Zr(b) 1135-2125 K"),
+        _phase_interval("Zr", 2125.0, 6000.0, "NASA CEA Zr(L) 2125-6000 K"),
+    ),
+    "ZrO2": (
+        _phase_interval("ZrO2", 300.0, 1445.0, "NASA CEA ZrO2(III) 300-1445 K"),
+        _phase_interval("ZrO2", 1445.0, 2620.0, "NASA CEA ZrO2(II) 1445-2620 K; 2620 K starts ZrO2(I)"),
+        _phase_interval("ZrO2", 2620.0, 2983.0, "NASA CEA ZrO2(I) 2620-2983 K"),
+    ),
+}
+
+
+def _oxide_formula(phase_basis: str) -> str | None:
+    product = str(phase_basis).split("->", 1)
+    if len(product) != 2:
+        return None
+    text = product[1].strip()
+    if text[:1].isdigit():
+        parts = text.split(None, 1)
+        if len(parts) != 2:
+            return None
+        text = parts[1]
+    name, sep, _rest = text.partition("(")
+    if not sep or not name:
+        return None
+    return name
+
+
+def _phase_interval_at(
+    formula: str,
+    temperature_K: float,
+) -> _EllinghamPhaseInterval | None:
+    hits = [
+        interval
+        for interval in _ELLINGHAM_PHASE_INTERVALS.get(formula, ())
+        if interval.contains(temperature_K)
+    ]
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
+def _segment_phase_domain(
+    species: str,
+    segment: EllinghamFitSegment,
+) -> tuple[float, float | None] | None:
+    low, high = segment.range_K
+    midpoint = (low + high) / 2.0
+    metal = _phase_interval_at(species, midpoint)
+    oxide_name = _oxide_formula(segment.phase_basis)
+    oxide = _phase_interval_at(oxide_name, midpoint) if oxide_name else None
+    if metal is None or oxide is None:
+        return None
+    domain_low = max(metal.low_K, oxide.low_K)
+    highs = [bound for bound in (metal.high_K, oxide.high_K) if bound is not None]
+    domain_high = min(highs) if highs else None
+    if domain_high is not None and not domain_low < domain_high:
+        return None
+    return (domain_low, domain_high)
+
+
+def _domain_contains(
+    domain: tuple[float, float | None],
+    temperature_K: float,
+) -> bool:
+    low, high = domain
+    if temperature_K < low:
+        return False
+    if high is None:
+        return True
+    return temperature_K < high
+
+
+def _k_text(value: float) -> str:
+    return format(value, ".12g")
+
+
+def ellingham_same_phase_extension(
+    species: str,
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Evaluate the nearest segment when T is outside every fit but still
+    in that segment's metal and oxide phase fields.
+
+    Returns None when T is inside a certified segment, when the nearest
+    segment is ambiguous, or when reaching T crosses a source transition.
+    The runtime clamp in ``ellingham_segment_for_temperature`` is unchanged.
+    """
+
+    key = str(species)
+    segments = ELLINGHAM_FIT_SEGMENTS[key]
+    T_K = _finite_temperature_K(temperature_K)
+    if any(low <= T_K <= high for low, high in (segment.range_K for segment in segments)):
+        return None
+    nearest: EllinghamFitSegment | None = None
+    nearest_distance: float | None = None
+    ambiguous = False
+    for segment in segments:
+        low, high = segment.range_K
+        distance = (low - T_K) if T_K < low else (T_K - high)
+        if nearest_distance is None or distance < nearest_distance:
+            nearest = segment
+            nearest_distance = distance
+            ambiguous = False
+        elif distance == nearest_distance:
+            ambiguous = True
+    if ambiguous or nearest is None or nearest_distance is None:
+        return None
+    domain = _segment_phase_domain(key, nearest)
+    if domain is None or not _domain_contains(domain, T_K):
+        return None
+    low, high = nearest.range_K
+    if T_K < low:
+        edge = low
+    else:
+        edge = high
+    band = f"{_k_text(low)}-{_k_text(high)}"
+    distance_text = _k_text(nearest_distance)
+    return {
+        "species": key,
+        "segment": nearest,
+        "authority": ELLINGHAM_EXTENSION_AUTHORITY,
+        "segment_range_K": (low, high),
+        "segment_edge_K": edge,
+        "extension_distance_K": nearest_distance,
+        "phase_domain_K": domain,
+        "phase_basis": nearest.phase_basis,
+        "original_refusal_reason": ELLINGHAM_OUTSIDE_SEGMENT_REASON,
+        "notice_reason": (
+            f"authority={ELLINGHAM_EXTENSION_AUTHORITY}; "
+            f"segment_band_K={band}; "
+            f"segment_edge_K={_k_text(edge)}; "
+            f"extension_distance_K={distance_text}; "
+            f"original_refusal_reason={ELLINGHAM_OUTSIDE_SEGMENT_REASON}"
+        ),
+    }
 
 
 def ellingham_metal_phase_kind(species: str, temperature_K: float) -> str:

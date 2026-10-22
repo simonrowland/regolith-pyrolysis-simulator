@@ -71,7 +71,9 @@ from simulator.battery.records import (
 )
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_SEGMENTS,
+    ELLINGHAM_OUTSIDE_SEGMENT_REASON,
     EllinghamFitSegment,
+    ellingham_same_phase_extension,
     ellingham_segment_for_temperature,
 )
 
@@ -471,8 +473,11 @@ def _ellingham_attempt(
     named on that segment. Dividing by n_ox is the oxide formation value
     only while those phases are the standard states, which is the
     segment's own temperature range. Outside that range the selector
-    clamps to a neighbouring reaction. That number is not ΔfG and is
-    refused, not scored as an extrapolated formation value.
+    clamps to a neighbouring reaction. The owner evaluates that reaction
+    only when T is still in the nearest segment's metal and oxide phase
+    fields, and the battery flags the value as extrapolated. Crossing a
+    phase transition stays refused: that number is a different reference
+    state.
 
     Unit check: (kJ/mol O2) / (mol oxide / mol O2) = kJ/mol oxide.
     log10 Kf = −ΔfG / (R T ln 10) with ΔfG in kJ/mol and R in kJ/(mol·K)
@@ -484,7 +489,10 @@ def _ellingham_attempt(
     ΔfG = −7.4056 / 2 = −3.7028 kJ/mol. Residual +0.183 kJ/mol, inside
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
-    K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
+    K2O at 298.15 K is below the potassium boiling point, so the K(g)
+    segment is a different phase and stays refused. CaO at 3200 K is the
+    JANAF crystal-to-liquid point, outside the solid field, and stays
+    refused.
     """
 
     if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
@@ -552,20 +560,24 @@ def _ellingham_attempt(
     call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
     if product.polymorph is None and product.phase is Phase.CR:
         call += ":generic-solid"
+    extension = None
     if extrapolated:
-        # Neighbouring-segment reaction dG is a different reference state.
-        return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "ellingham-formation-outside-segment",
-            quantity=quantity,
-            origin=origin,
-            extra={
-                "segment_range_K": [segment.range_K[0], segment.range_K[1]],
-                "temperature_K": str(temperature_K),
-                "phase_basis": segment.phase_basis,
-            },
-            call_evidence=call + ":outside-segment",
-        )
+        # The selector clamps. The owner names the nearest segment and
+        # refuses a phase crossing. A mismatch is a different reaction.
+        extension = ellingham_same_phase_extension(metal, temperature)
+        if extension is None or extension["segment"] is not segment:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                ELLINGHAM_OUTSIDE_SEGMENT_REASON,
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "segment_range_K": [segment.range_K[0], segment.range_K[1]],
+                    "temperature_K": str(temperature_K),
+                    "phase_basis": segment.phase_basis,
+                },
+                call_evidence=call + ":outside-segment",
+            )
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
@@ -712,6 +724,18 @@ def _ellingham_attempt(
                 ),
                 origin=origin,
                 band=str(segment.range_K),
+            )
+        )
+    if extension is not None:
+        authority = Authority.EXTRAPOLATED
+        notices.append(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason=extension["notice_reason"],
+                origin=origin,
+                band=str(extension["segment_range_K"]),
+                authority=Authority.EXTRAPOLATED,
             )
         )
     return ThermoAttempt(

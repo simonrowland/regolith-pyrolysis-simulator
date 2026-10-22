@@ -4,8 +4,10 @@ import pytest
 
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
+    ELLINGHAM_EXTENSION_AUTHORITY,
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ELLINGHAM_METAL_PHASE_GAS,
+    ELLINGHAM_OUTSIDE_SEGMENT_REASON,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
     ELLINGHAM_THERMO,
@@ -16,6 +18,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_fit_extrapolation,
     ellingham_fit_segments,
     ellingham_metal_phase_kind,
+    ellingham_same_phase_extension,
     ellingham_segment_for_temperature,
 )
 
@@ -198,6 +201,116 @@ def test_mn_reconstructed_tail_is_computable_but_not_authoritative() -> None:
         ("Mn", 1410.0, "Mn(delta,s)"),
     ],
 )
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "edge_K", "distance_K", "notice_reason"),
+    [
+        (
+            "Ca",
+            1000.0,
+            1100.0,
+            100.0,
+            "authority=extrapolated; segment_band_K=1100-1115; "
+            "segment_edge_K=1100; extension_distance_K=100; "
+            "original_refusal_reason=ellingham-formation-outside-segment",
+        ),
+        (
+            "Ca",
+            3100.0,
+            2600.0,
+            500.0,
+            "authority=extrapolated; segment_band_K=2400-2600; "
+            "segment_edge_K=2600; extension_distance_K=500; "
+            "original_refusal_reason=ellingham-formation-outside-segment",
+        ),
+        (
+            "Al",
+            2700.0,
+            2600.0,
+            100.0,
+            "authority=extrapolated; segment_band_K=2327-2600; "
+            "segment_edge_K=2600; extension_distance_K=100; "
+            "original_refusal_reason=ellingham-formation-outside-segment",
+        ),
+        (
+            "Fe",
+            3100.0,
+            2600.0,
+            500.0,
+            "authority=extrapolated; segment_band_K=1809-2600; "
+            "segment_edge_K=2600; extension_distance_K=500; "
+            "original_refusal_reason=ellingham-formation-outside-segment",
+        ),
+        (
+            "Ti",
+            1000.0,
+            1100.0,
+            100.0,
+            "authority=extrapolated; segment_band_K=1100-1166; "
+            "segment_edge_K=1100; extension_distance_K=100; "
+            "original_refusal_reason=ellingham-formation-outside-segment",
+        ),
+    ],
+    ids=["Ca-1000", "Ca-3100", "Al-2700", "Fe-3100", "Ti-1000"],
+)
+def test_same_phase_extension_names_the_nearest_segment(
+    species: str,
+    temperature_K: float,
+    edge_K: float,
+    distance_K: float,
+    notice_reason: str,
+) -> None:
+    extension = ellingham_same_phase_extension(species, temperature_K)
+
+    assert extension is not None
+    assert extension["segment"] is ellingham_segment_for_temperature(
+        species,
+        temperature_K,
+    )
+    assert extension["authority"] == ELLINGHAM_EXTENSION_AUTHORITY
+    assert extension["segment_edge_K"] == edge_K
+    assert extension["extension_distance_K"] == distance_K
+    assert extension["original_refusal_reason"] == ELLINGHAM_OUTSIDE_SEGMENT_REASON
+    assert extension["notice_reason"] == notice_reason
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K"),
+    [
+        ("Ca", 3200.0),
+        ("Ca", 700.0),
+        ("Ca", 1600.0),
+        ("Al", 2800.0),
+        ("Fe", 1000.0),
+        ("K", 1000.0),
+        ("Zr", 2700.0),
+    ],
+    ids=["Ca-3200", "Ca-700", "Ca-1600", "Al-2800", "Fe-1000", "K-1000", "Zr-2700"],
+)
+def test_phase_crossing_and_in_range_are_not_extended(
+    species: str,
+    temperature_K: float,
+) -> None:
+    """3200 K is CaO's melting point, the start of the liquid field.
+
+    The solid segment's high bound is exclusive, and this fit has no
+    CaO(l) segment, so the point stays outside. 1600 K is inside a
+    certified Ca segment and is not an extension either.
+    """
+
+    assert ellingham_same_phase_extension(species, temperature_K) is None
+
+
+def test_formation_extension_does_not_change_the_runtime_clamp() -> None:
+    flagged = ellingham_fit_extrapolation(1000.0, species="Ca", consumer="test")
+
+    assert flagged is not None
+    assert flagged["authority_flag"] == ELLINGHAM_AUTHORITY_LIMIT_FLAG
+    segment = ellingham_segment_for_temperature("Ca", 1000.0)
+    assert ellingham_delta_g_kj_per_mol_o2("Ca", 1000.0) == (
+        segment.delta_g_kJ_per_mol_O2(1000.0)
+    )
+
+
 def test_ellingham_shared_breakpoints_select_next_segment(
     species: str,
     breakpoint_K: float,
