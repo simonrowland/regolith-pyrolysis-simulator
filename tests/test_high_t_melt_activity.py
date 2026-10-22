@@ -1141,6 +1141,76 @@ def test_isothermal_refusal_expires_on_composition_drift(
     assert activity.evidence_tier == "PREDICT_AND_FLAG"
 
 
+def test_zero_composition_cap_skips_unbounded_gamma_exponential(monkeypatch) -> None:
+    # Captured from RH03 hour 14: the last two certified Na2O gammas differ
+    # by a positive ln-gamma slope, while the certificate's composition step
+    # is tiny. A far composition makes the raw secant exponent exceed float64.
+    certificate = {
+        "coefficient_basis": "bulk_single_cation",
+        "composition_prev_single_cation": {
+            "Al2O3": 0.18818467463857735,
+            "CaO": 0.13955949376940213,
+            "FeO": 0.005581240609423344,
+            "K2O": 0.0010220152113098698,
+            "MgO": 0.12914835111720346,
+            "Na2O": 9.958071682057058e-15,
+            "SiO2": 0.5221475634479281,
+            "TiO2": 0.013329599885124678,
+        },
+        "composition_single_cation": {
+            "Al2O3": 0.1881895142690163,
+            "CaO": 0.13956317643418928,
+            "FeO": 0.005581388198588453,
+            "K2O": 0.0010144138454821247,
+            "MgO": 0.1291359082175647,
+            "Na2O": 9.958335011232148e-15,
+            "SiO2": 0.5221613710094267,
+            "TiO2": 0.013327185601658593,
+        },
+        "composition_window_L1": 8.987198964479898e-05,
+        "gamma_last": 0.00014457357191422025,
+        "gamma_prev": 0.00011452123208885657,
+        "hour": 14.0,
+        "ln_gamma_last": -8.841722031788455,
+        "ln_gamma_prev": -9.07475031907012,
+        "temperature_K": 2473.15,
+        "temperature_prev_K": 2473.15,
+        "window_K": 0.0,
+    }
+    # d-207 checks the previous solve's own temperature before continuing a
+    # vapour certificate; real authority records always carry it.
+    previous = {
+        "temperature_K": 2473.15,
+        "certified_effective_gamma_by_parent": {"Na2O": certificate},
+        "last_extrapolated_gamma_by_parent": {},
+    }
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError("reproduced RH03 refusal", {})
+
+    monkeypatch.setattr(
+        openimcc_bridge_module, "evaluate_cleaned_melt", nonconverge,
+    )
+    authority = vapor_pressure_module._build_high_t_melt_activity_authority(
+        composition_mol={"SiO2": 1.0, "Na2O": 1e-20},
+        temperature_K=2473.15,
+        controls={
+            "high_t_melt_activity": "openimcc",
+            "simulation_hour": 15,
+            "high_t_melt_activity_previous": previous,
+        },
+        below_cap_fe_activity=1.0,
+        below_cap_fe_activity_basis="test",
+    )
+
+    notice = authority["held_effective_gamma_by_parent"]["Na2O"]
+    assert authority["authority"] == "extrapolated"
+    assert notice["composition_cap_L1"] == 0.0
+    assert notice["flag"] == "extrapolation_capped_frozen"
+    assert notice["progress_s"] > 1000.0
+    assert notice["gamma_applied"] == certificate["gamma_last"]
+
+
 def test_below_certified_edge_is_activity_source_parity_with_pre_c3_path() -> None:
     provider = _provider()
     temperature_K = openimcc_bridge_module._temperature_domain_K()[0] - 0.1
