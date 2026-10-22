@@ -65,7 +65,15 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         for formula, observation in raw_rows.values()
         if observation["values"].get("quantity") == "equilibrium_phase_composition"
     ]
-    emitted_rows = set(range(6, 7)) | set(range(9, 22)) | set(range(23, 27)) | set(range(34, 40)) | set(range(40, 71))
+    emitted_rows = (
+        set(range(6, 7))
+        | set(range(9, 22))
+        | set(range(23, 27))
+        | set(range(34, 40))
+        | set(range(40, 56))
+        | set(range(57, 71))
+        | set(range(75, 78))
+    )
     expected_component_cells = sum(
         ws.cell(row, column).value is not None
         for row in (*sorted(emitted_rows), *range(81, 129))
@@ -76,10 +84,10 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         for _, observation in compositions
         if int(re.search(r"row(\d+)_", observation["observation_id"]).group(1)) in emitted_rows
     }
-    assert len(emitted_experiments) == 55
+    assert len(emitted_experiments) == 57
     assert len(capacities) == 126
-    assert len(compositions) == expected_component_cells == 1751
-    assert len(raw_rows) == len(migrated) == 1877
+    assert len(compositions) == expected_component_cells == 1785
+    assert len(raw_rows) == len(migrated) == 1911
 
     for formula, observation in capacities:
         row_number = int(re.search(r"row(\d+)_chloride_capacity$", observation["observation_id"]).group(1))
@@ -169,6 +177,15 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     assert ws["AC55"].value == "AgI/Cl-026"
     assert ws["B55"].value == 37.23
     assert migrated["rusiecka_2026_data_row55_sio2"].value.point == Decimal("37.23")
+    assert "rusiecka_2026_data_row56_sio2" not in migrated
+    assert "rusiecka_2026_data_row56_cl" not in migrated
+    assert ws["AC75"].value == "ICB-1"
+    assert ws["B75"].value == 51.17
+    assert ws["K75"].value == 1.7
+    assert migrated["rusiecka_2026_data_row75_sio2"].value.point == Decimal("51.17")
+    assert migrated["rusiecka_2026_data_row75_cl"].value.point == Decimal("1.7")
+    assert migrated["rusiecka_2026_data_row75_i2o"].value.point == Decimal("0.3")
+    assert migrated["rusiecka_2026_data_row75_ag2o"].value.point == Decimal("0.1")
     assert "rusiecka_2026_data_row71_sio2" not in migrated
     assert ws["AC71"].value == "ICB-4"
 
