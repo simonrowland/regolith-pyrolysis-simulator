@@ -1,0 +1,551 @@
+schema_version: literature_extract.v1
+source_id: gibson-1971-lunar-gas-release
+source:
+  citation: 'Gibson, E. K. Jr. & Johnson, S. M. (1971), "Thermal analysis-inorganic gas release studies of lunar samples", Lunar and Planetary Science Conference proceedings, 2, 1351–1364.'
+  doi: null
+  year: 1971
+extraction:
+  method: MinerU table transcription checked against rendered PDF pages 10–11
+  date: '2026-10-22'
+  worker: wave51-F51
+review_status: draft
+fidelity_samples:
+- path: species.lunar_samples.observations[gibson_1971_10086_weight_loss].values.points[0].mass_loss_wt_pct
+  value: '0.13'
+  locator: {page: 10, table: '1', row: 'Apollo 11 Soil 10086,16', column: 'Percent weight-loss to 1000°C'}
+- path: species.K.observations[gibson_1971_10073_k_residue_ppm].values.series[0].residue_ppm
+  value: '385'
+  locator: {page: 11, table: '2', row: K, column: 'Breccia 10073 after 1400°C'}
+- path: species.Na.observations[gibson_1971_10017_na_residue_ppm].values.series[0].residue_ppm
+  value: '500'
+  locator: {page: 11, table: '2', row: Na, column: 'Basalt 10017 after 1400°C'}
+- path: species.Gd.observations[gibson_1971_12022_gd_residue_ppm].values.series[0].residue_ppm
+  value: '7.85'
+  locator: {page: 11, table: '2', row: Gd, column: 'Basalt 12022 after 1400°C'}
+benches:
+- id: mettler-vacuum-thermoanalyzer
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Mettler recording vacuum thermoanalyzer with Finnigan quadrupole mass spectrometer}
+    locator: {page: 3, section: 'Experiment procedures'}
+  cell_material_and_liner:
+    state: {tag: value, value: 'previously outgassed platinum crucible, 16 mm diameter'}
+    locator: {page: 3, section: 'Experiment procedures'}
+experiments:
+- experiment_id: lunar-sample-10086
+  bench_id: mettler-vacuum-thermoanalyzer
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 3, section: 'Experiment procedures'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.00024296'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['242.96 mg']}}
+    printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this soil.'}}
+    form: {state: {tag: value, value: 'Apollo 11 soil 10086,16'}, locator: {page: 10, table: '1'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+- experiment_id: lunar-sample-12023
+  bench_id: mettler-vacuum-thermoanalyzer
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 3, section: 'Experiment procedures'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.00020850'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['208.50 mg']}}
+    printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this soil.'}}
+    form: {state: {tag: value, value: 'Apollo 12 soil 12023,9'}, locator: {page: 10, table: '1'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+- experiment_id: lunar-sample-10073
+  bench_id: mettler-vacuum-thermoanalyzer
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 3, section: 'Experiment procedures'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.00020187'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['201.87 mg']}}
+    printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this breccia.'}}
+    form: {state: {tag: value, value: 'Apollo 11 breccia 10073,23'}, locator: {page: 10, table: '1'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+- experiment_id: lunar-sample-10017
+  bench_id: mettler-vacuum-thermoanalyzer
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 3, section: 'Experiment procedures'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.00040045'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['400.45 mg']}}
+    printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this basalt.'}}
+    form: {state: {tag: value, value: 'Apollo 11 rock 10017,57'}, locator: {page: 10, table: '1'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+- experiment_id: lunar-sample-12022
+  bench_id: mettler-vacuum-thermoanalyzer
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 3, section: 'Experiment procedures'}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.00050065'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['500.65 mg']}}
+    printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this basalt.'}}
+    form: {state: {tag: value, value: 'Apollo 12 rock 12022,38'}, locator: {page: 10, table: '1'}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+species:
+  lunar_samples:
+    observations:
+    - observation_id: gibson_1971_10086_weight_loss
+      type: mass_loss
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10086
+      locator: {page: 10, pdf_page_index: 9, table: '1', row: 'Apollo 11 Soil 10086,16'}
+      units: wt. % as printed
+      values:
+        quantity: mass_loss_fraction
+        total_pressure_torr: '0.000002'
+        method_class: measured_direct
+        sample_mass_mg: '242.96'
+        initial_melting_C_as_context: '1120 ± 10'
+        points:
+        - T_C: '1000'
+          mass_loss_wt_pct: '0.13'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+        - T_C: '1400'
+          mass_loss_wt_pct: '1.41'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+    - observation_id: gibson_1971_12023_weight_loss
+      type: mass_loss
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12023
+      locator: {page: 10, pdf_page_index: 9, table: '1', row: 'Apollo 12 Soil 12023,9'}
+      units: wt. % as printed
+      values:
+        quantity: mass_loss_fraction
+        total_pressure_torr: '0.000002'
+        method_class: measured_direct
+        sample_mass_mg: '208.50'
+        initial_melting_C_as_context: '1125 ± 10'
+        points:
+        - T_C: '1000'
+          mass_loss_wt_pct: '0.20'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+        - T_C: '1400'
+          mass_loss_wt_pct: '2.13'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+    - observation_id: gibson_1971_10073_weight_loss
+      type: mass_loss
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10073
+      locator: {page: 10, pdf_page_index: 9, table: '1', row: 'Apollo 11 Breccia 10073,23'}
+      units: wt. % as printed
+      values:
+        quantity: mass_loss_fraction
+        total_pressure_torr: '0.000002'
+        method_class: measured_direct
+        sample_mass_mg: '201.87'
+        initial_melting_C_as_context: '1125, 1230 ± 10'
+        points:
+        - T_C: '1000'
+          mass_loss_wt_pct: '0.15'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+        - T_C: '1400'
+          mass_loss_wt_pct: '0.95'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+    - observation_id: gibson_1971_10017_weight_loss
+      type: mass_loss
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10017
+      locator: {page: 10, pdf_page_index: 9, table: '1', row: 'Apollo 11 Rock A 10017,57'}
+      units: wt. % as printed
+      values:
+        quantity: mass_loss_fraction
+        total_pressure_torr: '0.000002'
+        method_class: measured_direct
+        sample_mass_mg: '400.45'
+        initial_melting_C_as_context: '1100 ± 10'
+        points:
+        - T_C: '1000'
+          mass_loss_wt_pct: '0.073'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+        - T_C: '1400'
+          mass_loss_wt_pct: '1.02'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+    - observation_id: gibson_1971_12022_weight_loss
+      type: mass_loss
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 10, pdf_page_index: 9, table: '1', row: 'Apollo 12 Rock 12022,38'}
+      units: wt. % as printed
+      values:
+        quantity: mass_loss_fraction
+        total_pressure_torr: '0.000002'
+        method_class: measured_direct
+        sample_mass_mg: '500.65'
+        initial_melting_C_as_context: '1140 ± 10'
+        points:
+        - T_C: '1000'
+          mass_loss_wt_pct: '0.038'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+        - T_C: '1400'
+          mass_loss_wt_pct: '0.51'
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+  Ce:
+    observations:
+    - observation_id: gibson_1971_12022_ce_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Ce, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Ce
+        starting_measured_ppm: '17.4'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '17.7'
+  Eu:
+    observations:
+    - observation_id: gibson_1971_12022_eu_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Eu, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Eu
+        starting_measured_ppm: '1.28'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '1.28'
+  Gd:
+    observations:
+    - observation_id: gibson_1971_12022_gd_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Gd, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Gd
+        starting_measured_ppm: '7.90'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '7.85'
+      note: Dashes in the after-1400 °C columns remain unreported and are not typed as residue values.
+  K:
+    observations:
+    - observation_id: gibson_1971_10073_k_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10073
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: K, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10073'
+        sample_form: breccia
+        analyte: K
+        starting_measured_ppm: '1200'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '385'
+    - observation_id: gibson_1971_10017_k_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10017
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: K, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10017'
+        sample_form: basalt
+        analyte: K
+        starting_measured_ppm: '2610'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '641'
+    - observation_id: gibson_1971_12022_k_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: K, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: K
+        starting_measured_ppm: '536'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '179.3'
+  Li:
+    observations:
+    - observation_id: gibson_1971_10017_li_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10017
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Li, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10017'
+        sample_form: basalt
+        analyte: Li
+        starting_measured_ppm: '18.7'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '19.3'
+    - observation_id: gibson_1971_12022_li_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Li, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Li
+        starting_measured_ppm: '9.51'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '11.8'
+  Na:
+    observations:
+    - observation_id: gibson_1971_10017_na_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10017
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Na, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10017'
+        sample_form: basalt
+        analyte: Na
+        starting_measured_ppm: '3800'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '500'
+    - observation_id: gibson_1971_12022_na_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Na, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Na
+        starting_measured_ppm: '1824'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '673'
+  Nd:
+    observations:
+    - observation_id: gibson_1971_12022_nd_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Nd, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Nd
+        starting_measured_ppm: '14.8'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '15.0'
+  Rb:
+    observations:
+    - observation_id: gibson_1971_10073_rb_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10073
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Rb, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10073'
+        sample_form: breccia
+        analyte: Rb
+        starting_measured_ppm: '2.84'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '0.69'
+    - observation_id: gibson_1971_10017_rb_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-10017
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Rb, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '10017'
+        sample_form: basalt
+        analyte: Rb
+        starting_measured_ppm: '5.63'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '1.05'
+    - observation_id: gibson_1971_12022_rb_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Rb, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Rb
+        starting_measured_ppm: '0.738'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '0.173'
+  Sm:
+    observations:
+    - observation_id: gibson_1971_12022_sm_residue_ppm
+      type: concentration_series
+      regime: vacuum_chamber_pyrolysis
+      experiment: lunar-sample-12022
+      locator: {page: 11, pdf_page_index: 10, table: '2', row: Sm, column: 'after 1400 °C; initial'}
+      T_range_K: ['1673.15', '1673.15']
+      units: ppm
+      point_conditions:
+        pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        sample_number: '12022'
+        sample_form: basalt
+        analyte: Sm
+        starting_measured_ppm: '5.58'
+        total_pressure_torr: '0.000002'
+        analytical_method: isotopic dilution and atomic absorption analysis
+        series:
+        - T_C: '1400'
+          residue_ppm: '5.59'
+notes:
+- Table 1 initial-melting values are contextual; the paper calls them initial melting/solidus, but they are not typed as separate transition-temperature measurements in this extract.
+- Figures 1–5 contain gas-release curves only; figure-read candidates are deferred because the curves are not tabulated numeric data.
+- Table 2 prints 27 initial element concentrations but only 15 numerical after-1400 °C residue concentrations; remaining residue cells are dashes.
+- Distinct 1971 proceedings paper; the separate Gibson and Hubbard 1972 extract is unchanged.
