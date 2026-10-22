@@ -72,6 +72,7 @@ experiments:
               section: 2.1 Thermal Analysis and Mass Spectroscopy
               note: Printed 1500 mg specimen; unit conversion only.
         output_unit: kg
+        references: []
     form:
       state:
         tag: value
@@ -125,6 +126,7 @@ experiments:
               section: 2.1 Thermal Analysis and Mass Spectroscopy
               note: Icarus journal pre-proof; no printed pagination.
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -188,6 +190,7 @@ experiments:
                 section: 2.1 Thermal Analysis and Mass Spectroscopy
                 note: Printed 2.5 C/min; unit conversion only.
           output_unit: K/s
+          references: []
     setpoints_and_holds:
     - temperature_K:
         state:
@@ -232,6 +235,7 @@ experiments:
                 section: 2.1 Thermal Analysis and Mass Spectroscopy
                 note: Printed 25-1200 C; unit conversion only.
           output_unit: K
+          references: []
 - experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
   kind: literature
   method:
@@ -317,6 +321,7 @@ experiments:
                 section: 3.3 Heat Treatment Design
                 note: Printed 2.5 C/min; unit conversion only.
           output_unit: K/s
+          references: []
     setpoints_and_holds:
     - temperature_K:
         state:
@@ -352,6 +357,7 @@ experiments:
                 section: 3.3 Heat Treatment Design
                 note: Printed 750 C; unit conversion only.
           output_unit: K
+          references: []
       hold_duration_s:
         state:
           tag: value
@@ -386,6 +392,7 @@ experiments:
                 section: 3.3 Heat Treatment Design
                 note: Printed two-hour hold; unit conversion only.
           output_unit: s
+          references: []
 - experiment_id: 10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series
   kind: literature
   method:
@@ -426,6 +433,7 @@ experiments:
               section: 2.1 Thermal Analysis and Mass Spectroscopy
               note: Printed approximately 23 g; unit conversion only.
         output_unit: kg
+        references: []
     form:
       state:
         tag: value
@@ -516,6 +524,7 @@ experiments:
                 section: 2.1 Thermal Analysis and Mass Spectroscopy
                 note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
           output_unit: Pa
+          references: []
       pump:
         state:
           tag: value
@@ -583,6 +592,7 @@ experiments:
                 section: 2.1 Thermal Analysis and Mass Spectroscopy
                 note: Printed 2.5 C/min; unit conversion only.
           output_unit: K/s
+          references: []
     setpoints_and_holds:
     - temperature_K:
         state:

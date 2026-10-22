@@ -60,6 +60,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_prose_1200C_range
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -154,12 +155,14 @@ observations:
               note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
                 X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1100
   identity:
@@ -323,6 +326,7 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -330,6 +334,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1200
   identity:
@@ -493,6 +498,7 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -500,6 +506,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1300
   identity:
@@ -663,6 +670,7 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -670,6 +678,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1100
   identity:
@@ -833,6 +842,7 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -840,6 +850,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1200
   identity:
@@ -1003,6 +1014,7 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1010,6 +1022,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1300
   identity:
@@ -1173,6 +1186,7 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1180,6 +1194,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1100
   identity:
@@ -1343,6 +1358,7 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1350,6 +1366,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1200
   identity:
@@ -1513,6 +1530,7 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1520,6 +1538,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1300
   identity:
@@ -1683,6 +1702,7 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1690,6 +1710,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1100
   identity:
@@ -1853,6 +1874,7 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -1860,6 +1882,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1200
   identity:
@@ -2023,6 +2046,7 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -2030,6 +2054,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1300
   identity:
@@ -2193,6 +2218,7 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
       via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
@@ -2200,6 +2226,7 @@ observations:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2721,9 +2748,11 @@ observations:
               figure: '8'
               paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
         output_unit: K
+        references: []
   derivation:
     relation: identity.fO2_Pa=derived via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
     inputs:
     - pdf:ts1985
     parameters: []
     output_unit: Pa
+    references: []

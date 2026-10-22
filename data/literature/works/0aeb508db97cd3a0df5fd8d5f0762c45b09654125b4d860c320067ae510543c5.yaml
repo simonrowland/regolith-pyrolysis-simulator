@@ -58,6 +58,7 @@ experiments:
         - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -101,6 +102,7 @@ experiments:
         - Printed nominal total pressure about 1e-3 atm
         parameters: []
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -147,6 +149,7 @@ experiments:
         - Printed oxygen partial-pressure range 1e-13 to 1e-8 atm
         parameters: []
         output_unit: Pa
+        references: []
   thermal_schedule:
     setpoints_and_holds:
     - temperature_K:
@@ -167,6 +170,7 @@ experiments:
           - Printed temperature range 1300-1500 C
           parameters: []
           output_unit: K
+          references: []
 - experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
   kind: literature
   method:

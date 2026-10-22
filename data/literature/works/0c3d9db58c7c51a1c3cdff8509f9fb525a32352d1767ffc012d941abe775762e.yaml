@@ -80,6 +80,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -106,6 +107,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -213,6 +215,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+        references: []
 - experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::b-133-evaporation
   kind: literature
   method:
@@ -262,6 +265,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -288,6 +292,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -395,6 +400,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+        references: []
 - experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::bcai-evaporation
   kind: literature
   method:
@@ -444,6 +450,7 @@ experiments:
               section: 5.1 Starting Materials
               note: 5-70 mg; converted to kg
         output_unit: kg
+        references: []
     initial_composition:
       state:
         tag: value
@@ -470,6 +477,7 @@ experiments:
         - original_unit=wt_pct
         parameters: []
         output_unit: mole_fraction
+        references: []
     printed_composition:
       state:
         tag: value
@@ -516,8 +524,8 @@ experiments:
           approximate: false
       locator:
         paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-        line_range: 194-196
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        line_range: 198
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
       inference:
         relation: bar_to_Pa
         inputs:
@@ -532,17 +540,18 @@ experiments:
               value: '0.000000001'
             locator:
               paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-              line_range: 194-196
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+              line_range: 198
+              source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         - - factor
           - state:
               tag: value
               value: '100000'
             locator:
               paragraph: vacuum experiments P≈10^-6 torr; also H2 and 1 bar gas-mix furnaces
-              line_range: 194-196
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+              line_range: 198
+              source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -605,6 +614,7 @@ experiments:
               table: '1'
               note: 15-300 min per run; converted to s
         output_unit: s
+        references: []
 - experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::kems-037-richter-2002
   kind: literature
   method:
@@ -626,7 +636,7 @@ experiments:
           approximate: false
       locator:
         table: '1'
-        source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+        source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
       inference:
         relation: bar_to_Pa
         inputs:
@@ -641,15 +651,16 @@ experiments:
               value: '0.000187'
             locator:
               table: '1'
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+              source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         - - factor
           - state:
               tag: value
               value: '100000'
             locator:
               table: '1'
-              source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+              source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -662,7 +673,7 @@ experiments:
   locator:
     table: '1'
     paragraph: Avg.area (cm2) and γ_Mg per run
-    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
+    source_path: text/kems-037-richter-2002/mineru/source/vlm/source.md
 benches:
 - id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::bench::evaporation-furnaces
   work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e

@@ -99,7 +99,7 @@ experiments:
       locator:
         paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
         section: '4.1'
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
       inference:
         relation: bar_to_Pa
         inputs:
@@ -115,7 +115,7 @@ experiments:
             locator:
               paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
               section: '4.1'
-              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+              source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         - - factor
           - state:
               tag: value
@@ -123,8 +123,9 @@ experiments:
             locator:
               paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
               section: '4.1'
-              source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+              source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
         output_unit: Pa
+        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -137,13 +138,13 @@ experiments:
   locator:
     table: '3'
     line_range: 186-197
-    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   apparatus:
     cell_material_and_liner:
       state:
         tag: value
         value: graphite crucible (Hashimoto) / vacuum free-evap (Yu)
       locator:
-        paragraph: apparatus of primary experiment
+        paragraph: graphite crucible in a vacuum chamber
         line_range: '171'
-        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+        source_path: text/kems-005-fedkin-2006/mineru/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md

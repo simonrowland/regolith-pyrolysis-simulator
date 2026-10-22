@@ -53,6 +53,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure2_time_series
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
   identity:
@@ -155,6 +156,7 @@ observations:
               figure: '2'
               note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
         output_unit: K
+        references: []
     composition:
       state:
         tag: value
@@ -335,6 +337,7 @@ observations:
               figure: '2'
               note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
         output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -349,6 +352,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg11
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
@@ -427,6 +431,7 @@ observations:
               figure: '3'
               note: Volatility-factor plot; values retained as figure-only and not read off the graph.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -441,6 +446,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg13
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
   identity:
@@ -519,6 +525,7 @@ observations:
               figure: '3'
               note: Volatility-factor plot; values retained as figure-only and not read off the graph.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -533,6 +540,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg7
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
   identity:
@@ -611,6 +619,7 @@ observations:
               figure: '3'
               note: Volatility-factor plot; values retained as figure-only and not read off the graph.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -625,6 +634,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg9
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg9
   identity:
@@ -703,6 +713,7 @@ observations:
               figure: '3'
               note: Volatility-factor plot; values retained as figure-only and not read off the graph.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -717,6 +728,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg11
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
@@ -795,6 +807,7 @@ observations:
               figure: 4a,b
               note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -809,6 +822,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg13
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
   identity:
@@ -887,6 +901,7 @@ observations:
               figure: 4a,b
               note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
         output_unit: K
+        references: []
     fO2_log:
       state:
         tag: value
@@ -901,6 +916,7 @@ observations:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions
   experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
   identity:
@@ -981,9 +997,11 @@ observations:
               section: Experimental vaporisation experiments
               note: Main text conditions; detailed assembly and timing are in Methods on PDF pages 11-14.
         output_unit: K
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
     - pdf:norris-2017-earth-volatiles-nature
     parameters: []
     output_unit: Pa
+    references: []
