@@ -2457,6 +2457,78 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     assert decision_band_for(Quantity.CP, SourceRelation.SAME_INPUT) is None
 
 
+# Exact outputs of the base in-band resolver. K at 1800 K is the join:
+# T == T_max of the lower segment, so that segment owns it. K at 6000 K
+# and Fe at 4000 K are the upper segment's certified interior or end.
+_VAPOROCK_IN_BAND_PIN = (
+    (
+        "K",
+        Decimal("1200"),
+        {
+            Quantity.CP: Decimal("20.78466702488889"),
+            Quantity.S: Decimal("189.01928920321794"),
+            Quantity.H_MINUS_H298: Decimal("18.746192578133332"),
+        },
+    ),
+    (
+        "K",
+        Decimal("1800"),
+        {
+            Quantity.CP: Decimal("20.864585592395063"),
+            Quantity.S: Decimal("197.45608706041142"),
+            Quantity.H_MINUS_H298: Decimal("31.232321333688887"),
+        },
+    ),
+    (
+        "K",
+        Decimal("6000"),
+        {
+            Quantity.CP: Decimal("45.086233055555525"),
+            Quantity.S: Decimal("230.09770134488363"),
+            Quantity.H_MINUS_H298: Decimal("155.28008366666666"),
+        },
+    ),
+    (
+        "Fe",
+        Decimal("4000"),
+        {
+            Quantity.CP: Decimal("29.672713874999996"),
+            Quantity.S: Decimal("243.52268739094387"),
+            Quantity.H_MINUS_H298: Decimal("91.8760058333333"),
+        },
+    ),
+)
+
+
+def test_vaporock_gas_in_band_outputs_are_pinned() -> None:
+    """In-band Shomate Cp, S, and H−H298 stay on these exact values.
+
+    The numbers are the base resolver's outputs for the containing
+    JANAF row, not a re-fit. A later out-of-band change must leave them
+    bit-identical, still BRIDGE, and still without a notice.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    for formula, temperature, expected in _VAPOROCK_IN_BAND_PIN:
+        for quantity, pinned in expected.items():
+            attempt = predict_thermo_attempt(
+                Engine.VAPOROCK,
+                F.observation(
+                    f"pin-{formula}-{quantity.value}-{temperature}",
+                    "exp-1",
+                    _gas_thermo(formula, quantity, temperature),
+                    pinned,
+                ),
+            )
+            assert attempt.refusal_reason is None
+            assert attempt.value == pinned
+            assert attempt.authority is Authority.BRIDGE
+            assert attempt.notices == ()
+
+
 def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     import pytest
 
