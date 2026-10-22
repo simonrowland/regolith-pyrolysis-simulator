@@ -4178,11 +4178,13 @@ class CondensationModel:
             factor: float,
         ) -> dict[str, dict[Any, float]]:
             relaxed: dict[str, dict[Any, float]] = {}
-            for species in set(previous) | set(current):
+            for species in sorted(set(previous) | set(current)):
                 values: dict[Any, float] = {}
                 for location in (
-                    set(previous.get(species, {}))
-                    | set(current.get(species, {}))
+                    sorted(
+                        set(previous.get(species, {}))
+                        | set(current.get(species, {}))
+                    )
                 ):
                     old_value = float(
                         previous.get(species, {}).get(location, 0.0)

@@ -294,7 +294,7 @@ def _nearest_feedstock(
         species = set(wt_pct) | set(anchor)
         return sum(
             (wt_pct.get(name, 0.0) - float(anchor.get(name, 0.0))) ** 2
-            for name in species
+            for name in sorted(species)
         )
 
     return min(sorted(anchors), key=lambda name: distance(anchors[name]))

@@ -969,7 +969,7 @@ def _same_composition_temperature_bridge(
                 points.append((probe_T, gammas))
     fits: dict[str, dict[str, Any]] = {}
     parents = {oxide for _probe_T, gammas in points for oxide in gammas}
-    for oxide in parents:
+    for oxide in sorted(parents):
         observations = [
             (probe_T, gammas[oxide])
             for probe_T, gammas in points
