@@ -6,7 +6,11 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from engines.antoine import _append_antoine_skip_notice, _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -1424,7 +1428,10 @@ class EquilibriumMixin:
             },
             activity_coefficients=activities,
             fO2_log=intrinsic_fO2_log,
-            warnings=warnings,
+            warnings=_antoine_skip_notices_for_omitted_species(
+                warnings,
+                vapor_pressures,
+            ),
             status='ok',
             diagnostics=_eq_diagnostics,
         )

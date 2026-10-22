@@ -56,7 +56,11 @@ if TYPE_CHECKING:
         GasChannelPotential,
     )
 
-from engines.antoine import _append_antoine_skip_notice, _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
@@ -4191,7 +4195,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             transition=None,
             control_audit=control_audit,
             diagnostic=diagnostic,
-            warnings=tuple(warnings),
+            warnings=tuple(
+                _antoine_skip_notices_for_omitted_species(
+                    warnings,
+                    vapor_pressures,
+                )
+            ),
         )
 
     # ------------------------------------------------------------------

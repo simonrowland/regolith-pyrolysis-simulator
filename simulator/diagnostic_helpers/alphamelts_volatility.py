@@ -16,7 +16,11 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from engines.antoine import _append_antoine_skip_notice, _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
@@ -177,7 +181,10 @@ def alphamelts_activity_volatility_diagnostic(
             vacuum_floor_bar=float(vacuum_floor_bar),
         )
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
-        for notice in computed.get("warnings", ()):
+        for notice in _antoine_skip_notices_for_omitted_species(
+            computed.get("warnings", ()),
+            computed["species"],
+        ):
             if notice not in antoine_skip_notices:
                 antoine_skip_notices.append(notice)
         grid.append(
