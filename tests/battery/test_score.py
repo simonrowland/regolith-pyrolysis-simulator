@@ -11300,7 +11300,7 @@ def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str)
 def test_stolyarova_partial_pressure_species_phase_follows_the_printed_field(
     tmp_path: Path,
 ) -> None:
-    """The fixture's melt string is stamped onto the Al partial-pressure species."""
+    """The fixture's melt string names the condensed source, not the Al vapour."""
 
     context = _migrated_stolyarova_cell_context(tmp_path)
     reference = next(
@@ -11312,7 +11312,9 @@ def test_stolyarova_partial_pressure_species_phase_follows_the_printed_field(
         and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
     )
     assert reference.identity.species.formula == "Al"
-    assert reference.identity.species.phase.value is Phase.L
+    assert reference.identity.species.phase.value is Phase.G
+    assert reference.derivation is not None
+    assert "condensed source" in reference.derivation.relation
 
 
 def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
@@ -11391,8 +11393,28 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
         experiment=experiment,
         bench=bench,
     )
+    assert reference.identity.species.phase.value is Phase.G
     assert len(prediction_inputs) == 1
     assert prediction_inputs[0].cell_material == "Mo"
+    liquid = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=replace(reference.identity.species, phase=State.of(Phase.L)),
+        ),
+    )
+    refused = predict_with_engine(
+        Engine.OPENIMCC,
+        liquid,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert len(prediction_inputs) == 1
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == (
+        "partial-pressure-condensed-species-not-on-gas-map"
+    )
+    assert refused.refusal_detail["observation_basis"] == "Al(l)"
 
     # This legacy extract leaves several identity axes unresolved. Use a typed
     # KEMS scoring identity for the residual while keeping the migrated row id,
