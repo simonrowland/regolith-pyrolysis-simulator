@@ -216,19 +216,7 @@ class EquipmentDesigner:
         design.concentrator = self.size_solar_concentrator(
             mass_kg, peak_T_C)
 
-        # Estimate peak evaporation rate from batch size
-        # ~10 g/s per tonne at peak SiO window
-        peak_evap_kg_s = mass_kg * 10e-3 / 1000.0
-        design.pipe = self.size_collection_pipe(peak_evap_kg_s)
-        pipe_volume_m3 = (
-            math.pi * design.pipe.diameter_m**2 / 4.0
-            * design.pipe.length_m
-        )
-        crucible_freeboard_m3 = self._crucible_freeboard_volume_m3(
-            design.crucible
-        )
-        design.headspace_volume_m3 = crucible_freeboard_m3 + pipe_volume_m3
-        design.condensers = self._condenser_specs(design.pipe)
+        self.resize_collection_pipe(design)
 
         design.turbine = self.size_turbine(mass_kg)
         design.volatiles_train = self.size_volatiles_train(mass_kg, feedstock)
@@ -364,6 +352,21 @@ class EquipmentDesigner:
             peak_flux_kW_m2=flux,
             efficiency=eff,
         )
+
+    def resize_collection_pipe(self, design: PlantDesign) -> None:
+        # Estimate peak evaporation rate from batch size
+        # ~10 g/s per tonne at peak SiO window
+        peak_evap_kg_s = design.batch_mass_kg * 10e-3 / 1000.0
+        design.pipe = self.size_collection_pipe(peak_evap_kg_s)
+        pipe_volume_m3 = (
+            math.pi * design.pipe.diameter_m**2 / 4.0
+            * design.pipe.length_m
+        )
+        crucible_freeboard_m3 = self._crucible_freeboard_volume_m3(
+            design.crucible
+        )
+        design.headspace_volume_m3 = crucible_freeboard_m3 + pipe_volume_m3
+        design.condensers = self._condenser_specs(design.pipe)
 
     def size_collection_pipe(self, peak_evap_rate_kg_s: float,
                               pressure_mbar: float = 10.0) -> PipeSpec:

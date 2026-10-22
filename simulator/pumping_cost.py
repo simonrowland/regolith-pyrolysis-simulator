@@ -442,6 +442,14 @@ def estimate_subambient_pump_cost(
     )
 
 
+def _process_transport_pressure_admitted(transport_pressure_pa: float,
+                                         requested_pressure_pa: float) -> bool:
+    """Binary64 EOS round-trip allowance shared by balance and admission."""
+    return transport_pressure_pa <= requested_pressure_pa or math.isclose(
+        transport_pressure_pa, requested_pressure_pa, rel_tol=4 * math.ulp(1.0), abs_tol=0.0,
+    )
+
+
 def process_pressure_state(
     *, requested_pressure_pa: float, ambient_pressure_pa: float,
     chamber_mol_per_s: float, chamber_temperature_K: float,
@@ -456,9 +464,8 @@ def process_pressure_state(
     # PV/RT startup. Binary64 round trips can add a few ulps (1500 Pa
     # becomes 1500.0000000000005 Pa). Admit only this relative 4*eps
     # band; preserve raw achieved pressure and the strict pump-speed limit.
-    transport_admitted = transport_pressure_pa <= requested_pressure_pa or math.isclose(
-        transport_pressure_pa, requested_pressure_pa, rel_tol=4 * math.ulp(1.0), abs_tol=0.0,
-    )
+    transport_admitted = _process_transport_pressure_admitted(
+        transport_pressure_pa, requested_pressure_pa)
     diagnostic = {
         "requested_pressure_pa": requested_pressure_pa,
         "achieved_pressure_pa": requested_pressure_pa,
