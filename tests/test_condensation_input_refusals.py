@@ -37,6 +37,23 @@ def test_minimum_knudsen_pressure_refuses_nonfinite_temperature(value):
         )
 
 
+def test_invalid_pipe_diameter_has_same_knudsen_refusal_across_paths():
+    with pytest.raises(condensation.KnudsenRegimeRefusal) as pressure_exc:
+        condensation.minimum_pressure_mbar_for_knudsen(
+            gas_temperature_C=1700.0,
+            pipe_diameter_m=0.0,
+        )
+
+    model = _configured_model()
+    model.pipe_diameter_m = 0.0
+    with pytest.raises(condensation.KnudsenRegimeRefusal) as regime_exc:
+        model._enforce_knudsen_regime()
+
+    assert type(pressure_exc.value) is type(regime_exc.value)
+    assert pressure_exc.value.reason == "invalid_pipe_diameter"
+    assert pressure_exc.value.diagnostic["field"] == "pipe_diameter_m"
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [

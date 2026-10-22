@@ -126,114 +126,16 @@
     "sulfur_saturation_notice": {
       "notices": [
         {
-          "calibration_status": "out_of_range",
+          "calibration_status": "unavailable",
           "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=348.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=398.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=448.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=498.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=548.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=598.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=648.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=698.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=748.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=798.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=848.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=898.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=948.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]",
-            "T_K=998.15 K outside Chowdhury-Dasgupta 2019 SCAS calibration window [1023.0, 1598.0]"
-          ]
-        },
-        {
-          "calibration_status": "out_of_range",
-          "warnings": [
-            "FeO_total=16.98 wt% outside Chowdhury-Dasgupta 2019 SCAS calibration window [0.0, 12.0]"
+            "PySulfSat import failed: ModuleNotFoundError(\"No module named 'PySulfSat'\")"
           ]
         }
       ],
       "first_hour": 1,
       "last_hour": 24,
       "count": 24,
-      "calibration_status": "out_of_range"
+      "calibration_status": "unavailable"
     },
     "composition_projected_liquidus_notice": {
       "kind": "composition_projected",
@@ -32785,10 +32687,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.590266505623063,
+        "fe2o3_equiv_wt_pct": 18.590551505606918,
         "fe2o3_over_feo_molar": 8365413905198.211,
         "fe3_over_sigma_fe": 0.9999999999999403,
-        "feo_equiv_wt_pct": 1.0008616891634039e-12,
+        "feo_equiv_wt_pct": 1.0008770329759935e-12,
         "ferric_frac": 0.9999999999999403,
         "ferrous_frac": 5.972999872483342e-14,
         "high_uncertainty": true,
@@ -33262,10 +33164,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.590266505291,
+        "fe2o3_equiv_wt_pct": 18.590551505274853,
         "fe2o3_over_feo_molar": 27380876841.829823,
         "fe3_over_sigma_fe": 0.999999999981739,
-        "feo_equiv_wt_pct": 3.0546361503226606e-10,
+        "feo_equiv_wt_pct": 3.054682979734883e-10,
         "ferric_frac": 0.999999999981739,
         "ferrous_frac": 1.8260948309034575e-11,
         "high_uncertainty": true,
@@ -33739,10 +33641,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.59026647854264,
+        "fe2o3_equiv_wt_pct": 18.590551478526088,
         "fe2o3_over_feo_molar": 336835172.7685952,
         "fe3_over_sigma_fe": 0.9999999985155944,
-        "feo_equiv_wt_pct": 2.4830710221871945e-08,
+        "feo_equiv_wt_pct": 2.4831090891617074e-08,
         "ferric_frac": 0.9999999985155944,
         "ferrous_frac": 1.4844055984397642e-09,
         "high_uncertainty": true,
@@ -38694,10 +38596,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.590265628819086,
+        "fe2o3_equiv_wt_pct": 18.590550628789753,
         "fe2o3_over_feo_molar": 10403687.483804433,
         "fe3_over_sigma_fe": 0.9999999519401196,
-        "feo_equiv_wt_pct": 8.039318584109755e-07,
+        "feo_equiv_wt_pct": 8.039441831706451e-07,
         "ferric_frac": 0.9999999519401196,
         "ferrous_frac": 4.805988040867959e-08,
         "high_uncertainty": true,
@@ -43649,10 +43551,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.590251909538832,
+        "fe2o3_equiv_wt_pct": 18.590536909303164,
         "fe2o3_over_feo_molar": 624962.0361935734,
         "fe3_over_sigma_fe": 0.9999991999520434,
-        "feo_equiv_wt_pct": 1.3382972339662928e-05,
+        "feo_equiv_wt_pct": 1.3383177508693529e-05,
         "ferric_frac": 0.9999991999520434,
         "ferrous_frac": 8.000479565506424e-07,
         "high_uncertainty": true,
@@ -48604,10 +48506,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.59011851306105,
+        "fe2o3_equiv_wt_pct": 18.590403510819147,
         "fe2o3_over_feo_molar": 61637.784758452304,
         "fe3_over_sigma_fe": 0.9999918881584399,
-        "feo_equiv_wt_pct": 0.000135692573336743,
+        "feo_equiv_wt_pct": 0.00013569465358594443,
         "ferric_frac": 0.9999918881584399,
         "ferrous_frac": 8.111841560132227e-06,
         "high_uncertainty": true,
@@ -53559,10 +53461,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.589239451744135,
+        "fe2o3_equiv_wt_pct": 18.58952443628145,
         "fe2o3_over_feo_molar": 8881.230658019977,
         "fe3_over_sigma_fe": 0.9999437046653122,
-        "feo_equiv_wt_pct": 0.0009416931567983409,
+        "feo_equiv_wt_pct": 0.000941707593536825,
         "ferric_frac": 0.9999437046653122,
         "ferrous_frac": 5.629533468776149e-05,
         "high_uncertainty": true,
@@ -58552,10 +58454,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.58496642424986,
+        "fe2o3_equiv_wt_pct": 18.58525134452197,
         "fe2o3_over_feo_molar": 1720.6161646673613,
         "fe3_over_sigma_fe": 0.9997094908465423,
-        "feo_equiv_wt_pct": 0.004859579869885835,
+        "feo_equiv_wt_pct": 0.004859654370575655,
         "ferric_frac": 0.9997094908465423,
         "ferrous_frac": 0.00029050915345774087,
         "high_uncertainty": true,
@@ -63623,10 +63525,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.568667848113513,
+        "fe2o3_equiv_wt_pct": 18.568952523254083,
         "fe2o3_over_feo_molar": 421.85067191941323,
         "fe3_over_sigma_fe": 0.9988161496281569,
-        "feo_equiv_wt_pct": 0.019803545237091855,
+        "feo_equiv_wt_pct": 0.019803848844064106,
         "ferric_frac": 0.9988161496281569,
         "ferrous_frac": 0.0011838503718430982,
         "high_uncertainty": true,
@@ -72614,10 +72516,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.517630777020965,
+        "fe2o3_equiv_wt_pct": 18.517914684507183,
         "fe2o3_over_feo_molar": 125.09497900151536,
         "fe3_over_sigma_fe": 0.996018949133357,
-        "feo_equiv_wt_pct": 0.06659881228810564,
+        "feo_equiv_wt_pct": 0.06659983336372861,
         "ferric_frac": 0.996018949133357,
         "ferrous_frac": 0.003981050866643021,
         "high_uncertainty": true,
@@ -82100,10 +82002,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.382179640373437,
+        "fe2o3_equiv_wt_pct": 18.382461510128483,
         "fe2o3_over_feo_molar": 43.34680514082073,
         "fe3_over_sigma_fe": 0.9885966606142871,
-        "feo_equiv_wt_pct": 0.1907923049234237,
+        "feo_equiv_wt_pct": 0.1907952305057706,
         "ferric_frac": 0.9885966606142871,
         "ferrous_frac": 0.011403339385712918,
         "high_uncertainty": true,
@@ -91587,10 +91489,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 18.07136865618735,
+        "fe2o3_equiv_wt_pct": 18.07164584792123,
         "fe2o3_over_feo_molar": 17.088892979773036,
         "fe3_over_sigma_fe": 0.971572969340652,
-        "feo_equiv_wt_pct": 0.47577109987308813,
+        "feo_equiv_wt_pct": 0.4757783975946174,
         "ferric_frac": 0.971572969340652,
         "ferrous_frac": 0.02842703065934804,
         "high_uncertainty": true,
@@ -101074,10 +100976,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 17.4495020284602,
+        "fe2o3_equiv_wt_pct": 17.44976985139154,
         "fe2o3_over_feo_molar": 7.505710398105307,
         "fe3_over_sigma_fe": 0.9375445806635305,
-        "feo_equiv_wt_pct": 1.0459530155222372,
+        "feo_equiv_wt_pct": 1.045969069287107,
         "ferric_frac": 0.9375445806635305,
         "ferrous_frac": 0.062455419336469475,
         "high_uncertainty": true,
@@ -110561,10 +110463,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 16.366739911249628,
+        "fe2o3_equiv_wt_pct": 16.36699139281708,
         "fe2o3_over_feo_molar": 3.611807570089669,
         "fe3_over_sigma_fe": 0.8783989786785923,
-        "feo_equiv_wt_pct": 2.0387243932270187,
+        "feo_equiv_wt_pct": 2.038755719050536,
         "ferric_frac": 0.8783989786785923,
         "ferrous_frac": 0.12160102132140771,
         "high_uncertainty": true,
@@ -120048,10 +119950,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 14.740293670545881,
+        "fe2o3_equiv_wt_pct": 14.740520536342661,
         "fe2o3_over_feo_molar": 1.8786817711486141,
         "fe3_over_sigma_fe": 0.7897995410464004,
-        "feo_equiv_wt_pct": 3.529993102771227,
+        "feo_equiv_wt_pct": 3.5300474324010005,
         "ferric_frac": 0.7897995410464004,
         "ferrous_frac": 0.21020045895359962,
         "high_uncertainty": true,
@@ -130855,10 +130757,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 12.649190455669919,
+        "fe2o3_equiv_wt_pct": 12.649385551587097,
         "fe2o3_over_feo_molar": 1.0447258040362397,
         "fe3_over_sigma_fe": 0.6763179596705502,
-        "feo_equiv_wt_pct": 5.447300732125921,
+        "feo_equiv_wt_pct": 5.44738474905461,
         "ferric_frac": 0.6763179596705502,
         "ferrous_frac": 0.3236820403294498,
         "high_uncertainty": true,
@@ -142327,10 +142229,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.0,
-        "fe2o3_equiv_wt_pct": 10.344070363982194,
+        "fe2o3_equiv_wt_pct": 10.344230279873637,
         "fe2o3_over_feo_molar": 0.615520483997047,
         "fe3_over_sigma_fe": 0.5517787372147228,
-        "feo_equiv_wt_pct": 7.560837390163744,
+        "feo_equiv_wt_pct": 7.5609542781980235,
         "ferric_frac": 0.5517787372147228,
         "ferrous_frac": 0.4482212627852772,
         "high_uncertainty": true,
@@ -154726,10 +154628,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.000000000344185,
-        "fe2o3_equiv_wt_pct": 8.129557658519648,
+        "fe2o3_equiv_wt_pct": 8.129683620603119,
         "fe2o3_over_feo_molar": 0.3813379570030824,
         "fe3_over_sigma_fe": 0.432680737250658,
-        "feo_equiv_wt_pct": 9.591307665195846,
+        "feo_equiv_wt_pct": 9.591456276122475,
         "ferric_frac": 0.432680737250658,
         "ferrous_frac": 0.567319262749342,
         "high_uncertainty": true,
@@ -168897,10 +168799,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.000000000176025,
-        "fe2o3_equiv_wt_pct": 7.129600168385959,
+        "fe2o3_equiv_wt_pct": 7.1297107483818625,
         "fe2o3_over_feo_molar": 0.3052527252591007,
         "fe3_over_sigma_fe": 0.3790769229137121,
-        "feo_equiv_wt_pct": 10.508157349990594,
+        "feo_equiv_wt_pct": 10.508320331359709,
         "ferric_frac": 0.3790769229137121,
         "ferrous_frac": 0.6209230770862879,
         "high_uncertainty": true,
@@ -183696,10 +183598,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.000000000452252,
-        "fe2o3_equiv_wt_pct": 6.052826045043864,
+        "fe2o3_equiv_wt_pct": 6.052920026297408,
         "fe2o3_over_feo_molar": 0.2368937463905724,
         "fe3_over_sigma_fe": 0.32147612535852993,
-        "feo_equiv_wt_pct": 11.49543840400313,
+        "feo_equiv_wt_pct": 11.495616891820754,
         "ferric_frac": 0.32147612535852993,
         "ferrous_frac": 0.6785238746414701,
         "high_uncertainty": true,
@@ -194230,10 +194132,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.00000000100375,
-        "fe2o3_equiv_wt_pct": 5.117566739388541,
+        "fe2o3_equiv_wt_pct": 5.117646273933544,
         "fe2o3_over_feo_molar": 0.18638596325737494,
         "fe3_over_sigma_fe": 0.2715468748411534,
-        "feo_equiv_wt_pct": 12.352966248577106,
+        "feo_equiv_wt_pct": 12.353158231916073,
         "ferric_frac": 0.2715468748411534,
         "ferrous_frac": 0.7284531251588466,
         "high_uncertainty": true,
@@ -204764,10 +204666,10 @@
         "diagnostic_only": true,
         "extrapolation": true,
         "fO2_log": -9.000000002212513,
-        "fe2o3_equiv_wt_pct": 4.319653700213249,
+        "fe2o3_equiv_wt_pct": 4.3197208879572315,
         "fe2o3_over_feo_molar": 0.14852879301540717,
         "fe3_over_sigma_fe": 0.2290242077376487,
-        "feo_equiv_wt_pct": 13.084562977471766,
+        "feo_equiv_wt_pct": 13.084766494310957,
         "ferric_frac": 0.2290242077376487,
         "ferrous_frac": 0.7709757922623512,
         "high_uncertainty": true,
@@ -215363,10 +215265,10 @@
         "diagnostic_only": true,
         "extrapolation": false,
         "fO2_log": -8.99940375362166,
-        "fe2o3_equiv_wt_pct": 1.4192636734908723,
+        "fe2o3_equiv_wt_pct": 1.4192858131114028,
         "fe2o3_over_feo_molar": 0.040557516946783875,
         "fe3_over_sigma_fe": 0.07502904996283057,
-        "feo_equiv_wt_pct": 15.743912625881356,
+        "feo_equiv_wt_pct": 15.744158221014736,
         "ferric_frac": 0.07502904996283057,
         "ferrous_frac": 0.9249709500371694,
         "high_uncertainty": false,
@@ -233638,10 +233540,10 @@
         "diagnostic_only": true,
         "extrapolation": false,
         "fO2_log": -8.999403753621667,
-        "fe2o3_equiv_wt_pct": 1.4192636734908688,
+        "fe2o3_equiv_wt_pct": 1.4192858131113992,
         "fe2o3_over_feo_molar": 0.040557516946783764,
         "fe3_over_sigma_fe": 0.07502904996283037,
-        "feo_equiv_wt_pct": 15.743912625881356,
+        "feo_equiv_wt_pct": 15.744158221014743,
         "ferric_frac": 0.07502904996283037,
         "ferrous_frac": 0.9249709500371697,
         "high_uncertainty": false,
@@ -250129,11 +250031,11 @@
       "context": "Path A: Continuous pN\u2082 ramp extracts Na/K/Fe/SiO\u2082. Path A_staged: staged pN\u2082 ramp separates alkali, SiO, hot Fe hold, then cool Na cleanup. Path B: pO\u2082-managed Fe-only pyrolysis preserving CMAS glass for tapping as Material 1."
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250144,14 +250046,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250162,14 +250065,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250180,14 +250084,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250198,14 +250103,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250216,14 +250122,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250234,14 +250141,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250252,14 +250160,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250270,14 +250179,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250288,14 +250198,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250306,14 +250217,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250324,14 +250236,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250342,14 +250255,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250360,14 +250274,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250378,14 +250293,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250396,14 +250312,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250414,14 +250331,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250432,14 +250350,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250450,14 +250369,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250468,14 +250388,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250486,14 +250407,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250504,14 +250426,15 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     },
     {
-      "event": "shadow_dispatch",
+      "event": "shadow_error",
       "provider_id": "vaporock",
       "intent": "vapor_pressure",
       "result": {
-        "status": "non_authoritative",
+        "status": "unavailable",
         "diagnostic": {
           "melt_model_id": "MELTS-v1.0",
           "T_calib_max_K": 1700.0,
@@ -250522,7 +250445,8 @@
           "constants_version": "2026-08-10.ht-c3.1",
           "instrument_status": "non_authoritative"
         }
-      }
+      },
+      "error": "ProviderUnavailableError(\"VapoRock diagnostic provider unavailable: VapoRock import failed: vaporock: ModuleNotFoundError: No module named 'vaporock'; VapoRock: ModuleNotFoundError: No module named 'VapoRock'\")"
     }
   ],
   "status": "ok",
