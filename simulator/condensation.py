@@ -91,6 +91,7 @@ from typing import Any, Dict
 import yaml
 
 from engines.antoine import _antoine_log10_pressure
+from simulator.environment import _molar_flow_partial_pressures
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -6112,10 +6113,9 @@ def _flowing_species_partial_pressures_pa(
         total_molar_flow = sum(molar_flow_by_species.values())
         if total_molar_flow <= 0.0:
             return {}
-        partial_pressures_pa = {
-            species: molar_flow / total_molar_flow * pressure_pa
-            for species, molar_flow in molar_flow_by_species.items()
-        }
+        partial_pressures_pa = _molar_flow_partial_pressures(
+            molar_flow_by_species, total_molar_flow, pressure_pa,
+        )
 
     for species, partial_pressure_pa in partial_pressures_pa.items():
         if not math.isfinite(partial_pressure_pa) or partial_pressure_pa < 0.0:

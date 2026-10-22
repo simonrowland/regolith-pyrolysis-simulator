@@ -59,6 +59,7 @@ from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
     _headspace_moles_at_pressure_pa,
+    _molar_flow_partial_pressures,
     controlled_background_partial_pressure,
     cover_gas_partial_pressures,
     ideal_gas_partial_pressures_bar,
@@ -458,7 +459,7 @@ def sweep_boundary_partials_bar(species_mol: Mapping[str, float], *, pressure_ba
                                temperature_K: float) -> dict[str, Any]:
     """Pressure-only projection; CO2 dissociation never creates product O2."""
     total = sum(species_mol.values())
-    partials = {s: n / total * pressure_bar for s, n in species_mol.items()} if total else {}
+    partials = _molar_flow_partial_pressures(species_mol, total, pressure_bar) if total else {}
     notices = []
     if partials.get('CO2', 0.0) > 0.0 and partials.get('CO', 0.0) > 0.0:
         raise OverheadConfigurationError('missing_input: reactive CO/CO2 boundary; pure-CO2 dissociation cannot describe supplied CO')
@@ -1509,42 +1510,15 @@ class OverheadGasModel:
                 temperature_K=gas.headspace_temperature_K,
             )
             gas.composition = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
-        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            for species, partial_mbar in cover_gas_partial_pressures(
-                melt.ambient_atmosphere, melt.p_total_mbar,
-            ).items():
-                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
-        elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — inert-sweep total pressure floor
-            # Kr audit 2026-07-25: key the sweep balance partial off the
-            # STAMPED carrier, not literal 'N2' — a Kr carrier previously
-            # got a phantom full-magnitude N2 partial alongside its real
-            # Kr partial (double-counted buffer in flue partials and the
-            # thermal-train Kn mixture).
-            _sweep_key = (
-                getattr(melt, 'background_gas_species', '')
-                or ('Ar' if atmosphere_name == 'ARGON_FLOW' else 'N2')
-            )
-            gas.composition[_sweep_key] = max(
-                gas.composition.get(_sweep_key, 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
-        elif atmosphere_name in {
-            'CONTROLLED_O2',
-            'CONTROLLED_O2_FLOW',
-            'O2_BACKPRESSURE',
-        } and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    controlled_background_partial_pressure(
-                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
-                    ),  # mbar — background gas partial pressure share
-                )
+        else:
+            if atmosphere_name in {
+                'PN2_SWEEP', 'ARGON_FLOW',
+                'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE',
+            } and melt.p_total_mbar > 0:
+                gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)
+            if melt.p_total_mbar > 0:
+                for species, partial_mbar in self._background_partial_pressures_mbar(melt).items():
+                    gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
 
         partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
             max(0.0, float(partial_pressure))
@@ -1588,15 +1562,12 @@ class OverheadGasModel:
             molar_flow_by_species[species] = max(0.0, float(rate)) / (
                 molar_mass_g_mol / 1000.0
             )
+        # Unknown-only mixtures retain the legacy mass-fraction fallback.
         total_molar_flow = sum(molar_flow_by_species.values())
-        # F-316: y_i = n_dot_i / sum(n_dot), p_i = y_i P_vapor. Mass rates
-        # become mol/hr through kg/(kg/mol); unknown-only mixtures retain the
-        # legacy mass-fraction fallback instead of losing pressure entirely.
         if total_molar_flow > 0.0:
-            return {
-                species: molar_flow / total_molar_flow * vapor_pressure_mbar
-                for species, molar_flow in molar_flow_by_species.items()
-            }
+            return _molar_flow_partial_pressures(
+                molar_flow_by_species, total_molar_flow, vapor_pressure_mbar,
+            )
         return {
             species: max(0.0, float(rate)) / total_evap_kg_hr
             * vapor_pressure_mbar
@@ -1628,23 +1599,10 @@ class OverheadGasModel:
                 temperature_K=gas.headspace_temperature_K,
             )
             gas.composition = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
-        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
-            for species, partial_mbar in cover_gas_partial_pressures(
-                melt.ambient_atmosphere, melt.p_total_mbar,
-            ).items():
+        elif atmosphere_name in {'CO2_BACKPRESSURE', 'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
+            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)
+            for species, partial_mbar in self._background_partial_pressures_mbar(melt).items():
                 gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
-        elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
-            gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — sweep total pressure floor
-            # Kr audit 2026-07-25: same stamped-carrier fix as the
-            # no-headspace branch above.
-            _sweep_key = (
-                getattr(melt, 'background_gas_species', '')
-                or ('Ar' if atmosphere_name == 'ARGON_FLOW' else 'N2')
-            )
-            gas.composition[_sweep_key] = max(
-                gas.composition.get(_sweep_key, 0.0),
-                max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
 
         # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
         # no-headspace branch (above) calls `apply_commanded_o2_floor` so a
@@ -1672,17 +1630,28 @@ class OverheadGasModel:
                 self.apply_commanded_o2_floor(gas.composition, melt.pO2_mbar)
             gas.pressure_mbar = max(  # mbar — controlled total pressure floor
                 gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    controlled_background_partial_pressure(
-                        melt.p_total_mbar, melt.pO2_mbar, background_fraction,
-                    ),  # mbar — background gas partial pressure share
-                )
+            for species, partial_mbar in self._background_partial_pressures_mbar(melt).items():
+                gas.composition[species] = max(gas.composition.get(species, 0.0), partial_mbar)
+
+    @staticmethod
+    def _background_partial_pressures_mbar(melt: MeltState) -> dict[str, float]:
+        """Project existing declared carrier floors, separately from vapour."""
+        atmosphere = getattr(melt.atmosphere, 'name', '')
+        if atmosphere == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+            return cover_gas_partial_pressures(melt.ambient_atmosphere, melt.p_total_mbar)
+        if atmosphere in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
+            carrier = getattr(melt, 'background_gas_species', '') or (
+                'Ar' if atmosphere == 'ARGON_FLOW' else 'N2'
+            )
+            return {carrier: max(0.0, melt.p_total_mbar - melt.pO2_mbar)}
+        if atmosphere in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
+            carrier = str(getattr(melt, 'background_gas_species', '') or '').strip()
+            if carrier and carrier.upper() != 'O2':
+                fraction = float(getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
+                return {carrier: controlled_background_partial_pressure(
+                    melt.p_total_mbar, melt.pO2_mbar, fraction,
+                )}
+        return {}
 
     @staticmethod
     def apply_commanded_o2_floor(

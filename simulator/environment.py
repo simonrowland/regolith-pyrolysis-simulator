@@ -81,6 +81,21 @@ def ideal_gas_partial_pressures_bar(
     }
 
 
+def _molar_flow_partial_pressures(
+    molar_flow_by_species: Mapping[str, float], total_molar_flow: float, pressure: float,
+) -> dict[str, float]:
+    """Dalton projection in the caller's pressure units (Pa or mbar).
+
+    p_i = n_dot_i/sum(n_dot) * P. The molar-rate units cancel, leaving
+    pressure units; one species takes P. Callers retain their zero shortcuts.
+    Caller-specific species resolution and validation stay at the boundary.
+    """
+    return {
+        species: molar_flow / total_molar_flow * pressure
+        for species, molar_flow in molar_flow_by_species.items()
+    }
+
+
 def _headspace_pressure_bar(mol: float, volume_m3: float, temperature_K: float) -> float:
     """Legacy scalar EOS, after caller-specific zero/validity handling.
 
