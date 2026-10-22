@@ -105,3 +105,16 @@ def test_mars_startup_before_first_pipe_evaluation():
     sim = mars_sim(sweep=0.0)
     boundary = sim._physical_sweep_boundary()
     assert boundary["partials_bar"].get("O2", 0.0) == 0.0
+
+
+
+def test_legacy_bleed_notice_reaches_source_without_co2_projection():
+    sim = _gas_train_sim()
+    sim._headspace_bleed_conductance_kg_s(
+        species_kg_for_M_avg={"O2": 1e-8, "Kr": 1e-8},
+        p_upstream_bar=1e-11, p_downstream_bar=0.0)
+    sim._headspace_co2_dissociation_diagnostic = {}
+    sim.melt.temperature_C = 100.0
+    source = SimpleNamespace(warnings=[])
+    sim._refresh_vapor_pressures_from_kernel(source)
+    assert any(REASON in n for n in source.warnings)

@@ -10093,6 +10093,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 warning = f"{notice['code']}: T_gas={notice['temperature_K']:g} K; {notice['reason']}"
                 if warning not in result.warnings:
                     result.warnings.append(warning)
+        routing_notices = list(getattr(self, "_process_pressure_diagnostic", {}).get("transport_notices", ()))
+        pipe_notice = getattr(getattr(self, "_overhead_model", None), "last_pipe_conductance_authority_notice", None)
+        if pipe_notice:
+            routing_notices.append(pipe_notice)
+        for notice in dict.fromkeys(routing_notices):
+            if not any(notice in warning for warning in result.warnings):
+                result.warnings.append(notice)
         if T_C + 273.15 < 400:
             self._last_high_t_melt_activity = {}
             self._last_high_t_melt_activity_temperature_K = None
