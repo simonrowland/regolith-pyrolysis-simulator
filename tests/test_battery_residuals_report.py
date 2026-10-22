@@ -209,6 +209,34 @@ def _write_pair(path: Path, values: tuple[str, ...], *, status: str) -> None:
             )
 
 
+def _write_values(path: Path, rows: tuple[tuple[str, str], ...]) -> None:
+    with path.open("w", encoding="utf-8") as handle:
+        handle.write('{"kind":"battery_store_stamp","revision":"show"}\n')
+        for key, value in rows:
+            handle.write(
+                '{"key":"' + key + '","status":"match","rail":"melt_activity",'
+                '"candidate_request":{"engine":"openimcc"},'
+                f'"numeric":{{"operation":"dex","unit":"1","value":"{value}"}}}}\n'
+            )
+
+
+def test_rowdiff_show_keeps_the_largest_relative_moves(tmp_path: Path) -> None:
+    """show=2 keeps the two largest |relative| moves, b=3 and c=2.5, not a=2."""
+
+    base = tmp_path / "base.jsonl"
+    tip = tmp_path / "tip.jsonl"
+    _write_values(base, (("a", "1"), ("b", "1"), ("c", "1")))
+    _write_values(tip, (("a", "2"), ("b", "3"), ("c", "2.5")))
+
+    report = rowdiff_report(base, tip, show=2)
+
+    assert report.value_move_count == 3
+    assert [(item.key, item.relative) for item in report.value_moves] == [
+        ("b", Decimal("2")),
+        ("c", Decimal("1.5")),
+    ]
+
+
 def test_duplicate_keys_keep_the_last_row(tmp_path: Path) -> None:
     base = tmp_path / "base.jsonl"
     tip = tmp_path / "tip.jsonl"

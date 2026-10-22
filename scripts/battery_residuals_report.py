@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import argparse
 import array
+import heapq
 import sys
 from collections import Counter
 from dataclasses import dataclass
@@ -468,25 +469,40 @@ def _change_of(key: str, record: _Record, raw_status: Mapping[tuple[str, str], s
     )
 
 
-def _outranks(left: ValueMove, right: ValueMove) -> bool:
-    if left.relative != right.relative:
-        return left.relative > right.relative
-    return left.key < right.key
+class _ReverseKey:
+    """Heap rank that treats a greater key as smaller, so it is evicted first."""
+
+    __slots__ = ("key",)
+
+    def __init__(self, key: str) -> None:
+        self.key = key
+
+    def __lt__(self, other: _ReverseKey) -> bool:
+        return self.key > other.key
+
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, _ReverseKey) and self.key == other.key
 
 
-def _keep_move(chosen: list[ValueMove], move: ValueMove, show: int) -> None:
+def _keep_move(
+    chosen: list[tuple[Decimal, _ReverseKey, ValueMove]],
+    move: ValueMove,
+    show: int,
+) -> None:
+    """Keep at most ``show`` moves with the largest absolute relative change.
+
+    The heap root is the worst retained move: the smaller relative change,
+    and, on a tie, the greater key. A smaller key outranks a greater one.
+    """
+
     if show <= 0:
         return
+    item = (move.relative, _ReverseKey(move.key), move)
     if len(chosen) < show:
-        chosen.append(move)
+        heapq.heappush(chosen, item)
         return
-    worst = 0
-    for index in range(1, len(chosen)):
-        if _outranks(chosen[worst], chosen[index]):
-            continue
-        worst = index
-    if _outranks(move, chosen[worst]):
-        chosen[worst] = move
+    if item[:2] > chosen[0][:2]:
+        heapq.heapreplace(chosen, item)
 
 
 def _summarize(
@@ -497,7 +513,7 @@ def _summarize(
     retain_details: bool,
 ) -> tuple[RowDiffReport, int, int, int, int]:
     transitions: Counter[tuple[str, str, str]] = Counter()
-    moves: list[ValueMove] = []
+    moves: list[tuple[Decimal, _ReverseKey, ValueMove]] = []
     above = {threshold: 0 for threshold in _RELATIVE_BUCKETS}
     appeared = 0
     cleared = 0
@@ -548,7 +564,7 @@ def _summarize(
             refused_n += 1
             if retain_details:
                 newly_refused.append(change)
-    moves.sort(key=lambda item: (-item.relative, item.key))
+    ordered = sorted((item[2] for item in moves), key=lambda item: (-item.relative, item.key))
     if retain_details:
         for bucket in (newly_scored, newly_refused, added, removed):
             bucket.sort(key=lambda item: item.key)
@@ -563,7 +579,7 @@ def _summarize(
         ),
         value_move_count=move_count,
         value_moves_above=tuple((threshold, above[threshold]) for threshold in _RELATIVE_BUCKETS),
-        value_moves=tuple(moves),
+        value_moves=tuple(ordered),
         value_appeared=appeared,
         value_cleared=cleared,
         newly_scored=tuple(newly_scored),
