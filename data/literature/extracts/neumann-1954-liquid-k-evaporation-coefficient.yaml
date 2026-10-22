@@ -27,8 +27,9 @@ extraction:
     table_1: >-
       PDF p2: MinerU HTML and pdftotext agree on the numeric alpha and delta cells,
       including comma decimals and the printed ± on the Prüger water row. The
-      render confirms each row/column assignment and the species formula C9H6;
-      pdftotext's CCI, is an OCR error. Delta is the printed free angular ratio,
+      render confirms each row/column assignment. In pdftotext, CCI, is the row-4
+      CCl4 token and the row-5 species cell is blank; the render reads row 5 as
+      C9H6. Delta is the printed free angular ratio,
       retained as context because this extract's quantity is alpha. Schema gap:
       no free-angular-ratio quantity token exists. Neumann's K row is retained as
       his own summary value, not attributed to prior work.

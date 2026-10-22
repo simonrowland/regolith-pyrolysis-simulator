@@ -14,7 +14,7 @@ recorded below.
 | 2 | Hg | 1.00 | — | Volmer and Estermann 1921 [2] | MinerU + pdftotext; render row/column check |
 | 3 | K | 1 | — | Neumann, this work | MinerU + pdftotext; render row/column check |
 | 4 | CCl4 | 1 | 1 | Alty 1931 [3], Prüger 1940 [4], Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
-| 5 | C9H6 | 0.9 | 0.85 | Baranaev 1939 [5] | Render identifies row 5 as C9H6; pdftotext `CCI,` is an OCR error. It is distinct from row 4 CCl4. |
+| 5 | C9H6 | 0.9 | 0.85 | Baranaev 1939 [5] | pdftotext `CCI,` is the row-4 CCl4 token; row-5 species cell is blank in pdftotext; render reads row 5 as C9H6. |
 | 6 | CHCl3 | 0.16 | 0.54 | Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
 | 7 | C2H5OH | 0.02 | 0.02 | Baranaev 1939 [5] | MinerU + pdftotext; render row/column check |
 | 8 | C2H5OH | 0.024 | 0.02 | Bucka 1950 [6] | MinerU + pdftotext; render row/column check |
@@ -23,8 +23,8 @@ recorded below.
 | 11 | H2O | 0.04 | 0.04 | Alty and Mackay 1935 [3] | MinerU + pdftotext; render row/column check |
 | 12 | H2O | 0.02 ± 0.04 | 0.04 | Prüger 1940 [4] | MinerU + pdftotext; render confirms ± and row/column assignment |
 
-The row 5 `C9H6` formula is distinct from row 4 `CCl4`; the render resolves the
-pdftotext OCR error and confirms `C9H6` as printed, without chemical reinterpretation.
+The row-4 `CCl4` token appears as `CCI,` in pdftotext; row 5's species cell is
+blank in pdftotext, and the render reads row 5 as `C9H6`.
 Delta is retained as source context; the schema has no free-angular-ratio
 quantity token. The K row is Neumann's own result, not an attribution to prior
 work.
