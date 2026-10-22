@@ -654,6 +654,13 @@ def classify_knudsen_regime(knudsen_number: float) -> KnudsenRegime:
     return KnudsenRegime.FREE_MOLECULAR
 
 
+def mean_mixture_bulk_fraction_routing_is_approximation(
+    knudsen_number: float,
+) -> bool:
+    """Whether molecular bulk-fraction routing invokes the F3 approximation."""
+    return classify_knudsen_regime(knudsen_number) is KnudsenRegime.FREE_MOLECULAR
+
+
 def mean_molecular_speed_m_s(
     temperature_K: float,
     molar_mass_kg_mol: float,
@@ -824,6 +831,89 @@ def long_tube_molecular_conductance_m3_s(
         transmission_probability=transmission_probability,
         knudsen_number=knudsen_number,
     )
+
+
+def independent_molecular_species_molar_flows_mol_s(
+    *,
+    area_m2: float,
+    transmission_probability: float,
+    temperature_K: float,
+    molar_masses_kg_mol: Mapping[str, float],
+    upstream_partial_pressures_Pa: Mapping[str, float],
+    downstream_partial_pressures_Pa: Mapping[str, float],
+) -> dict[str, float]:
+    """Return signed species flows in the independent free-molecular limit.
+
+    Each species has its own Clausing conductance and partial-pressure drop;
+    positive flow is upstream-to-downstream. This is a reference calculation
+    for F3 mixtures, not the mean-mixture pipe model used for runtime capacity.
+    """
+    species = set(molar_masses_kg_mol)
+    if not species:
+        _refuse(
+            "missing_molecular_species",
+            "at least one species is required for molecular reference flow",
+        )
+    if species != set(upstream_partial_pressures_Pa) or species != set(
+        downstream_partial_pressures_Pa
+    ):
+        _refuse(
+            "molecular_species_mismatch",
+            "molar masses and both partial-pressure maps must name the same species",
+        )
+
+    area_m2 = _require_positive(
+        area_m2, name="area_m2", category="invalid_geometry"
+    )
+    temperature_K = _require_positive(
+        temperature_K, name="temperature_K", category="invalid_temperature"
+    )
+    transmission_probability = _require_nonnegative(
+        transmission_probability,
+        name="transmission_probability",
+        category="invalid_transmission_probability",
+    )
+    if transmission_probability > 1.0:
+        _refuse(
+            "invalid_transmission_probability",
+            "transmission_probability must be <= 1",
+        )
+
+    flows: dict[str, float] = {}
+    for species_name, molar_mass in molar_masses_kg_mol.items():
+        molar_mass = _require_positive(
+            molar_mass,
+            name=f"{species_name}.molar_mass_kg_mol",
+            category="invalid_molar_mass",
+        )
+        upstream_pressure = _require_nonnegative(
+            upstream_partial_pressures_Pa[species_name],
+            name=f"{species_name}.upstream_partial_pressure_Pa",
+            category="invalid_pressure",
+        )
+        downstream_pressure = _require_nonnegative(
+            downstream_partial_pressures_Pa[species_name],
+            name=f"{species_name}.downstream_partial_pressure_Pa",
+            category="invalid_pressure",
+        )
+        conductance_m3_s = (
+            0.25
+            * area_m2
+            * mean_molecular_speed_m_s(temperature_K, molar_mass)
+            * transmission_probability
+        )
+        # Premise: in the independent molecular limit each species flows
+        # through its own Clausing conductance C_i=A*tau*cbar_i/4, so
+        # n_dot_i=C_i*(p_up,i-p_down,i)/(R*T). C_i has units m^3/s and
+        # pressure/(R*T) has units mol/m^3, yielding signed mol/s. Equal total
+        # pressures can still produce opposed species flows; equal partial
+        # pressures give zero for that species, the correct equilibrium limit.
+        flows[species_name] = (
+            conductance_m3_s
+            * (upstream_pressure - downstream_pressure)
+            / (GAS_CONSTANT_J_MOL_K * temperature_K)
+        )
+    return flows
 
 
 def dynamic_viscosity_sutherland_pa_s(

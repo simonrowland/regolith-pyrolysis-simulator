@@ -951,6 +951,13 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
         )
         for species, mass in masses_kg_mol.items()
     }
+    actual_equal_partial_flows = tr.independent_molecular_species_molar_flows_mol_s(
+        **common,
+        molar_masses_kg_mol=masses_kg_mol,
+        upstream_partial_pressures_Pa={"O2": 50.0, "Kr": 50.0},
+        downstream_partial_pressures_Pa={"O2": 0.0, "Kr": 0.0},
+    )
+    assert actual_equal_partial_flows == pytest.approx(equal_partial_flows)
     assert equal_partial_flows["O2"] / equal_partial_flows["Kr"] == pytest.approx(
         math.sqrt(masses_kg_mol["Kr"] / masses_kg_mol["O2"]), rel=1e-12
     )
@@ -969,12 +976,29 @@ def test_molecular_two_species_reference_uses_independent_partial_pressures():
             downstream_partial_pressure_Pa=80.0,
         ),
     }
+    actual_counterflow = tr.independent_molecular_species_molar_flows_mol_s(
+        **common,
+        molar_masses_kg_mol=masses_kg_mol,
+        upstream_partial_pressures_Pa={"O2": 80.0, "Kr": 20.0},
+        downstream_partial_pressures_Pa={"O2": 20.0, "Kr": 80.0},
+    )
+    assert actual_counterflow == pytest.approx(counterflow)
     assert counterflow["O2"] > 0.0
     assert counterflow["Kr"] < 0.0
-    assert sum((80.0, 20.0)) == sum((20.0, 80.0))
+    assert sum({"O2": 80.0, "Kr": 20.0}.values()) == sum(
+        {"O2": 20.0, "Kr": 80.0}.values()
+    )
 
     # The existing scalar total-pressure law sees ΔP_total = 0 and cannot
     # represent the two opposed independent molecular species flows above.
     assert tr.pipe_mass_flow_kg_s(
         0.01, 0.1, 0.057898, 1.0e-5, common["temperature_K"], 100.0, 100.0
     ) == 0.0
+
+
+def test_mean_mixture_bulk_fraction_routing_approximation_starts_at_molecular_limit():
+    assert not tr.mean_mixture_bulk_fraction_routing_is_approximation(9.999)
+    assert tr.mean_mixture_bulk_fraction_routing_is_approximation(10.0)
+    assert tr.mean_mixture_bulk_fraction_routing_is_approximation(math.inf)
+    with pytest.raises(Exception, match="invalid_knudsen_number"):
+        tr.mean_mixture_bulk_fraction_routing_is_approximation(-1.0)
