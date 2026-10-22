@@ -70,17 +70,17 @@ fidelity_samples:
     note: Table 3 row 11 Al2O3; read from the 600 dpi render.
     row: '11'
     column: Al2O3
-- path: species.V2O5.context[neubert_2025_table_3_v2o5_context_cells].values.rows[36].V2O5_wt_pct_as_published
-  value: '8.87'
+- path: species.CaO.observations[neubert_2025_table_3_run_37_cao_slag_composition].values.points[0].CaO_wt_pct
+  value: '33.98'
   locator:
     source_path: corpus/raw/neubert-2025-vanadium-slag-evaporation/neubert-2025-vanadium-slag-evaporation.pdf
     page: 4
     pdf_page_index: 3
     published_page: 2300681 (4 of 8)
     table: '3'
-    note: Table 3 row 37 V2O5; read from the 600 dpi render.
+    note: Table 3 row 37 CaO; read from the 600 dpi render.
     row: '37'
-    column: V2O5
+    column: CaO
 experiments:
 - experiment_id: run-01
   locator: &id001
