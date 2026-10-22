@@ -5180,3 +5180,51 @@ def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
         "pdf_page_index": 11,
         "figure": "6",
     }
+
+
+def test_konta_1975_table_i_render_pins_and_residue_migration() -> None:
+    """Pin the scanned Table I values and prove every residue row lifts its axes."""
+    from simulator.battery.enums import Quantity
+
+    source_id = "konta-1975-moldavite-oxide-volatility"
+    path = EXTRACTS / f"{source_id}.yaml"
+    document = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    observations = {
+        item["observation_id"]: item
+        for species_data in document["species"].values()
+        for item in species_data.get("observations", [])
+    }
+    assert len(
+        [
+            item
+            for item in observations.values()
+            if item["values"].get("quantity") == "residue_component_composition"
+        ]
+    ) == 132  # 11 oxides × 6 runs × raw and separately printed water-free basis.
+    assert observations["konta_1975_5.91_SiO2_raw"]["values"]["SiO2_wt_pct"] == "77.04"
+    assert observations["konta_1975_10.52_Al2O3_raw"]["values"]["Al2O3_wt_pct"] == "18.14"
+    assert observations["konta_1975_13.92_SiO2_water_free"]["values"]["SiO2_wt_pct"] == "69.41"
+    assert observations["konta_1975_condensate_10.52_SiO2"]["values"]["value_wt_pct"] == "90.60"
+
+    migrator = battery_migrate.Migrator(REPO_ROOT)
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    residue_rows = [
+        item
+        for item in result.observations.values()
+        if item.source_id == source_id
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue_rows) == 132
+    assert result.validation is not None and not result.validation.hard_issues
+    for item in residue_rows:
+        assert item.identity.temperature_K.is_value
+        assert item.identity.composition.is_value
+        assert item.identity.total_pressure_Pa.is_value
+        assert "temperature_K" in item.point_conditions
+        assert "starting_composition" in item.point_conditions
+    assert next(
+        item for item in residue_rows if item.observation_id.endswith("konta_1975_5.91_SiO2_raw")
+    ).value.point == Decimal("77.04")
