@@ -726,25 +726,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id003
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '50'
-                - - SiO2
-                  - '45'
-                - - V2O3
-                  - '5'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 3 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
     - observation_id: vickerfalt_2024_table1_sample_03_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -774,7 +759,10 @@ species:
         point_conditions:
           temperature_K: *id001
           pO2_Pa: *id002
-          composition: *id003
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
     - observation_id: vickerfalt_2024_table1_sample_03_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -804,7 +792,10 @@ species:
         point_conditions:
           temperature_K: *id001
           pO2_Pa: *id002
-          composition: *id003
+        composition_wt_pct:
+          Al2O3: '50'
+          SiO2: '45'
+          V2O3: '5'
     context:
     - observation_id: vickerfalt_2024_mullite_ratio_summary_context
       type: table_context
@@ -1306,25 +1297,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id006
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '40'
-                - - SiO2
-                  - '35'
-                - - V2O3
-                  - '25'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 9 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_09_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1354,7 +1330,10 @@ species:
         point_conditions:
           temperature_K: *id004
           pO2_Pa: *id005
-          composition: *id006
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_09_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1384,7 +1363,10 @@ species:
         point_conditions:
           temperature_K: *id004
           pO2_Pa: *id005
-          composition: *id006
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_10_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1432,25 +1414,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id009
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '28'
-                - - SiO2
-                  - '32'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 10 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_10_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1480,7 +1447,10 @@ species:
         point_conditions:
           temperature_K: *id007
           pO2_Pa: *id008
-          composition: *id009
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_10_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1510,7 +1480,10 @@ species:
         point_conditions:
           temperature_K: *id007
           pO2_Pa: *id008
-          composition: *id009
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_11_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1558,25 +1531,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id012
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '28'
-                - - SiO2
-                  - '32'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 11 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_11_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1606,7 +1564,10 @@ species:
         point_conditions:
           temperature_K: *id010
           pO2_Pa: *id011
-          composition: *id012
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_11_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1636,7 +1597,10 @@ species:
         point_conditions:
           temperature_K: *id010
           pO2_Pa: *id011
-          composition: *id012
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_12_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1684,25 +1648,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id015
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '28'
-                - - SiO2
-                  - '32'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 12 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_12_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1732,7 +1681,10 @@ species:
         point_conditions:
           temperature_K: *id013
           pO2_Pa: *id014
-          composition: *id015
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_12_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1762,7 +1714,10 @@ species:
         point_conditions:
           temperature_K: *id013
           pO2_Pa: *id014
-          composition: *id015
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_13_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1810,25 +1765,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id018
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '28'
-                - - SiO2
-                  - '32'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 13 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_13_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1858,7 +1798,10 @@ species:
         point_conditions:
           temperature_K: *id016
           pO2_Pa: *id017
-          composition: *id018
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_13_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1888,7 +1831,10 @@ species:
         point_conditions:
           temperature_K: *id016
           pO2_Pa: *id017
-          composition: *id018
+        composition_wt_pct:
+          Al2O3: '28'
+          SiO2: '32'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_14_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -1936,25 +1882,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id021
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '40'
-                - - SiO2
-                  - '35'
-                - - V2O3
-                  - '25'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 14 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_14_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -1984,7 +1915,10 @@ species:
         point_conditions:
           temperature_K: *id019
           pO2_Pa: *id020
-          composition: *id021
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_14_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2014,7 +1948,10 @@ species:
         point_conditions:
           temperature_K: *id019
           pO2_Pa: *id020
-          composition: *id021
+        composition_wt_pct:
+          Al2O3: '40'
+          SiO2: '35'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_17_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2062,25 +1999,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-11 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id024
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '4'
-                - - SiO2
-                  - '66'
-                - - V2O3
-                  - '30'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 17 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
     - observation_id: vickerfalt_2024_table1_sample_17_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -2110,7 +2032,10 @@ species:
         point_conditions:
           temperature_K: *id022
           pO2_Pa: *id023
-          composition: *id024
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
     - observation_id: vickerfalt_2024_table1_sample_17_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2140,7 +2065,10 @@ species:
         point_conditions:
           temperature_K: *id022
           pO2_Pa: *id023
-          composition: *id024
+        composition_wt_pct:
+          Al2O3: '4'
+          SiO2: '66'
+          V2O3: '30'
     - observation_id: vickerfalt_2024_table1_sample_18_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2188,25 +2116,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id027
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '5'
-                - - SiO2
-                  - '55'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 18 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_18_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -2236,7 +2149,10 @@ species:
         point_conditions:
           temperature_K: *id025
           pO2_Pa: *id026
-          composition: *id027
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_18_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2266,7 +2182,10 @@ species:
         point_conditions:
           temperature_K: *id025
           pO2_Pa: *id026
-          composition: *id027
+        composition_wt_pct:
+          Al2O3: '5'
+          SiO2: '55'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_19_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2314,25 +2233,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id030
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '6'
-                - - SiO2
-                  - '44'
-                - - V2O3
-                  - '50'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 19 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     - observation_id: vickerfalt_2024_table1_sample_19_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -2362,7 +2266,10 @@ species:
         point_conditions:
           temperature_K: *id028
           pO2_Pa: *id029
-          composition: *id030
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     - observation_id: vickerfalt_2024_table1_sample_19_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2392,7 +2299,10 @@ species:
         point_conditions:
           temperature_K: *id028
           pO2_Pa: *id029
-          composition: *id030
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     - observation_id: vickerfalt_2024_table1_sample_20_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2440,25 +2350,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id033
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '6'
-                - - SiO2
-                  - '54'
-                - - V2O3
-                  - '40'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 20 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_20_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -2488,7 +2383,10 @@ species:
         point_conditions:
           temperature_K: *id031
           pO2_Pa: *id032
-          composition: *id033
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_20_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2518,7 +2416,10 @@ species:
         point_conditions:
           temperature_K: *id031
           pO2_Pa: *id032
-          composition: *id033
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '54'
+          V2O3: '40'
     - observation_id: vickerfalt_2024_table1_sample_21_liquid_al2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2566,25 +2467,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.4 × 10^-9 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id036
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '6'
-                - - SiO2
-                  - '44'
-                - - V2O3
-                  - '50'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 21 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     - observation_id: vickerfalt_2024_table1_sample_21_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -2614,7 +2500,10 @@ species:
         point_conditions:
           temperature_K: *id034
           pO2_Pa: *id035
-          composition: *id036
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     - observation_id: vickerfalt_2024_table1_sample_21_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -2644,7 +2533,10 @@ species:
         point_conditions:
           temperature_K: *id034
           pO2_Pa: *id035
-          composition: *id036
+        composition_wt_pct:
+          Al2O3: '6'
+          SiO2: '44'
+          V2O3: '50'
     context:
     - observation_id: vickerfalt_2024_figure_1_context
       type: figure_context
@@ -3026,25 +2918,10 @@ species:
               page: 3
               table: '1'
               note: Table 1 prints pO2 = 3.3 × 10^-10 atm; stored pO2_Pa is the direct pressure-unit conversion.
-          composition: &id039
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - Al2O3
-                  - '10'
-                - - SiO2
-                  - '65'
-                - - V2O3
-                  - '25'
-            locator:
-              source_path: raw/vickerfalt-2024-al-si-v-phase-diagram/vickerfalt-2024-al-si-v-phase-diagram.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 15 initial mixed charge composition.
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_15_liquid_sio2
       type: composition_series
       units: wt% oxide component as printed
@@ -3074,7 +2951,10 @@ species:
         point_conditions:
           temperature_K: *id037
           pO2_Pa: *id038
-          composition: *id039
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
     - observation_id: vickerfalt_2024_table1_sample_15_liquid_v2o3
       type: composition_series
       units: wt% oxide component as printed
@@ -3104,7 +2984,10 @@ species:
         point_conditions:
           temperature_K: *id037
           pO2_Pa: *id038
-          composition: *id039
+        composition_wt_pct:
+          Al2O3: '10'
+          SiO2: '65'
+          V2O3: '25'
     context:
     - observation_id: vickerfalt_2024_table1_mo2o3_context
       type: table_context

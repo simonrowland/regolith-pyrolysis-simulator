@@ -126,9 +126,8 @@ def _actual_rows(document: dict[str, object]) -> dict[tuple[str, str], dict[str,
                 continue
             sample = str(observation["experiment"]).rsplit("_", 1)[-1].lstrip("0")
             values = observation["values"]
+            composition = values["composition_wt_pct"]
             conditions = values["point_conditions"]
-            charge = conditions["composition"]["state"]["value"]["components"]
-            composition = {str(formula): str(amount) for formula, amount in charge}
             oxygen = Decimal(str(conditions["pO2_Pa"]["state"]["value"]))
             row = liquids.setdefault(sample, {
                 "sample": sample,
