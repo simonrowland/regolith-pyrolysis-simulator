@@ -47,8 +47,17 @@ def _read_fixture() -> list[dict[str, str]]:
 def _extract_grid(document: dict) -> list[dict[str, str]]:
     rows = []
     for species_formula, species in document["species"].items():
-        for observation in species.get("observations", []):
+        records = list(species.get("observations") or []) + [
+            row
+            for row in (species.get("context") or [])
+            if row.get("values", {}).get("quantity_as_published")
+            == "equilibrium_phase_composition"
+        ]
+        for observation in records:
             values = observation["values"]
+            amount = values.get("component_amount")
+            if amount is None:
+                amount = values["component_amount_as_published"].split()[0]
             rows.append(
                 {
                     "observation_id": observation["observation_id"],
@@ -59,7 +68,7 @@ def _extract_grid(document: dict) -> list[dict[str, str]]:
                     "phase_label_as_published": values["phase_label_as_published"],
                     "assemblage_as_published": values["assemblage_as_published"],
                     "basis": values["basis"],
-                    "component_amount": decimal_text(values["component_amount"]),
+                    "component_amount": decimal_text(amount),
                     "component_amount_as_published": str(values["component_amount_as_published"]),
                     "sigma": decimal_text((observation.get("uncertainty") or {}).get("sigma")),
                     "page": str(observation["locator"]["page"]),
@@ -83,7 +92,7 @@ def test_render_grid_covers_typed_components_and_rejects_mutations() -> None:
     figure_records = [
         record
         for species in document["species"].values()
-        for record in species.get("context", [])
+        for record in (species.get("context") or [])
         if record.get("type") == "figure_record"
     ]
     assert {record["values"]["figure"]: record["locator"]["page"] for record in figure_records} == {
@@ -108,7 +117,7 @@ def test_render_grid_covers_typed_components_and_rejects_mutations() -> None:
     first = next(
         observation
         for species in mutated_extract["species"].values()
-        for observation in species.get("observations", [])
+        for observation in (species.get("observations") or [])
         if observation["observation_id"] == first_id
     )
     first["values"]["component_amount"] += 1
@@ -117,6 +126,7 @@ def test_render_grid_covers_typed_components_and_rejects_mutations() -> None:
 
 
 def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_conditions() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     fixture = _read_fixture()
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -124,13 +134,33 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         observation.observation_id.split("::", 1)[1]: observation
         for observation in migrator.result.observations.values()
     }
-    assert len(observations) == len(fixture) == 168
+    zero_rows = [row for row in fixture if Decimal(row["component_amount"]) == 0]
+    expected_ids = {
+        row["observation_id"] for row in fixture if Decimal(row["component_amount"]) > 0
+    }
+    assert len(observations) == len(expected_ids) == 165
+    assert set(observations) == expected_ids
     assert not migrator.result.validation.hard_issues
+    context = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in (species.get("context") or [])
+    }
+    for row in zero_rows:
+        item = context[row["observation_id"]]
+        assert item["type"] == "context_only"
+        assert item["values"]["basis"] == "mole_fraction"
+        assert item["values"]["component_amount_as_published"] == "0 mol.%"
+        assert "component_amount" not in item["values"]
+        assert item["locator"]["page"] == int(row["page"])
 
     for row in fixture:
+        if Decimal(row["component_amount"]) == 0:
+            continue
         observation = observations[row["observation_id"]]
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
+        assert Decimal(0) < observation.value.point <= Decimal(1)
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         assert observation.identity.species.formula == row["species_formula"]
         assert observation.identity.species.phase.value is Phase.L
@@ -152,5 +182,6 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         assert not observation.notices
 
     assert sum(row["table"] == "2" for row in fixture) == 147
+    assert sum(row["table"] == "2" and Decimal(row["component_amount"]) > 0 for row in fixture) == 144
     assert sum(row["table"] == "3" for row in fixture) == 21
     assert sum(row["method_class"] == "quoted_attributed" for row in fixture) == 18

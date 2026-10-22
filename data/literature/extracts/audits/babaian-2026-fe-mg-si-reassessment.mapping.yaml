@@ -17,7 +17,9 @@ mappings:
       - MgO (mol.%, corrected)
       - Old wt.% total
     typed_as:
-      - one equilibrium_phase_composition observation per printed component in each liquid phase
+      - one equilibrium_phase_composition observation per nonzero printed component in each liquid phase
+    context_only:
+      - printed 0 mol.% oxide cells retained verbatim with locators because zero is outside the migrated mole_fraction point interval
     component_species:
       - SiO2
       - FeO
@@ -25,7 +27,7 @@ mappings:
     identity:
       phase_role: melt
       basis: mole_fraction
-      amount: printed mol.% value, retained in mol.% units
+      amount: printed mol.% component value shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
       sigma: printed standard deviation, retained in mol.% units when nonzero
       temperature: values.T_C and point_conditions.T_C with state and row locator
       oxygen: printed 10^-4 or 10^-6 atm converted to canonical pO2_Pa and original condition retained verbatim
@@ -38,6 +40,8 @@ mappings:
       one_solid_spinel: species.FeO
       one_solid_silica_polymorph: species.SiO2
       multiple_coexisting_solids: species.SiO2
+    audit:
+      zero_mol_percent_context_rows: 6
     untyped_rows:
       solid_phase_compositions: context rows with every printed component and old wt.% total; no d-223 solid phase_role exists
       old_wt_percent_total: preserved on liquid rows and solid context rows; not mapped to printed_sum because it is the previous wt.% total
@@ -59,13 +63,15 @@ mappings:
       - SnO/Sn (mol.%, corrected)
       - Old wt.% total
     typed_as:
-      - one equilibrium_phase_composition observation per printed component in each liquid slag
-      - one equilibrium_phase_composition observation per printed component in each liquid metal
+      - one equilibrium_phase_composition observation per nonzero printed component in each liquid slag
+      - one equilibrium_phase_composition observation per nonzero printed component in each liquid metal
+    context_only:
+      - printed 0 mol.% cells retained verbatim with locators because zero is outside the migrated mole_fraction point interval
     identity:
       slag_phase_role: slag
       metal_phase_role: metal
       basis: mole_fraction
-      amount: printed mol.% value, retained in mol.% units
+      amount: printed component mol.% shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
       temperature: values.T_C and point_conditions.T_C with state and row locator
       oxygen: not printed; equilibrium with Sn-Fe alloy retained as text and no pO2 inferred
       assemblage: shared experiment across slag, metal and solid phases
@@ -73,6 +79,8 @@ mappings:
       solid_phase_compositions: context rows with all four printed component columns and old wt.% total; no d-223 solid phase_role exists
       FMSSn5_metal_Mg: blank cell retained as unreported; not converted to zero
       old_wt_percent_total: preserved in row notes; not treated as the corrected mol.% sum
+    audit:
+      zero_mol_percent_context_rows: 5
   - table: '3'
     page_range: '12-19'
     typed_as: context only

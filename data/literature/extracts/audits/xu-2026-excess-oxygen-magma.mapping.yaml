@@ -1,6 +1,6 @@
 source_id: xu-2026-excess-oxygen-magma
-source: /Users/simonrowland/Repos/regolith-corpus/raw/xu-2026-excess-oxygen-magma/xu-2026-excess-oxygen-magma.pdf
-supplement: /Users/simonrowland/Repos/regolith-sources/_incoming/xu-2026-excess-oxygen-magma/supporting/publisher-supplement.zip
+source: ../regolith-corpus/raw/xu-2026-excess-oxygen-magma/xu-2026-excess-oxygen-magma.pdf
+supplement: ../regolith-sources/_incoming/xu-2026-excess-oxygen-magma/supporting/publisher-supplement.zip
 extraction_mode: manual_600dpi_render_checked
 table_tool: copied from offer-21 commit 57eef5488 into scratch; not committed
 table_tool_compare: >-
@@ -32,7 +32,7 @@ mappings:
       pressure: point_conditions.total_pressure_Pa and experiment.pressure_environment.total_pressure_Pa; GPa and atm converted to Pa
       oxygen_source: printed PtO2 or No PtO2; no actual run fO2 is inferred
       sample_binding: every component binds to the Table 1 LVP sample and row
-      quench: piston-cylinder products fell below 100°C in <7 s; cubic-press products below glass transition in <2 s; LVP-1 water-quenched
+      quench: piston-cylinder products were power-cut and fell below 100°C in <7 s; cubic-press products were power-cut and fell below glass transition in <2 s; LVP-1 was water-quenched as stated in supplement page 4
     audit:
       typed_scalar_observations: 273
       row_column_assignment: every Table 1 mean and 1-sd cell checked against the 600 dpi render of physical page 3

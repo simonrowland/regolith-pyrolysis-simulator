@@ -70,15 +70,18 @@ experiments:
     buffer:
       state:
         tag: value
-        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer,
-          while the authors state actual run fO2 was more reduced
+        value: PtO2
       locator: *id001
   thermal_schedule:
     method:
       state:
         tag: value
-        value: box furnace run at the listed temperature followed by power-off quenching
-      locator: *id001
+        value: box furnace; temperature calibrated using the melting point of gold
+      locator:
+        source_path: XuEtAl_Suppl_0820.pdf
+        pdf_page_index: 3
+        page: 4
+        section: High-pressure, high-temperature experiments
     total_duration_s:
       state:
         tag: value
@@ -1272,13 +1275,13 @@ species:
         method_class: measured_direct
         analytical_method: EMPA (element concentrations); NanoSIMS for CO2 and H2O
         admission_status: admitted
-        quench_provenance_as_published: All run products contain quenched glass. Piston-cylinder runs were power-cut
-          and cooled below 100°C in less than 7 s; cubic-press runs were power-cut and cooled below glass transition
-          in less than 2 s; the 1-atm box-furnace run was water-quenched.
+        quench_provenance_as_published: The 1-atm box-furnace sample was quenched in water.
         quench_locator:
           source_path: XuEtAl_Suppl_0820.pdf
+          pdf_page_index: 3
+          page: 4
           section: High-pressure, high-temperature experiments
-          note: Run-product glass is quenched magma; detailed procedure differs by apparatus.
+          note: The supplement states that the single high-temperature 1-atm sample was quenched in water.
         point_conditions:
           T_C:
             state:

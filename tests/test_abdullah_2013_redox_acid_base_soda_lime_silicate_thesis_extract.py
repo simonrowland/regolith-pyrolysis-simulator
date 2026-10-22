@@ -117,7 +117,7 @@ def _expected_grid() -> list[dict[str, str]]:
                     "fO2_log": decimal_text(row["log_fO2"]),
                     "phase_label": "melt",
                     "phase_label_as_published": "NCxS melt",
-                    "basis": "mole_fraction",
+                    "basis": "at_percent",
                     "component_amount": amount,
                     "component_amount_as_published": row[sample],
                     "sigma": sigma,
@@ -146,7 +146,7 @@ def _expected_grid() -> list[dict[str, str]]:
                 "fO2_log": "",
                 "phase_label": "melt",
                 "phase_label_as_published": "Glasses",
-                "basis": "mole_fraction",
+                "basis": "at_percent",
                 "component_amount": amount,
                 "component_amount_as_published": row["N2S"],
                 "sigma": sigma,
@@ -168,11 +168,14 @@ def _load_extract() -> dict:
 def _extract_grid(document: dict) -> list[dict[str, str]]:
     rows = []
     for species_formula, species in document["species"].items():
-        for observation in species.get("observations", []):
+        for observation in species.get("context", []):
             values = observation["values"]
+            if values.get("quantity_as_published") != "equilibrium_phase_composition":
+                continue
             conditions = values["point_conditions"]
             fO2 = conditions.get("fO2_log", {}).get("state", {}).get("value", "")
             secondary = values.get("also_reported_at", {})
+            amount, _ = _cell_values(values["component_amount_as_published"])
             rows.append(
                 {
                     "observation_id": observation["observation_id"],
@@ -187,7 +190,7 @@ def _extract_grid(document: dict) -> list[dict[str, str]]:
                     "phase_label": values["phase_label"],
                     "phase_label_as_published": values["phase_label_as_published"],
                     "basis": values["basis"],
-                    "component_amount": decimal_text(values["component_amount"]),
+                    "component_amount": amount,
                     "component_amount_as_published": values["component_amount_as_published"],
                     "sigma": decimal_text(observation["uncertainty"]["sigma"]),
                     "uncertainty_units": observation["uncertainty"]["units"],
@@ -231,15 +234,15 @@ def test_grid_and_extract_mutations_each_break_the_render_comparison() -> None:
     first = next(
         observation
         for species in mutated_extract["species"].values()
-        for observation in species.get("observations", [])
+        for observation in species.get("context", [])
         if observation["observation_id"] == first_id
     )
-    first["values"]["component_amount"] += 1
+    first["values"]["component_amount_as_published"] = "999 ± 0.11"
     with pytest.raises(AssertionError):
         _assert_grid_matches(mutated_extract, expected)
 
 
-def test_every_cr_solubility_observation_migrates_as_a_point_with_conditions() -> None:
+def test_elemental_at_percent_rows_remain_untyped_context() -> None:
     expected = _expected_grid()
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -248,35 +251,23 @@ def test_every_cr_solubility_observation_migrates_as_a_point_with_conditions() -
         for observation in migrator.result.observations.values()
     }
 
-    assert len(observations) == len(expected) == 70
+    assert not observations
     assert not migrator.result.validation.hard_issues
+    context = {
+        item["observation_id"]: item
+        for item in _load_extract()["species"]["Cr"]["context"]
+        if item.get("values", {}).get("quantity_as_published") == "equilibrium_phase_composition"
+    }
+    assert len(context) == len(expected) == 70
     for row in expected:
-        observation = observations[row["observation_id"]]
-        assert observation.value.kind is ValueKind.POINT
-        assert observation.value.point == Decimal(row["component_amount"])
-        assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        assert observation.identity.species.formula == "Cr"
-        assert observation.identity.species.phase.value is Phase.L
-        assert observation.identity.phase_role.value is PhaseRole.MELT
-        assert observation.identity.subtype.value == "mole_fraction"
-        assert observation.identity.temperature_K.value == celsius_to_kelvin(Decimal(row["T_C"]))
-        temperature = observation.point_conditions["T_C"]
-        assert temperature.state.value == Decimal(row["T_C"])
-        assert temperature.locator.page == int(row["page"])
-        assert temperature.locator.pdf_page_index == int(row["page"]) - 1
-        if row["fO2_log"]:
-            assert observation.point_conditions["fO2_log"].state.value == Decimal(row["fO2_log"])
-            assert observation.point_conditions["fO2_log"].locator.page == 211
-        else:
-            assert "fO2_log" not in observation.point_conditions
-        if row["buffer_as_published"] == "Air":
-            assert observation.point_conditions["atmosphere"].state.value == "air"
-        else:
-            assert "atmosphere" not in observation.point_conditions
-        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
-        assert Decimal(str(observation.uncertainty.verbatim["sigma"])) == Decimal(row["sigma"])
-        assert observation.uncertainty.verbatim["units"] == "at.%"
-        assert not observation.notices
+        item = context[row["observation_id"]]
+        assert item["type"] == "context_only"
+        assert item["units"] == "at.% as printed"
+        assert item["values"]["basis"] == "at_percent"
+        assert item["values"]["component_amount_as_published"] == row["component_amount_as_published"]
+        assert "component_amount" not in item["values"]
+        assert item["locator"]["page"] == int(row["page"])
+        assert item["locator"]["pdf_page_index"] == int(row["page"]) - 1
 
 
 def test_activation_fit_context_and_deferred_figure_records_preserve_printed_data() -> None:

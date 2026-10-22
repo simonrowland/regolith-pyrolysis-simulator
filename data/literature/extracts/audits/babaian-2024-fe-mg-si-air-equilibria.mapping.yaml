@@ -34,7 +34,7 @@ mappings:
       - FeO1.5 (mol.%)
       - MgO (mol.%)
     typed_as:
-      - one equilibrium_phase_composition observation per printed component for every liquid phase
+      - one equilibrium_phase_composition observation per nonzero printed component for every liquid phase
     component_species:
       - SiO2
       - FeO1.5
@@ -42,7 +42,7 @@ mappings:
     identity:
       phase_role: melt
       basis: mole_fraction
-      amount: printed mol.% value, retained in mol.% units
+      amount: printed oxide mol.% shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
       sigma: printed standard deviation, retained in mol.% units when nonzero
       temperature: final equilibration T_C is carried by values.T_C and point_conditions.T_C with the Table 2 row locator
       atmosphere: air from the Table 2 caption, carried by point_conditions.atmosphere
@@ -59,7 +59,8 @@ mappings:
       printed_phase_rows: 113
       typed_liquid_phase_rows: 49
       context_solid_phase_rows: 64
-      typed_scalar_observations: 147
+      typed_scalar_observations: 144
+      zero_mol_percent_context_rows: 3
       row_column_assignment: checked against 600 dpi renders of physical pages 6 and 7
   - table: '3'
     page: 10
@@ -74,6 +75,11 @@ mappings:
     typed_as:
       - one equilibrium_phase_composition observation per printed liquid component for present-study experimental data
       - one equilibrium_phase_composition observation per printed liquid component for quoted measured data
+    identity:
+      phase_role: melt
+      basis: mole_fraction
+      amount: printed oxide mol.% shifted exactly two decimal places to mole fraction; original printed figure and mol.% unit retained in component_amount_as_published
+      sigma: printed standard deviation, retained in mol.% units when nonzero
     typed_rows:
       present_study_experiment: 1637°C invariant composition (three components)
       quoted_measurements: six rows attributed to references 38), 39), and 40) (eighteen components total)

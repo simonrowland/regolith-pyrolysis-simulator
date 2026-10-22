@@ -246,9 +246,10 @@ experiments:
     row: 1350 °C; Ni/NiO
 species:
   Cr:
-    observations:
+    observations: []
+    context:
     - observation_id: abdullah_2013_t4_8_n2s_t1200_air_khedim99
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t4_8_n2s_quoted_khedim99_air
       locator: &id001
@@ -257,13 +258,12 @@ species:
         table: '4.8'
         row: N2S, 1200 °C
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 2.13
-        component_amount_as_published: 2.13(± 0.11)
+        component_amount_as_published: '2.13(± 0.11)'
         phase_label: melt
         phase_label_as_published: Glasses
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: N2S
         sample_composition_as_published: Na2O-2SiO2 (N2S)
@@ -290,7 +290,7 @@ species:
         sigma: 0.11
         units: at.%
     - observation_id: abdullah_2013_t4_8_n2s_t1250_air_khedim99
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t4_8_n2s_quoted_khedim99_air
       locator: &id002
@@ -299,13 +299,12 @@ species:
         table: '4.8'
         row: N2S, 1250 °C
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 2.76
-        component_amount_as_published: 2.76(± 0.15)
+        component_amount_as_published: '2.76(± 0.15)'
         phase_label: melt
         phase_label_as_published: Glasses
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1250
         sample_id_as_published: N2S
         sample_composition_as_published: Na2O-2SiO2 (N2S)
@@ -332,7 +331,7 @@ species:
         sigma: 0.15
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_air_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_air
       locator: &id003
@@ -341,13 +340,12 @@ species:
         table: '5.3'
         row: 1200 °C; Air; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.74
-        component_amount_as_published: 0.74 ± (0.06)
+        component_amount_as_published: '0.74 ± (0.06)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -390,7 +388,7 @@ species:
         sigma: 0.06
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_air_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_air
       locator: &id004
@@ -399,13 +397,12 @@ species:
         table: '5.3'
         row: 1200 °C; Air; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.55
-        component_amount_as_published: 0.55 (±0.03)
+        component_amount_as_published: '0.55 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -442,7 +439,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_air_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_air
       locator: &id005
@@ -451,13 +448,12 @@ species:
         table: '5.3'
         row: 1200 °C; Air; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.44
-        component_amount_as_published: 0.44 (±0.02)
+        component_amount_as_published: '0.44 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -494,7 +490,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_air_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_air
       locator: &id006
@@ -503,13 +499,12 @@ species:
         table: '5.3'
         row: 1200 °C; Air; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.42
-        component_amount_as_published: 0.42 (±0.06)
+        component_amount_as_published: '0.42 (±0.06)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -552,7 +547,7 @@ species:
         sigma: 0.06
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_co_coo
       locator: &id007
@@ -561,13 +556,12 @@ species:
         table: '5.3'
         row: 1200 °C; Co/CoO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.27
-        component_amount_as_published: 0.27 (±0.04)
+        component_amount_as_published: '0.27 (±0.04)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -599,7 +593,7 @@ species:
         sigma: 0.04
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_co_coo
       locator: &id008
@@ -608,13 +602,12 @@ species:
         table: '5.3'
         row: 1200 °C; Co/CoO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.33
-        component_amount_as_published: 0.33 (±0.02)
+        component_amount_as_published: '0.33 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -646,7 +639,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_co_coo
       locator: &id009
@@ -655,13 +648,12 @@ species:
         table: '5.3'
         row: 1200 °C; Co/CoO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.29
-        component_amount_as_published: 0.29 (±0.03)
+        component_amount_as_published: '0.29 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -693,7 +685,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_co_coo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_co_coo
       locator: &id010
@@ -702,13 +694,12 @@ species:
         table: '5.3'
         row: 1200 °C; Co/CoO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.25
-        component_amount_as_published: 0.25 (±0.01)
+        component_amount_as_published: '0.25 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -740,7 +731,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_cu_cu2o
       locator: &id011
@@ -749,13 +740,12 @@ species:
         table: '5.3'
         row: 1200 °C; Cu/Cu2O; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.26
-        component_amount_as_published: 0.26 (±0.01)
+        component_amount_as_published: '0.26 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -787,7 +777,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_cu_cu2o
       locator: &id012
@@ -796,13 +786,12 @@ species:
         table: '5.3'
         row: 1200 °C; Cu/Cu2O; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.3
-        component_amount_as_published: 0.30 (±0.01)
+        component_amount_as_published: '0.30 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -834,7 +823,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_cu_cu2o
       locator: &id013
@@ -843,13 +832,12 @@ species:
         table: '5.3'
         row: 1200 °C; Cu/Cu2O; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.29
-        component_amount_as_published: 0.29 (±0.03)
+        component_amount_as_published: '0.29 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -881,7 +869,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_cu_cu2o_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_cu_cu2o
       locator: &id014
@@ -890,13 +878,12 @@ species:
         table: '5.3'
         row: 1200 °C; Cu/Cu2O; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.26
-        component_amount_as_published: 0.26 (±0.02)
+        component_amount_as_published: '0.26 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -928,7 +915,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
       locator: &id015
@@ -937,13 +924,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe3O4/Fe2O3; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.56
-        component_amount_as_published: 0.56 (±0.03)
+        component_amount_as_published: '0.56 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -975,7 +961,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
       locator: &id016
@@ -984,13 +970,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe3O4/Fe2O3; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.33
-        component_amount_as_published: 0.33 (±0.02)
+        component_amount_as_published: '0.33 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1022,7 +1007,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
       locator: &id017
@@ -1031,13 +1016,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe3O4/Fe2O3; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.31
-        component_amount_as_published: 0.31 (±0.02)
+        component_amount_as_published: '0.31 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -1069,7 +1053,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe3o4_fe2o3_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe3o4_fe2o3
       locator: &id018
@@ -1078,13 +1062,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe3O4/Fe2O3; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.26
-        component_amount_as_published: 0.26 (±0.03)
+        component_amount_as_published: '0.26 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -1116,7 +1099,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe_feo
       locator: &id019
@@ -1125,13 +1108,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe/FeO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.36
-        component_amount_as_published: 0.36 (±0.02)
+        component_amount_as_published: '0.36 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -1163,7 +1145,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe_feo
       locator: &id020
@@ -1172,13 +1154,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe/FeO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.45
-        component_amount_as_published: 0.45 (±0.03)
+        component_amount_as_published: '0.45 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1210,7 +1191,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe_feo
       locator: &id021
@@ -1219,13 +1200,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe/FeO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.45
-        component_amount_as_published: 0.45 (±0.02)
+        component_amount_as_published: '0.45 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -1257,7 +1237,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_fe_feo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_fe_feo
       locator: &id022
@@ -1266,13 +1246,12 @@ species:
         table: '5.3'
         row: 1200 °C; Fe/FeO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.53
-        component_amount_as_published: 0.53 (±0.03)
+        component_amount_as_published: '0.53 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -1304,7 +1283,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
       locator: &id023
@@ -1313,13 +1292,12 @@ species:
         table: '5.3'
         row: 1200 °C; FeO/Fe3O4; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.31
-        component_amount_as_published: 0.31 (±0.01)
+        component_amount_as_published: '0.31 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -1351,7 +1329,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
       locator: &id024
@@ -1360,13 +1338,12 @@ species:
         table: '5.3'
         row: 1200 °C; FeO/Fe3O4; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.34
-        component_amount_as_published: 0.34 (±0.02)
+        component_amount_as_published: '0.34 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1398,7 +1375,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
       locator: &id025
@@ -1407,13 +1384,12 @@ species:
         table: '5.3'
         row: 1200 °C; FeO/Fe3O4; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.3
-        component_amount_as_published: 0.30 (±0.02)
+        component_amount_as_published: '0.30 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -1445,7 +1421,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_feo_fe3o4_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_feo_fe3o4
       locator: &id026
@@ -1454,13 +1430,12 @@ species:
         table: '5.3'
         row: 1200 °C; FeO/Fe3O4; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.28
-        component_amount_as_published: 0.28 (±0.01)
+        component_amount_as_published: '0.28 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -1492,7 +1467,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_ni_nio
       locator: &id027
@@ -1501,13 +1476,12 @@ species:
         table: '5.3'
         row: 1200 °C; Ni/NiO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.25
-        component_amount_as_published: 0.25 (±0.02)
+        component_amount_as_published: '0.25 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -1539,7 +1513,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_ni_nio
       locator: &id028
@@ -1548,13 +1522,12 @@ species:
         table: '5.3'
         row: 1200 °C; Ni/NiO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.29
-        component_amount_as_published: 0.29 (±0.01)
+        component_amount_as_published: '0.29 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1586,7 +1559,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_ni_nio
       locator: &id029
@@ -1595,13 +1568,12 @@ species:
         table: '5.3'
         row: 1200 °C; Ni/NiO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.27
-        component_amount_as_published: 0.27 (±0.02)
+        component_amount_as_published: '0.27 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -1633,7 +1605,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1200_ni_nio_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1200_ni_nio
       locator: &id030
@@ -1642,13 +1614,12 @@ species:
         table: '5.3'
         row: 1200 °C; Ni/NiO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.26
-        component_amount_as_published: 0.26 (±0.02)
+        component_amount_as_published: '0.26 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1200
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -1680,7 +1651,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_air_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_air
       locator: &id031
@@ -1689,13 +1660,12 @@ species:
         table: '5.3'
         row: 1300 °C; Air; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.84
-        component_amount_as_published: 0.84 (±0.03)
+        component_amount_as_published: '0.84 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -1738,7 +1708,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_air_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_air
       locator: &id032
@@ -1747,13 +1717,12 @@ species:
         table: '5.3'
         row: 1300 °C; Air; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.67
-        component_amount_as_published: 0.67 (±0.05)
+        component_amount_as_published: '0.67 (±0.05)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1790,7 +1759,7 @@ species:
         sigma: 0.05
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_air_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_air
       locator: &id033
@@ -1799,13 +1768,12 @@ species:
         table: '5.3'
         row: 1300 °C; Air; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.45
-        component_amount_as_published: 0.45 (±0.05)
+        component_amount_as_published: '0.45 (±0.05)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -1842,7 +1810,7 @@ species:
         sigma: 0.05
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_air_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_air
       locator: &id034
@@ -1851,13 +1819,12 @@ species:
         table: '5.3'
         row: 1300 °C; Air; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.5
-        component_amount_as_published: 0.50 (±0.03)
+        component_amount_as_published: '0.50 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -1900,7 +1867,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_co_coo
       locator: &id035
@@ -1909,13 +1876,12 @@ species:
         table: '5.3'
         row: 1300 °C; Co/CoO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.38
-        component_amount_as_published: 0.38 (±0.02)
+        component_amount_as_published: '0.38 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -1947,7 +1913,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_co_coo
       locator: &id036
@@ -1956,13 +1922,12 @@ species:
         table: '5.3'
         row: 1300 °C; Co/CoO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.41
-        component_amount_as_published: 0.41 (±0.01)
+        component_amount_as_published: '0.41 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -1994,7 +1959,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_co_coo
       locator: &id037
@@ -2003,13 +1968,12 @@ species:
         table: '5.3'
         row: 1300 °C; Co/CoO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.43
-        component_amount_as_published: 0.43 (±0.01)
+        component_amount_as_published: '0.43 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -2041,7 +2005,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_co_coo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_co_coo
       locator: &id038
@@ -2050,13 +2014,12 @@ species:
         table: '5.3'
         row: 1300 °C; Co/CoO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.42
-        component_amount_as_published: 0.42 (±0.02)
+        component_amount_as_published: '0.42 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -2088,7 +2051,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_fe_feo
       locator: &id039
@@ -2097,13 +2060,12 @@ species:
         table: '5.3'
         row: 1300 °C; Fe/FeO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.7
-        component_amount_as_published: 0.70 (±0.03)
+        component_amount_as_published: '0.70 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -2135,7 +2097,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_fe_feo
       locator: &id040
@@ -2144,13 +2106,12 @@ species:
         table: '5.3'
         row: 1300 °C; Fe/FeO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.5
-        component_amount_as_published: 0.50 (±0.06)
+        component_amount_as_published: '0.50 (±0.06)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -2182,7 +2143,7 @@ species:
         sigma: 0.06
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_fe_feo
       locator: &id041
@@ -2191,13 +2152,12 @@ species:
         table: '5.3'
         row: 1300 °C; Fe/FeO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.66
-        component_amount_as_published: 0.66 (±0.07)
+        component_amount_as_published: '0.66 (±0.07)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -2229,7 +2189,7 @@ species:
         sigma: 0.07
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_fe_feo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_fe_feo
       locator: &id042
@@ -2238,13 +2198,12 @@ species:
         table: '5.3'
         row: 1300 °C; Fe/FeO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.66
-        component_amount_as_published: 0.66 (±0.11)
+        component_amount_as_published: '0.66 (±0.11)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -2276,7 +2235,7 @@ species:
         sigma: 0.11
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
       locator: &id043
@@ -2285,13 +2244,12 @@ species:
         table: '5.3'
         row: 1300 °C; FeO/Fe3O4; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.52
-        component_amount_as_published: 0.52 (±0.03)
+        component_amount_as_published: '0.52 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -2323,7 +2281,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
       locator: &id044
@@ -2332,13 +2290,12 @@ species:
         table: '5.3'
         row: 1300 °C; FeO/Fe3O4; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.47
-        component_amount_as_published: 0.47 (±0.01)
+        component_amount_as_published: '0.47 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -2370,7 +2327,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
       locator: &id045
@@ -2379,13 +2336,12 @@ species:
         table: '5.3'
         row: 1300 °C; FeO/Fe3O4; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.45
-        component_amount_as_published: 0.45 (±0.02)
+        component_amount_as_published: '0.45 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -2417,7 +2373,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_feo_fe3o4_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_feo_fe3o4
       locator: &id046
@@ -2426,13 +2382,12 @@ species:
         table: '5.3'
         row: 1300 °C; FeO/Fe3O4; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.38
-        component_amount_as_published: 0.38 (±0.03)
+        component_amount_as_published: '0.38 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -2464,7 +2419,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_ni_nio
       locator: &id047
@@ -2473,13 +2428,12 @@ species:
         table: '5.3'
         row: 1300 °C; Ni/NiO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.3
-        component_amount_as_published: 0.30 (±0.02)
+        component_amount_as_published: '0.30 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -2511,7 +2465,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_ni_nio
       locator: &id048
@@ -2520,13 +2474,12 @@ species:
         table: '5.3'
         row: 1300 °C; Ni/NiO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.38
-        component_amount_as_published: 0.38 (±0.04)
+        component_amount_as_published: '0.38 (±0.04)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -2558,7 +2511,7 @@ species:
         sigma: 0.04
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_ni_nio
       locator: &id049
@@ -2567,13 +2520,12 @@ species:
         table: '5.3'
         row: 1300 °C; Ni/NiO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.39
-        component_amount_as_published: 0.39 (±0.03)
+        component_amount_as_published: '0.39 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -2605,7 +2557,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1300_ni_nio_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1300_ni_nio
       locator: &id050
@@ -2614,13 +2566,12 @@ species:
         table: '5.3'
         row: 1300 °C; Ni/NiO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.34
-        component_amount_as_published: 0.34 (±0.02)
+        component_amount_as_published: '0.34 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1300
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -2652,7 +2603,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_air_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_air
       locator: &id051
@@ -2661,13 +2612,12 @@ species:
         table: '5.3'
         row: 1350 °C; Air; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 1.05
-        component_amount_as_published: 1.05 (±0.04)
+        component_amount_as_published: '1.05 (±0.04)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -2704,7 +2654,7 @@ species:
         sigma: 0.04
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_air_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_air
       locator: &id052
@@ -2713,13 +2663,12 @@ species:
         table: '5.3'
         row: 1350 °C; Air; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.65
-        component_amount_as_published: 0.65 (±0.05)
+        component_amount_as_published: '0.65 (±0.05)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -2756,7 +2705,7 @@ species:
         sigma: 0.05
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_air_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_air
       locator: &id053
@@ -2765,13 +2714,12 @@ species:
         table: '5.3'
         row: 1350 °C; Air; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.57
-        component_amount_as_published: 0.57 (±0.02)
+        component_amount_as_published: '0.57 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -2808,7 +2756,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_air_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_air
       locator: &id054
@@ -2817,13 +2765,12 @@ species:
         table: '5.3'
         row: 1350 °C; Air; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.54
-        component_amount_as_published: 0.54 (±0.02)
+        component_amount_as_published: '0.54 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -2860,7 +2807,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_co_coo
       locator: &id055
@@ -2869,13 +2816,12 @@ species:
         table: '5.3'
         row: 1350 °C; Co/CoO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.49
-        component_amount_as_published: 0.49 (±0.01)
+        component_amount_as_published: '0.49 (±0.01)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -2907,7 +2853,7 @@ species:
         sigma: 0.01
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_co_coo
       locator: &id056
@@ -2916,13 +2862,12 @@ species:
         table: '5.3'
         row: 1350 °C; Co/CoO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.5
-        component_amount_as_published: 0.50 (±0.02)
+        component_amount_as_published: '0.50 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -2954,7 +2899,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_co_coo
       locator: &id057
@@ -2963,13 +2908,12 @@ species:
         table: '5.3'
         row: 1350 °C; Co/CoO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.48
-        component_amount_as_published: 0.48 (±0.02)
+        component_amount_as_published: '0.48 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -3001,7 +2945,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_co_coo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_co_coo
       locator: &id058
@@ -3010,13 +2954,12 @@ species:
         table: '5.3'
         row: 1350 °C; Co/CoO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.43
-        component_amount_as_published: 0.43 (±0.02)
+        component_amount_as_published: '0.43 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -3048,7 +2991,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_fe_feo
       locator: &id059
@@ -3057,13 +3000,12 @@ species:
         table: '5.3'
         row: 1350 °C; Fe/FeO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.97
-        component_amount_as_published: 0.97 (±0.02)
+        component_amount_as_published: '0.97 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -3095,7 +3037,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_fe_feo
       locator: &id060
@@ -3104,13 +3046,12 @@ species:
         table: '5.3'
         row: 1350 °C; Fe/FeO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 1.05
-        component_amount_as_published: 1.05 (±0.02)
+        component_amount_as_published: '1.05 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -3142,7 +3083,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_fe_feo
       locator: &id061
@@ -3151,13 +3092,12 @@ species:
         table: '5.3'
         row: 1350 °C; Fe/FeO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.96
-        component_amount_as_published: 0.96 (±0.04)
+        component_amount_as_published: '0.96 (±0.04)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -3189,7 +3129,7 @@ species:
         sigma: 0.04
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_fe_feo_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_fe_feo
       locator: &id062
@@ -3198,13 +3138,12 @@ species:
         table: '5.3'
         row: 1350 °C; Fe/FeO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.92
-        component_amount_as_published: 0.92 (±0.13)
+        component_amount_as_published: '0.92 (±0.13)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -3236,7 +3175,7 @@ species:
         sigma: 0.13
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
       locator: &id063
@@ -3245,13 +3184,12 @@ species:
         table: '5.3'
         row: 1350 °C; FeO/Fe3O4; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.62
-        component_amount_as_published: 0.62 (±0.06)
+        component_amount_as_published: '0.62 (±0.06)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -3283,7 +3221,7 @@ species:
         sigma: 0.06
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
       locator: &id064
@@ -3292,13 +3230,12 @@ species:
         table: '5.3'
         row: 1350 °C; FeO/Fe3O4; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.58
-        component_amount_as_published: 0.58 (±0.03)
+        component_amount_as_published: '0.58 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -3330,7 +3267,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
       locator: &id065
@@ -3339,13 +3276,12 @@ species:
         table: '5.3'
         row: 1350 °C; FeO/Fe3O4; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.53
-        component_amount_as_published: 0.53 (±0.02)
+        component_amount_as_published: '0.53 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -3377,7 +3313,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_feo_fe3o4_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_feo_fe3o4
       locator: &id066
@@ -3386,13 +3322,12 @@ species:
         table: '5.3'
         row: 1350 °C; FeO/Fe3O4; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.38
-        component_amount_as_published: 0.38 (±0.03)
+        component_amount_as_published: '0.38 (±0.03)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -3424,7 +3359,7 @@ species:
         sigma: 0.03
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc3s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_ni_nio
       locator: &id067
@@ -3433,13 +3368,12 @@ species:
         table: '5.3'
         row: 1350 °C; Ni/NiO; NC3S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.38
-        component_amount_as_published: 0.38 (±0.02)
+        component_amount_as_published: '0.38 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC3S
         sample_composition_as_published: Na2O-CaO-3SiO2 (NC3S)
@@ -3471,7 +3405,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc4s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_ni_nio
       locator: &id068
@@ -3480,13 +3414,12 @@ species:
         table: '5.3'
         row: 1350 °C; Ni/NiO; NC4S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.4
-        component_amount_as_published: 0.40 (±0.02)
+        component_amount_as_published: '0.40 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC4S
         sample_composition_as_published: Na2O-CaO-4SiO2 (NC4S)
@@ -3518,7 +3451,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc5s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_ni_nio
       locator: &id069
@@ -3527,13 +3460,12 @@ species:
         table: '5.3'
         row: 1350 °C; Ni/NiO; NC5S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.41
-        component_amount_as_published: 0.41 (±0.02)
+        component_amount_as_published: '0.41 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC5S
         sample_composition_as_published: Na2O-CaO-5SiO2 (NC5S)
@@ -3565,7 +3497,7 @@ species:
         sigma: 0.02
         units: at.%
     - observation_id: abdullah_2013_t5_3_t1350_ni_nio_nc6s
-      type: composition_series
+      type: context_only
       units: at.% as printed
       experiment: abdullah_2013_t5_3_t1350_ni_nio
       locator: &id070
@@ -3574,13 +3506,12 @@ species:
         table: '5.3'
         row: 1350 °C; Ni/NiO; NC6S
       values:
-        quantity: equilibrium_phase_composition
+        quantity_as_published: equilibrium_phase_composition
         formula: Cr
-        component_amount: 0.42
-        component_amount_as_published: 0.42 (±0.02)
+        component_amount_as_published: '0.42 (±0.02)'
         phase_label: melt
         phase_label_as_published: NCxS melt
-        basis: mole_fraction
+        basis: at_percent
         T_C: 1350
         sample_id_as_published: NC6S
         sample_composition_as_published: Na2O-CaO-6SiO2 (NC6S)
@@ -3611,7 +3542,6 @@ species:
         reported_status: printed
         sigma: 0.02
         units: at.%
-    context:
     - observation_id: abdullah_2013_figure_5_24_arrhenius_regression
       type: model_derived
       locator:
@@ -3828,11 +3758,3 @@ species:
         attribution_as_published: present work
         numeric_points_digitised: false
         digitisation: deferred to a figure pass
-fidelity_samples:
-- path: species.Cr.observations[abdullah_2013_t5_3_t1200_air_nc3s].values.component_amount
-  value: 0.74
-  locator:
-    pdf_page_index: 210
-    page: 211
-    table: '5.3'
-    row: 1200 °C; Air; NC3S

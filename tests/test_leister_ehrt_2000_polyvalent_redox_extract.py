@@ -159,6 +159,23 @@ def test_untyped_valence_tables_keep_each_rendered_cell():
     assert ti_prose["locator"]["page"] == 8
 
 
+def test_printed_glass_mol_percent_is_kept_with_fractional_composition():
+    source = _load()
+    compositions = [
+        observation["values"]
+        for observation in source["species"]["Fe"]["observations"]
+        if "composition_mol" in observation["values"]
+    ]
+    glass_a = next(
+        values for values in compositions if values["composition_mol"].get("Na2O") == "0.33"
+    )
+    assert glass_a["composition_mol_as_published"] == {
+        "Na2O": "33 mol%",
+        "SiO2": "67 mol%",
+    }
+    assert glass_a["composition_mol_locator"]["page"] == 1
+
+
 def test_migrated_fe_values_species_temperature_atmosphere_and_composition():
     source = _load()
     migrator = migrate_one_extract(root=ROOT, path=EXTRACT)

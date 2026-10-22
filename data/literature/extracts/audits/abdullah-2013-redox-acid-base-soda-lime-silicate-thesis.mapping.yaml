@@ -1,0 +1,25 @@
+source_id: abdullah-2013-redox-acid-base-soda-lime-silicate-thesis
+source: ../regolith-corpus/raw/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.pdf
+extraction_mode: manual_600dpi_render_checked
+mappings:
+  - table: '4.8'
+    page: 151
+    columns:
+      - Sample
+      - Temperature
+      - Chromium solubility (at.%)
+    disposition: context only
+    basis: at_percent
+    reason: Elemental atomic percent includes oxygen and is not a mole fraction or oxide composition; retain printed cells verbatim with row locators.
+    rows: 2
+  - table: '5.3'
+    page: 211
+    columns:
+      - Sample
+      - Temperature
+      - Oxygen buffer
+      - Chromium solubility (at.%)
+    disposition: context only
+    basis: at_percent
+    reason: Elemental atomic percent includes oxygen and is not a mole fraction or oxide composition; retain printed cells verbatim with row locators.
+    rows: 68

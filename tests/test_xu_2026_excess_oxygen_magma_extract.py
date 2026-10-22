@@ -164,11 +164,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             pressure_value = pressure_value.point
         assert Decimal(str(pressure_value)) == Decimal(row["total_pressure_Pa"])
         buffer_text = experiments[row["experiment"]]["fO2_control"]["buffer"]["state"]["value"]
-        if row["oxygen_source"] == "PtO2":
+        if row["experiment"] == "xu_2026_lvp_1":
+            assert buffer_text == "PtO2"
+        elif row["oxygen_source"] == "PtO2":
             assert "PtO2 powder" in buffer_text
             assert "log fO2 ≈ 0" in buffer_text
         else:
             assert "No PtO2 powder" in buffer_text
+        assert observation.identity.fO2_Pa.is_unknown
         assert not observation.notices
 
         if row["sigma"]:
