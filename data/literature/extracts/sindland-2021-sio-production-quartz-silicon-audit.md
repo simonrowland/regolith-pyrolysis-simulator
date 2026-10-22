@@ -1,6 +1,6 @@
 # Sindland & Tangstad (2021) extraction audit
 
-Source: `sindland-2021-sio-production-quartz-silicon`, DOI 10.1007/s11663-021-02143-4. The paper is born digital. Its exact-text input is `/Users/simonrowland/Repos/regolith-corpus/text/sindland-2021-sio-production-quartz-silicon/pdftotext-layout.txt`. No `mineru/` or `ocr-mineru/` directory exists in either corpus location, so the staged `/private/tmp/claude-501/main-review/tools/mineru_table_draft.py` converter and compare had no content-list JSON input. The page 6 PDF render was checked at `/private/tmp/claude-501/main-review/wave51-F61/tables/page6.png` (backup PDF only for this render). It confirms each Table IV/V row and column assignment. No PDF render was used to transcribe digits.
+Source: `sindland-2021-sio-production-quartz-silicon`, DOI 10.1007/s11663-021-02143-4. The paper is born digital. Values were transcribed from the `pdftotext -layout` text layer; the page 6 PDF render confirmed every Table IV/V row and column assignment. No MinerU content-list JSON was available for comparison. The render was used only to confirm layout, not to transcribe digits.
 
 ## Table V, PDF page 6
 
@@ -54,7 +54,7 @@ The text-layer digits and comparison operators below were checked against the pa
 
 ## Experimental conditions and scope
 
-The following condition numbers were read from the exact text layer: 20.0 g initial charge, 1:1 molar Si:SiO2, 1.5 bar argon at 99.999 pct purity, 50 K/min heating rate, and row-specific Table V hold times. Table V footnote assigns graphite crucibles except h-BN for experiment 5. Row conditions retain T_C, hold time, pressure, atmosphere, and starting-composition locators; the migrated identity receives T, total pressure, and the 1:1 starting composition. Numeric fO2 is not reported and remains unknown. The reservoir is a typed unknown because the charge has no single printed evaporating-species reservoir. The authors' SiO(g) attribution remains a note and the stored quantity is whole-charge mass loss, not an SiO species amount.
+The following condition numbers were read from the exact text layer: 20.0 g initial charge, 1:1 molar Si:SiO2, 1.5 bar argon at 99.999 pct purity, 50 K/min heating rate, and row-specific Table V hold times. Table V footnote assigns graphite crucibles except h-BN for experiment 5. The experimental section assigns induction heat furnaces to experiments 3, 4, 9, 10, 12, and 15; the other experiments used resistance heat furnaces. Row conditions retain T_C, hold time, pressure, atmosphere, and starting-composition locators; the migrated identity receives T, total pressure, and the 1:1 starting composition. Numeric fO2 is not reported and remains unknown. The reservoir is a typed unknown because the charge has no single printed evaporating-species reservoir. The authors' SiO(g) attribution remains a note and the stored quantity is whole-charge mass loss, not an SiO species amount.
 
 Tables II and VI report reaction constants and activation energy (`k0`, `Q`). No schema token represents those fitted quantities; they are schema gaps and are not typed. Figure-only readings are out of scope and were not digitized.
 
@@ -71,3 +71,5 @@ The identity axes were inspected on experiments 2–4 after migration:
 | 4 | 2023.15 | Si 0.5, SiO2 0.5 mole fraction; printed sample recipe 1:1 molar | 150000 | unknown: not reported |
 
 For each migrated observation the point conditions carry temperature, hold time, total pressure, starting composition, and Ar sweep gas with their source locators. The 30 stored loss values remain printed wt.% and the migrator converts them to mass fractions (for example 3.25% -> 0.0325).
+
+The unscoped migrated run charge uses the mass-times-mole-fraction route for both Si and SiO2. Its species mole amounts are equal, and weighting them by the project's `MOLAR_MASS` values closes to the printed 20.0 g charge within rounding. The sample's 1:1 composition is stored as mole fractions (0.5 / 0.5); `0.0200 kg` remains the extensive sample mass.

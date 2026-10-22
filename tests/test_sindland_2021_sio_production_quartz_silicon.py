@@ -3,7 +3,9 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import AmountBasis, Quantity, ValueKind
+from simulator.battery.waypoints import charge_moles_by_species
+from simulator.state import MOLAR_MASS
 from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +29,19 @@ def test_sindland_table_v_rows_match_page_6_and_migrate_conditions() -> None:
     assert all(row["values"]["quantity"] == "mass_loss_fraction" for row in table_v)
     assert all("SiO formation" in row["values"]["attribution_as_printed"] for row in table_v)
     assert all("SiO" not in row["values"].get("gas_species", "") for row in table_v)
+    sample_composition = document["experiments"][0]["sample"]["initial_composition"]["state"]["value"]
+    assert sample_composition["amount_basis"] == AmountBasis.MOLE_FRACTION.value
+    assert sample_composition["components"] == [["Si", "0.5"], ["SiO2", "0.5"]]
+    by_number = {
+        int(row["observation_id"].rsplit("_", 1)[1]): row
+        for row in table_v
+    }
+    assert by_number[5]["values"]["points"][0]["crucible_as_printed"] == "h-BN crucible"
+    induction_experiments = {3, 4, 9, 10, 12, 15}
+    assert {
+        number for number, row in by_number.items()
+        if row["values"].get("furnace") == "induction heat furnace"
+    } == induction_experiments
 
     migrator = migrate_one_extract(root=ROOT, path=EXTRACT)
     migrator.finalize()
@@ -36,6 +51,27 @@ def test_sindland_table_v_rows_match_page_6_and_migrate_conditions() -> None:
         obs.value.kind is ValueKind.UNAVAILABLE
         for obs in migrator.result.observations.values()
     ) == 0
+    experiment = next(iter(migrator.result.experiments.values()))
+    initial_composition = experiment.sample.initial_composition
+    assert initial_composition is not None and initial_composition.state.is_value
+    assert initial_composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert initial_composition.state.value.components == (
+        ("Si", Decimal("0.5")),
+        ("SiO2", Decimal("0.5")),
+    )
+    assert experiment.sample.mass_kg is not None
+    assert experiment.sample.mass_kg.state.value.point == Decimal("0.0200")
+    charge = charge_moles_by_species(experiment, None)
+    si = charge["Si"].selected
+    sio2 = charge["SiO2"].selected
+    assert si is not None and sio2 is not None
+    assert si.route == sio2.route == "mass_times_mole_fraction"
+    assert si.value.point == sio2.value.point
+    charged_mass_g = sum(
+        waypoint.value.point * Decimal(str(MOLAR_MASS[species]))
+        for species, waypoint in (("Si", si), ("SiO2", sio2))
+    )
+    assert abs(charged_mass_g - Decimal("20.0")) <= Decimal("0.001")
     observations = [
         obs for obs in migrator.result.observations.values()
         if "sindland_2021_experiment_" in obs.observation_id

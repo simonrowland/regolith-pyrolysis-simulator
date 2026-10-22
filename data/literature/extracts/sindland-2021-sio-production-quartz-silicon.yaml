@@ -71,17 +71,16 @@ experiments:
         tag: value
         value:
           basis: printed_formula_stoichiometry
-          amount_basis: mol_inventory
+          amount_basis: mole_fraction
           components:
           - - Si
-            - '1'
+            - '0.5'
           - - SiO2
-            - '1'
+            - '0.5'
       locator:
         page: 4
         pdf_page_index: 3
         section: Experimental
-        note: Printed Si:SiO2 molar ratio 1:1; one mole of each is the literal ratio representation.
     form:
       state:
         tag: value
@@ -287,6 +286,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
@@ -387,6 +387,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
@@ -887,6 +888,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
@@ -987,6 +989,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
@@ -1187,6 +1190,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
@@ -1487,6 +1491,7 @@ species:
         quartz_type: A
         size_fraction_mm_as_printed: 2 to 5
         raw_materials_as_printed: layered
+        furnace: induction heat furnace
         measured_quantity_as_printed: whole-charge weight loss
         attribution_as_printed: The authors assume the weight loss is due to SiO formation only.
         reservoir_as_printed: No single-component evaporating reservoir is printed for the Si plus SiO2
