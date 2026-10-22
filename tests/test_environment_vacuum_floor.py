@@ -212,6 +212,23 @@ def test_transport_uses_the_existing_headspace_gas_temperature_owner():
     assert sim._headspace_co2_dissociation_diagnostic['notices'][0]['temperature_K'] == 1500.0
 
 
+@pytest.mark.parametrize(
+    ('model', 'offset_K', 'expected_hex'),
+    [
+        ('melt', None, '0x1.c200000000000p+10'),
+        ('lumped', None, '0x1.a900000000000p+10'),
+        ('melt', -300.0, '0x1.7700000000000p+10'),
+    ],
+)
+def test_headspace_temperature_models_preserve_exact_values(model, offset_K, expected_hex):
+    sim = _mars_sim()
+    sim.melt.temperature_C = 1800.0 - 273.15
+    sim._overhead_headspace_config['temperature_model'] = model
+    sim._overhead_headspace_config['temperature_offset_K'] = offset_K
+
+    assert sim._headspace_temperature_K().hex() == expected_hex
+
+
 @pytest.mark.parametrize('body', ['moon', 'asteroid', 'earth', 'unknown', ''])
 def test_airless_numerical_oxygen_guards_preserve_existing_resolution(body):
     assert oxygen_numerical_floor_bar_for_body(body) == vacuum_floor_bar_for_body(body)
