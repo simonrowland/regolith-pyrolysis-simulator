@@ -96,6 +96,25 @@ def _openimcc_gas_channels_and_omission_notices(
         for name, reason in omitted_channels.items()
     )
     return channels, notices
+
+
+def _record_p2o5_gas_notices(
+    notices: list[dict[str, Any]], gas_notices: Any
+) -> None:
+    """Copy bridge gas notices onto the battery list. One conversion."""
+
+    for gas_notice in gas_notices:
+        notices.append(
+            {
+                "kind": "openimcc_p2o5_gas",
+                "authority": None,
+                "code": gas_notice.get("code"),
+                "reason": gas_notice.get("message") or gas_notice.get("code"),
+                "notice": dict(gas_notice),
+            }
+        )
+
+
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
 
@@ -2309,25 +2328,18 @@ class _OpenImccBatteryBackend:
             bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
-        # Assess the original composition before any parent solve. The
-        # default pack refuses unprojected P2O5 via the old S/P API;
-        # that pack stays off. A P-bearing call solves the cleaned
-        # parents and keeps this extension for gas and oxygen balance.
+        # Parent selection lives on the bridge. This caller keeps its
+        # pack, extrapolation flags, and the original kilogram input
+        # when the melt has no P2O5.
         original_moles = self._bridge.composition_moles_for_p2o5(
             composition_mol, composition_kg
         )
-        p2o5_extension = self._bridge.assess_p2o5_extension(
+        cleaned_mol, p2o5_extension = self._bridge.p2o5_parent_solve_input(
             original_moles, temperature_K
         )
-        if float(p2o5_extension.get("p2o5_moles") or 0.0) > 0.0:
-            cleaned_mol, policy = self._bridge._cleaned_melt_policy(
-                original_moles,
-                temperature_K=temperature_K,
-                p2o5_extension=p2o5_extension,
-            )
-            stored_extension = policy.get("p2o5_extension")
-            if isinstance(stored_extension, Mapping):
-                p2o5_extension = stored_extension
+        if cleaned_mol is None:
+            result = self._bridge.evaluate(**bridge_kwargs)
+        else:
             result = self._bridge.evaluate(
                 composition_mol=cleaned_mol,
                 temperature_K=temperature_K,
@@ -2335,8 +2347,6 @@ class _OpenImccBatteryBackend:
                 allow_extrapolation=True,
                 allow_out_of_envelope=True,
             )
-        else:
-            result = self._bridge.evaluate(**bridge_kwargs)
         self.model_id = result.pack_model_id
         self._identity["model_id"] = self.model_id
         self._identity["name"] = self.model_id
@@ -2445,20 +2455,10 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 po2_bar, gas_result, balance = balance_result
-                for gas_notice in (
-                    balance_notices or self._bridge.p_gas_notices(gas_result)
-                ):
-                    notices.append(
-                        {
-                            "kind": "openimcc_p2o5_gas",
-                            "authority": None,
-                            "code": gas_notice.get("code"),
-                            "reason": (
-                                gas_notice.get("message") or gas_notice.get("code")
-                            ),
-                            "notice": dict(gas_notice),
-                        }
-                    )
+                _record_p2o5_gas_notices(
+                    notices,
+                    balance_notices or self._bridge.p_gas_notices(gas_result),
+                )
                 cell_fraction = 0.0
                 cell_info = {
                     "cell_material": None,
@@ -2501,19 +2501,7 @@ class _OpenImccBatteryBackend:
                     p2o5_extension,
                     _probe_gas,
                 )
-                for gas_notice in choice_notices:
-                    notices.append(
-                        {
-                            "kind": "openimcc_p2o5_gas",
-                            "authority": None,
-                            "code": gas_notice.get("code"),
-                            "reason": (
-                                gas_notice.get("message")
-                                or gas_notice.get("code")
-                            ),
-                            "notice": dict(gas_notice),
-                        }
-                    )
+                _record_p2o5_gas_notices(notices, choice_notices)
                 channels, _omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
                         gas_parent_oxides, self._gas
@@ -2544,19 +2532,9 @@ class _OpenImccBatteryBackend:
                         parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
                     )
-                    for gas_notice in self._bridge.p_gas_notices(gas_at_po2):
-                        notices.append(
-                            {
-                                "kind": "openimcc_p2o5_gas",
-                                "authority": None,
-                                "code": gas_notice.get("code"),
-                                "reason": (
-                                    gas_notice.get("message")
-                                    or gas_notice.get("code")
-                                ),
-                                "notice": dict(gas_notice),
-                            }
-                        )
+                    _record_p2o5_gas_notices(
+                        notices, self._bridge.p_gas_notices(gas_at_po2)
+                    )
                     return gas_at_po2
 
                 po2_bar, all_gas, balance, cell_fraction, cell_info = (
@@ -2578,18 +2556,9 @@ class _OpenImccBatteryBackend:
                     parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
-                for gas_notice in self._bridge.p_gas_notices(gas_result):
-                    notices.append(
-                        {
-                            "kind": "openimcc_p2o5_gas",
-                            "authority": None,
-                            "code": gas_notice.get("code"),
-                            "reason": (
-                                gas_notice.get("message") or gas_notice.get("code")
-                            ),
-                            "notice": dict(gas_notice),
-                        }
-                    )
+                _record_p2o5_gas_notices(
+                    notices, self._bridge.p_gas_notices(gas_result)
+                )
                 gas_pressures = dict(gas_result)
                 gas_pressures.update(
                     {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
@@ -2686,19 +2655,7 @@ class _OpenImccBatteryBackend:
                     p2o5_extension,
                     _probe_commanded,
                 )
-                for gas_notice in choice_notices:
-                    notices.append(
-                        {
-                            "kind": "openimcc_p2o5_gas",
-                            "authority": None,
-                            "code": gas_notice.get("code"),
-                            "reason": (
-                                gas_notice.get("message")
-                                or gas_notice.get("code")
-                            ),
-                            "notice": dict(gas_notice),
-                        }
-                    )
+                _record_p2o5_gas_notices(notices, choice_notices)
                 gas_result = evaluate_gas(
                     chosen_activities,
                     temperature_K,
@@ -2707,18 +2664,9 @@ class _OpenImccBatteryBackend:
                     parent_oxides=gas_parent_oxides,
                     allow_extrapolation=True,
                 )
-                for gas_notice in self._bridge.p_gas_notices(gas_result):
-                    notices.append(
-                        {
-                            "kind": "openimcc_p2o5_gas",
-                            "authority": None,
-                            "code": gas_notice.get("code"),
-                            "reason": (
-                                gas_notice.get("message") or gas_notice.get("code")
-                            ),
-                            "notice": dict(gas_notice),
-                        }
-                    )
+                _record_p2o5_gas_notices(
+                    notices, self._bridge.p_gas_notices(gas_result)
+                )
                 _channels, omission_notices = (
                     _openimcc_gas_channels_and_omission_notices(
                         gas_parent_oxides, self._gas, gas_result

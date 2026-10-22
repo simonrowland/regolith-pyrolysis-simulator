@@ -1403,6 +1403,33 @@ def _cleaned_melt_policy(
     return cleaned_composition_mol, policy
 
 
+def p2o5_parent_solve_input(
+    composition_mol: Mapping[str, float],
+    temperature_K: float | None,
+) -> tuple[dict[str, float] | None, dict[str, Any]]:
+    """Select the parent-solve input after assessing the original melt.
+
+    Only a positive P2O5 inventory uses the cleaned, folded parent map.
+    None tells the caller to keep the input it already built, including
+    a kilogram map, pack name, and isolation. The record is the policy's
+    extension when the policy ran, otherwise the assessment. The old S/P
+    pack is not enabled.
+    """
+
+    extension = assess_p2o5_extension(composition_mol, temperature_K)
+    if float(extension.get("p2o5_moles") or 0.0) <= 0.0:
+        return None, extension
+    cleaned_mol, policy = _cleaned_melt_policy(
+        composition_mol,
+        temperature_K=temperature_K,
+        p2o5_extension=extension,
+    )
+    stored_extension = policy.get("p2o5_extension")
+    if isinstance(stored_extension, Mapping):
+        extension = stored_extension
+    return cleaned_mol, extension
+
+
 def evaluate_cleaned_melt(
     composition_mol: Mapping[str, float],
     temperature_K: float,

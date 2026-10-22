@@ -1416,25 +1416,19 @@ def _predict_hashimoto_residue_cohort(
                     current_composition = {
                         oxide: amount for oxide, amount in key if amount > 0.0
                     }
-                    # Assess before the parent solve. The default pack
-                    # refuses unprojected P2O5 through the old S/P API;
-                    # that pack stays off. Only a P-bearing inventory
-                    # uses the cleaned parent solve.
-                    extension = openimcc_bridge.assess_p2o5_extension(
-                        current_composition,
-                        temperature_K,
-                    )
-                    evaluate_composition = current_composition
-                    if float(extension.get("p2o5_moles") or 0.0) > 0.0:
-                        cleaned_mol, policy = openimcc_bridge._cleaned_melt_policy(
+                    # Parent selection lives on the bridge. Isolation,
+                    # timeout, and the evaluate flags stay here.
+                    cleaned_mol, extension = (
+                        openimcc_bridge.p2o5_parent_solve_input(
                             current_composition,
-                            temperature_K=temperature_K,
-                            p2o5_extension=extension,
+                            temperature_K,
                         )
-                        stored_extension = policy.get("p2o5_extension")
-                        if isinstance(stored_extension, Mapping):
-                            extension = stored_extension
-                        evaluate_composition = cleaned_mol
+                    )
+                    evaluate_composition = (
+                        current_composition
+                        if cleaned_mol is None
+                        else cleaned_mol
+                    )
                     try:
                         state = _evaluate_openimcc_isolated(
                             openimcc_bridge.evaluate,

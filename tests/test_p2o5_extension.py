@@ -921,10 +921,15 @@ def _scoring_pot(pot_id: str):
     return pots[pot_id]
 
 
-def test_phosphorus_pots_are_assessed_before_the_parent_solve() -> None:
-    """The installed pin still refuses these pots, after the extension notice.
+def test_phosphorus_pots_are_assessed_before_the_parent_solve(monkeypatch) -> None:
+    """The installed openimcc selects the pot assertion. Neither branch is skipped.
 
-    The refusal is the 1 wt% projection, not the old S/P pack.
+    With no evaluate_p2o5_activity, both pots still raise the typed 1 wt%
+    refusal after assessment, not the old S/P pack. With the callable
+    present, the same calls return the assessed liquid a(P2O5). The
+    landing pin has the callable, so that run executes both branches:
+    the refusal is forced by hiding the callable, then the real call
+    is repeated.
     """
 
     import openimcc
@@ -932,34 +937,74 @@ def test_phosphorus_pots_are_assessed_before_the_parent_solve() -> None:
         _OpenImccBatteryBackend,
         composition_kg_and_mol,
     )
+    from simulator.melt_backend import openimcc_bridge
     from simulator.melt_backend.openimcc_bridge import (
         OpenImccCompositionPolicyRefusal,
     )
 
-    backend = _OpenImccBatteryBackend("openimcc")
-    sp_error = openimcc.ImccSPComponentRequiresExtensionError
-    for pot_id in (
+    pot_ids = (
         "kambayashi_1985_feto_p2o5_s01",
         "ohara_1987_feto_p2o5_i_s14",
-    ):
+    )
+    real_callable = openimcc_bridge.p2o5_extension_callable()
+
+    def equilibrate(pot_id: str):
+        backend = _OpenImccBatteryBackend("openimcc")
         pot = _scoring_pot(pot_id)
         composition_kg, composition_mol = composition_kg_and_mol(
             pot.composition_wt_pct
         )
-        with pytest.raises(OpenImccCompositionPolicyRefusal) as caught:
-            backend.equilibrate(
-                1643.0 - 273.15,
-                composition_kg=composition_kg,
-                composition_mol=composition_mol,
-                fO2_log=-9.0,
-            )
-        assert not isinstance(caught.value, sp_error)
-        assert caught.value.code == "openimcc_projection_over_threshold"
-        extension = caught.value.diagnostics["p2o5_extension"]
-        assert any(
-            notice.get("code") == "openimcc_p2o5_extension_unavailable"
-            for notice in extension["notices"]
+        return backend.equilibrate(
+            1643.0 - 273.15,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            fO2_log=-9.0,
         )
+
+    def assert_unavailable_refusal() -> None:
+        sp_error = openimcc.ImccSPComponentRequiresExtensionError
+        for pot_id in pot_ids:
+            with pytest.raises(OpenImccCompositionPolicyRefusal) as caught:
+                equilibrate(pot_id)
+            assert not isinstance(caught.value, sp_error)
+            assert caught.value.code == "openimcc_projection_over_threshold"
+            extension = caught.value.diagnostics["p2o5_extension"]
+            assert any(
+                notice.get("code") == "openimcc_p2o5_extension_unavailable"
+                for notice in extension["notices"]
+            )
+
+    def assert_visible_activity() -> None:
+        for pot_id in pot_ids:
+            result = equilibrate(pot_id)
+            assert result.status == "ok"
+            extension = result.diagnostics["p2o5_extension"]
+            assert extension.get("evaluated") is True
+            activity = result.activity_coefficients["P2O5"]
+            assert activity == pytest.approx(float(extension["activity"]))
+            assert activity > 0.0
+            assert "P2O5" not in result.reported_activity_coefficients
+            reference = result.activities_standard_state
+            assert reference["phase"] == "liquid"
+            assert reference["component"] == "P2O5"
+            assert reference["convention"] == "raoultian_pure_endmember"
+            assert reference["activity"] == pytest.approx(activity)
+            codes = [notice.get("code") for notice in result.imcc_notices]
+            assert "imcc_p2o5_activity_domain_notice" in codes
+            assert "p2o5_feiii_phosphate_chemistry_not_modelled" in codes
+
+    package = openimcc_bridge._openimcc
+    monkeypatch.setattr(
+        package, "evaluate_p2o5_activity", None, raising=False
+    )
+    assert openimcc_bridge.p2o5_extension_callable() is None
+    assert_unavailable_refusal()
+    monkeypatch.undo()
+    if real_callable is None:
+        assert openimcc_bridge.p2o5_extension_callable() is None
+        return
+    assert openimcc_bridge.p2o5_extension_callable() is not None
+    assert_visible_activity()
 
 
 def test_phosphorus_pot_exposes_liquid_p2o5_activity(monkeypatch) -> None:
