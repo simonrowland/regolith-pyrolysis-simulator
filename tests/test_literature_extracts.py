@@ -1301,6 +1301,7 @@ def tmp_extracts(tmp_path: Path):
                     "phase_transition": ["fixture-source"],
                     "gas_speciation": ["fixture-source"],
                     "sulfur_solubility_and_sulfate_capacity_series": ["fixture-source"],
+                    "chloride_capacity": ["fixture-source"],
                     "composition_series": ["fixture-source"],
                 },
             }
@@ -1917,6 +1918,13 @@ def test_d032_boundary_class_types_still_refused(d_type):
     doc["species"]["Fe"]["observations"][0]["type"] = d_type
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
     assert any("type must be one of" in e for e in errs)
+
+
+def test_t1413_chloride_capacity_type_is_accepted():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["type"] = "chloride_capacity"
+    errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    assert not any("type must be one of" in e for e in errs)
 
 
 def test_pre_policy_allowlist_exempts_missing_samples():

@@ -1,0 +1,469 @@
+schema_version: literature_extract.v1
+source_id: su-2024-lunar-volatiles-thesis
+source:
+  citation: 'Su, Xue (2024), Lunar Stories Unfolded by Volatile Elements: From Water in the Lunar Mantle
+    to Volcanic Eruptions on the Lunar Surface. PhD dissertation, University of Michigan.'
+  year: 2024
+extraction:
+  method: Context-only transcription of Tables 2.1–2.4 and 4.1–4.2. Born-digital table text was read from
+    pdftotext-layout and row/column assignment checked against 600 dpi physical-page renders; Table 2.4
+    ratios and uncertainties were transcribed from its page render because the text layer is garbled.
+    The controller ruled that natural melt inclusions/groundmass and modelled bead loss/gain remain context-only.
+  date: '2026-10-22'
+  worker: fam44-1022
+  provenance_path: corpus/raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: su-table-2-1-whole-rock-and-quench-rates
+      type: measured_table_without_store_token
+      locator:
+        table: '2.1'
+        page: 26
+        published_page: 11
+        pdf_page_index: 25
+      units: oxide columns wt%; q K/h
+      candidate_tokens:
+      - residue_component_composition
+      - equilibrium_phase_composition
+      reason: The oxide analyses are whole-rock multiphase compositions, not one measured phase; q is
+        an inferred quench rate, for which no quantity token exists. This table is therefore context rather
+        than a phase-composition observation.
+      values:
+        table_caption: Whole rock compositions and inferred quench rates of the investigated lunar samples.
+        composition_attribution_as_printed: Nava (1974) for 15597 and 74220; Rose et al. (1974) for 79135.
+        q_definition_as_printed: q (K/h); sources for quench rate data can be found in the text.
+        samples:
+        - sample: '15597'
+          SiO2_wt_percent: '48.1'
+          TiO2_wt_percent: '1.87'
+          Al2O3_wt_percent: '9.27'
+          Cr2O3_wt_percent: '0.49'
+          FeO_wt_percent: '20.2'
+          MnO_wt_percent: '0.25'
+          MgO_wt_percent: '9.18'
+          CaO_wt_percent: '9.69'
+          Na2O_wt_percent: '0.32'
+          q_K_per_h_as_printed: 700–7800
+        - sample: '74220'
+          SiO2_wt_percent: '38.9'
+          TiO2_wt_percent: '8.96'
+          Al2O3_wt_percent: '6.38'
+          Cr2O3_wt_percent: '0.68'
+          FeO_wt_percent: '22.3'
+          MnO_wt_percent: '0.26'
+          MgO_wt_percent: '14.8'
+          CaO_wt_percent: '7.01'
+          Na2O_wt_percent: '0.43'
+          q_K_per_h_as_printed: 3600–360000
+        - sample: '79135'
+          SiO2_wt_percent: '42.6'
+          TiO2_wt_percent: '6.33'
+          Al2O3_wt_percent: '14.7'
+          Cr2O3_wt_percent: '0.45'
+          FeO_wt_percent: '15.2'
+          MnO_wt_percent: '0.19'
+          MgO_wt_percent: '9.10'
+          CaO_wt_percent: '11.9'
+          Na2O_wt_percent: '0.40'
+          q_K_per_h_as_printed: unknown
+    - observation_id: su-table-2-2-natural-ohmi-compositions
+      type: measured_table_without_store_token
+      locator:
+        table: '2.2'
+        page: 31
+        published_page: 16
+        pdf_page_index: 30
+      units: oxide rows wt%; H2O and trace-element rows ppmw; listed ratios dimensionless
+      candidate_tokens:
+      - residue_component_composition
+      - equilibrium_phase_composition
+      reason: These are compositions of natural OHMIs, not experimental evaporation residues or equilibrium-run
+        phases. No concentration-series token stores these natural inclusion composition vectors; blank
+        cells remain blank.
+      values:
+        table_caption: Compositions of natural OHMIs from lunar samples 79135 and 74220 studied in this
+          work.
+        sample_columns:
+        - 79135 OL1
+        - 79135 OL7
+        - 79135 OL11-2
+        - 79135 OL3
+        - 79135 OL6
+        - 79135 OL8
+        - 79135 OL9
+        - 74220 OL7
+        - 74220 OL19
+        printed_table_and_notes_as_published: "Table 2.2: Compositions of natural OHMIs from lunar sample\
+          \ 79135 and 74220 studied in this work.\n\n\n  Lunar sample #                              \
+          \   OHMIs in 79135                                  OHMIs in 74220\n  Host mineral         \
+          \ Olivine Olivine Olivine Olivine Olivine Olivine Olivine                   Olivine Olivine\n\
+          \  Host mineral Fo# 80             71                  81        71         80        80   \
+          \        80        80\n  Sample #              OL1       OL7       OL11-2 OL3          OL6 \
+          \       OL8       OL9          OL7       OL19\n  Host mnrl dia (µm) 119          138       89\
+          \        101       76         56        156          124       416\n  MI dia (µm)          \
+          \ 37×43     11×16     18×19     8×15      9×18       3×5       8×11         30×85     71×82\n\
+          \  MI dist to surf (µm) 13         24        25        23        3          22        45   \
+          \        22        104\n  SiO2 (wt%)            49.1      58.7                49.5      56.5\
+          \       47.8      49.4         39.8      40.7\n  TiO2                  4.4       4.4       \
+          \          6.5       3.2        5.6       4.9          10.8      10.4\n  Al2O3             \
+          \    9.6       10.4                10.7      11.8       10.8      10.8         7.7       7.8\n\
+          \  Cr2O3                 0.01      0.15                0.22      0.09       0.08      0.10 \
+          \        0.74      0.62\n  FeO                   18.1      5.3                 15.7      5.3\
+          \        12.2      14.8         22.8      21.7\n  MnO                   0.29      0.11     \
+          \           0.25      0.07       0.22      0.25         0.30      0.29\n  MgO              \
+          \     4.8       1.7                 3.3       1.8        4.3       3.4          6.6       7.4\n\
+          \  CaO                   13.7      18.5                13.9      19.6       15.0      14.9 \
+          \        9.8       9.2\n  Na2O                  0.54      0.61                0.74      0.59\
+          \       0.62      0.59         0.41      0.52\n  K2O                   0.09      0.15      \
+          \          0.13      0.13       0.01      0.02         0.08      0.09\n  H2O (ppmw)        \
+          \    969       452       352                                                   1563      905\n\
+          \  F                     60.4      70.8      31.1                                          \
+          \        61.4      49.6\n  P                     237       306       56.5                  \
+          \                                313       158\n  S                     907       260      \
+          \ 296                                                   588       530\n  Cl                \
+          \    1.9                                                                       1.9       2.0\n\
+          \  Li                    17        8.4       14.1                                          \
+          \        11.9      11.1\n  Na                    5668      5016      5118                  \
+          \                                4472      3731\n  K                     875       843     \
+          \  893                                                   613       482\n  Sr               \
+          \     427       222       302                                                   285       249\n\
+          \  Y                     113       102       65                                            \
+          \        61        60\n  Zr                    394       326       254                     \
+          \                              242       223\n  Nb                    37.1      56.8      24.3\
+          \                                                  22.2      20.8\n  Ba                    150\
+          \       115       130                                                   106       78\n  La \
+          \                   14.5      7.4       9.7                                                \
+          \   7.22      8.9\n  Ce                    45.4      24.9      28.8                        \
+          \                          23.3      33.6\n  Pr                    9.1       4.8       5.24\
+          \                                                  4.03      4.21\n  Nd                    45.4\
+          \      25.3      29.7                                                  22.3      25.3\n  Sm\
+          \                    15.8      10        10.8                                              \
+          \    8.51      7.67\n  Eu                    3.9       2.1       4.67                      \
+          \                            2.36      2.25\n  Gd                    16.3      12.5      9.22\
+          \                                                  8.91      8.78\n  Tb                    3.4\
+          \       2.6       4.47                                                  1.63      2.34\n  Dy\
+          \                    22        17.6      12                                                \
+          \    11.5      13.7\n  Ho                    5         4         4.23                      \
+          \                            2.24      2.62\n  Er                    13.1      10.4      6.03\
+          \                                                  6.25      6.8\n  Tm                    1.7\
+          \       1.9       0.54                                                  0.8       0.92\n  Yb\
+          \                    14.6      11.1      12.4                                              \
+          \    6.24      5.36\n  Lu                    2.2       1.5       1.17                      \
+          \                            0.78      0.63\n  H2O/Ce                21.3      18.2      12.2\
+          \                                                  67.1      26.9\n  F/Nd                  1.33\
+          \      2.80      1.05                                                  2.75      1.96\n  Cl/Ba\
+          \                 0.013                                                                    \
+          \ 0.018     0.026\n  S/Dy                  41        15        25                          \
+          \                          51        39\nMI dist to surf (µm): the minimum distance from melt\
+          \ inclusion surface to host surface. If this value is small, there\nis likely significant loss\
+          \ of H2O. The average 2σ errors for major oxides are 0.4 wt% for SiO2, 0.5 wt% for TiO2, 0.1\n\
+          wt% for Al2O3 and Cr2O3, 0.2 wt% for FeO, 0.03 wt% for MnO, 0.06 wt% for MgO, 0.1 wt% for CaO,\
+          \ 0.03 wt% for\nNa2O, and 0.01 wt% for K2O. The average 2σ relative errors for trace elements\
+          \ are <10% for H2O, F, P and Cl,\n<15% for S, less than 10% for Li, Na, K, Sr, Y, Zr, Nb and\
+          \ Ce, 10 to 20% for Ba, La, Ce, Pr, Nd, Dy, and Yb, 20 to\n40% for Sm, Gd, Tb, Ho, Er, and Lu,\
+          \ 50 to 100% for Tm, and approximately 100% for Eu."
+    - observation_id: su-table-2-3-natural-phmi-and-groundmass-compositions
+      type: measured_table_without_store_token
+      locator:
+        table: '2.3'
+        page: 32
+        published_page: 17
+        pdf_page_index: 31
+      units: oxide rows wt%; H2O, volatile, and trace-element rows ppmw; displayed blank and slash cells
+        retained
+      candidate_tokens:
+      - residue_component_composition
+      - equilibrium_phase_composition
+      reason: These are natural PHMI and groundmass compositions, not experimental evaporation residues
+        or equilibrium-run phases. The vector concentrations have no matching store token in this context,
+        and host-pyroxene deconvolution is described separately in the printed note.
+      values:
+        table_caption: Compositions of melt inclusions and groundmass from lunar sample 15597.
+        sample_columns:
+        - bst-24-py1
+        - bst-05-py1
+        - bst-27-py8
+        - bst-13-py1
+        - bst-14-py1
+        - bst-08-py2
+        - groundmass average
+        printed_table_and_notes_as_published: "Table 2.3: Compositions of melt inclusions and groundmass\
+          \ from lunar sample 15597.\n\n Lunar sample #                                    PHMIs in 15597\
+          \                                         15597\n Host mineral         Pyroxene     Pyroxene\
+          \     Pyroxene   Pyroxene        Pyroxene     Pyroxene        Groundmass\n Sample #        \
+          \     bst-24-py1   bst-05-py1   bst-27-py8    bst-13-py1   bst-14-py1   bst-08-py2       average\n\
+          \ Host mnrl dia (µm)   100          103          45            96           93           115\n\
+          \ MI dia (µm)          18×25        11×57        9×12          6×15         7×23         7×13\n\
+          \ MI dist to surf      31           19           18            28           36           50\n\
+          \ (µm)\n SiO2 (wt%)           50.9         53.3         54.1          53.7         54.0    \
+          \     54.7            48.8\n TiO2                 2.15         1.88         1.34          1.52\
+          \         1.62         1.07            2.26\n Al2O3                18.8         20.0       \
+          \  19.6          19.5         20.2         19.5            15.9\n Cr2O3                0.01\
+          \         0.05         0.08          0.04         0.04         0.01            0.005\n FeO \
+          \                 17.7         16.0         13.3          13.6         14.6         12.1   \
+          \         21.9\n MnO                  0.17         0.12         0.10          0.12         0.12\
+          \         0.13            0.207\n MgO                  0.16         0.06         0.03      \
+          \    0.06         0.04         0.10            0.52\n CaO                  9.1          9.0\
+          \          9.0           9.3          9.1          9.3             9.2\n Na2O              \
+          \   0.81         0.91         0.98          1.01         0.91         0.82            0.812\n\
+          \ K2O                  0.19         0.19         0.20          0.20         0.19         0.20\
+          \            0.125\n H2O (ppmw)           493          793          694           438      \
+          \    316          607             39.6\n F                    87.3         101.0        69.6\
+          \          95.4         111          142             65.1\n P                    767       \
+          \   903          681           988          643          310             512\n S           \
+          \         2556         1953         994           2136         1646         790            \
+          \ 1896\n Cl                   /            8.9          6.9           8.2          /       \
+          \     2.8             5.9\n                              Original concentrations before deconvolution*\n\
+          \  Li                 9.74          6.31           6.65         9.97          9.83         \
+          \                 10.1\n  Na                 6976          3488           3777         5425\
+          \          4870                          6048\n  K                  1318          439      \
+          \      890          980           1069                          793\n  Sr                 329\
+          \           150            189          246           235                           235\n  Y\
+          \                  41.5          33.2           34.8         43.2          41.0            \
+          \              43\n  Zr                 245           150            169          221      \
+          \     213                           206\n  Nb                 25.4          11.9           14.6\
+          \         21.2          17.9                          19.2\n  Ba                 260       \
+          \    93             130          168           177                           160\n  La     \
+          \            20.0          8.6            10.9         15.4          14.0                  \
+          \        14.9\n  Ce                 47.7          23.5           28.7         41.5         \
+          \ 37.2                          39.0\n  Pr                 6.77          3.37           4.11\
+          \         5.91          5.46                          5.43\n  Nd                 30.6      \
+          \    16.0           19.3         30.1          25.2                          25.4\n  Sm    \
+          \             8.24          4.66           5.88         9.31          5.45                 \
+          \         6.79\n  Eu                 0.54          1.16           2.09         1.81        \
+          \  1.10                          2.06\n  Gd                 7.65          5.13           6.02\
+          \         7.43          6.93                          7.23\n  Tb                 1.45      \
+          \    0.96           1.09         1.25          1.15                          1.26\n  Dy    \
+          \             8.63          5.90           7.40         7.25          8.47                 \
+          \         7.74\n  Ho                 1.73          1.24           1.40         1.80        \
+          \  1.87                          1.59\n  Er                 4.83          3.24           4.13\
+          \         4.88          4.68                          4.52\n  Tm                 0.77      \
+          \    0.49           0.37         1.14          0.74                          0.61\n  Yb    \
+          \             4.81          3.04           3.83         5.27          3.65                 \
+          \         4.22\n  Lu                 0.64          0.44           0.47         0.95        \
+          \  0.47                          0.60\nOriginal concentrations before deconvolution* mean these\
+          \ concentrations have not been corrected by deconvolution.\nThe listed original data of non-volatile\
+          \ trace elements (from Li to Lu in the table), except the PHMI in bst-24-py1,\nare detected\
+          \ to have host pyroxene signal due to the small size of the MIs and/or irregular shapes. The\
+          \ mixed signal\nhas been corrected using the deconvolution method and the deconvoluted concentrations\
+          \ are shown in Table 3b. See\ntext for more explanation. The average 2σ errors for major oxides\
+          \ are 0.4 wt% for SiO2, 0.2 wt% for TiO2, 0.2 wt%\nfor Al2O3, 0.08 wt% for Cr2O3, 0.2 wt% for\
+          \ FeO, 0.03 wt% for MnO, 0.02 wt% for MgO, 0.1 wt% for CaO, 0.04\nwt% for Na2O, and 0.02 wt%\
+          \ for K2O. For trace elements in MIs, the average 2σ relative errors can be found in\nTable\
+          \ 2.2. For the matrix glass, average 2σ analytical errors are <10% for H2O, F, P and Cl, <15%\
+          \ for S, 5 to 10%\nfor Sm, Gd, Tb, Ho, Er, Tm, and Lu, about 30% for Eu, and less than 5% for\
+          \ other non-volatile trace elements."
+    - observation_id: su-table-2-4-deconvolved-natural-phmi-ree
+      type: measured_table_without_store_token
+      locator:
+        table: '2.4'
+        page: 33
+        published_page: 18
+        pdf_page_index: 32
+      units: corrected REE ppmw with printed 1σ errors; proportions and ratios as printed
+      candidate_tokens:
+      - residue_component_composition
+      - equilibrium_phase_composition
+      reason: The rows are deconvolution-corrected REE concentrations for natural PHMIs, not experimental
+        evaporation residues or equilibrium-run phases. No concentration-series token fits this table;
+        the printed blank bst-24-py1 corrected cells are not inferred values.
+      values:
+        table_caption: Corrected REE compositions (ppmw) of four 15597 PHMIs with 1σ error.
+        sample_columns:
+        - bst-24-py1
+        - bst-05-py1
+        - bst-27-py8
+        - bst-13-py1
+        - bst-14-py1
+        printed_table_as_read_from_600dpi_render: 'Table 2.4: Corrected REE compositions (ppmw) of four
+          15597 PHMIs with 1σ error.
+
+
+          Sample columns: bst-24-py1; bst-05-py1; bst-27-py8; bst-13-py1; bst-14-py1
+
+          Augite prop*: no mix; 0.610(190); 0.350(198); 0.324(106); 0.257(102)
+
+          Pigeonite prop*: no mix; 0.056(168); 0.162(182); 0.072(91); 0.094(82)
+
+          Corrected concentrations after deconvolution (except bst-24-py1), ppmw; blank for bst-24-py1:
+
+          La: —; 22.9±14.9; 21.3±10.8; 24.6±5.4; 21.0±4.0
+
+          Ce: —; 59.1±35.5; 54.7±26.4; 65.1±13.5; 55.0±10.1
+
+          Pr: —; 7.89±4.29; 7.58±3.46; 9.06±1.87; 7.93±1.43
+
+          Nd: —; 34.7±16.8; 34.2±14.5; 44.7±8.5; 35.8±6.0
+
+          Sm: —; 8.74±3.40; 9.70±3.66; 13.1±2.8; 7.41±1.46
+
+          Eu: —; 2.05±0.80; 3.32±1.51; 2.48±1.74; 1.46±1.12
+
+          Gd: —; 8.62±2.79; 9.32±3.08; 9.98±2.13; 9.08±1.53
+
+          Tb: —; 1.55±0.46; 1.64±0.52; 1.65±0.38; 1.48±0.27
+
+          Dy: —; 9.20±2.57; 10.9±3.1; 9.41±1.46; 10.8±1.4)
+
+          Ho: —; 1.89±0.51; 2.03±0.58; 2.31±0.43; 2.37±0.35
+
+          Er: —; 4.92±1.28; 5.96±1.62; 6.24±1.04; 5.87±0.82
+
+          Tm: —; 0.74±0.19; 0.52±0.17; 1.46±0.31; 0.93±0.18
+
+          Yb: —; 4.64±1.18; 5.51±1.45; 6.74±1.03; 4.58±0.64
+
+          Lu: —; 0.68±0.18; 0.68±0.20; 1.21±0.26; 0.59±0.13
+
+          H2O/Ce*: 10.3±0.9; 13.4(+20.2/−5.0); 12.7(+11.8/−4.1); 6.7(+1.8/−1.2); 5.7(+1.3/−0.9)
+
+          F/Nd*: 2.85±0.26; 2.91(+2.73/−0.95); 2.03(+1.5/−0.6); 2.13(+0.50/−0.34); 3.10(+0.62/−0.45)
+
+          S/Dy*: 296±31; 212(+82/−46); 91(+37/−20); 227(+42/−30); 152(+22/−17)
+
+          * Augite prop and pigeonite prop mean the mass proportions of augite and pigeonite signals mixed
+          into the original concentration data of the PHMIs. The deconvoluted concentrations have larger
+          errors than the instrumental analytical errors and the 1σ errors are listed here.
+
+          '
+        render_check: 'All Table 2.4 cells were checked against the 600 dpi render of physical PDF page
+          33. The malformed pdftotext ratio/error glyphs were transcribed from the render. The printed
+          bst-14-py1 Dy entry includes a trailing right parenthesis: 10.8±1.4).'
+    - observation_id: su-table-4-1-diffusion-model-fit-parameters
+      type: model_derived_table
+      locator:
+        table: '4.1'
+        page: 104
+        published_page: 89
+        pdf_page_index: 103
+      units: diameter µm; τ1 and τ2 s; a0 ppm; b0 K; aD unit as defined in the model
+      candidate_tokens:
+      - residue_component_composition
+      reason: This table reports fitted diffusion-model parameters rather than measured melt or residue
+        compositions; fitted parameters a0, b0, aD, τ1 and τ2 have no corresponding quantity token.
+      values:
+        quantity_as_published: Fitted parameters by the diffusion model
+        method_class: model_derived
+        bracket_uncertainty_as_published: Numbers in brackets represent ±1σ to the last significant digits.
+        Na_profile_fitting:
+        - bead: OR-GB-A4
+          diameter_um: '232'
+          tau1_s: 108(8)
+          tau2_s: –
+        - bead: OR-GB-C2
+          diameter_um: '189'
+          tau1_s: 197(11)
+          tau2_s: –
+        - bead: OR-GB-H11
+          diameter_um: '115'
+          tau1_s: 575(67)
+          tau2_s: '5.8'
+        - bead: OR-GB-G11
+          diameter_um: '206'
+          tau1_s: 26(2)
+          tau2_s: '0.26'
+        sulfur_profile_fitting:
+          a0_ppm: '122'
+          b0_K: '1431'
+          aD: '-5.15'
+          C0_ppm: '377'
+    - observation_id: su-table-4-2-modelled-sulfur-and-sodium-loss-gain
+      type: model_derived_table
+      locator:
+        table: '4.2'
+        page: 106
+        published_page: 91
+        pdf_page_index: 105
+      units: Ttr K; C1 and C2 as printed (S ppm, Na wt%); loss and gain fractions %
+      candidate_tokens:
+      - mass_loss_fraction
+      - residue_component_composition
+      reason: The sulfur and sodium loss/gain values are model outputs, not measured residue compositions.
+        Although percentages resemble a loss-fraction token, these are fitted model partitions with no
+        stored model inputs and are context-only under the controller ruling.
+      values:
+        quantity_as_published: Calculated loss and gain of S and Na in individual orange beads
+        method_class: model_derived
+        initial_model_conditions_as_printed:
+          T0_K: '1640'
+          C0_S_ppm: '377'
+          C0_Na_wt_percent: '0.35'
+        sulfur_rows:
+        - bead: OR-GB-A4
+          size_um: '232'
+          Ttr_K: '1550'
+          C1_ppm: '314'
+          fS_loss_percent: 17%
+          C2_ppm: '346'
+          fS_mag_percent: 91%
+          fS_ingassed_percent: 9%
+        - bead: OR-GB-C2
+          size_um: '189'
+          Ttr_K: '1591'
+          C1_ppm: '303'
+          fS_loss_percent: 20%
+          C2_ppm: '360'
+          fS_mag_percent: 84%
+          fS_ingassed_percent: 16%
+        - bead: OR-GB-H11
+          size_um: '115'
+          Ttr_K: '1630'
+          C1_ppm: '295'
+          fS_loss_percent: 22%
+          C2_ppm: '387'
+          fS_mag_percent: 76%
+          fS_ingassed_percent: 24%
+        - bead: Average
+          size_um: '179'
+          Ttr_K: '1590'
+          C1_ppm: '304'
+          fS_loss_percent: 19%
+          C2_ppm: '364'
+          fS_mag_percent: 84%
+          fS_ingassed_percent: 16%
+        sodium_rows:
+        - bead: OR-GB-A4
+          size_um: '232'
+          Ttr_K: '1570'
+          C1_wt_percent: '0.31'
+          fNa_loss_percent: 11%
+          C2_wt_percent: '0.36'
+          fNa_mag_percent: 86%
+          fNa_ingassed_percent: 14%
+        - bead: OR-GB-C2
+          size_um: '189'
+          Ttr_K: '1602'
+          C1_wt_percent: '0.31'
+          fNa_loss_percent: 13%
+          C2_wt_percent: '0.38'
+          fNa_mag_percent: 80%
+          fNa_ingassed_percent: 20%
+        - bead: OR-GB-H11
+          size_um: '115'
+          Ttr_K: '1632'
+          C1_wt_percent: '0.30'
+          fNa_loss_percent: 14%
+          C2_wt_percent: '0.40'
+          fNa_mag_percent: 76%
+          fNa_ingassed_percent: 24%
+        - bead: OR-GB-G11
+          size_um: '195'
+          Ttr_K: '1539'
+          C1_wt_percent: '0.32'
+          fNa_loss_percent: 8%
+          C2_wt_percent: '0.34'
+          fNa_mag_percent: 94%
+          fNa_ingassed_percent: 6%
+        - bead: Average
+          size_um: '183'
+          Ttr_K: '1586'
+          C1_wt_percent: '0.31'
+          fNa_loss_percent: 12%
+          C2_wt_percent: '0.37'
+          fNa_mag_percent: 84%
+          fNa_ingassed_percent: 16%
+        source_note: T0=1640 K and C0 values are shared model assumptions, not run temperatures or measured
+          values attached to the bead rows.

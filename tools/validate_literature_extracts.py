@@ -93,6 +93,7 @@ OBSERVATION_TYPES = frozenset(
         "phase_transition",
         "gas_speciation",
         "sulfur_solubility_and_sulfate_capacity_series",
+        "chloride_capacity",
         "composition_series",
     }
 )
