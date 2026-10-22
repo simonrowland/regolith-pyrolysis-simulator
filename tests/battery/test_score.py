@@ -12011,6 +12011,69 @@ def _cell_material_score_case(material, inference):
     return reference, context, bench, prediction
 
 
+def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    reference, context, bench, _ = _cell_material_score_case(CellMaterial.W, None)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(
+                Composition(
+                    basis="printed_mole_fraction",
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                    components=(("CaO", Decimal("0.6")), ("SiO2", Decimal("0.4"))),
+                )
+            ),
+        ),
+    )
+    requests = []
+    request_type = battery.Po2Request
+
+    def capture_request(**kwargs):
+        request = request_type(**kwargs)
+        requests.append(request)
+        return request
+
+    monkeypatch.setattr(battery, "Po2Request", capture_request)
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda name: battery.EngineHandle(
+            name=name,
+            backend=None,
+            available=False,
+            unavailable_reason="test unavailable",
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        reference,
+        experiment=context.experiments[reference.experiment_id],
+        bench=bench,
+    )
+    closure_requests = [
+        request for request in requests
+        if request.mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
+    ]
+    assert len(closure_requests) == 1
+    assert closure_requests[0].cell_material == "W"
+    assert closure_requests[0].po2_bar is None
+    assert not any(request.mode == battery.PO2_COMMANDED for request in requests)
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == (
+            "model assumption: vapour-only zero-storage closure; "
+            "source_oxygen_fallback=lineage_untyped"
+        )
+        for notice in prediction.notices
+    )
+
+
 def _migrated_stolyarova_cell_context(tmp_path: Path) -> ScoreContext:
     from simulator.battery.migrate import Migrator, write_outputs
 
