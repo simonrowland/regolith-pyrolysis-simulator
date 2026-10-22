@@ -58,6 +58,7 @@ from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
+from simulator.overhead import OverheadGasModel
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
@@ -4134,8 +4135,8 @@ def _apply_sio_wall_sweep_controls(
             pO2_value,
             controlled_o2=True,
         )
-        sim.overhead.composition["O2"] = max(
-            float(sim.overhead.composition.get("O2", 0.0)),
+        OverheadGasModel.apply_commanded_o2_floor(
+            sim.overhead.composition,
             pO2_value,
         )
         # Phase A chunk-review P2 (codex 2026-05-28): the wall-sweep

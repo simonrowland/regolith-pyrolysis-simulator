@@ -1500,8 +1500,7 @@ class OverheadGasModel:
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         } and melt.pO2_mbar > 0.0:
-            gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
+            self.apply_commanded_o2_floor(gas.composition, melt.pO2_mbar)
 
         if melt.sweep_mol_per_s is not None:
             boundary = self.sweep_boundary(
@@ -1647,10 +1646,10 @@ class OverheadGasModel:
                 max(0.0, melt.p_total_mbar - melt.pO2_mbar))  # mbar — sweep balance partial pressure
 
         # 0.5.3 Phase A1 (2026-05-28): commanded-pO2 floor mirror. The legacy
-        # no-headspace branch (above) writes `gas.composition['O2'] = max(...,
-        # melt.pO2_mbar)` so a recipe pO2 setpoint always survives. Without the
-        # mirror here, the holdup-derived O2 partial would override the setpoint
-        # for actively-controlled atmospheres. Only apply in O2-controlled modes:
+        # no-headspace branch (above) calls `apply_commanded_o2_floor` so a
+        # recipe pO2 setpoint always survives. Without the mirror here, the
+        # holdup-derived O2 partial would override the setpoint for actively-
+        # controlled atmospheres. Only apply in O2-controlled modes:
         # an uncontrolled HARD_VACUUM / PN2_SWEEP run must NOT get a synthetic
         # O2 floor (matches the design intent at equilibrium.py:9-12).
         #
@@ -1669,8 +1668,7 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         }:
             if melt.pO2_mbar > 0.0:
-                gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                    gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
+                self.apply_commanded_o2_floor(gas.composition, melt.pO2_mbar)
             gas.pressure_mbar = max(  # mbar — controlled total pressure floor
                 gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
             background_species = str(
@@ -1684,6 +1682,17 @@ class OverheadGasModel:
                         melt.p_total_mbar, melt.pO2_mbar, background_fraction,
                     ),  # mbar — background gas partial pressure share
                 )
+
+    @staticmethod
+    def apply_commanded_o2_floor(
+        composition: dict[str, float],
+        pO2_mbar: float,
+    ) -> None:
+        """Preserve a commanded oxygen partial-pressure floor in mbar."""
+        composition['O2'] = max(
+            float(composition.get('O2', 0.0)),
+            float(pO2_mbar),
+        )
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:
