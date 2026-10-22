@@ -116,6 +116,37 @@ def test_docs_private_preflight_is_inert_without_strict_environment(
     _invoke_sessionstart(tmp_path, monkeypatch)
 
 
+def test_sessionstart_none_skips_docs_private_work_without_strict(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(_STRICT_ENV, raising=False)
+    monkeypatch.setenv("PYTEST_XDIST_WORKER", "gw-docs-private-preflight")
+    swept_roots: list[Path] = []
+    monkeypatch.setattr(
+        project_conftest,
+        "_cleanup_dead_worker_caches",
+        lambda root: swept_roots.append(root),
+    )
+
+    def unexpected_docs_private_work(*_args: object) -> None:
+        raise AssertionError("strict docs-private setup ran without strict mode")
+
+    monkeypatch.setattr(
+        project_conftest,
+        "_preflight_docs_private_inputs",
+        unexpected_docs_private_work,
+    )
+    monkeypatch.setattr(
+        project_conftest,
+        "_install_docs_private_open_audit",
+        unexpected_docs_private_work,
+    )
+
+    project_conftest.pytest_sessionstart(None)
+
+    assert swept_roots == [project_conftest._worker_cache_root()]
+
+
 def test_docs_private_manifest_matches_reader_generator() -> None:
     if not (_REPO_ROOT / "docs-private").is_dir() and _STRICT_ENV not in os.environ:
         pytest.skip("manifest expansion needs the docs-private source tree")

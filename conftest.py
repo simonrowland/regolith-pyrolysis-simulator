@@ -440,23 +440,21 @@ def _fail_on_missing_docs_private_opens(session: pytest.Session) -> str | None:
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session: pytest.Session) -> None:
     _cleanup_dead_worker_caches(_worker_cache_root())
-    repo_root = Path(session.config.rootpath)
-    _preflight_docs_private_inputs(
-        repo_root,
-        repo_root / "tests" / "docs_private_inputs.json",
-    )
-    global _DOCS_PRIVATE_AUDIT_SESSION_DIR
-    if (
-        DOCS_PRIVATE_MANIFEST_STRICT_ENV in os.environ
-        and not os.environ.get("PYTEST_XDIST_WORKER")
-    ):
-        _DOCS_PRIVATE_AUDIT_SESSION_DIR = Path(
-            tempfile.mkdtemp(prefix="regolith-docs-private-audit-")
+    if DOCS_PRIVATE_MANIFEST_STRICT_ENV in os.environ:
+        repo_root = Path(session.config.rootpath)
+        _preflight_docs_private_inputs(
+            repo_root,
+            repo_root / "tests" / "docs_private_inputs.json",
         )
-        os.environ[DOCS_PRIVATE_AUDIT_DIR_ENV] = str(
-            _DOCS_PRIVATE_AUDIT_SESSION_DIR
-        )
-    _install_docs_private_open_audit(repo_root)
+        global _DOCS_PRIVATE_AUDIT_SESSION_DIR
+        if not os.environ.get("PYTEST_XDIST_WORKER"):
+            _DOCS_PRIVATE_AUDIT_SESSION_DIR = Path(
+                tempfile.mkdtemp(prefix="regolith-docs-private-audit-")
+            )
+            os.environ[DOCS_PRIVATE_AUDIT_DIR_ENV] = str(
+                _DOCS_PRIVATE_AUDIT_SESSION_DIR
+            )
+        _install_docs_private_open_audit(repo_root)
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
     global _SESSION_WATCHDOG
