@@ -290,6 +290,14 @@ def test_fusion_predictor_refuses_a_noncrystalline_solid_identity() -> None:
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
 
 
+_VAPOROCK_GAS_TABLE = {
+    "K": "K-005",
+    "Fe": "Fe-008",
+    "O2": "O-029",
+    "Co": "Co-005",
+}
+
+
 def _gas_thermo(
     formula: str = "K",
     quantity: Quantity = Quantity.CP,
@@ -304,6 +312,31 @@ def _gas_thermo(
         formation_elements=State.not_applicable("not a formation quantity"),
     )
     return identity
+
+
+def _same_table_gas(
+    observation_id: str,
+    formula: str,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    value: Decimal,
+    **kwargs,
+):
+    """JANAF gas-thermo observation whose locator is that species' gas table."""
+
+    from simulator.battery.records import Locator
+
+    table_id = _VAPOROCK_GAS_TABLE[formula]
+    return replace(
+        F.observation(
+            observation_id,
+            "exp-1",
+            _gas_thermo(formula, quantity, temperature_K),
+            value,
+            **kwargs,
+        ),
+        locator=Locator(table=table_id, record=table_id),
+    )
 
 
 def _context(*observations, works=None, experiments=None, origins=None):
@@ -2368,7 +2401,6 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
 
     pytest.importorskip("vaporock.equil")
 
-    identity = _gas_thermo(temperature_K=Decimal("1200"))
     expected = {
         Quantity.CP: (Decimal("20.787"), Decimal("0.01")),
         Quantity.S: (Decimal("189.284"), Decimal("0.3")),
@@ -2378,10 +2410,11 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     for quantity, (printed, tolerance) in expected.items():
         attempt = predict_thermo_attempt(
             Engine.VAPOROCK,
-            F.observation(
+            _same_table_gas(
                 f"kgas-{quantity.value}",
-                "exp-1",
-                replace(identity, quantity=quantity),
+                "K",
+                quantity,
+                Decimal("1200"),
                 printed,
             ),
         )
@@ -2413,10 +2446,11 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     assert attempts[Quantity.S].unit == "J_per_declared_mol_basis_per_K"
     assert attempts[Quantity.H_MINUS_H298].unit == "kJ_per_declared_mol_basis"
 
-    reference = F.observation(
+    reference = _same_table_gas(
         "kgas-cp-janaf",
-        "exp-1",
-        replace(identity, quantity=Quantity.CP),
+        "K",
+        Quantity.CP,
+        Decimal("1200"),
         Decimal("20.787"),
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
@@ -2504,8 +2538,11 @@ def test_vaporock_gas_in_band_outputs_are_pinned() -> None:
     """In-band Shomate Cp, S, and H−H298 stay on these exact values.
 
     The numbers are the base resolver's outputs for the containing
-    JANAF row, not a re-fit. A later out-of-band change must leave them
-    bit-identical, still BRIDGE, and still without a notice.
+    JANAF row, not a re-fit. These rows verify as subtract-H, so the
+    enthalpy convention leaves them bit-identical. The locator is that
+    species' gas table; the basis gate runs before the in-band return.
+    A later out-of-band change must leave them bit-identical, still
+    BRIDGE, and still without a notice.
     """
 
     import pytest
@@ -2516,10 +2553,11 @@ def test_vaporock_gas_in_band_outputs_are_pinned() -> None:
         for quantity, pinned in expected.items():
             attempt = predict_thermo_attempt(
                 Engine.VAPOROCK,
-                F.observation(
+                _same_table_gas(
                     f"pin-{formula}-{quantity.value}-{temperature}",
-                    "exp-1",
-                    _gas_thermo(formula, quantity, temperature),
+                    formula,
+                    quantity,
+                    temperature,
                     pinned,
                 ),
             )
@@ -2653,10 +2691,11 @@ def test_vaporock_gas_census_preserves_same_input_relation(monkeypatch) -> None:
     from simulator.battery import score as score_module
     from simulator.battery.compilation_tier import compilation_tier_census
 
-    reference = F.observation(
+    reference = _same_table_gas(
         "kgas-cp-janaf",
-        "exp-1",
-        _gas_thermo(temperature_K=Decimal("1200")),
+        "K",
+        Quantity.CP,
+        Decimal("1200"),
         Decimal("20.787"),
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
@@ -2790,10 +2829,11 @@ def test_vaporock_gas_outside_janaf_table_stays_refused() -> None:
     for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
         outside = predict_thermo_attempt(
             Engine.VAPOROCK,
-            F.observation(
+            _same_table_gas(
                 f"potassium-above-table-{quantity.value}",
-                "exp-1",
-                _gas_thermo("K", quantity, Decimal("6500")),
+                "K",
+                quantity,
+                Decimal("6500"),
                 Decimal("0"),
             ),
         )
@@ -3059,6 +3099,135 @@ def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
     assert heat_attempt.authority is Authority.BRIDGE
 
 
+def _b1259_point(filename: str, observation_id: str):
+    from pathlib import Path
+
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+
+    root = Path(__file__).resolve().parents[2]
+    document = load_yaml(
+        root
+        / "data/literature/observations-v2"
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / filename
+    )
+    raw = next(
+        row for row in document["observations"] if row["observation_id"] == observation_id
+    )
+    return observation_from_plain(raw)
+
+
+def test_vaporock_in_band_basis_and_enthalpy_form() -> None:
+    """Inside a coefficient row, basis and the H term are still gated.
+
+    B1259 O2 entropy at 800 K is 1 atm on O2's first Shomate row, so S
+    refuses with both pressures. B1259 magnesium entropy at 1500 K is on
+    Mg(g)'s row, and that bulletin's 298.15 K zero is the crystal, so S
+    refuses on reference basis. O2 H−H298 at 800 K follows the printed
+    O-029 node. K entropy at 1200 K on K-005 still answers. Co on
+    (1000, 3000] stores H = 0 and does not reproduce printed H−H298, so
+    that enthalpy refuses; heat capacity on the same row still answers.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    oxygen_entropy = _b1259_point(
+        "b1259-ht-0034-oxygen-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0034-oxygen-reference-state:"
+        "S:shared:T=800:col=entropy:name=oxygen-(reference-state):v=b128b3593f",
+    )
+    entropy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_entropy)
+    assert entropy_attempt.value is None
+    assert entropy_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert entropy_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert entropy_attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert entropy_attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert entropy_attempt.refusal_detail["gas_table"] == "O-029"
+    assert entropy_attempt.refusal_detail["coefficient_interval"] == "inside"
+    assert entropy_attempt.refusal_detail["branch"] == "shomate"
+
+    magnesium_entropy = _b1259_point(
+        "b1259-ht-0027-magnesium-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0027-magnesium-reference-state:"
+        "S:shared:T=1500:col=entropy:name=magnesium-(reference-state):v=48985b088a",
+    )
+    magnesium_attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium_entropy)
+    assert magnesium_attempt.value is None
+    assert magnesium_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        magnesium_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    )
+    assert magnesium_attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert magnesium_attempt.refusal_detail["coefficient_interval"] == "inside"
+    assert magnesium_attempt.refusal_detail["branch"] == "shomate"
+    assert "gas_pressure_Pa" not in magnesium_attempt.refusal_detail
+
+    oxygen_enthalpy = _b1259_point(
+        "b1259-ht-0034-oxygen-reference-state.yaml",
+        "robie-waldbaum-1968-usgs-b1259:b1259-ht-0034-oxygen-reference-state:"
+        "H_minus_H298:shared:T=800:col=H_minus_H298:name=oxygen-(reference-state):"
+        "v=29ef8ac3ab",
+    )
+    printed = _printed_janaf_node("O-029", Decimal("800"), "enthalpy_increment")
+    assert printed == Decimal("15.835")
+    enthalpy_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen_enthalpy)
+    assert enthalpy_attempt.refusal_reason is None
+    assert enthalpy_attempt.value is not None
+    assert abs(enthalpy_attempt.value - printed) <= Decimal("0.001")
+    assert enthalpy_attempt.value < Decimal("20")
+    assert enthalpy_attempt.authority is Authority.BRIDGE
+    assert enthalpy_attempt.notices == ()
+    assert "enthalpy_form=through_F" in enthalpy_attempt.call_evidence
+    assert "green_subtract_H=" in enthalpy_attempt.call_evidence
+
+    potassium = _same_table_gas(
+        "k-005-entropy-1200",
+        "K",
+        Quantity.S,
+        Decimal("1200"),
+        Decimal("189.01928920321794"),
+        source_id="nist-janaf-4th",
+    )
+    potassium_attempt = predict_thermo_attempt(Engine.VAPOROCK, potassium)
+    assert potassium_attempt.refusal_reason is None
+    assert potassium_attempt.value == Decimal("189.01928920321794")
+    assert potassium_attempt.notices == ()
+    assert potassium_attempt.authority is Authority.BRIDGE
+
+    cobalt_enthalpy = _same_table_gas(
+        "co-unverified-enthalpy",
+        "Co",
+        Quantity.H_MINUS_H298,
+        Decimal("2000"),
+        Decimal("0"),
+        source_id="nist-janaf-4th",
+    )
+    cobalt_attempt = predict_thermo_attempt(Engine.VAPOROCK, cobalt_enthalpy)
+    assert cobalt_attempt.value is None
+    assert cobalt_attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        cobalt_attempt.refusal_detail["reason"]
+        == "shomate_enthalpy_normalisation_unverified"
+    )
+    assert cobalt_attempt.refusal_detail["coefficient_interval"] == "inside"
+    cobalt_heat = _same_table_gas(
+        "co-unverified-heat-capacity",
+        "Co",
+        Quantity.CP,
+        Decimal("2000"),
+        Decimal("0"),
+        source_id="nist-janaf-4th",
+    )
+    heat_attempt = predict_thermo_attempt(Engine.VAPOROCK, cobalt_heat)
+    assert heat_attempt.refusal_reason is None
+    assert heat_attempt.value is not None
+    assert heat_attempt.value > 0
+    assert heat_attempt.notices == ()
+    assert "enthalpy_form=unverified" in heat_attempt.call_evidence
+
+
 def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
     monkeypatch,
 ) -> None:
@@ -3087,10 +3256,19 @@ def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
         "_vaporock_gas_provenance",
         lambda _module: "test-provenance",
     )
+    # The stub row is not K's coefficient row. The production classifier
+    # would call it unverified. This test pins the shared numeric gate,
+    # so the convention is fixed as subtract-H, which is what the stub's
+    # _janaf_dH (enthalpy + H) undoes.
+    monkeypatch.setattr(
+        compilation_tier,
+        "_shomate_enthalpy_form",
+        lambda _vapor, _row, _table_id: "subtract_H",
+    )
 
     class _Coefs:
         def __init__(self, row: dict[str, float]) -> None:
-            self.loc = {"Xx(g)": row}
+            self.loc = {"K(g)": row}
 
     class _Vapor:
         def __init__(self, row: dict[str, float], entropy: float, enthalpy: float) -> None:
@@ -3132,10 +3310,11 @@ def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
         for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
             attempt = predict_thermo_attempt(
                 Engine.VAPOROCK,
-                F.observation(
-                    f"xx-inadmissible-{index}-{quantity.value}",
-                    "exp-1",
-                    _gas_thermo("Xx", quantity, Decimal("1000")),
+                _same_table_gas(
+                    f"k-inadmissible-{index}-{quantity.value}",
+                    "K",
+                    quantity,
+                    Decimal("1000"),
                     Decimal("0"),
                 ),
             )
@@ -3155,10 +3334,11 @@ def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
     for quantity, pinned in expected.items():
         attempt = predict_thermo_attempt(
             Engine.VAPOROCK,
-            F.observation(
-                f"xx-admissible-{quantity.value}",
-                "exp-1",
-                _gas_thermo("Xx", quantity, Decimal("1000")),
+            _same_table_gas(
+                f"k-admissible-{quantity.value}",
+                "K",
+                quantity,
+                Decimal("1000"),
                 pinned,
             ),
         )

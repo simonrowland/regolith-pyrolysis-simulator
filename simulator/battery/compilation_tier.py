@@ -1035,6 +1035,17 @@ _JANAF_TABLE_NOTICE = (
 _VAPOROCK_GAS_NOT_ADMISSIBLE = "vaporock-gas-thermo-not-admissible"
 
 
+def _vaporock_cp_s_admissible(heat_capacity: Decimal, entropy: Decimal) -> bool:
+    """Cp > 0 and S > 0. Shared by the full gate and an unverified H row."""
+
+    return (
+        heat_capacity.is_finite()
+        and heat_capacity > 0
+        and entropy.is_finite()
+        and entropy > 0
+    )
+
+
 def _vaporock_gas_thermo_admissible(
     heat_capacity: Decimal,
     entropy: Decimal,
@@ -1042,17 +1053,13 @@ def _vaporock_gas_thermo_admissible(
 ) -> bool:
     """Cp > 0, S > 0, and a finite H−H298.
 
-    One gate for the in-band Shomate row and the tabulated gas read.
+    One gate for a verified in-band Shomate row and the tabulated gas read.
     A negative enthalpy increment below 298.15 K is finite and is kept.
+    An unverified Shomate H term never reaches this predicate: that H−H298
+    request refuses, and Cp and S are gated by `_vaporock_cp_s_admissible`.
     """
 
-    return (
-        heat_capacity.is_finite()
-        and heat_capacity > 0
-        and entropy.is_finite()
-        and entropy > 0
-        and enthalpy.is_finite()
-    )
+    return _vaporock_cp_s_admissible(heat_capacity, entropy) and enthalpy.is_finite()
 
 
 def _refuse_inadmissible_vaporock_gas(
@@ -1127,6 +1134,164 @@ def _tabulated_gas_basis_matches(
     return False
 
 
+# Printed H−H298 is kJ/mol. 1 kJ/mol is under the smallest stored |H| that
+# separates the two candidates on this catalog (CaO, 43.9 kJ/mol) and over
+# the worst residual of a row that is still that printed enthalpy (Ca(g)
+# at 6000 K, 0.994 kJ/mol).
+_SHOMATE_ENTHALPY_TOLERANCE_KJ = Decimal("1")
+_SHOMATE_H_UNVERIFIED = "shomate_enthalpy_normalisation_unverified"
+_SHOMATE_COEF_FIELDS = ("T_min", "T_max", "A", "B", "C", "D", "E", "F", "G", "H")
+
+
+def _vaporock_gas_basis_refusal(
+    observation: Observation,
+    formula: str,
+    table_id: str,
+    quantity: Quantity,
+    *,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+    coefficient_interval: str,
+) -> ThermoAttempt | None:
+    """One basis gate for the in-band row and the tabulated read.
+
+    Species, phase, and reference basis first. Standard pressure is part
+    of the basis for entropy only. Ideal gas: H and Cp have no pressure
+    term; S has −R ln(p/p°). This path compares the declared pressure to
+    JANAF's 0.1 MPa and does not convert the value. None means the
+    observation may be answered from this gas table.
+    """
+
+    from simulator.battery.generators.janaf import (
+        STANDARD_PRESSURE_PA as janaf_standard_pressure,
+    )
+
+    pressure_extra: dict[str, object] = {}
+    if _tabulated_gas_basis_matches(observation, formula, table_id):
+        if quantity is not Quantity.S:
+            return None
+        declared_pressure = _declared_standard_pressure_Pa(observation)
+        if declared_pressure == janaf_standard_pressure:
+            return None
+        pressure_extra = {
+            "observation_pressure_Pa": (
+                None
+                if declared_pressure is None
+                else _decimal_token(declared_pressure)
+            ),
+            "gas_pressure_Pa": _decimal_token(janaf_standard_pressure),
+        }
+    declared = None
+    if isinstance(observation.identity, Identity):
+        declared = phase_token(observation.identity.species)
+    return _refuse(
+        RefusalReason.IDENTITY_MISMATCH,
+        "tabulated_table_basis_mismatch",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "engine": Engine.VAPOROCK.value,
+            "species": species_name,
+            "observation_table": _locator_table_id(observation),
+            "observation_phase": None if declared is None else declared.value,
+            "gas_table": table_id,
+            "gas_phase": Phase.G.value,
+            "coefficient_interval": coefficient_interval,
+            "branch": "shomate" if coefficient_interval == "inside" else "table",
+            **pressure_extra,
+        },
+        call_evidence=call_evidence,
+    )
+
+
+def _shomate_row_key(row) -> tuple[float, ...]:
+    return tuple(float(row[name]) for name in _SHOMATE_COEF_FIELDS)
+
+
+def _classify_shomate_enthalpy_form(vapor, row, table_id: str) -> str:
+    """``subtract_H``, ``through_F``, or ``unverified`` for one coefficient row.
+
+    NIST Shomate, t = T/1000, with Cp and S in J/(mol·K) and H−H298 in kJ/mol:
+    Cp = A + Bt + Ct² + Dt³ + E/t²,
+    S = A ln t + Bt + Ct²/2 + Dt³/3 − E/(2t²) + G,
+    H−H298 = At + Bt²/2 + Ct³/3 + Dt⁴/4 − E/t + F − H.
+    VapoRock ``_janaf_dH`` returns that polynomial through +F and does not
+    subtract the stored H. The rows do not share one meaning for H.
+
+    Each printed ``enthalpy_increment`` node with T_min < T <= T_max is
+    compared to both candidates after ``as_decimal(str(float(raw)))``.
+    That is the conversion a returned value uses, and both sides are
+    kJ/mol, so nothing is rescaled. ``subtract_H`` when the NIST form
+    stays within 1 kJ/mol at every such node, including when both
+    candidates do (the stored H does not move the value). ``through_F``
+    when only the polynomial through F does. Otherwise the row's H term
+    is unverified.
+
+    K(g) on (1039.54, 1800] at 1200 K: through F is 107.74615257813333
+    and minus H = 88.99996 is 18.746192578133332, against printed K-005
+    18.746. O2(g) on (700, 2000] at 800 K: through F is
+    15.835631675866665 against printed O-029 15.835; subtracting
+    H = −48.593 yields 64.42863167586667. Co(g), Mn(g), and Ni(g) store
+    H = 0 and miss the printed enthalpy by hundreds of kJ/mol.
+    """
+
+    from simulator.battery.generators.janaf import _cached_table_property_points
+
+    try:
+        points = _cached_table_property_points(table_id, "enthalpy_increment")[0]
+        t_min = float(row["T_min"])
+        t_max = float(row["T_max"])
+        h_coef = float(row["H"])
+    except (KeyError, TypeError, ValueError, ArithmeticError):
+        return "unverified"
+    subtract_ok = True
+    through_ok = True
+    saw = False
+    tolerance = _SHOMATE_ENTHALPY_TOLERANCE_KJ
+    for temperature, printed in points:
+        node = float(temperature)
+        if not (node > t_min and node <= t_max):
+            continue
+        saw = True
+        try:
+            raw = float(vapor._janaf_dH(node, row))
+            through = as_decimal(str(raw))
+            subtract = as_decimal(str(float(raw - h_coef)))
+        except (TypeError, ValueError, ArithmeticError, OverflowError):
+            return "unverified"
+        if (
+            not subtract.is_finite()
+            or abs(subtract - printed) > tolerance
+        ):
+            subtract_ok = False
+        if not through.is_finite() or abs(through - printed) > tolerance:
+            through_ok = False
+    if not saw or not (subtract_ok or through_ok):
+        return "unverified"
+    if subtract_ok:
+        return "subtract_H"
+    return "through_F"
+
+
+def _shomate_enthalpy_form(vapor, row, table_id: str) -> str:
+    """Cached row convention. The cache key is the coefficient row, not T."""
+
+    cache = getattr(_shomate_enthalpy_form, "_cache", None)
+    if cache is None:
+        cache = {}
+        setattr(_shomate_enthalpy_form, "_cache", cache)
+    try:
+        key = (table_id, _shomate_row_key(row))
+    except (KeyError, TypeError, ValueError, ArithmeticError):
+        return "unverified"
+    form = cache.get(key)
+    if form is None:
+        form = _classify_shomate_enthalpy_form(vapor, row, table_id)
+        cache[key] = form
+    return form
+
+
 def _vaporock_tabulated_gas_attempt(
     formula: str,
     quantity: Quantity,
@@ -1143,14 +1308,14 @@ def _vaporock_tabulated_gas_attempt(
     JANAF fusion read in this module. The table document has no separate
     authority field. This is not an extrapolated Shomate continuation.
     The gas may be a phase-g table or a reference-phase gas already marked
-    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). `_vaporock_gas_thermo_admissible`
-    is the same gate as the in-band Shomate row.
+    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). The species, phase,
+    reference-basis, and entropy-pressure gate is
+    `_vaporock_gas_basis_refusal`, already applied by the caller.
+    `_vaporock_gas_thermo_admissible` is the same numeric gate as a
+    verified in-band row.
     """
 
-    from simulator.battery.generators.janaf import (
-        STANDARD_PRESSURE_PA as janaf_standard_pressure,
-        janaf_tabulated_gas_thermo,
-    )
+    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
 
     table_formula = formula[:-3] if formula.endswith("(g)") else formula
     try:
@@ -1199,63 +1364,6 @@ def _vaporock_tabulated_gas_attempt(
             call_evidence=call_evidence,
         )
 
-    if not _tabulated_gas_basis_matches(observation, table_formula, sample.table_id):
-        # The table read is a different reference basis. Do not return its
-        # number: Mg-001 at 1366.104 K publishes H−H298 169.298, which
-        # includes vaporization, while Mg-005 publishes 22.198.
-        declared = None
-        if isinstance(observation.identity, Identity):
-            declared = phase_token(observation.identity.species)
-        return _refuse(
-            RefusalReason.IDENTITY_MISMATCH,
-            "tabulated_table_basis_mismatch",
-            quantity=quantity,
-            origin=origin,
-            extra={
-                "engine": Engine.VAPOROCK.value,
-                "species": species_name,
-                "observation_table": _locator_table_id(observation),
-                "observation_phase": None if declared is None else declared.value,
-                "gas_table": sample.table_id,
-                "gas_phase": Phase.G.value,
-            },
-            call_evidence=call_evidence,
-        )
-
-    # Ideal gas: H and Cp have no pressure term; S has −R ln(p/p°).
-    # This path answers Cp, S, and H−H298, so only S is compared.
-    # G is not answered here. The table is JANAF's declared 0.1 MPa.
-    # Do not relabel 1 atm as 1 bar and do not convert the value.
-    if quantity is Quantity.S:
-        declared_pressure = _declared_standard_pressure_Pa(observation)
-        if declared_pressure != janaf_standard_pressure:
-            declared_phase = None
-            if isinstance(observation.identity, Identity):
-                declared_phase = phase_token(observation.identity.species)
-            return _refuse(
-                RefusalReason.IDENTITY_MISMATCH,
-                "tabulated_table_basis_mismatch",
-                quantity=quantity,
-                origin=origin,
-                extra={
-                    "engine": Engine.VAPOROCK.value,
-                    "species": species_name,
-                    "observation_table": _locator_table_id(observation),
-                    "observation_phase": (
-                        None if declared_phase is None else declared_phase.value
-                    ),
-                    "gas_table": sample.table_id,
-                    "gas_phase": Phase.G.value,
-                    "observation_pressure_Pa": (
-                        None
-                        if declared_pressure is None
-                        else _decimal_token(declared_pressure)
-                    ),
-                    "gas_pressure_Pa": _decimal_token(janaf_standard_pressure),
-                },
-                call_evidence=call_evidence,
-            )
-
     heat_capacity = sample.heat_capacity
     entropy = sample.entropy
     enthalpy = sample.enthalpy_increment
@@ -1290,7 +1398,10 @@ def _vaporock_tabulated_gas_attempt(
         ),
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=f"{call_evidence}:janaf_table_id={sample.table_id}",
+        call_evidence=(
+            f"{call_evidence}:branch=table:coefficient_interval=outside:"
+            f"janaf_table_id={sample.table_id}"
+        ),
     )
 
 
@@ -1403,9 +1514,58 @@ def _vaporock_gas_attempt(
         for row in table_rows
         if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
     )
+    # Containing-row selection is not an answer. The basis gate runs before
+    # either branch returns a number. Do not continue a Shomate row: Cr(g)
+    # at 500 K on that polynomial is about −49 J/(mol·K); the gas table's
+    # own 500 K node is 20.786.
+    from simulator.battery.generators.janaf import _janaf_gas_table_ids
+
+    table_formula = formula[:-3] if formula.endswith("(g)") else formula
+    table_ids = _janaf_gas_table_ids().get(table_formula, ())
+    coefficient_interval = "inside" if matching_rows else "outside"
+    if len(table_ids) != 1:
+        # No Shomate number without the one gas table the basis gate names.
+        if not table_ids:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "vaporock-temperature-outside-janaf-row",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": Engine.VAPOROCK.value,
+                    "species": species_name,
+                    "coefficient_interval": coefficient_interval,
+                    "branch": "shomate" if matching_rows else "table",
+                },
+                call_evidence=call_evidence,
+            )
+        return _refuse(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            "vaporock-janaf-gas-table-ambiguous",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "coefficient_interval": coefficient_interval,
+                "branch": "shomate" if matching_rows else "table",
+            },
+            call_evidence=call_evidence,
+        )
+    table_id = table_ids[0]
+    basis_refusal = _vaporock_gas_basis_refusal(
+        observation,
+        table_formula,
+        table_id,
+        quantity,
+        origin=origin,
+        species_name=species_name,
+        call_evidence=call_evidence,
+        coefficient_interval=coefficient_interval,
+    )
+    if basis_refusal is not None:
+        return basis_refusal
     if not matching_rows:
-        # Do not continue the Shomate row. Cr(g) at 500 K on that polynomial
-        # is about −49 J/(mol·K); the gas table's own 500 K node is 20.786.
         return _vaporock_tabulated_gas_attempt(
             formula,
             quantity,
@@ -1421,25 +1581,23 @@ def _vaporock_gas_attempt(
             "vaporock-janaf-interval-ambiguous",
             quantity=quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            extra={
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "coefficient_interval": coefficient_interval,
+                "branch": "shomate",
+            },
             call_evidence=call_evidence,
         )
     row = matching_rows[0]
 
-    # Shomate forms use t=T/1000: Cp=A+Bt+Ct²+Dt³+E/t² and
-    # S=A ln(t)+Bt+Ct²/2+Dt³/3−E/(2t²)+G, both J/(mol·K);
-    # H−H298=At+Bt²/2+Ct³/3+Dt⁴/4−E/t+F−H, in kJ/mol. Cp uses
-    # the selected VapoRock row; its native evaluators supply S and
-    # _janaf_dH's apparent H(T) terms through +F, not H−H298. Subtract the
-    # selected row's H coefficient per the Shomate form. Unit check: kJ/mol
-    # remains kJ/mol.
-    # Sanity: K(g), 1200 K gives 18.7461926 kJ/mol vs printed JANAF
-    # K-005 H−H298 = 18.746 kJ/mol.
-    # All three are evaluated before any one is returned. The shared gate
-    # refuses the row when Cp <= 0, S <= 0, or H is not finite, so a
-    # request for S cannot admit a row whose heat capacity is not positive.
-    # An admissible value is still as_decimal(str(float(raw))), the pin's
-    # conversion.
+    # Cp uses the selected row. S uses VapoRock's own evaluator, which is
+    # the 1 bar fit and has no pressure term. H−H298 uses the row's
+    # verified convention (`_classify_shomate_enthalpy_form`): subtract the
+    # stored H, or keep the polynomial through F. A returned value is
+    # as_decimal(str(float(raw))). When the convention is verified, Cp, S,
+    # and H are gated together. When it is not, H−H298 refuses and Cp and
+    # S are gated on their own.
     try:
         t = temperature / 1000.0
         raw_cp = (
@@ -1450,10 +1608,13 @@ def _vaporock_gas_attempt(
             + row["E"] / t**2
         )
         raw_s = vapor._janaf_S(temperature, row)
-        raw_h = vapor._janaf_dH(temperature, row) - row["H"]
+        raw_through = vapor._janaf_dH(temperature, row)
+        raw_subtract = raw_through - row["H"]
         heat_capacity = as_decimal(str(float(raw_cp)))
         entropy = as_decimal(str(float(raw_s)))
-        enthalpy = as_decimal(str(float(raw_h)))
+        enthalpy_through = as_decimal(str(float(raw_through)))
+        enthalpy_subtract = as_decimal(str(float(raw_subtract)))
+        form = _shomate_enthalpy_form(vapor, row, table_id)
     except Exception as exc:  # noqa: BLE001 - optional engine evaluator boundary
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -1463,18 +1624,62 @@ def _vaporock_gas_attempt(
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
             call_evidence=call_evidence,
         )
-    if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
-        return _refuse_inadmissible_vaporock_gas(
-            quantity,
-            origin=origin,
-            species_name=species_name,
-            call_evidence=call_evidence,
+    if form == "subtract_H":
+        enthalpy = enthalpy_subtract
+    elif form == "through_F":
+        enthalpy = enthalpy_through
+    else:
+        enthalpy = None
+    if form == "unverified":
+        if not _vaporock_cp_s_admissible(heat_capacity, entropy):
+            return _refuse_inadmissible_vaporock_gas(
+                quantity,
+                origin=origin,
+                species_name=species_name,
+                call_evidence=call_evidence,
+            )
+        if quantity is Quantity.H_MINUS_H298:
+            extra = {
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "gas_table": table_id,
+                "coefficient_interval": "inside",
+                "branch": "shomate",
+                "enthalpy_form": "unverified",
+            }
+            if enthalpy_subtract.is_finite():
+                extra["green_subtract_H"] = _decimal_token(enthalpy_subtract)
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                _SHOMATE_H_UNVERIFIED,
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        value = {Quantity.CP: heat_capacity, Quantity.S: entropy}[quantity]
+    else:
+        assert enthalpy is not None
+        if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
+            return _refuse_inadmissible_vaporock_gas(
+                quantity,
+                origin=origin,
+                species_name=species_name,
+                call_evidence=call_evidence,
+            )
+        value = {
+            Quantity.CP: heat_capacity,
+            Quantity.S: entropy,
+            Quantity.H_MINUS_H298: enthalpy,
+        }[quantity]
+    evidence = (
+        f"{call_evidence}:branch=shomate:coefficient_interval=inside:"
+        f"enthalpy_form={form}:gas_table={table_id}"
+    )
+    if quantity is Quantity.H_MINUS_H298 and form == "through_F":
+        evidence = (
+            f"{evidence}:green_subtract_H={_decimal_token(enthalpy_subtract)}"
         )
-    value = {
-        Quantity.CP: heat_capacity,
-        Quantity.S: entropy,
-        Quantity.H_MINUS_H298: enthalpy,
-    }[quantity]
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
@@ -1482,7 +1687,7 @@ def _vaporock_gas_attempt(
         notices=(),
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=call_evidence,
+        call_evidence=evidence,
     )
 
 
