@@ -107,7 +107,8 @@ def _table3_grid(document):
             uncertainty = observation.get("uncertainty", {})
             sd = uncertainty.get("sigma_as_published")
             if sd is not None:
-                cell = f"{cell}({sd})"
+                places = len(cell.partition(".")[2])
+                cell = f"{cell}({Decimal(sd):.{places}f})"
         rows.setdefault(sample, {})[values["formula"]] = cell
     metadata = {
         row["sample"]: (row["system_as_printed"], row["buffer_as_printed"])
@@ -124,7 +125,20 @@ def _stored_table2_grid():
 
 
 def _stored_table3_grid():
-    return [(sample, system, buffer, tuple(_stored_cell(cell) for cell in cells)) for sample, system, buffer, cells in TABLE3_GRID]
+    return [
+        (sample, system, buffer, tuple(_expanded_table3_cell(cell) for cell in cells))
+        for sample, system, buffer, cells in TABLE3_GRID
+    ]
+
+
+def _expanded_table3_cell(cell):
+    stored = _stored_cell(cell)
+    if stored == "D.L." or "(" not in stored:
+        return stored
+    mean, raw_sigma = stored.removesuffix(")").split("(")
+    places = len(mean.partition(".")[2])
+    sigma = Decimal(raw_sigma) if "." in raw_sigma else Decimal(raw_sigma).scaleb(-places)
+    return f"{mean}({sigma:.{places}f})"
 
 
 def test_render_transcriptions_bind_every_table_and_detect_mutations():
@@ -223,12 +237,17 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
         else:
             mean = cell.partition("(")[0]
             assert row.value.kind.value == "point"
-            assert row.value.point == Decimal(mean) / Decimal(100)
+            assert row.value.point == Decimal(mean)
+            assert Decimal(values["component_amount"]) == Decimal(mean)
             uncertainty = yaml_row.get("uncertainty")
             if "(" in cell and Decimal(cell.partition("(")[2].removesuffix(")")) != 0:
-                assert uncertainty["sigma_as_published"] == cell.partition("(")[2].removesuffix(")")
+                raw_sigma = cell.partition("(")[2].removesuffix(")")
+                places = len(mean.partition(".")[2])
+                expected_sigma = Decimal(raw_sigma) if "." in raw_sigma else Decimal(raw_sigma).scaleb(-places)
+                assert Decimal(uncertainty["sigma_as_published"]) == expected_sigma
                 assert uncertainty["sigma_units_as_published"] == "wt.%"
-                assert uncertainty["units"] == "dimensionless"
+                assert uncertainty["units"] == "wt.%"
+                assert Decimal(uncertainty["sigma"]) == expected_sigma
                 assert row.uncertainty.kind.value == "printed"
                 assert row.uncertainty.verbatim["sigma"] == uncertainty["sigma"]
             else:
@@ -236,9 +255,9 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
     assert len(experiment_ids) == 12
     assert all(len(ids) == 1 for ids in experiment_ids.values())
     assert len({next(iter(ids)) for ids in experiment_ids.values()}) == 12
-    assert observations["zagrtdenov_2020_E23_na2o"].uncertainty.verbatim["sigma"] == "0.0003"
-    assert observations["zagrtdenov_2020_E23_k2o"].uncertainty.verbatim["sigma"] == "0.0002"
-    assert observations["zagrtdenov_2020_E23_cr2o3"].uncertainty.verbatim["sigma"] == "0.0001"
+    assert observations["zagrtdenov_2020_E23_na2o"].uncertainty.verbatim["sigma"] == "0.03"
+    assert observations["zagrtdenov_2020_E23_k2o"].uncertainty.verbatim["sigma"] == "0.02"
+    assert observations["zagrtdenov_2020_E23_cr2o3"].uncertainty.verbatim["sigma"] == "0.01"
 
     all_rows = [*document["species"]["Cr"]["observations"], *document["species"]["Cr"]["context"]]
     assert all(row["locator"]["page"] == row["locator"]["pdf_page_index"] + 1 for row in all_rows)

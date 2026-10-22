@@ -170,10 +170,7 @@ def _table3_grid(document):
         sample = observation["locator"]["row"]
         values = observation["values"]
         iron_rows.setdefault(sample, {})
-        if "Fe3_over_Fe2" in values:
-            iron_rows[sample]["Fe3_over_Fe2"] = values["Fe3_over_Fe2"]
-        else:
-            iron_rows[sample]["Fe3_over_FeT"] = values["Fe3_over_FeT"]
+        iron_rows[sample]["Fe3_over_Fe2"] = values["Fe3_over_Fe2"]
     auxiliary = {
         row["sample"]: row
         for row in find_context_row(document, "bonnand_2020_table3_auxiliary_columns")["values"]["rows_as_printed"]
@@ -191,7 +188,7 @@ def _table3_grid(document):
                 aux["Total_2sd_wt_pct"],
                 aux["NBO/T"],
                 iron_rows[sample]["Fe3_over_Fe2"],
-                iron_rows[sample]["Fe3_over_FeT"],
+                aux["Fe3_over_FeT"],
                 aux["Cr2_over_Cr3"],
                 aux["Cr3_over_CrTOT"],
             ]
@@ -257,7 +254,7 @@ def test_isolated_migration_scores_all_typed_values_with_sample_conditions_and_s
         row.observation_id: row for row in migrator.result.observations.values()
     }
     assert migrator.result.validation.hard_issues == ()
-    assert len(observations) == 112
+    assert len(observations) == 98
     assert all(row.value.kind.value == "point" for row in observations.values())
     assert all(not row.notices for row in observations.values())
 
@@ -330,7 +327,7 @@ def test_isolated_migration_scores_all_typed_values_with_sample_conditions_and_s
         for observation_id, row in observations.items()
         if row.identity.quantity.value.value == "fe3_fe2_ratio"
     }
-    assert len(iron_rows) == 28
+    assert len(iron_rows) == 14
     for observation_id, migrated in iron_rows.items():
         source = extracted[observation_id]
         values = source["values"]
@@ -360,15 +357,21 @@ def test_isolated_migration_scores_all_typed_values_with_sample_conditions_and_s
         assert "quench_redox_preservation" not in values
         assert "quench_statement_locator" not in values
         assert migrated.value.kind.value == "point"
-        if "Fe3_over_Fe2" in values:
-            assert migrated.value.point == Decimal(values["Fe3_over_Fe2"])
-        else:
-            assert migrated.value.point == battery_migrate.fe3_fe2_ratio_from_ferric_fraction(
-                Decimal(values["Fe3_over_FeT"])
-            )
+        assert "Fe3_over_Fe2" in values
+        assert "Fe3_over_FeT" not in values
+        assert migrated.value.point == Decimal(values["Fe3_over_Fe2"])
 
     context3 = find_context_row(document, "bonnand_2020_table3_auxiliary_columns")
     assert len(context3["values"]["rows_as_printed"]) == 14
+    a7_context = next(row for row in context3["values"]["rows_as_printed"] if row["sample"] == "A7")
+    assert a7_context["Fe3_over_FeT"] == "0.44"
+    assert a7_context["Fe3_over_FeT_locator"] == {
+        "page": 42, "pdf_page_index": 41, "published_page": 41,
+        "table": "3", "row": "A7", "column": "Fe3+/FeTOT",
+    }
+    assert not any("Fe3_over_FeT" in row["values"] for row in document["species"]["Fe"]["observations"])
+    a7_fe2 = iron_rows["bonnand_2020_A7_fe3_over_fe2"]
+    assert a7_fe2.value.point == Decimal("0.80")
     context4 = find_context_row(document, "bonnand_2020_table4_chromite_compositions")
     assert "crystal/spinel role" in context4["values"]["schema_gap"]
     context5 = find_context_row(document, "bonnand_2020_table5_chromium_isotope_data")

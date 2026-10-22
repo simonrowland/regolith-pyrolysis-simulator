@@ -19,7 +19,7 @@ fidelity_samples:
   observable: concentration_series
   observation_id: zagrtdenov_2020_E23_cr2o3
   field: component_amount
-  value: '0.0092'
+  value: '0.92'
   locator:
     page: 41
     pdf_page_index: 40
@@ -31,7 +31,7 @@ fidelity_samples:
   observable: concentration_series
   observation_id: zagrtdenov_2020_E24_sio2
   field: component_amount
-  value: '0.4977'
+  value: '49.77'
   locator:
     page: 41
     pdf_page_index: 40
@@ -43,7 +43,7 @@ fidelity_samples:
   observable: concentration_series
   observation_id: zagrtdenov_2020_E26_cr2o3
   field: component_amount
-  value: '0.01'
+  value: '1.00'
   locator:
     page: 41
     pdf_page_index: 40
@@ -895,7 +895,7 @@ species:
         column: Na2O
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -940,13 +940,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0051'
+        component_amount: '0.51'
         value_as_published: '0.51'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_sio2
@@ -961,7 +961,7 @@ species:
         column: SiO2
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -1006,13 +1006,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5396'
+        component_amount: '53.96'
         value_as_published: '53.96'
       uncertainty:
         kind: printed
-        sigma: '0.0022'
-        units: dimensionless
-        sigma_as_published: '22'
+        sigma: '0.22'
+        units: wt.%
+        sigma_as_published: '0.22'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_al2o3
@@ -1027,7 +1027,7 @@ species:
         column: Al2O3
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -1072,13 +1072,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1654'
+        component_amount: '16.54'
         value_as_published: '16.54'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_k2o
@@ -1093,7 +1093,7 @@ species:
         column: K2O
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -1138,12 +1138,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0019'
+        component_amount: '0.19'
         value_as_published: '0.19'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -1159,7 +1159,7 @@ species:
         column: CaO
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -1204,13 +1204,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1093'
+        component_amount: '10.93'
         value_as_published: '10.93'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_mno
@@ -1225,7 +1225,7 @@ species:
         column: MnO
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -1270,13 +1270,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0018'
+        component_amount: '0.18'
         value_as_published: '0.18'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_feo
@@ -1291,7 +1291,7 @@ species:
         column: FeO
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -1336,13 +1336,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0604'
+        component_amount: '6.04'
         value_as_published: '6.04'
       uncertainty:
         kind: printed
-        sigma: '0.0009'
-        units: dimensionless
-        sigma_as_published: '9'
+        sigma: '0.09'
+        units: wt.%
+        sigma_as_published: '0.09'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_mgo
@@ -1357,7 +1357,7 @@ species:
         column: MgO
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -1402,13 +1402,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0898'
+        component_amount: '8.98'
         value_as_published: '8.98'
       uncertainty:
         kind: printed
-        sigma: '0.0009'
-        units: dimensionless
-        sigma_as_published: '9'
+        sigma: '0.09'
+        units: wt.%
+        sigma_as_published: '0.09'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_tio2
@@ -1423,7 +1423,7 @@ species:
         column: TiO2
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -1468,13 +1468,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0157'
+        component_amount: '1.57'
         value_as_published: '1.57'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E23_p2o5
@@ -1551,7 +1551,7 @@ species:
         column: Cr2O3
         note: Run E23 (50 analyses); system Chr-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -1596,13 +1596,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0092'
+        component_amount: '0.92'
         value_as_published: '0.92'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_na2o
@@ -1617,7 +1617,7 @@ species:
         column: Na2O
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -1662,13 +1662,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0102'
+        component_amount: '1.02'
         value_as_published: '1.02'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_sio2
@@ -1683,7 +1683,7 @@ species:
         column: SiO2
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -1728,13 +1728,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5213'
+        component_amount: '52.13'
         value_as_published: '52.13'
       uncertainty:
         kind: printed
-        sigma: '0.0017'
-        units: dimensionless
-        sigma_as_published: '17'
+        sigma: '0.17'
+        units: wt.%
+        sigma_as_published: '0.17'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_al2o3
@@ -1749,7 +1749,7 @@ species:
         column: Al2O3
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -1794,13 +1794,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1588'
+        component_amount: '15.88'
         value_as_published: '15.88'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_k2o
@@ -1815,7 +1815,7 @@ species:
         column: K2O
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -1860,12 +1860,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0023'
+        component_amount: '0.23'
         value_as_published: '0.23'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -1881,7 +1881,7 @@ species:
         column: CaO
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -1926,13 +1926,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1067'
+        component_amount: '10.67'
         value_as_published: '10.67'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_mno
@@ -1947,7 +1947,7 @@ species:
         column: MnO
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -1992,13 +1992,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0017'
+        component_amount: '0.17'
         value_as_published: '0.17'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_feo
@@ -2013,7 +2013,7 @@ species:
         column: FeO
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -2058,13 +2058,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0891'
+        component_amount: '8.91'
         value_as_published: '8.91'
       uncertainty:
         kind: printed
-        sigma: '0.0014'
-        units: dimensionless
-        sigma_as_published: '14'
+        sigma: '0.14'
+        units: wt.%
+        sigma_as_published: '0.14'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_mgo
@@ -2079,7 +2079,7 @@ species:
         column: MgO
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -2124,13 +2124,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0859'
+        component_amount: '8.59'
         value_as_published: '8.59'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_tio2
@@ -2145,7 +2145,7 @@ species:
         column: TiO2
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -2190,13 +2190,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.015'
+        component_amount: '1.50'
         value_as_published: '1.50'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E19_p2o5
@@ -2273,7 +2273,7 @@ species:
         column: Cr2O3
         note: Run E19 (50 analyses); system Chr-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -2318,7 +2318,7 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0042'
+        component_amount: '0.42'
         value_as_published: '0.42'
         printed_parenthetical_note: Source parenthetical standard deviation omitted under the no-zero-uncertainty
           rule.
@@ -2334,7 +2334,7 @@ species:
         column: Na2O
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -2379,13 +2379,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0184'
+        component_amount: '1.84'
         value_as_published: '1.84'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_sio2
@@ -2400,7 +2400,7 @@ species:
         column: SiO2
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -2445,13 +2445,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5281'
+        component_amount: '52.81'
         value_as_published: '52.81'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_al2o3
@@ -2466,7 +2466,7 @@ species:
         column: Al2O3
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -2511,13 +2511,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.161'
+        component_amount: '16.1'
         value_as_published: '16.1'
       uncertainty:
         kind: printed
-        sigma: '0.011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '1.1'
+        units: wt.%
+        sigma_as_published: '1.1'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_k2o
@@ -2532,7 +2532,7 @@ species:
         column: K2O
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -2577,12 +2577,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0027'
+        component_amount: '0.27'
         value_as_published: '0.27'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -2598,7 +2598,7 @@ species:
         column: CaO
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -2643,13 +2643,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1077'
+        component_amount: '10.77'
         value_as_published: '10.77'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_mno
@@ -2664,7 +2664,7 @@ species:
         column: MnO
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -2709,13 +2709,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0017'
+        component_amount: '0.17'
         value_as_published: '0.17'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_feo
@@ -2730,7 +2730,7 @@ species:
         column: FeO
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -2775,13 +2775,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0717'
+        component_amount: '7.17'
         value_as_published: '7.17'
       uncertainty:
         kind: printed
-        sigma: '0.0012'
-        units: dimensionless
-        sigma_as_published: '12'
+        sigma: '0.12'
+        units: wt.%
+        sigma_as_published: '0.12'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_mgo
@@ -2796,7 +2796,7 @@ species:
         column: MgO
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -2841,13 +2841,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0864'
+        component_amount: '8.64'
         value_as_published: '8.64'
       uncertainty:
         kind: printed
-        sigma: '0.0009'
-        units: dimensionless
-        sigma_as_published: '9'
+        sigma: '0.09'
+        units: wt.%
+        sigma_as_published: '0.09'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_tio2
@@ -2862,7 +2862,7 @@ species:
         column: TiO2
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -2907,13 +2907,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0152'
+        component_amount: '1.52'
         value_as_published: '1.52'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E27_p2o5
@@ -2990,7 +2990,7 @@ species:
         column: Cr2O3
         note: Run E27 (50 analyses); system Chr-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -3035,7 +3035,7 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0029'
+        component_amount: '0.29'
         value_as_published: '0.29'
         printed_parenthetical_note: Source parenthetical standard deviation omitted under the no-zero-uncertainty
           rule.
@@ -3113,7 +3113,7 @@ species:
         column: SiO2
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -3158,13 +3158,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.4977'
+        component_amount: '49.77'
         value_as_published: '49.77'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_al2o3
@@ -3179,7 +3179,7 @@ species:
         column: Al2O3
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -3224,13 +3224,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0921'
+        component_amount: '9.21'
         value_as_published: '9.21'
       uncertainty:
         kind: printed
-        sigma: '0.0007'
-        units: dimensionless
-        sigma_as_published: '7'
+        sigma: '0.07'
+        units: wt.%
+        sigma_as_published: '0.07'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_k2o
@@ -3307,7 +3307,7 @@ species:
         column: CaO
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -3352,13 +3352,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.2466'
+        component_amount: '24.66'
         value_as_published: '24.66'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_mno
@@ -3435,7 +3435,7 @@ species:
         column: FeO
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -3480,13 +3480,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0104'
+        component_amount: '1.04'
         value_as_published: '1.04'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_mgo
@@ -3501,7 +3501,7 @@ species:
         column: MgO
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -3546,13 +3546,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1503'
+        component_amount: '15.03'
         value_as_published: '15.03'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_tio2
@@ -3629,7 +3629,7 @@ species:
         column: P2O5
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: P2O5
@@ -3674,13 +3674,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0007'
+        component_amount: '0.07'
         value_as_published: '0.07'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E24_cr2o3
@@ -3695,7 +3695,7 @@ species:
         column: Cr2O3
         note: Run E24 (50 analyses); system Chr-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -3740,13 +3740,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0088'
+        component_amount: '0.88'
         value_as_published: '0.88'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_na2o
@@ -3761,7 +3761,7 @@ species:
         column: Na2O
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -3806,13 +3806,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0011'
+        component_amount: '0.11'
         value_as_published: '0.11'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_sio2
@@ -3827,7 +3827,7 @@ species:
         column: SiO2
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -3872,13 +3872,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5022'
+        component_amount: '50.22'
         value_as_published: '50.22'
       uncertainty:
         kind: printed
-        sigma: '0.0019'
-        units: dimensionless
-        sigma_as_published: '19'
+        sigma: '0.19'
+        units: wt.%
+        sigma_as_published: '0.19'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_al2o3
@@ -3893,7 +3893,7 @@ species:
         column: Al2O3
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -3938,13 +3938,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0918'
+        component_amount: '9.18'
         value_as_published: '9.18'
       uncertainty:
         kind: printed
-        sigma: '0.0007'
-        units: dimensionless
-        sigma_as_published: '7'
+        sigma: '0.07'
+        units: wt.%
+        sigma_as_published: '0.07'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_k2o
@@ -4021,7 +4021,7 @@ species:
         column: CaO
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -4066,13 +4066,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.251'
+        component_amount: '25.1'
         value_as_published: '25.1'
       uncertainty:
         kind: printed
-        sigma: '0.014'
-        units: dimensionless
-        sigma_as_published: '14'
+        sigma: '1.4'
+        units: wt.%
+        sigma_as_published: '1.4'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_mno
@@ -4149,7 +4149,7 @@ species:
         column: FeO
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -4194,13 +4194,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0022'
+        component_amount: '0.22'
         value_as_published: '0.22'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_mgo
@@ -4215,7 +4215,7 @@ species:
         column: MgO
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -4260,13 +4260,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1511'
+        component_amount: '15.11'
         value_as_published: '15.11'
       uncertainty:
         kind: printed
-        sigma: '0.0013'
-        units: dimensionless
-        sigma_as_published: '13'
+        sigma: '0.13'
+        units: wt.%
+        sigma_as_published: '0.13'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E32_tio2
@@ -4405,7 +4405,7 @@ species:
         column: Cr2O3
         note: Run E32 (50 analyses); system Chr-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -4450,13 +4450,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.006'
+        component_amount: '0.60'
         value_as_published: '0.60'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_na2o
@@ -4471,7 +4471,7 @@ species:
         column: Na2O
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -4516,13 +4516,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.002'
+        component_amount: '0.20'
         value_as_published: '0.20'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_sio2
@@ -4537,7 +4537,7 @@ species:
         column: SiO2
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -4582,13 +4582,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.502'
+        component_amount: '50.2'
         value_as_published: '50.2'
       uncertainty:
         kind: printed
-        sigma: '0.019'
-        units: dimensionless
-        sigma_as_published: '19'
+        sigma: '1.9'
+        units: wt.%
+        sigma_as_published: '1.9'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_al2o3
@@ -4603,7 +4603,7 @@ species:
         column: Al2O3
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -4648,13 +4648,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0912'
+        component_amount: '9.12'
         value_as_published: '9.12'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_k2o
@@ -4731,7 +4731,7 @@ species:
         column: CaO
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -4776,13 +4776,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.2501'
+        component_amount: '25.01'
         value_as_published: '25.01'
       uncertainty:
         kind: printed
-        sigma: '0.0015'
-        units: dimensionless
-        sigma_as_published: '15'
+        sigma: '0.15'
+        units: wt.%
+        sigma_as_published: '0.15'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_mno
@@ -4859,7 +4859,7 @@ species:
         column: FeO
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -4904,13 +4904,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0051'
+        component_amount: '0.51'
         value_as_published: '0.51'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_mgo
@@ -4925,7 +4925,7 @@ species:
         column: MgO
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -4970,13 +4970,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1494'
+        component_amount: '14.94'
         value_as_published: '14.94'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_tio2
@@ -5053,7 +5053,7 @@ species:
         column: P2O5
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: P2O5
@@ -5098,13 +5098,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0007'
+        component_amount: '0.07'
         value_as_published: '0.07'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E28_cr2o3
@@ -5119,7 +5119,7 @@ species:
         column: Cr2O3
         note: Run E28 (50 analyses); system Chr-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -5164,7 +5164,7 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0048'
+        component_amount: '0.48'
         value_as_published: '0.48'
         printed_parenthetical_note: Source parenthetical standard deviation omitted under the no-zero-uncertainty
           rule.
@@ -5180,7 +5180,7 @@ species:
         column: Na2O
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -5225,13 +5225,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.006'
+        component_amount: '0.60'
         value_as_published: '0.60'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_sio2
@@ -5246,7 +5246,7 @@ species:
         column: SiO2
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -5291,13 +5291,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5466'
+        component_amount: '54.66'
         value_as_published: '54.66'
       uncertainty:
         kind: printed
-        sigma: '0.0017'
-        units: dimensionless
-        sigma_as_published: '17'
+        sigma: '0.17'
+        units: wt.%
+        sigma_as_published: '0.17'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_al2o3
@@ -5312,7 +5312,7 @@ species:
         column: Al2O3
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -5357,13 +5357,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.159'
+        component_amount: '15.90'
         value_as_published: '15.90'
       uncertainty:
         kind: printed
-        sigma: '0.001'
-        units: dimensionless
-        sigma_as_published: '10'
+        sigma: '0.10'
+        units: wt.%
+        sigma_as_published: '0.10'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_k2o
@@ -5378,7 +5378,7 @@ species:
         column: K2O
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -5423,12 +5423,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.002'
+        component_amount: '0.20'
         value_as_published: '0.20'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -5444,7 +5444,7 @@ species:
         column: CaO
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -5489,13 +5489,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1108'
+        component_amount: '11.08'
         value_as_published: '11.08'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_mno
@@ -5510,7 +5510,7 @@ species:
         column: MnO
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -5555,13 +5555,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0016'
+        component_amount: '0.16'
         value_as_published: '0.16'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_feo
@@ -5576,7 +5576,7 @@ species:
         column: FeO
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -5621,13 +5621,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0627'
+        component_amount: '6.27'
         value_as_published: '6.27'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_mgo
@@ -5642,7 +5642,7 @@ species:
         column: MgO
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -5687,13 +5687,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0831'
+        component_amount: '8.31'
         value_as_published: '8.31'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_tio2
@@ -5708,7 +5708,7 @@ species:
         column: TiO2
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -5753,13 +5753,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0163'
+        component_amount: '1.63'
         value_as_published: '1.63'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E25_p2o5
@@ -5836,7 +5836,7 @@ species:
         column: Cr2O3
         note: Run E25 (50 analyses); system Cr2O3-MORB; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -5881,13 +5881,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0094'
+        component_amount: '0.94'
         value_as_published: '0.94'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_na2o
@@ -5902,7 +5902,7 @@ species:
         column: Na2O
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -5947,13 +5947,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0126'
+        component_amount: '1.26'
         value_as_published: '1.26'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_sio2
@@ -5968,7 +5968,7 @@ species:
         column: SiO2
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -6013,13 +6013,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.529'
+        component_amount: '52.90'
         value_as_published: '52.90'
       uncertainty:
         kind: printed
-        sigma: '0.0013'
-        units: dimensionless
-        sigma_as_published: '13'
+        sigma: '0.13'
+        units: wt.%
+        sigma_as_published: '0.13'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_al2o3
@@ -6034,7 +6034,7 @@ species:
         column: Al2O3
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -6079,13 +6079,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1541'
+        component_amount: '15.41'
         value_as_published: '15.41'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_k2o
@@ -6100,7 +6100,7 @@ species:
         column: K2O
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -6145,12 +6145,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0025'
+        component_amount: '0.25'
         value_as_published: '0.25'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -6166,7 +6166,7 @@ species:
         column: CaO
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -6211,13 +6211,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1078'
+        component_amount: '10.78'
         value_as_published: '10.78'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_mno
@@ -6232,7 +6232,7 @@ species:
         column: MnO
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -6277,13 +6277,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0017'
+        component_amount: '0.17'
         value_as_published: '0.17'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_feo
@@ -6298,7 +6298,7 @@ species:
         column: FeO
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -6343,13 +6343,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0854'
+        component_amount: '8.54'
         value_as_published: '8.54'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_mgo
@@ -6364,7 +6364,7 @@ species:
         column: MgO
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -6409,13 +6409,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.08'
+        component_amount: '8.00'
         value_as_published: '8.00'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_tio2
@@ -6430,7 +6430,7 @@ species:
         column: TiO2
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -6475,13 +6475,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0158'
+        component_amount: '1.58'
         value_as_published: '1.58'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E31_p2o5
@@ -6558,7 +6558,7 @@ species:
         column: Cr2O3
         note: Run E31 (50 analyses); system Cr2O3-MORB; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -6603,13 +6603,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0045'
+        component_amount: '0.45'
         value_as_published: '0.45'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_na2o
@@ -6624,7 +6624,7 @@ species:
         column: Na2O
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -6669,13 +6669,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0216'
+        component_amount: '2.16'
         value_as_published: '2.16'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_sio2
@@ -6690,7 +6690,7 @@ species:
         column: SiO2
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -6735,13 +6735,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5166'
+        component_amount: '51.66'
         value_as_published: '51.66'
       uncertainty:
         kind: printed
-        sigma: '0.0018'
-        units: dimensionless
-        sigma_as_published: '18'
+        sigma: '0.18'
+        units: wt.%
+        sigma_as_published: '0.18'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_al2o3
@@ -6756,7 +6756,7 @@ species:
         column: Al2O3
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -6801,13 +6801,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1504'
+        component_amount: '15.04'
         value_as_published: '15.04'
       uncertainty:
         kind: printed
-        sigma: '0.0009'
-        units: dimensionless
-        sigma_as_published: '9'
+        sigma: '0.09'
+        units: wt.%
+        sigma_as_published: '0.09'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_k2o
@@ -6822,7 +6822,7 @@ species:
         column: K2O
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: K2O
@@ -6867,12 +6867,12 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0027'
+        component_amount: '0.27'
         value_as_published: '0.27'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
+        sigma: '0.02'
+        units: wt.%
         sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
@@ -6888,7 +6888,7 @@ species:
         column: CaO
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -6933,13 +6933,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1059'
+        component_amount: '10.59'
         value_as_published: '10.59'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_mno
@@ -6954,7 +6954,7 @@ species:
         column: MnO
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MnO
@@ -6999,13 +6999,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0016'
+        component_amount: '0.16'
         value_as_published: '0.16'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_feo
@@ -7020,7 +7020,7 @@ species:
         column: FeO
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -7065,13 +7065,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0974'
+        component_amount: '9.74'
         value_as_published: '9.74'
       uncertainty:
         kind: printed
-        sigma: '0.0011'
-        units: dimensionless
-        sigma_as_published: '11'
+        sigma: '0.11'
+        units: wt.%
+        sigma_as_published: '0.11'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_mgo
@@ -7086,7 +7086,7 @@ species:
         column: MgO
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -7131,13 +7131,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.078'
+        component_amount: '7.80'
         value_as_published: '7.80'
       uncertainty:
         kind: printed
-        sigma: '0.0007'
-        units: dimensionless
-        sigma_as_published: '7'
+        sigma: '0.07'
+        units: wt.%
+        sigma_as_published: '0.07'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_tio2
@@ -7152,7 +7152,7 @@ species:
         column: TiO2
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -7197,13 +7197,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0154'
+        component_amount: '1.54'
         value_as_published: '1.54'
       uncertainty:
         kind: printed
-        sigma: '0.0003'
-        units: dimensionless
-        sigma_as_published: '3'
+        sigma: '0.03'
+        units: wt.%
+        sigma_as_published: '0.03'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E29_p2o5
@@ -7280,7 +7280,7 @@ species:
         column: Cr2O3
         note: Run E29 (50 analyses); system Cr2O3-MORB; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -7325,7 +7325,7 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0028'
+        component_amount: '0.28'
         value_as_published: '0.28'
         printed_parenthetical_note: Source parenthetical standard deviation omitted under the no-zero-uncertainty
           rule.
@@ -7403,7 +7403,7 @@ species:
         column: SiO2
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -7448,13 +7448,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5061'
+        component_amount: '50.61'
         value_as_published: '50.61'
       uncertainty:
         kind: printed
-        sigma: '0.0017'
-        units: dimensionless
-        sigma_as_published: '17'
+        sigma: '0.17'
+        units: wt.%
+        sigma_as_published: '0.17'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_al2o3
@@ -7469,7 +7469,7 @@ species:
         column: Al2O3
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -7514,13 +7514,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0846'
+        component_amount: '8.46'
         value_as_published: '8.46'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_k2o
@@ -7597,7 +7597,7 @@ species:
         column: CaO
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -7642,13 +7642,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.2517'
+        component_amount: '25.17'
         value_as_published: '25.17'
       uncertainty:
         kind: printed
-        sigma: '0.0017'
-        units: dimensionless
-        sigma_as_published: '17'
+        sigma: '0.17'
+        units: wt.%
+        sigma_as_published: '0.17'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_mno
@@ -7725,7 +7725,7 @@ species:
         column: FeO
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -7770,13 +7770,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0068'
+        component_amount: '0.68'
         value_as_published: '0.68'
       uncertainty:
         kind: printed
-        sigma: '0.0004'
-        units: dimensionless
-        sigma_as_published: '4'
+        sigma: '0.04'
+        units: wt.%
+        sigma_as_published: '0.04'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_mgo
@@ -7791,7 +7791,7 @@ species:
         column: MgO
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -7836,13 +7836,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1447'
+        component_amount: '14.47'
         value_as_published: '14.47'
       uncertainty:
         kind: printed
-        sigma: '0.0012'
-        units: dimensionless
-        sigma_as_published: '12'
+        sigma: '0.12'
+        units: wt.%
+        sigma_as_published: '0.12'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_tio2
@@ -7857,7 +7857,7 @@ species:
         column: TiO2
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -7902,13 +7902,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0006'
+        component_amount: '0.06'
         value_as_published: '0.06'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E26_p2o5
@@ -7985,7 +7985,7 @@ species:
         column: Cr2O3
         note: Run E26 (49 analyses); system Cr2O3-DiAn; buffer FMQ-2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -8030,13 +8030,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.01'
+        component_amount: '1.00'
         value_as_published: '1.00'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_na2o
@@ -8051,7 +8051,7 @@ species:
         column: Na2O
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -8096,13 +8096,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.001'
+        component_amount: '0.10'
         value_as_published: '0.10'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_sio2
@@ -8117,7 +8117,7 @@ species:
         column: SiO2
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -8162,13 +8162,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.5115'
+        component_amount: '51.15'
         value_as_published: '51.15'
       uncertainty:
         kind: printed
-        sigma: '0.0021'
-        units: dimensionless
-        sigma_as_published: '21'
+        sigma: '0.21'
+        units: wt.%
+        sigma_as_published: '0.21'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_al2o3
@@ -8183,7 +8183,7 @@ species:
         column: Al2O3
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -8228,13 +8228,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0855'
+        component_amount: '8.55'
         value_as_published: '8.55'
       uncertainty:
         kind: printed
-        sigma: '0.0006'
-        units: dimensionless
-        sigma_as_published: '6'
+        sigma: '0.06'
+        units: wt.%
+        sigma_as_published: '0.06'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_k2o
@@ -8311,7 +8311,7 @@ species:
         column: CaO
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -8356,13 +8356,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.2555'
+        component_amount: '25.55'
         value_as_published: '25.55'
       uncertainty:
         kind: printed
-        sigma: '0.0018'
-        units: dimensionless
-        sigma_as_published: '18'
+        sigma: '0.18'
+        units: wt.%
+        sigma_as_published: '0.18'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_mno
@@ -8501,7 +8501,7 @@ species:
         column: MgO
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -8546,13 +8546,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1455'
+        component_amount: '14.55'
         value_as_published: '14.55'
       uncertainty:
         kind: printed
-        sigma: '0.0013'
-        units: dimensionless
-        sigma_as_published: '13'
+        sigma: '0.13'
+        units: wt.%
+        sigma_as_published: '0.13'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E33_tio2
@@ -8691,7 +8691,7 @@ species:
         column: Cr2O3
         note: Run E33 (50 analyses); system Cr2O3-DiAn; buffer FMQ.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -8736,7 +8736,7 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0066'
+        component_amount: '0.66'
         value_as_published: '0.66'
         printed_parenthetical_note: Source parenthetical standard deviation omitted under the no-zero-uncertainty
           rule.
@@ -8752,7 +8752,7 @@ species:
         column: Na2O
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Na2O
@@ -8797,13 +8797,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0013'
+        component_amount: '0.13'
         value_as_published: '0.13'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_sio2
@@ -8818,7 +8818,7 @@ species:
         column: SiO2
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: SiO2
@@ -8863,13 +8863,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.503'
+        component_amount: '50.30'
         value_as_published: '50.30'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_al2o3
@@ -8884,7 +8884,7 @@ species:
         column: Al2O3
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Al2O3
@@ -8929,13 +8929,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0838'
+        component_amount: '8.38'
         value_as_published: '8.38'
       uncertainty:
         kind: printed
-        sigma: '0.0007'
-        units: dimensionless
-        sigma_as_published: '7'
+        sigma: '0.07'
+        units: wt.%
+        sigma_as_published: '0.07'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_k2o
@@ -9012,7 +9012,7 @@ species:
         column: CaO
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: CaO
@@ -9057,13 +9057,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.2515'
+        component_amount: '25.15'
         value_as_published: '25.15'
       uncertainty:
         kind: printed
-        sigma: '0.0016'
-        units: dimensionless
-        sigma_as_published: '16'
+        sigma: '0.16'
+        units: wt.%
+        sigma_as_published: '0.16'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_mno
@@ -9140,7 +9140,7 @@ species:
         column: FeO
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: FeO
@@ -9185,13 +9185,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0159'
+        component_amount: '1.59'
         value_as_published: '1.59'
       uncertainty:
         kind: printed
-        sigma: '0.0006'
-        units: dimensionless
-        sigma_as_published: '6'
+        sigma: '0.06'
+        units: wt.%
+        sigma_as_published: '0.06'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_mgo
@@ -9206,7 +9206,7 @@ species:
         column: MgO
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: MgO
@@ -9251,13 +9251,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.1424'
+        component_amount: '14.24'
         value_as_published: '14.24'
       uncertainty:
         kind: printed
-        sigma: '0.0008'
-        units: dimensionless
-        sigma_as_published: '8'
+        sigma: '0.08'
+        units: wt.%
+        sigma_as_published: '0.08'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_tio2
@@ -9272,7 +9272,7 @@ species:
         column: TiO2
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: TiO2
@@ -9317,13 +9317,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0006'
+        component_amount: '0.06'
         value_as_published: '0.06'
       uncertainty:
         kind: printed
-        sigma: '0.0002'
-        units: dimensionless
-        sigma_as_published: '2'
+        sigma: '0.02'
+        units: wt.%
+        sigma_as_published: '0.02'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     - observation_id: zagrtdenov_2020_E30_p2o5
@@ -9400,7 +9400,7 @@ species:
         column: Cr2O3
         note: Run E30 (50 analyses); system Cr2O3-DiAn; buffer FMQ+2.
       regime: quench_equilibration
-      units: dimensionless fraction of oxide component; published wt.% retained
+      units: wt.% oxide component
       values:
         quantity: equilibrium_phase_composition
         formula: Cr2O3
@@ -9445,13 +9445,13 @@ species:
               pdf_page_index: 5
               published_page: 6
               note: Printed one atmosphere; stored in Pa by exact unit conversion only.
-        component_amount: '0.0051'
+        component_amount: '0.51'
         value_as_published: '0.51'
       uncertainty:
         kind: printed
-        sigma: '0.0001'
-        units: dimensionless
-        sigma_as_published: '1'
+        sigma: '0.01'
+        units: wt.%
+        sigma_as_published: '0.01'
         sigma_units_as_published: wt.%
         interpretation: one standard deviation among analyses
     context:
