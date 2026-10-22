@@ -2,9 +2,8 @@
 import pytest
 
 from engines.builtin.overhead_bleed import controlled_flow_capacity
-from simulator.overhead import OverheadGasModel
+from simulator.overhead import OverheadConfigurationError, OverheadGasModel
 from simulator.state import Atmosphere, CondensationTrain, EvaporationFlux, MeltState
-from tests.test_overhead_accounting import _gas_train_sim
 
 
 def _boundary(carrier, fraction=1.0, *, atmosphere=Atmosphere.CONTROLLED_O2):
@@ -23,65 +22,20 @@ def _boundary(carrier, fraction=1.0, *, atmosphere=Atmosphere.CONTROLLED_O2):
     return model, melt, flux, capacity
 
 
-@pytest.mark.xfail(strict=True, reason="b-1016: full total pressure is assigned to vapour alone")
+@pytest.mark.xfail(strict=True, reason="b-1016: achieved carrier composition unavailable; scope blocked")
 @pytest.mark.parametrize("carrier", ["Kr", "N2"])
-@pytest.mark.parametrize("fraction,expected_fe_mbar", [(1.0, 0.0), (0.5, 5.0)])
-def test_carrier_present_dalton_partials(carrier, fraction, expected_fe_mbar):
-    model, melt, flux, capacity = _boundary(carrier, fraction)
-    transport = model.estimate_transport_state(flux, melt, effective_transport_capacity=capacity)
-    # Physical reference: total 10.2 mbar, oxygen 0.2, carrier 10 or 5.
-    # The remaining pressure budget is 0 or 5 mbar, all Fe for this source.
-    assert transport["pressure_mbar"] == 10.2
-    gas = model.update(flux, melt, CondensationTrain.create_default(), effective_transport_capacity=capacity)
-    assert gas.composition["Fe"] == pytest.approx(expected_fe_mbar, abs=1e-14)
-    partials = transport["species_partial_pressures_mbar"]
-    assert gas.composition["Fe"] == partials["Fe"]
-    assert gas.composition[carrier] == (10.0 if fraction == 1.0 else 5.0)
-    assert gas.composition["O2"] == 0.2
-    # Core and evaporation consume this very projection on the next tick.
-    sim = _gas_train_sim()
-    sim._melt_headspace_composition_mbar = partials
-    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(expected_fe_mbar * 100.0, abs=1e-12)
-
-
-@pytest.mark.xfail(strict=True, reason="b-1016: closed line and downstream reference include carrier")
-@pytest.mark.parametrize("closed", [False, True])
-def test_carrier_projection_preserves_pressure_origin(closed):
-    model, melt, flux, _ = _boundary("Kr")
-    downstream = 0.010199999
-    if closed:
-        model._pipe_conductance = lambda *_args, **_kwargs: 0.0
-    else:
-        assert model._pipe_conductance(
-            1020.0, melt.temperature_C, p_downstream_Pa=downstream * 1e5,
-            species_kg_for_M_avg=flux.species_kg_hr,
-        ) > 0.0
-    raw_total = (10.2 if closed else model._vapor_pressure_mbar_from_flux(
-        flux.total_kg_hr / 3600.0, melt.temperature_C,
-        p_downstream_bar=downstream, species_kg_for_M_avg=flux.species_kg_hr,
-    ))
-    gas = model.update(flux, melt, CondensationTrain.create_default(), p_downstream_bar=downstream)
-    assert gas.composition["Fe"] == pytest.approx(max(0.0, raw_total - 10.2), abs=1e-12)
-    assert gas.composition["O2"] == 0.2
-    assert gas.composition["Kr"] == 10.0
-
-
-@pytest.mark.xfail(strict=True, reason="b-1016: oxygen must occupy its own share exactly once")
-@pytest.mark.parametrize("oxygen_share,expected_fe,expected_o2", [(0.5, 2.6, 2.6), (0.01, 5.0, 0.2)])
-def test_emitted_oxygen_and_controlled_floor_share_one_budget(oxygen_share, expected_fe, expected_o2):
-    from simulator.accounting import resolve_species_formula
-    model, melt, _, capacity = _boundary("Kr", 0.5)
-    # One mol/hr total source, with independently chosen O2 molar shares.
-    flux = EvaporationFlux(species_kg_hr={
-        "Fe": (1.0 - oxygen_share) * resolve_species_formula("Fe").molar_mass_kg_per_mol(),
-        "O2": oxygen_share * resolve_species_formula("O2").molar_mass_kg_per_mol(),
-    })
-    flux.update_totals()
-    gas = model.update(flux, melt, CondensationTrain.create_default(), effective_transport_capacity=capacity)
-    assert gas.composition["Fe"] == pytest.approx(expected_fe)
-    assert gas.composition["O2"] == pytest.approx(expected_o2)
-    assert gas.composition["Kr"] == 5.0
-    assert sum(gas.composition.values()) == pytest.approx(10.2)
+def test_carrier_full_pressure_requires_achieved_composition(carrier):
+    model, melt, flux, capacity = _boundary(carrier)
+    assert melt.sweep_mol_per_s is None
+    # A pure carrier feed/declared pressure floor is not an achieved gas mole
+    # fraction after vapour enters. No carrier inventory or removal closure is
+    # supplied here. Reserving all nominal carrier/O2 pressure and assigning
+    # zero vapour would merely replace one unsupported split with another.
+    # The missing achieved-mixture input needs a typed refusal or an authorized
+    # flow/inventory closure, rather than a guessed numerical back-pressure.
+    with pytest.raises(OverheadConfigurationError, match="carrier"):
+        model.update(flux, melt, CondensationTrain.create_default(),
+                     effective_transport_capacity=capacity)
 
 
 def test_carrier_absent_controlled_split_is_bit_identical():
