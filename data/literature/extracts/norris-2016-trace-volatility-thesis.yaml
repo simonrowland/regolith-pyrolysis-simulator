@@ -122,9 +122,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -222,9 +222,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -322,9 +322,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -422,9 +422,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -522,9 +522,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -622,9 +622,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -722,9 +722,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -822,9 +822,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -922,9 +922,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -1022,9 +1022,9 @@ experiments:
           point: '101325'
           approximate: false
       locator:
-        page: 223
-        pdf_page_index: 222
-        table: 5.4.1
+        page: 196
+        pdf_page_index: 195
+        section: '5.2'
         note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
     sweep_gas:
       state:
@@ -1063,7 +1063,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '46'
       values:
         quantity: residue_component_composition
@@ -1077,8 +1077,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id003
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1115,9 +1115,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1168,7 +1168,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '54'
       values:
         quantity: residue_component_composition
@@ -1182,8 +1182,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id004
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1216,9 +1216,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1269,7 +1269,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '38'
       values:
         quantity: residue_component_composition
@@ -1283,8 +1283,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id006
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1317,9 +1317,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1370,7 +1370,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '1.2'
       values:
         quantity: residue_component_composition
@@ -1384,8 +1384,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id007
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1418,9 +1418,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1471,7 +1471,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '9'
       values:
         quantity: residue_component_composition
@@ -1485,8 +1485,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id008
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1519,9 +1519,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1572,7 +1572,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '17'
       values:
         quantity: residue_component_composition
@@ -1586,8 +1586,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id009
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1620,9 +1620,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1673,7 +1673,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '5.0'
       values:
         quantity: residue_component_composition
@@ -1687,8 +1687,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id010
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1721,9 +1721,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1774,7 +1774,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '61'
       values:
         quantity: residue_component_composition
@@ -1788,8 +1788,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id011
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1822,9 +1822,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1875,7 +1875,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '2.0'
       values:
         quantity: residue_component_composition
@@ -1889,8 +1889,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id012
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -1923,9 +1923,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -1976,7 +1976,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '1.4'
       values:
         quantity: residue_component_composition
@@ -1990,8 +1990,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id013
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2024,9 +2024,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2079,7 +2079,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '14'
       values:
         quantity: residue_component_composition
@@ -2093,8 +2093,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id014
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2127,9 +2127,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2180,7 +2180,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '21'
       values:
         quantity: residue_component_composition
@@ -2194,8 +2194,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id015
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2228,9 +2228,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2281,7 +2281,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '16'
       values:
         quantity: residue_component_composition
@@ -2295,8 +2295,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id016
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2329,9 +2329,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2382,7 +2382,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.3'
       values:
         quantity: residue_component_composition
@@ -2396,8 +2396,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id017
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2430,9 +2430,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2483,7 +2483,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '4'
       values:
         quantity: residue_component_composition
@@ -2497,8 +2497,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id018
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2531,9 +2531,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2584,7 +2584,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '19'
       values:
         quantity: residue_component_composition
@@ -2598,8 +2598,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id019
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2632,9 +2632,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2685,7 +2685,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -2699,8 +2699,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id020
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2733,9 +2733,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2786,7 +2786,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '31'
       values:
         quantity: residue_component_composition
@@ -2800,8 +2800,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id021
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2834,9 +2834,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2887,7 +2887,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.8'
       values:
         quantity: residue_component_composition
@@ -2901,8 +2901,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id022
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -2935,9 +2935,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -2988,7 +2988,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.7'
       values:
         quantity: residue_component_composition
@@ -3002,8 +3002,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id023
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3036,9 +3036,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3091,7 +3091,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '36'
       values:
         quantity: residue_component_composition
@@ -3105,8 +3105,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id024
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3139,9 +3139,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3192,7 +3192,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '41'
       values:
         quantity: residue_component_composition
@@ -3206,8 +3206,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id025
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3240,9 +3240,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3293,7 +3293,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '17'
       values:
         quantity: residue_component_composition
@@ -3307,8 +3307,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id026
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3341,9 +3341,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3394,7 +3394,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.1'
       values:
         quantity: residue_component_composition
@@ -3408,8 +3408,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id027
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3442,9 +3442,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3495,7 +3495,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '4.0'
       values:
         quantity: residue_component_composition
@@ -3509,8 +3509,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id028
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3543,9 +3543,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3596,7 +3596,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -3610,8 +3610,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id029
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3644,9 +3644,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3697,7 +3697,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '4.0'
       values:
         quantity: residue_component_composition
@@ -3711,8 +3711,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id030
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3745,9 +3745,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3798,7 +3798,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '26'
       values:
         quantity: residue_component_composition
@@ -3812,8 +3812,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id031
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3846,9 +3846,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -3899,7 +3899,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.5'
       values:
         quantity: residue_component_composition
@@ -3913,8 +3913,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id032
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -3947,9 +3947,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4000,7 +4000,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '1.0'
       values:
         quantity: residue_component_composition
@@ -4014,8 +4014,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id033
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4048,9 +4048,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4103,7 +4103,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '57'
       values:
         quantity: residue_component_composition
@@ -4117,8 +4117,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id034
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4151,9 +4151,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4204,7 +4204,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '60'
       values:
         quantity: residue_component_composition
@@ -4218,8 +4218,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id035
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4252,9 +4252,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4305,7 +4305,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '58'
       values:
         quantity: residue_component_composition
@@ -4319,8 +4319,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id036
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4353,9 +4353,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4406,7 +4406,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '27'
       values:
         quantity: residue_component_composition
@@ -4420,8 +4420,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id037
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4454,9 +4454,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4507,7 +4507,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '14'
       values:
         quantity: residue_component_composition
@@ -4521,8 +4521,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id038
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4555,9 +4555,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4608,7 +4608,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -4622,8 +4622,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id039
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4656,9 +4656,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4709,7 +4709,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '20'
       values:
         quantity: residue_component_composition
@@ -4723,8 +4723,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id040
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4757,9 +4757,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4810,7 +4810,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '49'
       values:
         quantity: residue_component_composition
@@ -4824,8 +4824,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id041
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4858,9 +4858,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -4911,7 +4911,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '18'
       values:
         quantity: residue_component_composition
@@ -4925,8 +4925,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id042
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -4959,9 +4959,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5012,7 +5012,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '31'
       values:
         quantity: residue_component_composition
@@ -5026,8 +5026,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id043
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5060,9 +5060,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5115,7 +5115,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '32'
       values:
         quantity: residue_component_composition
@@ -5129,8 +5129,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id044
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5163,9 +5163,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5216,7 +5216,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '48'
       values:
         quantity: residue_component_composition
@@ -5230,8 +5230,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id045
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5264,9 +5264,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5317,7 +5317,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '17'
       values:
         quantity: residue_component_composition
@@ -5331,8 +5331,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id046
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5365,9 +5365,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5418,7 +5418,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '3.4'
       values:
         quantity: residue_component_composition
@@ -5432,8 +5432,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id047
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5466,9 +5466,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5519,7 +5519,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -5533,8 +5533,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id048
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5567,9 +5567,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5620,7 +5620,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '16'
       values:
         quantity: residue_component_composition
@@ -5634,8 +5634,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id049
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5668,9 +5668,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5721,7 +5721,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '5.3'
       values:
         quantity: residue_component_composition
@@ -5735,8 +5735,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id050
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5769,9 +5769,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5822,7 +5822,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '63'
       values:
         quantity: residue_component_composition
@@ -5836,8 +5836,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id051
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5870,9 +5870,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -5923,7 +5923,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '3.7'
       values:
         quantity: residue_component_composition
@@ -5937,8 +5937,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id052
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -5971,9 +5971,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6024,7 +6024,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '5.1'
       values:
         quantity: residue_component_composition
@@ -6038,8 +6038,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id053
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6072,9 +6072,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6127,7 +6127,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -6141,8 +6141,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id054
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6175,9 +6175,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6228,7 +6228,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -6242,8 +6242,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id055
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6276,9 +6276,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6329,7 +6329,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '19'
       values:
         quantity: residue_component_composition
@@ -6343,8 +6343,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id056
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6377,9 +6377,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6430,7 +6430,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '21'
       values:
         quantity: residue_component_composition
@@ -6444,8 +6444,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id057
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6478,9 +6478,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6531,7 +6531,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '41'
       values:
         quantity: residue_component_composition
@@ -6545,8 +6545,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id058
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6579,9 +6579,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6632,7 +6632,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '10'
       values:
         quantity: residue_component_composition
@@ -6646,8 +6646,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id059
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6680,9 +6680,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6733,7 +6733,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -6747,8 +6747,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id060
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6781,9 +6781,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6834,7 +6834,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '108'
       values:
         quantity: residue_component_composition
@@ -6848,8 +6848,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id061
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6882,9 +6882,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -6935,7 +6935,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -6949,8 +6949,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id062
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -6983,9 +6983,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7036,7 +7036,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '19'
       values:
         quantity: residue_component_composition
@@ -7050,8 +7050,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id063
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7084,9 +7084,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7139,7 +7139,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '26'
       values:
         quantity: residue_component_composition
@@ -7153,8 +7153,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id064
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7187,9 +7187,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7240,7 +7240,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '51'
       values:
         quantity: residue_component_composition
@@ -7254,8 +7254,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id065
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7288,9 +7288,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7341,7 +7341,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -7355,8 +7355,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id066
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7389,9 +7389,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7442,7 +7442,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '3.5'
       values:
         quantity: residue_component_composition
@@ -7456,8 +7456,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id067
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7490,9 +7490,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7543,7 +7543,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '24'
       values:
         quantity: residue_component_composition
@@ -7557,8 +7557,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id068
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7591,9 +7591,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7644,7 +7644,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '14'
       values:
         quantity: residue_component_composition
@@ -7658,8 +7658,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id069
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7692,9 +7692,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7745,7 +7745,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '8.5'
       values:
         quantity: residue_component_composition
@@ -7759,8 +7759,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id070
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7793,9 +7793,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7846,7 +7846,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '41'
       values:
         quantity: residue_component_composition
@@ -7860,8 +7860,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id071
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7894,9 +7894,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -7947,7 +7947,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '1.9'
       values:
         quantity: residue_component_composition
@@ -7961,8 +7961,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id072
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -7995,9 +7995,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8048,7 +8048,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '1.6'
       values:
         quantity: residue_component_composition
@@ -8062,8 +8062,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id073
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8096,9 +8096,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8151,7 +8151,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -8165,8 +8165,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id074
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8199,9 +8199,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8252,7 +8252,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '18'
       values:
         quantity: residue_component_composition
@@ -8266,8 +8266,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id075
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8300,9 +8300,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8353,7 +8353,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -8367,8 +8367,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id076
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8401,9 +8401,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8454,7 +8454,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '7.4'
       values:
         quantity: residue_component_composition
@@ -8468,8 +8468,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id077
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8502,9 +8502,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8555,7 +8555,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -8569,8 +8569,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id078
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8603,9 +8603,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8656,7 +8656,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -8670,8 +8670,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id079
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8704,9 +8704,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8757,7 +8757,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '13'
       values:
         quantity: residue_component_composition
@@ -8771,8 +8771,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id080
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8805,9 +8805,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8858,7 +8858,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -8872,8 +8872,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id081
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -8906,9 +8906,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -8959,7 +8959,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '7.2'
       values:
         quantity: residue_component_composition
@@ -8973,8 +8973,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id082
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9007,9 +9007,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9060,7 +9060,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '6.5'
       values:
         quantity: residue_component_composition
@@ -9074,8 +9074,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id083
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9108,9 +9108,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9163,7 +9163,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '13'
       values:
         quantity: residue_component_composition
@@ -9177,8 +9177,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id084
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9211,9 +9211,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9264,7 +9264,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -9278,8 +9278,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id085
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9312,9 +9312,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9365,7 +9365,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '25'
       values:
         quantity: residue_component_composition
@@ -9379,8 +9379,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id086
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9413,9 +9413,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9466,7 +9466,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '26'
       values:
         quantity: residue_component_composition
@@ -9480,8 +9480,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id087
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9514,9 +9514,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9567,7 +9567,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '27'
       values:
         quantity: residue_component_composition
@@ -9581,8 +9581,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id088
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9615,9 +9615,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9668,7 +9668,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '17'
       values:
         quantity: residue_component_composition
@@ -9682,8 +9682,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id089
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9716,9 +9716,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9769,7 +9769,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '14'
       values:
         quantity: residue_component_composition
@@ -9783,8 +9783,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id090
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9817,9 +9817,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9870,7 +9870,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '113'
       values:
         quantity: residue_component_composition
@@ -9884,8 +9884,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id091
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -9918,9 +9918,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -9971,7 +9971,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -9985,8 +9985,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id092
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10019,9 +10019,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10072,7 +10072,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -10086,8 +10086,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id093
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10120,9 +10120,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10175,7 +10175,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -10189,8 +10189,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id094
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10223,9 +10223,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10276,7 +10276,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '71'
       values:
         quantity: residue_component_composition
@@ -10290,8 +10290,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id095
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10324,9 +10324,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10377,7 +10377,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '33'
       values:
         quantity: residue_component_composition
@@ -10391,8 +10391,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id096
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10425,9 +10425,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10478,7 +10478,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '18'
       values:
         quantity: residue_component_composition
@@ -10492,8 +10492,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id097
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10526,9 +10526,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10579,7 +10579,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '36'
       values:
         quantity: residue_component_composition
@@ -10593,8 +10593,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id098
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10627,9 +10627,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10680,7 +10680,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '20'
       values:
         quantity: residue_component_composition
@@ -10694,8 +10694,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id099
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10728,9 +10728,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10781,7 +10781,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '28'
       values:
         quantity: residue_component_composition
@@ -10795,8 +10795,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id100
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10829,9 +10829,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10882,7 +10882,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '55'
       values:
         quantity: residue_component_composition
@@ -10896,8 +10896,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id101
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -10930,9 +10930,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -10983,7 +10983,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '6.7'
       values:
         quantity: residue_component_composition
@@ -10997,8 +10997,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id102
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11031,9 +11031,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11084,7 +11084,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '8.9'
       values:
         quantity: residue_component_composition
@@ -11098,8 +11098,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id103
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11132,9 +11132,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11187,7 +11187,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '30'
       values:
         quantity: residue_component_composition
@@ -11201,8 +11201,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id104
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11235,9 +11235,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11288,7 +11288,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '85'
       values:
         quantity: residue_component_composition
@@ -11302,8 +11302,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id105
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11336,9 +11336,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11389,7 +11389,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '39'
       values:
         quantity: residue_component_composition
@@ -11403,8 +11403,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id106
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11437,9 +11437,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11490,7 +11490,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '6.7'
       values:
         quantity: residue_component_composition
@@ -11504,8 +11504,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id107
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11538,9 +11538,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11591,7 +11591,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '34'
       values:
         quantity: residue_component_composition
@@ -11605,8 +11605,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id108
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11639,9 +11639,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11692,7 +11692,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '33'
       values:
         quantity: residue_component_composition
@@ -11706,8 +11706,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id109
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11740,9 +11740,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11793,7 +11793,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '34'
       values:
         quantity: residue_component_composition
@@ -11807,8 +11807,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id110
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11841,9 +11841,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11894,7 +11894,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '95'
       values:
         quantity: residue_component_composition
@@ -11908,8 +11908,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id111
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -11942,9 +11942,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -11995,7 +11995,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.4'
       values:
         quantity: residue_component_composition
@@ -12009,8 +12009,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id112
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12043,9 +12043,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12096,7 +12096,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '0.3'
       values:
         quantity: residue_component_composition
@@ -12110,8 +12110,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id113
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12144,9 +12144,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12199,7 +12199,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -12213,8 +12213,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id114
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12247,9 +12247,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12300,7 +12300,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '25'
       values:
         quantity: residue_component_composition
@@ -12314,8 +12314,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id115
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12348,9 +12348,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12401,7 +12401,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '10'
       values:
         quantity: residue_component_composition
@@ -12415,8 +12415,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id116
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12449,9 +12449,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12502,7 +12502,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '6.4'
       values:
         quantity: residue_component_composition
@@ -12516,8 +12516,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id117
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12550,9 +12550,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12603,7 +12603,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -12617,8 +12617,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id118
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12651,9 +12651,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12704,7 +12704,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '8.2'
       values:
         quantity: residue_component_composition
@@ -12718,8 +12718,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id119
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12752,9 +12752,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12805,7 +12805,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '5.5'
       values:
         quantity: residue_component_composition
@@ -12819,8 +12819,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id120
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12853,9 +12853,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -12906,7 +12906,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -12920,8 +12920,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id121
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -12954,9 +12954,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13007,7 +13007,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '2.7'
       values:
         quantity: residue_component_composition
@@ -13021,8 +13021,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id122
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13055,9 +13055,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13108,7 +13108,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '2.6'
       values:
         quantity: residue_component_composition
@@ -13122,8 +13122,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id123
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13156,9 +13156,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13211,7 +13211,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '18'
       values:
         quantity: residue_component_composition
@@ -13225,8 +13225,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id124
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13259,9 +13259,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13312,7 +13312,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '50'
       values:
         quantity: residue_component_composition
@@ -13326,8 +13326,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id125
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13360,9 +13360,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13413,7 +13413,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '20'
       values:
         quantity: residue_component_composition
@@ -13427,8 +13427,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id126
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13461,9 +13461,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13514,7 +13514,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '3.6'
       values:
         quantity: residue_component_composition
@@ -13528,8 +13528,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id127
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13562,9 +13562,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13615,7 +13615,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '8.3'
       values:
         quantity: residue_component_composition
@@ -13629,8 +13629,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id128
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13663,9 +13663,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13716,7 +13716,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '12'
       values:
         quantity: residue_component_composition
@@ -13730,8 +13730,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id129
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13764,9 +13764,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13817,7 +13817,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '15'
       values:
         quantity: residue_component_composition
@@ -13831,8 +13831,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id130
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13865,9 +13865,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -13918,7 +13918,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '63'
       values:
         quantity: residue_component_composition
@@ -13932,8 +13932,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id131
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -13966,9 +13966,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14019,7 +14019,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '2.1'
       values:
         quantity: residue_component_composition
@@ -14033,8 +14033,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id132
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14067,9 +14067,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14120,7 +14120,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '4.3'
       values:
         quantity: residue_component_composition
@@ -14134,8 +14134,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id133
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14168,9 +14168,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14223,7 +14223,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '26'
       values:
         quantity: residue_component_composition
@@ -14237,8 +14237,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id134
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14271,9 +14271,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14324,7 +14324,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '18'
       values:
         quantity: residue_component_composition
@@ -14338,8 +14338,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id135
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14372,9 +14372,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14425,7 +14425,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '29'
       values:
         quantity: residue_component_composition
@@ -14439,8 +14439,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id136
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14473,9 +14473,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14526,7 +14526,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '24'
       values:
         quantity: residue_component_composition
@@ -14540,8 +14540,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id137
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14574,9 +14574,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14627,7 +14627,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '45'
       values:
         quantity: residue_component_composition
@@ -14641,8 +14641,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id138
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14675,9 +14675,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14728,7 +14728,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '20'
       values:
         quantity: residue_component_composition
@@ -14742,8 +14742,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id139
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14776,9 +14776,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14829,7 +14829,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '21'
       values:
         quantity: residue_component_composition
@@ -14843,8 +14843,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id140
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14877,9 +14877,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -14930,7 +14930,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '255'
       values:
         quantity: residue_component_composition
@@ -14944,8 +14944,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id141
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -14978,9 +14978,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15031,7 +15031,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '21'
       values:
         quantity: residue_component_composition
@@ -15045,8 +15045,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id142
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15079,9 +15079,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15132,7 +15132,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '13'
       values:
         quantity: residue_component_composition
@@ -15146,8 +15146,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id143
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15180,9 +15180,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15235,7 +15235,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '28'
       values:
         quantity: residue_component_composition
@@ -15249,8 +15249,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id144
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15283,9 +15283,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15336,7 +15336,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '25'
       values:
         quantity: residue_component_composition
@@ -15350,8 +15350,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id145
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15384,9 +15384,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15437,7 +15437,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '35'
       values:
         quantity: residue_component_composition
@@ -15451,8 +15451,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id146
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15485,9 +15485,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15538,7 +15538,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '31'
       values:
         quantity: residue_component_composition
@@ -15552,8 +15552,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id147
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15586,9 +15586,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15639,7 +15639,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '53'
       values:
         quantity: residue_component_composition
@@ -15653,8 +15653,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id148
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15687,9 +15687,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15740,7 +15740,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -15754,8 +15754,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id149
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15788,9 +15788,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15841,7 +15841,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '24'
       values:
         quantity: residue_component_composition
@@ -15855,8 +15855,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id150
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15889,9 +15889,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -15942,7 +15942,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '69'
       values:
         quantity: residue_component_composition
@@ -15956,8 +15956,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id151
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -15990,9 +15990,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16043,7 +16043,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '25'
       values:
         quantity: residue_component_composition
@@ -16057,8 +16057,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id152
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16091,9 +16091,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16144,7 +16144,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '17'
       values:
         quantity: residue_component_composition
@@ -16158,8 +16158,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id153
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16192,9 +16192,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16247,7 +16247,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -16261,8 +16261,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id154
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16295,9 +16295,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16348,7 +16348,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '55'
       values:
         quantity: residue_component_composition
@@ -16362,8 +16362,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id155
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16396,9 +16396,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16449,7 +16449,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '34'
       values:
         quantity: residue_component_composition
@@ -16463,8 +16463,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id156
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16497,9 +16497,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16550,7 +16550,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '23'
       values:
         quantity: residue_component_composition
@@ -16564,8 +16564,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-7'
-          units: log10
-          locator: *id157
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16598,9 +16598,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16651,7 +16651,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '37'
       values:
         quantity: residue_component_composition
@@ -16665,8 +16665,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id158
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16699,9 +16699,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16752,7 +16752,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '32'
       values:
         quantity: residue_component_composition
@@ -16766,8 +16766,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id159
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16800,9 +16800,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16853,7 +16853,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '27'
       values:
         quantity: residue_component_composition
@@ -16867,8 +16867,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-9'
-          units: log10
-          locator: *id160
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -16901,9 +16901,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -16954,7 +16954,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '50'
       values:
         quantity: residue_component_composition
@@ -16968,8 +16968,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id161
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -17002,9 +17002,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -17055,7 +17055,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '9.2'
       values:
         quantity: residue_component_composition
@@ -17069,8 +17069,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-11'
-          units: log10
-          locator: *id162
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -17103,9 +17103,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -17156,7 +17156,7 @@ species:
       units: µg/g in quenched glass
       uncertainty:
         note: Printed σ; confidence level not stated. Source says the product was dropped into a bucket of water
-          (PDF p.224); whether this preserved trace composition is not stated.
+          (PDF p.222, §5.4.3); whether this preserved trace composition is not stated.
         sigma_ppm: '11'
       values:
         quantity: residue_component_composition
@@ -17170,8 +17170,8 @@ species:
         T_C: '1300'
         log10_fO2:
           value: '-13'
-          units: log10
-          locator: *id163
+          units: log10(atm)
+          locator: *id002
         composition_wt_pct:
           SiO2: '50.66'
           TiO2: '0.96'
@@ -17204,9 +17204,9 @@ species:
               point: '101325'
               approximate: false
           locator:
-            page: 223
-            pdf_page_index: 222
-            table: 5.4.1
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
             note: One atmosphere.
         composition:
           state:
@@ -17541,9 +17541,9 @@ species:
     - observation_id: norris_2016_related_2017_nature_experiments
       type: context
       locator:
-        page: 187
-        pdf_page_index: 186
-        table: 5.4.1
+        page: 217
+        pdf_page_index: 216
+        section: '5.4.1'
         note: The same EBT1 stirred-furnace volatile-loss experiment series is described in Norris & Wood (2017),
           whose extract contains the ED Table 1 starting row and figure-only volatility factors.
       units: source relationship

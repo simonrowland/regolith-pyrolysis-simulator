@@ -1,6 +1,6 @@
 # Norris (2016) Chapter 5 extraction audit
 
-Source: C.A. Norris, *Volatilities of trace elements in silicate melts*, DPhil thesis, University of Oxford (2016), doi:10.5287/ora-qmdvbxydr. The primary source is the born-digital text at `/Users/simonrowland/Repos/regolith-corpus/text/norris-2016-trace-volatility-thesis/pdftotext-layout.txt`; MinerU input is the matching `text/norris-2016-trace-volatility-thesis/mineru/` tree. The PDF was used read-only for render checks.
+Source: C.A. Norris, *Volatilities of trace elements in silicate melts*, DPhil thesis, University of Oxford (2016), doi:10.5287/ora-qmdvbxydr. The primary inputs were the born-digital text layer and available MinerU table reads from the source corpus. The PDF was used read-only for render checks.
 
 ## Cell and row audit
 
@@ -16,7 +16,7 @@ The pdftotext layer supplies exact characters for these born-digital pages. I re
 
 Total: 568 numeric cells (including the two Table 5.5 footer counts). Table 5.4’s row/date, temperature, duration, and oxygen-fugacity assignment was confirmed against the render; the date labels are retained as printed text.
 
-The required staged converter and compare used `/private/tmp/claude-501/main-review/tools/mineru_table_draft.py` unchanged. It produced 10 MinerU tables, including Table 5.7 as p232-t09 and p232-t10; it also found unrelated Table 4.15 on p170, excluded here. The compare output is:
+The required staged standalone table-draft converter and compare were used unchanged. They produced 10 MinerU tables, including Table 5.7 as p232-t09 and p232-t10; the converter also found unrelated Table 4.15 on p170, excluded here. The compare output is:
 
 ```text
 compare: matched=0 no-match=0 mismatch=0 presence-only=0 needs_mapping=0 total=0
@@ -28,13 +28,15 @@ This compare implementation only traverses a short list of standard observation 
 ## Representation and migration
 
 - Table 5.2’s nine major-oxide values are on each EBT1 experiment sample as the starting composition. The sample carries the printed major values; its standard deviations, the trace oxides and their standard deviations, and the reported total remain in one Table 5.2 context row. This avoids treating the same EBT1 starting material as another work.
-- Table 5.4 supplies 10 linked experiment records, each at 1300 °C with its printed duration and absolute log fO₂. The furnace is at 1 atm and uses a CO/CO₂ mix; the source does not tabulate its gas flow ratio. The wetted material is nickel.
-- Table 5.6 supplies 160 measured residual-glass component-composition observations, one per printed element/run cell. Each carries its printed σ (confidence level not stated), locator p. 227, T, log fO₂, 1 atm pressure, starting melt composition, and run link. Products were dropped into water (p. 224); whether quenching preserves trace composition is not stated, recorded on every row. The measured state is glass.
+- Table 5.4 supplies 10 linked experiment records, each at 1300 °C with its printed duration and absolute log fO₂. The furnace is stated to operate at one atmosphere on PDF p. 196, §5.2; pressure locators use that page and section, with no table locator. It uses a CO/CO₂ mix; the source does not tabulate its gas flow ratio. The wetted material is nickel.
+- Table 5.6 supplies 160 measured residual-glass component-composition observations, one per printed element/run cell. Each carries its printed σ (confidence level not stated), locator p. 227, T, log fO₂, 1 atm pressure, starting melt composition, and run link. Products were dropped into a water bucket on PDF p. 222, §5.4.3; whether quenching preserves trace composition is not stated, recorded on every row. The measured state is glass.
 - Table 5.7 prints the dimensionless concentration ratio X_final/X_initial in mole fraction single-cation oxide, not a mass-loss fraction. The current schema has no token for this form. Per controller ruling, all four rows and 64 element ratios with σ are preserved as a typed-refused context transcription, without observations or lineage. Fraction-remaining is pending ruling t-1473.
 - Table 5.5 is one nine-experiment major-element mean context row only; no run-level values are inferred.
-- A source-relationship context links the thesis to `norris-2017-earth-volatiles-nature`, whose extract has the ED Table 1 starting row and figure-only volatility factors. The EBT1 row is not duplicated as an independent work.
+- A source-relationship context at PDF p. 217 (printed p. 187; `pdf_page_index: 216`, §5.4.1) links the thesis to `norris-2017-earth-volatiles-nature`, whose extract has the ED Table 1 starting row and figure-only volatility factors. The relationship is the extract-level dedup note; no table locator is asserted. The EBT1 row is not duplicated as an independent work.
 - Table 4.15, p. 170 (activity coefficients at 1923 K), is out of scope and is a follow-up candidate. Figure-only readings, including Figure 5.16 time-series values and Figure 5.17 volatility-factor curves, are not transcribed.
 
-Isolated real-migrator result: 160 observations, 10 experiments, 4 work-context rows, 0 hard issues, 0 unavailable observations. Temperature (1573.15 K), composition, and total pressure (101325 Pa) map to identity on all residue rows; per-row point conditions also retain log fO₂ at p. 224. Identity `fO2_Pa` remains unknown on this green seat because no current extract path binds absolute log fO₂ for this quantity. Controller ruling t-1360 says the existing point condition is correct and identity binding will be available after its `oxygen_identity.py` change lands; no converted twin or migrator change was made.
+Isolated real-migrator result: 160 observations, 10 experiments, 4 work-context rows, 0 hard issues, 0 unavailable observations. Temperature (1573.15 K), composition, and total pressure (101325 Pa) map to identity on all residue rows; the pressure locator is PDF p. 196, §5.2. The migrated per-row `fO2_log` locator is Table 5.4, PDF p. 224. The source prints log(fO₂) relative to atm (PDF p. 250, “log(fO₂) of −7 atm”), stored as `log10(atm)` so a later binder does not apply the bar reference. Identity `fO2_Pa` remains unknown on this green seat because no current extract path binds absolute log fO₂ for this quantity. Controller ruling t-1360 says the existing point condition is correct and identity binding will be available after its `oxygen_identity.py` change lands; no converted twin or migrator change was made.
 
-Expected store delta, without regenerating or committing the battery store: +1 work, +1 bench, +10 experiments, +160 residue observations, and +4 context rows. The typed-refused contexts remain source transcription and do not create executable measurements.
+Identity `subtype` also remains unknown. The current extract uses scalar `concentration_series` observations with `values.residue_ppm`; the existing `element_ppm_by_mass` subtype stamp is only applied by the migrator’s series-point path, and no existing scalar extract field binds this subtype. This is a known gap; no migrator change was made.
+
+Expected store delta, without regenerating or committing the battery store: +1 work, +0 benches, +10 experiments, +160 residue observations, and +4 context rows. The typed-refused contexts remain source transcription and do not create executable measurements.

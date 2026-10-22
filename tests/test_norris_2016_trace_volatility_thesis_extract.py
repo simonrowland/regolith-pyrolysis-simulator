@@ -25,6 +25,14 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         for item in source["species"].values()
         for row in item.get("observations", [])
     }
+    for row in source_observations.values():
+        oxygen = row["values"]["log10_fO2"]
+        assert oxygen["units"] == "log10(atm)"
+        assert oxygen["locator"]["page"] == 224
+        assert oxygen["locator"]["table"] == "5.4"
+        pressure = row["point_conditions"]["total_pressure_Pa"]["locator"]
+        assert pressure["page"] == 196
+        assert pressure["section"] == "5.2"
     # Render-checked cells from PDF p. 227, Table 5.6.
     for observation_id, (value, sigma) in expected.items():
         row = source_observations[observation_id]
@@ -64,10 +72,21 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         assert row.identity.temperature_K.value == Decimal("1573.15")
         assert row.identity.composition.is_value
         assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        pressure = (
+            result.experiments[row.experiment_id]
+            .pressure_environment.total_pressure_Pa
+        )
+        assert pressure.locator.page == 196
+        assert pressure.locator.section == "5.2"
+        assert pressure.locator.table is None
         assert row.point_conditions["temperature_K"].state.value == Decimal("1573.15")
-        assert row.point_conditions["fO2_log"].locator is not None
+        assert row.point_conditions["fO2_log"].locator.page == 224
+        assert row.point_conditions["fO2_log"].locator.table == "5.4"
         assert row.point_conditions["fO2_log"].state.value in {
-            Decimal("-7"), Decimal("-9"), Decimal("-11"), Decimal("-13")
+            Decimal("-7"),
+            Decimal("-9"),
+            Decimal("-11"),
+            Decimal("-13"),
         }
         assert row.point_conditions["starting_composition"].locator.page == 220
 
