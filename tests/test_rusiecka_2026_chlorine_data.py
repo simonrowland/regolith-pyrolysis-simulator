@@ -29,6 +29,15 @@ def _workbook_or_skip() -> Path:
     return workbook
 
 
+def _displayed_decimal(cell) -> Decimal:
+    value = Decimal(str(cell.value))
+    if cell.number_format == "0.00":
+        return Decimal(f"{value:.2f}")
+    if cell.number_format == "0.00E+00":
+        return Decimal(f"{value:.2E}")
+    return Decimal(format(value, ".15g"))
+
+
 def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     workbook = _workbook_or_skip()
     ws = load_workbook(workbook, data_only=True, read_only=False)["data"]
@@ -72,6 +81,7 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert row.identity.quantity.value is Quantity.CHLORIDE_CAPACITY
         assert row.identity.phase_role.value is PhaseRole.MELT
         assert row.identity.species.phase.value is Phase.L
+        assert observation["type"] == "chloride_capacity"
         assert row.value.kind is ValueKind.POINT
         assert not row.notices
         assert row.value.point == Decimal(f"{ws.cell(row_number, 28).value:.2f}")
@@ -80,12 +90,21 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
         assert row.experiment_id.endswith(f"::experiment::worksheet-row-{row_number}")
+        assert row.point_conditions["total_pressure_Pa"].state.value == (
+            _displayed_decimal(ws.cell(row_number, 21)) * Decimal("1000000000")
+        )
+        assert row.point_conditions["total_pressure_Pa"].locator is not None
         assert row.point_conditions["fCl2_bar"].state.is_value
         assert row.point_conditions["fCl2_bar"].locator is not None
-        assert row.point_conditions["fO2_Pa"].state.is_value
-        assert row.point_conditions["total_pressure_Pa"].state.is_value
-        assert row.point_conditions["total_pressure_Pa"].locator is not None
-        assert row.point_conditions["fO2_Pa"].locator is not None
+        assert row.point_conditions["fCl2_bar"].state.value == _displayed_decimal(
+            ws.cell(row_number, 24)
+        )
+        assert row.point_conditions["fO2_bar"].state.is_value
+        assert row.point_conditions["fO2_bar"].locator is not None
+        assert row.point_conditions["fO2_bar"].state.value == _displayed_decimal(
+            ws.cell(row_number, 25)
+        )
+        assert "fO2_Pa" not in row.point_conditions
         assert "fO2_log" not in row.point_conditions
 
     for formula, observation in compositions:
@@ -96,11 +115,7 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         raw_id = observation["observation_id"]
         row = migrated[raw_id]
         source_cell = ws[f"{column_letters}{row_number}"]
-        displayed_component = (
-            Decimal(f"{source_cell.value:.2f}")
-            if source_cell.number_format == "0.00"
-            else Decimal(format(float(source_cell.value), ".15g"))
-        )
+        displayed_component = _displayed_decimal(source_cell)
         assert row.identity.species.formula == formula
         assert row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         assert row.identity.phase_role.value is PhaseRole.GLASS
@@ -112,9 +127,18 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
         assert row.experiment_id.endswith(f"::experiment::worksheet-row-{row_number}")
-        assert row.point_conditions["total_pressure_Pa"].state.is_value
-        assert row.point_conditions["fO2_Pa"].state.is_value
-        assert row.point_conditions["fCl2_bar"].state.is_value
+        assert row.point_conditions["total_pressure_Pa"].state.value == (
+            _displayed_decimal(ws.cell(row_number, 21)) * Decimal("1000000000")
+        )
+        assert row.point_conditions["total_pressure_Pa"].locator is not None
+        assert row.point_conditions["fO2_bar"].state.value == _displayed_decimal(
+            ws.cell(row_number, 25)
+        )
+        assert row.point_conditions["fO2_bar"].locator is not None
+        assert row.point_conditions["fCl2_bar"].state.value == _displayed_decimal(
+            ws.cell(row_number, 24)
+        )
+        assert row.point_conditions["fCl2_bar"].locator is not None
         assert not row.notices
 
     # Independent cell pins: Lunar-1 is a named legacy composition row, while AND-1 is this study.
@@ -138,7 +162,7 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     and1 = migrated["rusiecka_2026_data_row81_chloride_capacity"]
     assert and1.value.point == Decimal("0.23")
     assert and1.point_conditions["total_pressure_Pa"].state.value == Decimal("1050000000.00")
-    assert and1.point_conditions["fO2_Pa"].state.value == Decimal("0.000055400000000")
+    assert and1.point_conditions["fO2_bar"].state.value == Decimal("5.54E-10")
 
 
 def test_companion_table2_locator_and_sample_list_disagreement() -> None:
