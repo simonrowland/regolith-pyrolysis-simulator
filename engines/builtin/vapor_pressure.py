@@ -56,7 +56,11 @@ if TYPE_CHECKING:
         GasChannelPotential,
     )
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
@@ -2706,6 +2710,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             temperature_K=T_K,
         )
         warnings: list[str] = []
+        antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
         melt_account_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
@@ -2889,6 +2894,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 B = antoine.get('B', 0)
                 C = antoine.get('C', 0)
                 if compiled_reference_Pa is None and not (A > 0 and T_K > 300):
+                    if not A > 0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine,
+                            species=species,
+                            site="builtin_vapor_pressure.metal_antoine",
+                            temperature_K=T_K,
+                        )
                     continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -3107,6 +3121,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 B_l = float(antoine_liq.get("B", 0.0) or 0.0)
                 C_l = float(antoine_liq.get("C", 0.0) or 0.0)
                 if not (A_l > 0.0 and T_K > 300.0):
+                    if not A_l > 0.0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine_liq,
+                            species=species,
+                            site="builtin_vapor_pressure.liquid_oxide_antoine",
+                            temperature_K=T_K,
+                        )
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -3218,6 +3241,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 B_g = float(antoine_gas.get("B", 0.0) or 0.0)
                 C_g = float(antoine_gas.get("C", 0.0) or 0.0)
                 if not (A_g > 0.0 and T_K > 300.0):
+                    if not A_g > 0.0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine_gas,
+                            species=species,
+                            site="builtin_vapor_pressure.gas_rail_antoine",
+                            temperature_K=T_K,
+                        )
                     continue
                 if _is_mapping(
                     sp_data.get(RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY)
@@ -3685,6 +3717,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 except (KeyError, ValueError):
                     pass
             if not A > 0 and compiled_evaluator is None:
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=name,
+                    site="builtin_vapor_pressure.oxide_vapor_antoine",
+                    temperature_K=T_K,
+                )
                 continue
             coefficient_block = (
                 "compiled_reference_pressure_model"
@@ -4166,7 +4206,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             transition=None,
             control_audit=control_audit,
             diagnostic=diagnostic,
-            warnings=tuple(warnings),
+            warnings=tuple(
+                _antoine_skip_notices_for_omitted_species(
+                    warnings,
+                    vapor_pressures,
+                )
+            ),
         )
 
     # ------------------------------------------------------------------

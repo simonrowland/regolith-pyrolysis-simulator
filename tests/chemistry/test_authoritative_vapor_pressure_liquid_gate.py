@@ -73,6 +73,7 @@ def _with_empty_vapour_batch(sim):
 def _sim_with_vapor_dispatch(
     vapor_pressures: dict[str, float],
     vapor_sources: dict[str, str] | None = None,
+    warnings: tuple[str, ...] = (),
 ):
     calls = []
     source_by_species = vapor_sources or {
@@ -89,6 +90,7 @@ def _sim_with_vapor_dispatch(
                 'vapor_pressures_Pa': dict(vapor_pressures),
                 'vapor_pressures_source': dict(source_by_species),
             },
+            warnings=warnings,
         )
 
     sim = types.SimpleNamespace(
@@ -108,6 +110,29 @@ def _sim_with_vapor_dispatch(
         ),
     )
     return _with_empty_vapour_batch(sim), calls
+
+
+def test_kernel_warning_survives_core_refresh_in_retained_diagnostic():
+    notice = (
+        'antoine_species_skipped: species=Na '
+        'site=builtin_vapor_pressure.metal_antoine '
+        'reason=missing_antoine_A temperature_K=1873.150'
+    )
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5}, warnings=(notice,))
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        liquid_fraction=1.0,
+        vapor_pressures_Pa={},
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert result.vapor_pressures_Pa == {'Na': 12.5}
+    assert sim._last_vapor_pressure_diagnostic[
+        'kernel_vapor_pressure_warnings'
+    ] == [notice]
 
 
 def test_authoritative_vapor_pressure_no_liquid_gate_zeroes_evaporation():

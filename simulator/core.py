@@ -10050,6 +10050,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+
+        def append_kernel_warnings(
+            messages: tuple[str, ...] | str,
+        ) -> None:
+            if not messages:
+                return
+            additions = (
+                (messages,)
+                if isinstance(messages, str)
+                else tuple(messages)
+            )
+            existing = diagnostic.get('kernel_vapor_pressure_warnings')
+            if not isinstance(existing, list):
+                existing = [existing] if existing is not None else []
+            existing.extend(additions)
+            diagnostic['kernel_vapor_pressure_warnings'] = existing
+
+        append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
         self._last_high_t_melt_activity = dict(
             diagnostic.get("high_t_melt_activity") or {}
         )
@@ -10192,25 +10210,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         f"continue on backend vapor pressures. Diagnostic "
                         f"keys: {diagnostic_keys!r}"
                     )
-                # Codex challenge pre-0.5.1 P2 (2026-05-27): defensive
-                # warning-append. The diagnostic dict is free-form per
-                # the provider contract, so the
-                # ``kernel_vapor_pressure_warnings`` slot may already
-                # hold a non-list value (None, str, etc.); coerce to
-                # list before appending.
-                existing_warnings = diagnostic.get(
-                    'kernel_vapor_pressure_warnings')
-                if not isinstance(existing_warnings, list):
-                    existing_warnings = (
-                        [existing_warnings]
-                        if existing_warnings is not None else []
-                    )
-                existing_warnings.append(
+                append_kernel_warnings(
                     f"VAPOR_PRESSURE returned status={kernel_status!r}; "
                     f"falling back to backend vapor pressures under "
                     f"allow_fallback_vapor=True."
                 )
-                diagnostic['kernel_vapor_pressure_warnings'] = existing_warnings
                 if backend_sources:
                     result.vapor_pressures_source = dict(backend_sources)
                 diagnostic['vapor_pressures_source'] = dict(
