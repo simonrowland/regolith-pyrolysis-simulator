@@ -6822,11 +6822,14 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Sossi 2020 adds 22 isotope_delta rows under the field shared with the
     # migrator's Quantity.ISOTOPE_DELTA source map. The census falls back to
     # QUANTITY_SOURCE_FIELDS for quantities without a unit-conversion case.
+    # Measured on the b146r2 merge regen: isotope_delta 0->22 and n_numeric
+    # 3114->3136. mismatches stays 0; the count moved because those rows
+    # became visible, not because a check was relaxed.
     assert census.get("isotope_delta") == 22
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 3114, (n_numeric, census, n_unavailable)
+    assert n_numeric == 3136, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
