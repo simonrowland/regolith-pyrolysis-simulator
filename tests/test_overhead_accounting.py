@@ -1475,6 +1475,33 @@ def test_overhead_total_pressure_covers_additive_partial_floors():
     assert gas.pressure_mbar + 1e-12 >= partial_sum
 
 
+def test_controlled_o2_pressure_floor_values_match_in_both_headspace_modes():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    melt = MeltState(
+        temperature_C=1500.0,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+        pO2_mbar=1.0,
+        p_total_mbar=10.0,
+        background_gas_species="N2",
+        background_gas_mole_fraction=0.8,
+    )
+
+    for finite_headspace in (False, True):
+        config = {"enabled": finite_headspace}
+        if finite_headspace:
+            config["volume_m3"] = 1.0
+        gas = OverheadGasModel(config).update(
+            EvaporationFlux(),
+            melt,
+            CondensationTrain.create_default(),
+        )
+
+        assert gas.pressure_mbar == pytest.approx(10.0)
+        assert gas.composition == pytest.approx({"O2": 1.0, "N2": 7.2})
+
+
 def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
     from simulator.state import (
         CondensationTrain,
