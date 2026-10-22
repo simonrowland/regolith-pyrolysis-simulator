@@ -2483,6 +2483,102 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
         assert parse_species_formula(row["formula"]) == expected
 
 
+def test_species_formula_parser_accepts_published_typography() -> None:
+    assert parse_species_formula("$Ta_{2}C$") == (("C", 1.0), ("Ta", 2.0))
+    assert parse_species_formula("V₂S₃") == (("S", 3.0), ("V", 2.0))
+    assert parse_species_formula(
+        r"$\text{HCl}(g)$", species=Species("HCl", Phase.G)
+    ) == (("Cl", 1.0), ("H", 1.0))
+
+
+def test_species_formula_parser_accepts_nested_groups() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("(NH4)2SO4") == (
+        ("H", 8.0),
+        ("N", 2.0),
+        ("O", 4.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("Fe(OH)") == (
+        ("Fe", 1.0),
+        ("H", 1.0),
+        ("O", 1.0),
+    )
+
+
+def test_species_formula_parser_accepts_hydrate_segments() -> None:
+    assert parse_species_formula("CoSO4·6H2O") == (
+        ("Co", 1.0),
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("CaSO4·1/2H2O") == (
+        ("Ca", 1.0),
+        ("H", 1.0),
+        ("O", 4.5),
+        ("S", 1.0),
+    )
+    assert parse_species_formula("H2SO4·6.5H2O") == (
+        ("H", 15.0),
+        ("O", 10.5),
+        ("S", 1.0),
+    )
+
+
+def test_species_formula_parser_requires_phase_axis_for_suffix() -> None:
+    assert parse_species_formula("$As(g)$") is None
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.G)) == (
+        ("As", 1.0),
+    )
+    assert parse_species_formula("$As(g)$", species=Species("As", Phase.CR)) is None
+
+
+def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
+    assert parse_species_formula("Fe(α)") is None
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(alpha)", species=Species("Fe", Phase.CR, State.of(Polymorph.ALPHA))
+    ) == (("Fe", 1.0),)
+    assert parse_species_formula(
+        "Fe(α)", species=Species("Fe", Phase.CR, State.of(Polymorph.BETA))
+    ) is None
+    assert parse_species_formula(
+        "SiO2(quartz)",
+        species=Species("SiO2", Phase.CR, State.of(Polymorph.QUARTZ)),
+    ) == (("O", 2.0), ("Si", 1.0))
+
+
+def test_species_formula_parser_requires_charge_axis_for_charge_notation() -> None:
+    assert parse_species_formula("$Ba^{++}(aq)$") is None
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=2)
+    ) == (("Ba", 1.0),)
+    assert parse_species_formula(
+        "$Ba^{++}(aq)$", species=Species("Ba", Phase.AQ, charge=0)
+    ) is None
+
+
+def test_species_formula_parser_keeps_deuterium_distinct() -> None:
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula(
+        "$AsD_3(g)$", species=Species("AsD3", Phase.G)
+    ) == (("As", 1.0), ("D", 3.0))
+
+
+def test_species_formula_parser_refuses_names_and_variable_compositions() -> None:
+    assert parse_species_formula("quartz") is None
+    assert parse_species_formula("gibbsite") is None
+    assert parse_species_formula("Fe1-xO") is None
+    assert parse_species_formula("NH.C1") is None
+
+
 def test_compile_mutates_each_conjunct_off() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
