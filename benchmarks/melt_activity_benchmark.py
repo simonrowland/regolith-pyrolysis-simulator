@@ -210,9 +210,9 @@ def _wt_to_mol(values: Mapping[str, Any]) -> dict[str, float]:
 
 
 def _oxide_mole_fractions(values: Mapping[str, Any]) -> dict[str, float]:
-    mol = _wt_to_mol(values)
-    total = sum(mol.values())
-    return {key: value / total for key, value in mol.items()} if total else {}
+    from simulator.accounting.formulas import project_oxide_composition
+
+    return project_oxide_composition(_positive_finite(values), source_basis="wt_pct")
 
 
 def _oxide_cations_per_formula(parent_oxide: str) -> float:
@@ -595,8 +595,10 @@ class InternalAnalyticalEngine:
             if raw_status in POINT_STATUSES
             else "refused"
         )
-        diagnostics = dict(result.diagnostics or {})
-        provenance = dict(diagnostics.get("activity_provenance", {}) or {})
+        diagnostics = dict(sim._last_vapor_pressure_diagnostic or {})
+        provenance = dict(
+            diagnostics.get("vapor_pressure_numerator_provenance", {}) or {}
+        )
         activities: dict[str, float] = {}
         gammas: dict[str, float] = {}
         parent_mole_fractions = _oxide_mole_fractions(composition_wt_pct)

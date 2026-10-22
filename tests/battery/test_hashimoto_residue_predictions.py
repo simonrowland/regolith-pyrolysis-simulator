@@ -23,14 +23,7 @@ STORE = ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
 PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
 
-
-@pytest.fixture(autouse=True)
-def _close_openimcc_worker_between_tests():
-    from simulator.battery.residue import _close_openimcc_evaluation_worker
-
-    _close_openimcc_evaluation_worker()
-    yield
-    _close_openimcc_evaluation_worker()
+pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
 
 
 def _hanging_openimcc_engine(**_kwargs):
@@ -274,6 +267,37 @@ def _source_data():
         measured_rows,
         geometry_record["values"]["starting_preform_mm"],
     )
+
+
+def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
+    pytest.importorskip("openimcc")
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    predictions = _predict_hashimoto_residue_cohort(
+        (experiments[0],),
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="pre-mass-loss-pin",
+        engine="openimcc",
+        _allow_partial_cohort_for_test=True,
+    )
+    primary = next(
+        row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
+    )
+
+    assert primary.experiment_id == "hashimoto-1983-run-17c3-2"
+    assert primary.primary_geometry_policy_id == "sphere_shrinking"
+    assert {
+        oxide: value.hex()
+        for oxide, value in primary.primary_oxide_wt_pct.items()
+    } == {
+        "SiO2": "0x1.5f0cdac992197p+5",
+        "Al2O3": "0x1.1b3cb0566fbffp+2",
+        "FeO": "0x1.10ec3b5604051p+4",
+        "MgO": "0x1.f179bb173dc7fp+4",
+        "CaO": "0x1.c5893f4ff0809p+1",
+    }
 
 
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(

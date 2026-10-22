@@ -5322,6 +5322,9 @@ def test_physics_policy_version_is_excluded_from_eval_cache_key(
         changed_version
     )
 
+    # PHYSICS_GATE_VERSION is a label. Green excludes it from the eval cache
+    # key; corpus_version is the cache lever. A version-string edit must not
+    # change physics_constraints_digest.
     assert current_digest == changed_digest
     assert current_cache_key == changed_cache_key
     assert current_recipe_id == changed_recipe_id
@@ -5558,28 +5561,75 @@ def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:
 
 
 def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) -> None:
-    with pytest.raises(study.StudyNoFeasibleError, match="stale_profile"):
-        study.run(
-            _stale_melt_target_profile(),
-            FEEDSTOCK,
-            "random",
-            "internal-analytical",
-            1,
-            1,
-            tmp_path,
-            seed=7,
-        )
+    result = study.run(
+        _stale_melt_target_profile(),
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        1,
+        tmp_path,
+        seed=7,
+    )
 
     pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
     provenance = _read_provenance(tmp_path)
+    leaderboard = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
 
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
     assert pareto_payload["failure_counts"] == {"stale_profile": 1}
     assert provenance[0]["status"] == "stale_profile"
     assert provenance[0]["failure_category"] == "stale_profile"
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
     assert "delivered_stream_purity" in provenance[0]["notes"][0]
     assert "residual_rump_at_stop" in provenance[0]["notes"][0]
     assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
     assert not (tmp_path / "winner.recipe.yaml").exists()
+
+
+def test_cli_stale_profile_file_runs_as_ranked_unavailable_candidate(tmp_path) -> None:
+    profile_path = tmp_path / "stale-melt-profile.yaml"
+    profile_path.write_text(
+        yaml.safe_dump(_stale_melt_target_profile()),
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "stale-profile-cli"
+
+    exit_code = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            str(profile_path),
+            "--strategy",
+            "random",
+            "--fidelity",
+            "internal-analytical",
+            "--budget",
+            "1",
+            "--out",
+            str(out_dir),
+            "--seed",
+            "7",
+        ]
+    )
+
+    assert exit_code == 0
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard = list(csv.DictReader((out_dir / "leaderboard.csv").open()))
+    provenance = _read_provenance(out_dir)
+
+    assert status["status"] == "completed-no-feasible-winner"
+    assert status["success"] is True
+    assert pareto["failure_counts"] == {"stale_profile": 1}
+    assert len(leaderboard) == 1
+    assert leaderboard[0]["rank"] == "1"
+    assert leaderboard[0]["composition_target:stale-profile-target"] == ""
+    assert provenance[0]["failure_category"] == "stale_profile"
+    assert "FORCE_PROFILES=1" in provenance[0]["notes"][0]
 
 
 def test_all_out_of_domain_completes_no_feasible_and_logs_count(tmp_path) -> None:

@@ -79,6 +79,7 @@ from simulator.battery.migrate import (
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
+    QUANTITY_SOURCE_FIELDS,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -6584,6 +6585,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
                 return amount * _TORR
             return None
         return None
+    try:
+        quantity = Quantity(q_token)
+    except ValueError:
+        return None
+    for field in QUANTITY_SOURCE_FIELDS.get(quantity, ()):
+        if field in item:
+            return _num(item.get(field))
     return None
 
 
@@ -6800,6 +6808,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "sato-1976-lunar-fo2-apollo-17"
     ]
     assert not mismatches, mismatches[:20]
+
+
     # Re-pinned for the reviewed Holzheid 1997 correction: its 33 Table 3 gamma cells
     # now migrate as model_derived numeric activity_coefficient series (author
     # calculations, not measurements). Per-source delta: holzheid-1997 0->33;
@@ -6900,7 +6910,24 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Tsuchiyama (18 areal mass-loss cells). Their 132 cells have zero mismatches;
     # the merged numeric-series count moves 2071->2203 because the data became
     # visible, not because a check was relaxed.
-    assert n_numeric == 2203, (n_numeric, census, n_unavailable)
+    # Sossi 2020 adds 22 isotope_delta rows under the field shared with the
+    # migrator's Quantity.ISOTOPE_DELTA source map.
+    assert census.get("isotope_delta") == 22
+    assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
+        "isotope_delta": 22
+    }
+    assert n_numeric == 2225, (n_numeric, census, n_unavailable)
+
+
+def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
+    fields = QUANTITY_SOURCE_FIELDS[Quantity.ISOTOPE_DELTA]
+    assert fields == ("isotope_delta_isotope_delta",)
+    item = {fields[0]: "2.15"}
+    selected = select_declared_source(Quantity.ISOTOPE_DELTA, "per mil", item)
+    assert selected.amount is not None
+    assert _census_expected_point(
+        item, Quantity.ISOTOPE_DELTA.value, "per mil"
+    ) == selected.amount
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import re
 import sqlite3
 from collections.abc import Mapping, Sequence
@@ -22,6 +21,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
     melt_regime,
 )
+from simulator.scalar_boundary import finite_float
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -115,17 +115,9 @@ def _reason_tokens(value: Any) -> set[str]:
     return tokens
 
 
-def _finite_float(value: Any) -> float | None:
-    try:
-        result = float(value)
-    except (TypeError, ValueError):
-        return None
-    return result if math.isfinite(result) else None
-
-
 def _recorded_number(row: Mapping[str, Any], *keys: str) -> float | None:
     for key in keys:
-        value = _finite_float(row.get(key))
+        value = finite_float(row.get(key))
         if value is not None:
             return value
     return None
@@ -143,7 +135,7 @@ def _reported_liquidus(row: Mapping[str, Any]) -> float | None:
         raw_payload,
         flags=re.IGNORECASE,
     )
-    return _finite_float(match.group(1)) if match else None
+    return finite_float(match.group(1)) if match else None
 
 
 def classify_non_eval(row: Mapping[str, Any]) -> str:
@@ -291,7 +283,7 @@ def _nearest_feedstock(
     values = {
         str(species): float(value)
         for species, value in composition.items()
-        if _finite_float(value) is not None and float(value) >= 0.0
+        if finite_float(value) is not None and float(value) >= 0.0
     }
     total = sum(values.values())
     if total <= 0.0:

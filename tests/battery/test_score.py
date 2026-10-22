@@ -5791,6 +5791,382 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+_SAMPLE_PHASE_NOT_MELT_OBSERVABLE = "sample_phase_not_melt_activity_observable"
+
+
+def _oxide_activity_at_sample_phase(
+    phase: Phase | State,
+    *,
+    quantity: Quantity = Quantity.ACTIVITY,
+    observation_id: str = "sample-phase-activity",
+) -> tuple[object, Observation]:
+    """Al2O3 activity in a CaO–Al2O3 melt, with the sample phase replaced.
+
+    The reference endmember stays liquid, so a phase gate is the only thing
+    that can keep a crystalline sample off the melt engines.
+    """
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="Al2O3",
+        component_basis="Al2O3",
+        composition=composition,
+    )
+    polymorph = (
+        State.unknown("source does not state polymorph")
+        if phase is Phase.CR
+        else State.not_applicable("not crystal")
+    )
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species("Al2O3", phase, polymorph=polymorph),
+    )
+    reference = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="sample-phase-activity",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_activity(reference, experiment):
+    calls: list[str] = []
+
+    def predict(engine, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        return _predict(Decimal("0.4"), obs.identity)
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT),
+)
+def test_crystalline_sample_activity_is_refused_not_a_melt_miss(
+    quantity: Quantity,
+) -> None:
+    """A crystalline solid solution is not an observable of a melt engine."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        quantity=quantity,
+        observation_id=f"spinel-ss-{quantity.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == quantity.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    if quantity is Quantity.ACTIVITY:
+        direct = predict_with_engine(Engine.INTERNAL_ANALYTICAL, reference)
+        assert direct.value is None
+        assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+        assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+        assert direct.execution.state is ExecutionState.NOT_PROBED
+        assert direct.execution.call_evidence is None
+
+
+def test_crystalline_malformed_composition_is_invalid_source() -> None:
+    """A malformed activity print stays INVALID_SOURCE on a crystal sample.
+
+    ``run_validity_gates`` does not read that composition. The activity
+    contract does, and its source refusal wins over the phase refusal.
+    The predictor is still not called.
+    """
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        Phase.CR,
+        observation_id="crystal-malformed-composition",
+    )
+    reference = replace(
+        reference,
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "composition": Located(State.unknown("malformed declared amount")),
+        },
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == []
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.INVALID_SOURCE
+    assert residual.refusal.detail["reason"] == RefusalReason.INVALID_SOURCE.value
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    (gap,) = residual.refusal.detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
+    assert gap["missing"] == [
+        f"observation[{reference.observation_id}].point_conditions.composition"
+    ]
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L),
+)
+def test_melt_like_sample_activity_stays_on_the_melt_activity_rail(
+    phase: Phase,
+) -> None:
+    """Liquid, glass, and supercooled liquid stay comparable melt activities."""
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        phase,
+        observation_id=f"melt-like-{phase.value}",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+
+
+def test_unknown_sample_phase_activity_stays_on_the_melt_activity_rail() -> None:
+    """An untyped phase is not a crystalline-sample statement.
+
+    Identity comparison already refuses an unknown species phase, so the
+    row is not a numeric melt miss. The phase gate must leave that refusal
+    in place rather than reclassifying it.
+    """
+
+    experiment, reference = _oxide_activity_at_sample_phase(
+        State.unknown("source does not state phase"),
+        observation_id="unknown-sample-phase-activity",
+    )
+    residual, calls = _score_sample_phase_activity(reference, experiment)
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.numeric is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "species.phase" in residual.refusal.detail["fields"]
+    assert residual.refusal.detail.get("reason") != _SAMPLE_PHASE_NOT_MELT_OBSERVABLE
+    assert _residual_engine_observable(residual_to_plain(residual)) is True
+
+
+_SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID = "sample_phase_crystalline_vs_liquid_engine"
+
+
+def _vapour_over_sample_form(form: str):
+    """Mg partial pressure over a sample whose form token is ``form``.
+
+    Tabulation keeps the effusion gate from firing, so a melt sample and
+    a non-liquid engine reach the stub predictor. The gas species stays
+    Phase.G; the sample phase is only the experiment form.
+    """
+
+    base = F.tabulation_experiment()
+    experiment = replace(
+        base, sample=replace(base.sample, form=F.located(form))
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("MgO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.psat_identity("Mg", T_K=Decimal("2100")),
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(composition),
+        fO2_Pa=State.of(Decimal("1e-3")),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reservoir=State.unknown("source condensed reservoir not grounded"),
+    )
+    reference = F.observation(
+        "spinel-vapour-mg",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="spinel-vapour",
+    )
+    return experiment, reference
+
+
+def _score_sample_phase_vapour(reference, experiment, engine):
+    calls: list[str] = []
+
+    def predict(engine_arg, obs, **_kwargs):
+        calls.append(obs.observation_id)
+        produced = _predict(Decimal("2e-5"), obs.identity)
+        return replace(produced, engine=engine_arg)
+
+    residual, _candidate = compile_residual(
+        reference,
+        engine,
+        context=_context(F.work(), experiment, reference),
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+    return residual, calls
+
+
+def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> None:
+    """Vapour over a typed crystal does not test a liquid-engine score."""
+
+    from simulator.battery.migrate import phase_for_sample_form
+
+    assert phase_for_sample_form("condensed_solid") is Phase.CR
+    assert phase_for_sample_form("Condensed_Solid") is Phase.CR
+    assert (
+        phase_for_sample_form(
+            "Sintered stoichiometric spinel sample and spinel solid-solution compositions"
+        )
+        is None
+    )
+    assert phase_for_sample_form("oxide melt samples") is None
+    assert phase_for_sample_form(None) is None
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == []
+    assert residual.rail is Rail.VAPOUR
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert residual.refusal.detail["sample_phase"] == Phase.CR.value
+    assert residual.refusal.detail["quantity"] == Quantity.P_PARTIAL.value
+    assert _residual_engine_observable(residual_to_plain(residual)) is False
+
+    direct = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+    assert direct.value is None
+    assert direct.refusal_reason is RefusalReason.UNSUPPORTED
+    assert direct.refusal_detail["reason"] == _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    assert direct.execution.state is ExecutionState.NOT_PROBED
+    assert direct.execution.call_evidence is None
+
+
+@pytest.mark.parametrize("engine", sorted(SINGLE_LIQUID_ENGINES, key=lambda e: e.value))
+@pytest.mark.parametrize("compound", ("MgAl2O4", "BaO"))
+def test_crystalline_vapour_missing_fusion_detail_comes_from_reservoir(
+    engine: Engine, compound: str
+) -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reservoir=State.of(Species(compound, Phase.CR)),
+        ),
+    )
+    residual, calls = _score_sample_phase_vapour(reference, experiment, engine)
+
+    assert calls == []
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail == {
+        "reason": _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID,
+        "sample_phase": "cr",
+        "quantity": "p_partial",
+        "fusion_data": {
+            "status": "not_available_to_simulator",
+            "compound": compound,
+        },
+    }
+    direct = predict_with_engine(engine, reference, experiment=experiment)
+    assert direct.refusal_detail == residual.refusal.detail
+    assert direct.execution.state is ExecutionState.NOT_PROBED
+
+
+def test_crystalline_vapour_with_existing_fusion_pair_is_unaffected() -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            reservoir=State.of(Species("MgO", Phase.CR)),
+        ),
+    )
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.OPENIMCC
+    )
+
+    assert calls == []
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail == {
+        "reason": _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID,
+        "sample_phase": "cr",
+        "quantity": "p_partial",
+    }
+
+
+@pytest.mark.parametrize("form", ("condensed_liquid", "oxide melt samples"))
+def test_melt_or_untyped_sample_vapour_stays_scored(form: str) -> None:
+    """A melt token and untyped prose stay on the liquid-engine path."""
+
+    experiment, reference = _vapour_over_sample_form(form)
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
+def test_non_liquid_engine_scores_vapour_over_a_crystalline_sample() -> None:
+    """A non-liquid engine is not the liquid-engine domain refusal."""
+
+    experiment, reference = _vapour_over_sample_form("condensed_solid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.MAGEMIN
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is Rail.VAPOUR
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.refusal is None or (
+        residual.refusal.detail.get("reason") != _SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID
+    )
+
+
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
         ENGINE_CHANNELS,
@@ -12302,6 +12678,69 @@ def _cell_material_score_case(material, inference):
         identity=getattr(identity, "identity", identity),
     )
     return reference, context, bench, prediction
+
+
+def test_unlinked_knudsen_row_keeps_closure_with_assumption_notice(monkeypatch) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    reference, context, bench, _ = _cell_material_score_case(CellMaterial.W, None)
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(
+                Composition(
+                    basis="printed_mole_fraction",
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                    components=(("CaO", Decimal("0.6")), ("SiO2", Decimal("0.4"))),
+                )
+            ),
+        ),
+    )
+    requests = []
+    request_type = battery.Po2Request
+
+    def capture_request(**kwargs):
+        request = request_type(**kwargs)
+        requests.append(request)
+        return request
+
+    monkeypatch.setattr(battery, "Po2Request", capture_request)
+    monkeypatch.setattr(
+        battery,
+        "open_battery_engine",
+        lambda name: battery.EngineHandle(
+            name=name,
+            backend=None,
+            available=False,
+            unavailable_reason="test unavailable",
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        reference,
+        experiment=context.experiments[reference.experiment_id],
+        bench=bench,
+    )
+    closure_requests = [
+        request for request in requests
+        if request.mode == battery.PO2_OXYGEN_BALANCE_EFFUSION
+    ]
+    assert len(closure_requests) == 1
+    assert closure_requests[0].cell_material == "W"
+    assert closure_requests[0].po2_bar is None
+    assert not any(request.mode == battery.PO2_COMMANDED for request in requests)
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == (
+            "model assumption: vapour-only zero-storage closure; "
+            "source_oxygen_fallback=lineage_untyped"
+        )
+        for notice in prediction.notices
+    )
 
 
 def _migrated_stolyarova_cell_context(tmp_path: Path) -> ScoreContext:

@@ -168,6 +168,22 @@ def test_resolver_clamps_requested_cap_to_material_max():
     assert resolve_furnace_max_T_C("zirconia_ysz", 1800) == 1800
 
 
+def test_campaign_manager_applies_resolved_material_cap_before_run():
+    from simulator.campaigns import CampaignManager
+
+    material_id = "dense_alumina_continuous"
+    requested_cap_C = 2200.0
+    manager = CampaignManager({
+        "furnace_material": material_id,
+        "furnace_max_T_C": requested_cap_C,
+        "campaigns": {},
+    })
+
+    assert manager.furnace_max_T_C == pytest.approx(
+        resolve_furnace_max_T_C(material_id, requested_cap_C)
+    )
+
+
 def test_resolver_distinguishes_service_rating_from_applied_ceiling():
     caps = resolve_furnace_temperature_caps("zirconia_ysz", 1800)
 

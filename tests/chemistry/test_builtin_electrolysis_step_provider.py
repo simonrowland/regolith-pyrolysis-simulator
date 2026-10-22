@@ -60,6 +60,7 @@ from simulator.electrolysis import (
     DECOMP_VOLTAGES,
     ELECTRONS_PER_OXIDE,
     ElectrolysisModel,
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_CERTIFICATION_DENYLIST_REASON,
     MRE_CERTIFICATION_EVIDENCE_CLASS,
     MRE_FIXED_REDUCIBLE_OXIDES,
@@ -67,6 +68,8 @@ from simulator.electrolysis import (
     MRE_OPTIONAL_BANNER,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
+    MREElectrolysisInvalidInput,
+    MREElectrolysisRefusal,
     current_efficiency,
     min_decomposition_voltage,
 )
@@ -147,6 +150,52 @@ def _simulator_ledger_fingerprint(sim) -> tuple:
         tuple(sorted(sim.atom_ledger.mol_by_species().items())),
         tuple(sorted(sim.melt.composition_kg.items())),
         tuple(sorted(sim.product_ledger().items())),
+    )
+
+
+def _dispatch_single_control_value(
+    *,
+    control_name: str,
+    value: float,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_overrides: dict[str, float] | None = None,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+    }
+    if control_overrides:
+        controls.update(control_overrides)
+    controls[control_name] = value
+    return BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
     )
 
 
@@ -479,6 +528,413 @@ def test_provider_rejects_wrong_intent(
     result = provider.dispatch(request)
     assert result.status == "unsupported"
     assert result.transition is None
+
+
+@pytest.mark.parametrize(
+    "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
+)
+@pytest.mark.parametrize("value", [1e-308, 1e308])
+def test_provider_refuses_extreme_finite_electrolysis_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 10.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    controls = {
+        "voltage_V": 5.0,
+        "current_A": 100.0,
+        "dt_hr": 1.0,
+        "pO2_bar": 1.0,
+        "allowed_oxides": ["SiO2"],
+    }
+    controls[control_name] = value
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs=controls,
+        )
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert (
+        diagnostic["reason_refused"]
+        == "electrolysis_control_out_of_domain"
+    )
+    invalid_controls = diagnostic["invalid_controls"]
+    assert control_name in invalid_controls
+    bound_direction = "below minimum" if value < 1.0 else "above maximum"
+    assert bound_direction in invalid_controls[control_name]
+    expected_units = {
+        "dt_hr": "hr",
+        "current_A": "A",
+        "voltage_V": "V",
+        "pO2_bar": "bar",
+    }
+    assert expected_units[control_name] in invalid_controls[control_name]
+    assert diagnostic.get("energy_kWh", 0.0) == 0.0
+
+
+def test_provider_predicts_and_flags_finite_low_po2_outside_certified_band(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    result = _dispatch_single_control_value(
+        control_name="pO2_bar",
+        value=1e-12,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "ok", result.diagnostic
+    assert result.transition is not None
+    notices = result.diagnostic["notices"]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["control"] == "pO2_bar"
+    assert notice["reason"] == "electrolysis_control_out_of_domain"
+    assert notice["control_reason"] == "below minimum 1e-09 bar"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"pO2_bar": (1e-9, 1.0)}
+
+
+@pytest.mark.parametrize(
+    ("control_name", "value", "certified_band", "control_reason"),
+    [
+        ("dt_hr", 1.01, {"dt_hr": (0.0, 1.0)}, "above maximum 1 hr"),
+        (
+            "current_A", 3001.0, {"current_A": (0.0, 3000.0)},
+            "above maximum 3000 A",
+        ),
+        (
+            "voltage_V", 5.1, {"voltage_V": (0.0, 5.0)},
+            "above maximum 5 V",
+        ),
+        (
+            "pO2_bar", 1.01, {"pO2_bar": (1e-9, 1.0)},
+            "above maximum 1 bar",
+        ),
+        ("dt_hr", 1e30, {"dt_hr": (0.0, 1.0)}, "above maximum 1 hr"),
+        (
+            "current_A", 1e30, {"current_A": (0.0, 3000.0)},
+            "above maximum 3000 A",
+        ),
+        (
+            "voltage_V", 1e30, {"voltage_V": (0.0, 5.0)},
+            "above maximum 5 V",
+        ),
+        (
+            "pO2_bar", 1e30, {"pO2_bar": (1e-9, 1.0)},
+            "above maximum 1 bar",
+        ),
+    ],
+    ids=[
+        "duration", "current", "voltage", "oxygen-pressure",
+        "large-duration", "large-current", "large-voltage",
+        "large-oxygen-pressure",
+    ],
+)
+def test_provider_predicts_and_flags_finite_controls_outside_certified_band(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+    certified_band,
+    control_reason,
+):
+    result = _dispatch_single_control_value(
+        control_name=control_name,
+        value=value,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "ok", result.diagnostic
+    notices = result.diagnostic["notices"]
+    assert len(notices) == 1
+    assert notices[0] == {
+        "kind": "out_of_certified_band",
+        "control": control_name,
+        "reason": "electrolysis_control_out_of_domain",
+        "control_reason": control_reason,
+        "authority_level": "extrapolated",
+        "certified_band": certified_band,
+    }
+
+
+@pytest.mark.parametrize(
+    ("control_name", "value", "certified_band", "control_reason"),
+    [
+        (
+            "current_A", 3001.0, {"current_A": (0.0, 3000.0)},
+            "above maximum 3000 A",
+        ),
+        (
+            "voltage_V", 5.1, {"voltage_V": (0.0, 5.0)},
+            "above maximum 5 V",
+        ),
+        (
+            "pO2_bar", 1.01, {"pO2_bar": (1e-9, 1.0)},
+            "above maximum 1 bar",
+        ),
+        (
+            "current_A", 1e30, {"current_A": (0.0, 3000.0)},
+            "above maximum 3000 A",
+        ),
+        (
+            "voltage_V", 1e30, {"voltage_V": (0.0, 5.0)},
+            "above maximum 5 V",
+        ),
+        (
+            "pO2_bar", 1e30, {"pO2_bar": (1e-9, 1.0)},
+            "above maximum 1 bar",
+        ),
+    ],
+    ids=[
+        "current", "voltage", "oxygen-pressure",
+        "large-current", "large-voltage", "large-oxygen-pressure",
+    ],
+)
+def test_legacy_step_hour_predicts_and_flags_finite_controls_outside_certified_band(
+    control_name,
+    value,
+    certified_band,
+    control_reason,
+):
+    controls = {"voltage_V": 5.0, "current_A": 100.0, "pO2_bar": 1.0}
+    controls[control_name] = value
+    result = ElectrolysisModel().step_hour(
+        MeltState(composition_kg={}),
+        voltage_V=controls["voltage_V"],
+        current_A=controls["current_A"],
+        T_C=1600.0,
+        pO2_bar=controls["pO2_bar"],
+    )
+
+    notices = result["notices"]
+    assert len(notices) == 1
+    assert notices[0] == {
+        "kind": "out_of_certified_band",
+        "control": control_name,
+        "reason": "electrolysis_control_out_of_domain",
+        "control_reason": control_reason,
+        "authority_level": "extrapolated",
+        "certified_band": certified_band,
+    }
+
+
+def test_legacy_step_hour_refuses_binary64_overflow_before_empty_melt_energy():
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        ElectrolysisModel().step_hour(
+            MeltState(composition_kg={}),
+            voltage_V=1e308,
+            current_A=100.0,
+            T_C=1600.0,
+        )
+
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert refusal.value.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    assert "voltage_V" in refusal.value.diagnostic["invalid_controls"]
+    assert "binary64" in refusal.value.diagnostic["invalid_controls"]["voltage_V"]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "invalid_control"),
+    [
+        (
+            {"voltage_V": 3.0, "current_A": -100.0, "T_C": 1600.0},
+            "current_A",
+        ),
+        (
+            {"voltage_V": -3.0, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {
+                "voltage_V": 3.0,
+                "current_A": 100.0,
+                "T_C": 1600.0,
+                "pO2_bar": 0.0,
+            },
+            "pO2_bar",
+        ),
+        (
+            {"voltage_V": math.nan, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {"voltage_V": 3.0, "current_A": math.inf, "T_C": 1600.0},
+            "current_A",
+        ),
+        (
+            {
+                "voltage_V": 3.0,
+                "current_A": 100.0,
+                "T_C": 1600.0,
+                "pO2_bar": math.nan,
+            },
+            "pO2_bar",
+        ),
+        (
+            {"voltage_V": None, "current_A": 100.0, "T_C": 1600.0},
+            "voltage_V",
+        ),
+        (
+            {"voltage_V": 3.0, "current_A": None, "T_C": 1600.0},
+            "current_A",
+        ),
+    ],
+    ids=[
+        "negative-current", "negative-voltage", "zero-pO2",
+        "nan-voltage", "infinite-current", "nan-pO2",
+        "missing-voltage", "missing-current",
+    ],
+)
+def test_legacy_step_hour_invalid_controls_raise_typed_value_error(
+    kwargs,
+    invalid_control,
+):
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        ElectrolysisModel().step_hour(
+            MeltState(composition_kg={}),
+            **kwargs,
+        )
+
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert invalid_control in refusal.value.diagnostic["invalid_controls"]
+
+
+def test_provider_refuses_nonfinite_energy_intermediate(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    result = _dispatch_single_control_value(
+        control_name="voltage_V",
+        value=5.992310449541053e307,
+        control_overrides={"current_A": 3.0, "dt_hr": 0.01},
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    )
+    assert "voltage_V" in result.diagnostic["invalid_controls"]
+    assert "binary64" in result.diagnostic["invalid_controls"]["voltage_V"]
+
+
+@pytest.mark.parametrize(
+    "control_name", ["dt_hr", "current_A", "voltage_V", "pO2_bar"]
+)
+@pytest.mark.parametrize(
+    "value", [float("nan"), float("inf"), float("-inf")],
+    ids=["nan", "positive-infinity", "negative-infinity"],
+)
+def test_provider_refuses_nonfinite_electrolysis_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    value,
+):
+    result = _dispatch_single_control_value(
+        control_name=control_name,
+        value=value,
+        vapor_pressure_data=vapor_pressure_data,
+        feedstocks_data=feedstocks_data,
+        setpoints_data=setpoints_data,
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    assert (
+        result.diagnostic["reason_refused"] == "invalid_electrolysis_control"
+    )
+    assert control_name in result.diagnostic["invalid_controls"]
+
+
+def test_provider_refuses_nonfinite_faraday_extent(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": 10.0},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    monkeypatch.setattr("simulator.state.FARADAY", 1e-308)
+    monkeypatch.setattr(
+        BuiltinElectrolysisStepProvider,
+        "_nernst_voltage",
+        staticmethod(lambda *args, **kwargs: 0.0),
+    )
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=1575.0,
+            pressure_bar=1.0,
+            control_inputs={
+                "voltage_V": 5.0,
+                "current_A": 100.0,
+                "dt_hr": 1.0,
+                "pO2_bar": 1.0,
+                "allowed_oxides": ["FeO"],
+            },
+        )
+    )
+
+    assert result.status == "refused", result.diagnostic
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    assert (
+        diagnostic["reason_refused"]
+        == "electrolysis_control_out_of_domain"
+    )
+    assert diagnostic["energy_kWh"] == 0.0
 
 
 def test_empty_melt_result_carries_redox_diagnostics(

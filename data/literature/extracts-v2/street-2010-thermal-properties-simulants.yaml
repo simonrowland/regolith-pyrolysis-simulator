@@ -68,10 +68,9 @@ observations:
       tag: not_applicable
       reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
-      mass_loss_percent, as_printed, quote, feedstock, T_conversion'
-    approximate: false
+    kind: point
+    point: '0.001'
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -83,9 +82,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: street-2010-thermal-properties-simulants::street_2010_anorthosite_water_mass_loss_0p1_pct
   source_id: street-2010-thermal-properties-simulants
   locator:
     published_page: 1
