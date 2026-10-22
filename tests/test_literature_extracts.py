@@ -600,20 +600,140 @@ def test_ni_2021_conditions_and_starting_composition_reach_identity() -> None:
     migrator.finalize()
     observations = list(migrator.result.observations.values())
 
-    assert len(observations) == 48
+    assert len(observations) == 53
     assert migrator.result.validation is not None
     assert not migrator.result.validation.hard_issues
+    unheated = [o for o in observations if not o.identity.temperature_K.is_value]
+    assert len(unheated) == 5
     for observation in observations:
-        assert observation.identity.temperature_K.is_value
-        if observation.identity.quantity.value != "isotope_delta":
+        if observation.identity.temperature_K.is_value:
+            assert observation.identity.temperature_K.value in {
+                Decimal("2023.15"), Decimal("2273.15"), Decimal("2423.15")
+            }
+        if observation.identity.temperature_K.is_value and observation.identity.quantity.value != "isotope_delta":
             assert observation.identity.composition.is_value
-            assert any(
-                component == "FeO" and amount > 0
-                for component, amount in observation.identity.composition.value.components
+            composition_components = observation.identity.composition.value.components
+            expected_iron_token = (
+                "FeOT"
+                if observation.identity.quantity.value == "residue_component_composition"
+                else "FeO"
             )
+            assert any(component == expected_iron_token and amount > 0 for component, amount in composition_components)
             assert observation.identity.total_pressure_Pa.is_value
             assert observation.identity.total_pressure_Pa.value == 101325
             assert observation.identity.fO2_Pa.is_unknown
+
+
+def test_ni_2021_review_findings_are_pinned() -> None:
+    source = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    doc = yaml.safe_load(source.read_text())
+    cu_rows = doc["species"]["Cu"]["observations"]
+    by_id = {row["observation_id"]: row for row in cu_rows}
+
+    heated_row = by_id["ni_2021_cu_1_12_cu_residue"]
+    assert heated_row["values"]["points"] == [
+        {
+            "residue_ppm": "517",
+            "T_C": "1750",
+            "locator": {
+                "page": 41,
+                "pdf_page_index": 40,
+                "table": "1",
+                "row": "Cu 1.12",
+                "column": "C_Cu",
+            },
+        }
+    ]
+    assert "element_ppm_by_mass" not in heated_row["values"]
+
+    isotope_rows = [row for row in cu_rows if row["values"].get("quantity") == "isotope_delta"]
+    assert len(isotope_rows) == 18
+    for row in isotope_rows:
+        assert row["values"]["reference_standard"] == "NIST SRM 976"
+        assert row["values"]["bracketing_standard"] == "ERM-AE633"
+        assert row["values"]["reference_correction_permil"] == "+0.01"
+        assert row["values"]["reference_standard_locator"]["page"] == 13
+
+    for observation_id, expected in (
+        ("ni_2021_et1cu_cu_concentration", "1185"),
+        ("ni_2021_cu_1_15_cu_concentration", "1129"),
+    ):
+        assert by_id[observation_id]["values"]["points"][0]["residue_ppm"] == expected
+    for observation_id, expected in (
+        ("ni_2021_et1cu_delta65cu", "3.46"),
+        ("ni_2021_cu_1_15_delta65cu", "3.71"),
+    ):
+        assert by_id[observation_id]["values"]["isotope_delta_isotope_delta"] == expected
+        assert by_id[observation_id]["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"
+
+    experiment = next(row for row in doc["experiments"] if row["experiment_id"] == "table1-cu_1_12")
+    assert experiment["bench_id"] == "laser-aerodynamic-levitation"
+    assert experiment["sample"]["mass_kg"]["state"]["value"]["point"] == "0.000020044"
+    assert experiment["sample"]["mass_kg"]["locator"]["row"] == "Cu 1.12"
+    assert experiment["pressure_environment"]["total_pressure_Pa"]["locator"]["page"] == 25
+    assert "1 atm = 101325 Pa" in experiment["pressure_environment"]["total_pressure_Pa"]["locator"]["note"]
+    assert experiment["pressure_environment"]["sweep_gas"]["locator"]["page"] == 10
+    assert doc["benches"][0]["apparatus_family"]["locator"]["page"] == 9
+    assert doc["benches"][0]["temperature_measurement"]["sensor"]["locator"]["page"] == 9
+    heated_mass_loss = doc["species"]["basaltic_glass"]["observations"][0]
+    assert heated_mass_loss["values"]["quench_locator"]["page"] == 10
+    assert doc["species"]["basaltic_glass"]["observations"][0]["point_conditions"]["composition"]["state"]["value"]["amount_basis"] == "mass_percent"
+
+    quoted_prior = by_id["ni_2021_et1cu_cu_prior_assay_quoted"]
+    assert quoted_prior["values"]["method_class"] == "quoted_attributed"
+    assert quoted_prior["values"]["attribution"] == "Ni and Zhang (2016)"
+    assert quoted_prior["values"]["points"][0]["residue_ppm"] == "1174"
+    assert quoted_prior["uncertainty"]["verbatim"] == "+/- 121 ppm"
+
+    audit = (EXTRACTS / "ni-2021-laser-levitation-evaporation-audit.md").read_text()
+    assert "PDF p. 14 states 3.17‰" in audit
+    assert "PDF p. 13 states 3.17‰" not in audit
+    assert "99.53" not in source.read_text()
+    assert "printed oxide total" not in source.read_text()
+
+
+def test_ni_2021_residue_and_unheated_measurements_migrate() -> None:
+    path = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    mass_loss = next(o for o in observations if o.observation_id.endswith("ni_2021_cu_1_12_bulk_mass_loss"))
+    assert mass_loss.value.point == Decimal("0.0111")
+    residue = next(o for o in observations if "ni_2021_cu_1_12_cu_residue::" in o.observation_id)
+    assert residue.identity.subtype.is_value
+    assert residue.identity.subtype.value == "element_ppm_by_mass"
+    assert residue.identity.sample_mass_kg.is_value
+    assert residue.identity.sample_mass_kg.value == Decimal("0.000020044")
+    assert residue.value.point == Decimal("517")
+    assert residue.identity.temperature_K.value == Decimal("2023.15")
+    assert any(notice.kind.value == "total_iron_reported_as_feo" for notice in residue.notices)
+
+    for fragment, expected in (
+        ("ni_2021_et1cu_cu_concentration::points:", Decimal("1185")),
+        ("ni_2021_cu_1_15_cu_concentration::points:", Decimal("1129")),
+    ):
+        point = next(o for o in observations if fragment in o.observation_id)
+        assert point.value.point == expected
+        assert point.identity.temperature_K.is_unknown
+        assert point.identity.subtype.value == "element_ppm_by_mass"
+        if "cu_1_15" in fragment:
+            assert point.identity.sample_mass_kg.value == Decimal("0.000019664")
+        else:
+            assert point.identity.sample_mass_kg.is_unknown
+
+    for fragment, expected in (
+        ("ni_2021_et1cu_delta65cu", Decimal("3.46")),
+        ("ni_2021_cu_1_15_delta65cu", Decimal("3.71")),
+    ):
+        point = next(o for o in observations if fragment in o.observation_id)
+        assert point.value.point == expected
+        assert point.identity.temperature_K.is_unknown
+
+    quoted = next(o for o in observations if "ni_2021_et1cu_cu_prior_assay_quoted::points:" in o.observation_id)
+    assert quoted.value.point == Decimal("1174")
+    assert quoted.evidence.class_.is_value
+    assert quoted.evidence.class_.value.value == "quoted_attributed"
+    assert quoted.uncertainty.verbatim["verbatim"] == "+/- 121 ppm"
 
 
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
