@@ -572,6 +572,22 @@ def test_cache_trace_payload_strips_full_trace_when_compact_profile_exists() -> 
                 "reduced_real_cache_state": "cached_exact",
             }
         ],
+        "trajectory": {
+            "schema_version": 1,
+            "status": "available",
+            "hours": [
+                {
+                    "hour": 1,
+                    "campaign": "C3",
+                    "T_C": 1320.0,
+                    "p_total_mbar": None,
+                    "pO2_mbar": None,
+                    "vapour_kg_h": {},
+                    "capture_kg_h": {},
+                    "wall_deposit_kg_h": {},
+                }
+            ],
+        },
     }
     assert "raw" not in payload
 

@@ -14729,7 +14729,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             elif self.melt.c5_enabled:
                 next_campaign = CampaignPhase.C5
             else:
-                complete = True
+                # Arm before start_campaign so configure_campaign copies the
+                # 82 h / 160 h clocks into the final C2A. Branch one does
+                # not end the batch.
+                self.campaign_mgr._arm_final_c2a(self.record)
+                next_campaign = CampaignPhase.C2A
 
         elif decision_type == DecisionType.TI_RETENTION:
             # Handled within C5 campaign logic

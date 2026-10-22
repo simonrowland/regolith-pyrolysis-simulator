@@ -15,7 +15,7 @@ import tempfile
 from typing import Any, TypeVar
 from urllib.parse import quote, urlsplit
 
-from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
+from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session, url_for
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
@@ -95,6 +95,18 @@ from simulator.optimize.reoptimize import (
 from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
+)
+from simulator.optimize.trajectory import (
+    TRAJECTORY_STATUS_AVAILABLE,
+    TrajectorySchemaError,
+    read_trajectory,
+)
+from web.optimizer_tradeoff import (
+    COMPARE_MAX,
+    COMPARE_MIN,
+    compare_model,
+    pareto_view,
+    trajectory_chart_model,
 )
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.recipe_io import (
@@ -3001,6 +3013,10 @@ def _optimizer_table_context() -> dict[str, Any]:
         'imported_entries': imported_studies(root),
         'filters': filters,
         'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
+        'local_runs': [
+            {'id': _optimizer_run_id(run_dir, root)}
+            for run_dir in run_dirs
+        ],
         **_optimizer_version_context(),
     }
 
@@ -3270,6 +3286,11 @@ def _result_detail_model(
         'target_thermal_windows': target_thermal_windows,
         'artifacts': _artifact_metadata(run_dir, root),
     }
+    result['trajectory'] = _trajectory_chart_for_row(
+        run_dir / OPTIMIZER_CACHE_NAME,
+        str(row['cache_key']),
+        series_id=_request_arg('series'),
+    )
     return result
 
 
@@ -4891,6 +4912,259 @@ def optimizer_job_detail(job_id: str):
     return render_template('optimizer_job.html', job=job)
 
 
+class _TrajectoryReaderStore:
+    """Read-only adapter the trajectory reader already knows how to open."""
+
+    def __init__(self, cache_path: Path) -> None:
+        self._cache_path = cache_path
+
+    def _connect(self) -> sqlite3.Connection:
+        return _connect_result_store(self._cache_path)
+
+
+def _read_stored_trajectory(
+    cache_path: Path,
+    cache_key: str,
+) -> tuple[dict[str, Any] | None, bool]:
+    try:
+        trajectory = read_trajectory(_TrajectoryReaderStore(cache_path), cache_key)
+    except TrajectorySchemaError:
+        return None, True
+    if not isinstance(trajectory, dict):
+        return None, False
+    return trajectory, False
+
+
+def _trajectory_chart_for_row(
+    cache_path: Path,
+    cache_key: str,
+    *,
+    series_id: str | None,
+) -> dict[str, Any]:
+    trajectory, unreadable = _read_stored_trajectory(cache_path, cache_key)
+    return trajectory_chart_model(
+        trajectory,
+        series_id=series_id,
+        unreadable=unreadable,
+    )
+
+
+def _read_pareto_document(run_dir: Path) -> tuple[str, dict[str, Any]]:
+    path = run_dir / 'pareto.json'
+    if not path.is_file():
+        return 'absent', {}
+    try:
+        payload = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return 'unreadable', {}
+    if not isinstance(payload, dict):
+        return 'unreadable', {}
+    return 'present', payload
+
+
+def _tradeoff_rows(run_dir: Path) -> list[dict[str, Any]]:
+    cache_path = run_dir / OPTIMIZER_CACHE_NAME
+    stored = _fetch_selector_rows(
+        cache_path,
+        feedstock_id=None,
+        profile_id=None,
+        fidelity=None,
+        columns=(
+            'cache_key',
+            'candidate_id',
+            'feasible',
+            'failure_category',
+            'objectives',
+            'feasibility_margins',
+        ),
+    )
+    rows = []
+    for row in stored:
+        cache_key = str(_row_value(row, 'cache_key') or '')
+        trajectory, unreadable = _read_stored_trajectory(cache_path, cache_key)
+        if unreadable:
+            trajectory_status = 'unreadable'
+        elif isinstance(trajectory, Mapping):
+            trajectory_status = str(
+                trajectory.get('status') or 'trajectory unavailable'
+            )
+        else:
+            trajectory_status = 'trajectory unavailable'
+        objectives = _json_value(_row_value(row, 'objectives'), [])
+        if not isinstance(objectives, list):
+            objectives = []
+        rows.append({
+            'cache_key': cache_key,
+            'candidate_id': str(_row_value(row, 'candidate_id') or ''),
+            'feasible': _result_row_feasible(row),
+            'failure_category': _row_value(row, 'failure_category'),
+            'objectives': objectives,
+            'trajectory_status': trajectory_status,
+        })
+    return rows
+
+
+def _tradeoff_run(
+    run_id: str,
+) -> tuple[Path, list[dict[str, Any]], str, dict[str, Any]] | None:
+    resolved = _optimizer_run_dir_for_id(run_id)
+    if resolved is None:
+        return None
+    _root, run_dir = resolved
+    document_status, document = _read_pareto_document(run_dir)
+    return run_dir, _tradeoff_rows(run_dir), document_status, document
+
+
+def _pareto_model(
+    run_id: str,
+    loaded: tuple[Path, list[dict[str, Any]], str, dict[str, Any]],
+) -> dict[str, Any]:
+    _run_dir, rows, document_status, document = loaded
+    model = pareto_view(
+        run_id=run_id,
+        rows=rows,
+        pareto_document=document,
+        pareto_document_status=document_status,
+        x=_request_arg('x'),
+        y=_request_arg('y'),
+    )
+    _stamp_detail_urls(model['points'], run_id)
+    return model
+
+
+def _stamp_detail_urls(points: list[dict[str, Any]], run_id: str) -> None:
+    for point in points:
+        point['detail_url'] = url_for(
+            'web.optimizer_result_detail',
+            run_id=run_id,
+            cache_key=point['cache_key'],
+        )
+
+
+def _compare_cache_keys() -> list[str]:
+    seen: list[str] = []
+    for raw in request.args.getlist('cache_key'):
+        text = str(raw).strip()
+        if text and text not in seen:
+            seen.append(text)
+    return seen
+
+
+def _compare_for_run(
+    run_id: str,
+    loaded: tuple[Path, list[dict[str, Any]], str, dict[str, Any]],
+    keys: list[str],
+    pareto: Mapping[str, Any],
+) -> tuple[dict[str, Any] | None, str | None, int]:
+    if len(keys) < COMPARE_MIN or len(keys) > COMPARE_MAX:
+        return None, 'compare requires 2 to 4 points', 400
+    run_dir, rows, _document_status, _document = loaded
+    by_key = {row['cache_key']: row for row in rows}
+    cache_path = run_dir / OPTIMIZER_CACHE_NAME
+    selections = []
+    for key in keys:
+        row = by_key.get(key)
+        if row is None:
+            return None, f'optimizer result not found: {key}', 404
+        trajectory, unreadable = _read_stored_trajectory(cache_path, key)
+        hours = None
+        if unreadable:
+            trajectory_status = 'unreadable'
+        elif (
+            isinstance(trajectory, Mapping)
+            and trajectory.get('status') == TRAJECTORY_STATUS_AVAILABLE
+        ):
+            trajectory_status = TRAJECTORY_STATUS_AVAILABLE
+            raw_hours = trajectory.get('hours')
+            hours = raw_hours if isinstance(raw_hours, list) else None
+        elif isinstance(trajectory, Mapping):
+            trajectory_status = str(
+                trajectory.get('status') or 'trajectory unavailable'
+            )
+        else:
+            trajectory_status = 'trajectory unavailable'
+        selections.append({
+            'cache_key': key,
+            'candidate_id': row['candidate_id'],
+            'objectives': row['objectives'],
+            'trajectory_status': trajectory_status,
+            'hours': hours,
+        })
+    model = compare_model(
+        run_id=run_id,
+        selections=selections,
+        x_metric=pareto.get('x') if isinstance(pareto.get('x'), str) else None,
+        y_metric=pareto.get('y') if isinstance(pareto.get('y'), str) else None,
+        series_id=_request_arg('series'),
+    )
+    _stamp_detail_urls(model['points'], run_id)
+    if model.get('series_error'):
+        return model, str(model['series_error']), 400
+    return model, None, 200
+
+
+@bp.route('/optimizer/runs/<path:run_id>/pareto')
+def optimizer_pareto_page(run_id: str):
+    """Scatter of one local run, with an optional trajectory overlay."""
+    loaded = _tradeoff_run(run_id)
+    if loaded is None:
+        return render_template('optimizer_not_found.html'), 404
+    model = _pareto_model(run_id, loaded)
+    status = 400 if model.get('axis_error') else 200
+    keys = _compare_cache_keys()
+    compare = None
+    compare_error = None
+    if keys:
+        compare, compare_error, compare_status = _compare_for_run(
+            run_id, loaded, keys, model,
+        )
+        if compare_status != 200:
+            status = compare_status
+    return render_template(
+        'optimizer_pareto.html',
+        pareto=model,
+        compare=compare,
+        compare_error=compare_error,
+        compare_keys=keys,
+    ), status
+
+
+@bp.route('/api/optimizer/runs/<path:run_id>/pareto')
+def optimizer_pareto_api(run_id: str):
+    """JSON feed for one local run's Pareto scatter."""
+    loaded = _tradeoff_run(run_id)
+    if loaded is None:
+        return jsonify({'error': 'Optimizer run not found'}), 404
+    model = _pareto_model(run_id, loaded)
+    status = 400 if model.get('axis_error') else 200
+    return jsonify(model), status
+
+
+@bp.route('/api/optimizer/runs/<path:run_id>/compare')
+def optimizer_compare_api(run_id: str):
+    """JSON overlay of 2 to 4 stored trajectories from one run."""
+    loaded = _tradeoff_run(run_id)
+    if loaded is None:
+        return jsonify({'error': 'Optimizer run not found'}), 404
+    keys = _compare_cache_keys()
+    model = _pareto_model(run_id, loaded)
+    compare, compare_error, status = _compare_for_run(
+        run_id, loaded, keys, model,
+    )
+    if compare is None:
+        error_type = (
+            'compare_count' if status == 400 else 'compare_point'
+        )
+        return jsonify({'error': compare_error, 'error_type': error_type}), status
+    if compare.get('series_error'):
+        return jsonify({
+            'error': compare['series_error'],
+            'error_type': 'unknown_trajectory_series',
+            'compare': compare,
+        }), status
+    return jsonify(compare), status
+
+
 @bp.route('/optimizer/runs/<path:run_id>/results/<cache_key>')
 def optimizer_result_detail(run_id: str, cache_key: str):
     """Read-only result detail and stored recipe audit view."""
@@ -4898,10 +5172,13 @@ def optimizer_result_detail(run_id: str, cache_key: str):
     if resolved is None:
         return render_template('optimizer_not_found.html'), 404
     root, run_dir, row = resolved
+    result = _result_detail_model(root, run_dir, row)
+    trajectory = result.get('trajectory') or {}
+    status = 400 if trajectory.get('series_error') else 200
     return render_template(
         'optimizer_detail.html',
-        result=_result_detail_model(root, run_dir, row),
-    )
+        result=result,
+    ), status
 
 
 @bp.route('/optimizer/runs/<path:run_id>/results/<cache_key>/recipe.yaml')

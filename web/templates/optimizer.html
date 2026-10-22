@@ -204,6 +204,17 @@
 
     {% include "partials/optimizer_jobs.html" %}
 
+    {% if local_runs %}
+    <div class="section-card">
+        <h3>Pareto tradeoffs</h3>
+        <ul class="tradeoff-run-list">
+            {% for run in local_runs %}
+            <li><a href="{{ url_for('web.optimizer_pareto_page', run_id=run.id) }}">{{ run.id }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
     <div id="optimizer-table"
          hx-get="{{ url_for('web.optimizer_table_partial') }}"
          hx-include="#optimizer-filters"

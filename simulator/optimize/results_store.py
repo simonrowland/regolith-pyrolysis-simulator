@@ -1752,6 +1752,7 @@ def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
         "proof_grade",
         "refusal_reason",
         "refusal_diagnostic",
+        "trajectory",
     ):
         if key in source_trace:
             trace[key] = _jsonable(source_trace[key])

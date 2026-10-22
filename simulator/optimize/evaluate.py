@@ -77,6 +77,7 @@ from simulator.interpolation_uncertainty import (
     feasibility_verdict_from_reduced_real_cache,
 )
 from simulator.optimize.knob_saturation import compute_knob_saturation
+from simulator.optimize.trajectory import project_trajectory
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
     canonicalize_fidelity_emission,
@@ -5998,6 +5999,13 @@ def _cache_trace_payload(
         payload["per_hour"] = per_hour_cache
     if pO2_enforcement_by_hour:
         payload["pO2_enforcement_by_hour"] = pO2_enforcement_by_hour
+
+    # Compact trajectory for later tradeoff inspection. The per_hour overlay
+    # above stays the reduced-real cache-state carrier; this does not replace it.
+    payload["trajectory"] = project_trajectory(
+        getattr(run_execution, "per_hour", ()) or (),
+        snapshots=getattr(run_execution, "snapshots", ()) or (),
+    )
 
     if payload:
         return payload

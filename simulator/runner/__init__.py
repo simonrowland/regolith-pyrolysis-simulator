@@ -122,9 +122,13 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     normalize_lab_schedule,
 )
-from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
+from simulator.recipe import (
+    C3_ALKALI_REFERENCE_CHARGE_KG,
+    c3_alkali_explicit_dose_kg,
+    resolve_c3_alkali_credit_dose_kg,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.recipe_io import RecipeIOError, load_recipe_patch
+from simulator.recipe_io import RecipeIOError, load_recipe_patch_for_charge
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
@@ -139,7 +143,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.9.0"
+RUNNER_SCHEMA_VERSION = "1.10.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -877,14 +881,22 @@ def _deep_merge_setpoints(
 def _additives_with_c3_alkali_dosing(
     additives_kg: Mapping[str, float],
     setpoints: Mapping[str, Any],
+    charge_kg: float = C3_ALKALI_REFERENCE_CHARGE_KG,
 ) -> dict[str, float]:
     additives: dict[str, float] = {}
     for key, value in dict(additives_kg).items():
         if not is_declared_real_scalar(value, allow_numeric_str=True):
             raise RunnerError(f"additives_kg[{key!r}] must be numeric")
         additives[str(key)] = float(value)
-    dosing_by_species = _c3_alkali_dosing_kg_by_species(setpoints)
-    for species, dose_kg in dosing_by_species.items():
+    # Credit-line defaults are not a competing specification. Only an
+    # explicit dose can disagree with a pre-funded additives_kg charge.
+    for species in ("Na", "K"):
+        try:
+            dose_kg = c3_alkali_explicit_dose_kg(setpoints, species, charge_kg)
+        except ValueError as exc:
+            raise RunnerError(str(exc)) from exc
+        if dose_kg is None:
+            continue
         raw_additive_kg = additives.get(species, 0.0)
         if raw_additive_kg > 0.0 and not math.isclose(
             raw_additive_kg, dose_kg, rel_tol=0.0, abs_tol=1.0e-12
@@ -899,41 +911,26 @@ def _additives_with_c3_alkali_dosing(
 
 def _c3_alkali_dosing_kg_by_species(
     setpoints: Mapping[str, Any],
+    charge_kg: float = C3_ALKALI_REFERENCE_CHARGE_KG,
 ) -> dict[str, float]:
-    campaigns = setpoints.get("campaigns", {})
-    if not isinstance(campaigns, Mapping):
-        return {}
-    c3 = campaigns.get("C3", {})
-    if not isinstance(c3, Mapping):
-        return {}
-    dosing = c3.get("alkali_dosing", {})
-    if dosing in (None, {}):
-        return {}
-    if not isinstance(dosing, Mapping):
-        raise RunnerError("campaigns.C3.alkali_dosing must be a mapping")
+    """Resolved credit doses. Null keys use the plant-band default.
 
+    An explicit value at or below the charge-scaled deadband is omitted.
+    The reference-charge default keeps the one-argument poison cases on
+    the historical 1.4 kg / 0.56 kg deadband.
+    """
     doses: dict[str, float] = {}
-    for key, species in (("Na_kg", "Na"), ("K_kg", "K")):
-        if key not in dosing or dosing[key] is None:
-            continue
+    for species in ("Na", "K"):
         try:
-            if not is_declared_real_scalar(
-                dosing[key],
-                allow_numeric_str=True,
-            ):
-                raise TypeError
-            dose_kg = float(dosing[key])
-        except (TypeError, ValueError) as exc:
-            raise RunnerError(
-                f"campaigns.C3.alkali_dosing.{key} must be numeric"
-            ) from exc
-        if not math.isfinite(dose_kg) or dose_kg < 0.0:
-            raise RunnerError(
-                f"campaigns.C3.alkali_dosing.{key} must be finite and non-negative"
+            dose_kg = resolve_c3_alkali_credit_dose_kg(
+                setpoints,
+                species,
+                charge_kg,
             )
-        if dose_kg <= C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES[species]:
-            continue
-        doses[species] = dose_kg
+        except ValueError as exc:
+            raise RunnerError(str(exc)) from exc
+        if dose_kg > 0.0:
+            doses[species] = dose_kg
     return doses
 
 
@@ -1236,11 +1233,12 @@ class PyrolysisRun:
         vapor_pressures = bundle.vapor_pressures
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(
             self.campaign, self.campaign)
+        mass_kg = _positive_mass_kg(self.mass_kg)
         additives_kg = _additives_with_c3_alkali_dosing(
             self.additives_kg,
             setpoints,
+            charge_kg=mass_kg,
         )
-        mass_kg = _positive_mass_kg(self.mass_kg)
         runtime_overrides = {
             str(campaign): dict(fields)
             for campaign, fields in dict(self.runtime_campaign_overrides).items()
@@ -1396,7 +1394,8 @@ class PyrolysisRun:
             "kernel_commit_sha": kernel_commit_sha,
         }
         c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
-            session_config.setpoints
+            session_config.setpoints,
+            charge_kg=float(self.mass_kg),
         )
         c3_credit_drawn_kg = dict(
             getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) or {}
@@ -3482,7 +3481,7 @@ def _final_summary_report(
     species_formula_registry: Mapping[str, Any] | None,
     unresolved_species_mol_by_species: dict[str, float],
 ) -> dict[str, Any]:
-    return {
+    summary = {
         "wall_deposit_by_species_kg": _wall_deposit_report_kg(
             final_state,
             species_formula_registry,
@@ -3493,6 +3492,14 @@ def _final_summary_report(
         ),
         "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
     }
+    # Imported here because optimizer evaluation also imports this runner;
+    # the objective module owns the throughput derivation.
+    from simulator.optimize.objective import throughput_report_block
+
+    summary["throughput_per_furnace_hour"] = _json_safe(
+        throughput_report_block(execution)
+    )
+    return summary
 
 
 def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
@@ -5451,6 +5458,12 @@ def _runner_failure_result(
             run_metadata,
             unresolved_wall_deposit_species_mol,
         )
+    else:
+        from simulator.optimize.objective import throughput_report_block
+
+        final["throughput_per_furnace_hour"] = _json_safe(
+            throughput_report_block(execution)
+        )
     stage_report = (
         _safe_failure_value(lambda: stage_purity_report(sim.train), {})
         if sim is not None
@@ -5828,7 +5841,10 @@ def main(argv: Optional[list[str]] = None) -> int:
             raise RunnerError("--feedstock is required unless --preset is supplied")
         if args.recipe:
             try:
-                recipe_patch = load_recipe_patch(Path(args.recipe))
+                recipe_patch = load_recipe_patch_for_charge(
+                    Path(args.recipe),
+                    mass_kg,
+                )
             except RecipeIOError as exc:
                 raise RunnerError(str(exc)) from exc
             setpoints_patch = _deep_merge_setpoints(setpoints_patch, recipe_patch)

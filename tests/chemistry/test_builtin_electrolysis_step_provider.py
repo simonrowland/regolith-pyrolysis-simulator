@@ -97,6 +97,13 @@ def _hkl_only_setpoints(setpoints_data):
     series_config["gas_resistance_enabled"] = False
     kernel_config["evaporation_series_resistance"] = series_config
     patched["chemistry_kernel"] = kernel_config
+    # d-212 retired C4 from the default sequence. This C0→C6 smoke
+    # still takes the opt-in C4 path so BRANCH_ONE_TWO can reach C6.
+    campaigns = dict(patched.get("campaigns") or {})
+    c4 = dict(campaigns.get("C4") or {})
+    c4["skip"] = False
+    campaigns["C4"] = c4
+    patched["campaigns"] = campaigns
     return patched
 
 

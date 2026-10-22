@@ -158,6 +158,13 @@ def _hkl_only_setpoints(setpoints_data):
     series_config["gas_resistance_enabled"] = False
     kernel_config["evaporation_series_resistance"] = series_config
     patched["chemistry_kernel"] = kernel_config
+    # d-212 retired C4 from the default sequence. These smokes still
+    # drive the opt-in C4/C6 path, so the skip must not strand them.
+    campaigns = dict(patched.get("campaigns") or {})
+    c4 = dict(campaigns.get("C4") or {})
+    c4["skip"] = False
+    campaigns["C4"] = c4
+    patched["campaigns"] = campaigns
     return patched
 
 
@@ -2651,8 +2658,11 @@ def test_c6_al_product_tap_routes_only_fresh_al_to_terminal_product(
 def test_provider_short_circuits_on_empty_reagent(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """No reagent inventory -> ok-no-op for every reaction family
-    (mirrors the legacy ``<= 0.01 kg`` early-return guard).
+    """No reagent inventory -> ok-no-op for every reaction family.
+
+    Na and K short-circuit at <= 0 kg. A positive credit-line dose below
+    the old 0.01 kg cutoff is not unavailable. Mg thermite still uses
+    its own 0.01 kg gate.
     """
 
     sim = _build_sim(
@@ -2690,9 +2700,44 @@ def test_provider_short_circuits_on_empty_reagent(
         assert result.transition is None
 
 
-# ---------------------------------------------------------------------------
-# 6. Smoke parity: full C0 -> C6 on two feedstocks (C3 + C6 exercised)
-# ---------------------------------------------------------------------------
+def test_sub_centigram_na_credit_is_not_flagged_unavailable(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """A 5 g Na credit dose must not take the old 0.01 kg unavailable exit."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": 0.165},
+            "process.metal_phase": {},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1100.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_NA,
+                "na_target_stage": "feo_cleanup",
+                "reagent_available_kg": 0.005,
+                "dt_hr": 1.0,
+                "liquid_fraction": 1.0,
+            },
+        )
+    )
+    reason = str((result.diagnostic or {}).get("reason_skipped", ""))
+    assert "0.01" not in reason
+    assert "unavailable" not in reason
 
 
 # A_staged+MAGEMin composition wall-clock: mass-balance class measured

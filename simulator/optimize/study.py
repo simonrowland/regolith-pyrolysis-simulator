@@ -596,10 +596,13 @@ def run(
             config.profile,
             source="<stale-profile>",
         )
-    active_schema = _schema_with_pinned_paths(
-        base_schema,
+    active_schema = _search_schema_for_profile(
+        _schema_with_pinned_paths(
+            base_schema,
+            resolved_profile,
+            cli_pinned_paths=pinned_paths,
+        ),
         resolved_profile,
-        cli_pinned_paths=pinned_paths,
     )
     search_space_identity = _search_space_identity(
         active_schema,
@@ -1200,10 +1203,13 @@ def run_certify(
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
         resolved_profile = dict(config.profile)
-    active_schema = _schema_with_pinned_paths(
-        base_schema,
+    active_schema = _search_schema_for_profile(
+        _schema_with_pinned_paths(
+            base_schema,
+            resolved_profile,
+            cli_pinned_paths=pinned_paths,
+        ),
         resolved_profile,
-        cli_pinned_paths=pinned_paths,
     )
     search_space_identity = _search_space_identity(
         active_schema,
@@ -1762,12 +1768,15 @@ def _load_study_journal(
         schema=base_schema,
     )
     manifest_identity = _mapping_or_empty(manifest.get("search_space_identity"))
-    active_schema = _schema_with_pinned_paths(
-        base_schema,
-        resolved_profile,
-        cli_pinned_paths=tuple(
-            str(path) for path in manifest_identity.get("cli_pinned_paths", ())
+    active_schema = _search_schema_for_profile(
+        _schema_with_pinned_paths(
+            base_schema,
+            resolved_profile,
+            cli_pinned_paths=tuple(
+                str(path) for path in manifest_identity.get("cli_pinned_paths", ())
+            ),
         ),
+        resolved_profile,
     )
     search_space_identity = _search_space_identity(
         active_schema,
@@ -2814,6 +2823,31 @@ def _certification_candidate_from_record(record: StudyRecord) -> Candidate:
     if "topology_id" in metadata and "topology" not in metadata:
         metadata["topology"] = {"id": metadata["topology_id"]}
     return Candidate(id=record.candidate_id, patch=record.patch, metadata=metadata)
+
+
+def _profile_run_mass_kg(profile: Mapping[str, Any]) -> float:
+    """Study charge mass. Missing or unusable values stay at 1000 kg."""
+    run = profile.get("run") if isinstance(profile, Mapping) else None
+    raw: Any = 1000.0
+    if isinstance(run, Mapping) and "mass_kg" in run and run.get("mass_kg") is not None:
+        raw = run.get("mass_kg")
+    if isinstance(raw, bool):
+        return 1000.0
+    try:
+        mass_kg = float(raw)
+    except (TypeError, ValueError):
+        return 1000.0
+    if not math.isfinite(mass_kg) or mass_kg <= 0.0:
+        return 1000.0
+    return mass_kg
+
+
+def _search_schema_for_profile(
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+) -> RecipeSchema:
+    """Scale C3 dose search bounds to the profile charge. 1000 kg is a no-op."""
+    return schema.scaled_for_charge(_profile_run_mass_kg(profile))
 
 
 def _schema_with_pinned_paths(
@@ -4298,6 +4332,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
+            "trajectory",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -6460,6 +6495,7 @@ def _record_payload(
     payload = {
         "cache_hit": record.cache_hit,
         "cache_key": record.cache_key,
+        "trajectory_cache_key": record.cache_key,
         "candidate_id": record.candidate_id,
         "failure_category": record.failure_category,
         "failing_gates": list(record.failing_gates),

@@ -19,6 +19,7 @@ from simulator.chemistry.kernel.config import (
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.canonical import canonical_json_dumps
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import CondensationTrain
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -222,6 +223,232 @@ C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES: Mapping[str, float] = MappingProxyTyp
         "K": C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[C3_ALKALI_DOSING_K_KG_PATH],
     }
 )
+# The catalog highs above are the ~1000 kg plant. Search bounds and the
+# sampler deadband scale by charge/this reference so a 1 kg batch is not
+# zeroed by the 1.4 kg / 0.56 kg reference deadband.
+C3_ALKALI_REFERENCE_CHARGE_KG = 1000.0
+_C3_ALKALI_SEARCH_HIGH_KG_BY_SPECIES: Mapping[str, float] = MappingProxyType(
+    {
+        "Na": C3_ALKALI_DOSING_NA_HIGH_KG,
+        "K": C3_ALKALI_DOSING_K_HIGH_KG,
+    }
+)
+# Plant bands live in setpoints.yaml. They are per reference charge, not
+# a second copy of the search highs (K's searchable high is 2× the band).
+_C3_ALKALI_PLANT_BAND_LOCATION: Mapping[str, tuple[str, str]] = MappingProxyType(
+    {
+        "Na": ("Na_phase", "Na_total_kg"),
+        "K": ("K_phase", "K_per_cycle_kg"),
+    }
+)
+
+
+def c3_alkali_charge_scale(charge_kg: float) -> float:
+    """Return charge_kg / 1000 kg. Non-positive or non-finite mass stays at 1."""
+    if isinstance(charge_kg, bool):
+        return 1.0
+    try:
+        mass_kg = float(charge_kg)
+    except (TypeError, ValueError):
+        return 1.0
+    if not math.isfinite(mass_kg) or mass_kg <= 0.0:
+        return 1.0
+    return mass_kg / C3_ALKALI_REFERENCE_CHARGE_KG
+
+
+def c3_alkali_search_high_kg(species: str, charge_kg: float) -> float:
+    """Reference-charge search high scaled to ``charge_kg``."""
+    try:
+        high_kg = _C3_ALKALI_SEARCH_HIGH_KG_BY_SPECIES[species]
+    except KeyError as exc:
+        raise ValueError(f"unsupported C3 alkali species {species!r}") from exc
+    return high_kg * c3_alkali_charge_scale(charge_kg)
+
+
+def c3_alkali_zero_level_kg(species: str, charge_kg: float) -> float:
+    """Sampler OFF deadband: 1% of the charge-scaled search high.
+
+    At the 1000 kg reference this is Na 1.4 kg and K 0.56 kg. At 1 kg it
+    is Na 0.0014 kg and K 0.00056 kg, so the credit default survives.
+    """
+    return (
+        c3_alkali_search_high_kg(species, charge_kg)
+        * C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION
+    )
+
+
+def c3_alkali_plant_band_kg(
+    setpoints: Mapping[str, Any],
+    species: str,
+) -> tuple[float, float] | None:
+    """Return the setpoints plant band for ``species``, or None if absent."""
+    try:
+        phase_key, band_key = _C3_ALKALI_PLANT_BAND_LOCATION[species]
+    except KeyError as exc:
+        raise ValueError(f"unsupported C3 alkali species {species!r}") from exc
+    campaigns = setpoints.get("campaigns") if isinstance(setpoints, Mapping) else None
+    c3 = campaigns.get("C3") if isinstance(campaigns, Mapping) else None
+    phase = c3.get(phase_key) if isinstance(c3, Mapping) else None
+    band = phase.get(band_key) if isinstance(phase, Mapping) else None
+    if not isinstance(band, (list, tuple)) or len(band) != 2:
+        return None
+    try:
+        low_kg = float(band[0])
+        high_kg = float(band[1])
+    except (TypeError, ValueError):
+        return None
+    if (
+        isinstance(band[0], bool)
+        or isinstance(band[1], bool)
+        or not math.isfinite(low_kg)
+        or not math.isfinite(high_kg)
+        or high_kg < low_kg
+    ):
+        return None
+    return (low_kg, high_kg)
+
+
+def c3_alkali_credit_default_kg(
+    setpoints: Mapping[str, Any],
+    species: str,
+    charge_kg: float,
+) -> float:
+    """Credit-line Na or K dose for one charge, in kilograms.
+
+    Premise: the shuttle draws from a credit-line reagent stock
+    (``reservoir.reagent.{Na,K}``), not from a feedstock inventory that
+    can be flagged out. The authority is the plant band already published
+    in setpoints.yaml for a ~1000 kg charge: ``Na_total_kg`` [80, 140]
+    and ``K_per_cycle_kg`` [18, 28]. The stoichiometric FeO helper in
+    ``additive_calculations`` is a UI estimate, not this default.
+
+    Algebra: dose_kg = ((band_low + band_high) / 2) * (charge_kg / 1000 kg).
+    Units: band endpoints and the result are kilograms of elemental Na or K.
+    A missing band, or a non-positive charge, returns 0 — unit fixtures
+    that never loaded the plant bands must not invent a 110 kg dose.
+
+    Sanity check (1 kg lunar_mare_low_ti, FeO 16.5 wt%): 0.165 kg FeO
+    = 2.30 mol. 2 Na + FeO -> Na2O + Fe needs 4.59 mol Na = 0.106 kg,
+    versus the scaled Na band midpoint 0.110 kg.
+    """
+    if isinstance(charge_kg, bool):
+        return 0.0
+    try:
+        mass_kg = float(charge_kg)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(mass_kg) or mass_kg <= 0.0:
+        return 0.0
+    band = c3_alkali_plant_band_kg(setpoints, species)
+    if band is None:
+        return 0.0
+    midpoint_kg = (band[0] + band[1]) / 2.0
+    return midpoint_kg * (mass_kg / C3_ALKALI_REFERENCE_CHARGE_KG)
+
+
+def _c3_alkali_dosing_block(
+    setpoints: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    if not isinstance(setpoints, Mapping):
+        return None
+    campaigns = setpoints.get("campaigns", {})
+    if not isinstance(campaigns, Mapping):
+        return None
+    c3 = campaigns.get("C3", {})
+    if not isinstance(c3, Mapping):
+        return None
+    if "alkali_dosing" not in c3:
+        return None
+    dosing = c3.get("alkali_dosing")
+    if dosing is None:
+        return None
+    if not isinstance(dosing, Mapping):
+        raise ValueError("campaigns.C3.alkali_dosing must be a mapping")
+    return dosing
+
+
+def _parse_c3_alkali_dose_kg(value: Any, key: str) -> float:
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise ValueError(f"campaigns.C3.alkali_dosing.{key} must be numeric")
+    try:
+        dose_kg = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f"campaigns.C3.alkali_dosing.{key} must be numeric"
+        ) from exc
+    if not math.isfinite(dose_kg) or dose_kg < 0.0:
+        raise ValueError(
+            f"campaigns.C3.alkali_dosing.{key} must be finite and non-negative"
+        )
+    return dose_kg
+
+
+def resolve_c3_alkali_credit_dose_kg(
+    setpoints: Mapping[str, Any],
+    species: str,
+    charge_kg: float,
+) -> float:
+    """Kilograms of ``species`` the credit line should fund.
+
+    A missing or null ``alkali_dosing.{species}_kg`` is the credit default
+    and is never deadbanded. An explicit number at or below the
+    charge-scaled sampler deadband is OFF (returns 0), including an
+    explicit 0. A non-positive charge judges an explicit number against
+    the reference deadband and does not invent a credit default.
+    """
+    if species not in _C3_ALKALI_SEARCH_HIGH_KG_BY_SPECIES:
+        raise ValueError(f"unsupported C3 alkali species {species!r}")
+    key = f"{species}_kg"
+    dosing = _c3_alkali_dosing_block(setpoints)
+    if dosing is None or key not in dosing or dosing[key] is None:
+        return c3_alkali_credit_default_kg(setpoints, species, charge_kg)
+    dose_kg = _parse_c3_alkali_dose_kg(dosing[key], key)
+    if dose_kg <= c3_alkali_zero_level_kg(species, charge_kg):
+        return 0.0
+    return dose_kg
+
+
+def c3_alkali_explicit_dose_kg(
+    setpoints: Mapping[str, Any],
+    species: str,
+    charge_kg: float,
+) -> float | None:
+    """Positive explicit dose, or None when the key is absent, null, or off.
+
+    Credit defaults are not explicit. An additives_kg pre-fund conflicts
+    only with an explicit dose, not with the credit-line default.
+    """
+    if species not in _C3_ALKALI_SEARCH_HIGH_KG_BY_SPECIES:
+        raise ValueError(f"unsupported C3 alkali species {species!r}")
+    key = f"{species}_kg"
+    dosing = _c3_alkali_dosing_block(setpoints)
+    if dosing is None or key not in dosing or dosing[key] is None:
+        return None
+    dose_kg = _parse_c3_alkali_dose_kg(dosing[key], key)
+    if dose_kg <= c3_alkali_zero_level_kg(species, charge_kg):
+        return None
+    return dose_kg
+
+
+def c3_alkali_zero_levels_for_schema(
+    schema: "RecipeSchema",
+) -> dict[KeyPath, float]:
+    """Deadband per dose path from the schema's own search high."""
+    levels: dict[KeyPath, float] = {}
+    for path, species in (
+        (C3_ALKALI_DOSING_NA_KG_PATH, "Na"),
+        (C3_ALKALI_DOSING_K_KG_PATH, "K"),
+    ):
+        spec = schema._spec_by_path.get(path)
+        if spec is not None and spec.high is not None:
+            high_kg = float(spec.high)
+        else:
+            high_kg = c3_alkali_search_high_kg(
+                species,
+                C3_ALKALI_REFERENCE_CHARGE_KG,
+            )
+        levels[path] = high_kg * C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION
+    return levels
 C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
     "alkali_early_fe",
     "sio_window",
@@ -1029,6 +1256,15 @@ class RecipeSchema:
             ),
         ),
         _knob(
+            "campaigns.C3.skip",
+            "categorical",
+            choices=("false", "true"),
+            bounds_source=(
+                "engineering_envelope d-212 C3 recipe skip; absent means "
+                "C3 runs"
+            ),
+        ),
+        _knob(
             "campaigns.C3.duration_after_pathA_hr",
             units="hr",
             bounds_source="setpoints:campaigns.C3.duration_after_pathA_h",
@@ -1045,6 +1281,16 @@ class RecipeSchema:
             bounds_source=(
                 "engineering_envelope inert SSO-O2 chunk-A C3 actuator "
                 "placeholder; runtime reader lands in chunk B"
+            ),
+        ),
+        _knob(
+            "campaigns.C4.skip",
+            "categorical",
+            choices=("false", "true"),
+            bounds_source=(
+                "engineering_envelope d-212 C4 recipe skip; the default "
+                "sequence retires the millibar Mg hold and the final C2A "
+                "ramp replaces it"
             ),
         ),
         _knob(
@@ -1442,6 +1688,36 @@ class RecipeSchema:
             pinned_paths=pinned_paths,
         )
 
+    def scaled_for_charge(self, charge_kg: float) -> "RecipeSchema":
+        """Copy with C3 dose highs scaled to ``charge_kg``.
+
+        Scale 1 returns this schema so the reference-charge bounds digest
+        is unchanged. Pins already applied on ``self.allowlist`` are kept;
+        they are not applied a second time.
+        """
+        scale = c3_alkali_charge_scale(charge_kg)
+        if math.isclose(scale, 1.0, rel_tol=0.0, abs_tol=0.0):
+            return self
+        dose_paths = {
+            C3_ALKALI_DOSING_NA_KG_PATH,
+            C3_ALKALI_DOSING_K_KG_PATH,
+        }
+        scaled_allowlist = tuple(
+            replace(spec, high=float(spec.high) * scale)
+            if spec.path in dose_paths and spec.high is not None
+            else spec
+            for spec in self.allowlist
+        )
+        scaled = type(self)(
+            allowlist=scaled_allowlist,
+            setpoints=self.setpoints,
+            forbidden_prefixes=self.forbidden_prefixes,
+            recipe_schema_version=self.recipe_schema_version,
+            allowlist_version=self.allowlist_version,
+        )
+        scaled.pinned_paths = self.pinned_paths
+        return scaled
+
     def spec_for(self, path: KeyPath) -> KnobSpec:
         normalized = _normalize_key_path(path)
         if self.is_forbidden(normalized):
@@ -1468,7 +1744,14 @@ class RecipeSchema:
     def to_setpoints_patch(self, patch: "RecipePatch") -> dict[str, Any]:
         """Validate then render the optimizer-facing setpoints patch."""
         validated = patch.validated(self)
-        canonical_values = _canonical_recipe_values(validated.values)
+        canonical_values = _canonical_recipe_values(
+            validated.values,
+            c3_zero_levels=c3_alkali_zero_levels_for_schema(self),
+        )
+        # Keep sampled doses explicit so plant nulls cannot restore credit defaults.
+        for path in C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH:
+            if path in validated.values:
+                canonical_values[path] = float(validated.values[path])
         runtime_values = {
             path: value
             for path, value in canonical_values.items()
@@ -2364,7 +2647,9 @@ class RecipePatch:
             resolved.values,
             allowlist_version or active_schema.allowlist_version,
         )
-        canonical = resolved.canonical_json().encode("utf-8")
+        canonical = resolved.canonical_json(
+            c3_zero_levels=c3_alkali_zero_levels_for_schema(active_schema),
+        ).encode("utf-8")
         payload = (
             canonical
             + b"\n"
@@ -2383,10 +2668,21 @@ class RecipePatch:
         """Return cache identity for resolved recipe values only."""
         active_schema = schema or RecipeSchema()
         resolved = active_schema.resolve_conditional_patch(self).patch
-        return hashlib.sha256(resolved.canonical_json().encode("utf-8")).hexdigest()
+        return hashlib.sha256(
+            resolved.canonical_json(
+                c3_zero_levels=c3_alkali_zero_levels_for_schema(active_schema),
+            ).encode("utf-8")
+        ).hexdigest()
 
-    def canonical_json(self) -> str:
-        values = _canonical_recipe_values(self.values)
+    def canonical_json(
+        self,
+        *,
+        c3_zero_levels: Mapping[KeyPath, float] | None = None,
+    ) -> str:
+        values = _canonical_recipe_values(
+            self.values,
+            c3_zero_levels=c3_zero_levels,
+        )
         entries = [
             {"path": list(path), "value": _normalize_value(value)}
             for path, value in sorted(values.items())
@@ -2408,27 +2704,38 @@ def _identity_float(value: Any) -> float | None:
 
 def _canonical_c3_alkali_dosing_recipe_values(
     values: Mapping[KeyPath, Any],
+    zero_levels: Mapping[KeyPath, float] | None = None,
 ) -> dict[KeyPath, Any]:
+    levels = (
+        C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH
+        if zero_levels is None
+        else zero_levels
+    )
     canonical = dict(values)
-    for path, zero_level_kg in C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH.items():
+    for path, zero_level_kg in levels.items():
         if path not in canonical:
             continue
         dose_kg = _identity_float(canonical[path])
         if dose_kg is None:
             continue
         if dose_kg <= zero_level_kg:
-            canonical.pop(path, None)
+            canonical[path] = 0.0
         else:
             canonical[path] = dose_kg
     return canonical
 
 
-def _canonical_recipe_values(values: Mapping[KeyPath, Any]) -> dict[KeyPath, Any]:
+def _canonical_recipe_values(
+    values: Mapping[KeyPath, Any],
+    *,
+    c3_zero_levels: Mapping[KeyPath, float] | None = None,
+) -> dict[KeyPath, Any]:
     return _canonical_o2_bubbler_recipe_values(
         _canonical_c3_alkali_dosing_recipe_values(
             _canonical_c2a_staged_depletion_log_slope_recipe_values(
                 _canonical_c2a_staged_depletion_flux_decay_recipe_values(values)
-            )
+            ),
+            zero_levels=c3_zero_levels,
         )
     )
 
