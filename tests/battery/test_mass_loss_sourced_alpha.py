@@ -156,13 +156,84 @@ def test_sourced_channels_close_oxygen_with_declared_unity_escape(
     # Independent 70-digit Decimal solution of O conservation with the printed
     # Fig. 3 alphas and CIAAW masses: 2*J_O2=J_Mg+J_SiO. One shared pO2,
     # then the analytic one-second depletion of each one-mol parent at 1 cm2.
-    assert result.pO2_bar_by_step == pytest.approx((expected_po2,), rel=1e-10)
-    assert result.evaporated_mol["Mg"] == pytest.approx(expected_mg, rel=1e-10)
-    assert result.evaporated_mol.get("SiO", 0.0) == pytest.approx(expected_sio, rel=1e-10)
+    assert result.pO2_bar_by_step == pytest.approx((expected_po2,), rel=1e-10, abs=0.0)
+    assert result.evaporated_mol["Mg"] == pytest.approx(expected_mg, rel=1e-10, abs=0.0)
+    assert result.evaporated_mol.get("SiO", 0.0) == pytest.approx(expected_sio, rel=1e-10, abs=0.0)
     assert result.evaporated_mol["O2"] == pytest.approx(
-        (expected_mg + expected_sio) / 2.0, rel=1e-10
+        (expected_mg + expected_sio) / 2.0, rel=1e-10, abs=0.0
     )
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1e-14
+
+
+def test_r11_isolated_mgo_bound_has_zero_coproduct_oxygen(monkeypatch):
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    # R-11 at its first ramp midpoint, 1183.15 K; real OpenIMCC 66ec4a3d8
+    # composition/pressure snapshot. Only the isolated MgO bound is active.
+    inventory = {"MgO": 0.0005423805580240438, "SiO2": 0.0014578626113198004,
+                 "Al2O3": 0.0003621246012321325, "CaO": 0.0007850791320550105}
+    channels = (
+        ResidueChannel("MgO", "MgO", "MgO", 1.0, "isolated alpha<=1 bound"),
+        ResidueChannel("O", "O", None, 1.0, "declared unity oxygen escape"),
+        ResidueChannel("O2", "O2", None, 1.0, "declared unity oxygen escape"),
+    )
+
+    def pressure(_inventory, logp):
+        return {"MgO": 1.8527138089578604e-16,
+                "O": 0.00174657993789618 * (10.0**logp)**0.5,
+                "O2": 100000.0 * 10.0**logp}
+
+    balances = []
+    original = residue._solve_vacuum_oxygen_balance
+
+    def record_balance(*args, **kwargs):
+        balance = original(*args, **kwargs)
+        balances.append(balance)
+        return balance
+
+    monkeypatch.setattr(residue, "_solve_vacuum_oxygen_balance", record_balance)
+    result = integrate_residue_inventory(
+        inventory, channels, pressure, temperature_K=1183.15,
+        duration_s=60.0, area_evolution_m2=(9.13e-5,),
+    )
+    assert result.pO2_bar_by_step == (0.0,)
+    # Independent HKL flux; all oxygen leaves in MgO(g). The existing flux
+    # provider threshold suppresses this tiny rate, so the inventory stays put.
+    assert balances[0].channel_fluxes_mol_m2_s["MgO"] == pytest.approx(
+        3.711994573534765e-18, rel=1e-10, abs=0.0
+    )
+    assert balances[0].channel_fluxes_mol_m2_s["O"] == 0.0
+    assert balances[0].channel_fluxes_mol_m2_s["O2"] == 0.0
+    assert result.evaporated_mol == {}
+    assert result.residue_mol == inventory
+    assert result.buffer_oxygen_exchange_mol == 0.0
+    assert max(abs(value) for value in result.atom_closure_mol.values()) < 1e-14
+
+    def invalid_pressure(inventory, logp):
+        return dict(pressure(inventory, logp), MgO=1.8527138089578604e-16 * 10.0**logp)
+
+    with pytest.raises(ResidueInventoryRefusal, match="exponent mismatch"):
+        integrate_residue_inventory(
+            inventory, channels, invalid_pressure, temperature_K=1183.15,
+            duration_s=60.0, area_evolution_m2=(9.13e-5,),
+        )
+
+    oxygen_rich_channels = (
+        ResidueChannel("AlO2", "AlO2", "Al2O3", 1.0, "isolated alpha<=1 bound"),
+        *channels[1:],
+    )
+
+    def oxygen_rich_pressure(inventory, logp):
+        return dict(pressure(inventory, logp), AlO2=3.9402330720917226e-20 * (10.0**logp)**0.25)
+
+    # The next real R-11 bound needs additional oxygen. It must not acquire
+    # a fabricated zero bound from the congruent-oxide boundary correction.
+    with pytest.raises(ResidueInventoryRefusal, match="no root"):
+        integrate_residue_inventory(
+            inventory, oxygen_rich_channels, oxygen_rich_pressure, temperature_K=1183.15,
+            duration_s=60.0, area_evolution_m2=(9.13e-5,),
+        )
 
 
 @pytest.fixture

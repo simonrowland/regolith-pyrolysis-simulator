@@ -149,8 +149,11 @@ def _solve_vacuum_oxygen_balance(
             2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
         )
 
-    def evaluate(logp: float) -> tuple[float, dict[str, float], float, float]:
-        model_pressures = pressure_model(logp)
+    def evaluate(
+        logp: float, model_pressures: Mapping[str, float] | None = None,
+    ) -> tuple[float, dict[str, float], float, float]:
+        if model_pressures is None:
+            model_pressures = pressure_model(logp)
         if not isinstance(model_pressures, Mapping):
             raise ValueError("pressure model must return a species-to-Pa mapping")
         pressures: dict[str, float] = {}
@@ -175,7 +178,20 @@ def _solve_vacuum_oxygen_balance(
 
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
-    if f_low == 0.0:
+    parent_channels = [channel for channel in active_channels if channel.parent_oxygen_demand > 0.0]
+    neutral_parents_only = background_pressure_Pa == 0.0 and bool(parent_channels) and all(
+        channel.oxygen_atoms == channel.parent_oxygen_demand and channel.pO2_exponent == 0.0
+        for channel in parent_channels
+    ) and all(
+        channel.pO2_exponent > 0.0
+        for channel in active_channels if channel.parent_oxygen_demand == 0.0
+    )
+    if neutral_parents_only:
+        # Congruent oxide gases release no coproduct oxygen: the root is the
+        # pO2=0 boundary. Validate every pressure exponent at a finite anchor
+        # before taking that limit; neutral-parent pressures have exponent 0.
+        root = low
+    elif f_low == 0.0:
         root = low
     elif f_high == 0.0:
         root = high
@@ -215,13 +231,20 @@ def _solve_vacuum_oxygen_balance(
                 f"declared {channel.pO2_exponent}, observed {observed_exponent}"
             )
 
+    if neutral_parents_only:
+        residual, pressures, oxygen_flux, parent_flux = evaluate(root, {
+            channel.species: (
+                0.0 if channel.parent_oxygen_demand == 0.0 else pressures[channel.species]
+            )
+            for channel in active_channels
+        })
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
         channel.species: molar_flux(channel, pressures[channel.species])
         for channel in active_channels
     }
     return _VacuumOxygenBalance(
-        pO2_bar=10.0**root,
+        pO2_bar=0.0 if neutral_parents_only else 10.0**root,
         pressures_Pa=pressures,
         channel_fluxes_mol_m2_s=fluxes,
         oxygen_atom_flux_mol_m2_s=oxygen_flux,
