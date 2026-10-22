@@ -352,6 +352,13 @@ class _ChannelTerms:
     oxide_per_product_kg: float
     o2_per_product_kg: float
 
+    def is_active(self, inventory: Mapping[str, float]) -> bool:
+        """Parentless oxygen stays active, including the gas pack's '' token."""
+        return (
+            self.parent_moles_per_product == 0.0
+            or inventory.get(self.source.parent_oxide or "", 0.0) > 0.0
+        )
+
 
 def _formula_terms(formula_text: str) -> tuple[dict[str, float], float]:
     try:
@@ -599,10 +606,7 @@ def _residue_oxygen_balance(terms, inventory, pressure_at, temperature):
                     / 2.0,
                     alpha=float(term.source.alpha),
                     alpha_source=term.source.alpha_source,
-                    active=(
-                        term.parent_moles_per_product == 0.0
-                        or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
-                    ),
+                    active=term.is_active(inventory),
                 )
                 for term in terms
             ),
