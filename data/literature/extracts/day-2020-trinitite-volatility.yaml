@@ -1,0 +1,1732 @@
+schema_version: literature_extract.v1
+source_id: day-2020-trinitite-volatility
+source:
+  citation: Day, J. M. D., Moynier, F., Sossi, P. A., Wang, K., Meshik, A. P., Pravdivtseva, O. V., and Pettit,
+    D. R. (2020). Moderately volatile element behaviour at high temperature determined from nuclear detonation.
+    Geochemical Perspectives Letters 13, 54–60.
+  doi: 10.7185/geochemlet.2014
+  year: 2020
+extraction:
+  method: Born-digital pdftotext-layout transcription of Table S-1, with all 13 rows reconciled and all cells checked
+    against a 600 dpi physical PDF page render. Figure records are deferred; numeric isotope data printed in Table
+    S-1 are typed.
+  date: '2026-10-22'
+  worker: fam39-1022
+review_status: draft
+source_locators:
+  table_s1: &id001
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 11
+    pdf_page_index: 10
+    published_page: SI-4
+    table: S-1
+    note: Table S-1; all 13 printed rows and 16 columns reconciled to pdftotext-layout and checked against the 600
+      dpi page render.
+  main_sample_conditions: &id003
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 2
+    pdf_page_index: 1
+    published_page: 55
+    section: Samples and Methods
+    note: Sample formation temperatures and cooling times stated in the main text.
+  detailed_methods: &id004
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 10
+    pdf_page_index: 9
+    published_page: SI-3
+    section: Detailed Methods
+    note: Supplementary Information Detailed Methods; leach steps and Cu isotope method.
+  figure_1:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 3
+    pdf_page_index: 2
+    published_page: 56
+    figure: '1'
+  figure_2:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 3
+    pdf_page_index: 2
+    published_page: 56
+    figure: '2'
+  figure_3:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 4
+    pdf_page_index: 3
+    published_page: 57
+    figure: '3'
+  figure_4:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 5
+    pdf_page_index: 4
+    published_page: 58
+    figure: '4'
+  figure_s1:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 9
+    pdf_page_index: 8
+    published_page: SI-2
+    figure: S-1
+fidelity_samples:
+- path: species.Cu.observations[day_2020_table_s1_cu_glass_isotope_delta].values.points[0].isotope_delta_isotope_delta
+  value: '0.30'
+  locator:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 11
+    pdf_page_index: 10
+    published_page: SI-4
+    table: S-1
+    note: Table S-1 row 1, IF-2 Bulk δ65Cu; 600 dpi render and page text.
+- path: species.Cu.observations[day_2020_table_s1_cu_aq_isotope_delta].values.points[1].isotope_delta_isotope_delta
+  value: '-0.63'
+  locator:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 11
+    pdf_page_index: 10
+    published_page: SI-4
+    table: S-1
+    note: Table S-1 row 4, IF-2 20m 3N HCl US δ65Cu; 600 dpi render and page text.
+- path: species.K.observations[day_2020_table_s1_k_glass_isotope_delta].values.points[6].isotope_delta_isotope_delta
+  value: '-0.42'
+  locator:
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+    page: 11
+    pdf_page_index: 10
+    published_page: SI-4
+    table: S-1
+    note: Table S-1 row 13, T-3 Bulk δ41K; 600 dpi render and page text.
+species:
+  Cu:
+    observations:
+    - observation_id: day_2020_table_s1_cu_glass_isotope_delta
+      type: rate_series
+      class_tag: measured_direct
+      phase: glass
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        analyte: Cu
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 65Cu/63Cu
+        reference_standard: NIST SRM976
+        attribution: present work
+        points:
+        - sample_id: IF-2
+          sample_description: Bulk
+          table_row_number: 1
+          isotope_delta_isotope_delta: '0.30'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 1; IF-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: &id002
+                source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+                page: 2
+                pdf_page_index: 1
+                published_page: 55
+                section: Samples and Methods
+                note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric
+                  formation temperature here.
+          T_K: '1663'
+          distance_m_as_published: '10'
+          sigma: '0.04'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IF-2
+          sample_description: Residue
+          table_row_number: 2
+          isotope_delta_isotope_delta: '0.46'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 2; IF-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+          sigma: '0.05'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IG-2
+          sample_description: Bulk
+          table_row_number: 6
+          isotope_delta_isotope_delta: '0.40'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 6; IG-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+          sigma: '0.02'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IG-2
+          sample_description: Residue
+          table_row_number: 7
+          isotope_delta_isotope_delta: '0.45'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 7; IG-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+          sigma: '0.04'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: T-3
+          sample_description: Bulk
+          table_row_number: 13
+          isotope_delta_isotope_delta: '0.10'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 13; T-3 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_numeric
+              locator: *id002
+          distance_m_as_published: '200'
+          sigma: '0.02'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+    - observation_id: day_2020_table_s1_cu_aq_isotope_delta
+      type: rate_series
+      class_tag: measured_direct
+      phase: aq
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        analyte: Cu
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 65Cu/63Cu
+        reference_standard: NIST SRM976
+        attribution: present work
+        points:
+        - sample_id: IF-2
+          sample_description: 20m H2O US
+          table_row_number: 3
+          isotope_delta_isotope_delta: '-1.11'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 3; IF-2 20m H2O US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+          sigma: '0.01'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IF-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 4
+          isotope_delta_isotope_delta: '-0.63'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+          sigma: '0.10'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IF-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 5
+          isotope_delta_isotope_delta: '-0.01'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+          sigma: '0.03'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IG-2
+          sample_description: 20m H2O US
+          table_row_number: 8
+          isotope_delta_isotope_delta: '-0.07'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 8; IG-2 20m H2O US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+          sigma: '0.12'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IG-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 9
+          isotope_delta_isotope_delta: '2.56'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+          sigma: '0.03'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+        - sample_id: IG-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 10
+          isotope_delta_isotope_delta: '-0.23'
+          isotope_ratio: 65Cu/63Cu
+          reference_standard: NIST SRM976
+          attribution: present work
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+          sigma: '0.01'
+          uncertainty_convention: ±2σ as printed; the confidence level is not stated.
+    context:
+    - observation_id: day_2020_table_s1_non_token_cells
+      type: printed_table_values_without_fitting_quantity_token
+      locator: *id001
+      units: as headed in Table S-1
+      values:
+        quantity: table_s1_non_token_cells
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        retention_note: 'The table has 13 printed rows. Cu concentrations, Zn concentrations, masses, fractions,
+          blank percentages, ICP Cu, K2O and the recombined-sum columns are retained as printed context. Candidate
+          tokens checked: isotope_delta (used for the three isotope columns); residue_component_composition (not
+          applicable because these are bulk trinitite and chemically leached fractions, not evaporation residues);
+          equilibrium_phase_composition (not a single-phase composition); mass_loss_fraction (the printed fraction
+          is a Cu recovery fraction, not sample mass loss). No matching token represents the remaining concentration
+          and recovery columns in this extract.'
+        column_headers_as_published:
+        - Sample
+        - Distance (m)
+        - Type
+        - Mass (g)
+        - Cu (ug/g)
+        - d65Cu
+        - plusminus_2sigma
+        - Fraction
+        - Blank%
+        - sum_Cu (ug/g)
+        - sum_d65Cu
+        - Cu (ICP) (ug/g)
+        - Zn (ug/g)
+        - d66Zn
+        - K2O (wt%)
+        - d41K
+        typed_isotope_columns:
+        - d65Cu
+        - plusminus_2sigma
+        - d66Zn
+        - d41K
+        rows_as_published:
+        - row_number: 1
+          sample_id: IF-2
+          distance_m_as_published: '10'
+          sample_description: Bulk
+          values_as_published:
+            Mass (g): '0.0386'
+            Cu (ug/g): '4.4'
+            Fraction: 100%
+            Blank%: 2.3%
+            sum_Cu (ug/g): '4.4'
+            sum_d65Cu: '0.30'
+            Cu (ICP) (ug/g): '7.39'
+            Zn (ug/g): '13.2'
+            K2O (wt%): '3.3'
+        - row_number: 2
+          sample_id: IF-2
+          distance_m_as_published: '10'
+          sample_description: Residue
+          values_as_published:
+            Mass (g): '0.3113'
+            Cu (ug/g): '3.7'
+            Fraction: 97%
+            Blank%: 0.3%
+            sum_Cu (ug/g): '4.0'
+            sum_d65Cu: '0.44'
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '12.1'
+            K2O (wt%): null
+        - row_number: 3
+          sample_id: IF-2
+          distance_m_as_published: '10'
+          sample_description: 20m H2O US
+          values_as_published:
+            Mass (g): '0.0004'
+            Cu (ug/g): '25.3'
+            Fraction: 0.1%
+            Blank%: 30.5%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '3.0'
+            K2O (wt%): null
+        - row_number: 4
+          sample_id: IF-2
+          distance_m_as_published: '10'
+          sample_description: 20m 3N HCl US
+          values_as_published:
+            Mass (g): '0.0012'
+            Cu (ug/g): '18.6'
+            Fraction: 0.4%
+            Blank%: 14.8%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '144.0'
+            K2O (wt%): null
+        - row_number: 5
+          sample_id: IF-2
+          distance_m_as_published: '10'
+          sample_description: 2hr 1N HF-HNO3
+          values_as_published:
+            Mass (g): '0.0065'
+            Cu (ug/g): '11.8'
+            Fraction: 2.0%
+            Blank%: 4.9%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '32.0'
+            K2O (wt%): null
+        - row_number: 6
+          sample_id: IG-2
+          distance_m_as_published: '100'
+          sample_description: Bulk
+          values_as_published:
+            Mass (g): '0.0618'
+            Cu (ug/g): '36.8'
+            Fraction: 100%
+            Blank%: 0.2%
+            sum_Cu (ug/g): '36.8'
+            sum_d65Cu: '0.40'
+            Cu (ICP) (ug/g): '44.58'
+            Zn (ug/g): '12.6'
+            K2O (wt%): '3.5'
+        - row_number: 7
+          sample_id: IG-2
+          distance_m_as_published: '100'
+          sample_description: Residue
+          values_as_published:
+            Mass (g): '0.1966'
+            Cu (ug/g): '32.8'
+            Fraction: 96%
+            Blank%: 0.1%
+            sum_Cu (ug/g): '33.0'
+            sum_d65Cu: '0.43'
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '10.2'
+            K2O (wt%): null
+        - row_number: 8
+          sample_id: IG-2
+          distance_m_as_published: '100'
+          sample_description: 20m H2O US
+          values_as_published:
+            Mass (g): '0.0005'
+            Cu (ug/g): '42.5'
+            Fraction: 0.2%
+            Blank%: 15.6%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '17.6'
+            K2O (wt%): null
+        - row_number: 9
+          sample_id: IG-2
+          distance_m_as_published: '100'
+          sample_description: 20m 3N HCl US
+          values_as_published:
+            Mass (g): '0.0014'
+            Cu (ug/g): '69.0'
+            Fraction: 0.7%
+            Blank%: 3.8%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '47.3'
+            K2O (wt%): null
+        - row_number: 10
+          sample_id: IG-2
+          distance_m_as_published: '100'
+          sample_description: 2hr 1N HF-HNO3
+          values_as_published:
+            Mass (g): '0.0067'
+            Cu (ug/g): '45.7'
+            Fraction: 3.3%
+            Blank%: 1.3%
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): null
+            Zn (ug/g): '31.0'
+            K2O (wt%): null
+        - row_number: 11
+          sample_id: T-1
+          distance_m_as_published: '200'
+          sample_description: Bulk
+          values_as_published:
+            Mass (g): '0.0971'
+            Cu (ug/g): null
+            Fraction: null
+            Blank%: null
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): '48.8'
+            Zn (ug/g): '18.3'
+            K2O (wt%): '3.4'
+        - row_number: 12
+          sample_id: T-2
+          distance_m_as_published: null
+          sample_description: Bulk
+          values_as_published:
+            Mass (g): '0.0911'
+            Cu (ug/g): null
+            Fraction: null
+            Blank%: null
+            sum_Cu (ug/g): null
+            sum_d65Cu: null
+            Cu (ICP) (ug/g): '58.1'
+            Zn (ug/g): '17.4'
+            K2O (wt%): '3.6'
+        - row_number: 13
+          sample_id: T-3
+          distance_m_as_published: '200'
+          sample_description: Bulk
+          values_as_published:
+            Mass (g): '0.1269'
+            Cu (ug/g): '66.8'
+            Fraction: null
+            Blank%: 0.05%
+            sum_Cu (ug/g): '66.8'
+            sum_d65Cu: '0.10'
+            Cu (ICP) (ug/g): '72.8'
+            Zn (ug/g): '16.3'
+            K2O (wt%): '3.51'
+    - observation_id: day_2020_recombined_residue_leachate_results_context
+      type: author_derived_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 10
+        pdf_page_index: 9
+        published_page: SI-3
+        section: Detailed Results
+      units: μg/g Cu; ‰ δ65Cu
+      values:
+        quantity: recombined_Cu_concentration_and_isotope_delta
+        method_class: author_derived
+        evidence_class: author_derived
+        values_as_published:
+          IG_residue_etchate_leachate_Cu: '33.5'
+          IG_residue_etchate_leachate_delta65Cu: '0.44'
+          IF_residue_etchate_leachate_Cu: '4'
+          IF_residue_etchate_leachate_delta65Cu: '0.44'
+        note: These recombined results are author-derived narrative values, not separate measured sample rows. Table S-1
+          reports IG sum_Cu 33.0 μg/g and sum_d65Cu 0.43‰, while its IF sums are 4.0 μg/g and 0.44‰; retain both
+          printed versions without scoring the recombination twice. The input concentrations have no store token;
+          derivation pending a corpus table asset (controller, t-1382). Table S-1 inputs are retained in
+          .agent-scratch/f39-tables/day-2020-trinitite-volatility/table-s1.csv and the extract's Table S-1 context.
+    - observation_id: day_2020_sample_formation_and_cooling_context
+      type: experimental_context
+      locator: *id003
+      units: as printed
+      values:
+        quantity: sample_formation_context
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        samples:
+        - sample_id: IF
+          distance_m: 10
+          formation_temperature_K: 1663
+          cooling_time_min: 17
+        - sample_id: IG
+          distance_m: 100
+          formation_temperature_K: 1593
+          cooling_time_min: 5
+        - sample_id: T3
+          distance_m_as_published: 200 ± 50
+          formation_temperature: lower than IF and IG; no numeric value stated
+          cooling_rate: higher; no numeric rate stated
+        note: The exact IF and IG formation temperatures are also used as Table S-1 point conditions. T3 is not
+          assigned a numeric temperature.
+    - observation_id: day_2020_non_sample_oxygen_reference_context
+      type: quoted_condition_context
+      locator: *id003
+      units: log10(bar)
+      values:
+        quantity: reference_oxygen_fugacity_comparison
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        values_as_published:
+        - buffer: FMQ
+          temperature_K: '1673'
+          log_fO2: '-6.3'
+        - buffer: FMQ
+          temperature_K: '2273'
+          log_fO2: '-1.8'
+        - atmosphere: air
+          temperature_K: 1673 and 2273
+          log_fO2: '-0.68'
+        note: These are reference comparisons in the main text, not measured trinitite run conditions; none is bound
+          to a Table S-1 point.
+    - observation_id: day_2020_cu_activity_coefficient_quoted_context
+      type: quoted_measurement_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        section: Discussion
+      units: dimensionless as printed
+      values:
+        quantity: activity_coefficient
+        candidate_token: activity_coefficient
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        oxide_formula_as_published: CuO0.5
+        values_as_published:
+        - approximately 10–20 at 1300 °C
+        - 3.5 at 1650 °C
+        attribution: Holzheid and Lodders (2001); Wood and Wade (2013)
+        standard_state: not stated in Day et al. (2020)
+        note: The source quotes an approximate range at 1300 °C and a separate value at 1650 °C, but does not map
+          each value to a cited source or state the reference basis. Preserve as printed context pending source-specific
+          attribution.
+    - observation_id: day_2020_partial_pressures_and_vaporized_fractions_context
+      type: model_derived_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        section: Discussion
+      units: bar; dimensionless fractions
+      values:
+        quantity: equilibrium_partial_pressures_and_fraction_vaporized
+        method_class: model_derived
+        evidence_class: model_derived
+        conditions_as_published:
+          temperature_K: '1600'
+          total_pressure_bar: '1'
+          atmosphere: air
+          log_fO2_bar: '-0.68'
+        equilibrium_partial_pressure_bar:
+          K: '1.06e-5'
+          Zn: '1.58e-4'
+          Cu: '8.84e-5'
+        fraction_vaporized:
+          Cu: '0.86'
+          Zn: '0.92'
+          K: '0.37'
+        copper_remaining_in_IF_ug_g: 7.4–12.1
+        initial_copper_content_ug_g: '73.4'
+        note: Author calculations from equilibrium vapor pressures and an assumed melt model; not observations or
+          sample conditions. Inputs are not all tokenized in this extract.
+    - observation_id: day_2020_relative_isotope_sensitivity_context
+      type: author_derived_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        section: Discussion
+      units: dimensionless ratios
+      values:
+        quantity: relative_isotope_sensitivity
+        method_class: author_derived
+        evidence_class: author_derived
+        values_as_published:
+        - ratio: δ66Zn/δ65Cu
+          central: '1.5'
+          upper_uncertainty: '2.5'
+          lower_uncertainty: '1.2'
+        - ratio: δ65Cu/δ41K
+          central: '1.9'
+          upper_uncertainty: '1.2'
+          lower_uncertainty: '1.6'
+        note: Calculated from relationships in Figure 3 and associated error envelopes; figure digitisation is deferred.
+    - observation_id: day_2020_thermal_history_context
+      type: quoted_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 10
+        pdf_page_index: 9
+        published_page: SI-3
+        section: Supplementary Information
+      units: K; s
+      values:
+        quantity: detonation_thermal_history
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        values_as_published:
+          temperature: above 8430 K within 3 s
+          hot_cloud_duration: 14–20 s
+          freeze_out: approximately 8–11 s
+        note: These are general detonation history estimates and are not assigned to any individual sample measurement.
+    - observation_id: day_2020_leaching_method_context
+      type: experimental_method_context
+      locator: *id004
+      units: as printed
+      values:
+        quantity: leaching_and_cu_isotope_method
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        values_as_published:
+          H2O: 18.2 MΩ; 20 min ultrasonication at 30 °C
+          HCl: 3 N; 20 min ultrasonication at 30 °C
+          HF-HNO3: 1 N; 120 min hotplate at 60 °C
+          final_Cu_cut: 99 ± 1 % of Cu
+          procedural_blank: approximately 4 ng Cu
+          blank_fraction_of_analyte: approximately 30 % to <0.1 %
+          Cu_reference_standard: NIST SRM976
+          Cu_delta_definition: δ65Cu = [(65Cu/63Cu_sample / 65Cu/63Cu_SRM976) − 1] × 1000
+          BHVO-2_measured: 0.07 ± 0.06 ‰ (2SD)
+          BHVO-2_literature: 0.12 ± 0.02 ‰
+        note: Method and reference checks on SI physical page 10; Cu Table S-1 isotope rows are measured relative
+          to NIST SRM976.
+    - observation_id: day_2020_figure_1_cu_isotope_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 3
+        pdf_page_index: 2
+        published_page: 56
+        figure: '1'
+      attribution: present work and Savage et al. (2015)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta and Cu concentration
+        species: Cu
+        phase: trinitite glass and chemical leach fractions
+        T_K: not stated
+        axes_as_published:
+          x: Cu (μg g−1)
+          y: δ65Cu (‰)
+        caption: Copper content versus δ65Cu in trinitite. Bulk silicate Earth (BSE) estimate from Savage et al.
+          (2015).
+        panel: all panels
+        series:
+        - name: IF (<10 m)
+          marker_count: 5
+          attribution: present work
+        - name: IG (100 m)
+          marker_count: 5
+          attribution: present work
+        - name: T3 (150–250 m)
+          marker_count: 1
+          attribution: present work
+        - name: BSE reference band
+          marker_count: 0
+          attribution: Savage et al. (2015)
+        numeric_points: []
+    - observation_id: day_2020_figure_2a_cu_isotope_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 3
+        pdf_page_index: 2
+        published_page: 56
+        figure: '2'
+      attribution: present work and Savage et al. (2015)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta
+        species: Cu
+        phase: trinitite glass
+        T_K: not stated
+        axes_as_published:
+          x: distance from the Gadget (m)
+          y: δ65Cu (‰)
+        caption: δ65Cu and Cu abundance in trinitite with distance from the Gadget compared with Zn, Pb and K contents
+          from the same samples; BSE from Savage et al. (2015).
+        panel: a
+        series:
+        - name: IF
+          marker_count: 2
+          attribution: present work
+        - name: IG
+          marker_count: 2
+          attribution: present work
+        - name: T3
+          marker_count: 1
+          attribution: present work
+        numeric_points: []
+    - observation_id: day_2020_figure_2b_cu_abundance_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 3
+        pdf_page_index: 2
+        published_page: 56
+        figure: '2'
+      attribution: present work; Day et al. (2017); Chen et al. (2019)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: Cu concentration
+        species: Cu
+        phase: trinitite glass
+        T_K: not stated
+        axes_as_published:
+          x: distance from the Gadget (m)
+          y: Cu (μg g−1)
+        caption: δ65Cu and Cu abundance in trinitite with distance from the Gadget compared with Zn, Pb and K contents
+          from the same samples; BSE from Savage et al. (2015).
+        panel: b
+        series:
+        - name: IF
+          marker_count: 1
+          attribution: present work
+        - name: IG
+          marker_count: 2
+          attribution: present work
+        - name: T3
+          marker_count: 1
+          attribution: present work
+        - name: Zn, Pb and K reference trends
+          marker_count: 0
+          attribution: Day et al. (2017); Chen et al. (2019)
+        numeric_points: []
+    - observation_id: day_2020_figure_4a_cu_model_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 5
+        pdf_page_index: 4
+        published_page: 58
+        figure: '4'
+      attribution: present work and cited literature
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta and Cu concentration
+        species: Cu
+        phase: trinitite glass, tektites and lunar samples
+        T_K: not stated
+        axes_as_published:
+          x: Cu content (μg g−1)
+          y: δ65Cu (‰)
+        caption: Rayleigh distillation curves versus (a) Cu, (b) Zn and (c) K contents and isotopic compositions
+          for trinitite glass, tektites and lunar samples. Curves shown for α = 1, 0.9998, 0.999 and 0.998.
+        panel: a
+        series:
+        - name: Lunar Basalts
+          marker_count: 18
+          attribution: Paniello et al. (2012); Kato et al. (2015); Wang and Jacobsen (2016)
+        - name: Tektites
+          marker_count: 23
+          attribution: Moynier et al. (2009, 2010); Jiang et al. (2019)
+        - name: Trinitite Glass
+          marker_count: 5
+          attribution: present work; Day et al. (2017)
+        numeric_points: []
+    - observation_id: day_2020_figure_s1_sample_localities_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 9
+        pdf_page_index: 8
+        published_page: SI-2
+        figure: S-1
+      attribution: modified from Day et al. (2017); Ross (1948); Staritzky (1950)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: sample locality schematic
+        species: Cu
+        phase: trinitite site samples
+        T_K: not stated
+        axes_as_published:
+          x: no coordinate axes; 700 m scale bar
+          y: no coordinate axis
+        caption: Schematic of the “geology” of trinitite at the Trinity Test Site, constructed from observations
+          of Ross (1948) and Staritzky (1950), and modified from Day et al. (2017). Grey bands show locations of
+          samples used in this study (shown as concentric rings).
+        panel: all panels
+        series:
+        - name: IF-2
+          marker_count: 1
+          attribution: present work
+        - name: IG-2
+          marker_count: 1
+          attribution: present work
+        - name: T-1
+          marker_count: 1
+          attribution: present work
+        - name: T-2
+          marker_count: 1
+          attribution: present work
+        - name: T-3
+          marker_count: 1
+          attribution: present work
+        numeric_points: []
+    - observation_id: day_2020_figure4_rayleigh_inputs_context
+      type: model_derived_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 5
+        pdf_page_index: 4
+        published_page: 58
+        figure: '4'
+      units: dimensionless; μg g−1
+      values:
+        quantity: rayleigh_model_parameters
+        method_class: model_derived
+        evidence_class: model_derived
+        alpha_fractionation_factors_as_published:
+        - '1'
+        - '0.9998'
+        - '0.999'
+        - '0.998'
+        estimated_BSE_element_contents_as_published:
+          Cu: 70 μg g−1
+          Zn: 30 μg g−1
+          K: 40000 μg g−1
+        note: Printed Figure 4 caption values; the plotted curves and data markers remain deferred.
+  Zn:
+    observations:
+    - observation_id: day_2020_table_s1_zn_glass_isotope_delta
+      type: rate_series
+      class_tag: quoted_attributed
+      phase: glass
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        analyte: Zn
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 66Zn/64Zn
+        reference_standard: not restated in Day et al. (2020)
+        attribution: Day et al. (2017)
+        points:
+        - sample_id: IF-2
+          sample_description: Bulk
+          table_row_number: 1
+          isotope_delta_isotope_delta: '0.72'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 1; IF-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IF-2
+          sample_description: Residue
+          table_row_number: 2
+          isotope_delta_isotope_delta: '0.85'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 2; IF-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IG-2
+          sample_description: Bulk
+          table_row_number: 6
+          isotope_delta_isotope_delta: '0.64'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 6; IG-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: IG-2
+          sample_description: Residue
+          table_row_number: 7
+          isotope_delta_isotope_delta: '0.65'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 7; IG-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: T-3
+          sample_description: Bulk
+          table_row_number: 13
+          isotope_delta_isotope_delta: '0.31'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 13; T-3 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_numeric
+              locator: *id002
+          distance_m_as_published: '200'
+    - observation_id: day_2020_table_s1_zn_aq_isotope_delta
+      type: rate_series
+      class_tag: quoted_attributed
+      phase: aq
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        analyte: Zn
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 66Zn/64Zn
+        reference_standard: not restated in Day et al. (2020)
+        attribution: Day et al. (2017)
+        points:
+        - sample_id: IF-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 4
+          isotope_delta_isotope_delta: '-0.09'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IF-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 5
+          isotope_delta_isotope_delta: '0.67'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IG-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 9
+          isotope_delta_isotope_delta: '0.12'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: IG-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 10
+          isotope_delta_isotope_delta: '0.63'
+          isotope_ratio: 66Zn/64Zn
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Day et al. (2017)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+    context:
+    - observation_id: day_2020_figure_3a_zn_isotope_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        figure: '3'
+      attribution: present work; Day et al. (2017); Moynier et al. (2017); Wang and Jacobsen (2016)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta
+        species: Cu and Zn
+        phase: trinitite glass
+        T_K: not stated
+        axes_as_published:
+          x: δ65Cu (‰)
+          y: δ66Zn (‰)
+        caption: Copper versus (a) Zn and (b) K isotopes in trinitite. Zinc and K data for trinitites from Day et
+          al. (2017) and Chen et al. (2019). BSE Cu, Zn and K values from Moynier et al. (2017) and Wang and Jacobsen
+          (2016).
+        panel: a
+        series:
+        - name: IF
+          marker_count: 2
+          attribution: present work and Day et al. (2017)
+        - name: IG
+          marker_count: 2
+          attribution: present work and Day et al. (2017)
+        - name: T3
+          marker_count: 1
+          attribution: present work and Day et al. (2017)
+        - name: BSE
+          marker_count: 1
+          attribution: Moynier et al. (2017); Wang and Jacobsen (2016)
+        numeric_points: []
+    - observation_id: day_2020_figure_4b_zn_model_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 5
+        pdf_page_index: 4
+        published_page: 58
+        figure: '4'
+      attribution: present work and cited literature
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta and Zn concentration
+        species: Zn
+        phase: trinitite glass, tektites and lunar samples
+        T_K: not stated
+        axes_as_published:
+          x: Zn content (μg g−1)
+          y: δ66Zn (‰)
+        caption: Rayleigh distillation curves versus (a) Cu, (b) Zn and (c) K contents and isotopic compositions
+          for trinitite glass, tektites and lunar samples. Curves shown for α = 1, 0.9998, 0.999 and 0.998.
+        panel: b
+        series:
+        - name: Lunar Basalts
+          marker_count: 16
+          attribution: Paniello et al. (2012); Kato et al. (2015); Wang and Jacobsen (2016)
+        - name: Tektites
+          marker_count: 12
+          attribution: Moynier et al. (2009, 2010); Jiang et al. (2019)
+        - name: Trinitite Glass
+          marker_count: 8
+          attribution: present work; Day et al. (2017)
+        numeric_points: []
+  K:
+    observations:
+    - observation_id: day_2020_table_s1_k_glass_isotope_delta
+      type: rate_series
+      class_tag: quoted_attributed
+      phase: glass
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        analyte: K
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 41K/39K
+        reference_standard: not restated in Day et al. (2020)
+        attribution: Chen et al. (2019)
+        points:
+        - sample_id: IF-2
+          sample_description: Bulk
+          table_row_number: 1
+          isotope_delta_isotope_delta: '-0.27'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 1; IF-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IF-2
+          sample_description: Residue
+          table_row_number: 2
+          isotope_delta_isotope_delta: '-0.27'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 2; IF-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IG-2
+          sample_description: Bulk
+          table_row_number: 6
+          isotope_delta_isotope_delta: '-0.45'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 6; IG-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: IG-2
+          sample_description: Residue
+          table_row_number: 7
+          isotope_delta_isotope_delta: '-0.43'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 7; IG-2 Residue isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: T-1
+          sample_description: Bulk
+          table_row_number: 11
+          isotope_delta_isotope_delta: '-0.48'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 11; T-1 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_numeric
+              locator: *id002
+          distance_m_as_published: '200'
+        - sample_id: T-2
+          sample_description: Bulk
+          table_row_number: 12
+          isotope_delta_isotope_delta: '-0.46'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 12; T-2 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_numeric
+              locator: *id002
+        - sample_id: T-3
+          sample_description: Bulk
+          table_row_number: 13
+          isotope_delta_isotope_delta: '-0.42'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 13; T-3 Bulk isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: not_numeric
+              locator: *id002
+          distance_m_as_published: '200'
+    - observation_id: day_2020_table_s1_k_aq_isotope_delta
+      type: rate_series
+      class_tag: quoted_attributed
+      phase: aq
+      units: permil
+      locator: *id001
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        analyte: K
+        system_class: trinitite glass or its chemically leached fraction
+        isotope_ratio: 41K/39K
+        reference_standard: not restated in Day et al. (2020)
+        attribution: Chen et al. (2019)
+        points:
+        - sample_id: IF-2
+          sample_description: 20m H2O US
+          table_row_number: 3
+          isotope_delta_isotope_delta: '-0.41'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 3; IF-2 20m H2O US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IF-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 4
+          isotope_delta_isotope_delta: '-0.40'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IF-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 5
+          isotope_delta_isotope_delta: '-0.26'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1663'
+              locator: *id002
+          T_K: '1663'
+          distance_m_as_published: '10'
+        - sample_id: IG-2
+          sample_description: 20m H2O US
+          table_row_number: 8
+          isotope_delta_isotope_delta: '-0.77'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 8; IG-2 20m H2O US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: IG-2
+          sample_description: 20m 3N HCl US
+          table_row_number: 9
+          isotope_delta_isotope_delta: '-0.34'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+        - sample_id: IG-2
+          sample_description: 2hr 1N HF-HNO3
+          table_row_number: 10
+          isotope_delta_isotope_delta: '-0.42'
+          isotope_ratio: 41K/39K
+          reference_standard: not restated in Day et al. (2020)
+          attribution: Chen et al. (2019)
+          locator:
+            source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+            page: 11
+            pdf_page_index: 10
+            published_page: SI-4
+            table: S-1
+            note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator: *id002
+          T_K: '1593'
+          distance_m_as_published: '100'
+    context:
+    - observation_id: day_2020_quoted_zn_activity_and_alkali_activity_context
+      type: quoted_measurement_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        section: Discussion
+      units: dimensionless as printed
+      values:
+        quantity: activity_coefficient
+        candidate_tokens:
+        - activity_coefficient
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        values_as_published:
+        - oxide: ZnO(l)
+          activity_coefficient: slightly less than unity
+          attribution: Sossi et al. (2019)
+        - oxide: KO0.5
+          activity_coefficient: approximately 2 × 10^-4
+          attribution: Hastie and Bonnell (1985); Sossi et al. (2019)
+        standard_state: not stated in Day et al. (2020)
+        note: The quoted Zn statement is qualitative. KO0.5 has a numerical approximate coefficient, but the paper
+          does not state its standard state or separate source-specific value; retained as quoted context.
+    - observation_id: day_2020_k_equilibrium_partial_pressure_context
+      type: model_derived_context
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        section: Discussion
+      units: bar
+      values:
+        quantity: equilibrium_partial_pressure
+        method_class: model_derived
+        evidence_class: model_derived
+        species: K
+        value_as_published: '1.06e-5'
+        temperature_K: '1600'
+        total_pressure_bar: '1'
+        atmosphere: air
+        log_fO2_bar: '-0.68'
+        note: Author calculation; not an observation or a sample condition.
+    - observation_id: day_2020_figure_3b_k_isotope_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 4
+        pdf_page_index: 3
+        published_page: 57
+        figure: '3'
+      attribution: present work; Chen et al. (2019); Moynier et al. (2017); Wang and Jacobsen (2016)
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta
+        species: Cu and K
+        phase: trinitite glass
+        T_K: not stated
+        axes_as_published:
+          x: δ65Cu (‰)
+          y: δ41K (‰)
+        caption: Copper versus (a) Zn and (b) K isotopes in trinitite. Zinc and K data for trinitites from Day et
+          al. (2017) and Chen et al. (2019). BSE Cu, Zn and K values from Moynier et al. (2017) and Wang and Jacobsen
+          (2016).
+        panel: b
+        series:
+        - name: IF
+          marker_count: 2
+          attribution: present work and Chen et al. (2019)
+        - name: IG
+          marker_count: 2
+          attribution: present work and Chen et al. (2019)
+        - name: T3
+          marker_count: 1
+          attribution: present work and Chen et al. (2019)
+        - name: BSE
+          marker_count: 1
+          attribution: Moynier et al. (2017); Wang and Jacobsen (2016)
+        numeric_points: []
+    - observation_id: day_2020_figure_4c_k_model_deferred
+      type: figure_record
+      locator:
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+        page: 5
+        pdf_page_index: 4
+        published_page: 58
+        figure: '4'
+      attribution: present work and cited literature
+      digitisation: deferred to a figure pass
+      units: axes and marker counts as printed; numeric points deferred
+      values:
+        quantity: isotope_delta and K concentration
+        species: K
+        phase: trinitite glass, tektites and lunar samples
+        T_K: not stated
+        axes_as_published:
+          x: K content (μg g−1)
+          y: δ41K (‰)
+        caption: Rayleigh distillation curves versus (a) Cu, (b) Zn and (c) K contents and isotopic compositions
+          for trinitite glass, tektites and lunar samples. Curves shown for α = 1, 0.9998, 0.999 and 0.998.
+        panel: c
+        series:
+        - name: Lunar Basalts
+          marker_count: 8
+          attribution: Paniello et al. (2012); Kato et al. (2015); Wang and Jacobsen (2016)
+        - name: Tektites
+          marker_count: 17
+          attribution: Moynier et al. (2009, 2010); Jiang et al. (2019)
+        - name: Trinitite Glass
+          marker_count: 6
+          attribution: present work; Chen et al. (2019)
+        numeric_points: []
