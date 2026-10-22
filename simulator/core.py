@@ -522,7 +522,6 @@ from simulator.chemistry.kernel import (
     normalize_oxygen_sink_channel_mode,
 )
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
 # engines.builtin.vapor_pressure -> simulator.chemistry.kernel ->
@@ -9769,7 +9768,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # removed at flip time per the goal spec ("comparing against the
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
-        self._refresh_vapor_pressures_from_kernel(result)
+        self._refresh_vapor_pressures_from_kernel(
+            result, simulation_hour=int(self.melt.hour) + 1,
+        )
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
@@ -9849,6 +9850,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
+        simulation_hour: int | None = None,
         observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
@@ -9857,6 +9859,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
         legacy internal analytical path) produces an EquilibriumResult.
+
+        ``simulation_hour`` enables trajectory continuation for runtime calls;
+        standalone equilibrium probes omit it.
 
         Behaviour:
           - Below 400 K this method returns before kernel dispatch and preserves
@@ -9995,7 +10000,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
         )
         high_t_control_inputs: dict[str, Any] = {}
-        if T_C + 273.15 > VAPOROCK_T_MAX_K:
+        from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
+
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=T_C + 273.15, controls={},
+            quantity_class="activity",
+        ):
             high_t_control_inputs = {
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
@@ -10006,21 +10016,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity_previous': getattr(
                     self, '_last_high_t_melt_activity', {}
                 ),
-                'simulation_hour': int(self.melt.hour) + 1,
-                'high_t_melt_activity_crossing': (
-                    getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    is not None
-                    and getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    <= VAPOROCK_T_MAX_K
-                ),
+                'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
             'control_inputs': {
@@ -10218,9 +10214,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 diagnostic['vapor_pressures_source'] = dict(
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
-        kernel_activities = diagnostic.get('activities') or {}
+        high_t_activity = diagnostic.get('high_t_melt_activity') or {}
+        parent_activities = high_t_activity.get('selected_parent_activities')
+        kernel_activities = parent_activities or diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
+            if parent_activities:
+                result.diagnostics = {
+                    **(getattr(result, 'diagnostics', {}) or {}),
+                    'activities_provider': high_t_activity['selected_parent_activities_provider'],
+                    'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
+                    'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
+                }
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
