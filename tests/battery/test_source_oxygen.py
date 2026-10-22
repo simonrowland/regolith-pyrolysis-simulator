@@ -10,6 +10,7 @@ from simulator.battery.enums import Engine, EvidenceClass, Phase, Quantity
 from simulator.battery.records import Species, State
 from simulator.battery.score import _bench_for_score, compile_residual, load_score_context
 from simulator.battery.source_oxygen import (
+    SourceOxygenCondition,
     SourceOxygenFallback,
     SourceOxygenFallbackReason as FallbackReason,
     resolve_source_oxygen,
@@ -304,3 +305,56 @@ def test_printed_point_oxygen_keeps_unmodelled_reactive_cell_notice(source_conte
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment, bench=bench)
     assert any(request.mode == battery.PO2_COMMANDED and request.po2_bar == pytest.approx(4.6508175e-11) for request in requests)
     assert any(notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for notice in prediction.notices)
+
+
+@pytest.mark.parametrize(
+    ("pressure_atm", "expected_pa"),
+    (
+        ("6.8e-10", "3.073062242627939E-7"),
+        ("2.65e-9", "4.667080363074115E-6"),
+    ),
+    ids=("W-6.8e-10-atm", "Shornikov-2.65e-9-atm"),
+)
+def test_atomic_oxygen_conversion_is_bit_identical(pressure_atm, expected_pa):
+    """One measured atomic-O row at 1933 K, with no O2 partner.
+
+    The stored pascal values are the atomic branch's Decimal(str(float))
+    output. W 6.8e-10 atm is 3.073062242627939e-7 Pa, which is the
+    3.0730622426279393e-12 bar figure after the pascal string round-trip.
+    Shornikov's 2.65e-9 atm is 4.667080363074115e-6 Pa
+    (4.6670803630741150e-11 bar). The literals are those stored numbers.
+    """
+    from simulator.battery.enums import AmountBasis
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import Composition
+    from tests.battery.factories import observation
+
+    composition = State.of(Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.6")), ("SiO2", Decimal("0.4"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    ))
+    temperature = State.of(Decimal("1933"))
+
+    def partial(observation_id, formula, value_pa):
+        return observation(
+            observation_id,
+            "exp-atomic-pin",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species(formula, Phase.G),
+                temperature_K=temperature,
+                composition=composition,
+            ),
+            value_pa,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="synthetic-atomic-pin",
+        )
+
+    sample = partial("sample-sio", "SiO", Decimal("1"))
+    atomic = partial("printed-o", "O", Decimal(pressure_atm) * Decimal("101325"))
+    selected = resolve_source_oxygen(sample, (sample, atomic), None)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert selected.observation.value.point == Decimal(expected_pa)
+    assert selected.observation.identity.species.formula == "O2"
+    assert "pO2_Pa=100000*(pO_Pa/100000/K_O)^2" in selected.observation.derivation.relation
