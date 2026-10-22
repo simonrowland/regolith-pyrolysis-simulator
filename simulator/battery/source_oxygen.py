@@ -189,13 +189,14 @@ def _printed_partner_is_ineligible(
     measured: list[tuple[Observation, set[str]]],
     cell_oxygen: list[tuple[Observation, set[str]]],
 ) -> bool:
-    """Both formulas are printed and exactly one side is measured-eligible.
+    """Both formulas are printed and this is not one eligible condition.
 
-    Counted before the eligibility filter. Dropping a rejected or untyped
-    partner and keeping the survivor is the ambiguity this condition forbids.
-    A measured O2 still precedes a cell-route O, as at base: every printed O
-    in that case is the cell row. Downstream O2 is not this case either,
-    because neither side is measured-eligible and the cell branch still runs.
+    Counted on the printed rows, before eligibility drops a partner.
+    Exactly one measured-eligible side is ambiguous. Neither side eligible
+    is ambiguous too: an O/O2 pair where either row fails, including both,
+    stays AMBIGUOUS. A cell-route O is the base exception, and it still
+    owns a downstream printed O2 linked to that cell row. A measured O2
+    still precedes a cell-route O when every printed O is that cell row.
     """
     printed: dict[str, list[Observation]] = {"O": [], "O2": []}
     for row in point.values():
@@ -206,8 +207,10 @@ def _printed_partner_is_ineligible(
     eligible: dict[str, set[str]] = {"O": set(), "O2": set()}
     for row, _used in measured:
         eligible[row.identity.species.formula].add(row.observation_id)
-    if bool(eligible["O"]) == bool(eligible["O2"]):
+    if eligible["O"] and eligible["O2"]:
         return False
+    if not eligible["O"] and not eligible["O2"]:
+        return not cell_oxygen
     if eligible["O2"] and not eligible["O"]:
         cell_ids = {row.observation_id for row, _used in cell_oxygen}
         if cell_ids and all(row.observation_id in cell_ids for row in printed["O"]):
@@ -414,9 +417,11 @@ def _combined_stated_consistency_dex(
     Premise. JANAF O-001 is 1/2 O2 = O, so at fixed T the K_O-implied
     pO2 is proportional to pO squared. K_O is the compilation constant,
     not a stated source uncertainty, and is left out of the envelope.
-    The two printed pressures are independent readings, so their
-    envelopes can line up: the combined bound is the sum, not the
-    root-sum-square.
+    The ruling does not establish that the two readings are independent:
+    one may be reduced from the other. The bound is still the sum of
+    the envelopes, not a root-sum-square, so the envelopes can line up.
+    That sum is the notice threshold. It is not a claim that the
+    readings were made separately.
 
     Algebra. consistency_dex = log10(pO2) - 2 log10(pO) - constant(T).
     A relative width ε moves log10(p) by at most -log10(1-ε) when
@@ -427,8 +432,9 @@ def _combined_stated_consistency_dex(
     envelope, there is no combined bound.
 
     Unit check. ε = δp/p is dimensionless. -log10(1-ε) is dex. The
-    factor 2 is dex because log10(p^2) = 2 log10(p). The sum is dex.
-    consistency_dex is log10(Pa/Pa) = dex.
+    factor 2 is dimensionless: log10(p^2) = 2 log10(p), and twice a
+    dex envelope is dex. The sum is dex. consistency_dex is
+    log10(Pa/Pa) = dex.
 
     Sanity. Shornikov at 1933 K, O = 2.65e-9 atm and O2 = 4.59e-11 atm,
     gives |consistency_dex| about 0.0016. A stated ±8% on both sides is

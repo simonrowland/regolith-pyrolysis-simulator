@@ -554,7 +554,14 @@ def test_other_oxygen_multiplicities_stay_ambiguous(formulas):
 
 @pytest.mark.parametrize(
     "case",
-    ("rejected-o", "rejected-o2", "tabulated-o", "derived-o2", "unlocated-o"),
+    (
+        "rejected-o",
+        "rejected-o2",
+        "tabulated-o",
+        "derived-o2",
+        "unlocated-o",
+        "both-rejected",
+    ),
 )
 def test_ineligible_oxygen_partner_is_not_the_co_measured_condition(monkeypatch, case):
     from simulator.battery.enums import AdmissionStatus
@@ -575,6 +582,11 @@ def test_ineligible_oxygen_partner_is_not_the_co_measured_condition(monkeypatch,
         molecular = replace(molecular, derived_from=("printed-o",))
     elif case == "unlocated-o":
         atomic = replace(atomic, locator=None)
+    elif case == "both-rejected":
+        atomic = replace(atomic, admission=replace(atomic.admission, status=AdmissionStatus.REJECTED))
+        molecular = replace(
+            molecular, admission=replace(molecular.admission, status=AdmissionStatus.REJECTED),
+        )
     else:
         raise AssertionError(case)
 
@@ -655,14 +667,57 @@ def test_printed_fo2_condition_input_is_not_scored(source_context):
     assert residual.refusal.detail["derivation"]["inputs"]
 
 
-def test_own_printed_oxygen_value_is_not_scored_against_itself(source_context):
-    """Tabulated O2 whose own pressure is the printed fO2, float residue included.
+def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_context, monkeypatch):
+    """A sample gas whose pressure equals the oxygen condition is still scored.
 
-    measured_tabulated is not a selector candidate, so this is not the
-    used-set path. A sample gas carrying the same stamp is still scored;
-    test_printed_command_is_preserved is that row.
+    Real Stolyarova 1933 K, X(CaO)=0.6 SiO. Printing identity fO2 equal to
+    that SiO pressure used to refuse the row by numeric coincidence. Setting
+    the SiO pressure itself equal to the selected O2 condition does too.
+    The row is in neither derivation. A matching number is not an input.
     """
-    from simulator.battery.records import Located, Value
+    from simulator.battery.records import Value
+
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    point_rows = tuple(
+        item for item in source_context.observations.values()
+        if item.experiment_id == row.experiment_id
+    )
+    selected = _resolve(source_context, row, point_rows)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert row.observation_id not in selected.used_observations
+    assert row.observation_id not in selected.observation.derivation.inputs
+
+    stamped = replace(row, identity=replace(row.identity, fO2_Pa=State.of(row.value.point)))
+    requests, handles = _capture_engine(monkeypatch, stamped)
+    residual, candidate = compile_residual(
+        stamped, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=point_rows,
+    )
+    assert residual.refusal is None
+    assert residual.numeric is not None and candidate is not None
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(float(row.value.point) / 1e5, rel=1e-12)
+
+    equal = replace(row, value=Value.point_of(selected.observation.value.point))
+    requests, handles = _capture_engine(monkeypatch, equal)
+    residual, candidate = compile_residual(
+        equal, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=point_rows,
+    )
+    assert residual.refusal is None
+    assert residual.numeric is not None and candidate is not None
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+
+
+def test_printed_fo2_naming_the_row_is_not_scored(source_context, monkeypatch):
+    """A matching pressure is scored. The same fO2 naming this observation is not.
+
+    measured_tabulated is not a selector candidate. The name is the Located
+    inference inputs, not the numeric residue between the row and its stamp.
+    """
+    from simulator.battery.records import Derivation, Located, Value
     from simulator.battery.score import _has_printed_fo2
 
     sio = _row(source_context, "kems-053-stolyarova-1991")
@@ -679,7 +734,6 @@ def test_own_printed_oxygen_value_is_not_scored_against_itself(source_context):
         value=Value.point_of(exact),
         evidence=replace(sio.evidence, class_=State.of(EvidenceClass.MEASURED_TABULATED)),
         point_conditions={
-            **(sio.point_conditions or {}),
             "fO2_Pa": Located(State.of(Value.point_of(widened)), locator=sio.locator),
         },
         notices=(),
@@ -687,16 +741,41 @@ def test_own_printed_oxygen_value_is_not_scored_against_itself(source_context):
     )
     assert _has_printed_fo2(own, own.identity)
     point_rows = tuple(
-        r for r in source_context.observations.values()
-        if r.experiment_id == sio.experiment_id
+        item for item in source_context.observations.values()
+        if item.experiment_id == sio.experiment_id
+    )
+    requests, handles = _capture_engine(monkeypatch, own)
+    residual, candidate = compile_residual(
+        own, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=point_rows,
+    )
+    assert residual.refusal is None
+    assert residual.numeric is not None and candidate is not None
+    assert len(requests) == 1
+    assert own.observation_id not in _resolve(source_context, own, point_rows).used_observations
+
+    named = replace(
+        own,
+        point_conditions={
+            "fO2_Pa": Located(
+                State.of(Value.point_of(widened)),
+                locator=sio.locator,
+                inference=Derivation(
+                    relation="printed fO2 from this observation",
+                    inputs=(own.observation_id,),
+                    parameters=(),
+                    output_unit="Pa",
+                ),
+            ),
+        },
     )
     residual, candidate = compile_residual(
-        own, Engine.OPENIMCC, context=source_context, point_observations=point_rows,
+        named, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=point_rows,
     )
     assert residual.numeric is None and candidate is None
     assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
-    assert residual.refusal.detail["match"] == "own_value_is_condition"
-    assert own.observation_id not in set(residual.refusal.detail.get("derived_from") or ())
+    assert residual.refusal.detail["match"] == "printed_fo2_names_observation"
 
 
 def test_comeasured_consistency_notice_reaches_scored_residual(source_context, monkeypatch):
@@ -735,6 +814,60 @@ def test_comeasured_consistency_notice_reaches_scored_residual(source_context, m
     )
     assert len(requests) == 1
     assert requests[0].mode == battery.PO2_COMMANDED
+    assert any(notice.origin == "co-measured oxygen consistency" for notice in residual.notices)
+    assert not any(notice.origin == "unrelated-o2-source-notice" for notice in residual.notices)
+    assert any(
+        notice.reason.startswith("co_measured_o_o2_consistency:") for notice in residual.notices
+    )
+
+
+def test_comeasured_consistency_notice_reaches_printed_fo2_residual(source_context, monkeypatch):
+    """A printed command stays. The pair's consistency notice still arrives.
+
+    Shornikov's 1933 K O2 is 4.59e-11 atm = 4.6508175e-11 bar. The stated
+    molecular relative width is 1e-8, which is inside the notice bound.
+    """
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.records import Notice
+
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    _sample, pair = _pair_rows(
+        o2_uncertainty=_printed_uncertainty(
+            "stated relative pressure uncertainty", Decimal("1e-8"), "relative",
+        ),
+    )
+    unrelated = Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="not the consistency check",
+        origin="unrelated-o2-source-notice",
+    )
+    oxygen = []
+    for item in pair:
+        if item.identity.species.formula not in {"O", "O2"}:
+            continue
+        item = replace(
+            item,
+            experiment_id=row.experiment_id,
+            source_id=row.source_id,
+            identity=replace(
+                row.identity,
+                species=Species(item.identity.species.formula, Phase.G),
+                reaction=State.unknown("printed pressure"),
+            ),
+        )
+        if item.identity.species.formula == "O2":
+            item = replace(item, notices=(unrelated,))
+        oxygen.append(item)
+    printed = replace(row, identity=replace(row.identity, fO2_Pa=State.of(_SHORNIKOV_O2_PA)))
+    requests, handles = _capture_engine(monkeypatch, printed)
+    residual, _candidate = compile_residual(
+        printed, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=(printed, *oxygen),
+    )
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert requests[0].po2_bar == pytest.approx(4.6508175e-11, rel=1e-12)
     assert any(notice.origin == "co-measured oxygen consistency" for notice in residual.notices)
     assert not any(notice.origin == "unrelated-o2-source-notice" for notice in residual.notices)
     assert any(

@@ -6581,53 +6581,29 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
-def _same_printed_pressure(left: Decimal, right: Decimal) -> bool:
-    """One printed number stored twice, not a physical agreement band.
+def _printed_fo2_names_observation(reference: Observation) -> bool:
+    """The printed fO2 derivation lists this observation. A number does not.
 
-    Shornikov 2020 Table 3 writes the O2 pressure on the row and again as
-    oxygen_partial_pressure. Binary float residue is about 1e-16 relative.
-    1e-12 separates that residue from a different gas at the same point
-    (atomic O is about 37 times the O2 stamp).
+    identity.fO2_Pa is a State and has no inputs. The name is the Located
+    inference on fO2_Pa or oxygen_partial_pressure_Pa. Inputs that do not
+    list this observation_id are not a name, including a unit conversion.
     """
-    if (
-        not left.is_finite() or not right.is_finite()
-        or left <= 0 or right <= 0
-    ):
+    point = oxygen_pressure_point(reference)
+    if point is None or point.inference is None:
         return False
-    return abs(left - right) / max(abs(left), abs(right)) <= Decimal("1e-12")
+    return reference.observation_id in point.inference.inputs
 
 
-def _scoring_condition_pressure_pa(
-    reference: Observation, oxygen: SourceOxygenCondition | object
-) -> Decimal | None:
-    """pO2 this row would be scored at. Printed fO2 wins over the selector."""
-    if _has_printed_fo2(reference, reference.identity):
-        fo2 = reference.identity.fO2_Pa
-        if (
-            fo2 is not None and fo2.is_value
-            and isinstance(fo2.value, Decimal) and fo2.value > 0
-        ):
-            return fo2.value
-        return printed_source_pressure(reference)
-    if isinstance(oxygen, SourceOxygenCondition):
-        value = oxygen.observation.value
-        point = value.point if value.kind is ValueKind.POINT else None
-        if isinstance(point, Decimal) and point.is_finite() and point > 0:
-            return point
-    return None
-
-
-def _own_value_is_scoring_condition(
-    reference: Observation, oxygen: SourceOxygenCondition | object
+def _is_selected_condition_observation(
+    reference: Observation, oxygen: SourceOxygenCondition
 ) -> bool:
-    """The row's own partial pressure is the oxygen condition, float residue included."""
-    value = reference.value
-    if value.kind is not ValueKind.POINT or not isinstance(value.point, Decimal):
-        return False
-    condition = _scoring_condition_pressure_pa(reference, oxygen)
-    if condition is None:
-        return False
-    return _same_printed_pressure(value.point, condition)
+    """Identity with the selected condition: an input, or the condition itself."""
+    if reference.observation_id == oxygen.observation.observation_id:
+        return True
+    if reference.observation_id in oxygen.used_observations:
+        return True
+    derivation = oxygen.observation.derivation
+    return derivation is not None and reference.observation_id in derivation.inputs
 
 
 def compile_residual(
@@ -6921,10 +6897,11 @@ def compile_residual(
             predictor is predict_with_engine
             and _knudsen_vapour_equilibrium(quantity, experiment)
         ):
-            # The used-set check applies whether fO2 is printed on the
-            # identity or supplied by the selector. A printed command is
-            # not overwritten; it still cannot score one of its own inputs,
-            # or the row whose value is that command.
+            # Identity, whether fO2 is printed or supplied by the selector.
+            # A printed command is not overwritten. A row is a condition
+            # input when its observation_id is in the selected derivation,
+            # when it is the condition observation, or when the printed
+            # fO2 derivation names it. A matching pressure is not that name.
             recorded = _bench_for_score(experiment, context.benches)
             oxygen = resolve_source_oxygen(
                 reference,
@@ -6934,7 +6911,7 @@ def compile_residual(
             printed_fo2 = _has_printed_fo2(reference, reference.identity)
             if (
                 isinstance(oxygen, SourceOxygenCondition)
-                and reference.observation_id in oxygen.used_observations
+                and _is_selected_condition_observation(reference, oxygen)
             ):
                 return _refused(
                     RefusalReason.UNSUPPORTED,
@@ -6945,10 +6922,10 @@ def compile_residual(
                     },
                     execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
-            if _own_value_is_scoring_condition(reference, oxygen):
+            if _printed_fo2_names_observation(reference):
                 detail: dict[str, object] = {
                     "reason": "used_as_scoring_condition",
-                    "match": "own_value_is_condition",
+                    "match": "printed_fo2_names_observation",
                 }
                 if isinstance(oxygen, SourceOxygenCondition):
                     detail["derivation"] = to_plain(oxygen.observation.derivation)
@@ -6959,12 +6936,12 @@ def compile_residual(
                     execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
             if isinstance(oxygen, SourceOxygenCondition):
+                consistency = tuple(
+                    notice for notice in oxygen.observation.notices
+                    if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
+                )
+                notices = union_notices(notices, consistency)
                 if not printed_fo2:
-                    consistency = tuple(
-                        notice for notice in oxygen.observation.notices
-                        if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
-                    )
-                    notices = union_notices(notices, consistency)
                     reference = replace(
                         reference,
                         point_conditions={
