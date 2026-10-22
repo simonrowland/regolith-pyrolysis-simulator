@@ -4,11 +4,11 @@ rows in: 50497
 records out (observations): 126296
 works: 349
 experiments: 3823
-queue size: 80881
+queue size: 80878
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 348
-hard issues: 3334
+hard issues: 3344
 
 ## Spec vs measured
 
@@ -17994,7 +17994,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/borisov-2018-compilation.yaml` | 435 | 435 | 1305 |
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 46 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
-| `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 38 |
+| `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 35 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 37 | 37 | 111 |
 | `data/literature/extracts/busemann-2000-phase-q-noble-gases.yaml` | 40 | 308 | 496 |
 | `data/literature/extracts/busemann-2024-noble-gases-ryugu-bennu.yaml` | 2 | 2 | 8 |
@@ -18010,7 +18010,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` | 3 | 3 | 9 |
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 190 |
-| `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 7 |
+| `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
 | `data/literature/extracts/fdm879.yaml` | 6 | 8 | 26 |
 | `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 75 | 179 |
@@ -18060,7 +18060,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 300 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 45 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 333 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 339 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 9 | 22 | 63 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 40 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
@@ -18280,7 +18280,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
 | `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 198 |
-| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 34 |
+| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml` | 6 | 6 | 6 |
@@ -18310,7 +18310,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/volovetskii-2012-iron-redox.yaml` | 3 | 30 | 3 |
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
-| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 69 |
+| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 65 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 67 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 33 |
@@ -18326,14 +18326,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3334
+hard issues: 3344
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
 | `conditional_field:derived_from` | 2175 |
-| `conditional_field:derivation` | 1159 |
+| `conditional_field:derivation` | 1165 |
+| `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
 

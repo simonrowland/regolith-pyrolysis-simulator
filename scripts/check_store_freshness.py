@@ -74,6 +74,19 @@ CODE_INPUTS = (
 #     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
 #     acknowledges STORE outputs only; the predictor's value moves (d-236) are
 #     covered by the commits' tests.
+#   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
+#     vapour rows at typed source oxygen conditions and keep typed reasons for
+#     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
+#   6f308879c, 82655ba66, 9c40ad728, 6444f432c: the d-216 co-measured
+#     follow-up. A co-measured O/O2 pair is one printed pO2 condition; the
+#     JANAF atomic-O conversion moves into its owner; identity-based oxygen
+#     exclusions. 6444f432c also reads the optional extract field
+#     values.oxygen_partial_pressure.source_observation_id in
+#     simulator/battery/migrate.py (documented in the extract SCHEMA).
+#     The landing train's full regen of b149 (tip 988454487 on green
+#     2c7bcb1cc, studio-3) was a fixed point, so these change no STORE output.
+#     This acknowledges STORE outputs only; the scoring moves are covered by
+#     d-216 and by the commits' tests.
 #   80fad2bfa: the OpenIMCC af0f2a2 pin bump. The Sossi residue prediction path
 #     (simulator/battery/residue.py and score.py _sossi_residue_prediction) sends melt evaluation
 #     only the melt pack's oxides and passes the existing UNCERTIFIED MnO activity extension to the
@@ -197,6 +210,8 @@ CODE_INPUTS = (
 #     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
+    "037f97ff6", "5d46c88e1",
+    "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
     "09c498b65",
     "1b78b5697", "574800443", "149df2858",

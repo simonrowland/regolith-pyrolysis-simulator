@@ -1231,17 +1231,26 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert len(point_rows) == 1, x_sio2
 
 
-def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_regime_flagged(tmp_path: Path) -> None:
-    # Suppose my change is wrong in the way that matters most: restoring the
-    # old reactive_cell_oxygen_reservoir refusal makes this red, because typed
-    # [W] rows never request oxygen_balance_effusion with cell_material W.
+def test_stolyarova_typed_w_cell_scores_at_source_oxygen_and_flags_uncalibrated_regime(tmp_path: Path, monkeypatch) -> None:
+    # d-216 commands linked source oxygen; other typed W rows retain the
+    # labelled closure. Neither route may restore the reactive-cell refusal.
 
     _require_oxygen_balance()
     _require_openimcc()
     from simulator.battery.oxygen_balance import IMCC_ENGINES
     from simulator.battery.score import quantity_token
+    from simulator.battery.source_oxygen import SourceOxygenFallbackReason
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
     from tests.battery.test_migrate import _migrate_real_extract
 
+    requests = []
+    original_equilibrate = battery.equilibrate_cell
+
+    def capture_request(*args, po2, **kwargs):
+        requests.append(po2)
+        return original_equilibrate(*args, po2=po2, **kwargs)
+
+    monkeypatch.setattr(battery, "equilibrate_cell", capture_request)
     result = _migrate_real_extract(tmp_path, "kems-053-stolyarova-1991.yaml")
     context = ScoreContext(
         works=result.works,
@@ -1268,10 +1277,12 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
     }
     residuals = []
     tagged = []
+    linked_seen = closure_seen = anchor_seen = 0
     handles = {engine.value: open_battery_engine(engine.value) for engine in engines}
     for observation in rows:
         for engine in engines:
-            residual, _candidate = compile_residual(
+            requests.clear()
+            residual, candidate = compile_residual(
                 observation, engine, context=context, handles=handles
             )
             residuals.append(residual)
@@ -1295,9 +1306,64 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
                 if notice.origin == "engine:%s" % engine.value
                 and notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
             ]
-            assert len(solved) == 1, (observation.observation_id, engine.value)
-            payload = json.loads(solved[0].reason.split(" ", 1)[1])
-            assert payload.get("cell_material") == "W"
+            assert candidate is not None and len(requests) == 1
+            condition = (candidate.provenance or {}).get("source_oxygen_condition")
+            if condition is not None:
+                linked_seen += 1
+                assert not solved
+                assert requests[0].mode == battery.PO2_COMMANDED
+                pressure_Pa = Decimal(condition["value"]["point"])
+                assert requests[0].po2_bar == pytest.approx(
+                    float(pressure_Pa / Decimal("1e5")), rel=1e-10
+                )
+                assert candidate.identity.fO2_Pa.value == pressure_Pa
+                derivation = condition["derivation"]
+                assert derivation["inputs"] == condition["derived_from"]
+                parents = [result.observations[key] for key in condition["derived_from"]]
+                oxygen = [
+                    parent for parent in parents
+                    if parent.identity.species.formula == "O"
+                ]
+                assert len(oxygen) == 1
+                assert oxygen[0].experiment_id == observation.experiment_id
+                assert oxygen[0].identity.temperature_K == observation.identity.temperature_K
+                assert oxygen[0].identity.composition == observation.identity.composition
+                assert "JANAF O-001" in derivation["relation"]
+                assert "cell-metal activity as assumed by the source" in derivation["relation"]
+                parameters = dict(derivation["parameters"])
+                assert parameters["K_O"]["locator"]["source_path"].endswith("/O-001.yaml")
+                if (
+                    observation.identity.temperature_K.value == 1933
+                    and dict(observation.identity.composition.value.components)["CaO"] == Decimal("0.6")
+                ):
+                    # Table Ib: pO=6.8e-10 atm. JANAF G(1933)=126.02894
+                    # kJ/mol gives K_O=3.930428016089429e-4; convert to bar
+                    # before (pO_bar/K_O)^2 = 3.0730622426279393e-12 bar.
+                    assert oxygen[0].value.point == Decimal("6.8e-10") * Decimal("101325")
+                    assert requests[0].po2_bar == pytest.approx(
+                        3.0730622426279393e-12, rel=1e-10
+                    )
+                    anchor_seen += 1
+            else:
+                closure_seen += 1
+                assert requests[0].mode == PO2_OXYGEN_BALANCE_EFFUSION
+                assert len(solved) == 1, (observation.observation_id, engine.value)
+                payload = json.loads(solved[0].reason.split(" ", 1)[1])
+                assert payload.get("cell_material") == "W"
+                fallback = [
+                    notice for notice in residual.notices
+                    if notice.origin == "source oxygen selection"
+                ]
+                assert len(fallback) == 1
+                prefix = "model assumption: vapour-only zero-storage closure; source_oxygen_fallback="
+                assert fallback[0].reason.startswith(prefix)
+                assert SourceOxygenFallbackReason(fallback[0].reason.removeprefix(prefix))
+    assert linked_seen > 0 and closure_seen > 0 and anchor_seen > 0
+    assert all(
+        residual.refusal is None
+        or residual.refusal.detail.get("reason") != "reactive_cell_oxygen_reservoir"
+        for residual in residuals
+    )
     report = []
     for engine in engines:
         bucket = [
