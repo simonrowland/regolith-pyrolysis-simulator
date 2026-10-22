@@ -4213,7 +4213,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
 
-    def _inert_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
+    def _inert_sweep_transport_pO2_bar(self, head_o2_mol: float, *, dt_hr: float = 1.0) -> float:
         """Inert-sweep transport pO2 for vapor dispatch.
 
         Formula follows docs-private/research/2026-07-03-live-po2-probe/
@@ -4226,45 +4226,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         residual_o2_mol = max(0.0, float(head_o2_mol))
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
-            holdup_mol = {
-                species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
-                    'process.overhead_gas'
-                ).items()
-                if max(0.0, float(mol)) > 0.0
-            }
+            holdup_mol = self.atom_ledger.project_account_mol("process.overhead_gas")
+            from simulator.gas_balance import bled_species_mol
+
             total_mol = sum(holdup_mol.values())
-            total_kg = 0.0
-            holdup_kg: Dict[str, float] = {}
-            for species, mol in holdup_mol.items():
-                formula = resolve_species_formula(
-                    species,
-                    self.atom_ledger.registry,
-                )
-                species_kg = mol * formula.molar_mass_kg_per_mol()
-                holdup_kg[species] = species_kg
-                total_kg += species_kg
+            total_kg = sum(self._overhead_holdup_species_kg(holdup_mol).values())
             if total_mol > 0.0 and total_kg > 0.0:
-                volume_m3 = self._headspace_volume_m3()
-                T_head_K = self._headspace_temperature_K()
-                p_total_bar = 0.0
-                if volume_m3 > 0.0 and T_head_K > 0.0:
-                    p_total_bar = _headspace_pressure_bar(total_mol, volume_m3, T_head_K)
-                bleed_kg = (
-                    self._headspace_bleed_conductance_kg_s(
-                        species_kg_for_M_avg=holdup_kg,
-                        p_upstream_bar=p_total_bar,
-                    )
-                    * 3600.0
+                step = getattr(self, "_sweep_transport_step", None) or {}
+                controls = self._overhead_bleed_controls(dt_hr=dt_hr, capacity_result=step.get("capacity_result"))
+                candidate = bled_species_mol(
+                    holdup_mol, total_mol=total_mol, total_kg=total_kg, controls=controls,
                 )
-                if bleed_kg > 0.0:
-                    avg_molar_mass = total_kg / total_mol
-                    bleed_total_mol = min(total_mol, bleed_kg / avg_molar_mass)
-                    bled_o2_mol = min(
-                        residual_o2_mol,
-                        residual_o2_mol * bleed_total_mol / total_mol,
-                    )
-                    residual_o2_mol = max(0.0, residual_o2_mol - bled_o2_mol)
+                removed, _ = self._preview_overhead_removal(candidate, controls)
+                residual_o2_mol = max(0.0, residual_o2_mol - removed.get(OXYGEN_SPECIES, 0.0))
         residual_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(
             residual_o2_mol
         )
@@ -4380,12 +4354,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         plan = None
         step = getattr(self, '_sweep_transport_step', None)
         if step is not None:
-            initial, generated, _, _ = sweep_source_split(
+            initial, generated, external_initial, external_generated = sweep_source_split(
                 step['initial_species_mol'], self.atom_ledger.transitions[step['transition_start']:],
                 self.atom_ledger.registry,
+                initial_external_o2_mol=step["initial_external_o2_mol"],
             )
-            plan = self._continuous_sweep_plan(initial, generated, dt_s=3600.0)
-            holdup = plan['final_species_mol']
+            duration_s = step.get("dt_s", 3600.0)
+            plan = self._continuous_sweep_plan(
+                initial, generated, dt_s=duration_s,
+                initial_external_o2_mol=external_initial, generated_external_o2_mol=external_generated,
+            )
+            controls = self._overhead_bleed_controls(
+                dt_hr=duration_s / 3600.0, capacity_result=step.get("capacity_result"),
+                sweep_outflow_species_mol=plan["outflow_species_mol"],
+                sweep_external_o2_outflow_mol=plan["external_o2_outflow_mol"],
+                sweep_pressure_bar=plan["pressure_bar"], sweep_capacity_integrated=True,
+                transport_notices=plan["notices"],
+            )
+            _, holdup = self._preview_overhead_removal(
+                plan["outflow_species_mol"], controls, inlet_mol=plan["inlet_species_mol"],
+                integrated_external_o2_mol=plan["external_o2_outflow_mol"],
+            )
             pressure = self.melt.p_total_mbar / 1000.0
         elif sum(holdup.values()) > 0.0:
             pressure = _headspace_pressure_bar(sum(holdup.values()), volume, temperature)
@@ -6989,9 +6978,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             dt_hr=dt_hr,
         )
 
-    def _dispatch_overhead_bleed(
+    def _overhead_bleed_controls(
         self,
         *,
+        dt_hr: float = 1.0,
         force_drain_all: bool = False,
         capacity_result=None,
         effective_transport_capacity=None,
@@ -7001,7 +6991,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         sweep_capacity_shortfall=None,
         sweep_capacity_integrated=False,
         transport_notices=(),
-    ) -> IntentResult:
+    ) -> Dict[str, Any]:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
         if sweep_outflow_species_mol is not None:
@@ -7049,7 +7039,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     effective_transport_capacity
                 )
             ),
-            'dt_hr': 1.0,
+            'dt_hr': dt_hr,
             'force_drain_all': bool(force_drain_all),
             'external_o2_in_overhead_mol': getattr(
                 self,
@@ -7070,10 +7060,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.thermal_train import FiniteCapacity
 
         capacity, cold_train = self._cold_train_capacity_policy()
-        # Snapshot for _project_overhead_bleed_partition: the policy re-reads
+        # The same policy snapshot supplies preview and committed removal.
         # config on every call, so the projection must reuse the exact
         # capacity this dispatch partitioned with, never a fresh read.
-        self._last_bleed_cold_train_capacity = capacity
+        controls["cold_train_capacity"] = capacity
         if isinstance(capacity, FiniteCapacity):
             assert cold_train is not None
             accumulator_enabled = bool(
@@ -7115,6 +7105,70 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             notices.add(notice)
         if notices:
             controls["transport_notices"] = sorted(notices)
+        return controls
+
+    def _preview_overhead_removal(self, candidate, controls, *, inlet_mol=None,
+                                  integrated_external_o2_mol=None):
+        from simulator.gas_balance import removal_partition, net_sweep_transfer_mol, bounded_sweep_outlet_mol
+        from simulator.accounting import MaterialLot
+        from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+
+        initial = self.atom_ledger.project_account_mol("process.overhead_gas")
+        inlet = {}
+        if inlet_mol:
+            raw_staged = self.atom_ledger.mol_by_account("reservoir.reagent.sweep_gas")
+            outward = self.atom_ledger.project_account_mol("reservoir.reagent.sweep_gas")
+            staged = {s: n for s, n in raw_staged.items() if s in outward}
+            for species, mol in inlet_mol.items():
+                staged[species] = raw_staged.get(species, 0.0) + mol
+            # Provider inputs use the ledger outward mol projection, including
+            # its kg round-trip. Preview that boundary without loading a lot.
+            staged = {s: n for s, n in staged.items() if n > 0.0}
+            lot = self.atom_ledger.credit_mol("reservoir.reagent.sweep_gas", staged)
+            inlet = MaterialLot(lot.account, lot.species_kg).species_moles_for(self.atom_ledger.registry)
+        available = dict(initial)
+        for species, mol in inlet.items():
+            available[species] = available.get(species, 0.0) + mol
+        masses = {species: resolve_species_formula(species, self.atom_ledger.registry).molar_mass_kg_per_mol()
+                  for species in available}
+        cistern_mol = self.atom_ledger.project_account_mol(
+            OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+        ).get(OXYGEN_SPECIES, 0.0)
+        removed, _ = removal_partition(
+            available, bounded_sweep_outlet_mol(available, candidate), masses, controls, cistern_fill_mol=cistern_mol,
+            integrated_external_o2_mol=integrated_external_o2_mol,
+        )
+        raw_initial = self.atom_ledger.mol_by_account("process.overhead_gas")
+        _, _, final = net_sweep_transfer_mol(raw_initial, inlet, removed)
+        # Ledger application sorts each account after applying a lot.
+        return removed, {species: mol for species, mol in sorted(final.items()) if mol > 0.0}
+
+    def _dispatch_overhead_bleed(
+        self,
+        *,
+        dt_hr: float = 1.0,
+        force_drain_all: bool = False,
+        capacity_result=None,
+        effective_transport_capacity=None,
+        sweep_outflow_species_mol=None,
+        sweep_external_o2_outflow_mol=None,
+        sweep_pressure_bar=None,
+        sweep_capacity_shortfall=None,
+        sweep_capacity_integrated=False,
+        transport_notices=(),
+    ) -> IntentResult:
+        controls = self._overhead_bleed_controls(
+            dt_hr=dt_hr, force_drain_all=force_drain_all,
+            capacity_result=capacity_result,
+            effective_transport_capacity=effective_transport_capacity,
+            sweep_outflow_species_mol=sweep_outflow_species_mol,
+            sweep_external_o2_outflow_mol=sweep_external_o2_outflow_mol,
+            sweep_pressure_bar=sweep_pressure_bar,
+            sweep_capacity_shortfall=sweep_capacity_shortfall,
+            sweep_capacity_integrated=sweep_capacity_integrated,
+            transport_notices=transport_notices,
+        )
+        self._last_bleed_cold_train_capacity = controls["cold_train_capacity"]
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -7190,7 +7244,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'o2_accumulated_mol', 'o2_relieved_mol', 'o2_held_mol'
                 )
             )
-            # dt_hr is pinned to 1.0 in _dispatch_overhead_bleed's controls.
+            # The outer simulation step projects a one-hour receipt here.
             capacity_mol = (
                 capacity.value_kg_hr * 1.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
             )
@@ -14252,10 +14306,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._apply_oxygen_reservoir_exchange()
         sweep_initial_mol = self._overhead_holdup_mol() if self.melt.sweep_mol_per_s is not None else None
         sweep_transition_start = len(self.atom_ledger.transitions)
-        self._sweep_transport_step = ({'initial_species_mol': sweep_initial_mol,
+        self._sweep_transport_step = {'initial_species_mol': self._overhead_holdup_mol(),
                                        'initial_external_o2_mol': self._o2_bubbler_external_o2_overhead_mol(),
                                        'transition_start': sweep_transition_start}
-                                      if sweep_initial_mol is not None else None)
         self._apply_o2_bubbler()
         # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
         # (Ellingham C/CO vs Fe/FeO). Equilibrium-limited one-step.
@@ -14358,6 +14411,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if isinstance(capacity_result, CapacityShadowRefusal):
                         raise CapacityCouplingRefusalError(capacity_result)
             if capacity_result is not None:
+                self._sweep_transport_step['capacity_result'] = capacity_result
                 live_raw_flux = self._calculate_evaporation(
                     equilibrium,
                     overhead_partials_override_Pa=(
