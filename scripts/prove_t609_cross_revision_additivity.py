@@ -31,6 +31,10 @@ BASE_REVISION = "cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2"
 CANDIDATE_REVISION = "c4a2213422eb30b6f2f38b68281d9662fc35926d"
 EXPECTED_ADDITIONS = ("FeO_association_gas", "NiO_gas")
 PO2_GRID_BAR = (1.0e-30, 1.0e-9, 1.0, 100.0)
+REFERENCE_PRESSURE_MODEL_TYPE = (
+    "simulator.vapour_rail.catalog._ReferencePressureModel"
+)
+COMPOSITE_THERMO_DOMAIN_FIELD = "composite_thermo_domain_K"
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EVIDENCE = (
     ROOT / "validation-data" / "pin-evidence" / "t609_additivity_2026-08-11.yaml"
@@ -129,6 +133,31 @@ def _canonical(value: Any) -> Any:
         f"unsupported compiled value {type(value).__module__}."
         f"{type(value).__qualname__}"
     )
+
+
+def _without_composite_thermo_domain(value: Any) -> Any:
+    """Drop only b-936's known-added reference-model domain metadata."""
+
+    if isinstance(value, Mapping):
+        if (
+            value.get("__dataclass__") == REFERENCE_PRESSURE_MODEL_TYPE
+            and isinstance(value.get("fields"), Mapping)
+        ):
+            return {
+                **value,
+                "fields": {
+                    name: _without_composite_thermo_domain(item)
+                    for name, item in value["fields"].items()
+                    if name != COMPOSITE_THERMO_DOMAIN_FIELD
+                },
+            }
+        return {
+            key: _without_composite_thermo_domain(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_without_composite_thermo_domain(item) for item in value]
+    return value
 
 
 def _canonical_json(value: Any) -> str:
@@ -324,6 +353,7 @@ def _generate_evidence(
     *,
     candidate_revision: str | None = None,
     candidate_materialization: str = "revision_archive",
+    known_added_composite_thermo_domain: bool = False,
 ) -> dict[str, Any]:
     candidate_root = candidate_root.resolve()
     if not candidate_revision:
@@ -336,6 +366,11 @@ def _generate_evidence(
             f"unknown candidate materialization {candidate_materialization!r}; "
             "expected 'revision_archive' or 'catalog_blob'"
         )
+
+    def comparable_compiled_value(value: Any) -> Any:
+        if known_added_composite_thermo_domain:
+            return _without_composite_thermo_domain(value)
+        return value
 
     base_commit = _run(
         ["git", "rev-parse", f"{BASE_REVISION}^{{commit}}"], cwd=candidate_root
@@ -413,8 +448,8 @@ def _generate_evidence(
     for species_id in sorted(baseline_ids):
         _assert_equal(
             f"compiled dataclass for {species_id}",
-            baseline["compiled_species"][species_id],
-            candidate["compiled_species"][species_id],
+            comparable_compiled_value(baseline["compiled_species"][species_id]),
+            comparable_compiled_value(candidate["compiled_species"][species_id]),
         )
         _assert_equal(
             f"evaluation grid for {species_id}",
@@ -433,11 +468,13 @@ def _generate_evidence(
     ):
         raise ProofFailure(f"unexpected t-583 receipt: {t583}")
 
-    baseline_compiled = baseline["compiled_species"]
-    candidate_preexisting_compiled = {
-        species_id: candidate["compiled_species"][species_id]
-        for species_id in sorted(baseline_ids)
-    }
+    baseline_compiled = comparable_compiled_value(baseline["compiled_species"])
+    candidate_preexisting_compiled = comparable_compiled_value(
+        {
+            species_id: candidate["compiled_species"][species_id]
+            for species_id in sorted(baseline_ids)
+        }
+    )
     baseline_evaluations = baseline["evaluations"]
     candidate_preexisting_evaluations = {
         species_id: candidate["evaluations"][species_id]
@@ -474,7 +511,11 @@ def _generate_evidence(
             "temperature_positions": ["low", "mid", "high"],
             "pO2_grid_bar": list(PO2_GRID_BAR),
             "comparison": (
-                "exact canonical dataclass values and exception/result values"
+                "exact canonical dataclass values, excluding known-added "
+                f"{COMPOSITE_THERMO_DOMAIN_FIELD!r} metadata, and exact "
+                "exception/result values"
+                if known_added_composite_thermo_domain
+                else "exact canonical dataclass values and exception/result values"
             ),
             "float_encoding": "IEEE-754 float.hex",
         },

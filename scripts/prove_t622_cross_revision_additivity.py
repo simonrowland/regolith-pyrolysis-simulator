@@ -42,6 +42,7 @@ def _main() -> int:
         args.baseline_root,
         candidate_revision=CANDIDATE_REVISION,
         candidate_materialization="catalog_blob",
+        known_added_composite_thermo_domain=True,
     )
     evidence["proof_id"] = "t622_cross_revision_additivity_2026-08-12"
     evidence["generated_by"] = "scripts/prove_t622_cross_revision_additivity.py"
