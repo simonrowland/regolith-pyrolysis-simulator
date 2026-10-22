@@ -138,10 +138,9 @@ def _assert_rendered_table1_grid(
                 assert row["locator"]["page"] == (
                     6 if int(sample) <= 105 else 7 if int(sample) <= 119 else 8
                 )
-                composition = values["point_conditions"]["composition"]["state"]["value"]
-                assert composition["components"] == [
-                    ["CaO", initial[0]], ["SiO2", initial[1]], ["V2O3", initial[2]]
-                ]
+                assert values["composition_wt_pct"] == {
+                    "CaO": initial[0], "SiO2": initial[1], "V2O3": initial[2]
+                }
             printed_value, _, printed_sigma = cell.partition(" ± ")
             assert direct["values"]["component_amount"] == printed_value
             assert direct["uncertainty"]["sigma"] == printed_sigma
@@ -232,10 +231,10 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
             assert observation.point_conditions["pO2_Pa"].state.value == expected_oxygen
             composition = observation.identity.composition
             assert composition is not None and composition.is_value, raw["observation_id"]
-            printed_components = raw_conditions["composition"]["state"]["value"]["components"]
+            printed_components = values["composition_wt_pct"]
             expected_components = {
                 oxide
-                for oxide, amount in printed_components
+                for oxide, amount in printed_components.items()
                 if Decimal(str(amount)) > 0
             }
             assert set(dict(composition.value.components)) == expected_components
@@ -260,6 +259,18 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
             oxygen = raw_conditions["pO2_Pa"]["state"]["value"]
             assert observation.point_conditions["pO2_Pa"].state.value == Decimal(str(oxygen))
             assert observation.point_conditions["pO2_Pa"].locator.page == raw_conditions["pO2_Pa"]["locator"]["page"]
+        elif "oxygen_partial_pressure" in values:
+            oxygen = values["oxygen_partial_pressure"]
+            assert oxygen["units"] == "atm"
+            pressure_by_printed_atm = {
+                "6.9e-11": Decimal("0.000006991425"),
+                "1.7e-9": Decimal("0.0001722525"),
+            }
+            printed_atm = str(oxygen["value"])
+            assert printed_atm in pressure_by_printed_atm
+            mapped_condition = observation.point_conditions["fO2_Pa"]
+            assert mapped_condition.state.value.point == pressure_by_printed_atm[printed_atm]
+            assert mapped_condition.locator.page == oxygen["locator"]["page"]
         assert observation.identity.species.formula == str(values.get("formula") or container)
 
     contexts = [row for rows in migrator.result.context_by_work.values() for row in rows]
