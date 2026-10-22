@@ -1365,3 +1365,110 @@ def test_campaign_start_and_reset_record_p2o5_survival() -> None:
     assert recorded["entered_campaign"] == "C2A"
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
     assert sim.p2o5_survived_stage0_cleanup() is None
+
+
+def test_p_bearing_success_path_pins_parent_solve_activity_pressures_and_gas_notice(
+    monkeypatch,
+) -> None:
+    """Pin the 6576dfbde P-bearing success outputs.
+
+    Kambayashi Fe-tO/P2O5 s01 at 1643 K, commanded log fO2 = -9. The
+    patched activity and gas result are inputs. The cleaned parent
+    moles, liquid reference, pascal pressures, and converted gas notice
+    are that production resolver's outputs.
+    """
+
+    import openimcc
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+        composition_kg_and_mol,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    _patch_activity(monkeypatch, violated=False)
+    species = ("P", "P2", "P4", "PO", "PO2", "P4O6", "P4O10")
+
+    def evaluate_gas(
+        activities, temperature_K, fo2, datapack, parent_oxides=None, **kwargs
+    ):
+        del activities, temperature_K, fo2, datapack, parent_oxides, kwargs
+        return _PGas(
+            {name: _FLUX_PARTIAL_BAR for name in species},
+            notices=(
+                SimpleNamespace(
+                    code="p_gas_exceeds_one_bar_complete_volatilisation",
+                    message=_ONE_BAR_MESSAGE,
+                    species=species,
+                    total_pressure_bar=1.4,
+                ),
+            ),
+        )
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_gas)
+    seen: list[dict[str, float]] = []
+    original = openimcc_bridge.evaluate
+
+    def track_evaluate(**kwargs):
+        seen.append(dict(kwargs["composition_mol"]))
+        return original(**kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", track_evaluate)
+    pot = _scoring_pot("kambayashi_1985_feto_p2o5_s01")
+    composition_kg, composition_mol = composition_kg_and_mol(
+        pot.composition_wt_pct
+    )
+    result = _OpenImccBatteryBackend("openimcc").equilibrate(
+        1643.0 - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        fO2_log=-9.0,
+    )
+    assert seen == [{"FeO": 13.560375262004346}]
+    assert result.status == "ok"
+    assert result.activity_coefficients["P2O5"] == 0.01
+    assert "P2O5" not in result.reported_activity_coefficients
+    assert result.activities_standard_state == {
+        "convention": "raoultian_pure_endmember",
+        "phase": "liquid",
+        "reference_pressure_bar": 1.0,
+        "reference_temperature_K": None,
+        "component_basis": "raoultian_pure_endmember",
+        "component": "P2O5",
+        "activity": 0.01,
+        "regression": "Suito-Inoue-1984-Eq-14-no-Mn",
+        "reconciliation": (
+            "openimcc a(P2O5) is the Turkdogan-Pearson hypothetical-liquid "
+            "activity at 1 atm after the published shift 3.5*R*T*ln(1.01325) "
+            "onto the gas-pack Jung-Hudon 1 bar standard. That shifted value "
+            "is the Raoultian pure-liquid P2O5 activity declared by the CEA "
+            "carrier activity_input. It is not an unshifted Turkdogan gamma "
+            "and not pure-endmember a=1."
+        ),
+        "authority_status": "flagged",
+        "limitations_warning": (
+            "Fe-P alloy partitioning under carbon reduction is not modelled; "
+            "metallic iron belongs to the simulator metal account. "
+            "Fe(III) phosphates are not modelled. "
+            "Fe(III) phosphate chemistry is not modelled."
+        ),
+        "gamma": 4.0,
+    }
+    assert result.vapor_pressures_Pa == {name: 20000.0 for name in species}
+    assert [
+        notice
+        for notice in result.imcc_notices
+        if notice.get("kind") == "openimcc_p2o5_gas"
+    ] == [
+        {
+            "kind": "openimcc_p2o5_gas",
+            "authority": None,
+            "code": "p_gas_exceeds_one_bar_complete_volatilisation",
+            "reason": _ONE_BAR_MESSAGE,
+            "notice": {
+                "code": "p_gas_exceeds_one_bar_complete_volatilisation",
+                "message": _ONE_BAR_MESSAGE,
+                "species": list(species),
+                "total_pressure_bar": 1.4,
+            },
+        }
+    ]
