@@ -5924,18 +5924,6 @@ _KELLEY_ENTROPY_COLUMNS = (
 )
 _KELLEY_ENTROPY_T_K = Decimal("298.15")
 _TEMPERATURE_COLUMN_KEYS = frozenset({"t", "temperature", "temperature_k", "t_k"})
-# These sources print molar units for the series that carry a per-species basis.
-_MOLAR_BASIS_COMPILATION_SOURCES = frozenset(
-    {
-        "pankratz-1984-usbm-b677",
-        "pankratz-1987-usbm-b689",
-        "pankratz-1994-usbm-b696",
-        "kelley-king-1961-usbm-b592",
-    }
-)
-_MOLAR_COMPILATION_SERIES_UNITS = frozenset(
-    {"cal/mol·k", "kcal/mol", "cal./deg.-mole"}
-)
 
 
 @dataclass(frozen=True)
@@ -18462,14 +18450,18 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
+        # For mapped thermodynamic quantities, a non-"as_published" trail means
+        # the converter recognized a molar/gfw denominator.
         molar_series_per = {
             series.quantity: PerBasis.MOL_SPECIES
             for series in column_series or ()
-            if source_id in _MOLAR_BASIS_COMPILATION_SOURCES
-            and series.source_units
+            if series.source_units
             and all(
                 unit is not None
-                and unit.strip().casefold() in _MOLAR_COMPILATION_SERIES_UNITS
+                and (converted := _convert_compilation_amount(
+                    Decimal("1"), series.quantity, unit
+                )) is not None
+                and converted[1] != "as_published"
                 for unit in series.source_units
             )
         }

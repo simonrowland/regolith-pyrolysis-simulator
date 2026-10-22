@@ -365,6 +365,8 @@ TABLE6_IMAGE_VERIFIED_SPLITS = {
     ],
 }
 TABLE6_IMAGE_VERIFIED_TOKEN_CORRECTIONS = {
+    # At 600 dpi, printed page 101 places -76±10 on Al+++(aq), not Al(g).
+    (101, "Al(g)"): {10: ""},
     (103, "$\\mathrm{B}_{2}\\mathrm{H}_{5}(g)\\dagger$"): {0: "$\\mathrm{B}_{2}\\mathrm{H}_{6}(g)\\dagger$"},
     (104, "COCl3(g)†"): {0: "COCl2(g)†"},
     (104, "C2N4(g)†"): {0: "C2N2(g)†"},
