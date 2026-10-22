@@ -15498,6 +15498,64 @@ def test_zhang_2021_table1_alkali_residue_pins(tmp_path: Path) -> None:
     assert all(observation.value.point != Decimal("2.27") for observation in points if observation.identity.species.formula == "Na2O")
 
 
+def test_zhang_2021_below_detection_na_is_context_only(tmp_path: Path) -> None:
+    """The printed Bas1400C90m Na2O cell stays visible without scoring as zero."""
+
+    result = _migrate_real_extract(tmp_path, "kems-006-zhang-2021.yaml")
+    contexts = [
+        row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("observation_id") == "zhang_2021_table1_bas1400c90m_na2o_below_detection"
+    ]
+    assert len(contexts) == 1
+    context = contexts[0]
+    assert context["context_id"] == (
+        "kems-006-zhang-2021::context::"
+        "zhang_2021_table1_bas1400c90m_na2o_below_detection"
+    )
+    assert context["context_id"] not in result.observations
+    assert context["species"] == "Na"
+    assert context["type"] == "below_detection_cell"
+    assert context["values"]["analyte"] == "Na2O"
+    assert context["values"]["printed"] == "b.d.l."
+    assert context["locator"] == {
+        "table": "1",
+        "page": 71,
+        "row": "Bas1400C90m",
+    }
+    points = _zhang_residue_points(result)
+    assert not any(
+        "Bas1400C90m" in (observation.locator.note or "")
+        and observation.identity.species.formula == "Na2O"
+        for observation in points
+    )
+    assert all(observation.value.point != Decimal("0") for observation in points)
+
+
+def test_kang_2007_t2_sample_301_sio2_activity_is_not_residue(
+    tmp_path: Path,
+) -> None:
+    """A real oxide value on an activity row does not name a residue quantity."""
+
+    result = _migrate_real_extract(
+        tmp_path, "kang-2007-sio2-activity-cas-low-silica.yaml"
+    )
+    activity = result.observations[
+        "kang-2007-sio2-activity-cas-low-silica::kang_2007_t2_sample_301_sio2_activity"
+    ]
+    assert activity.identity.quantity.is_value
+    assert activity.identity.quantity.value is Quantity.ACTIVITY
+    assert activity.value.point == Decimal("0.00102")
+    assert activity.admission.status is AdmissionStatus.ADMITTED
+    assert not any(
+        observation.source_id == "kang-2007-sio2-activity-cas-low-silica"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        for observation in result.observations.values()
+    )
+
+
 def test_removing_k2o_from_the_residue_allowlist_drops_the_zhang_pin(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -15631,6 +15689,57 @@ def test_ivanova_residue_point_ids_survive_the_wider_allowlist(tmp_path: Path) -
     assert all(
         observation.identity.species.formula != "FeO" for observation in cells
     )
+
+
+def test_ivanova_appended_oxide_keeps_ordinal_and_content_stable_ids(
+    tmp_path: Path,
+) -> None:
+    """An appended oxide must not shift the published ordinal residue series."""
+
+    name = "ivanova-2018-spinel-rich-cai-evaporation.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    source_observation = next(
+        observation
+        for observation in doc["species"]["CaO"]["observations"]
+        if observation.get("observation_id")
+        == "ivanova_2018_table1_residue_composition"
+    )
+    rows = source_observation["values"]["series"]
+    assert len(rows) == 8
+    for row in rows:
+        row["TiO2_wt_pct"] = "1.11"
+
+    result = _migrate_real_extract(tmp_path, name, extract_doc=doc)
+    parent = (
+        "ivanova-2018-spinel-rich-cai-evaporation"
+        "::ivanova_2018_table1_residue_composition::"
+    )
+    cells = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(parent)
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    silica = [
+        observation
+        for observation in cells
+        if observation.identity.species.formula == "SiO2"
+    ]
+    titanium = [
+        observation
+        for observation in cells
+        if observation.identity.species.formula == "TiO2"
+    ]
+    assert sorted(
+        int(observation.observation_id.rsplit(":", 1)[-1])
+        for observation in silica
+    ) == [0, 6, 12, 18, 24, 30, 36, 42]
+    assert len(titanium) == 8
+    assert all("::row=" in observation.observation_id for observation in titanium)
+    assert all("::point:" not in observation.observation_id for observation in titanium)
 
 
 def test_residue_migration_keeps_feo_and_fe2o3_distinct(tmp_path: Path) -> None:
