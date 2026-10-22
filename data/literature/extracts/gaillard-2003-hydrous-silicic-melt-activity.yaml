@@ -1357,6 +1357,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 1/1
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -1368,14 +1379,25 @@ species:
           activity_pair_as_printed:
           - '0.157'
           - '0.147'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.08'
-            Al2O3_wt_pct: '11.75'
-            FeO_wt_pct: '10.37'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.11'
-            K2O_wt_pct: '4.23'
+          composition_mass_percent:
+            SiO2: '69.08'
+            Al2O3: '11.75'
+            FeO: '10.37'
+            CaO: '0.00'
+            Na2O: '3.11'
+            K2O: '4.23'
         - sample: 1/2
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -1385,14 +1407,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.159'
           activity: '0.159'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.14'
-            Al2O3_wt_pct: '11.50'
-            FeO_wt_pct: '11.85'
-            CaO_wt_pct: '0.07'
-            Na2O_wt_pct: '3.08'
-            K2O_wt_pct: '4.28'
+          composition_mass_percent:
+            SiO2: '68.14'
+            Al2O3: '11.50'
+            FeO: '11.85'
+            CaO: '0.07'
+            Na2O: '3.08'
+            K2O: '4.28'
         - sample: 1/3
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: Ir powders/Pt wires Pt
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -1404,14 +1437,25 @@ species:
           activity_pair_as_printed:
           - '0.110'
           - '0.105'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.96'
-            Al2O3_wt_pct: '11.75'
-            FeO_wt_pct: '7.35'
-            CaO_wt_pct: '0.08'
-            Na2O_wt_pct: '3.35'
-            K2O_wt_pct: '4.55'
+          composition_mass_percent:
+            SiO2: '71.96'
+            Al2O3: '11.75'
+            FeO: '7.35'
+            CaO: '0.08'
+            Na2O: '3.35'
+            K2O: '4.55'
         - sample: 1/4
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: wire
           activity_sensors_ditto_resolved: Pt wire
@@ -1421,14 +1465,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.100'
           activity: '0.100'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.65'
-            Al2O3_wt_pct: '11.82'
-            FeO_wt_pct: '7.89'
-            CaO_wt_pct: '0.07'
-            Na2O_wt_pct: '3.29'
-            K2O_wt_pct: '4.49'
+          composition_mass_percent:
+            SiO2: '71.65'
+            Al2O3: '11.82'
+            FeO: '7.89'
+            CaO: '0.07'
+            Na2O: '3.29'
+            K2O: '4.49'
         - sample: 1/5
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -1440,14 +1495,25 @@ species:
           activity_pair_as_printed:
           - '0.054'
           - '0.057'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '74.21'
-            Al2O3_wt_pct: '11.89'
-            FeO_wt_pct: '4.26'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.54'
-            K2O_wt_pct: '4.71'
+          composition_mass_percent:
+            SiO2: '74.21'
+            Al2O3: '11.89'
+            FeO: '4.26'
+            CaO: '0.00'
+            Na2O: '3.54'
+            K2O: '4.71'
         - sample: 1/6
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -1457,14 +1523,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.057'
           activity: '0.057'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '74.04'
-            Al2O3_wt_pct: '12.01'
-            FeO_wt_pct: '4.67'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.59'
-            K2O_wt_pct: '4.65'
+          composition_mass_percent:
+            SiO2: '74.04'
+            Al2O3: '12.01'
+            FeO: '4.67'
+            CaO: '0.00'
+            Na2O: '3.59'
+            K2O: '4.65'
         - sample: 1/7
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -1476,14 +1553,25 @@ species:
           activity_pair_as_printed:
           - '0.029'
           - '0.027'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.68'
-            Al2O3_wt_pct: '12.05'
-            FeO_wt_pct: '2.10'
-            CaO_wt_pct: '0.04'
-            Na2O_wt_pct: '3.80'
-            K2O_wt_pct: '4.80'
+          composition_mass_percent:
+            SiO2: '75.68'
+            Al2O3: '12.05'
+            FeO: '2.10'
+            CaO: '0.04'
+            Na2O: '3.80'
+            K2O: '4.80'
         - sample: 1/8
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -1493,13 +1581,13 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.028'
           activity: '0.028'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.91'
-            Al2O3_wt_pct: '12.10'
-            FeO_wt_pct: '2.29'
-            CaO_wt_pct: '0.06'
-            Na2O_wt_pct: '3.71'
-            K2O_wt_pct: '4.86'
+          composition_mass_percent:
+            SiO2: '75.91'
+            Al2O3: '12.10'
+            FeO: '2.29'
+            CaO: '0.06'
+            Na2O: '3.71'
+            K2O: '4.86'
     - observation_id: gaillard_2003_table4_run2_a_feo
       experiment: gaillard-2003-run-2
       type: activity_coefficient
@@ -1549,6 +1637,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 2/1
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -1558,15 +1657,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.106'
           activity: '0.106'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '66.79'
-            Al2O3_wt_pct: '10.38'
-            FeO_wt_pct: '8.84'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.05'
-            K2O_wt_pct: '4.43'
-            H2O_EMPA: '5.21'
+          composition_mass_percent:
+            SiO2: '66.79'
+            Al2O3: '10.38'
+            FeO: '8.84'
+            CaO: '0.02'
+            Na2O: '3.05'
+            K2O: '4.43'
+          H2O_EMPA: '5.21'
         - sample: 2/3
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -1576,15 +1686,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.063'
           activity: '0.063'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.94'
-            Al2O3_wt_pct: '10.95'
-            FeO_wt_pct: '4.27'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.32'
-            K2O_wt_pct: '4.58'
-            H2O_EMPA: '5.56'
+          composition_mass_percent:
+            SiO2: '69.94'
+            Al2O3: '10.95'
+            FeO: '4.27'
+            CaO: '0.02'
+            Na2O: '3.32'
+            K2O: '4.58'
+          H2O_EMPA: '5.56'
         - sample: 2/5
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -1594,15 +1715,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.119'
           activity: '0.119'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '65.95'
-            Al2O3_wt_pct: '10.34'
-            FeO_wt_pct: '9.85'
-            CaO_wt_pct: '0.05'
-            Na2O_wt_pct: '3.20'
-            K2O_wt_pct: '4.39'
-            H2O_EMPA: '4.96'
+          composition_mass_percent:
+            SiO2: '65.95'
+            Al2O3: '10.34'
+            FeO: '9.85'
+            CaO: '0.05'
+            Na2O: '3.20'
+            K2O: '4.39'
+          H2O_EMPA: '4.96'
         - sample: 2/7
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt capsule
           activity_sensors_ditto_resolved: Ir powders/Pt capsule
@@ -1614,15 +1746,26 @@ species:
           activity_pair_as_printed:
           - '0.028'
           - '0.032'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.89'
-            Al2O3_wt_pct: '11.32'
-            FeO_wt_pct: '1.78'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.34'
-            K2O_wt_pct: '4.78'
-            H2O_EMPA: '5.03'
+          composition_mass_percent:
+            SiO2: '72.89'
+            Al2O3: '11.32'
+            FeO: '1.78'
+            CaO: '0.03'
+            Na2O: '3.34'
+            K2O: '4.78'
+          H2O_EMPA: '5.03'
         - sample: 2/8
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Pt capsule
           activity_sensors_ditto_resolved: Pt capsule
@@ -1632,14 +1775,14 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.051'
           activity: '0.051'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.08'
-            Al2O3_wt_pct: '11.16'
-            FeO_wt_pct: '3.55'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.35'
-            K2O_wt_pct: '4.77'
-            H2O_EMPA: '5.00'
+          composition_mass_percent:
+            SiO2: '72.08'
+            Al2O3: '11.16'
+            FeO: '3.55'
+            CaO: '0.01'
+            Na2O: '3.35'
+            K2O: '4.77'
+          H2O_EMPA: '5.00'
     - observation_id: gaillard_2003_table4_run3_a_feo
       experiment: gaillard-2003-run-3
       type: activity_coefficient
@@ -1688,6 +1831,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 3/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.85'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.85'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir Powders
           activity_sensors_ditto_resolved: Ir Powders
@@ -1697,15 +1851,26 @@ species:
           delta_NNO: '-2.85'
           a_as_printed: '0.064'
           activity: '0.064'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.60'
-            Al2O3_wt_pct: '11.63'
-            FeO_wt_pct: '4.54'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.55'
-            K2O_wt_pct: '4.60'
-            H2O_EMPA: '3.25'
+          composition_mass_percent:
+            SiO2: '71.60'
+            Al2O3: '11.63'
+            FeO: '4.54'
+            CaO: '0.01'
+            Na2O: '3.55'
+            K2O: '4.60'
+          H2O_EMPA: '3.25'
         - sample: 3/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1715,15 +1880,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.015'
           activity: '0.015'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.67'
-            Al2O3_wt_pct: '11.76'
-            FeO_wt_pct: '0.82'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.52'
-            K2O_wt_pct: '4.47'
-            H2O_EMPA: '6.71'
+          composition_mass_percent:
+            SiO2: '71.67'
+            Al2O3: '11.76'
+            FeO: '0.82'
+            CaO: '0.01'
+            Na2O: '3.52'
+            K2O: '4.47'
+          H2O_EMPA: '6.71'
         - sample: 3/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1733,15 +1909,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.107'
           activity: '0.107'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.46'
-            Al2O3_wt_pct: '10.57'
-            FeO_wt_pct: '6.05'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.19'
-            K2O_wt_pct: '4.15'
-            H2O_EMPA: '6.55'
+          composition_mass_percent:
+            SiO2: '68.46'
+            Al2O3: '10.57'
+            FeO: '6.05'
+            CaO: '0.02'
+            Na2O: '3.19'
+            K2O: '4.15'
+          H2O_EMPA: '6.55'
         - sample: 3/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.08'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.08'
           starting_products_as_printed: '#7 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1751,15 +1938,26 @@ species:
           delta_NNO: '-2.08'
           a_as_printed: '0.109'
           activity: '0.109'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.00'
-            Al2O3_wt_pct: '10.64'
-            FeO_wt_pct: '7.15'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.13'
-            K2O_wt_pct: '4.15'
-            H2O_EMPA: '5.85'
+          composition_mass_percent:
+            SiO2: '68.00'
+            Al2O3: '10.64'
+            FeO: '7.15'
+            CaO: '0.01'
+            Na2O: '3.13'
+            K2O: '4.15'
+          H2O_EMPA: '5.85'
         - sample: 3/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.66'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.66'
           starting_products_as_printed: '#7 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1769,15 +1967,26 @@ species:
           delta_NNO: '-2.66'
           a_as_printed: '0.076'
           activity: '0.076'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.54'
-            Al2O3_wt_pct: '11.74'
-            FeO_wt_pct: '4.77'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '2.90'
-            K2O_wt_pct: '4.50'
-            H2O_EMPA: '3.56'
+          composition_mass_percent:
+            SiO2: '71.54'
+            Al2O3: '11.74'
+            FeO: '4.77'
+            CaO: '0.03'
+            Na2O: '2.90'
+            K2O: '4.50'
+          H2O_EMPA: '3.56'
         - sample: 3/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.95'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.95'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1787,15 +1996,26 @@ species:
           delta_NNO: '-1.95'
           a_as_printed: '0.055'
           activity: '0.055'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.38'
-            Al2O3_wt_pct: '10.62'
-            FeO_wt_pct: '3.27'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.56'
-            K2O_wt_pct: '4.21'
-            H2O_EMPA: '6.59'
+          composition_mass_percent:
+            SiO2: '70.38'
+            Al2O3: '10.62'
+            FeO: '3.27'
+            CaO: '0.02'
+            Na2O: '3.56'
+            K2O: '4.21'
+          H2O_EMPA: '6.59'
         - sample: 3/7
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1805,15 +2025,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.042'
           activity: '0.042'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.07'
-            Al2O3_wt_pct: '10.66'
-            FeO_wt_pct: '2.45'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.31'
-            K2O_wt_pct: '4.21'
-            H2O_EMPA: '6.88'
+          composition_mass_percent:
+            SiO2: '71.07'
+            Al2O3: '10.66'
+            FeO: '2.45'
+            CaO: '0.01'
+            Na2O: '3.31'
+            K2O: '4.21'
+          H2O_EMPA: '6.88'
         - sample: 3/8
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.18'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.18'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1823,15 +2054,26 @@ species:
           delta_NNO: '-2.18'
           a_as_printed: '0.011'
           activity: '0.011'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.88'
-            Al2O3_wt_pct: '11.72'
-            FeO_wt_pct: '0.70'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.69'
-            K2O_wt_pct: '4.44'
-            H2O_EMPA: '6.02'
+          composition_mass_percent:
+            SiO2: '72.88'
+            Al2O3: '11.72'
+            FeO: '0.70'
+            CaO: '0.03'
+            Na2O: '3.69'
+            K2O: '4.44'
+          H2O_EMPA: '6.02'
         - sample: 3/9
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.39'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.39'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1841,15 +2083,26 @@ species:
           delta_NNO: '-2.39'
           a_as_printed: '0.104'
           activity: '0.104'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.69'
-            Al2O3_wt_pct: '10.89'
-            FeO_wt_pct: '7.46'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.29'
-            K2O_wt_pct: '4.30'
-            H2O_EMPA: '4.99'
+          composition_mass_percent:
+            SiO2: '68.69'
+            Al2O3: '10.89'
+            FeO: '7.46'
+            CaO: '0.01'
+            Na2O: '3.29'
+            K2O: '4.30'
+          H2O_EMPA: '4.99'
         - sample: 3/10
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1859,15 +2112,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.030'
           activity: '0.030'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.70'
-            Al2O3_wt_pct: '10.72'
-            FeO_wt_pct: '1.69'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.43'
-            K2O_wt_pct: '4.11'
-            H2O_EMPA: '7.1'
+          composition_mass_percent:
+            SiO2: '71.70'
+            Al2O3: '10.72'
+            FeO: '1.69'
+            CaO: '0.02'
+            Na2O: '3.43'
+            K2O: '4.11'
+          H2O_EMPA: '7.1'
         - sample: 3/11
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-3.16'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -3.16'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1877,15 +2141,26 @@ species:
           delta_NNO: '-3.16'
           a_as_printed: '0.028'
           activity: '0.028'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.40'
-            Al2O3_wt_pct: '11.34'
-            FeO_wt_pct: '1.81'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.70'
-            K2O_wt_pct: '4.46'
-            H2O_EMPA: '2.66'
+          composition_mass_percent:
+            SiO2: '75.40'
+            Al2O3: '11.34'
+            FeO: '1.81'
+            CaO: '0.01'
+            Na2O: '3.70'
+            K2O: '4.46'
+          H2O_EMPA: '2.66'
         - sample: 3/12
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1895,15 +2170,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.048'
           activity: '0.048'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.32'
-            Al2O3_wt_pct: '10.67'
-            FeO_wt_pct: '2.63'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.60'
-            K2O_wt_pct: '4.19'
-            H2O_EMPA: '6.44'
+          composition_mass_percent:
+            SiO2: '71.32'
+            Al2O3: '10.67'
+            FeO: '2.63'
+            CaO: '0.01'
+            Na2O: '3.60'
+            K2O: '4.19'
+          H2O_EMPA: '6.44'
         - sample: 3/13
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -1913,14 +2199,14 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.050'
           activity: '0.050'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.44'
-            Al2O3_wt_pct: '10.74'
-            FeO_wt_pct: '2.41'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.67'
-            K2O_wt_pct: '4.23'
-            H2O_EMPA: '6.77'
+          composition_mass_percent:
+            SiO2: '71.44'
+            Al2O3: '10.74'
+            FeO: '2.41'
+            CaO: '0.02'
+            Na2O: '3.67'
+            K2O: '4.23'
+          H2O_EMPA: '6.77'
     - observation_id: gaillard_2003_table4_run4_a_feo
       experiment: gaillard-2003-run-4
       type: activity_coefficient
@@ -1970,6 +2256,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 4/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#2'
           activity_sensors_as_printed: Ir Wire
           activity_sensors_ditto_resolved: Ir Wire
@@ -1979,15 +2276,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.011'
           activity: '0.011'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.70'
-            Al2O3_wt_pct: '11.47'
-            FeO_wt_pct: '0.61'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.70'
-            K2O_wt_pct: '4.57'
-            H2O_EMPA: '6.25'
+          composition_mass_percent:
+            SiO2: '73.70'
+            Al2O3: '11.47'
+            FeO: '0.61'
+            CaO: '0.01'
+            Na2O: '3.70'
+            K2O: '4.57'
+          H2O_EMPA: '6.25'
         - sample: 4/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -1997,15 +2305,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.018'
           activity: '0.018'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.20'
-            Al2O3_wt_pct: '11.50'
-            FeO_wt_pct: '0.98'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.80'
-            K2O_wt_pct: '4.53'
-            H2O_EMPA: '5.95'
+          composition_mass_percent:
+            SiO2: '73.20'
+            Al2O3: '11.50'
+            FeO: '0.98'
+            CaO: '0.00'
+            Na2O: '3.80'
+            K2O: '4.53'
+          H2O_EMPA: '5.95'
         - sample: 4/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#4'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2015,15 +2334,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.025'
           activity: '0.025'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.37'
-            Al2O3_wt_pct: '11.48'
-            FeO_wt_pct: '1.22'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.78'
-            K2O_wt_pct: '4.60'
-            H2O_EMPA: '6.35'
+          composition_mass_percent:
+            SiO2: '72.37'
+            Al2O3: '11.48'
+            FeO: '1.22'
+            CaO: '0.02'
+            Na2O: '3.78'
+            K2O: '4.60'
+          H2O_EMPA: '6.35'
         - sample: 4/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#5'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2033,15 +2363,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.041'
           activity: '0.041'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.82'
-            Al2O3_wt_pct: '10.98'
-            FeO_wt_pct: '1.81'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.40'
-            K2O_wt_pct: '4.63'
-            H2O_EMPA: '6.09'
+          composition_mass_percent:
+            SiO2: '72.82'
+            Al2O3: '10.98'
+            FeO: '1.81'
+            CaO: '0.03'
+            Na2O: '3.40'
+            K2O: '4.63'
+          H2O_EMPA: '6.09'
         - sample: 4/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#8'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2051,15 +2392,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.063'
           activity: '0.063'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.10'
-            Al2O3_wt_pct: '10.45'
-            FeO_wt_pct: '3.12'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.57'
-            K2O_wt_pct: '4.29'
-            H2O_EMPA: '6.01'
+          composition_mass_percent:
+            SiO2: '72.10'
+            Al2O3: '10.45'
+            FeO: '3.12'
+            CaO: '0.02'
+            Na2O: '3.57'
+            K2O: '4.29'
+          H2O_EMPA: '6.01'
         - sample: 4/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2069,15 +2421,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.085'
           activity: '0.085'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.16'
-            Al2O3_wt_pct: '11.10'
-            FeO_wt_pct: '4.65'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.18'
-            K2O_wt_pct: '3.79'
-            H2O_EMPA: '5.01'
+          composition_mass_percent:
+            SiO2: '71.16'
+            Al2O3: '11.10'
+            FeO: '4.65'
+            CaO: '0.00'
+            Na2O: '3.18'
+            K2O: '3.79'
+          H2O_EMPA: '5.01'
         - sample: 4/7
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#11'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2087,15 +2450,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.112'
           activity: '0.112'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.21'
-            Al2O3_wt_pct: '11.64'
-            FeO_wt_pct: '6.37'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.32'
-            K2O_wt_pct: '4.14'
-            H2O_EMPA: '4.36'
+          composition_mass_percent:
+            SiO2: '69.21'
+            Al2O3: '11.64'
+            FeO: '6.37'
+            CaO: '0.03'
+            Na2O: '3.32'
+            K2O: '4.14'
+          H2O_EMPA: '4.36'
         - sample: 4/8
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#12'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2105,14 +2479,14 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.120'
           activity: '0.120'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.29'
-            Al2O3_wt_pct: '11.82'
-            FeO_wt_pct: '7.18'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.47'
-            K2O_wt_pct: '4.06'
-            H2O_EMPA: '4.22'
+          composition_mass_percent:
+            SiO2: '68.29'
+            Al2O3: '11.82'
+            FeO: '7.18'
+            CaO: '0.00'
+            Na2O: '3.47'
+            K2O: '4.06'
+          H2O_EMPA: '4.22'
     - observation_id: gaillard_2003_table4_run5_a_feo
       experiment: gaillard-2003-run-5
       type: activity_coefficient
@@ -2162,6 +2536,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 5/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.5'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.5'
           starting_products_as_printed: '#11'
           activity_sensors_as_printed: Ir Wire
           activity_sensors_ditto_resolved: Ir Wire
@@ -2171,15 +2556,26 @@ species:
           delta_NNO: '-0.5'
           a_as_printed: '0.159'
           activity: '0.159'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.38'
-            Al2O3_wt_pct: '11.71'
-            FeO_wt_pct: '5.43'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.65'
-            K2O_wt_pct: '4.45'
-            H2O_EMPA: '5.10'
+          composition_mass_percent:
+            SiO2: '68.38'
+            Al2O3: '11.71'
+            FeO: '5.43'
+            CaO: '0.02'
+            Na2O: '3.65'
+            K2O: '4.45'
+          H2O_EMPA: '5.10'
         - sample: 5/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.5'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.5'
           starting_products_as_printed: '#12'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -2189,14 +2585,14 @@ species:
           delta_NNO: '-0.5'
           a_as_printed: '0.188'
           activity: '0.188'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '67.16'
-            Al2O3_wt_pct: '11.28'
-            FeO_wt_pct: '7.93'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.51'
-            K2O_wt_pct: '3.97'
-            H2O_EMPA: '4.50'
+          composition_mass_percent:
+            SiO2: '67.16'
+            Al2O3: '11.28'
+            FeO: '7.93'
+            CaO: '0.01'
+            Na2O: '3.51'
+            K2O: '3.97'
+          H2O_EMPA: '4.50'
     - observation_id: gaillard_2003_table4_run6_a_feo
       experiment: gaillard-2003-run-6
       type: activity_coefficient
@@ -2248,6 +2644,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 6/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#1'
           activity_sensors_as_printed: Ir Powders
           activity_sensors_ditto_resolved: Ir Powders
@@ -2258,15 +2665,26 @@ species:
           a_as_printed: '0.012'
           activity: '0.012'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.46'
-            Al2O3_wt_pct: '10.90'
-            FeO_wt_pct: '0.44'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.66'
-            K2O_wt_pct: '4.75'
-            H2O_EMPA: '6.68'
+          composition_mass_percent:
+            SiO2: '73.46'
+            Al2O3: '10.90'
+            FeO: '0.44'
+            CaO: '0.01'
+            Na2O: '3.66'
+            K2O: '4.75'
+          H2O_EMPA: '6.68'
         - sample: 6/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#2'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -2277,15 +2695,26 @@ species:
           a_as_printed: '0.030'
           activity: '0.030'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.80'
-            Al2O3_wt_pct: '11.25'
-            FeO_wt_pct: '0.77'
-            CaO_wt_pct: '0.06'
-            Na2O_wt_pct: '3.48'
-            K2O_wt_pct: '4.56'
-            H2O_EMPA: '6.97'
+          composition_mass_percent:
+            SiO2: '72.80'
+            Al2O3: '11.25'
+            FeO: '0.77'
+            CaO: '0.06'
+            Na2O: '3.48'
+            K2O: '4.56'
+          H2O_EMPA: '6.97'
         - sample: 6/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#5'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -2296,15 +2725,26 @@ species:
           a_as_printed: '0.059'
           activity: '0.059'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.01'
-            Al2O3_wt_pct: '11.46'
-            FeO_wt_pct: '1.71'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.55'
-            K2O_wt_pct: '4.57'
-            H2O_EMPA: '6.58'
+          composition_mass_percent:
+            SiO2: '72.01'
+            Al2O3: '11.46'
+            FeO: '1.71'
+            CaO: '0.00'
+            Na2O: '3.55'
+            K2O: '4.57'
+          H2O_EMPA: '6.58'
         - sample: 6/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#6'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -2315,15 +2755,26 @@ species:
           a_as_printed: '0.076'
           activity: '0.076'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.33'
-            Al2O3_wt_pct: '10.54'
-            FeO_wt_pct: '2.20'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.42'
-            K2O_wt_pct: '4.41'
-            H2O_EMPA: '6.97'
+          composition_mass_percent:
+            SiO2: '72.33'
+            Al2O3: '10.54'
+            FeO: '2.20'
+            CaO: '0.01'
+            Na2O: '3.42'
+            K2O: '4.41'
+          H2O_EMPA: '6.97'
         - sample: 6/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#9'
           activity_sensors_as_printed: Ir powders/Magnetite
           activity_sensors_ditto_resolved: Ir powders/Magnetite
@@ -2336,15 +2787,26 @@ species:
           - '0.092'
           - '0.087'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.25'
-            Al2O3_wt_pct: '10.45'
-            FeO_wt_pct: '2.71'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '2.93'
-            K2O_wt_pct: '4.37'
-            H2O_EMPA: '7.15'
+          composition_mass_percent:
+            SiO2: '72.25'
+            Al2O3: '10.45'
+            FeO: '2.71'
+            CaO: '0.03'
+            Na2O: '2.93'
+            K2O: '4.37'
+          H2O_EMPA: '7.15'
         - sample: 6/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: Ir powders/Magnetite
           activity_sensors_ditto_resolved: Ir powders/Magnetite
@@ -2357,15 +2819,26 @@ species:
           - '0.085'
           - '0.080'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.96'
-            Al2O3_wt_pct: '11.83'
-            FeO_wt_pct: '2.86'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.03'
-            K2O_wt_pct: '4.39'
-            H2O_EMPA: '6.80'
+          composition_mass_percent:
+            SiO2: '70.96'
+            Al2O3: '11.83'
+            FeO: '2.86'
+            CaO: '0.02'
+            Na2O: '3.03'
+            K2O: '4.39'
+          H2O_EMPA: '6.80'
         - sample: 6/11
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#9'
           activity_sensors_as_printed: Magnetite
           activity_sensors_ditto_resolved: Magnetite
@@ -2376,15 +2849,26 @@ species:
           a_as_printed: '0.090'
           activity: '0.090'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.15'
-            Al2O3_wt_pct: '10.68'
-            FeO_wt_pct: '2.93'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.17'
-            K2O_wt_pct: '4.38'
-            H2O_EMPA: '6.45'
+          composition_mass_percent:
+            SiO2: '72.15'
+            Al2O3: '10.68'
+            FeO: '2.93'
+            CaO: '0.01'
+            Na2O: '3.17'
+            K2O: '4.38'
+          H2O_EMPA: '6.45'
         - sample: 6/12
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: Magnetite
           activity_sensors_ditto_resolved: Magnetite
@@ -2395,14 +2879,14 @@ species:
           a_as_printed: '0.084'
           activity: '0.084'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.18'
-            Al2O3_wt_pct: '11.43'
-            FeO_wt_pct: '2.97'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.18'
-            K2O_wt_pct: '4.25'
-            H2O_EMPA: '6.81'
+          composition_mass_percent:
+            SiO2: '71.18'
+            Al2O3: '11.43'
+            FeO: '2.97'
+            CaO: '0.02'
+            Na2O: '3.18'
+            K2O: '4.25'
+          H2O_EMPA: '6.81'
     - observation_id: gaillard_2003_table4_run7_a_feo
       experiment: gaillard-2003-run-7
       type: activity_coefficient
@@ -2451,6 +2935,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 7/1
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca3 + Fe + Fe2O3'
           activity_sensors_as_printed: Hm
           activity_sensors_ditto_resolved: Hm
@@ -2460,14 +2955,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.017'
           activity: '0.017'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.22'
-            Al2O3_wt_pct: '14.93'
-            FeO_wt_pct: '3.77'
-            CaO_wt_pct: '2.50'
-            Na2O_wt_pct: '3.43'
-            K2O_wt_pct: '3.18'
+          composition_mass_percent:
+            SiO2: '70.22'
+            Al2O3: '14.93'
+            FeO: '3.77'
+            CaO: '2.50'
+            Na2O: '3.43'
+            K2O: '3.18'
         - sample: 7/2
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca2 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -2477,14 +2983,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.017'
           activity: '0.017'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.26'
-            Al2O3_wt_pct: '13.08'
-            FeO_wt_pct: '3.23'
-            CaO_wt_pct: '1.78'
-            Na2O_wt_pct: '2.96'
-            K2O_wt_pct: '3.59'
+          composition_mass_percent:
+            SiO2: '73.26'
+            Al2O3: '13.08'
+            FeO: '3.23'
+            CaO: '1.78'
+            Na2O: '2.96'
+            K2O: '3.59'
         - sample: 7/3
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca1 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -2494,14 +3011,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.017'
           activity: '0.017'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.29'
-            Al2O3_wt_pct: '11.86'
-            FeO_wt_pct: '2.73'
-            CaO_wt_pct: '0.85'
-            Na2O_wt_pct: '3.14'
-            K2O_wt_pct: '4.15'
+          composition_mass_percent:
+            SiO2: '75.29'
+            Al2O3: '11.86'
+            FeO: '2.73'
+            CaO: '0.85'
+            Na2O: '3.14'
+            K2O: '4.15'
         - sample: 7/4
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -2511,13 +3039,13 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.017'
           activity: '0.017'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.18'
-            Al2O3_wt_pct: '12.19'
-            FeO_wt_pct: '2.45'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.48'
-            K2O_wt_pct: '4.63'
+          composition_mass_percent:
+            SiO2: '75.18'
+            Al2O3: '12.19'
+            FeO: '2.45'
+            CaO: '0.02'
+            Na2O: '3.48'
+            K2O: '4.63'
     context:
     - observation_id: gaillard_2003_cover_access
       type: statement
@@ -3158,6 +3686,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 1/1
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -3169,14 +3708,25 @@ species:
           activity_pair_as_printed:
           - '0.0009'
           - '0.0011'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.08'
-            Al2O3_wt_pct: '11.75'
-            FeO_wt_pct: '10.37'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.11'
-            K2O_wt_pct: '4.23'
+          composition_mass_percent:
+            SiO2: '69.08'
+            Al2O3: '11.75'
+            FeO: '10.37'
+            CaO: '0.00'
+            Na2O: '3.11'
+            K2O: '4.23'
         - sample: 1/2
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -3186,14 +3736,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.0011'
           activity: '0.0011'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.14'
-            Al2O3_wt_pct: '11.50'
-            FeO_wt_pct: '11.85'
-            CaO_wt_pct: '0.07'
-            Na2O_wt_pct: '3.08'
-            K2O_wt_pct: '4.28'
+          composition_mass_percent:
+            SiO2: '68.14'
+            Al2O3: '11.50'
+            FeO: '11.85'
+            CaO: '0.07'
+            Na2O: '3.08'
+            K2O: '4.28'
         - sample: 1/3
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: Ir powders/Pt wires Pt
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -3205,14 +3766,25 @@ species:
           activity_pair_as_printed:
           - '0.0004'
           - '0.0004'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.96'
-            Al2O3_wt_pct: '11.75'
-            FeO_wt_pct: '7.35'
-            CaO_wt_pct: '0.08'
-            Na2O_wt_pct: '3.35'
-            K2O_wt_pct: '4.55'
+          composition_mass_percent:
+            SiO2: '71.96'
+            Al2O3: '11.75'
+            FeO: '7.35'
+            CaO: '0.08'
+            Na2O: '3.35'
+            K2O: '4.55'
         - sample: 1/4
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: wire
           activity_sensors_ditto_resolved: Pt wire
@@ -3222,14 +3794,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.0013'
           activity: '0.0013'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.65'
-            Al2O3_wt_pct: '11.82'
-            FeO_wt_pct: '7.89'
-            CaO_wt_pct: '0.07'
-            Na2O_wt_pct: '3.29'
-            K2O_wt_pct: '4.49'
+          composition_mass_percent:
+            SiO2: '71.65'
+            Al2O3: '11.82'
+            FeO: '7.89'
+            CaO: '0.07'
+            Na2O: '3.29'
+            K2O: '4.49'
         - sample: 1/5
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -3241,14 +3824,25 @@ species:
           activity_pair_as_printed:
           - '0.0001'
           - '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '74.21'
-            Al2O3_wt_pct: '11.89'
-            FeO_wt_pct: '4.26'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.54'
-            K2O_wt_pct: '4.71'
+          composition_mass_percent:
+            SiO2: '74.21'
+            Al2O3: '11.89'
+            FeO: '4.26'
+            CaO: '0.00'
+            Na2O: '3.54'
+            K2O: '4.71'
         - sample: 1/6
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -3258,14 +3852,25 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.0004'
           activity: '0.0004'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '74.04'
-            Al2O3_wt_pct: '12.01'
-            FeO_wt_pct: '4.67'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.59'
-            K2O_wt_pct: '4.65'
+          composition_mass_percent:
+            SiO2: '74.04'
+            Al2O3: '12.01'
+            FeO: '4.67'
+            CaO: '0.00'
+            Na2O: '3.59'
+            K2O: '4.65'
         - sample: 1/7
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: Ir powders/Pt wires
           activity_sensors_ditto_resolved: Ir powders/Pt wires
@@ -3277,14 +3882,25 @@ species:
           activity_pair_as_printed:
           - '0.00004'
           - '0.00002'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.68'
-            Al2O3_wt_pct: '12.05'
-            FeO_wt_pct: '2.10'
-            CaO_wt_pct: '0.04'
-            Na2O_wt_pct: '3.80'
-            K2O_wt_pct: '4.80'
+          composition_mass_percent:
+            SiO2: '75.68'
+            Al2O3: '12.05'
+            FeO: '2.10'
+            CaO: '0.04'
+            Na2O: '3.80'
+            K2O: '4.80'
         - sample: 1/8
+          T_C: '1210'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.28'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.28'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: Pt wire
           activity_sensors_ditto_resolved: Pt wire
@@ -3294,13 +3910,13 @@ species:
           delta_NNO: '-1.28'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.91'
-            Al2O3_wt_pct: '12.10'
-            FeO_wt_pct: '2.29'
-            CaO_wt_pct: '0.06'
-            Na2O_wt_pct: '3.71'
-            K2O_wt_pct: '4.86'
+          composition_mass_percent:
+            SiO2: '75.91'
+            Al2O3: '12.10'
+            FeO: '2.29'
+            CaO: '0.06'
+            Na2O: '3.71'
+            K2O: '4.86'
     - observation_id: gaillard_2003_table4_run2_a_fe2o3
       experiment: gaillard-2003-run-2
       type: activity_coefficient
@@ -3351,6 +3967,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 2/1
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -3360,15 +3987,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.0007'
           activity: '0.0007'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '66.79'
-            Al2O3_wt_pct: '10.38'
-            FeO_wt_pct: '8.84'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.05'
-            K2O_wt_pct: '4.43'
-            H2O_EMPA: '5.21'
+          composition_mass_percent:
+            SiO2: '66.79'
+            Al2O3: '10.38'
+            FeO: '8.84'
+            CaO: '0.02'
+            Na2O: '3.05'
+            K2O: '4.43'
+          H2O_EMPA: '5.21'
         - sample: 2/3
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -3378,15 +4016,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.0003'
           activity: '0.0003'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.94'
-            Al2O3_wt_pct: '10.95'
-            FeO_wt_pct: '4.27'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.32'
-            K2O_wt_pct: '4.58'
-            H2O_EMPA: '5.56'
+          composition_mass_percent:
+            SiO2: '69.94'
+            Al2O3: '10.95'
+            FeO: '4.27'
+            CaO: '0.02'
+            Na2O: '3.32'
+            K2O: '4.58'
+          H2O_EMPA: '5.56'
         - sample: 2/5
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir powders
           activity_sensors_ditto_resolved: Ir powders
@@ -3396,15 +4045,26 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.0009'
           activity: '0.0009'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '65.95'
-            Al2O3_wt_pct: '10.34'
-            FeO_wt_pct: '9.85'
-            CaO_wt_pct: '0.05'
-            Na2O_wt_pct: '3.20'
-            K2O_wt_pct: '4.39'
-            H2O_EMPA: '4.96'
+          composition_mass_percent:
+            SiO2: '65.95'
+            Al2O3: '10.34'
+            FeO: '9.85'
+            CaO: '0.05'
+            Na2O: '3.20'
+            K2O: '4.39'
+          H2O_EMPA: '4.96'
         - sample: 2/7
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe2O3'
           activity_sensors_as_printed: Ir powders/Pt capsule
           activity_sensors_ditto_resolved: Ir powders/Pt capsule
@@ -3416,15 +4076,26 @@ species:
           activity_pair_as_printed:
           - '0.00005'
           - '0.00006'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.89'
-            Al2O3_wt_pct: '11.32'
-            FeO_wt_pct: '1.78'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.34'
-            K2O_wt_pct: '4.78'
-            H2O_EMPA: '5.03'
+          composition_mass_percent:
+            SiO2: '72.89'
+            Al2O3: '11.32'
+            FeO: '1.78'
+            CaO: '0.03'
+            Na2O: '3.34'
+            K2O: '4.78'
+          H2O_EMPA: '5.03'
         - sample: 2/8
+          T_C: '1160'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.25'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.25'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Pt capsule
           activity_sensors_ditto_resolved: Pt capsule
@@ -3434,14 +4105,14 @@ species:
           delta_NNO: '-1.25'
           a_as_printed: '0.0002'
           activity: '0.0002'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.08'
-            Al2O3_wt_pct: '11.16'
-            FeO_wt_pct: '3.55'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.35'
-            K2O_wt_pct: '4.77'
-            H2O_EMPA: '5.00'
+          composition_mass_percent:
+            SiO2: '72.08'
+            Al2O3: '11.16'
+            FeO: '3.55'
+            CaO: '0.01'
+            Na2O: '3.35'
+            K2O: '4.77'
+          H2O_EMPA: '5.00'
     - observation_id: gaillard_2003_table4_run3_a_fe2o3
       experiment: gaillard-2003-run-3
       type: activity_coefficient
@@ -3491,6 +4162,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 3/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.85'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.85'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: Ir Powders
           activity_sensors_ditto_resolved: Ir Powders
@@ -3500,15 +4182,26 @@ species:
           delta_NNO: '-2.85'
           a_as_printed: '0.00007'
           activity: '0.00007'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.60'
-            Al2O3_wt_pct: '11.63'
-            FeO_wt_pct: '4.54'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.55'
-            K2O_wt_pct: '4.60'
-            H2O_EMPA: '3.25'
+          composition_mass_percent:
+            SiO2: '71.60'
+            Al2O3: '11.63'
+            FeO: '4.54'
+            CaO: '0.01'
+            Na2O: '3.55'
+            K2O: '4.60'
+          H2O_EMPA: '3.25'
         - sample: 3/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3518,15 +4211,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.00001'
           activity: '0.00001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.67'
-            Al2O3_wt_pct: '11.76'
-            FeO_wt_pct: '0.82'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.52'
-            K2O_wt_pct: '4.47'
-            H2O_EMPA: '6.71'
+          composition_mass_percent:
+            SiO2: '71.67'
+            Al2O3: '11.76'
+            FeO: '0.82'
+            CaO: '0.01'
+            Na2O: '3.52'
+            K2O: '4.47'
+          H2O_EMPA: '6.71'
         - sample: 3/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3536,15 +4240,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.0006'
           activity: '0.0006'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.46'
-            Al2O3_wt_pct: '10.57'
-            FeO_wt_pct: '6.05'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.19'
-            K2O_wt_pct: '4.15'
-            H2O_EMPA: '6.55'
+          composition_mass_percent:
+            SiO2: '68.46'
+            Al2O3: '10.57'
+            FeO: '6.05'
+            CaO: '0.02'
+            Na2O: '3.19'
+            K2O: '4.15'
+          H2O_EMPA: '6.55'
         - sample: 3/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.08'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.08'
           starting_products_as_printed: '#7 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3554,15 +4269,26 @@ species:
           delta_NNO: '-2.08'
           a_as_printed: '0.0005'
           activity: '0.0005'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.00'
-            Al2O3_wt_pct: '10.64'
-            FeO_wt_pct: '7.15'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.13'
-            K2O_wt_pct: '4.15'
-            H2O_EMPA: '5.85'
+          composition_mass_percent:
+            SiO2: '68.00'
+            Al2O3: '10.64'
+            FeO: '7.15'
+            CaO: '0.01'
+            Na2O: '3.13'
+            K2O: '4.15'
+          H2O_EMPA: '5.85'
         - sample: 3/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.66'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.66'
           starting_products_as_printed: '#7 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3572,15 +4298,26 @@ species:
           delta_NNO: '-2.66'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.54'
-            Al2O3_wt_pct: '11.74'
-            FeO_wt_pct: '4.77'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '2.90'
-            K2O_wt_pct: '4.50'
-            H2O_EMPA: '3.56'
+          composition_mass_percent:
+            SiO2: '71.54'
+            Al2O3: '11.74'
+            FeO: '4.77'
+            CaO: '0.03'
+            Na2O: '2.90'
+            K2O: '4.50'
+          H2O_EMPA: '3.56'
         - sample: 3/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.95'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.95'
           starting_products_as_printed: '#3 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3590,15 +4327,26 @@ species:
           delta_NNO: '-1.95'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.38'
-            Al2O3_wt_pct: '10.62'
-            FeO_wt_pct: '3.27'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.56'
-            K2O_wt_pct: '4.21'
-            H2O_EMPA: '6.59'
+          composition_mass_percent:
+            SiO2: '70.38'
+            Al2O3: '10.62'
+            FeO: '3.27'
+            CaO: '0.02'
+            Na2O: '3.56'
+            K2O: '4.21'
+          H2O_EMPA: '6.59'
         - sample: 3/7
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3608,15 +4356,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.00009'
           activity: '0.00009'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.07'
-            Al2O3_wt_pct: '10.66'
-            FeO_wt_pct: '2.45'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.31'
-            K2O_wt_pct: '4.21'
-            H2O_EMPA: '6.88'
+          composition_mass_percent:
+            SiO2: '71.07'
+            Al2O3: '10.66'
+            FeO: '2.45'
+            CaO: '0.01'
+            Na2O: '3.31'
+            K2O: '4.21'
+          H2O_EMPA: '6.88'
         - sample: 3/8
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.18'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.18'
           starting_products_as_printed: '#3 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3626,15 +4385,26 @@ species:
           delta_NNO: '-2.18'
           a_as_printed: '0.00000'
           activity: '0.00000'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.88'
-            Al2O3_wt_pct: '11.72'
-            FeO_wt_pct: '0.70'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.69'
-            K2O_wt_pct: '4.44'
-            H2O_EMPA: '6.02'
+          composition_mass_percent:
+            SiO2: '72.88'
+            Al2O3: '11.72'
+            FeO: '0.70'
+            CaO: '0.03'
+            Na2O: '3.69'
+            K2O: '4.44'
+          H2O_EMPA: '6.02'
         - sample: 3/9
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-2.39'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -2.39'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3644,15 +4414,26 @@ species:
           delta_NNO: '-2.39'
           a_as_printed: '0.0003'
           activity: '0.0003'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.69'
-            Al2O3_wt_pct: '10.89'
-            FeO_wt_pct: '7.46'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.29'
-            K2O_wt_pct: '4.30'
-            H2O_EMPA: '4.99'
+          composition_mass_percent:
+            SiO2: '68.69'
+            Al2O3: '10.89'
+            FeO: '7.46'
+            CaO: '0.01'
+            Na2O: '3.29'
+            K2O: '4.30'
+          H2O_EMPA: '4.99'
         - sample: 3/10
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3662,15 +4443,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.00005'
           activity: '0.00005'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.70'
-            Al2O3_wt_pct: '10.72'
-            FeO_wt_pct: '1.69'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.43'
-            K2O_wt_pct: '4.11'
-            H2O_EMPA: '7.1'
+          composition_mass_percent:
+            SiO2: '71.70'
+            Al2O3: '10.72'
+            FeO: '1.69'
+            CaO: '0.02'
+            Na2O: '3.43'
+            K2O: '4.11'
+          H2O_EMPA: '7.1'
         - sample: 3/11
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-3.16'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -3.16'
           starting_products_as_printed: '#5 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3680,15 +4472,26 @@ species:
           delta_NNO: '-3.16'
           a_as_printed: '0.00001'
           activity: '0.00001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.40'
-            Al2O3_wt_pct: '11.34'
-            FeO_wt_pct: '1.81'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.70'
-            K2O_wt_pct: '4.46'
-            H2O_EMPA: '2.66'
+          composition_mass_percent:
+            SiO2: '75.40'
+            Al2O3: '11.34'
+            FeO: '1.81'
+            CaO: '0.01'
+            Na2O: '3.70'
+            K2O: '4.46'
+          H2O_EMPA: '2.66'
         - sample: 3/12
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3698,15 +4501,26 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.32'
-            Al2O3_wt_pct: '10.67'
-            FeO_wt_pct: '2.63'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.60'
-            K2O_wt_pct: '4.19'
-            H2O_EMPA: '6.44'
+          composition_mass_percent:
+            SiO2: '71.32'
+            Al2O3: '10.67'
+            FeO: '2.63'
+            CaO: '0.01'
+            Na2O: '3.60'
+            K2O: '4.19'
+          H2O_EMPA: '6.44'
         - sample: 3/13
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-1.91'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -1.91'
           starting_products_as_printed: '#5 + Fe + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -3716,14 +4530,14 @@ species:
           delta_NNO: '-1.91'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.44'
-            Al2O3_wt_pct: '10.74'
-            FeO_wt_pct: '2.41'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.67'
-            K2O_wt_pct: '4.23'
-            H2O_EMPA: '6.77'
+          composition_mass_percent:
+            SiO2: '71.44'
+            Al2O3: '10.74'
+            FeO: '2.41'
+            CaO: '0.02'
+            Na2O: '3.67'
+            K2O: '4.23'
+          H2O_EMPA: '6.77'
     - observation_id: gaillard_2003_table4_run4_a_fe2o3
       experiment: gaillard-2003-run-4
       type: activity_coefficient
@@ -3774,6 +4588,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 4/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#2'
           activity_sensors_as_printed: Ir Wire
           activity_sensors_ditto_resolved: Ir Wire
@@ -3783,15 +4608,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.00002'
           activity: '0.00002'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.70'
-            Al2O3_wt_pct: '11.47'
-            FeO_wt_pct: '0.61'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.70'
-            K2O_wt_pct: '4.57'
-            H2O_EMPA: '6.25'
+          composition_mass_percent:
+            SiO2: '73.70'
+            Al2O3: '11.47'
+            FeO: '0.61'
+            CaO: '0.01'
+            Na2O: '3.70'
+            K2O: '4.57'
+          H2O_EMPA: '6.25'
         - sample: 4/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3801,15 +4637,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.00005'
           activity: '0.00005'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.20'
-            Al2O3_wt_pct: '11.50'
-            FeO_wt_pct: '0.98'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.80'
-            K2O_wt_pct: '4.53'
-            H2O_EMPA: '5.95'
+          composition_mass_percent:
+            SiO2: '73.20'
+            Al2O3: '11.50'
+            FeO: '0.98'
+            CaO: '0.00'
+            Na2O: '3.80'
+            K2O: '4.53'
+          H2O_EMPA: '5.95'
         - sample: 4/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#4'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3819,15 +4666,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0001'
           activity: '0.0001'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.37'
-            Al2O3_wt_pct: '11.48'
-            FeO_wt_pct: '1.22'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.78'
-            K2O_wt_pct: '4.60'
-            H2O_EMPA: '6.35'
+          composition_mass_percent:
+            SiO2: '72.37'
+            Al2O3: '11.48'
+            FeO: '1.22'
+            CaO: '0.02'
+            Na2O: '3.78'
+            K2O: '4.60'
+          H2O_EMPA: '6.35'
         - sample: 4/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#5'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3837,15 +4695,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0003'
           activity: '0.0003'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.82'
-            Al2O3_wt_pct: '10.98'
-            FeO_wt_pct: '1.81'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.40'
-            K2O_wt_pct: '4.63'
-            H2O_EMPA: '6.09'
+          composition_mass_percent:
+            SiO2: '72.82'
+            Al2O3: '10.98'
+            FeO: '1.81'
+            CaO: '0.03'
+            Na2O: '3.40'
+            K2O: '4.63'
+          H2O_EMPA: '6.09'
         - sample: 4/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#8'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3855,15 +4724,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0007'
           activity: '0.0007'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.10'
-            Al2O3_wt_pct: '10.45'
-            FeO_wt_pct: '3.12'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.57'
-            K2O_wt_pct: '4.29'
-            H2O_EMPA: '6.01'
+          composition_mass_percent:
+            SiO2: '72.10'
+            Al2O3: '10.45'
+            FeO: '3.12'
+            CaO: '0.02'
+            Na2O: '3.57'
+            K2O: '4.29'
+          H2O_EMPA: '6.01'
         - sample: 4/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3873,15 +4753,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0021'
           activity: '0.0021'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.16'
-            Al2O3_wt_pct: '11.10'
-            FeO_wt_pct: '4.65'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.18'
-            K2O_wt_pct: '3.79'
-            H2O_EMPA: '5.01'
+          composition_mass_percent:
+            SiO2: '71.16'
+            Al2O3: '11.10'
+            FeO: '4.65'
+            CaO: '0.00'
+            Na2O: '3.18'
+            K2O: '3.79'
+          H2O_EMPA: '5.01'
         - sample: 4/7
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#11'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3891,15 +4782,26 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0035'
           activity: '0.0035'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '69.21'
-            Al2O3_wt_pct: '11.64'
-            FeO_wt_pct: '6.37'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '3.32'
-            K2O_wt_pct: '4.14'
-            H2O_EMPA: '4.36'
+          composition_mass_percent:
+            SiO2: '69.21'
+            Al2O3: '11.64'
+            FeO: '6.37'
+            CaO: '0.03'
+            Na2O: '3.32'
+            K2O: '4.14'
+          H2O_EMPA: '4.36'
         - sample: 4/8
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.8'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.8'
           starting_products_as_printed: '#12'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3909,14 +4811,14 @@ species:
           delta_NNO: '-0.8'
           a_as_printed: '0.0040'
           activity: '0.0040'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.29'
-            Al2O3_wt_pct: '11.82'
-            FeO_wt_pct: '7.18'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.47'
-            K2O_wt_pct: '4.06'
-            H2O_EMPA: '4.22'
+          composition_mass_percent:
+            SiO2: '68.29'
+            Al2O3: '11.82'
+            FeO: '7.18'
+            CaO: '0.00'
+            Na2O: '3.47'
+            K2O: '4.06'
+          H2O_EMPA: '4.22'
     - observation_id: gaillard_2003_table4_run5_a_fe2o3
       experiment: gaillard-2003-run-5
       type: activity_coefficient
@@ -3967,6 +4869,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 5/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.5'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.5'
           starting_products_as_printed: '#11'
           activity_sensors_as_printed: Ir Wire
           activity_sensors_ditto_resolved: Ir Wire
@@ -3976,15 +4889,26 @@ species:
           delta_NNO: '-0.5'
           a_as_printed: '0.0055'
           activity: '0.0055'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '68.38'
-            Al2O3_wt_pct: '11.71'
-            FeO_wt_pct: '5.43'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.65'
-            K2O_wt_pct: '4.45'
-            H2O_EMPA: '5.10'
+          composition_mass_percent:
+            SiO2: '68.38'
+            Al2O3: '11.71'
+            FeO: '5.43'
+            CaO: '0.02'
+            Na2O: '3.65'
+            K2O: '4.45'
+          H2O_EMPA: '5.10'
         - sample: 5/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '-0.5'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO -0.5'
           starting_products_as_printed: '#12'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Wire
@@ -3994,14 +4918,14 @@ species:
           delta_NNO: '-0.5'
           a_as_printed: '0.0087'
           activity: '0.0087'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '67.16'
-            Al2O3_wt_pct: '11.28'
-            FeO_wt_pct: '7.93'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.51'
-            K2O_wt_pct: '3.97'
-            H2O_EMPA: '4.50'
+          composition_mass_percent:
+            SiO2: '67.16'
+            Al2O3: '11.28'
+            FeO: '7.93'
+            CaO: '0.01'
+            Na2O: '3.51'
+            K2O: '3.97'
+          H2O_EMPA: '4.50'
     - observation_id: gaillard_2003_table4_run6_a_fe2o3
       experiment: gaillard-2003-run-6
       type: activity_coefficient
@@ -4054,6 +4978,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 6/1
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#1'
           activity_sensors_as_printed: Ir Powders
           activity_sensors_ditto_resolved: Ir Powders
@@ -4064,15 +4999,26 @@ species:
           a_as_printed: '0.0002'
           activity: '0.0002'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.46'
-            Al2O3_wt_pct: '10.90'
-            FeO_wt_pct: '0.44'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.66'
-            K2O_wt_pct: '4.75'
-            H2O_EMPA: '6.68'
+          composition_mass_percent:
+            SiO2: '73.46'
+            Al2O3: '10.90'
+            FeO: '0.44'
+            CaO: '0.01'
+            Na2O: '3.66'
+            K2O: '4.75'
+          H2O_EMPA: '6.68'
         - sample: 6/2
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#2'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -4083,15 +5029,26 @@ species:
           a_as_printed: '0.0015'
           activity: '0.0015'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.80'
-            Al2O3_wt_pct: '11.25'
-            FeO_wt_pct: '0.77'
-            CaO_wt_pct: '0.06'
-            Na2O_wt_pct: '3.48'
-            K2O_wt_pct: '4.56'
-            H2O_EMPA: '6.97'
+          composition_mass_percent:
+            SiO2: '72.80'
+            Al2O3: '11.25'
+            FeO: '0.77'
+            CaO: '0.06'
+            Na2O: '3.48'
+            K2O: '4.56'
+          H2O_EMPA: '6.97'
         - sample: 6/3
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#5'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -4102,15 +5059,26 @@ species:
           a_as_printed: '0.0056'
           activity: '0.0056'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.01'
-            Al2O3_wt_pct: '11.46'
-            FeO_wt_pct: '1.71'
-            CaO_wt_pct: '0.00'
-            Na2O_wt_pct: '3.55'
-            K2O_wt_pct: '4.57'
-            H2O_EMPA: '6.58'
+          composition_mass_percent:
+            SiO2: '72.01'
+            Al2O3: '11.46'
+            FeO: '1.71'
+            CaO: '0.00'
+            Na2O: '3.55'
+            K2O: '4.57'
+          H2O_EMPA: '6.58'
         - sample: 6/4
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#6'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Ir Powders
@@ -4121,15 +5089,26 @@ species:
           a_as_printed: '0.0093'
           activity: '0.0093'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.33'
-            Al2O3_wt_pct: '10.54'
-            FeO_wt_pct: '2.20'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.42'
-            K2O_wt_pct: '4.41'
-            H2O_EMPA: '6.97'
+          composition_mass_percent:
+            SiO2: '72.33'
+            Al2O3: '10.54'
+            FeO: '2.20'
+            CaO: '0.01'
+            Na2O: '3.42'
+            K2O: '4.41'
+          H2O_EMPA: '6.97'
         - sample: 6/5
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#9'
           activity_sensors_as_printed: Ir powders/Magnetite
           activity_sensors_ditto_resolved: Ir powders/Magnetite
@@ -4142,15 +5121,26 @@ species:
           - '0.0136'
           - '0.01300'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.25'
-            Al2O3_wt_pct: '10.45'
-            FeO_wt_pct: '2.71'
-            CaO_wt_pct: '0.03'
-            Na2O_wt_pct: '2.93'
-            K2O_wt_pct: '4.37'
-            H2O_EMPA: '7.15'
+          composition_mass_percent:
+            SiO2: '72.25'
+            Al2O3: '10.45'
+            FeO: '2.71'
+            CaO: '0.03'
+            Na2O: '2.93'
+            K2O: '4.37'
+          H2O_EMPA: '7.15'
         - sample: 6/6
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: Ir powders/Magnetite
           activity_sensors_ditto_resolved: Ir powders/Magnetite
@@ -4163,15 +5153,26 @@ species:
           - '0.0118'
           - '0.0109'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.96'
-            Al2O3_wt_pct: '11.83'
-            FeO_wt_pct: '2.86'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.03'
-            K2O_wt_pct: '4.39'
-            H2O_EMPA: '6.80'
+          composition_mass_percent:
+            SiO2: '70.96'
+            Al2O3: '11.83'
+            FeO: '2.86'
+            CaO: '0.02'
+            Na2O: '3.03'
+            K2O: '4.39'
+          H2O_EMPA: '6.80'
         - sample: 6/11
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#9'
           activity_sensors_as_printed: Magnetite
           activity_sensors_ditto_resolved: Magnetite
@@ -4182,15 +5183,26 @@ species:
           a_as_printed: '0.0132'
           activity: '0.0132'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '72.15'
-            Al2O3_wt_pct: '10.68'
-            FeO_wt_pct: '2.93'
-            CaO_wt_pct: '0.01'
-            Na2O_wt_pct: '3.17'
-            K2O_wt_pct: '4.38'
-            H2O_EMPA: '6.45'
+          composition_mass_percent:
+            SiO2: '72.15'
+            Al2O3: '10.68'
+            FeO: '2.93'
+            CaO: '0.01'
+            Na2O: '3.17'
+            K2O: '4.38'
+          H2O_EMPA: '6.45'
         - sample: 6/12
+          T_C: '1000'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+1.4'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +1.4'
           starting_products_as_printed: '#10'
           activity_sensors_as_printed: Magnetite
           activity_sensors_ditto_resolved: Magnetite
@@ -4201,14 +5213,14 @@ species:
           a_as_printed: '0.0110'
           activity: '0.0110'
           H2O_approximate: true
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '71.18'
-            Al2O3_wt_pct: '11.43'
-            FeO_wt_pct: '2.97'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.18'
-            K2O_wt_pct: '4.25'
-            H2O_EMPA: '6.81'
+          composition_mass_percent:
+            SiO2: '71.18'
+            Al2O3: '11.43'
+            FeO: '2.97'
+            CaO: '0.02'
+            Na2O: '3.18'
+            K2O: '4.25'
+          H2O_EMPA: '6.81'
     - observation_id: gaillard_2003_table4_run7_a_fe2o3
       experiment: gaillard-2003-run-7
       type: activity_coefficient
@@ -4258,6 +5270,17 @@ species:
           which value belongs to which sensor. Both kept, not averaged.'
         series:
         - sample: 7/1
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca3 + Fe + Fe2O3'
           activity_sensors_as_printed: Hm
           activity_sensors_ditto_resolved: Hm
@@ -4267,14 +5290,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.099'
           activity: '0.099'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '70.22'
-            Al2O3_wt_pct: '14.93'
-            FeO_wt_pct: '3.77'
-            CaO_wt_pct: '2.50'
-            Na2O_wt_pct: '3.43'
-            K2O_wt_pct: '3.18'
+          composition_mass_percent:
+            SiO2: '70.22'
+            Al2O3: '14.93'
+            FeO: '3.77'
+            CaO: '2.50'
+            Na2O: '3.43'
+            K2O: '3.18'
         - sample: 7/2
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca2 + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -4284,14 +5318,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.102'
           activity: '0.102'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '73.26'
-            Al2O3_wt_pct: '13.08'
-            FeO_wt_pct: '3.23'
-            CaO_wt_pct: '1.78'
-            Na2O_wt_pct: '2.96'
-            K2O_wt_pct: '3.59'
+          composition_mass_percent:
+            SiO2: '73.26'
+            Al2O3: '13.08'
+            FeO: '3.23'
+            CaO: '1.78'
+            Na2O: '2.96'
+            K2O: '3.59'
         - sample: 7/3
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#Ca1 + Fe + Fe2O3'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -4301,14 +5346,25 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.102'
           activity: '0.102'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.29'
-            Al2O3_wt_pct: '11.86'
-            FeO_wt_pct: '2.73'
-            CaO_wt_pct: '0.85'
-            Na2O_wt_pct: '3.14'
-            K2O_wt_pct: '4.15'
+          composition_mass_percent:
+            SiO2: '75.29'
+            Al2O3: '11.86'
+            FeO: '2.73'
+            CaO: '0.85'
+            Na2O: '3.14'
+            K2O: '4.15'
         - sample: 7/4
+          T_C: '1245'
+          point_conditions:
+            delta_NNO:
+              state:
+                tag: value
+                value: '+7.3'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                table: '4'
+                note: 'Table 4 run condition; printed ΔNNO +7.3'
           starting_products_as_printed: '#3 + Fe'
           activity_sensors_as_printed: ″
           activity_sensors_ditto_resolved: Hm
@@ -4318,13 +5374,13 @@ species:
           delta_NNO: '+7.3'
           a_as_printed: '0.096'
           activity: '0.096'
-          glass_composition_wt_pct_table5:
-            SiO2_wt_pct: '75.18'
-            Al2O3_wt_pct: '12.19'
-            FeO_wt_pct: '2.45'
-            CaO_wt_pct: '0.02'
-            Na2O_wt_pct: '3.48'
-            K2O_wt_pct: '4.63'
+          composition_mass_percent:
+            SiO2: '75.18'
+            Al2O3: '12.19'
+            FeO: '2.45'
+            CaO: '0.02'
+            Na2O: '3.48'
+            K2O: '4.63'
     context:
     - observation_id: gaillard_2003_table1_fe2o3_liq_formation_this_study
       type: model_fit_context

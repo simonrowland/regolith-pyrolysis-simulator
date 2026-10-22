@@ -87,23 +87,44 @@ def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
 def test_gaillard_2003_migrates_printed_activity_cells() -> None:
     result = _migrate("gaillard-2003-hydrous-silicic-melt-activity.yaml")
     assert len(result.observations) == 260
-    assert _point(
-        result, "gaillard_2003_table4_run7_a_fe2o3::point:1"
-    ) == Decimal("0.102")
-    assert _point(
-        result, "gaillard_2003_table4_run7_a_feo::point:0"
-    ) == Decimal("0.017")
-    located = [
+    table4_rows = [
         observation
         for observation in result.observations.values()
-        if observation.point_conditions
+        if "gaillard_2003_table4_run" in observation.observation_id
     ]
-    assert len(located) == 96
+    assert len(table4_rows) == 96
+    run7_fe2o3 = next(
+        observation
+        for observation in table4_rows
+        if "run7_a_fe2o3::" in observation.observation_id
+        and ":row=7/1:" in observation.observation_id
+    )
+    run7_feo = next(
+        observation
+        for observation in table4_rows
+        if "run7_a_feo::" in observation.observation_id
+        and ":row=7/1:" in observation.observation_id
+    )
+    assert run7_fe2o3.value.point == Decimal("0.099")
+    assert run7_feo.value.point == Decimal("0.017")
+    assert run7_fe2o3.identity.composition.is_value
+    assert run7_fe2o3.identity.reference_state.is_value
+    assert (
+        run7_fe2o3.point_conditions["printed_composition"].state.value["FeO"]
+        == "3.77"
+    )
+    assert (
+        run7_fe2o3.point_conditions["delta_NNO"].state.value == Decimal("7.3")
+    )
+    assert run7_fe2o3.point_conditions["delta_NNO"].locator is not None
     assert all(
         observation.identity.temperature_K.is_value
+        and observation.identity.composition.is_value
         and observation.point_conditions["temperature_K"].state.is_value
         and observation.point_conditions["temperature_K"].locator is not None
-        for observation in located
+        and observation.point_conditions["delta_NNO"].state.is_value
+        and observation.point_conditions["delta_NNO"].locator is not None
+        for observation in table4_rows
     )
 
 
