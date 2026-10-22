@@ -372,6 +372,37 @@ def test_completed_run_marks_final_unavailable_when_ledger_projection_raises(
     }
 
 
+def test_sio_yield_report_propagates_unavailable_final_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.runner import build_sio_yield_report
+
+    def raise_ledger_projection_error(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("injected SiO ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        include_diagnostics=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+
+    assert report["status"] == "unavailable"
+    assert report["section"] == "sio_yield_report"
+    assert report["exception_type"] == "RuntimeError"
+    assert "final_state" in report["reason"]
+    assert "wall_deposit_kg" not in report
+    assert diagnostics["status"] == "unavailable"
+    assert diagnostics["section"] == "sio_yield_report.diagnostics"
+    assert "final_state" in diagnostics["reason"]
+    assert "closure_error_pct" not in diagnostics
+
+
 def test_completed_run_reports_unresolved_wall_species_without_aborting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

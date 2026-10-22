@@ -4423,6 +4423,23 @@ def build_sio_yield_report(
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
 
     final_state = result.get("final_state", {})
+    if (
+        isinstance(final_state, Mapping)
+        and final_state.get("status") == "unavailable"
+    ):
+        report = _unavailable_report_from_upstream(
+            final_state,
+            section="sio_yield_report",
+        )
+        if include_diagnostics:
+            return (
+                report,
+                _unavailable_report_from_upstream(
+                    report,
+                    section="sio_yield_report.diagnostics",
+                ),
+            )
+        return report
     cleaned_melt = final_state.get("process.cleaned_melt", {})
     condensation_train = final_state.get("process.condensation_train", {})
     wall_deposit = _wall_deposit_mol_by_species(final_state)
