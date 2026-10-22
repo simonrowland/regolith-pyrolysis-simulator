@@ -2792,6 +2792,9 @@ def convert_pressure_to_pa(
     if lowered in {"gpa"}:
         # Premise: 1 GPa = 1e9 Pa exactly (SI).
         return amount * Decimal("1000000000"), "GPa_to_Pa"
+    if lowered in {"kbar", "kilobar"}:
+        # Premise: 1 kbar = 100 MPa exactly (SI).
+        return amount * Decimal("100000000"), "kbar_to_Pa"
     if lowered in {"bar"}:
         return bar_to_pa(amount), "bar_to_Pa"
     if lowered in {"atm", "atmosphere", "atmospheres"}:
@@ -12716,9 +12719,34 @@ class Migrator:
             pressure_can_fill = True
         if pressure_can_fill:
             pressure_source = "experiment.pressure_environment.total_pressure_Pa"
-            pressure = _printed_experiment_pressure(
-                experiment.pressure_environment.total_pressure_Pa,
-            )
+            row_pressure_provenance = None
+            pressure = None
+            if (
+                quantity in PHASE_COMPOSITION_QUANTITIES
+                and isinstance(source_values, Mapping)
+            ):
+                # The helper scans its context for model-calculation markers;
+                # the phase-composition quantity itself contains "equilibrium"
+                # and would demote a source-declared row pressure. Give it only
+                # the pressure cell and evidence class for this row-level check.
+                row_pressure_values = {
+                    key: source_values[key]
+                    for key in ("total_pressure_Pa", "method_class")
+                    if source_values.get(key) is not None
+                }
+                row_pressure, row_pressure_provenance = _pressure_total_from_extract(
+                    {},
+                    row_pressure_values,
+                    gas_formula=None,
+                    source_text="",
+                )
+                if row_pressure is not None and row_pressure.is_value:
+                    pressure = row_pressure.value
+                    pressure_source = "observation row total_pressure_Pa"
+            if pressure is None:
+                pressure = _printed_experiment_pressure(
+                    experiment.pressure_environment.total_pressure_Pa,
+                )
             # Knudsen effusion: experiment total is chamber background for the
             # KEMS validity gates — never the pressure a prediction is made at.
             skip_identity_fill = _knudsen_effusion_chamber_background_not_for_identity(
@@ -12739,10 +12767,18 @@ class Migrator:
                         )
             if pressure is not None and not skip_identity_fill:
                 known["total_pressure_Pa"] = State.of(pressure)
-                provenance.append(
-                    "identity.total_pressure_Pa="
-                    f"{pressure_source} (printed experiment scope)"
-                )
+                if row_pressure_provenance is not None:
+                    provenance.append(row_pressure_provenance)
+                else:
+                    scope = (
+                        "printed experiment scope"
+                        if pressure_source.startswith("experiment.")
+                        else "printed observation row"
+                    )
+                    provenance.append(
+                        "identity.total_pressure_Pa="
+                        f"{pressure_source} ({scope})"
+                    )
 
         sweep_is_valid = (
             experiment.pressure_environment.sweep_gas.state.is_value
