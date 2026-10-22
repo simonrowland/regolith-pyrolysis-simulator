@@ -170,6 +170,51 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         for figure in figures
     )
 
+    source_context = doc["species"]["S"]["context"]
+    sulfate_capacities = [
+        context
+        for context in source_context
+        if context["observation_id"].endswith("-sulfate-capacity-no-token")
+    ]
+    assert len(sulfate_capacities) == 57
+    assert sulfate_capacities[0]["values"]["value_as_published"] == "9.7"
+    workbook_records = [
+        context
+        for context in source_context
+        if context["observation_id"] == "gw2026-s1-lasso-fit-matrix"
+    ]
+    assert len(workbook_records) == 1
+    workbook = workbook_records[0]
+    assert workbook["locator"]["record"].startswith(
+        "S1_Calibration_data_and_fitting_results.xlsx"
+    )
+    assert all(
+        cell_range in workbook["locator"]["record"]
+        for cell_range in (
+            "Info!A1:I22",
+            "S1_logCS2_data_for_fitting!A1:V307",
+            "S2_logCS6_data_for_fitting!A1:N404",
+            "S3-6_Fitting_results_summary!A1:U386",
+        )
+    )
+    assert workbook["values"]["sheets"][:3] == [
+        {"name": "Info"},
+        {
+            "name": "S1_logCS2_data_for_fitting",
+            "data_rows": 305,
+            "study_row_counts": {"GW": 48, "BW": 61, "OM": 196},
+        },
+        {
+            "name": "S2_logCS6_data_for_fitting",
+            "data_rows": 402,
+            "study_row_counts": {"GW": 51, "BW": 82, "OM": 269},
+        },
+    ]
+    assert workbook["values"]["discrepancies"]["sulfide_capacity"]["extra_workbook_row"] == 9
+    assert workbook["values"]["discrepancies"]["sulfate_capacity"][
+        "table_rows_missing_from_GW_fit"
+    ] == [f"t3-r{index:03d}" for index in range(43, 50)]
+
 
 def test_physical_page_locators_match_source_when_corpus_is_available() -> None:
     corpus = regolith_corpus_root()

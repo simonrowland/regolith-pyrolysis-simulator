@@ -14456,6 +14456,49 @@ species:
           literature markers in panel B: overlap prevents a reliable count from the render
         method_class: model_derived
         digitisation: deferred to a figure pass
+    - observation_id: gw2026-s1-lasso-fit-matrix
+      type: supplementary_fit_matrix_not_independent_observations
+      locator:
+        source_path: corpus/raw/gorojovsky-wood-2026-sulfur-crustal/gorojovsky-wood-2026-sulfur-crustal.pdf
+        page: 14
+        pdf_page_index: 13
+        paragraph: Supplementary materials statement
+        record: 'S1_Calibration_data_and_fitting_results.xlsx; Info!A1:I22; S1_logCS2_data_for_fitting!A1:V307; S2_logCS6_data_for_fitting!A1:N404; S3-6_Fitting_results_summary!A1:U386'
+      units: workbook sheets, cell ranges, and row counts
+      reason: The workbook contains LASSO fitting inputs with study codes but no run/sample identifiers
+        or row-level fO2/fS2. Its GW rows overlap the printed tables inconsistently, so it is not scored
+        or copied cell by cell.
+      values:
+        file_name: S1_Calibration_data_and_fitting_results.xlsx
+        contents: Temperature, log-capacity responses, single-oxygen-basis composition features divided
+          by temperature, and LASSO covariates and fit summaries.
+        sheets:
+        - name: Info
+        - name: S1_logCS2_data_for_fitting
+          data_rows: 305
+          study_row_counts:
+            GW: 48
+            BW: 61
+            OM: 196
+        - name: S2_logCS6_data_for_fitting
+          data_rows: 402
+          study_row_counts:
+            GW: 51
+            BW: 82
+            OM: 269
+        - name: S3-6_Fitting_results_summary
+        discrepancies:
+          sulfide_capacity:
+            printed_table_rows: 47
+            workbook_GW_rows: 48
+            extra_workbook_row: 9
+            extra_row_temperature_K: 1323
+          sulfate_capacity:
+            printed_table_rows: 57
+            workbook_GW_rows: 51
+            table_rows_missing_from_GW_fit: [t3-r043, t3-r044, t3-r045, t3-r046, t3-r047, t3-r048, t3-r049]
+            extra_workbook_row: 14
+            extra_row_temperature_K: 1323
   SiO2:
     observations:
     - observation_id: t2-r001-sio2
@@ -41623,10 +41666,11 @@ deepening:
       a printed dash retain their numeric cells in context and keep the sample composition unknown.
     Table 2: Typed 47 sulfide-capacity runs and nine printed glass oxide components per run; sulfur concentration
       in ppm retained in species.S.context because there is no ppm phase-composition basis.
-    Table 3: Typed 57 sulfate-capacity runs and nine printed glass oxide components per run; sulfur concentration
-      in ppm retained in species.S.context because there is no ppm phase-composition basis.
-    S1 workbook: Calibration/fitting inputs overlap the article tables and include literature datasets;
-      workbook rows are not observation records until their study and sample linkage is reconciled.
+    Table 3: Preserved all 57 printed sulfate-capacity values and nine glass oxide components per run;
+      sulfate capacity and sulfur concentration in ppm remain in species.S.context because neither has a
+      matching d-223 value token.
+    S1 workbook: One species.S.context record points to the sheet ranges, reports row counts and mismatches,
+      and identifies the workbook as a non-independent LASSO fit matrix; no workbook rows are scored.
   equation_note: The Table 2 capacity values are retained as printed. Equation 3's printed fugacity ratio
     appears opposite to the direction implied by Table 2 values; the original rendered equation is cited
     at PDF page 4. No value was recalculated.
