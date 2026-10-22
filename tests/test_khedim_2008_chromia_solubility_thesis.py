@@ -3,7 +3,6 @@ from __future__ import annotations
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
-import re
 import subprocess
 
 import pytest
@@ -14,10 +13,12 @@ from simulator.battery.identity import celsius_to_kelvin
 from simulator.battery.migrate import REPO_ROOT, migrate
 from tests.battery.test_migrate import _write_min_tree
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.printed_decimal_pair import printed_decimal_pair
 
 
 SOURCE_ID = "khedim-2008-chromia-solubility-thesis"
 EXTRACT = REPO_ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
+PUBLISHED_EXTRACT = REPO_ROOT / "data/literature/extracts/khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility.yaml"
 SOURCE_PDF = Path("raw") / SOURCE_ID / f"{SOURCE_ID}.pdf"
 
 # Independent transcription of the Appendix III grids from the 600 dpi renders.
@@ -161,18 +162,12 @@ def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
 
 
-def _printed_numbers(cell: str) -> tuple[str, str]:
-    match = re.fullmatch(r"\s*([0-9]+,[0-9]+)\s*\(\s*([0-9]+[,.][0-9]+)\s*\)\s*", cell)
-    assert match is not None, cell
-    return match.group(1), match.group(2)
-
-
 def _expected_rows(grid: list[dict] | None = None) -> list[dict]:
     rows: list[dict] = []
     for panel in RENDER_GRID if grid is None else grid:
         for offset, (buffer, log_fO2, cells) in enumerate(panel["rows"]):
             for column, composition, cell in zip(panel["columns"], panel["compositions"], cells):
-                printed_value, parenthetical = _printed_numbers(cell)
+                printed_value, parenthetical = printed_decimal_pair(cell)
                 rows.append(
                     {
                         "observation_id": (
@@ -199,15 +194,53 @@ def _expected_rows(grid: list[dict] | None = None) -> list[dict]:
 
 def _assert_render_grid_matches(document: dict, grid: list[dict] | None = None) -> None:
     expected = _expected_rows(grid)
+    published_ids = {
+        row["observation_id"]
+        for row in yaml.safe_load(PUBLISHED_EXTRACT.read_text(encoding="utf-8"))[
+            "species"
+        ]["Cr"]["observations"]
+    }
     observations = {
         row["observation_id"]: row
         for row in document["species"]["Cr"]["observations"]
     }
-    assert len(observations) == len(expected) == 105
+    duplicate_context = {
+        row["observation_id"]: row
+        for row in document["species"]["Cr"]["context"]
+        if row.get("type") == "duplicate_measurement_context"
+    }
+    assert len(observations) == 25
+    assert len(duplicate_context) == 80
     for row in expected:
-        observation = observations[row["observation_id"]]
-        values = observation["values"]
-        locator = observation["locator"]
+        observation = observations.get(row["observation_id"])
+        if observation is None:
+            context = duplicate_context[row["observation_id"]]
+            values = context["values"]
+            locator = context["locator"]
+            assert row["table"] in {"20", "21"}
+            block_start = (
+                4
+                if row["table"] == "20" and row["T_C"] == 1250
+                else 12
+                if row["table"] == "20" and row["T_C"] == 1200
+                else 20
+                if row["table"] == "20"
+                else 3
+            )
+            article_row = row["row"] - block_start + 1
+            article_column = row["column"] - 2
+            linked_id = values["linked_published_observation_id"]
+            assert linked_id in published_ids
+            assert linked_id == (
+                f"khedim_2010_binary_t{row['T_C']}_r{article_row:02d}_c{article_column:02d}"
+            )
+            assert Decimal(str(values["fO2_log_as_published"])) == row["fO2_log"]
+            assert values["composition"]["components"] == [
+                list(component) for component in row["composition"]
+            ]
+        else:
+            values = observation["values"]
+            locator = observation["locator"]
         assert locator["page"] == row["page"]
         assert locator["pdf_page_index"] == row["pdf_page_index"]
         assert locator["table"] == row["table"]
@@ -217,12 +250,13 @@ def _assert_render_grid_matches(document: dict, grid: list[dict] | None = None) 
         assert values["value_as_published"] == row["printed_value"]
         assert values["parenthetical_value_as_published"] == row["parenthetical"]
         assert Decimal(str(values["component_amount"])) == row["component_amount"]
-        conditions = values["point_conditions"]
-        assert Decimal(str(conditions["fO2_log"]["state"]["value"])) == row["fO2_log"]
         assert values["redox_buffer_as_published"] == row["buffer"]
-        assert conditions["composition"]["state"]["value"]["components"] == [
-            list(component) for component in row["composition"]
-        ]
+        if observation is not None:
+            conditions = values["point_conditions"]
+            assert Decimal(str(conditions["fO2_log"]["state"]["value"])) == row["fO2_log"]
+            assert conditions["composition"]["state"]["value"]["components"] == [
+                list(component) for component in row["composition"]
+            ]
         assert "At.% Cr" in locator["column"]
 
 
@@ -236,7 +270,13 @@ def test_appendix_render_grid_matches_extract_and_detects_mutations() -> None:
         _assert_render_grid_matches(document, changed_grid)
 
     changed_extract = deepcopy(document)
-    changed_extract["species"]["Cr"]["observations"][0]["values"]["value_as_published"] = "0,438"
+    first_duplicate_id = _expected_rows()[0]["observation_id"]
+    changed_duplicate = next(
+        row
+        for row in changed_extract["species"]["Cr"]["context"]
+        if row.get("observation_id") == first_duplicate_id
+    )
+    changed_duplicate["values"]["value_as_published"] = "0,438"
     with pytest.raises(AssertionError):
         _assert_render_grid_matches(changed_extract)
 
@@ -244,9 +284,10 @@ def test_appendix_render_grid_matches_extract_and_detects_mutations() -> None:
 def test_isolated_migration_keeps_every_component_and_condition(tmp_path: Path) -> None:
     document = _document()
     result = migrate(_write_min_tree(tmp_path / "tree", document), write=False)
-    expected = _expected_rows()
-    assert len(result.observations) == 105
-    assert len({row.observation_id for row in result.observations.values()}) == 105
+    expected = [row for row in _expected_rows() if row["table"] in {"22", "23"}]
+    assert len(expected) == 25
+    assert len(result.observations) == 25
+    assert len({row.observation_id for row in result.observations.values()}) == 25
 
     for row in expected:
         matches = [
