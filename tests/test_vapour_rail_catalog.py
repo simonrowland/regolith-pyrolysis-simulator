@@ -1646,16 +1646,8 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
     )
 
 
-def test_alo2_pathological_fO2_no_longer_explodes() -> None:
-    """b-148: AlO2 must not reach ~1e63 Pa when fed the 1e300 pO2 sentinel.
-
-    Hand algebra of the pre-fix path:
-      P = P_ref(a=1, pO2_ref=1) * a * (pO2 / pO2_ref)^0.25
-      with pO2 = 1e300 → (1e300)^0.25 = 1e75, so unit-ref ~1e-8 Pa → ~1e67 Pa.
-    After the physical pO2 envelope clamp, the same call is bounded by
-    (100 bar)^0.25 ≈ 3.2 and must stay far below 1e9 Pa.
-    """
-    from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+def test_alo2_extreme_oxygen_is_predicted_and_flagged() -> None:
+    """Finite oxygen remains the input even far outside the evaluator band."""
 
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
@@ -1669,16 +1661,25 @@ def test_alo2_pathological_fO2_no_longer_explodes() -> None:
     assert unit.pressure_pa < 1.0e-3
     assert unit.pressure_pa > 0.0
 
-    # Pathological fO2 sentinel that previously produced ~1e63–1e66 Pa dumps.
+    # Al2O3(l) + 1/2 O2(g) -> 2 AlO2(g) gives P_AlO2 proportional to
+    # pO2**(1/4) at fixed T/activity. From 100 to 1e300 bar, the dimensionless
+    # oxygen ratio is 1e298, hence 298/4 = 74.5 pressure decades. The same
+    # expression continues through the band edge; the notice limits evidence.
     exploded = evaluator.evaluate(
         1800.0 + 273.15, source_activity=0.1, pO2_bar=1.0e300
     )
-    assert exploded.pressure_pa < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-    # And must be within a few dex of the unit-ref * a * (100)^0.25 bound.
     capped = evaluator.evaluate(
         1800.0 + 273.15, source_activity=0.1, pO2_bar=100.0
     )
-    assert exploded.pressure_pa == pytest.approx(capped.pressure_pa, rel=0.0, abs=0.0)
+    assert math.isfinite(exploded.pressure_pa)
+    assert math.log10(exploded.pressure_pa / capped.pressure_pa) == pytest.approx(74.5)
+    notice = exploded.extrapolation_notice
+    assert notice["reason"] == "pO2_outside_evaluator_band"
+    assert notice["pO2_bar_used"] == 1e300
+    assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["was_clamped"] is False
+    assert capped.extrapolation_notice is None
 
 
 def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:

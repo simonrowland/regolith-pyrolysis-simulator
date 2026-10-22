@@ -78,6 +78,7 @@ diagnostic output, not certification evidence.
 from __future__ import annotations
 
 import math
+import sys
 from typing import Dict, List, Mapping, Tuple
 
 from simulator.chemistry.ellingham_thermo import (
@@ -90,7 +91,7 @@ from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
 from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -115,10 +116,13 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
+MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
+MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
 MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
-    "invalid_electrolysis_control",
+    MRE_INVALID_CONTROL_REFUSAL,
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
@@ -135,6 +139,162 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 )
 
 
+def mre_control_domain_assessment(
+    controls: Mapping[str, object],
+) -> tuple[dict[str, float], list[dict[str, object]]]:
+    """Coerce valid controls, flag band excursions, and reject invalid numbers."""
+
+    raw_controls = {
+        "dt_hr": controls.get("dt_hr", 1.0),
+        "current_A": controls.get("current_A"),
+        "voltage_V": controls.get("voltage_V"),
+        "pO2_bar": controls.get("pO2_bar", 1.0),
+    }
+    invalid_controls: dict[str, str] = {}
+    validated: dict[str, float] = {}
+    for name, raw_value in raw_controls.items():
+        if raw_value is None:
+            invalid_controls[name] = "missing"
+            continue
+        if isinstance(raw_value, bool) or not is_declared_real_scalar(
+            raw_value,
+            allow_numeric_str=True,
+        ):
+            invalid_controls[name] = (
+                "boolean_not_allowed"
+                if isinstance(raw_value, bool)
+                else "not_declared_real_scalar"
+            )
+            continue
+        try:
+            numeric_value = float(raw_value)
+        except (TypeError, ValueError, OverflowError):
+            invalid_controls[name] = "not_numeric"
+            continue
+        if not math.isfinite(numeric_value):
+            invalid_controls[name] = "not_finite"
+            continue
+        validated[name] = numeric_value
+    if invalid_controls:
+        raise MREElectrolysisInvalidInput(
+            MRE_INVALID_CONTROL_REFUSAL,
+            {"invalid_controls": invalid_controls},
+        )
+
+    # These are certified operating bands, not terminal physics limits:
+    # physically meaningful finite controls outside them are extrapolated if
+    # the required binary64 operations remain representable. The pO2 interval
+    # is the empirical certification band for ideal-gas anode activity.
+    domain_bounds = {
+        "dt_hr": (0.0, 1.0, "hr"),
+        "current_A": (0.0, 3000.0, "A"),
+        "voltage_V": (0.0, 5.0, "V"),
+        "pO2_bar": (1e-9, 1.0, "bar"),
+    }
+    invalid_input_controls: dict[str, str] = {}
+    invalid_numeric_controls: dict[str, str] = {}
+    notices: list[dict[str, object]] = []
+    for name, (minimum, maximum, unit) in domain_bounds.items():
+        value = validated[name]
+        if value < 0.0 or (name == "pO2_bar" and value == 0.0):
+            invalid_input_controls[name] = (
+                "must be positive"
+                if name == "pO2_bar"
+                else "must be nonnegative"
+            )
+            continue
+        if 0.0 < value < sys.float_info.min:
+            # IEEE-754 subnormals have fewer reliable significant bits, and
+            # MRE products involving efficiency, time, or energy can underflow
+            # them to zero. Reject those values as invalid input; finite values
+            # below a certified band remain extrapolatable.
+            invalid_numeric_controls[name] = (
+                f"below minimum normal binary64 value "
+                f"{sys.float_info.min:g} {unit}"
+            )
+            continue
+        if name == "pO2_bar" and not math.isfinite(value * PA_PER_BAR):
+            # pO2 is supplied in bar but participates in the physical pressure
+            # state expressed in Pa elsewhere in the simulator. Beyond this
+            # range, the same pressure cannot be represented in binary64 Pa.
+            invalid_numeric_controls[name] = (
+                "above maximum binary64-safe pressure "
+                f"{sys.float_info.max / PA_PER_BAR:g} bar "
+                "(bar-to-Pa conversion is not finite in binary64)"
+            )
+            continue
+        if value == 0.0:
+            continue
+        if value < minimum:
+            control_reason = f"below minimum {minimum:g} {unit}"
+        elif value > maximum:
+            control_reason = f"above maximum {maximum:g} {unit}"
+        else:
+            continue
+        notices.append({
+            "kind": "out_of_certified_band",
+            "control": name,
+            "reason": MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            "control_reason": control_reason,
+            "authority_level": "extrapolated",
+            "certified_band": {name: (minimum, maximum)},
+        })
+
+    if invalid_input_controls:
+        raise MREElectrolysisInvalidInput(
+            MRE_INVALID_CONTROL_REFUSAL,
+            {"invalid_controls": invalid_input_controls},
+        )
+    if invalid_numeric_controls:
+        raise MREElectrolysisInvalidInput(
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            {"invalid_controls": invalid_numeric_controls},
+        )
+
+    # IEEE-754 subnormals carry fewer significant bits and MRE's physical
+    # products can underflow them to zero. The remaining refusal line is based
+    # on the actual binary64 intermediates used in Faraday charge and energy,
+    # not a hand-picked finite-control threshold.
+    dt_hr = validated["dt_hr"]
+    current_A = validated["current_A"]
+    voltage_V = validated["voltage_V"]
+    duration_s = dt_hr * 3600.0
+    charge_C = current_A * duration_s
+    power_W = voltage_V * current_A
+    energy_product = power_W * dt_hr
+    energy_kWh = energy_product / 1000.0
+    if not math.isfinite(duration_s):
+        invalid_numeric_controls["dt_hr"] = (
+            "above maximum binary64-safe duration "
+            f"{sys.float_info.max / 3600.0:g} hr "
+            "(seconds conversion is not finite in binary64)"
+        )
+    elif not math.isfinite(charge_C):
+        invalid_numeric_controls["current_A"] = (
+            "above maximum binary64-safe current "
+            f"{sys.float_info.max / duration_s:g} A "
+            "(Faraday charge is not finite in binary64)"
+        )
+    if not math.isfinite(power_W):
+        invalid_numeric_controls["voltage_V"] = (
+            "above maximum binary64-safe voltage "
+            f"{sys.float_info.max / current_A:g} V "
+            "(voltage-current power is not finite in binary64)"
+        )
+    elif not math.isfinite(energy_product) or not math.isfinite(energy_kWh):
+        invalid_numeric_controls["voltage_V"] = (
+            "above maximum binary64-safe voltage for the requested duration "
+            "(V; energy product is not finite in binary64)"
+        )
+    if invalid_numeric_controls:
+        raise MREElectrolysisInvalidInput(
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+            {"invalid_controls": invalid_numeric_controls},
+        )
+
+    return validated, notices
+
+
 def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, object]:
     """A refused calculation has no computed product or energy quantities."""
     quantity_keys = {
@@ -148,6 +308,24 @@ def _without_mre_quantities(diagnostic: Mapping[str, object]) -> dict[str, objec
     return {key: value for key, value in diagnostic.items() if key not in quantity_keys}
 
 
+def _faraday_reduced_extent(
+    species_current_A: float,
+    current_efficiency: float,
+    duration_s: float,
+    electrons_per_formula: int,
+    oxide_molar_mass_gmol: float,
+    faraday: float,
+) -> tuple[float, float] | None:
+    """Return finite uncapped Faraday moles and oxide kg, else refuse."""
+    uncapped_moles = (
+        species_current_A * current_efficiency * duration_s
+    ) / (electrons_per_formula * faraday)
+    oxide_kg = uncapped_moles * oxide_molar_mass_gmol / 1000.0
+    if not math.isfinite(uncapped_moles) or not math.isfinite(oxide_kg):
+        return None
+    return uncapped_moles, oxide_kg
+
+
 class MREElectrolysisRefusal(RuntimeError):
     """Typed terminal refusal for a classified MRE physics limitation.
 
@@ -155,10 +333,10 @@ class MREElectrolysisRefusal(RuntimeError):
     ``MRE_TERMINAL_PHYSICS_REFUSAL_REASONS``. ``core.step`` uses
     ``terminal_refusal`` to restore the attempted hour instead of poisoning
     a simulator that already committed an earlier transition during that
-    hour. ElectrolysisModel.nernst_voltage() and step_hour() raise
-    ValueError/TypeError for invalid controls on the paths checked in this
-    module (non-finite T/activity/voltage/current, unknown oxide, pO2,
-    fugacity mapping); those paths do not raise this type.
+    hour. Invalid temperature, activity, oxide, or fugacity inputs retain
+    their ValueError/TypeError behavior. Invalid MRE controls use the
+    MREElectrolysisInvalidInput subclass so RuntimeError and ValueError
+    handlers both retain their contract.
     """
 
     terminal_refusal = True
@@ -167,6 +345,24 @@ class MREElectrolysisRefusal(RuntimeError):
         self.reason = str(reason)
         self.diagnostic = dict(diagnostic)
         super().__init__(self.reason)
+
+
+class MREElectrolysisInvalidInput(MREElectrolysisRefusal, ValueError):
+    """Typed invalid-control refusal caught as both RuntimeError and ValueError."""
+
+    def __init__(self, reason: str, diagnostic: Mapping[str, object]):
+        super().__init__(reason, diagnostic)
+        invalid = self.diagnostic.get("invalid_controls", {})
+        if isinstance(invalid, Mapping):
+            detail = "; ".join(
+                f"{name}: {message}"
+                for name, message in invalid.items()
+            )
+        else:
+            detail = ""
+        self.args = (
+            f"{self.reason}: {detail}" if detail else self.reason,
+        )
 
 
 class MRECurrentPartitionRefusal(MREElectrolysisRefusal):
@@ -633,8 +829,15 @@ class ElectrolysisModel:
                 O2_produced_kg:     float
                 energy_kWh:         float
         """
-        voltage_V = _require_finite_real("voltage_V", voltage_V)
-        current_A = _require_finite_real("current_A", current_A, minimum=0.0)
+        validated_controls, control_notices = mre_control_domain_assessment({
+            "dt_hr": 1.0,
+            "current_A": current_A,
+            "voltage_V": voltage_V,
+            "pO2_bar": pO2_bar,
+        })
+        voltage_V = validated_controls["voltage_V"]
+        current_A = validated_controls["current_A"]
+        pO2_bar = validated_controls["pO2_bar"]
         T_C = _require_finite_real("T_C", T_C)
         if T_C + CELSIUS_TO_KELVIN_OFFSET <= 0.0:
             raise ValueError("T_C must be above absolute zero")
@@ -683,6 +886,8 @@ class ElectrolysisModel:
             'mre_raw_margin_refused_targets': {},
             'mre_phase_refused_targets': {},
         }
+        if control_notices:
+            result['notices'] = control_notices
 
         # Find all reducible species at this voltage
         reducible = []
@@ -876,8 +1081,22 @@ class ElectrolysisModel:
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
 
-            uncapped_moles_reduced = (I_species * eta_CE * t_s) / (n * FARADAY)
-            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0  # g->kg
+            extent = _faraday_reduced_extent(
+                I_species,
+                eta_CE,
+                t_s,
+                n,
+                M_oxide_gmol,
+                faraday=FARADAY,
+            )
+            if extent is None:
+                result['reason_refused'] = MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+                result['invalid_controls'] = {
+                    'current_A': 'Faraday extent is not finite',
+                    'dt_hr': 'Faraday integration exceeds the admitted window',
+                }
+                return _without_mre_quantities(result)
+            uncapped_moles_reduced, kg_oxide_reduced = extent
 
             # Don't reduce more than available
             available = melt_state.composition_kg.get(oxide, 0.0)

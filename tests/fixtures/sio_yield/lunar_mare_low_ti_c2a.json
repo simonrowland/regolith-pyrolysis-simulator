@@ -35,7 +35,7 @@
     "authoritative_for_resinter": false,
     "verdict_authoritative": false,
     "status": "warning",
-    "status_reason": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Bi=refused, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=refused, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, P2=refused, P2O5_gas=refused, P4=refused, P4O10=refused, P4O6=refused, PO=refused, PO2=refused, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
+    "status_reason": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=refused, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
     "sticking_alpha_authority": {
       "authoritative": false,
       "authoritative_for_deposit_mass": false,
@@ -9380,7 +9380,6 @@
         "Al2O3_gas",
         "AlO",
         "AlO2",
-        "Bi",
         "Ca",
         "Ca2",
         "CaO_gas",
@@ -9402,13 +9401,6 @@
         "Na",
         "Na2",
         "Na2O_gas",
-        "P2",
-        "P2O5_gas",
-        "P4",
-        "P4O10",
-        "P4O6",
-        "PO",
-        "PO2",
         "Si",
         "Si2",
         "Si3",
@@ -9419,9 +9411,13 @@
         "TiO2_gas"
       ],
       "refused_carrier_species": [
-        "Bi",
         "Cr2O3_gas",
-        "MnO_gas",
+        "MnO_gas"
+      ],
+      "proven_zero_carrier_species": [],
+      "missing_carrier_authority_species": [],
+      "not_applicable_carrier_species": [
+        "Bi",
         "P2",
         "P2O5_gas",
         "P4",
@@ -9430,10 +9426,434 @@
         "PO",
         "PO2"
       ],
-      "proven_zero_carrier_species": [],
-      "missing_carrier_authority_species": [],
+      "not_applicable_by_species": {
+        "Bi": {
+          "species_id": "Bi",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "Bi",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "metal_trace_Bi_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "declared applicability predicate 'not_applicable' is inactive",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "not_applicable",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "Bi"
+              ],
+              "species_id": "Bi",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "P2": {
+          "species_id": "P2",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P2",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "P2O5_gas": {
+          "species_id": "P2O5_gas",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "declared applicability predicate 'not_applicable' is inactive"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P2O5_gas",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_P2O5_gas_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "declared applicability predicate 'not_applicable' is inactive",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "not_applicable",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2O5_gas",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "P4": {
+          "species_id": "P4",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P4",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "P4O10": {
+          "species_id": "P4O10",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P4O10",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O10",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "P4O6": {
+          "species_id": "P4O6",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "P4O6",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O6",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "PO": {
+          "species_id": "PO",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "PO",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        },
+        "PO2": {
+          "species_id": "PO2",
+          "pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "selected_runtime_pressure": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "flux": {
+            "kind": "refusal",
+            "code": "inapplicable_by_declared_predicate",
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')"
+          },
+          "source_label": "refusal_closure",
+          "formula_id": "PO2",
+          "source_account": "process.cleaned_melt",
+          "solve_group_id": "phosphorus_carriers_family",
+          "state_fingerprint": "state:T=1638.15|phase=hot_train|stage=evaporation|fO2=1e-09|source_fO2=1.03012e-09|source_fO2_log10=-8.98711|P=1000|activity_P_bar=1e-09|redox_model=REF-001-kress-carmichael-1991|composition=0d873578248721882158d459|activity_basis=Al=a20f7725151a43834f0154b3,Al2=a20f7725151a43834f0154b3,Al2O=a20f7725151a43834f0154b3,Al2O2=a20f7725151a43834f0154b3,Al2O3_gas=a20f7725151a43834f0154b3,AlO=a20f7725151a43834f0154b3,AlO2=a20f7725151a43834f0154b3,Ca=a20f7725151a43834f0154b3,Ca2=a20f7725151a43834f0154b3,CaO_gas=a20f7725151a43834f0154b3,Cr=a20f7725151a43834f0154b3,CrO=a20f7725151a43834f0154b3,CrO2=a20f7725151a43834f0154b3,CrO3=a20f7725151a43834f0154b3,Fe=a20f7725151a43834f0154b3,FeO_association_gas=a20f7725151a43834f0154b3,K=a20f7725151a43834f0154b3,K2=a20f7725151a43834f0154b3,K2O_gas=a20f7725151a43834f0154b3,Mg=a20f7725151a43834f0154b3,Mg2=a20f7725151a43834f0154b3,MgO_gas=a20f7725151a43834f0154b3,Mn=a20f7725151a43834f0154b3,MnO_gas=a20f7725151a43834f0154b3,Na=a20f7725151a43834f0154b3,Na2=a20f7725151a43834f0154b3,Na2O_gas=a20f7725151a43834f0154b3,Si=a20f7725151a43834f0154b3,Si2=a20f7725151a43834f0154b3,Si3=a20f7725151a43834f0154b3,SiO=a20f7725151a43834f0154b3,SiO2_gas=a20f7725151a43834f0154b3,Ti=a20f7725151a43834f0154b3,TiO=a20f7725151a43834f0154b3,TiO2_gas=a20f7725151a43834f0154b3|activity_provider=BuiltinVaporPressureProvider|activities=Al=0.0502418760787,Al2=0.0502418760787,Al2O=0.0502418760787,Al2O2=0.0502418760787,Al2O3_gas=0.0502418760787,AlO=0.0502418760787,AlO2=0.0502418760787,Ca=0.00138696507844,Ca2=0.00138696507844,CaO_gas=0.00138696507844,Cr=0.0843960369004,CrO=0.0843960369004,CrO2=0.0843960369004,CrO3=0.0843960369004,Fe=0.141295477879,FeO_association_gas=0.135322321158,K=4.37296768254e-08,K2=1.91228463525e-15,K2O_gas=1.91228463525e-15,Mg=0.131574195176,Mg2=0.131574195176,MgO_gas=0.131574195176,Mn=0.00315636133761,MnO_gas=0.00315636133761,Na=7.57126632586e-06,Na2=5.73240737771e-11,Na2O_gas=5.73240737771e-11,Si=0.436400019321,Si2=0.436400019321,Si3=0.436400019321,SiO=0.436400019321,SiO2_gas=0.436400019321,Ti=0.0177064343096,TiO=0.0177064343096,TiO2_gas=0.0177064343096",
+          "validation_status": "pending_validation",
+          "validation_anchor_refs": [],
+          "verdict_status": "status_bearing_non_authoritative",
+          "certification_ceiling": "never",
+          "refusal_code": "inapplicable_by_declared_predicate",
+          "is_refused": true,
+          "is_union_flux_eligible": false,
+          "extra": {
+            "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
+          },
+          "out_of_range": false,
+          "acquisition_flag": null,
+          "activity_bound": null,
+          "source_boundary": null,
+          "source_reaction_activity": null,
+          "is_flux_active": false,
+          "is_flux_dormant_by_epoch": true
+        }
+      },
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Bi=refused, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=refused, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, P2=refused, P2O5_gas=refused, P4=refused, P4O10=refused, P4O6=refused, PO=refused, PO2=refused, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
+      "message": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=refused, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
       "wall_saturation_pressure_extrapolations_by_species": {
         "K": {
           "stage_0_to_stage_1": {
@@ -10008,7 +10428,6 @@
         "Al2O3_gas": "status_bearing",
         "AlO": "status_bearing",
         "AlO2": "status_bearing",
-        "Bi": "refused",
         "Ca": "status_bearing",
         "Ca2": "status_bearing",
         "CaO_gas": "status_bearing",
@@ -10030,13 +10449,6 @@
         "Na": "status_bearing",
         "Na2": "status_bearing",
         "Na2O_gas": "status_bearing",
-        "P2": "refused",
-        "P2O5_gas": "refused",
-        "P4": "refused",
-        "P4O10": "refused",
-        "P4O6": "refused",
-        "PO": "refused",
-        "PO2": "refused",
         "Si": "status_bearing",
         "Si2": "status_bearing",
         "Si3": "status_bearing",

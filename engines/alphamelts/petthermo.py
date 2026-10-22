@@ -43,6 +43,7 @@ def equilibrate_via_python_api(
     fO2_log: float,
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any],
+    backend_kwargs: Mapping[str, Any] | None = None,
 ) -> Any:
     """Run AlphaMELTS via the PetThermoTools Python API.
 
@@ -70,6 +71,7 @@ def equilibrate_via_python_api(
         fO2_log=float(fO2_log),
         composition_mol_by_account=composition_mol_by_account,
         species_formula_registry=species_formula_registry,
+        **(backend_kwargs or {}),
     )
 
 
