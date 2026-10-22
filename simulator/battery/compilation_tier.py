@@ -635,23 +635,21 @@ def _ellingham_attempt(
         # old placement: this check runs only for an extension.
         reaction = _explicit_reaction(identity)
         if reaction is not None:
-            reaction_phases = tuple(
-                phase_token(term.species) for term in reaction.terms
+            # Compare every known term. An unknown sibling must not hide a
+            # metal or oxide that is already the wrong phase.
+            mismatch = _element_reference_phase_mismatch(
+                segment,
+                reaction,
+                include_products=True,
             )
-            if all(phase is not None for phase in reaction_phases):
-                mismatch = _element_reference_phase_mismatch(
-                    segment,
-                    reaction,
-                    include_products=True,
+            if mismatch is not None:
+                return _refuse(
+                    RefusalReason.IDENTITY_MISMATCH,
+                    "identity-mismatch-element-reference-phase",
+                    quantity=quantity,
+                    origin=origin,
+                    extra=mismatch,
                 )
-                if mismatch is not None:
-                    return _refuse(
-                        RefusalReason.IDENTITY_MISMATCH,
-                        "identity-mismatch-element-reference-phase",
-                        quantity=quantity,
-                        origin=origin,
-                        extra=mismatch,
-                    )
 
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))

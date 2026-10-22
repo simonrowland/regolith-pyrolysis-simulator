@@ -3134,6 +3134,75 @@ def test_extension_matches_the_requested_reaction_phases(
     assert oxide.refusal_detail["segment_phase"] == Phase.CR.value
 
 
+def test_extension_refuses_a_known_mismatch_beside_an_unknown_term() -> None:
+    """An unknown O2 phase does not hide a metal phase the segment rejects."""
+
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    reaction = identity.reaction.value
+    terms = tuple(
+        replace(
+            term,
+            species=replace(term.species, phase=State.unknown("not printed")),
+        )
+        if term.species.formula == "O2"
+        else term
+        for term in reaction.terms
+    )
+    refused = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-unknown-o2",
+            "exp-1",
+            replace(identity, reaction=State.of(replace(reaction, terms=terms))),
+            Decimal("0"),
+        ),
+    )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == "identity-mismatch-element-reference-phase"
+    assert refused.refusal_detail["element"] == "Ca"
+    assert refused.refusal_detail["cell_phase"] == Phase.CR.value
+    assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    matched = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("3100"),
+        metal_phase=Phase.G,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    matched_reaction = matched.reaction.value
+    matched_terms = tuple(
+        replace(
+            term,
+            species=replace(term.species, phase=State.unknown("not printed")),
+        )
+        if term.species.formula == "O2"
+        else term
+        for term in matched_reaction.terms
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "cao-3100-gas-unknown-o2",
+            "exp-1",
+            replace(
+                matched,
+                reaction=State.of(replace(matched_reaction, terms=matched_terms)),
+            ),
+            Decimal("0"),
+        ),
+    )
+    assert attempt.value is not None
+    assert attempt.authority is Authority.EXTRAPOLATED
+
+
 def test_in_range_reference_phase_stays_unchecked_at_fit_pressure() -> None:
     """1800 K is inside the Ca(g) segment. At 1 bar a crystal-Ca request
     still returns that segment. The extension check does not move this guard.

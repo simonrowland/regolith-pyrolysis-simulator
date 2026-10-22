@@ -1168,16 +1168,6 @@ def _segment_phase_domain(
     return (domain_low, domain_high)
 
 
-def _domain_contains(
-    domain: tuple[float, float | None],
-    temperature_K: float,
-) -> bool:
-    """Membership of an intersection. The endpoint rule lives on the interval."""
-
-    low, high = domain
-    return _phase_interval("domain", low, high, "intersection").contains(temperature_K)
-
-
 def _k_text(value: float) -> str:
     return format(value, ".12g")
 
@@ -1240,7 +1230,10 @@ def ellingham_same_phase_extension(
     if ambiguous or nearest is None or nearest_distance is None:
         return None
     domain = _segment_phase_domain(key, nearest)
-    if domain is None or not _domain_contains(domain, T_K):
+    if domain is None:
+        return None
+    domain_low, domain_high = domain
+    if not _phase_interval("domain", domain_low, domain_high, "intersection").contains(T_K):
         return None
     low, high = nearest.range_K
     if T_K < low:
