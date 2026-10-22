@@ -11297,6 +11297,24 @@ def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str)
     assert json.loads(notice.reason.partition(":")[2])["field"] == record_form
 
 
+def test_stolyarova_partial_pressure_species_phase_follows_the_printed_field(
+    tmp_path: Path,
+) -> None:
+    """The fixture's melt string is stamped onto the Al partial-pressure species."""
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    reference = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    assert reference.identity.species.formula == "Al"
+    assert reference.identity.species.phase.value is Phase.L
+
+
 def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -1807,6 +1807,150 @@ def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> Non
     )
 
 
+def _with_term_phase(identity, formula: str, phase: State):
+    reaction = identity.reaction.value
+    assert reaction is not None
+    terms = tuple(
+        replace(term, species=replace(term.species, phase=phase))
+        if term.species.formula == formula
+        else term
+        for term in reaction.terms
+    )
+    return replace(identity, reaction=State.of(replace(reaction, terms=terms)))
+
+
+# Captured from predict_thermo_attempt before the reference-state correction.
+_FEO_LIQUID_UNKNOWN_O2_2000K = Decimal("-148.4464525")
+_CAO_CRYSTAL_1100K = Decimal("-520.29700025")
+_NIO_CRYSTAL_1100K = Decimal("-140.6632534284")
+_ZRO2_BETA_1500K = Decimal("-819.6519385441172")
+
+
+def test_unknown_phase_on_one_term_does_not_skip_a_known_element_mismatch() -> None:
+    """An unknown O2 phase currently leaves Fe(cr) vs Fe(l) unanswered as a mismatch.
+
+    At 1 bar and with pressure missing the liquid FeO segment still returns
+    its number. At 1 atm the pressure transform refuses the unknown phase.
+    """
+
+    feo_liquid = F.oxide_identity(
+        "FeO",
+        Phase.L,
+        T_K=Decimal("2000"),
+        metal_formula="Fe",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    unknown_o2 = _with_term_phase(
+        feo_liquid, "O2", State.unknown("O2 phase absent")
+    )
+    for observation_id, identity in (
+        ("feo-unknown-o2-1bar", unknown_o2),
+        (
+            "feo-unknown-o2-missing-pressure",
+            replace(unknown_o2, standard_pressure_Pa=State.unknown("pressure not printed")),
+        ),
+    ):
+        _assert_ellingham_number(
+            observation_id,
+            identity,
+            _FEO_LIQUID_UNKNOWN_O2_2000K,
+            "ellingham:Fe:l:T=2000",
+        )
+    refused = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "feo-unknown-o2-1atm",
+            "exp-1",
+            replace(unknown_o2, standard_pressure_Pa=State.of(Decimal("101325"))),
+            Decimal("0"),
+        ),
+    )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert refused.refusal_detail["reason"] == (
+        "standard-pressure-transform-phase-unknown"
+    )
+
+
+def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> None:
+    """A generic segment solid currently answers every declared allotrope."""
+
+    cao = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1100"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    evidence = "ellingham:Ca:s:T=1100:generic-solid"
+    for name, polymorph in (
+        ("alpha", Polymorph.ALPHA),
+        ("beta", Polymorph.BETA),
+        ("omitted", None),
+        ("reference", Polymorph.REFERENCE),
+    ):
+        _assert_ellingham_number(
+            f"cao-1100-{name}",
+            _with_reactant_basis(cao, Phase.CR, polymorph),
+            _CAO_CRYSTAL_1100K,
+            evidence,
+        )
+    nio = F.oxide_identity(
+        "NiO",
+        Phase.CR,
+        T_K=Decimal("1100"),
+        metal_formula="Ni",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline",
+    )
+    _assert_ellingham_number(
+        "nio-1100-alpha",
+        _with_reactant_basis(nio, Phase.CR, Polymorph.ALPHA),
+        _NIO_CRYSTAL_1100K,
+        "ellingham:Ni:s:T=1100:generic-solid",
+    )
+
+
+def test_zr_cea_letter_is_the_janaf_allotrope() -> None:
+    """Zr(beta) currently refuses the CEA Zr(b) segment as a different allotrope."""
+
+    zro2 = F.oxide_identity(
+        "ZrO2",
+        Phase.CR,
+        T_K=Decimal("1500"),
+        metal_formula="Zr",
+        metal_phase=Phase.CR,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="ii",
+    )
+    _assert_element_basis_refusal(
+        "zro2-beta-1500",
+        _with_reactant_basis(zro2, Phase.CR, Polymorph.BETA),
+        "identity-mismatch-element-reference-allotrope",
+        "Zr(cr,beta)",
+        "Zr(cr,b)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    _assert_ellingham_number(
+        "zro2-omitted-1500",
+        _with_reactant_basis(zro2, Phase.CR, None),
+        _ZRO2_BETA_1500K,
+        "ellingham:Zr:II:T=1500",
+    )
+
+
 def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
     identity = _na2o_liquid(Quantity.LOG10_KF)
     attempt = predict_thermo_attempt(
