@@ -1,8 +1,10 @@
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -104,28 +106,101 @@ def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
     )
 
 
+# Printed Table 4 H2O EMPA cells. Each sample is stored on the FeO and Fe2O3
+# rows, so the count is 2. These are the analytical-total water weights, not
+# the separate H2O_wt_pct column.
+_GAILLARD_TABLE4_H2O_EMPA = (
+    ("2/1", "5.21", 2),
+    ("2/3", "5.56", 2),
+    ("2/5", "4.96", 2),
+    ("2/7", "5.03", 2),
+    ("2/8", "5.00", 2),
+    ("3/1", "3.25", 2),
+    ("3/10", "7.1", 2),
+    ("3/11", "2.66", 2),
+    ("3/12", "6.44", 2),
+    ("3/13", "6.77", 2),
+    ("3/2", "6.71", 2),
+    ("3/3", "6.55", 2),
+    ("3/4", "5.85", 2),
+    ("3/5", "3.56", 2),
+    ("3/6", "6.59", 2),
+    ("3/7", "6.88", 2),
+    ("3/8", "6.02", 2),
+    ("3/9", "4.99", 2),
+    ("4/1", "6.25", 2),
+    ("4/2", "5.95", 2),
+    ("4/3", "6.35", 2),
+    ("4/4", "6.09", 2),
+    ("4/5", "6.01", 2),
+    ("4/6", "5.01", 2),
+    ("4/7", "4.36", 2),
+    ("4/8", "4.22", 2),
+    ("5/1", "5.10", 2),
+    ("5/2", "4.50", 2),
+    ("6/1", "6.68", 2),
+    ("6/11", "6.45", 2),
+    ("6/12", "6.81", 2),
+    ("6/2", "6.97", 2),
+    ("6/3", "6.58", 2),
+    ("6/4", "6.97", 2),
+    ("6/5", "7.15", 2),
+    ("6/6", "6.80", 2),
+)
+
+# Sample 7/1 prints H2O 0 and no H2O EMPA. The oxide weights are a closed analysis.
+_GAILLARD_RUN7_SAMPLE_1_OXIDES = {
+    "SiO2": Decimal("70.22"),
+    "Al2O3": Decimal("14.93"),
+    "FeO": Decimal("3.77"),
+    "CaO": Decimal("2.50"),
+    "Na2O": Decimal("3.43"),
+    "K2O": Decimal("3.18"),
+}
+
+
+def _table4_row(table4_rows, parent_id: str, sample: str):
+    matches = [
+        observation
+        for observation in table4_rows
+        if f"{parent_id}::" in observation.observation_id
+        and f":row={sample}:" in observation.observation_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _printed_h2o_empa(item: dict) -> str | None:
+    sibling = item.get("H2O_EMPA")
+    if isinstance(sibling, str) and sibling.strip() not in {"", "–", "-"}:
+        return sibling
+    nested = (item.get("point_conditions") or {}).get("H2O_EMPA")
+    if isinstance(nested, dict):
+        value = (nested.get("state") or {}).get("value")
+        if isinstance(value, str) and value.strip() not in {"", "–", "-"}:
+            return value
+    return None
+
+
 def test_gaillard_2003_migrates_printed_activity_cells() -> None:
     result = _migrate("gaillard-2003-hydrous-silicic-melt-activity.yaml")
     assert len(result.observations) == 260
+    assert result.validation.hard_issues == ()
     table4_rows = [
         observation
         for observation in result.observations.values()
         if "gaillard_2003_table4_run" in observation.observation_id
     ]
     assert len(table4_rows) == 96
-    run7_fe2o3 = next(
-        observation
-        for observation in table4_rows
-        if "run7_a_fe2o3::" in observation.observation_id
-        and ":row=7/1:" in observation.observation_id
+    run7_fe2o3 = _table4_row(
+        table4_rows, "gaillard_2003_table4_run7_a_fe2o3", "7/1"
     )
-    run7_feo = next(
-        observation
-        for observation in table4_rows
-        if "run7_a_feo::" in observation.observation_id
-        and ":row=7/1:" in observation.observation_id
+    run7_fe2o3_second = _table4_row(
+        table4_rows, "gaillard_2003_table4_run7_a_fe2o3", "7/2"
     )
+    run7_feo = _table4_row(table4_rows, "gaillard_2003_table4_run7_a_feo", "7/1")
     assert run7_fe2o3.value.point == Decimal("0.099")
+    assert run7_fe2o3_second.value.point == Decimal("0.102")
     assert run7_feo.value.point == Decimal("0.017")
     assert run7_fe2o3.identity.composition.is_value
     assert run7_fe2o3.identity.reference_state.is_value
@@ -133,13 +208,73 @@ def test_gaillard_2003_migrates_printed_activity_cells() -> None:
         run7_fe2o3.point_conditions["printed_composition"].state.value["FeO"]
         == "3.77"
     )
+    assert "H2O_EMPA" not in run7_fe2o3.point_conditions
+    dry_oxides = wt_pct_to_mole_fraction(_GAILLARD_RUN7_SAMPLE_1_OXIDES)
+    assert dict(run7_fe2o3.identity.composition.value.components) == dict(
+        dry_oxides.components
+    )
+    assert dict(run7_feo.identity.composition.value.components) == dict(
+        dry_oxides.components
+    )
     assert (
         run7_fe2o3.point_conditions["delta_NNO"].state.value == Decimal("7.3")
     )
     assert run7_fe2o3.point_conditions["delta_NNO"].locator is not None
+    run2_feo = _table4_row(table4_rows, "gaillard_2003_table4_run2_a_feo", "2/1")
+    run3_feo = _table4_row(table4_rows, "gaillard_2003_table4_run3_a_feo", "3/1")
+    assert run2_feo.identity.composition.is_unknown
+    assert run2_feo.point_conditions["H2O_EMPA"].state.value == Decimal("5.21")
+    assert run2_feo.point_conditions["H2O_EMPA"].locator is not None
+    assert run2_feo.point_conditions["printed_composition"].state.value[
+        "FeO"
+    ] == Decimal("8.84")
+    assert run2_feo.point_conditions["printed_composition"].locator is not None
+    # Sample 3/1 prints H2O_wt_pct 3.03 and analytical H2O EMPA 3.25.
+    assert run3_feo.identity.composition.is_unknown
+    assert run3_feo.point_conditions["H2O_EMPA"].state.value == Decimal("3.25")
+    located_water = Counter()
+    for observation in table4_rows:
+        located = observation.point_conditions.get("H2O_EMPA")
+        if located is None:
+            continue
+        sample = observation.observation_id.split(":row=", 1)[1].split(":", 1)[0]
+        located_water[(sample, located.state.value)] += 1
+    assert located_water == Counter(
+        {
+            (sample, Decimal(weight)): count
+            for sample, weight, count in _GAILLARD_TABLE4_H2O_EMPA
+        }
+    )
+    document = yaml.safe_load(
+        (EXTRACTS / "gaillard-2003-hydrous-silicic-melt-activity.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_rows = [
+        (observation["observation_id"], item)
+        for species in document["species"].values()
+        for observation in species["observations"]
+        if "table4" in observation.get("observation_id", "")
+        for item in observation["values"]["series"]
+    ]
+    assert len(source_rows) == 96
+    hydrous_source = 0
+    for parent_id, item in source_rows:
+        migrated = _table4_row(table4_rows, parent_id, str(item["sample"]))
+        printed_water = _printed_h2o_empa(item)
+        if printed_water is None:
+            assert migrated.identity.composition.is_value
+            assert "H2O_EMPA" not in migrated.point_conditions
+            continue
+        hydrous_source += 1
+        assert migrated.identity.composition.is_unknown
+        assert migrated.point_conditions["H2O_EMPA"].state.value == Decimal(
+            printed_water
+        )
+        assert migrated.point_conditions["printed_composition"].locator is not None
+    assert hydrous_source == 72
     assert all(
         observation.identity.temperature_K.is_value
-        and observation.identity.composition.is_value
         and observation.point_conditions["temperature_K"].state.is_value
         and observation.point_conditions["temperature_K"].locator is not None
         and observation.point_conditions["delta_NNO"].state.is_value
@@ -227,7 +362,7 @@ def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     assert fusion.identity.species.phase.is_value
     assert fusion.identity.species.phase.value.value == "cr"
     assert fusion.identity.species.polymorph.is_value
-    assert fusion.identity.species.polymorph.value.value == "alpha"
+    assert fusion.identity.species.polymorph.value.value == "cyclowollastonite"
     assert any(
         "adamkovicova_1980_table1_solid_cooling_measured" in row.observation_id
         and row.value.point == Decimal("139.6")
