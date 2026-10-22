@@ -549,11 +549,12 @@ def _element_reference_refusal(
     ``Polymorph.REFERENCE`` means the element's standard state at this
     temperature, taken from its JANAF (ref) table. The B1452 crystal stamp
     is not that state. An unresolved reference state is admissible and
-    noticed. An omitted observation allotrope is not a mismatch. A declared
-    named allotrope is compared with the allotrope that table gives a
-    generic segment solid; if the table names none, the segment cannot
-    support the declaration. CEA ``Zr(a)`` / ``Zr(b)`` and JANAF alpha /
-    beta are one allotrope.
+    noticed. An omitted observation allotrope is not a mismatch. A
+    nonspecific token, including crystalline, is not a declared name. A
+    declared named allotrope is compared with the allotrope that table
+    gives a generic segment solid; if the table names none, the segment
+    cannot support the declaration. CEA ``Zr(a)`` / ``Zr(b)`` and JANAF
+    alpha / beta are one allotrope.
     """
 
     reaction_state = identity.reaction
@@ -644,7 +645,7 @@ def _element_reference_refusal(
             and cell_allotrope_name not in _NONSPECIFIC_ELEMENT_ALLOTROPES
         )
         if (
-            cell_allotrope_name
+            specific
             and segment_allotrope_name
             and cell_allotrope_name != segment_allotrope_name
         ):

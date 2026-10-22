@@ -1876,7 +1876,11 @@ def test_unknown_phase_on_one_term_does_not_skip_a_known_element_mismatch() -> N
 
 
 def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> None:
-    """Ca(s) at 1100 K is beta on Ca-001. Ni(s) names no allotrope."""
+    """Ca(s) at 1100 K is beta on Ca-001. Ni(s) names no allotrope.
+
+    Crystalline names no allotrope. Its answer is the omitted-allotrope
+    value from this same production call.
+    """
 
     cao = F.cao_identity(
         Phase.CR,
@@ -1897,17 +1901,27 @@ def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> 
     )
     assert refused.refusal_detail["cell_allotrope"] == "alpha"
     assert refused.refusal_detail["segment_allotrope"] == "beta"
+    omitted_answer = None
     for name, polymorph in (
         ("beta", Polymorph.BETA),
         ("omitted", None),
         ("reference", Polymorph.REFERENCE),
     ):
-        _assert_ellingham_number(
+        attempt = _assert_ellingham_number(
             f"cao-1100-{name}",
             _with_reactant_basis(cao, Phase.CR, polymorph),
             _CAO_CRYSTAL_1100K,
             evidence,
         )
+        if name == "omitted":
+            omitted_answer = attempt.value
+    assert omitted_answer is not None
+    _assert_ellingham_number(
+        "cao-1100-crystalline",
+        _with_reactant_basis(cao, Phase.CR, Polymorph.CRYSTALLINE),
+        omitted_answer,
+        evidence,
+    )
     nio = F.oxide_identity(
         "NiO",
         Phase.CR,
