@@ -1566,8 +1566,10 @@ class PyrolysisRun:
         # thermodynamic gate rejected -- silently dropping the dispatch
         # used to leave the run looking ``ok``/`partial`` with the C3
         # cleanup quietly missing.  Empty list when no refusals.
-        shuttle_refusal_history = list(
-            getattr(sim, "_shuttle_refusal_history", []) or [])
+        shuttle_refusal_history = _safe_failure_value(
+            lambda: _shuttle_refusal_history_report(sim),
+            section="shuttle_refusal_history",
+        )
         melt_redox_gate_floor_fallback_engagement = (
             _melt_redox_gate_floor_fallback_engagement(sim)
         )
@@ -1660,7 +1662,7 @@ class PyrolysisRun:
                         sim,
                         ledger_snapshots_from_sim(sim),
                     ),
-                    None,
+                    section="yield_disposition",
                 ),
             ),
             "product_classification": _json_safe(
@@ -1670,7 +1672,7 @@ class PyrolysisRun:
                         feedstock_id=self.feedstock_id,
                         campaign=self.campaign,
                     ),
-                    {"classification": {}, "markdown": ""},
+                    section="product_classification",
                 ),
             ),
             "terminal_product_taxonomy": _json_safe(
@@ -1679,13 +1681,13 @@ class PyrolysisRun:
                         sim,
                         feedstock_id=self.feedstock_id,
                     ),
-                    None,
+                    section="terminal_product_taxonomy",
                 ),
             ),
             "thermal_train_report": _json_safe(
                 _safe_failure_value(
                     lambda: _thermal_train_report(sim),
-                    {},
+                    section="thermal_train_report",
                 ),
             ),
             "stage_purity_report": stage_purity_report(sim.train),
@@ -5292,20 +5294,31 @@ def _parse_runtime_campaign_overrides_json(
     return parsed
 
 
-def _safe_failure_value(builder: Any, default: Any) -> Any:
+def _safe_failure_value(builder: Any, *, section: str) -> Any:
     try:
         return builder()
-    except Exception:  # noqa: BLE001 -- failure reporting must survive
-        return default
+    except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
+        failure = _safe_exception_text(exc)
+        _, separator, message = failure.partition(": ")
+        return {
+            "status": "unavailable",
+            "section": section,
+            "exception_type": type(exc).__name__,
+            "reason": message if separator else failure,
+        }
 
 
-def _execution_hours_completed(execution: RunExecution | None) -> int:
+def _execution_hours_completed(execution: RunExecution | None) -> Any:
     if execution is None:
         return 0
     return _safe_failure_value(
-        lambda: int(getattr(execution.simulator.melt, "hour", 0)),
-        0,
+        lambda: int(execution.simulator.melt.hour),
+        section="run_metadata.hours_completed",
     )
+
+
+def _shuttle_refusal_history_report(sim: Any) -> list[Any]:
+    return list(sim._shuttle_refusal_history)
 
 
 def _execution_per_hour_summary(execution: RunExecution | None) -> list[Any]:
@@ -5427,7 +5440,10 @@ def _runner_failure_result(
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
     final_state = (
-        _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
+        _safe_failure_value(
+            lambda: _final_state_from_ledger(sim),
+            section="final_state",
+        )
         if sim is not None
         else {}
     )
@@ -5445,21 +5461,24 @@ def _runner_failure_result(
                 sim.species_formula_registry,
                 unresolved_wall_deposit_species_mol,
             ),
-            final,
+            section="final",
         )
         _attach_wall_deposit_report_refusal(
             run_metadata,
             unresolved_wall_deposit_species_mol,
         )
     stage_report = (
-        _safe_failure_value(lambda: stage_purity_report(sim.train), {})
+        _safe_failure_value(
+            lambda: stage_purity_report(sim.train),
+            section="stage_purity_report",
+        )
         if sim is not None
         else {}
     )
     vapor_report = (
         _safe_failure_value(
             lambda: _vapor_pressure_source_report(sim),
-            _empty_vapor_pressure_source_report(),
+            section="vapor_pressure_source_report",
         )
         if sim is not None
         else _empty_vapor_pressure_source_report()
@@ -5467,7 +5486,7 @@ def _runner_failure_result(
     degraded_path_engagement = (
         _safe_failure_value(
             lambda: _degraded_path_engagement(sim),
-            _empty_degraded_path_engagement(),
+            section="degraded_path_engagement",
         )
         if sim is not None
         else _empty_degraded_path_engagement()
@@ -5475,7 +5494,7 @@ def _runner_failure_result(
     melt_redox_gate_floor_fallback_engagement = (
         _safe_failure_value(
             lambda: _melt_redox_gate_floor_fallback_engagement(sim),
-            _empty_melt_redox_gate_floor_fallback_engagement(),
+            section="melt_redox_gate_floor_fallback_engagement",
         )
         if sim is not None
         else _empty_melt_redox_gate_floor_fallback_engagement()
@@ -5498,7 +5517,7 @@ def _runner_failure_result(
                     feedstock_id=feedstock_id,
                     campaign=campaign,
                 ),
-                {"classification": {}, "markdown": ""},
+                section="product_classification",
             )
             if sim is not None
             else {"classification": {}, "markdown": ""}
@@ -5509,7 +5528,7 @@ def _runner_failure_result(
                     sim,
                     feedstock_id=feedstock_id,
                 ),
-                None,
+                section="terminal_product_taxonomy",
             )
             if sim is not None
             else None
@@ -5517,7 +5536,7 @@ def _runner_failure_result(
         "thermal_train_report": _json_safe(
             _safe_failure_value(
                 lambda: _thermal_train_report(sim),
-                {},
+                section="thermal_train_report",
             )
             if sim is not None
             else {}
@@ -5527,7 +5546,7 @@ def _runner_failure_result(
         "vapour_rail_instrumentation": _json_safe(
             _safe_failure_value(
                 lambda: _vapour_rail_instrumentation_report(sim),
-                {},
+                section="vapour_rail_instrumentation",
             )
             if sim is not None
             else {}
@@ -5535,26 +5554,32 @@ def _runner_failure_result(
         "condensation_refusals_by_species": _json_safe(
             _safe_failure_value(
                 lambda: _condensation_refusals_report(sim),
-                {},
+                section="condensation_refusals_by_species",
             )
             if sim is not None
             else {}
         ),
         "shuttle_refusal_history": _json_safe(
             _safe_failure_value(
-                lambda: list(getattr(sim, "_shuttle_refusal_history", []) or []),
-                [],
+                lambda: _shuttle_refusal_history_report(sim),
+                section="shuttle_refusal_history",
             )
             if sim is not None
             else []
         ),
         "c7_product_report": _json_safe(
-            _safe_failure_value(lambda: _c7_product_report(sim), {})
+            _safe_failure_value(
+                lambda: _c7_product_report(sim),
+                section="c7_product_report",
+            )
             if sim is not None
             else {}
         ),
         "c7_refusal_diagnostic": _json_safe(
-            _safe_failure_value(lambda: _c7_refusal_diagnostic(sim), {})
+            _safe_failure_value(
+                lambda: _c7_refusal_diagnostic(sim),
+                section="c7_refusal_diagnostic",
+            )
             if sim is not None
             else {}
         ),
@@ -5570,17 +5595,24 @@ def _runner_failure_result(
         "error_message": error_message,
     }
     if sim is not None:
-        try:
-            payload["yield_disposition"] = _json_safe(
-                build_yield_disposition(
-                    sim,
-                    ledger_snapshots_from_sim(sim),
-                )
-            )
-        except Exception as exc:  # noqa: BLE001 -- failure envelope must survive
+        yield_disposition = _safe_failure_value(
+            lambda: build_yield_disposition(
+                sim,
+                ledger_snapshots_from_sim(sim),
+            ),
+            section="yield_disposition",
+        )
+        payload["yield_disposition"] = _json_safe(yield_disposition)
+        if (
+            isinstance(yield_disposition, Mapping)
+            and yield_disposition.get("status") == "unavailable"
+            and yield_disposition.get("section") == "yield_disposition"
+        ):
             payload["error_message"] = (
                 f"{payload['error_message']}\n"
-                f"yield disposition unavailable: {_safe_exception_text(exc)}"
+                "yield disposition unavailable: "
+                f"{yield_disposition['exception_type']}: "
+                f"{yield_disposition['reason']}"
             )
     return payload
 

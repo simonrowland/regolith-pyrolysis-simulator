@@ -261,7 +261,12 @@ def test_completed_run_preserves_success_when_terminal_taxonomy_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["terminal_product_taxonomy"] is None
+    assert payload["terminal_product_taxonomy"] == {
+        "status": "unavailable",
+        "section": "terminal_product_taxonomy",
+        "exception_type": "RuntimeError",
+        "reason": "injected terminal-taxonomy failure",
+    }
 
 
 def test_completed_run_preserves_success_when_yield_disposition_raises(
@@ -287,7 +292,12 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "injected yield-disposition refusal",
+    }
     assert payload["terminal_product_taxonomy"] is not None
 
 
@@ -2495,7 +2505,17 @@ def test_runner_failure_preserves_primary_when_yield_disposition_raises(
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    completed_hours = payload["run_metadata"]["hours_completed"]
+    assert completed_hours["status"] == "unavailable"
+    assert completed_hours["section"] == "run_metadata.hours_completed"
+    assert completed_hours["exception_type"] == "AttributeError"
+    assert "melt" in completed_hours["reason"]
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "secondary disposition failure",
+    }
     assert "primary execution failure" in payload["error_message"]
     assert payload["error_message"].splitlines()[-1] == (
         "yield disposition unavailable: OriginUnresolvedError: "
@@ -2539,7 +2559,12 @@ def test_runner_failure_preserves_primary_when_yield_disposition_serialization_r
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "disposition serialization unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         (
@@ -2582,7 +2607,12 @@ def test_runner_failure_preserves_primary_when_atom_ledger_lookup_raises() -> No
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         "envelope detail unavailable: RuntimeError: primary detail failure",
