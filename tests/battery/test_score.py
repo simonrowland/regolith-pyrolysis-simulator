@@ -2583,6 +2583,63 @@ def test_match_reported_species_does_not_bind_solid_to_liquid_identity() -> None
     ) == ("FeO(l)", 0.85)
 
 
+@pytest.mark.parametrize(
+    ("label", "phase"),
+    [
+        ("s", Phase.CR),
+        ("S", Phase.CR),
+        ("solid", Phase.CR),
+        ("cr", Phase.CR),
+        ("l", Phase.L),
+        ("liq", Phase.L),
+        ("liquid", Phase.L),
+        ("g", Phase.G),
+        ("gas", Phase.G),
+        ("vapor", Phase.G),
+        ("aq", Phase.AQ),
+    ],
+)
+def test_species_formula_parser_gates_terminal_bracket_phase_labels(
+    label: str, phase: Phase
+) -> None:
+    formula = f"Fe2O3[{label}]"
+    wrong_phase = Phase.CR if phase is not Phase.CR else Phase.L
+
+    assert parse_species_formula(formula) is None
+    assert parse_species_formula(
+        formula, species=Species("Fe2O3", wrong_phase)
+    ) is None
+    assert parse_species_formula(formula, species=Species("Fe2O3", phase)) == (
+        score_mod.formula_composition("Fe2O3")
+    )
+
+
+def test_match_reported_species_does_not_bind_bracket_solid_to_liquid_identity() -> None:
+    liquid = Species("FeO", Phase.L)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15, "FeO(l)": 0.85},
+        species=liquid,
+    ) == ("FeO(l)", 0.85)
+    assert score_mod.match_reported_species(
+        "FeO",
+        {"FeO[s]": 0.15},
+        species=liquid,
+    ) is None
+
+
+def test_species_formula_parser_keeps_non_phase_brackets() -> None:
+    assert parse_species_formula("[Al(OH)4]") == (
+        ("Al", 1.0),
+        ("H", 4.0),
+        ("O", 4.0),
+    )
+    assert parse_species_formula("Fe2O3[c]") is None
+    assert parse_species_formula(
+        "Fe2O3[c]", species=Species("Fe2O3", Phase.CR)
+    ) is None
+
+
 def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:
     assert parse_species_formula("Fe(α)") is None
     assert parse_species_formula(

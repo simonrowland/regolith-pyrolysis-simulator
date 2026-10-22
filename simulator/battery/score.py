@@ -554,6 +554,10 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     return tuple(out)
 
 
+def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
+    return species is not None and phase_token(species) is phase
+
+
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
@@ -565,8 +569,10 @@ def parse_species_formula(
     decimal water multipliers) separated by a middle dot, TeX math wrappers /
     ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
     phase or polymorph labels require a matching existing species axis, as in
-    ``$AsCl_3(g)$`` and ``$Fe(α)$``. Mineral names, variable compositions, and
-    unverified charge or phase labels remain unmatched.
+    ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
+    accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
+    before the fallback. Mineral names, variable compositions, and unverified
+    charge or phase labels remain unmatched.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
@@ -589,25 +595,25 @@ def parse_species_formula(
     # and explicit middle-dot hydrates stay unchanged.
     if "·" not in text and re.search(r"\.\d+H2O", text):
         return None
+    phase_labels = {
+        "c": Phase.CR,
+        "cr": Phase.CR,
+        "s": Phase.CR,
+        "solid": Phase.CR,
+        "l": Phase.L,
+        "liq": Phase.L,
+        "liquid": Phase.L,
+        "g": Phase.G,
+        "gas": Phase.G,
+        "vapor": Phase.G,
+        "aq": Phase.AQ,
+    }
     annotation = re.search(r"\(([^()]*)\)$", text)
     if annotation is not None:
         label = annotation.group(1).strip().lower()
-        phase_labels = {
-            "c": Phase.CR,
-            "cr": Phase.CR,
-            "s": Phase.CR,
-            "solid": Phase.CR,
-            "l": Phase.L,
-            "liq": Phase.L,
-            "liquid": Phase.L,
-            "g": Phase.G,
-            "gas": Phase.G,
-            "vapor": Phase.G,
-            "aq": Phase.AQ,
-        }
         annotated_phase = phase_labels.get(label)
         if annotated_phase is not None:
-            if species is None or phase_token(species) is not annotated_phase:
+            if not _species_axis_matches_phase(species, annotated_phase):
                 return None
         else:
             from simulator.battery.polymorph_dictionary import coerce_polymorph_token
@@ -622,6 +628,18 @@ def parse_species_formula(
                 text = text[: annotation.start()]
         if annotated_phase is not None:
             text = text[: annotation.start()]
+
+    # Accounting strips these terminal brackets with no species axis. Bare
+    # [c] is not in that suffix list and stays unmatched.
+    bracket = re.search(r"\[([^\[\]]*)\]$", text)
+    if bracket is not None:
+        label = bracket.group(1).strip().lower()
+        if label != "c":
+            annotated_phase = phase_labels.get(label)
+            if annotated_phase is not None:
+                if not _species_axis_matches_phase(species, annotated_phase):
+                    return None
+                text = text[: bracket.start()]
 
     charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
     if charge_annotation is not None:
