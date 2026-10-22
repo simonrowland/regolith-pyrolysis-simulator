@@ -2,14 +2,14 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-006-zhang-2021.yaml
 observations:
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2::T=1473.15:row=bas1200c0h2:h=32b4ba4a4b48
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c0h2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: K2O
       phase:
         tag: value
         value: l
@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1473.15'
@@ -27,32 +30,46 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '0'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '2.58'
     approximate: false
   uncertainty:
     kind: printed
@@ -84,20 +101,70 @@ observations:
         table: '1'
         note: row=Bas1200C0h2
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C0h2
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2::T=1473.15:row=bas1200c0h2:h=7fc75b4132bd
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c0h2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: value
         value: l
@@ -107,6 +174,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1473.15'
@@ -115,32 +185,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '0'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '2.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C0h2
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C0h2
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C0h2
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C0h2
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h::T=1473.15:row=bas1200c10h:h=b61fd910059a
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '35700'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.84'
     approximate: false
   uncertainty:
     kind: printed
@@ -172,20 +411,70 @@ observations:
         table: '1'
         note: row=Bas1200C10h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '595'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C10h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h::T=1473.15:row=bas1200c10h:h=ca834ee052b3
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: value
         value: l
@@ -195,6 +484,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1473.15'
@@ -203,32 +495,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '35700'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '0.69'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C10h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C10h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C10h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '595'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C10h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h::T=1473.15:row=bas1200c1h:h=b1ff52765099
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3300'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2.53'
     approximate: false
   uncertainty:
     kind: printed
@@ -260,20 +721,70 @@ observations:
         table: '1'
         note: row=Bas1200C1h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '55'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C1h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h::T=1473.15:row=bas1200c1h:h=f30454b1bb53
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: value
         value: l
@@ -283,6 +794,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1473.15'
@@ -291,32 +805,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3300'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '1.99'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C1h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C1h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C1h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '55'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C1h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h::T=1473.15:row=bas1200c40h:h=67d1f35198d4
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '143700'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -348,20 +1031,70 @@ observations:
         table: '1'
         note: row=Bas1200C40h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '2395'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C40h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h::T=1473.15:row=bas1200c40h:h=a723610158cc
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: K2O
       phase:
         tag: value
         value: l
@@ -371,6 +1104,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1473.15'
@@ -379,32 +1115,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '143700'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '1.09'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C40h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C40h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C40h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '2395'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C40h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h::T=1473.15:row=bas1200c4h:h=456ced27b4b8
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '14100'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.08'
     approximate: false
   uncertainty:
     kind: printed
@@ -436,20 +1341,70 @@ observations:
         table: '1'
         note: row=Bas1200C4h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '235'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C4h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h::T=1473.15:row=bas1200c4h:h=cc172f2c7da3
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: K2O
       phase:
         tag: value
         value: l
@@ -459,6 +1414,164 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '14100'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C4h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C4h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1200C4h
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '235'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1200C4h
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1::T=1673.15:row=bas1400c0m1:h=89ce97debecd
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1673.15'
@@ -467,32 +1580,46 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '0'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '1.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -524,20 +1651,70 @@ observations:
         table: '1'
         note: row=Bas1400C0m1
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1::T=1673.15:row=bas1400c0m1:h=e560824706e2
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: K2O
       phase:
         tag: value
         value: l
@@ -547,6 +1724,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1673.15'
@@ -555,32 +1735,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '0'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '2.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C0m1
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C0m1
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C0m1
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m::T=1673.15:row=bas1400c15m:h=6ff16f74d08f
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.63'
     approximate: false
   uncertainty:
     kind: printed
@@ -612,20 +1961,70 @@ observations:
         table: '1'
         note: row=Bas1400C15m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C15m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m::T=1673.15:row=bas1400c15m:h=974b216850ad
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: value
         value: l
@@ -635,6 +2034,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1673.15'
@@ -643,32 +2045,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '0.66'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C15m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C15m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C15m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C15m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m::T=1673.15:row=bas1400c30m:h=2cb290569726
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '1800'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.19'
     approximate: false
   uncertainty:
     kind: printed
@@ -700,20 +2271,70 @@ observations:
         table: '1'
         note: row=Bas1400C30m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C30m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m::T=1673.15:row=bas1400c30m:h=face7522f20d
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: value
         value: l
@@ -723,6 +2344,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1673.15'
@@ -731,32 +2355,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '1800'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '0.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C30m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C30m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C30m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C30m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m::T=1673.15:row=bas1400c60m:h=66934456b1fa
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.01'
     approximate: false
   uncertainty:
     kind: printed
@@ -788,20 +2581,70 @@ observations:
         table: '1'
         note: row=Bas1400C60m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C60m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c90m
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m::T=1673.15:row=bas1400c60m:h=69d9d05f23bd
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'epma_residue_composition_vs_time'
+      tag: value
+      value: residue_component_composition
     species:
-      formula: Na
+      formula: K2O
       phase:
         tag: value
         value: l
@@ -811,6 +2654,9 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
     temperature_K:
       tag: value
       value: '1673.15'
@@ -819,32 +2665,201 @@ observations:
       value:
         basis: printed_oxides
         components:
-        - - Na2O
-          - '0.02376295692011644397393066023'
-        - - MgO
-          - '0.1141337377032675754490912716'
+        - - Al2O3
+          - '0.1018135974216813105666661448'
         - - CaO
           - '0.1296990502225264349969819782'
-        - - TiO2
-          - '0.01454160990158651625536872131'
-        - - SiO2
-          - '0.4960841329630148976092099902'
-        - - Al2O3
-          - '0.1018135974216813105666661449'
         - - FeO
-          - '0.09635846436686307280176800383'
+          - '0.09635846436686307280176800377'
         - - K2O
-          - '0.0171508119537805199089362338'
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
         - - Rb2O
-          - '0.006455638547163228438046996249'
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
         amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
-      pick a number
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C60m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C60m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C60m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C60m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: wt_percent
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m::T=1673.15:row=bas1400c90m:h=25f77cc25152
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c90m
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1018135974216813105666661448'
+        - - CaO
+          - '0.1296990502225264349969819782'
+        - - FeO
+          - '0.09635846436686307280176800377'
+        - - K2O
+          - '0.01715081195378051990893623378'
+        - - MgO
+          - '0.1141337377032675754490912716'
+        - - Na2O
+          - '0.02376295692011644397393066021'
+        - - Rb2O
+          - '0.006455638547163228438046996244'
+        - - SiO2
+          - '0.4960841329630148976092099898'
+        - - TiO2
+          - '0.0145416099015865162553687213'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '5400'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.05'
     approximate: false
   uncertainty:
     kind: printed
@@ -876,12 +2891,62 @@ observations:
         table: '1'
         note: row=Bas1400C90m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 71
+              table: '1'
+              note: row=Bas1400C90m
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+        note: Printed 10^-6 mbar; unit conversion only
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 2.2 Vacuum evaporation experiments
+    time_min:
+      state:
+        tag: value
+        value: '90'
+      locator:
+        page: 71
+        table: '1'
+        note: row=Bas1400C90m
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - unknown:kems-006-zhang-2021
     parameters: []
-    output_unit: Pa
+    output_unit: wt_percent
 - observation_id: kems-006-zhang-2021::zhang_2021_table3_diffusion_limitation
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
   identity:

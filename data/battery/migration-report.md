@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
 rows in: 50497
-records out (observations): 126296
+records out (observations): 126305
 works: 349
 experiments: 3823
-queue size: 80881
+queue size: 80861
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 348
@@ -18052,7 +18052,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 83 |
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 65 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 27 | 73 |
-| `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 15 | 48 |
+| `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 24 | 28 |
 | `data/literature/extracts/kems-007-costa-2015.yaml` | 17 | 113 | 14 |
 | `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 338 |
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
@@ -18390,8 +18390,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 223871
+advisory issues: 223909
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 223871 |
+| `identity_incomplete` | 223909 |
