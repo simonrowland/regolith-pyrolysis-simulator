@@ -53,6 +53,7 @@ def test_committed_disposition_uses_shared_flow_not_diagnostic_pressure():
         for p_down in (0.0, flow.downstream_pressure_bar, 0.001)
     ]
 
+    assert committed == pytest.approx([committed[0]] * len(committed))
     assert committed == pytest.approx([0.4, 0.4, 0.4])
 
 

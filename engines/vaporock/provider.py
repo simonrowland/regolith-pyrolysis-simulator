@@ -53,7 +53,7 @@ from simulator.melt_backend.melt_envelope import (
     consume_melt_extrapolation_envelope,
     melt_extrapolation_diagnostic,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import is_declared_real_scalar, is_finite
 
 
 _INTENTS = frozenset({ChemistryIntent.VAPOR_PRESSURE})
@@ -313,7 +313,7 @@ class VapoRockProvider(ChemistryProvider):
             self.DECLARED_ACCOUNT: {
                 str(sp): float(mol)
                 for sp, mol in species_mol.items()
-                if _is_finite(mol) and float(mol) > 0.0
+                if is_finite(mol) and float(mol) > 0.0
             }
         }
 
@@ -456,7 +456,7 @@ class VapoRockProvider(ChemistryProvider):
         vaporock_full_speciation_Pa: dict[str, float] = {}
         rejected_pressure_count = 0
         for species, value in raw_full_speciation.items():
-            if not _is_finite(value):
+            if not is_finite(value):
                 rejected_pressure_count += 1
                 continue
             pressure = float(value)
@@ -552,18 +552,6 @@ class VapoRockProvider(ChemistryProvider):
             except Exception:  # noqa: BLE001
                 return 'unavailable'
         return 'unavailable'
-
-
-def _is_finite(value: Any) -> bool:
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return False
-    if numeric != numeric:
-        return False
-    if numeric in (float('inf'), float('-inf')):
-        return False
-    return True
 
 
 __all__ = ('VapoRockProvider',)
