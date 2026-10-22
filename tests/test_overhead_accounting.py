@@ -1509,6 +1509,66 @@ def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
     assert gas.composition["Na"] > gas.composition["Fe"]
 
 
+def test_controlled_o2_species_partial_excludes_n2_carrier_pressure():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import MeltState
+    from simulator.thermal_train import NoColdTrain
+
+    model = OverheadGasModel({"enabled": False})
+    flux = EvaporationFlux(total_kg_hr=1.0, species_kg_hr={"Fe": 1.0})
+    melt = MeltState(
+        temperature_C=1700.0,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+        pO2_mbar=0.2,
+        p_total_mbar=10.2,
+        background_gas_species="N2",
+        background_gas_mole_fraction=1.0,
+    )
+
+    capacity = model.controlled_o2_transport_capacity(
+        flux,
+        melt,
+        cold_train_capacity=NoColdTrain(),
+    )
+    assert capacity is not None
+    transport = model.estimate_transport_state(
+        flux,
+        melt,
+        effective_transport_capacity=capacity,
+    )
+    partials = model.species_partial_pressures(
+        flux,
+        transport["vapor_pressure_mbar"],
+    )
+
+    # The declared 10 mbar N2 + 0.2 mbar O2 fills the 10.2 mbar total.
+    # Dalton's law leaves no pressure share for Fe; its P_bulk is not 10.2 mbar.
+    assert transport["pressure_mbar"] == pytest.approx(10.2)
+    assert partials["Fe"] == pytest.approx(0.0)
+
+    no_carrier = MeltState(
+        temperature_C=1700.0,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+        p_total_mbar=10.2,
+    )
+    no_carrier_capacity = model.controlled_o2_transport_capacity(
+        flux,
+        no_carrier,
+        cold_train_capacity=NoColdTrain(),
+    )
+    assert no_carrier_capacity is not None
+    no_carrier_transport = model.estimate_transport_state(
+        flux,
+        no_carrier,
+        effective_transport_capacity=no_carrier_capacity,
+    )
+    no_carrier_partials = model.species_partial_pressures(
+        flux,
+        no_carrier_transport["vapor_pressure_mbar"],
+    )
+    assert no_carrier_partials["Fe"] == pytest.approx(10.2)
+
+
 def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     sim = _gas_train_sim()
     sim.vapor_pressures["oxide_vapors"]["FeO"] = {
