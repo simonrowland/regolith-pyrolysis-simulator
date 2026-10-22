@@ -102,6 +102,8 @@ from simulator.battery.migrate import (
     _convert_compilation_amount,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
+    fe3_fe2_ratio_from_ferric_fraction,
+    fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     path_matches_source_tokens,
     phase_for_sample_form,
@@ -616,6 +618,14 @@ def _is_raw_element_label(formula: str) -> bool:
     return element != "O" and count == 1
 
 
+# Inverse of simulator.melt_backend.vaporock._GAS_NAMESPACE_SUFFIX.
+# The vapour adapter appends this exact suffix when a gas formula collides
+# with a melt oxide (SiO2(g) -> SiO2_gas). The scorer does not import the
+# vapour backend to read a four-character suffix. The emitter constant stays
+# in the adapter.
+_GAS_PHASE_SUFFIX = "_gas"
+
+
 def match_reported_species(
     formula: str,
     reported: Mapping[str, float],
@@ -627,6 +637,13 @@ def match_reported_species(
     ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
     map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
     ``Na`` when this flag is false.
+
+    Vapour rows also accept one explicit alias: a reported key that is exactly
+    the requested formula plus ``_gas``, and only when that stem's closed
+    formula equals the target. ``SiO2_gas`` matches ``SiO2``. ``SiO2gas``,
+    ``SiO2_gaseous``, and a stem that does not parse do not. An exact formula
+    hit in the first pass wins over the suffixed key. Oxide activity does
+    not use this alias.
     """
 
     target = parse_species_formula(formula)
@@ -641,6 +658,14 @@ def match_reported_species(
         if parsed == target:
             return str(name), float(value)
     if not oxide_activity:
+        suffix = _GAS_PHASE_SUFFIX
+        for name, value in reported.items():
+            text = str(name)
+            if len(text) <= len(suffix) or not text.endswith(suffix):
+                continue
+            stem = text[: -len(suffix)]
+            if parse_species_formula(stem) == target:
+                return text, float(value)
         return None
     from engines.alphamelts.domain import canonical_oxide_activity_map
 
@@ -4380,67 +4405,92 @@ def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | Non
     return pressure
 
 
-def _predict_fe_redox(
-    engine: Engine, observation: Observation, identity: Identity, channel: str
-) -> EnginePrediction:
-    """Predict Fe3+/Fe2+ with the production Kress91 melt-redox split."""
+_FE_REDOX_RATIO_UNDEFINED = object()
+_KRESS91_SOURCES = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
+_MELTS_FE_REDOX_ENGINES = (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+_FE_REDOX_NO_SPLIT_DETAIL = (
+    "no fixed-T/fO2/composition ferric output without phase-equilibrium execution"
+)
+
+
+@dataclass(frozen=True)
+class _FeRedoxMaterial:
+    temperature: Decimal
+    composition_state: State[Composition]
+    composition_wt: dict[str, float]
+    mol_fractions: dict[str, float]
+    dropped_components: tuple[str, ...]
+    dropped_mass_fraction: float | None
+
+
+@dataclass(frozen=True)
+class _FeRedoxRefusal:
+    reason: RefusalReason
+    detail: dict[str, object]
+
+
+def _open_cached_battery_handle(
+    engine: Engine,
+    handles: Mapping[str, object] | None,
+) -> object:
+    """Open one battery engine, reusing a live handle and dropping a dead one."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
+
+    handle_map: Mapping[str, object] = {} if handles is None else handles
+    handle = handle_map.get(engine.value)
+    if handle is not None and (
+        not getattr(handle, "available", False)
+        or getattr(handle, "backend", None) is None
+    ):
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine.value, None)
+        handle = None
+    if handle is None:
+        handle = open_battery_engine(engine.value)
+        if (
+            isinstance(handle_map, dict)
+            and getattr(handle, "available", False)
+            and getattr(handle, "backend", None) is not None
+        ):
+            handle_map[engine.value] = handle
+    return handle
+
+
+def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | None:
+    located = (observation.point_conditions or {}).get(key)
+    if not isinstance(located, Located) or located.inference is not None:
+        return None
+    if not located.state.is_value or located.state.value is None:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        return point_magnitude(raw)
+    try:
+        return as_decimal(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _fe_redox_material(
+    observation: Observation, identity: Identity
+) -> _FeRedoxMaterial | _FeRedoxRefusal:
+    """Temperature, oxide weights, and the Kress iron detector.
+
+    ``kress91_dropped_components`` is reported for the Kress notice only.
+    A MELTS pot is the full oxide weight map, not the Kress basis.
+    """
 
     from simulator.fe_redox import (
-        KRESS91_LIQUID_CALIBRATION_MAX_T_C,
-        KRESS91_LIQUID_CALIBRATION_MIN_T_C,
-        _kress91_fe3_fe2_ratio,
         kress91_dropped_components,
-        kress91_split,
-        kress91_temperature_band_case,
         melt_mol_fractions_for_kress91,
     )
 
-    sources = ("Kress and Carmichael 1991, doi:10.1007/BF00307328",)
-    if engine is not Engine.INTERNAL_ANALYTICAL:
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.UNSUPPORTED),
-            authority=Authority.REFUSED,
-            coefficient_sources=sources,
-            refusal_reason=RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
-            refusal_detail={
-                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
-                "engine": engine.value,
-                "detail": "no fixed-T/fO2/composition ferric output without phase-equilibrium execution",
-            },
-            identity=identity,
-        )
-
-    def refused(reason: RefusalReason, detail: Mapping[str, object]) -> EnginePrediction:
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.NOT_PROBED),
-            authority=Authority.REFUSED,
-            coefficient_sources=sources,
-            refusal_reason=reason,
-            refusal_detail=detail,
-            identity=identity,
-        )
-
-    def point_value(key: str) -> Decimal | None:
-        located = (observation.point_conditions or {}).get(key)
-        if not isinstance(located, Located) or located.inference is not None:
-            return None
-        if not located.state.is_value or located.state.value is None:
-            return None
-        raw = located.state.value
-        if isinstance(raw, Value):
-            return point_magnitude(raw)
-        try:
-            return as_decimal(raw)
-        except (TypeError, ValueError):
-            return None
-
-    temperature = temperature_of(identity) or point_value("temperature_K")
+    temperature = temperature_of(identity) or _printed_condition_decimal(
+        observation, "temperature_K"
+    )
     if temperature is None or not temperature.is_finite() or temperature <= 0:
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "temperature_K"},
         )
@@ -4453,7 +4503,7 @@ def _predict_fe_redox(
         or not composition_state.is_value
         or not isinstance(composition_state.value, Composition)
     ):
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "composition"},
         )
@@ -4478,23 +4528,40 @@ def _predict_fe_redox(
         )
         mol_fractions = melt_mol_fractions_for_kress91(composition_wt)
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
             {"reason": "invalid_redox_composition", "detail": str(exc)},
         )
     if not mol_fractions or mol_fractions.get("FeOt", 0.0) <= 0.0:
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "total_iron"},
         )
+    return _FeRedoxMaterial(
+        temperature=temperature,
+        composition_state=composition_state,
+        composition_wt=composition_wt,
+        mol_fractions=mol_fractions,
+        dropped_components=tuple(dropped_components),
+        dropped_mass_fraction=dropped_mass_fraction,
+    )
 
-    fO2_log = point_value("fO2_log")
-    if fO2_log is None:
+
+def _printed_fe_redox_fo2_log(
+    observation: Observation, identity: Identity
+) -> Decimal | None:
+    """Printed log10(fO2/bar), or None when oxygen is missing or only derived.
+
+    The extract labels this column log10 fO2; its air rows are about -0.68,
+    i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
+    A derived fO2 is not a printed command. Callers that require a printed
+    value refuse; an engine that computes its own fO2 does not.
+    """
+
+    fo2_log = _printed_condition_decimal(observation, "fO2_log")
+    if fo2_log is None:
         if _derived_fo2_condition(observation):
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "printed_fO2"},
-            )
+            return None
         oxygen_pa = identity.fO2_Pa
         point_oxygen = (observation.point_conditions or {}).get("fO2_Pa")
         if (
@@ -4505,136 +4572,480 @@ def _predict_fe_redox(
             and point_oxygen.state.value is not None
         ):
             oxygen_pa = point_oxygen.state
-        if oxygen_pa is not None and oxygen_pa.is_value and oxygen_pa.value is not None:
+        if (
+            oxygen_pa is not None
+            and oxygen_pa.is_value
+            and oxygen_pa.value is not None
+        ):
             oxygen_value = float(oxygen_pa.value)
             if oxygen_value > 0.0 and math.isfinite(oxygen_value):
-                fO2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
-    if fO2_log is None or not fO2_log.is_finite():
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
-        )
-    # The extract labels this column log10 fO2; its air rows are about -0.68,
-    # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
-    # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
-    # the predictor itself receives the printed log value without a frame shift.
+                fo2_log = Decimal(str(math.log10(oxygen_value / 100000.0)))
+    if fo2_log is None or not fo2_log.is_finite():
+        return None
+    return fo2_log
 
+
+def _fe_redox_pressure(
+    observation: Observation, identity: Identity
+) -> tuple[float, State[Any]] | _FeRedoxRefusal:
     pressure_pa = identity.total_pressure_Pa
-    point_pressure = point_value("total_pressure_Pa")
+    point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
     if (
         (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
         and point_pressure is not None
     ):
         pressure_pa = State.of(point_pressure)
-    if pressure_pa is not None and pressure_pa.is_value and pressure_pa.value is not None:
+    if (
+        pressure_pa is not None
+        and pressure_pa.is_value
+        and pressure_pa.value is not None
+    ):
         pressure_bar = float(pressure_pa.value) / 100000.0
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
         pressure_pa = State.of(Decimal("101325"))
     else:
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "total_pressure_Pa"},
         )
     if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
-        return refused(
+        return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
             {"reason": "invalid_input", "input": "total_pressure_Pa"},
         )
+    assert pressure_pa is not None
+    return pressure_bar, pressure_pa
 
-    band = kress91_temperature_band_case(float(temperature) - 273.15)
+
+def _oxide_weight_fe_ratio(
+    mapping: Mapping[str, object],
+    *,
+    fe2o3_key: str,
+    feo_key: str,
+) -> Decimal | object | None:
+    """Battery ratio from one weight pair. None means the pair is absent.
+
+    Both keys present and a None converter result is undefined: do not
+    fall through to another map. The two maps are not mixed.
+    """
+
+    if fe2o3_key not in mapping or feo_key not in mapping:
+        return None
     try:
-        split = kress91_split(
-            fO2_log=float(fO2_log),
-            mol_fractions=mol_fractions,
-            T_K=float(temperature),
-            pressure_bar=pressure_bar,
+        fe2o3 = as_decimal(mapping[fe2o3_key])
+        feo = as_decimal(mapping[feo_key])
+    except (TypeError, ValueError, ArithmeticError):
+        return _FE_REDOX_RATIO_UNDEFINED
+    if not fe2o3.is_finite() or not feo.is_finite():
+        return _FE_REDOX_RATIO_UNDEFINED
+    ratio = fe3_fe2_ratio_from_oxide_wt_pct(fe2o3, feo)
+    if ratio is None:
+        return _FE_REDOX_RATIO_UNDEFINED
+    return ratio
+
+
+def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
+    """Fe3+/Fe2+ from the cell. None means the engine reported no ferric split.
+
+    Prefer ``fe_redox_split`` weights, else liquid ``Fe2O3`` and ``FeO``.
+    ``Fe3Fet_Liq`` is Fe3+/Fe total and is used only when neither map has
+    both weights. ``_fe_redox_split`` remains the ThermoEngine emitter.
+    """
+
+    split = getattr(cell, "fe_redox_split", None) or {}
+    if not isinstance(split, Mapping):
+        split = {}
+    liquid = getattr(cell, "liquid_composition_wt_pct", None) or {}
+    if not isinstance(liquid, Mapping):
+        liquid = {}
+    from_split = _oxide_weight_fe_ratio(
+        split, fe2o3_key="Fe2O3_wt_pct", feo_key="FeO_wt_pct"
+    )
+    if from_split is not None:
+        return from_split
+    from_liquid = _oxide_weight_fe_ratio(liquid, fe2o3_key="Fe2O3", feo_key="FeO")
+    if from_liquid is not None:
+        return from_liquid
+    if "Fe3Fet_Liq" in split:
+        try:
+            fraction = as_decimal(split["Fe3Fet_Liq"])
+        except (TypeError, ValueError, ArithmeticError):
+            return _FE_REDOX_RATIO_UNDEFINED
+        ratio = fe3_fe2_ratio_from_ferric_fraction(fraction)
+        if ratio is None:
+            return _FE_REDOX_RATIO_UNDEFINED
+        return ratio
+    if any(key in split for key in ("FeO_wt_pct", "Fe2O3_wt_pct")) or any(
+        key in liquid for key in ("FeO", "Fe2O3")
+    ):
+        return _FE_REDOX_RATIO_UNDEFINED
+    return None
+
+
+def _predict_fe_redox(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+) -> EnginePrediction:
+    """Predict Fe3+/Fe2+ from Kress91 or from a MELTS ferric split.
+
+    Internal-analytical keeps the Kress91 split. AlphaMELTS and ThermoEngine
+    report the split they already compute; the battery ratio is
+    ``fe3_fe2_ratio_from_oxide_wt_pct`` or
+    ``fe3_fe2_ratio_from_ferric_fraction``. Other engines stay refused.
+    """
+
+    if engine not in (Engine.INTERNAL_ANALYTICAL, *_MELTS_FE_REDOX_ENGINES):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=_KRESS91_SOURCES,
+            refusal_reason=RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
+            refusal_detail={
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
+                "engine": engine.value,
+                "detail": _FE_REDOX_NO_SPLIT_DETAIL,
+            },
+            identity=identity,
         )
-        prediction_value = _kress91_fe3_fe2_ratio(float(split["ratio"]))
-    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+
+    melts = engine in _MELTS_FE_REDOX_ENGINES
+    melts_sources = ENGINE_COEFFICIENT_SOURCES[engine]
+
+    def refused(
+        reason: RefusalReason,
+        detail: Mapping[str, object],
+        *,
+        sources: tuple[str, ...] | None = None,
+        execution_state: ExecutionState = ExecutionState.NOT_PROBED,
+        call_evidence: str | None = None,
+        notices: tuple[Notice, ...] = (),
+        authority: Authority = Authority.REFUSED,
+        certified_band: Mapping[str, tuple[float, float]] | None = None,
+        identity_out: Identity | None = None,
+        version: str | None = None,
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution_state, call_evidence=call_evidence),
+            authority=authority,
+            notices=notices,
+            coefficient_sources=sources if sources is not None else (
+                melts_sources if melts else _KRESS91_SOURCES
+            ),
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity_out if identity_out is not None else identity,
+            version=version,
+        )
+
+    material = _fe_redox_material(observation, identity)
+    if isinstance(material, _FeRedoxRefusal):
+        return refused(material.reason, material.detail)
+
+    fo2_log = _printed_fe_redox_fo2_log(observation, identity)
+    handle: object | None = None
+    if fo2_log is None and melts:
+        # Missing printed fO2 is a refusal unless this engine computes its own.
+        # The flag is on the opened handle, not a hardcoded engine name.
+        handle = _open_cached_battery_handle(engine, handles)
+        if not getattr(handle, "available", False) or getattr(
+            handle, "backend", None
+        ) is None:
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {
+                    "reason": "unavailable",
+                    "engine_reason": str(
+                        getattr(handle, "unavailable_reason", None) or ""
+                    ),
+                },
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=(
+                    f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
+                ),
+            )
+        if not getattr(handle, "supports_intrinsic_fo2", False):
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "printed_fO2"},
+            )
+    elif fo2_log is None:
         return refused(
-            RefusalReason.INVALID_IDENTITY,
-            {"reason": "invalid_redox_controls", "detail": str(exc)},
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "printed_fO2"},
         )
-    if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+
+    pressure = _fe_redox_pressure(observation, identity)
+    if isinstance(pressure, _FeRedoxRefusal):
+        return refused(pressure.reason, pressure.detail)
+    pressure_bar, pressure_pa = pressure
+
+    if not melts:
+        from simulator.fe_redox import (
+            KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            _kress91_fe3_fe2_ratio,
+            kress91_split,
+            kress91_temperature_band_case,
+        )
+
+        # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
+        # the predictor itself receives the printed log value without a frame shift.
+        assert fo2_log is not None
+        band = kress91_temperature_band_case(float(material.temperature) - 273.15)
+        try:
+            split = kress91_split(
+                fO2_log=float(fo2_log),
+                mol_fractions=material.mol_fractions,
+                T_K=float(material.temperature),
+                pressure_bar=pressure_bar,
+            )
+            prediction_value = _kress91_fe3_fe2_ratio(float(split["ratio"]))
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return refused(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_redox_controls", "detail": str(exc)},
+            )
+        if not math.isfinite(prediction_value) or prediction_value <= 0.0:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            )
+
+        authority = Authority.BRIDGE
+        if not band["authoritative"]:
+            authority = Authority.EXTRAPOLATED
+        certified_band = {
+            "temperature_K": (
+                Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
+                Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
+            )
+        }
+        certified_band_text = (
+            f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+            f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+        )
+        notices: tuple[Notice, ...] = ()
+        if material.dropped_components and material.dropped_mass_fraction is not None:
+            notices = (
+                Notice(
+                    kind=NoticeKind.COMPOSITION_PROJECTED,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        "Kress91 oxide basis omits composition components: "
+                        f"{', '.join(material.dropped_components)}; "
+                        f"dropped_mass_fraction={material.dropped_mass_fraction:.6g}; "
+                        f"authority={authority.value}; certified_band={certified_band_text}"
+                    ),
+                    origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
+                    band=certified_band_text,
+                    dropped=material.dropped_components,
+                    dropped_mass_fraction=Decimal(str(material.dropped_mass_fraction)),
+                    authority=authority,
+                ),
+            )
+        if not band["authoritative"]:
+            notices += (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.FE3_FE2_RATIO,),
+                    reason=(
+                        f"kress91_{band['status']}; authority={band['source']}; "
+                        f"calibrated_temperature_C=[{KRESS91_LIQUID_CALIBRATION_MIN_T_C:g},"
+                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
+                    ),
+                    origin="simulator.fe_redox:kress91_split",
+                    band=(
+                        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
+                        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
+                    ),
+                    authority=authority,
+                ),
+            )
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            fO2_Pa=State.of(Decimal(str(100000.0 * 10.0 ** float(fo2_log)))),
+            total_pressure_Pa=pressure_pa,
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="simulator.fe_redox:kress91_split",
+            ),
+            value=as_decimal(str(prediction_value)),
+            unit="dimensionless",
+            authority=authority,
+            notices=notices,
+            coefficient_sources=_KRESS91_SOURCES,
+            lineage_complete=False,
+            certified_band=certified_band,
+            identity=prediction_identity,
+            version="Kress-Carmichael-1991",
+        )
+
+    if handle is None:
+        handle = _open_cached_battery_handle(engine, handles)
+        if (
+            not getattr(handle, "available", False)
+            or getattr(handle, "backend", None) is None
+        ):
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {
+                    "reason": "unavailable",
+                    "engine_reason": str(
+                        getattr(handle, "unavailable_reason", None) or ""
+                    ),
+                },
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=(
+                    f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
+                ),
+            )
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_ENGINE_DEFAULT,
+        REFUSAL_ENGINE_CRASH,
+        REFUSAL_TIMEOUT,
+        REFUSAL_UNAVAILABLE,
+        Po2Request,
+        equilibrate_cell,
+        identity_battery_pot,
+    )
+
+    # Absolute log10(bar) from the printed value. The adapter applies its own
+    # buffer-or-Absolute convention and refuses an unapplied absolute fO2.
+    # Intrinsic engines receive no commanded pO2 and not the default -9.
+    if fo2_log is not None:
+        po2 = Po2Request(
+            mode=PO2_COMMANDED,
+            po2_bar=float(10.0 ** float(fo2_log)),
+        )
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            fO2_Pa=State.of(Decimal(str(100000.0 * 10.0 ** float(fo2_log)))),
+            total_pressure_Pa=pressure_pa,
+        )
+    else:
+        po2 = Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None)
+        prediction_identity = replace(
+            identity,
+            composition=material.composition_state,
+            total_pressure_Pa=pressure_pa,
+        )
+    cell = equilibrate_cell(
+        handle,
+        identity_battery_pot(
+            f"obs:{observation.observation_id}",
+            material.composition_wt,
+        ),
+        temperature_K=float(material.temperature),
+        po2=po2,
+        qualification=False,
+        isolated=isolated,
+        physical_pressure_bar=pressure_bar,
+    )
+    name = str(getattr(handle, "name", engine.value))
+    call_evidence = (
+        f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
+        f":exit={getattr(cell, 'exit_code', None)}"
+    )
+    model_id = getattr(cell, "model_id", None)
+    version = None if model_id is None else (str(model_id) or None)
+    status = getattr(cell, "status", None)
+    if status != "ok":
+        # The activity/vapour classifier in predict_with_engine stays on that
+        # path (OpenIMCC species, internal-analytical input reasons). Redox
+        # only separates an unavailable cell from an engine refusal.
+        typed = str(getattr(cell, "refusal_reason", None) or status or "unavailable")
+        engine_reason = str(getattr(cell, "engine_reason", None) or "")
+        unavailable = typed in {
+            REFUSAL_TIMEOUT,
+            REFUSAL_UNAVAILABLE,
+            REFUSAL_ENGINE_CRASH,
+            "subprocess_died",
+        } or getattr(cell, "exit_signal", None)
+        if unavailable:
+            return refused(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                {"refusal_reason": typed, "engine_reason": engine_reason},
+                execution_state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                call_evidence=call_evidence,
+                version=version,
+            )
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {"refusal_reason": typed, "engine_reason": engine_reason},
+            execution_state=ExecutionState.UNSUPPORTED,
+            call_evidence=call_evidence,
+            version=version,
+        )
+
+    ratio = _reported_engine_fe3_fe2_ratio(cell)
+    notices = cell_notices(Quantity.FE3_FE2_RATIO, engine, cell)
+    authority, certified_band = _flags_from_scored_cell(
+        cell, Authority.BRIDGE, None
+    )
+    if ratio is None:
+        return refused(
+            RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX,
+            {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value,
+                "engine": engine.value,
+                "detail": "equilibrium result has no FeO/Fe2O3 split and no Fe3Fet_Liq",
+            },
+            execution_state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+            identity_out=prediction_identity,
+            version=version,
+        )
+    if ratio is _FE_REDOX_RATIO_UNDEFINED or not isinstance(ratio, Decimal):
         return refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
+            execution_state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+            notices=notices,
+            identity_out=prediction_identity,
+            version=version,
         )
-
-    authority = Authority.BRIDGE
-    if not band["authoritative"]:
-        authority = Authority.EXTRAPOLATED
-    certified_band = {
-        "temperature_K": (
-            Decimal(str(KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15)),
-            Decimal(str(KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15)),
-        )
-    }
-    certified_band_text = (
-        f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-        f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-    )
-    notices: tuple[Notice, ...] = ()
-    if dropped_components and dropped_mass_fraction is not None:
-        notices = (
-            Notice(
-                kind=NoticeKind.COMPOSITION_PROJECTED,
-                affected_quantities=(Quantity.FE3_FE2_RATIO,),
-                reason=(
-                    "Kress91 oxide basis omits composition components: "
-                    f"{', '.join(dropped_components)}; "
-                    f"dropped_mass_fraction={dropped_mass_fraction:.6g}; "
-                    f"authority={authority.value}; certified_band={certified_band_text}"
-                ),
-                origin="simulator.fe_redox:melt_mol_fractions_for_kress91",
-                band=certified_band_text,
-                dropped=dropped_components,
-                dropped_mass_fraction=Decimal(str(dropped_mass_fraction)),
-                authority=authority,
-            ),
-        )
-    if not band["authoritative"]:
-        notices += (
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.FE3_FE2_RATIO,),
-                reason=(
-                    f"kress91_{band['status']}; authority={band['source']}; "
-                    f"calibrated_temperature_C=[{KRESS91_LIQUID_CALIBRATION_MIN_T_C:g},"
-                    f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C:g}]"
-                ),
-                origin="simulator.fe_redox:kress91_split",
-                band=(
-                    f"[{KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15:g}, "
-                    f"{KRESS91_LIQUID_CALIBRATION_MAX_T_C + 273.15:g}] K"
-                ),
-                authority=authority,
-            ),
-        )
-    prediction_identity = replace(
-        identity,
-        composition=composition_state,
-        fO2_Pa=State.of(Decimal(str(100000.0 * 10.0 ** float(fO2_log)))),
-        total_pressure_Pa=pressure_pa,
-    )
+    expanded = expand_coefficient_sources(melts_sources)
     return EnginePrediction(
         engine=engine,
         channel=channel,
         execution=Execution(
             state=ExecutionState.PRODUCED,
-            call_evidence="simulator.fe_redox:kress91_split",
+            call_evidence=call_evidence,
         ),
-        value=as_decimal(str(prediction_value)),
+        value=ratio,
         unit="dimensionless",
         authority=authority,
         notices=notices,
-        coefficient_sources=sources,
-        lineage_complete=False,
+        coefficient_sources=expanded,
+        lineage_complete=lineage_complete_for(melts_sources),
         certified_band=certified_band,
         identity=prediction_identity,
-        version="Kress-Carmichael-1991",
+        version=version,
     )
 
 
@@ -6049,7 +6460,6 @@ def predict_with_engine(
         assess_qualification_gate,
         equilibrate_cell,
         identity_battery_pot,
-        open_battery_engine,
     )
 
     quantity = quantity_token(observation.identity)
@@ -6075,7 +6485,14 @@ def predict_with_engine(
             observation,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
-        return _predict_fe_redox(engine, observation, identity, channel)
+        return _predict_fe_redox(
+            engine,
+            observation,
+            identity,
+            channel,
+            handles=handles,
+            isolated=isolated,
+        )
     if quantity in PHASE_COMPOSITION_QUANTITIES or quantity in PRINTED_CAPACITY_QUANTITIES:
         return _predict_phase_row(engine, observation, identity, channel, sources)
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
@@ -6767,23 +7184,7 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
-    handle_map = handles if handles is not None else {}
-    handle = handle_map.get(engine.value)
-    if handle is not None and (
-        not getattr(handle, "available", False)
-        or getattr(handle, "backend", None) is None
-    ):
-        if isinstance(handle_map, dict):
-            handle_map.pop(engine.value, None)
-        handle = None
-    if handle is None:
-        handle = open_battery_engine(engine.value)
-        if (
-            isinstance(handle_map, dict)
-            and getattr(handle, "available", False)
-            and getattr(handle, "backend", None) is not None
-        ):
-            handle_map[engine.value] = handle
+    handle = _open_cached_battery_handle(engine, handles)
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:

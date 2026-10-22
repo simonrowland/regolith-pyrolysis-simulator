@@ -1291,6 +1291,23 @@ def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
     assert match_reported_species("Na", {"Na": 0.08}) == ("Na", 0.08)
 
 
+def test_match_reported_species_accepts_exact_gas_suffix():
+    """SiO2_gas is the vapour adapter's oxide-collision name, not a fuzzy stem."""
+
+    from simulator.battery.score import match_reported_species
+
+    reported = {"SiO2_gas": 12.5, "Na": 0.08, "FeO_association_gas": 3.0}
+    assert match_reported_species("SiO2", reported) == ("SiO2_gas", 12.5)
+    assert match_reported_species("SiO2", reported, oxide_activity=True) is None
+    assert match_reported_species("SiO2", {"SiO2gas": 1.0}) is None
+    assert match_reported_species("SiO2", {"SiO2_gaseous": 1.0}) is None
+    assert match_reported_species("Na", reported) == ("Na", 0.08)
+    assert match_reported_species("FeO", reported) is None
+    assert match_reported_species("FeO", {"FeO_gas": 4.0}) == ("FeO_gas", 4.0)
+    both = {"SiO2": 1.5, "SiO2_gas": 12.5}
+    assert match_reported_species("SiO2", both) == ("SiO2", 1.5)
+
+
 def _fake_engine(monkeypatch, activities, gammas=None):
     opened: list[str] = []
 
