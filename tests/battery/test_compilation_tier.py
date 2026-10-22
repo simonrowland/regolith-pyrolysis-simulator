@@ -1685,7 +1685,6 @@ def test_ellingham_refuses_element_basis_mismatch_at_every_pressure() -> None:
         assert refused.refusal_detail["element"] == "Ca"
 
 
-_MNO_LIQUID_2200K = Decimal("-215.05499999999998")
 _MNO_CRYSTAL_1800K = Decimal("-248.185")
 
 
@@ -1704,23 +1703,32 @@ def _mno_identity(phase: Phase, temperature: str, metal_phase: Phase = Phase.L):
     )
 
 
-def test_ellingham_mno_liquid_label_answers_with_the_crystal_segment_coefficients() -> None:
-    """MnO(lit. liquid range) is parsed as liquid and returns the copied dG.
+def test_ellingham_mno_liquid_label_refuses_copied_crystal_coefficients() -> None:
+    """A liquid MnO identity does not receive the crystal neighbour's dH and dS.
 
-    Captured from predict_thermo_attempt. The crystal neighbour at 1800 K
-    is the segment those coefficients belong to. Solid MnO at 2200 K and
-    liquid MnO outside the label's range already refuse.
+    The crystal neighbour at 1800 K keeps that number. Solid MnO at 2200 K
+    and liquid MnO at 1800 K stay phase-incompatible. Liquid MnO above the
+    label's range stays an outside-segment refusal.
     """
 
-    liquid = _assert_ellingham_number(
-        "mno-liquid-2200",
-        _mno_identity(Phase.L, "2200"),
-        _MNO_LIQUID_2200K,
-        "ellingham:Mn:lit. liquid range:T=2200",
+    liquid = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "mno-liquid-2200",
+            "exp-1",
+            _mno_identity(Phase.L, "2200"),
+            Decimal("0"),
+        ),
     )
-    assert liquid.notices[0].reason == (
-        "Ellingham segment (2058.0, 2600.0) authority reconstructed_limited"
+    assert liquid.value is None
+    assert liquid.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert liquid.refusal_detail["reason"] == (
+        "ellingham-liquid-label-copies-crystal-coefficients"
     )
+    assert liquid.refusal_detail["observation_product_basis"] == "MnO(l)"
+    assert "MnO(lit. liquid range)" in liquid.refusal_detail["segment_phase_basis"]
+    assert "MnO(s)" in liquid.refusal_detail["crystal_neighbour_phase_basis"]
+    assert liquid.call_evidence == "ellingham:Mn:lit. liquid range:T=2200"
     crystal = _assert_ellingham_number(
         "mno-crystal-1800",
         _mno_identity(Phase.CR, "1800"),

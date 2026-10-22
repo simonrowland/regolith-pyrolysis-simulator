@@ -130,9 +130,10 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 class _Product:
     formula: str
     coeff: Fraction
-    phase: Phase
+    phase: Phase | None
     polymorph: str | None  # None = generic crystal or a fluid
     token: str
+    literature_note: bool = False  # citation text, not a phase
 
 
 @dataclass(frozen=True)
@@ -361,7 +362,7 @@ def _per_basis(identity: Identity) -> PerBasis | None:
 
 def _product_phase(token: str) -> tuple[Phase, str | None]:
     text = token.strip().lower()
-    if "liquid" in text or text == "l":
+    if text in {"liquid", "l"}:
         return Phase.L, None
     if text in {"g", "gas"}:
         return Phase.G, None
@@ -369,6 +370,12 @@ def _product_phase(token: str) -> tuple[Phase, str | None]:
     if specific in {"s", "cr", "c"}:
         return Phase.CR, None
     return Phase.CR, specific
+
+
+def _is_literature_phase_note(token: str) -> bool:
+    """``lit. liquid range`` cites a neighbour. It is not a phase token."""
+
+    return "lit." in token.strip().lower()
 
 
 def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
@@ -381,11 +388,51 @@ def _parse_product(segment: EllinghamFitSegment) -> _Product | None:
         float(coeff) - float(segment.n_ox)
     ) > 1e-9:
         return None
+    if _is_literature_phase_note(token):
+        return _Product(
+            formula,
+            coeff,
+            None,
+            None,
+            token.strip(),
+            literature_note=True,
+        )
     phase, polymorph = _product_phase(token)
     return _Product(formula, coeff, phase, polymorph, token.strip())
 
 
+def _crystal_coefficient_donor(
+    metal: str, segment: EllinghamFitSegment
+) -> str | None:
+    """Phase basis of a crystal neighbour whose dH and dS this segment copies.
+
+    Equality is the stored floats. The only such pair is the MnO
+    ``lit. liquid range`` segment and the MnO(s) segment below it; any
+    later pair is the same refusal.
+    """
+
+    for other in ELLINGHAM_FIT_SEGMENTS.get(metal, ()):
+        if other is segment:
+            continue
+        if (
+            other.dH_f_kJ_per_mol_O2 != segment.dH_f_kJ_per_mol_O2
+            or other.dS_f_kJ_per_mol_K_per_mol_O2
+            != segment.dS_f_kJ_per_mol_K_per_mol_O2
+        ):
+            continue
+        parsed = _parse_product(other)
+        if (
+            parsed is not None
+            and not parsed.literature_note
+            and parsed.phase is Phase.CR
+        ):
+            return other.phase_basis
+    return None
+
+
 def _phase_compatible(product: _Product, identity: Identity) -> bool:
+    if product.literature_note or product.phase is None:
+        return False
     if phase_token(identity.species) is not product.phase:
         return False
     if product.phase is not Phase.CR:
@@ -424,6 +471,37 @@ def _segment_element_bases(
         for formula, token in _PHASED_SPECIES_RE.findall(reactant_side)
         if formula != "O2"
     }
+
+
+def _ellingham_call(metal: str, product: _Product, temperature_K: Decimal) -> str:
+    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
+    if product.polymorph is None and product.phase is Phase.CR:
+        call += ":generic-solid"
+    return call
+
+
+def _outside_segment_refusal(
+    segment: EllinghamFitSegment,
+    temperature_K: Decimal,
+    *,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    """A clamped neighbour is a different reaction, not an extrapolated ΔfG."""
+
+    return _refuse(
+        RefusalReason.UNSUPPORTED,
+        "ellingham-formation-outside-segment",
+        quantity=quantity,
+        origin=origin,
+        extra={
+            "segment_range_K": [segment.range_K[0], segment.range_K[1]],
+            "temperature_K": str(temperature_K),
+            "phase_basis": segment.phase_basis,
+        },
+        call_evidence=call_evidence,
+    )
 
 
 def _element_reference_refusal(
@@ -605,6 +683,10 @@ def _ellingham_attempt(
     at every printed pressure including exactly 1 bar and a missing pressure.
     When the bases match and the printed pressure is some other positive
     value, the 1 bar fit is still shifted by Δν_g R T ln(p2/p1).
+
+    A product token that is a literature note (``lit. liquid range``) is
+    not a phase. If that segment's dH and dS are copied from a crystal
+    neighbour, a liquid-product identity is refused instead of answered.
     """
 
     if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
@@ -636,6 +718,7 @@ def _ellingham_attempt(
         )
     temperature = float(temperature_K)
     matches: list[tuple[str, EllinghamFitSegment, _Product, bool]] = []
+    copied_liquid: list[tuple[str, EllinghamFitSegment, _Product, bool, str]] = []
     formula_hit = False
     for metal in ELLINGHAM_FIT_SEGMENTS:
         segment = ellingham_segment_for_temperature(metal, temperature)
@@ -645,11 +728,41 @@ def _ellingham_attempt(
         if parse_species_formula(product.formula) != target:
             continue
         formula_hit = True
-        if not _phase_compatible(product, identity):
-            continue
         low, high = segment.range_K
         extrapolated = not (low <= temperature <= high)
+        if phase_token(identity.species) is Phase.L and (
+            product.literature_note or product.phase is Phase.L
+        ):
+            donor = _crystal_coefficient_donor(metal, segment)
+            if donor is not None:
+                copied_liquid.append((metal, segment, product, extrapolated, donor))
+                continue
+        if not _phase_compatible(product, identity):
+            continue
         matches.append((metal, segment, product, extrapolated))
+    if not matches and len(copied_liquid) == 1:
+        metal, segment, product, extrapolated, donor = copied_liquid[0]
+        call = _ellingham_call(metal, product, temperature_K)
+        if extrapolated:
+            return _outside_segment_refusal(
+                segment,
+                temperature_K,
+                quantity=quantity,
+                origin=origin,
+                call_evidence=call + ":outside-segment",
+            )
+        return _refuse(
+            RefusalReason.IDENTITY_MISMATCH,
+            "ellingham-liquid-label-copies-crystal-coefficients",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "observation_product_basis": f"{product.formula}({Phase.L.value})",
+                "segment_phase_basis": segment.phase_basis,
+                "crystal_neighbour_phase_basis": donor,
+            },
+            call_evidence=call,
+        )
     if not matches:
         return _refuse(
             RefusalReason.UNSUPPORTED,
@@ -669,21 +782,13 @@ def _ellingham_attempt(
             extra={"formulas": [item[0] for item in matches]},
         )
     metal, segment, product, extrapolated = matches[0]
-    call = f"ellingham:{metal}:{product.token}:T={temperature_K}"
-    if product.polymorph is None and product.phase is Phase.CR:
-        call += ":generic-solid"
+    call = _ellingham_call(metal, product, temperature_K)
     if extrapolated:
-        # Neighbouring-segment reaction dG is a different reference state.
-        return _refuse(
-            RefusalReason.UNSUPPORTED,
-            "ellingham-formation-outside-segment",
+        return _outside_segment_refusal(
+            segment,
+            temperature_K,
             quantity=quantity,
             origin=origin,
-            extra={
-                "segment_range_K": [segment.range_K[0], segment.range_K[1]],
-                "temperature_K": str(temperature_K),
-                "phase_basis": segment.phase_basis,
-            },
             call_evidence=call + ":outside-segment",
         )
 
