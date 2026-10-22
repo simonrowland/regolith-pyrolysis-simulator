@@ -35,6 +35,7 @@ from engines.builtin.evaporation_flux import (
 )
 from engines.builtin.vapor_pressure import (
     FIT_TARGET_STANDARD_REACTION,
+    VaporPressureComputationError,
     vapor_pressure_antoine_coefficients,
 )
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
@@ -323,11 +324,36 @@ def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
             "builtin vapor-pressure provider for an effective P_eq."
         )
     antoine, _ = vapor_pressure_antoine_coefficients(row, temperature_K=T_K)
-    A = float(antoine.get("A", 0.0))
-    B = float(antoine.get("B", 0.0))
-    C = float(antoine.get("C", 0.0))
-    if A <= 0.0 or T_K <= 0.0:
-        return 0.0
+    try:
+        A, B, C = (float(antoine[key]) for key in ("A", "B", "C"))
+    except KeyError as exc:
+        raise VaporPressureComputationError(
+            "missing_antoine_coefficient: "
+            f"species={species} coefficient={exc.args[0]}"
+        ) from exc
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise VaporPressureComputationError(
+            f"invalid_antoine_coefficient: species={species}"
+        ) from exc
+
+    for name, value in (("A", A), ("B", B), ("C", C)):
+        if not math.isfinite(value):
+            raise VaporPressureComputationError(
+                "nonfinite_antoine_coefficient: "
+                f"species={species} coefficient={name} value={value!r}"
+            )
+
+    try:
+        valid_temperature = math.isfinite(T_K) and T_K > 0.0
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise VaporPressureComputationError(
+            f"invalid_antoine_temperature: species={species} T_K={T_K!r}"
+        ) from exc
+    if not valid_temperature:
+        raise VaporPressureComputationError(
+            f"invalid_antoine_temperature: species={species} T_K={T_K!r}"
+        )
+
     log10_p = _antoine_log10_pressure(A, B, C, T_K)
     return 10.0 ** log10_p
 

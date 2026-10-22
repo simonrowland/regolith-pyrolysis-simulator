@@ -31,6 +31,18 @@ _SIO_VAPOR_DATA = {
 }
 
 
+def test_sio_diagnostic_continues_below_declared_reference():
+    pressure, factor = volatility_module._oxide_vapor_pressure_Pa(
+        species="SiO", data={"pO2_reference_bar": 1e-9},
+        P_reference_Pa=100.0, oxide_activity=1.0, activity_exponent=1.0,
+        pO2_bar=1e-12, vacuum_floor_bar=1e-12,
+    )
+    # Three oxygen decades below the fitted reference give +1.5 pressure
+    # decades for SiO2 -> SiO + 1/2 O2. Environmental floors do not retune it.
+    assert pressure == pytest.approx(100.0 * 10.0 ** 1.5)
+    assert factor == pytest.approx(10.0 ** 1.5)
+
+
 class StubActivitySource:
     def __init__(self, by_pressure: dict[float, dict[str, float]]):
         self.by_pressure = by_pressure
