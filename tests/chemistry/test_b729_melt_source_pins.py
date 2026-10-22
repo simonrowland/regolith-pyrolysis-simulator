@@ -17,6 +17,34 @@ FEEDSTOCKS = (
     "mars_basalt", "s_type_asteroid_silicate", "ci_carbonaceous_chondrite",
 )
 TEMPERATURES_K = (1800.0, 2400.0)
+
+
+def test_b984_sio_fallback_consolidation_pin(vapor_pressure_data):
+    """Exact pre-consolidation outputs at and above the fitted oxygen reference."""
+    from simulator.diagnostic_helpers.alphamelts_volatility import _oxide_vapor_pressure_Pa
+
+    backend = AlphaMELTSBackend()
+    reference = float.fromhex("0x1.67e4168316334p+1")
+    expected = (
+        "0x1.67e4168316334p+1", "0x1.c73ae5bb39380p-1",
+        "0x1.7087420f72e4ap-9", "0x1.2a56ee89ef987p-17",
+    )
+    rows = [[], [], []]
+    for oxygen in (1e-9, 1e-8, 1e-3, 100.0):
+        rows[0].append(effective_equilibrium_pressure_Pa(
+            "SiO", 1873.15, oxygen, vapor_pressure_data=vapor_pressure_data,
+        ).hex())
+        rows[1].append(backend._activities_times_antoine(
+            1600.0, {"SiO2": 1.0}, {"SiO2": 100.0}, pO2_bar=oxygen,
+        )["SiO"].hex())
+        rows[2].append(_oxide_vapor_pressure_Pa(
+            species="SiO", data={}, P_reference_Pa=reference,
+            oxide_activity=1.0, activity_exponent=1.0,
+            pO2_bar=oxygen, vacuum_floor_bar=1e-9,
+        )[0].hex())
+    assert all(tuple(row) == expected for row in rows)
+
+
 # b-729: 2400 K uses the catalog's flagged physical continuation.
 PRESSURE_PINS = {
     ("lunar_mare_low_ti", 1800.0): ("0x1.4b6e943922b7cp-30", "0x1.4b6e943922b7cp-30", "0x1.839f19a7d90c9p-28", "0x1.839f19a7d90c9p-28"),

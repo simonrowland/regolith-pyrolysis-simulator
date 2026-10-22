@@ -88,7 +88,9 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
         def _build_chemistry_kernel(self):
             return None
 
-        def _refresh_vapor_pressures_from_kernel(self, equilibrium, *, simulation_hour):
+        def _refresh_vapor_pressures_from_kernel(
+            self, equilibrium, *, simulation_hour, observation_pO2_bar
+        ):
             assert simulation_hour == self.melt.hour + 1
             equilibrium.vapor_pressures_Pa = {"SiO": 1.0}
             equilibrium.vapor_pressures_source = {
@@ -120,6 +122,39 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
         cell_score_authority(SimpleNamespace(authority=authority), refused=False)
         != "certified"
     )
+
+
+def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from engines.vaporock.provider import VapoRockProvider
+
+    # This receipt concerns builtin transport, independent of native shadow boot.
+    monkeypatch.setattr(VapoRockProvider, '_ensure_backend', lambda self: None)
+
+    receipts = []
+    dispatch = BuiltinVaporPressureProvider.dispatch
+
+    def capture(provider, request):
+        result = dispatch(provider, request)
+        receipts.append((request, result))
+        return result
+
+    monkeypatch.setattr(BuiltinVaporPressureProvider, 'dispatch', capture)
+    oxygen = 1.3e-12
+    cell = equilibrate_cell(
+        open_battery_engine('internal-analytical'),
+        BinaryPot('observation', None, 'transport receipt', {'SiO2': 90., 'FeO': 10.}),
+        temperature_K=1873.15,
+        po2=Po2Request(mode='commanded', po2_bar=oxygen),
+        isolated=False,
+    )
+    assert cell.status == 'ok', cell.engine_reason
+    request, result = receipts[-1]
+    assert request.control_inputs['pO2_bar'] == oxygen
+    assert result.diagnostic['pO2_bar'] == oxygen
+    assert request.fO2_log == math.log10(oxygen)
+    assert request.control_inputs['intrinsic_fO2_log'] == math.log10(oxygen)
+    assert request.control_inputs['vacuum_floor_bar'] == 1e-9
 
 
 def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> None:

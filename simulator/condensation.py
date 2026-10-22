@@ -1870,6 +1870,18 @@ def _knudsen_input_refusal(
     })
 
 
+def _require_knudsen_pipe_diameter(value: Any, field: str) -> float:
+    try:
+        return require_lab_pipe_diameter(value, field)
+    except LabGeometryError as exc:
+        raise _knudsen_input_refusal(
+            reason=INVALID_PIPE_DIAMETER_REASON,
+            field=field,
+            value=value,
+            detail=str(exc),
+        ) from exc
+
+
 # Condensation temperatures at ~1 mbar partial pressure (°C).
 # Used to determine where each species preferentially deposits in the
 # routing logic (``_species_condensation_temperature_C``).
@@ -7190,7 +7202,7 @@ def minimum_pressure_mbar_for_knudsen(
     ceiling = float(knudsen_ceiling)
     if not math.isfinite(ceiling) or ceiling <= 0.0:
         raise ValueError('knudsen_ceiling must be finite and positive')
-    fallback_diameter_m = require_lab_pipe_diameter(
+    fallback_diameter_m = _require_knudsen_pipe_diameter(
         pipe_diameter_m,
         'pipe_diameter_m',
     )
@@ -7199,7 +7211,7 @@ def minimum_pressure_mbar_for_knudsen(
         name = str(getattr(segment, 'name', 'default_pipe'))
         lengths.append((
             name,
-            require_lab_pipe_diameter(
+            _require_knudsen_pipe_diameter(
                 getattr(segment, 'inner_diameter_m', fallback_diameter_m),
                 f'{name}.inner_diameter_m',
             ),
@@ -7249,7 +7261,7 @@ def _knudsen_regime_factor(knudsen_number: float) -> float:
 
 
 def _invalid_pipe_diameter_diagnostic(
-    exc: LabGeometryError,
+    exc: KnudsenRegimeRefusal,
     *,
     field: str,
     raw_value: Any,
@@ -7279,7 +7291,7 @@ def _invalid_pipe_diameter_diagnostic(
         'status': 'refused',
         'reason': INVALID_PIPE_DIAMETER_REASON,
         'reason_refused': INVALID_PIPE_DIAMETER_REASON,
-        'detail': str(exc),
+        'detail': str(exc.diagnostic.get('detail') or exc),
         'field': field,
         'regime': 'invalid',
         'knudsen_number': None,
@@ -7361,9 +7373,9 @@ def knudsen_regime_diagnostic(
         carrier_diagnostic['carrier_collision_diameter_m']
     )
     try:
-        fallback_diameter_m = require_lab_pipe_diameter(
+        fallback_diameter_m = _require_knudsen_pipe_diameter(
             pipe_diameter_m, 'pipe_diameter_m')
-    except LabGeometryError as exc:
+    except KnudsenRegimeRefusal as exc:
         return _invalid_pipe_diameter_diagnostic(
             exc,
             field='pipe_diameter_m',
@@ -7404,9 +7416,9 @@ def knudsen_regime_diagnostic(
             segment, 'inner_diameter_m', fallback_diameter_m)
         segment_name = str(getattr(segment, 'name', 'default_pipe'))
         try:
-            diameter_m = require_lab_pipe_diameter(
+            diameter_m = _require_knudsen_pipe_diameter(
                 raw_diameter_m, f'{segment_name}.inner_diameter_m')
-        except LabGeometryError as exc:
+        except KnudsenRegimeRefusal as exc:
             return _invalid_pipe_diameter_diagnostic(
                 exc,
                 field=f'{segment_name}.inner_diameter_m',

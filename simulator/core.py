@@ -7382,6 +7382,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pressure_bar: float,
         fO2_log: float,
     ) -> Dict[str, Any]:
+        from simulator.accounting.formulas import project_oxide_composition
+
         x = melt_mol_fractions_for_kress91(comp)
         if not x:
             return {
@@ -7405,25 +7407,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fe3 = kress_split['fe3']
         x_fe2o3 = kress_split['x_fe2o3']
         x_feo = kress_split['x_feo']
-        weighted_total = (
-            x.get('SiO2', 0.0) * 60.0843
-            + x.get('TiO2', 0.0) * 79.8788
-            + x.get('Al2O3', 0.0) * 101.961
-            + x.get('MnO', 0.0) * 70.9375
-            + x.get('MgO', 0.0) * 40.3044
-            + x.get('CaO', 0.0) * 56.0774
-            + x.get('Na2O', 0.0) * 61.9789
-            + x.get('K2O', 0.0) * 94.196
-            + x.get('P2O5', 0.0) * 141.937
-            + x_fe2o3 * 159.687
-            + x_feo * 71.844
+        redox_oxide_moles = {
+            oxide: amount
+            for oxide, amount in x.items()
+            if oxide not in {'FeOt', 'FeO', 'Fe2O3'}
+        }
+        redox_oxide_moles.update({'Fe2O3': x_fe2o3, 'FeO': x_feo})
+        mass_fractions = project_oxide_composition(
+            redox_oxide_moles,
+            source_basis='moles',
         )
-        if weighted_total <= 0.0:
-            fe2o3_wt = 0.0
-            feo_wt = 0.0
-        else:
-            fe2o3_wt = 100.0 * x_fe2o3 * 159.687 / weighted_total
-            feo_wt = 100.0 * x_feo * 71.844 / weighted_total
+        fe2o3_wt = 100.0 * mass_fractions.get('Fe2O3', 0.0)
+        feo_wt = 100.0 * mass_fractions.get('FeO', 0.0)
         return {
             'status': 'ok',
             'fe3_over_sigma_fe': fe3,
@@ -9851,6 +9846,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         include_diagnostic_shadows: bool = True,
         simulation_hour: int | None = None,
+        observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
@@ -9949,7 +9945,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
-        pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
+        # A reproduction cell binds measured transport oxygen. Simulated
+        # headspace controls still use their environment and quantization owner.
+        pO2_bar = (
+            self._vapor_pressure_dispatch_pO2_bar()
+            if observation_pO2_bar is None else observation_pO2_bar
+        )
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -10005,6 +10006,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         dispatch_kwargs = {
             'control_inputs': {
                 'pO2_bar': pO2_bar,
+                **({'pO2_admission': 'observation'}
+                   if observation_pO2_bar is not None else {}),
                 'intrinsic_fO2_log': intrinsic_fO2_log,
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
