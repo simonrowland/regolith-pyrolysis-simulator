@@ -94,6 +94,8 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     PerBasis,
     Phase,
+    PhaseRole,
+    PHASE_BASIS_TOKENS,
     PolymorphRejectionKind,
     Quantity,
     RefusalReason,
@@ -340,6 +342,8 @@ _AXIS_NAMES = (
     "exposure",
     "sample_mass_kg",
     "wall",
+    "phase_role",
+    "counter_phase_role",
 )
 
 # These printed axes can be retained on p_partial rows but do not describe the
@@ -651,6 +655,8 @@ class Identity:
     sample_mass_kg: State[Decimal] | None = None
     wall: State[WallIdentity] | None = None
     valence_basis: State[ValenceBasis] | None = None
+    phase_role: State[PhaseRole] | None = None
+    counter_phase_role: State[PhaseRole] | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.quantity, Quantity):
@@ -710,6 +716,16 @@ class Identity:
                 "sample_mass_kg",
                 State.of(as_decimal(self.sample_mass_kg.value)),
             )
+        self._coerce_phase_role("phase_role")
+        self._coerce_phase_role("counter_phase_role")
+
+    def _coerce_phase_role(self, name: str) -> None:
+        state = getattr(self, name)
+        if state is None or not isinstance(state, State) or not state.is_value:
+            return
+        if isinstance(state.value, PhaseRole):
+            return
+        object.__setattr__(self, name, State.of(PhaseRole(str(state.value))))
 
 
 @dataclass(frozen=True)
@@ -1007,11 +1023,101 @@ def profile_for(identity: Identity) -> QuantityProfile:
         # assumed geometry remains prediction provenance rather than identity.
         na("fO2_Pa")
     elif q is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
-        req("temperature_K", "subtype")
+        # Two populations share this token. A closed phase basis is a printed
+        # phase-composition row (t-1413). Any other subtype is an equilibrium
+        # ratio (Darken–Gurry r, pCO2/pCO) whose composition and pressure
+        # axes are not the measured state.
+        subtype = (
+            str(identity.subtype.value)
+            if identity.subtype is not None
+            and identity.subtype.is_value
+            and identity.subtype.value is not None
+            else ""
+        )
+        if subtype in PHASE_BASIS_TOKENS:
+            # Printed total pressure is an input. Marking it not-applicable
+            # drops the experiment registry point before the scorer can read it.
+            req(
+                "temperature_K",
+                "subtype",
+                "phase_role",
+                "composition",
+                "fO2_Pa",
+                "total_pressure_Pa",
+            )
+            na(
+                "counter_phase_role",
+                "per",
+                "standard_pressure_Pa",
+                "reaction",
+                "formation_elements",
+                "reference_state",
+                "reservoir",
+                "sweep_gas",
+                "exposure",
+                "sample_mass_kg",
+                "wall",
+            )
+        else:
+            req("temperature_K", "subtype")
+            na(
+                "per",
+                "standard_pressure_Pa",
+                "reaction",
+                "formation_elements",
+                "reference_state",
+                "composition",
+                "fO2_Pa",
+                "total_pressure_Pa",
+                "sweep_gas",
+                "exposure",
+                "sample_mass_kg",
+                "wall",
+                "reservoir",
+            )
+    elif q is Quantity.DISTRIBUTION_RATIO:
+        req(
+            "temperature_K",
+            "subtype",
+            "phase_role",
+            "counter_phase_role",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+        )
         na(
-            "per", "standard_pressure_Pa", "reaction", "formation_elements",
-            "reference_state", "composition", "fO2_Pa", "total_pressure_Pa",
-            "sweep_gas", "exposure", "sample_mass_kg", "wall", "reservoir",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+        )
+    elif q in {Quantity.SULFIDE_CAPACITY, Quantity.CHLORIDE_CAPACITY}:
+        req(
+            "temperature_K",
+            "phase_role",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+        )
+        na(
+            "subtype",
+            "counter_phase_role",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
         )
     elif q in {
         Quantity.VISCOSITY,

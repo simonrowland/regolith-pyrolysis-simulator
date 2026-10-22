@@ -18,6 +18,7 @@ from __future__ import annotations
 from typing import Dict, Iterable, List, Mapping, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
+from simulator.scalar_boundary import is_finite
 from simulator.state import OXIDE_SPECIES
 
 # Native melt activities exposed by the ig database. These are standard
@@ -136,7 +137,7 @@ class MAGEMinDomainGate:
 
         normalized: Dict[str, float] = {}
         for species, value in composition_wt_pct.items():
-            if not _is_finite(value):
+            if not is_finite(value):
                 continue
             normalized_name = _canonical_domain_species(species)
             normalized[normalized_name] = (
@@ -213,14 +214,6 @@ class MAGEMinDomainGate:
     def forbidden_species() -> Iterable[str]:
         """Return the species that disqualify a composition from MAGEMin."""
         return _FORBIDDEN_SPECIES
-
-
-def _is_finite(value: object) -> bool:
-    try:
-        numeric = float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return False
-    return numeric == numeric and numeric not in (float('inf'), float('-inf'))
 
 
 def _canonical_domain_species(name: object) -> str:

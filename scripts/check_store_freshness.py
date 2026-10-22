@@ -163,6 +163,17 @@ CODE_INPUTS = (
 #     store. A full regen at a571c4a70 was byte-identical to store commit
 #     d6fad0b93 (rows_in=51641 observations=128946 works=371 experiments=3863
 #     queue=88788 hard_issues=3268; git diff empty under store outputs).
+#   c21acfc5d, 6ba1b9771: t-1424 public battery tools. c21acfc5d names the
+#     residual-key spellings in simulator/battery/score.py, shares its key
+#     splitter with pins.py, and gives compilation_tier.py the shared
+#     no-headline rail token (same strings throughout). 6ba1b9771
+#     streams residual ledgers through iter_residual_payloads in score.py for
+#     scripts/battery_residuals_report.py. Migration's only import from these
+#     modules is the unchanged parse_species_formula, and neither commit
+#     touches scripts/battery_migrate.py, migrate.py, validate.py or data/.
+#     The landing train's full regen of b148 (on green 850a09e93) was a fixed
+#     point. This acknowledges STORE outputs only; the key and report changes
+#     are covered by the commits' tests.
 #   f74ef7a6f: scan-only parser; corpus census 24 source_form strings, 0 verdict changes.
 #     The census compared 29 occurrences across repo data and battery store
 #     inputs with the green implementation. This is the store-neutrality
@@ -175,6 +186,12 @@ CODE_INPUTS = (
 #     commit equals the tip, so no store change. This acknowledges STORE
 #     outputs only; the projection value moves (d-195) are covered by the
 #     commit's tests.
+#   7e0508bb5, b37e28bac, 297df02b9: t-1413 (d-223), printed phase
+#     compositions, distribution ratios and S/Cl capacities. They add the
+#     enums, identity axes, migrate readers and score.py paths for those rows.
+#     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
+#     studio-3) was a fixed point: no store change. This acknowledges STORE
+#     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -189,8 +206,10 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
     "9364d3828",
     "b1d82d91d", "a571c4a70",
+    "c21acfc5d", "6ba1b9771",
     "f74ef7a6f",
     "d6ccae4b4",
+    "7e0508bb5", "b37e28bac", "297df02b9",
 })
 
 
