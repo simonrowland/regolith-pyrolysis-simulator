@@ -97,6 +97,19 @@ def test_relative_spelling_validates_clean(form: str) -> None:
     assert vle.validate_extract_document(doc, expected_source_id="probe") == []
 
 
+def test_relative_docs_private_source_path_is_refused() -> None:
+    doc = yaml.safe_load(_text("quoted", "docs-private/research/ocr-repair/table.md"))
+    errors = vle.validate_extract_document(doc, expected_source_id="probe")
+    assert len(errors) == 1
+    assert "source_path" in errors[0]
+    assert "docs-private path refused" in errors[0]
+
+
+def test_corpus_text_source_path_validates_clean() -> None:
+    doc = yaml.safe_load(_text("quoted", "text/probe/ocr-repair/table.md"))
+    assert vle.validate_extract_document(doc, expected_source_id="probe") == []
+
+
 @pytest.mark.parametrize("form", ["quoted", "gibson_anchor_alias"])
 def test_validate_all_refuses_one_extract(tmp_path: Path, form: str) -> None:
     probe = tmp_path / "probe.yaml"
@@ -141,6 +154,15 @@ def test_repo_extracts_carry_no_absolute_path_values() -> None:
     assert offenders == [], "\n".join(offenders[:20])
 
 
+def test_repo_extracts_carry_no_private_path_values() -> None:
+    """Whole tree uses the same key owner and parsed walk as the hard gate."""
+    offenders: list[str] = []
+    for path in vle.discover_extracts():
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        offenders.extend(vle._private_path_value_errors(doc, path.name))
+    assert offenders == [], "\n".join(offenders[:20])
+
+
 # Every key in PATH_VALUE_KEYS, read from the validator (the one definition;
 # no copy of the set lives here). Each spelling plants exactly one absolute
 # value under ``extraction`` so it is the only thing wrong with the probe.
@@ -155,6 +177,7 @@ _PLANT_FORMS = {
 }
 _PLANT_ABS = "/opt/probe/regolith-corpus/raw/probe/t1.csv"
 _PLANT_REL = "tables/probe/t1.csv"
+_PLANT_PRIVATE = "docs-private/research/repair/table.md"
 
 
 def _planted_doc(key: str, form: str, value: str) -> dict:
@@ -173,6 +196,18 @@ def test_absolute_value_on_every_path_key_is_refused(key: str, form: str) -> Non
     assert len(refused) == 1, errors
     assert f"extraction.{key}" in refused[0]
     assert _PLANT_ABS in refused[0]
+    assert errors == refused  # the refusal is the only error, not buried
+
+
+@pytest.mark.parametrize("form", sorted(_PLANT_FORMS))
+@pytest.mark.parametrize("key", sorted(vle.PATH_VALUE_KEYS))
+def test_private_value_on_every_path_key_is_refused(key: str, form: str) -> None:
+    doc = _planted_doc(key, form, _PLANT_PRIVATE)
+    errors = vle.validate_extract_document(doc, expected_source_id="probe")
+    refused = [e for e in errors if "docs-private path refused" in e]
+    assert len(refused) == 1, errors
+    assert f"extraction.{key}" in refused[0]
+    assert _PLANT_PRIVATE in refused[0]
     assert errors == refused  # the refusal is the only error, not buried
 
 

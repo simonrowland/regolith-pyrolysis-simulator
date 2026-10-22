@@ -7,13 +7,13 @@ source:
   url: https://doi.org/10.2343/geochemj.17.111
   year: 1983
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract; WB-2 2026-09-06 Tables
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 free-evap geometry extract; WB-2 2026-09-06 Tables; validated in an internal review, 2026-09-19, ocr-artifacts
     1–7 transcribed from 200 dpi pdftoppm of the J-STAGE PDF (parent observation objects retained; new
     observation_ids only). Figure "~" grids not used as data. 2026-09-19 laboratory-parameter harvest from
     the J-STAGE PDF text layer (pdftotext; no OCR) of Hashimoto's own EXPERIMENTS section.
   date: '2026-09-19'
   worker: harvest-hashimoto-1983
-  provenance_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/
+  provenance_path: raw/kems-015-hashimoto-1983/kems-015-hashimoto-1983.pdf
 review_status: draft
 benches:
 - id: graphite-vacuum-furnace
@@ -4382,7 +4382,7 @@ species:
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
         line_range: 33-90
         figure: '1'
@@ -4695,7 +4695,7 @@ species:
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         paragraph: molten spherule free evaporation graphite crucible
       T_range_K:
       - 1973.0
@@ -4756,7 +4756,7 @@ species:
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: ABSTRACT
         line_range: '11'
         note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
@@ -13266,7 +13266,7 @@ species:
     - observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: RESULTS AND DISCUSSION
         line_range: 883-927
         note: CaO and Al2O3 become enriched in residues as more volatile components are lost
@@ -13297,7 +13297,7 @@ species:
     - observation_id: hashimoto_1983_stage_iv_cao_relative_volatility
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: RESULTS AND DISCUSSION
         line_range: 927-937
         note: Stage-IV CaO volatility reported as about one third of SiO2; thermodynamic estimate 0.36
@@ -18035,7 +18035,7 @@ species:
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
         line_range: 33-90
       T_range_K:
@@ -18054,7 +18054,7 @@ species:
         cell_material:
           value: graphite crucible
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Graphite crucible
             line_range: 70-74
         sample_surface_area:
@@ -18062,14 +18062,14 @@ species:
             form: molten_spherule
             numeric_m2_series: null
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: single spherules
             line_range: '90'
     - observation_id: hashimoto_1983_mg_geometry_class_b1
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         paragraph: molten spherule free evaporation graphite crucible
       T_range_K:
       - 1973.0
@@ -18098,7 +18098,7 @@ species:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: graphite crucible
         sample_surface_area:
           value:
@@ -18110,7 +18110,7 @@ species:
             numeric_m2_series: null
             note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
         chamber_pressure:
           value: 0.0001
@@ -23025,7 +23025,7 @@ species:
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         section: EXPERIMENTS
         line_range: 33-90
       T_range_K:
@@ -23045,14 +23045,14 @@ species:
         cell_material:
           value: graphite crucible
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: Graphite crucible
             line_range: 70-74
     - observation_id: hashimoto_1983_sio_geometry_class_b1
       experiment: fcmas-free-evap-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         paragraph: molten spherule free evaporation graphite crucible
       T_range_K:
       - 1973.0
@@ -23081,7 +23081,7 @@ species:
         cell_material:
           value: high-purity graphite crucible (atomic-pile grade)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: graphite crucible
         sample_surface_area:
           value:
@@ -23093,7 +23093,7 @@ species:
             numeric_m2_series: null
             note: Source states preform dimensions but does not tabulate the evolving molten-spherule area.
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+            source_path: text/kems-015-hashimoto-1983/mineru/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
             paragraph: starting preform height 4 mm diameter 4 mm
         chamber_pressure:
           value: 0.0001

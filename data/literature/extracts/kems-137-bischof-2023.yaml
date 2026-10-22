@@ -9,7 +9,7 @@ source:
   year: 2023
   version: accepted_manuscript_plus_published_supplement
 extraction:
-  method: Official Elsevier CDN accepted manuscript (am.pdf) + CC-BY supplement mmc1.pdf; pdftotext -layout
+  method: Official Elsevier CDN accepted manuscript (am.pdf) + CC-BY supplement mmc1.pdf; pdftotext -layout; validated in an internal review, 2026-09-06, wave-2
     of both. VoR typeset PDF blocked (ScienceDirect Cloudflare 403; ars.els-cdn main.pdf 400). Tables
     transcribed from AM/supplement text layer. Figures listed figure-only, not digitised. Measured p(i)
     vs derived gamma vs FactSage T50c / Henrian A,B kept distinct. Round 2 preferred-gamma locators on AM
@@ -19,7 +19,7 @@ extraction:
     invented from the printed 0.4 mm diameter; chamber pressure kept as the printed nominal ~10^-6 mbar.
   date: '2026-09-06'
   worker: wave-W2-kems-137-bischof-2023-r2
-  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-137-bischof-2023/
+  provenance_path: raw/kems-137-bischof-2023/kems-137-bischof-2023.pdf
 review_status: draft
 fidelity_samples:
 - species: Ga

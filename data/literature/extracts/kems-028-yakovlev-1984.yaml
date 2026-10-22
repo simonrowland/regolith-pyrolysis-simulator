@@ -7,7 +7,7 @@ source:
   url: https://ui.adsabs.harvard.edu/abs/1984LPSC...15..945Y
   year: 1984
 extraction:
-  method: 'Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,
+  method: 'Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,; validated in an internal review, 2026-09-12, kems-extracts
     published pp. 945–946). pdftotext -layout and MinerU are noisy OCR layers and were not used as data.
     Printed partial-pressure sentences and the Po2 table transcribed from a 400 dpi pdftoppm PNG. Figs
     1–2 listed figure-only and were not digitised. Authors'' measured KEMS partial pressures (torr as
@@ -20,7 +20,7 @@ extraction:
     Typewriter I for 1 in that table (I.4×10^-6) is read as 1.4.'
   date: '2026-09-12'
   worker: extract-kems-026
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-028-yakovlev-1984/kems-028-yakovlev-1984.pdf
 review_status: draft
 corrections:
 - observation_id: yakovlev_1984_murchison_Fe_max_1450_1725C

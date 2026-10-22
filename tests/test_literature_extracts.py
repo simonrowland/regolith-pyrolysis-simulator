@@ -1526,6 +1526,42 @@ def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch)
     )
 
 
+@pytest.mark.parametrize(
+    "companion_yaml",
+    [
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: docs-private/research/repair.md
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: [docs-private/research/repair.md]
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: &private_path docs-private/research/repair.md
+- provenance:
+    source_path: *private_path
+""",
+    ],
+    ids=("nested", "list", "alias"),
+)
+def test_refuses_private_path_on_companion(tmp_path: Path, monkeypatch, companion_yaml):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    path.write_text(companion_yaml, encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any("docs-private path refused" in error for error in errors)
+
+
 def test_refuses_companion_table_with_unprefixed_filename(
     tmp_path: Path, monkeypatch
 ):
@@ -3382,9 +3418,7 @@ def test_cea_source_ref_and_relative_provenance():
     """Null-hypothesis (P2): Ag source_ref_code truncated; absolute Dropbox path."""
     c = load_cached_safe_yaml((EXTRACTS / "nasa-cea-thermo.yaml").read_text(encoding="utf-8"))
     assert c["species"]["Ag"]["observations"][0]["values"]["source_ref_code"] == "g10/97"
-    prov = c["extraction"]["provenance_path"]
-    assert not prov.startswith("/")
-    assert "docs-private" in prov
+    assert c["extraction"]["provenance_path"] == "raw/nasa-cea-thermo/nasa-cea-thermo.pdf"
 
 
 def test_lh84_top_level_payloads_not_empty():

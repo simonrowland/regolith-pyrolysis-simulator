@@ -9,7 +9,7 @@ source:
   year: 1993
   corpus_source_id: banya-hino-nagasaka-1993-hydroxyl
 extraction:
-  method: Manual transcription from 300 dpi pdftoppm renders plus pdftotext -layout of the J-STAGE PDF
+  method: Manual transcription from 300 dpi pdftoppm renders plus pdftotext -layout of the J-STAGE PDF; validated in an internal review, 2026-09-06, deepening
     (regolith-corpus raw/banya-hino-nagasaka-1993-hydroxyl). No MinerU. Table 1 is a bibliographic system
     list (no physical quantities; not typed). Tables 2–3 and numbered equations with printed coefficients
     transcribed from page renders. Figures 1–10 recorded figure_only except coefficients printed on the
@@ -17,7 +17,8 @@ extraction:
     values from other columns, no reading points off plots.
   date: '2026-09-07'
   worker: new-extract-banya-hydroxyl
-  provenance_path: docs-private/research/2026-09-06-deepening/NEW-banya-hydroxyl-1993.md
+  provenance_path: raw/banya-hino-nagasaka-1993-hydroxyl/banya-hino-nagasaka-1993-hydroxyl.pdf
+
 review_status: draft
 fidelity_samples:
 - species: H2O

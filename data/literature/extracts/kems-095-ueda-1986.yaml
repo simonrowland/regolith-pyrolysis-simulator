@@ -7,7 +7,7 @@ source:
   url: https://doi.org/10.2320/jinstmet1952.50.12_1081
   year: 1986
 extraction:
-  method: Official J-STAGE OA PDF (raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf). Japanese body with
+  method: Official J-STAGE OA PDF (raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf). Japanese body with; validated in an internal review, 2026-09-12, kems-extracts
     English abstract, table captions, and figure captions. pdftotext -layout is a noisy OCR layer and
     is not data. Tables 1-2 transcribed from 400 dpi pdftoppm renders of PDF pages 3 and 5 (published
     pp. 1083, 1085). Where the decode and the render disagree, the render wins. Table 2 B (binary, ignore
@@ -15,7 +15,7 @@ extraction:
     prose beyond captions/numerals recorded as unseen.
   date: '2026-09-13'
   worker: extract-alloys-b1
-  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+  provenance_path: raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf
 review_status: draft
 corrections: []
 benches:

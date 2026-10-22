@@ -5,10 +5,10 @@ source:
     loss. PDF in docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf
   year: 2021
 extraction:
-  method: pdftotext -layout + visual certification of Tables 1–4 (PDF pp. 71–74); Studio-2 MinerU not ready; no figure digitization
+  method: pdftotext -layout + visual certification of Tables 1–4 (PDF pp. 71–74); Studio-2 MinerU not ready; no figure digitization; validated in an internal review, 2026-08-27, ocr-repair
   date: '2026-08-27'
   worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/
+  provenance_path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
 review_status: draft
 fidelity_samples:
 - species: Na
@@ -1165,7 +1165,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1400C0m1
@@ -1216,7 +1216,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1400C15m
@@ -1267,7 +1267,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1400C30m
@@ -1318,7 +1318,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1400C60m
@@ -1369,7 +1369,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1400C90m
@@ -1420,7 +1420,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1200C0h2
@@ -1471,7 +1471,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1200C1h
@@ -1522,7 +1522,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1200C4h
@@ -1573,7 +1573,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1200C10h
@@ -1624,7 +1624,7 @@ species:
     - observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '1'
         page: 71
         row: Bas1200C40h
@@ -1778,7 +1778,7 @@ species:
     - observation_id: zhang_2021_table3_diffusion_limitation
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        source_path: text/kems-006-zhang-2021/ocr-repair/kems-006-zhang-2021.md
         table: '3'
         page: 73
       T_range_K:
