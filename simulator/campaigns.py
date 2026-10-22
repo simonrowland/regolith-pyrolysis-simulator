@@ -297,9 +297,12 @@ class CampaignManager:
         # Derate to the named pipe: an in-envelope request may still exceed THIS
         # vessel's material, and a setpoint must never run a vessel hotter than
         # what it is made of. Downward only -- a request below the material stands.
-        if material_ceiling is not None:
-            self.furnace_max_T_C = min(
-                self.furnace_max_T_C, float(material_ceiling)
+        if (
+            material_ceiling is not None
+            and setpoints.get('furnace_max_T_C') is not None
+        ):
+            self.furnace_max_T_C = resolve_furnace_max_T_C(
+                str(material), self.furnace_max_T_C
             )
         # User-configurable overrides
         self.c4_max_temp_C = 1670.0  # Max T for C4 Mg pyrolysis (default)

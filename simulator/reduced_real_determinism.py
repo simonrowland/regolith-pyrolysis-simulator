@@ -2522,9 +2522,16 @@ def record_binding_producer_ids(
         )
 
         temperature_C = float(sim.melt.temperature_C)
+        controls = dict(getattr(sim, "setpoints", {}) or {})
+        controls["high_t_melt_activity"] = getattr(
+            sim,
+            "_high_t_melt_activity",
+            controls.get("high_t_melt_activity", "openimcc"),
+        )
         if openimcc_binding_selected_by_inputs(
             temperature_K=temperature_C + 273.15,
-            controls=getattr(sim, "setpoints", {}) or {},
+            controls=controls,
+            quantity_class="activity",
         ):
             selected.append("openimcc")
 

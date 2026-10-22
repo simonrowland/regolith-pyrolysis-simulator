@@ -44780,18 +44780,6 @@ entries:
       section: DSC
 - work_id: 10.1038/s41598-020-62312-4
   source: data/literature/extracts/engelschion-2020-eac1a-simulant.yaml
-  why: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class, water_released_wt_pct_as_printed,
-    drying_atmosphere, procedure'
-  axes:
-  - value
-  observations:
-  - observation_id: engelschion-2020-eac1a-simulant::engelschion_2020_eac1a_water_release
-    locator:
-      page: 2
-      section: Density
-      note: standard=ASTM D4442
-- work_id: 10.1038/s41598-020-62312-4
-  source: data/literature/extracts/engelschion-2020-eac1a-simulant.yaml
   why: phase string 'EAC-1A_and_comparison_simulants' is not in the closed automatic map
   axes:
   - phase
@@ -57490,31 +57478,6 @@ entries:
       figure: '6'
       section: Thermogravimetry and Evolved Gas Analysis
       note: TG/EGA method paragraph; Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer.
-- work_id: 10.1111/maps.13345
-  source: data/literature/extracts/britt-2019-asteroid-simulants.yaml
-  why: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class, total_integrated_mass_loss_wt_pct,
-    temperature_interval_C_as_printed, qualitative_release'
-  axes:
-  - value
-  observations:
-  - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
-    locator:
-      pdf_page_index: 11
-      figure: 6a
-      section: Thermogravimetry and Evolved Gas Analysis
-      note: Body text prints CI total integrated mass loss from 0 to 1000 °C.
-  - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
-    locator:
-      pdf_page_index: 11
-      figure: 6a
-      section: Thermogravimetry and Evolved Gas Analysis
-      note: Body text prints CM total integrated mass loss from 0 to 1000 °C.
-  - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
-    locator:
-      pdf_page_index: 11
-      figure: 6a
-      section: Thermogravimetry and Evolved Gas Analysis
-      note: Body text prints CR total integrated mass loss from 0 to 1000 °C.
 - work_id: 10.1111/maps.13345
   source: data/literature/extracts/britt-2019-asteroid-simulants.yaml
   why: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
@@ -88401,6 +88364,10 @@ entries:
       equation: '14'
       note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in
         eqn (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio_quoted
+    locator:
+      published_page: 133
+      equation: '16'
   - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy
     locator:
       published_page: 123
@@ -88408,6 +88375,10 @@ entries:
       figure: '10'
       paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
       note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy_quoted
+    locator:
+      published_page: 123
+      figure: '10'
   - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_reaction_order_endpoints
     locator:
       published_page: 123
@@ -88415,6 +88386,26 @@ entries:
       figure: '9'
       paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
       note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy
+    locator:
+      published_page: 123
+      pdf_page_index: 13
+      figure: '10'
+      paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy_quoted
+    locator:
+      published_page: 123
+      figure: '10'
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy
+    locator:
+      published_page: 123
+      pdf_page_index: 13
+      figure: '10'
+      paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+  - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy_quoted
+    locator:
+      published_page: 123
+      figure: '10'
   - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_feo_vaporization_enthalpies_quoted
     locator:
       published_page: 124
@@ -132550,7 +132541,7 @@ entries:
 - work_id: 10.6028/nbs.ir.83-2731
   source: data/literature/extracts/kems-027-plante-hastie-1983.yaml
   why: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, composition_wt_pct, composition_derivation,
-    evidence_class, admission_status, janaf_overlay, reason'
+    composition_role, evidence_class, admission_status, janaf_overlay, reason'
   axes:
   - value
   observations:
@@ -132564,7 +132555,7 @@ entries:
 - work_id: 10.6028/nbs.ir.83-2731
   source: data/literature/extracts/kems-027-plante-hastie-1983.yaml
   why: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, composition_wt_pct, composition_derivation,
-    evidence_class, admission_status, reason'
+    composition_role, evidence_class, admission_status, reason'
   axes:
   - value
   observations:
@@ -222759,18 +222750,6 @@ entries:
       pdf_page_index: 7
       table: '1'
       section: Equipment / Results
-- work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
-  source: data/literature/extracts/street-2010-thermal-properties-simulants.yaml
-  why: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class, mass_loss_percent,
-    as_printed, quote, feedstock, T_conversion'
-  axes:
-  - value
-  observations:
-  - observation_id: street-2010-thermal-properties-simulants::street_2010_anorthosite_water_mass_loss_0p1_pct
-    locator:
-      published_page: 1
-      pdf_page_index: 5
-      section: Abstract
 - work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
   source: data/literature/extracts/street-2010-thermal-properties-simulants.yaml
   why: phase string 'JSC-1AF' is not in the closed automatic map
@@ -357054,44 +357033,6 @@ entries:
       pdf_page_index: 11
       section: Conclusions
       note: Qualitative conclusion; not a tabulated yield
-- work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
-  source: data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
-  why: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class, gas_species, total_loss_wt_pct,
-    as_printed, table_caption_as_printed, thermal_program_on_table, omitted, T_conversion_note'
-  axes:
-  - value
-  observations:
-  - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_total_loss_wt_pct
-    locator:
-      pdf_page_index: 11
-      table: conclusions_total_gas_evolutions
-      note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
-        decomposition in JSC-1A. Workshop poster; no printed page numbers.'
-  - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_total_loss_wt_pct
-    locator:
-      pdf_page_index: 11
-      table: conclusions_total_gas_evolutions
-      note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
-        decomposition in JSC-1A. Workshop poster; no printed page numbers.'
-  - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_total_loss_wt_pct
-    locator:
-      pdf_page_index: 11
-      table: conclusions_total_gas_evolutions
-      note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
-        decomposition in JSC-1A. Workshop poster; no printed page numbers.'
-- work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
-  source: data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
-  why: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class, hold_C_as_printed,
-    T_K, T_conversion, atmosphere_as_printed, hold_time_hr, mass_loss_wt_pct_range, as_printed, quote, preceding_ramp_as_printed,
-    figure_curve'
-  axes:
-  - value
-  observations:
-  - observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
-    locator:
-      pdf_page_index: 8
-      section: Idealized Heat Treatment for Non-Lunar Species Removal
-      note: Printed bullets plus TG/dTG figure (figure-only curve)
 - work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
   source: data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
   why: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map

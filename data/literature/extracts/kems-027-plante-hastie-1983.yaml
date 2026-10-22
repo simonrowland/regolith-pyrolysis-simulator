@@ -581,6 +581,10 @@ species:
         method_class: measured_direct
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: &plante_hastie_kms_start
+          value: initial_charge_only
+          locator: {published_page: 3, pdf_page_index: 9, table: '1', note: 'Analytical Weight % values for the SNW glass used in KMS Series I/II'}
+          quote: 'SiO2 53.76; Fe2O3 11.49; Al2O3 4.75; B2O3 6.49; Li2O 3.96; Na2O 8.59; MnO2 3.57; NiO 1.80; CaO 1.01; MgO 0.54; ZrO2 3.79; SrO 0.05; Cs2O 0.07; RuO2 0.11; Re2O7 0.03'
         series_I_initial_sample_mg: 263.1
         series_II_initial_sample_mg: 418.4
         B2O3_borate_loss_cells: true_absence_printed_dashes_not_zero
@@ -750,6 +754,7 @@ species:
         method_class: measured_direct
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         activity: 0.01
         activity_qualifier: approximately
         temperature_dependence: slight
@@ -792,6 +797,7 @@ species:
         method_class: measured_direct
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         semantics: bound_not_point_ordering
         ions_sought:
           - Ru+
@@ -855,6 +861,7 @@ species:
         method_class: model_derived
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         admission_status: model_output_not_measurement
         activity: 0.01
         qualifier: approximately
@@ -1023,6 +1030,7 @@ species:
         method_class: measured_direct
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         activity: 0.1
         activity_qualifier: about
         temperature_dependence: some
@@ -1069,6 +1077,7 @@ species:
         method_class: model_derived
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         admission_status: model_output_not_measurement
         activity: 0.1
         qualifier: about
@@ -1178,6 +1187,7 @@ species:
         method_class: measured_direct
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         activity: 4.0e-6
         T_K: 1200.0
         P_obs_atm_order: 1.0e-8
@@ -1226,6 +1236,7 @@ species:
         method_class: model_derived
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         admission_status: model_output_not_measurement
         activity: 4.0e-06
         T_K: 1200
@@ -1273,6 +1284,7 @@ species:
         method_class: figure_only
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         evidence_class: figure_only
         admission_status: figure_only
         janaf_overlay: Fe2O3_c_to_Fe3O4_c
@@ -1369,6 +1381,7 @@ species:
         method_class: figure_only
         composition_wt_pct: *plante_analyzed_wt_pct
         composition_derivation: *plante_analyzed_composition_derivation
+        composition_role: *plante_hastie_kms_start
         evidence_class: figure_only
         admission_status: figure_only
         reason: Scatter not digitised; comparison JANAF curve is not measured. No invented temperature grid.
