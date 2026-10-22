@@ -1621,28 +1621,33 @@ def test_ellingham_refuses_element_basis_mismatch_at_every_pressure() -> None:
         polymorph="crystalline",
     )
     crystal_evidence = "ellingham:Fe:s:T=1200:generic-solid"
-    for name, polymorph, observation_basis in (
-        ("reference", Polymorph.REFERENCE, "Fe(cr,reference)"),
-        ("alpha", Polymorph.ALPHA, "Fe(cr,alpha)"),
+    refused = _assert_element_basis_refusal(
+        "feo-crystal-alpha-1bar",
+        _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Fe(cr,alpha)",
+        "Fe(cr,gamma)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    assert refused.refusal_detail["element"] == "Fe"
+    assert refused.refusal_detail["cell_allotrope"] == Polymorph.ALPHA.value
+    assert refused.refusal_detail["segment_allotrope"] == "gamma"
+    # REFERENCE at 1200 K is gamma on Fe-003, the same allotrope as the segment.
+    for name, polymorph in (
+        ("gamma", Polymorph.GAMMA),
+        ("omitted", None),
+        ("reference", Polymorph.REFERENCE),
     ):
-        refused = _assert_element_basis_refusal(
-            f"feo-crystal-{name}-1bar",
-            _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
-            "identity-mismatch-element-reference-allotrope",
-            observation_basis,
-            "Fe(cr,gamma)",
-            cell_phase=Phase.CR.value,
-            segment_phase=Phase.CR.value,
-        )
-        assert refused.refusal_detail["element"] == "Fe"
-        assert refused.refusal_detail["cell_allotrope"] == polymorph.value
-        assert refused.refusal_detail["segment_allotrope"] == "gamma"
-    for name, polymorph in (("gamma", Polymorph.GAMMA), ("omitted", None)):
-        _assert_ellingham_number(
+        answered = _assert_ellingham_number(
             f"feo-crystal-{name}-1bar",
             _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
             _FEO_CRYSTAL_1200K,
             crystal_evidence,
+        )
+        assert not any(
+            notice.reason.startswith("element-reference-state-unresolved")
+            for notice in answered.notices
         )
     fe_alpha_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA)
     _assert_element_basis_refusal(
@@ -1766,10 +1771,12 @@ def test_ellingham_mno_liquid_label_refuses_copied_crystal_coefficients() -> Non
 
 
 def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
+    # The 1200 K segment is Ca(l). The metal matches it, so an unknown
+    # product phase stays the pressure transform's refusal.
     identity = F.cao_identity(
         Phase.CR,
         T_K=Decimal("1200"),
-        metal_phase=Phase.CR,
+        metal_phase=Phase.L,
         per=PerBasis.MOL_SPECIES,
         p_std=Decimal("101325"),
     )
@@ -1819,18 +1826,17 @@ def _with_term_phase(identity, formula: str, phase: State):
     return replace(identity, reaction=State.of(replace(reaction, terms=terms)))
 
 
-# Captured from predict_thermo_attempt before the reference-state correction.
-_FEO_LIQUID_UNKNOWN_O2_2000K = Decimal("-148.4464525")
+# Captured from predict_thermo_attempt on the matching element basis.
 _CAO_CRYSTAL_1100K = Decimal("-520.29700025")
 _NIO_CRYSTAL_1100K = Decimal("-140.6632534284")
 _ZRO2_BETA_1500K = Decimal("-819.6519385441172")
 
 
 def test_unknown_phase_on_one_term_does_not_skip_a_known_element_mismatch() -> None:
-    """An unknown O2 phase currently leaves Fe(cr) vs Fe(l) unanswered as a mismatch.
+    """Unknown O2 does not hide Fe(cr) against the Fe(l) segment.
 
-    At 1 bar and with pressure missing the liquid FeO segment still returns
-    its number. At 1 atm the pressure transform refuses the unknown phase.
+    The element gate refuses at 1 bar, with pressure missing, and at 1 atm
+    before the pressure transform.
     """
 
     feo_liquid = F.oxide_identity(
@@ -1853,31 +1859,24 @@ def test_unknown_phase_on_one_term_does_not_skip_a_known_element_mismatch() -> N
             "feo-unknown-o2-missing-pressure",
             replace(unknown_o2, standard_pressure_Pa=State.unknown("pressure not printed")),
         ),
+        (
+            "feo-unknown-o2-1atm",
+            replace(unknown_o2, standard_pressure_Pa=State.of(Decimal("101325"))),
+        ),
     ):
-        _assert_ellingham_number(
+        _assert_element_basis_refusal(
             observation_id,
             identity,
-            _FEO_LIQUID_UNKNOWN_O2_2000K,
-            "ellingham:Fe:l:T=2000",
+            "identity-mismatch-element-reference-phase",
+            "Fe(cr)",
+            "Fe(l)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.L.value,
         )
-    refused = predict_thermo_attempt(
-        Engine.INTERNAL_ANALYTICAL,
-        F.observation(
-            "feo-unknown-o2-1atm",
-            "exp-1",
-            replace(unknown_o2, standard_pressure_Pa=State.of(Decimal("101325"))),
-            Decimal("0"),
-        ),
-    )
-    assert refused.value is None
-    assert refused.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
-    assert refused.refusal_detail["reason"] == (
-        "standard-pressure-transform-phase-unknown"
-    )
 
 
 def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> None:
-    """A generic segment solid currently answers every declared allotrope."""
+    """Ca(s) at 1100 K is beta on Ca-001. Ni(s) names no allotrope."""
 
     cao = F.cao_identity(
         Phase.CR,
@@ -1887,8 +1886,18 @@ def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> 
         p_std=Decimal("100000"),
     )
     evidence = "ellingham:Ca:s:T=1100:generic-solid"
+    refused = _assert_element_basis_refusal(
+        "cao-1100-alpha",
+        _with_reactant_basis(cao, Phase.CR, Polymorph.ALPHA),
+        "identity-mismatch-element-reference-allotrope",
+        "Ca(cr,alpha)",
+        "Ca(cr,beta)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
+    )
+    assert refused.refusal_detail["cell_allotrope"] == "alpha"
+    assert refused.refusal_detail["segment_allotrope"] == "beta"
     for name, polymorph in (
-        ("alpha", Polymorph.ALPHA),
         ("beta", Polymorph.BETA),
         ("omitted", None),
         ("reference", Polymorph.REFERENCE),
@@ -1911,16 +1920,28 @@ def test_declared_allotrope_against_generic_solid_uses_the_reference_table() -> 
         p_std=Decimal("100000"),
         polymorph="crystalline",
     )
-    _assert_ellingham_number(
+    ni_evidence = "ellingham:Ni:s:T=1100:generic-solid"
+    refused_ni = _assert_element_basis_refusal(
         "nio-1100-alpha",
         _with_reactant_basis(nio, Phase.CR, Polymorph.ALPHA),
-        _NIO_CRYSTAL_1100K,
-        "ellingham:Ni:s:T=1100:generic-solid",
+        "identity-mismatch-element-reference-allotrope",
+        "Ni(cr,alpha)",
+        "Ni(cr)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
     )
+    assert refused_ni.refusal_detail["segment_allotrope"] is None
+    for name, polymorph in (("omitted", None), ("reference", Polymorph.REFERENCE)):
+        _assert_ellingham_number(
+            f"nio-1100-{name}",
+            _with_reactant_basis(nio, Phase.CR, polymorph),
+            _NIO_CRYSTAL_1100K,
+            ni_evidence,
+        )
 
 
 def test_zr_cea_letter_is_the_janaf_allotrope() -> None:
-    """Zr(beta) currently refuses the CEA Zr(b) segment as a different allotrope."""
+    """CEA Zr(b) and JANAF beta are one allotrope. Alpha is the other."""
 
     zro2 = F.oxide_identity(
         "ZrO2",
@@ -1934,20 +1955,22 @@ def test_zr_cea_letter_is_the_janaf_allotrope() -> None:
         p_std=Decimal("100000"),
         polymorph="ii",
     )
+    evidence = "ellingham:Zr:II:T=1500"
+    for name, polymorph in (("beta", Polymorph.BETA), ("omitted", None)):
+        _assert_ellingham_number(
+            f"zro2-{name}-1500",
+            _with_reactant_basis(zro2, Phase.CR, polymorph),
+            _ZRO2_BETA_1500K,
+            evidence,
+        )
     _assert_element_basis_refusal(
-        "zro2-beta-1500",
-        _with_reactant_basis(zro2, Phase.CR, Polymorph.BETA),
+        "zro2-alpha-1500",
+        _with_reactant_basis(zro2, Phase.CR, Polymorph.ALPHA),
         "identity-mismatch-element-reference-allotrope",
+        "Zr(cr,alpha)",
         "Zr(cr,beta)",
-        "Zr(cr,b)",
         cell_phase=Phase.CR.value,
         segment_phase=Phase.CR.value,
-    )
-    _assert_ellingham_number(
-        "zro2-omitted-1500",
-        _with_reactant_basis(zro2, Phase.CR, None),
-        _ZRO2_BETA_1500K,
-        "ellingham:Zr:II:T=1500",
     )
 
 

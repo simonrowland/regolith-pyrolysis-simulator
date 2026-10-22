@@ -55,6 +55,8 @@ from simulator.battery.records import (
     State,
     Uncertainty,
     Value,
+    phase_token,
+    polymorph_token,
 )
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
@@ -1357,16 +1359,51 @@ def _parse_counts(formula: str) -> dict[str, Fraction] | None:
     return counts or None
 
 
-def _element_reference_species(symbol: str) -> Species:
+def _element_reference_species(symbol: str, temperature: Decimal) -> Species:
+    """Elemental reference species at T.
+
+    Diatomic gases stay O2, H2, N2, F2, and Cl2. Every other element is the
+    standard state on its JANAF (ref) table at this temperature. Phase.CR is
+    not assumed: potassium above its boiling point is the gas. A crystal
+    whose table names no allotrope is that standard crystal, polymorph
+    REFERENCE. An unresolved table keeps REFERENCE and an unknown phase.
+    """
+
     if symbol in _DIATOMIC_GASES:
         return make_species(f"{symbol}2", Phase.G, charge=0)
+    from simulator.battery.generators.janaf import _element_reference_state
+
+    species_state, _count, _locator, note, _convention = _element_reference_state(
+        symbol, temperature
+    )
     token = resolve_printed_name_polymorph("reference")
-    polymorph = (
+    reference_polymorph = (
         State.of(token)
         if token is not None
-        else State.unknown("elemental reference crystals")
+        else State.unknown("elemental reference state")
     )
-    return make_species(symbol, Phase.CR, polymorph, charge=0)
+    if not species_state.is_value:
+        return make_species(
+            symbol,
+            State.unknown(
+                note
+                or f"elemental reference state of {symbol} is not resolved at {temperature} K"
+            ),
+            reference_polymorph,
+            charge=0,
+        )
+    species = species_state.value
+    if phase_token(species) is Phase.CR and polymorph_token(species) is None:
+        # The (ref) table resolved the crystal and did not name an allotrope.
+        # REFERENCE is that standard crystal. The table's omitted-polymorph
+        # unknown is not an identity axis.
+        return make_species(
+            species.formula,
+            Phase.CR,
+            reference_polymorph,
+            charge=species.charge,
+        )
+    return species
 
 
 def _oxide_species(formula: str) -> Species:
@@ -1392,21 +1429,23 @@ def _oxide_species(formula: str) -> Species:
 
 
 def _formation_identity(
-    product: Species, basis: str
+    product: Species, basis: str, temperature: Decimal
 ) -> tuple[Reaction, tuple[tuple[str, Species], ...]] | None:
     counts = _parse_counts(product.formula)
     if counts is None:
         return None
     elements = tuple(
-        (element, _element_reference_species(element)) for element in sorted(counts)
+        (element, _element_reference_species(element, temperature))
+        for element in sorted(counts)
     )
     terms = [ReactionTerm(product, Fraction(1))]
     if basis == "from_the_elements":
         for element, amount in counts.items():
+            reference = _element_reference_species(element, temperature)
             if element in _DIATOMIC_GASES:
-                terms.append(ReactionTerm(_element_reference_species(element), -amount / 2))
+                terms.append(ReactionTerm(reference, -amount / 2))
             else:
-                terms.append(ReactionTerm(_element_reference_species(element), -amount))
+                terms.append(ReactionTerm(reference, -amount))
         return Reaction(tuple(terms)), elements
     if basis != "from_the_oxides":
         return None
@@ -1458,14 +1497,14 @@ def _formation_identity(
 
 
 def _basis_states(
-    product: Species, basis: str | None
+    product: Species, basis: str | None, temperature: Decimal
 ) -> tuple[State[Reaction], State[tuple[tuple[str, Species], ...]]]:
     if basis not in FORMATION_BASIS_REASON:
         return (
             State.unknown(MISSING_FORMATION_BASIS_REASON),
             State.unknown(MISSING_FORMATION_BASIS_REASON),
         )
-    built = _formation_identity(product, basis)
+    built = _formation_identity(product, basis, temperature)
     if built is None:
         reason = (
             f"formula {product.formula!r} does not parse to a closed {basis} reaction"
@@ -1531,7 +1570,9 @@ def _observation(
         "standard_pressure_Pa": State.of(STANDARD_PRESSURE_PA),
     }
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
-        known["reaction"], known["formation_elements"] = _basis_states(species, basis)
+        known["reaction"], known["formation_elements"] = _basis_states(
+            species, basis, temperature
+        )
     identity = fill_identity(quantity, species, **known)
     published_page, pdf_page = _pages(record)
     unit = _page_units(token.table_kind, token.column)
