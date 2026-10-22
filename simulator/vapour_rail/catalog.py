@@ -26,10 +26,6 @@ from typing import Any
 import yaml
 
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.physical_constants import (
-    MELT_DISSOCIATION_PO2_MAX_BAR,
-    MELT_DISSOCIATION_PO2_MIN_BAR,
-)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
@@ -49,7 +45,9 @@ from simulator.vapour_rail.channels import (
     CompiledReactionTerm,
     ReactionTermRole,
     ReactionThermoInputs,
+    _log_oxygen_ratio,
     channel_log10_contribution,
+    validate_physical_pO2_bar,
     compile_o2_channel_term,
     o2_potential_from_pO2_bar,
 )
@@ -1024,10 +1022,10 @@ class CompiledPressureEvaluator:
                 activity = _finite_positive(source_activity, "source_activity")
             log10_pressure += self.activity_exponent * math.log10(activity)
 
-        # O2 / exchange-channel terms (t-571).  THE BAR: bit-identical with
-        # the pre-t-571 scalar path for every existing catalog row.  Both the
+        # O2 / exchange-channel terms (t-571). Within the stated evaluator band,
+        # bit-identical with the pre-t-571 scalar path for every row. Both the
         # legacy pO2_bar kwargs and the typed ReactionThermoInputs path reduce
-        # to e · log10(p_clamped / p_ref) via channel_log10_contribution +
+        # to e · log10(p / p_ref) via channel_log10_contribution +
         # the legacy_scalar_adapter.
         o2_term = self.o2_channel_term
         needs_o2 = abs(self.pO2_exponent) > 0.0 or o2_term is not None
@@ -1152,11 +1150,15 @@ class CompiledPressureEvaluator:
                 )
             ),
         )
+        o2_notice = (
+            (o2_potential.observation_or_setpoint_receipt or {}).get("extrapolation_notice")
+            if o2_potential is not None else None
+        )
         # Non-field attribute so t-622 dataclass canonicalization is unchanged.
         object.__setattr__(
             evaluation,
             "extrapolation_notice",
-            _pO2_floor_inversion_notice(
+            o2_notice or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
@@ -1164,10 +1166,7 @@ class CompiledPressureEvaluator:
                     o2_potential=o2_potential,
                     pO2_bar=pO2_bar_raw,
                 ),
-                was_clamped=_evaluation_pO2_was_clamped(
-                    o2_potential=o2_potential,
-                    pO2_bar=pO2_bar_raw,
-                ),
+                was_clamped=False,
             ),
         )
         return evaluation
@@ -1280,12 +1279,18 @@ class CompiledPressureEvaluator:
                     }
                 )
             oxygen_raw = _finite_positive(pO2_bar, "pO2_bar")
-            oxygen = min(
-                max(oxygen_raw, MELT_DISSOCIATION_PO2_MIN_BAR),
-                MELT_DISSOCIATION_PO2_MAX_BAR,
+            o2_potential = o2_potential_from_pO2_bar(
+                pO2_bar=oxygen_raw,
+                temperature_K=temperature,
+                reaction_plane=(
+                    LEGACY_FO2_PLANE.get(self.oxygen_fugacity_channel or "")
+                    or REACTION_PLANE_TRANSPORT_HEADSPACE
+                ),
+                pO2_reference_bar=self.pO2_reference_bar,
             )
-            oxygen_term_ln = self.pO2_exponent * math.log(
-                oxygen / self.pO2_reference_bar
+            oxygen = o2_potential.legacy_pO2_bar
+            oxygen_term_ln = self.pO2_exponent * _log_oxygen_ratio(
+                oxygen, self.pO2_reference_bar
             )
         ln_pressure = reference_ln + activity_term_ln + oxygen_term_ln
 
@@ -1315,15 +1320,14 @@ class CompiledPressureEvaluator:
         }
         if self.pO2_exponent and math.isfinite(ln_pressure):
             pressure_pa = math.exp(float(ln_pressure))
-            notice = _pO2_floor_inversion_notice(
+            notice = (o2_potential.observation_or_setpoint_receipt or {}).get(
+                "extrapolation_notice"
+            ) or _pO2_floor_inversion_notice(
                 species_id=self.species_id,
                 pressure_pa=pressure_pa,
                 pO2_exponent=self.pO2_exponent,
                 pO2_bar_used=oxygen,
-                was_clamped=(
-                    oxygen_raw is not None
-                    and oxygen_raw < MELT_DISSOCIATION_PO2_MIN_BAR
-                ),
+                was_clamped=False,
             )
             if notice is not None:
                 payload["extrapolation_notice"] = dict(notice)
@@ -4167,38 +4171,7 @@ def _evaluation_pO2_bar_used(
         return None
     if not math.isfinite(raw) or raw <= 0.0:
         return None
-    return min(
-        max(raw, MELT_DISSOCIATION_PO2_MIN_BAR),
-        MELT_DISSOCIATION_PO2_MAX_BAR,
-    )
-
-
-def _evaluation_pO2_was_clamped(
-    *,
-    o2_potential: Any | None,
-    pO2_bar: float | None,
-) -> bool:
-    raw: float | None = None
-    if o2_potential is not None:
-        receipt = getattr(
-            o2_potential, "observation_or_setpoint_receipt", None
-        ) or {}
-        if isinstance(receipt, Mapping) and receipt.get("pO2_bar_input") is not None:
-            try:
-                raw = float(receipt["pO2_bar_input"])
-            except (TypeError, ValueError):
-                raw = None
-    if raw is None and pO2_bar is not None:
-        try:
-            raw = float(pO2_bar)
-        except (TypeError, ValueError):
-            raw = None
-    return (
-        raw is not None
-        and math.isfinite(raw)
-        and raw > 0.0
-        and raw < MELT_DISSOCIATION_PO2_MIN_BAR
-    )
+    return validate_physical_pO2_bar(raw)
 
 
 def _pO2_floor_inversion_notice(

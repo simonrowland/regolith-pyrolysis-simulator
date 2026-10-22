@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 50496
-records out (observations): 126295
+rows in: 50497
+records out (observations): 126296
 works: 349
 experiments: 3823
-queue size: 80925
+queue size: 80881
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 348
@@ -25,7 +25,7 @@ hard issues: 3334
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2103 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 5991 (mismatch) |
+| absent_admissions | 3511 | 5992 (mismatch) |
 | absent_classes | 2174 | 2118 (mismatch) |
 | range_only_T | 3125 | 2612 (mismatch) |
 | system_like_phases | 1065 | 2806 (mismatch) |
@@ -18107,7 +18107,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 24 | 92 |
 | `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 142 | 248 |
 | `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 35 | 52 |
-| `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 64 | 123 |
+| `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 64 | 100 |
 | `data/literature/extracts/kems-112-ichise-1989.yaml` | 49 | 87 | 77 |
 | `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 116 |
 | `data/literature/extracts/kems-116-nunoue-1987.yaml` | 12 | 40 | 45 |
@@ -18272,7 +18272,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 155 |
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 80 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 12 |
-| `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 242 |
+| `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 220 |
 | `data/literature/extracts/sossi-2020-magma-ocean-redox.yaml` | 12 | 12 | 24 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 24 | 24 | 145 |
@@ -18281,7 +18281,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
 | `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 198 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 34 |
-| `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 83 |
+| `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml` | 6 | 6 | 6 |
 | `data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml` | 7 | 16 | 0 |
@@ -18390,8 +18390,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 223868
+advisory issues: 223871
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 223868 |
+| `identity_incomplete` | 223871 |
