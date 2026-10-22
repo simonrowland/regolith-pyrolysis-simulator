@@ -540,8 +540,12 @@ def _is_engine_checkout(candidate: Path, key: str, pin: EnginePin) -> bool:
         return False
     if (candidate / ".git").exists():
         return True
-    if key == "alphamelts" and any(
-        path.exists() for path in _legacy_alphamelts_binary_candidates(candidate)
+    if key == "alphamelts" and (
+        (candidate / "run_alphamelts.command").exists()
+        or any(
+            path.exists()
+            for path in _legacy_alphamelts_binary_candidates(candidate)
+        )
     ):
         return True
     if key == "magemin" and any(

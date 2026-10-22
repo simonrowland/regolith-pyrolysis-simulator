@@ -85,10 +85,7 @@ class EngineInstaller:
                 return True
 
         # Check system PATH
-        from engine_install_config import _legacy_engine_path_command
-
-        command = _legacy_engine_path_command('alphamelts')
-        return command is not None and shutil.which(command) is not None
+        return shutil.which('alphamelts') is not None
 
     def _check_chemapp(self) -> bool:
         """Check whether a supported ChemApp Python module is importable."""

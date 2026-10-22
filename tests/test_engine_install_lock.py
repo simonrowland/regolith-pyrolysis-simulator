@@ -347,12 +347,41 @@ def test_lock_rendering_does_not_discover_legacy_engine_paths(
 
 def test_check_reports_each_magemin_runtime_binary_candidate(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import engine_install_config as module
+    from simulator.melt_backend import magemin as runtime
 
     lock = load_engine_lock(LOCK_PATH)
     repos_root = tmp_path / "repos"
     install_root = tmp_path / "home" / "repos" / "engine-bin"
+    empty_project = repos_root / "magemin-order" / "project"
+    empty_engine_root = empty_project / "engines" / "magemin"
+    empty_engine_root.mkdir(parents=True)
+    empty_candidates = module._legacy_magemin_binary_candidates(
+        empty_engine_root,
+        sibling_root=empty_project.parent,
+    )
+    monkeypatch.setattr(
+        runtime,
+        "__file__",
+        str(empty_project / "simulator" / "melt_backend" / "magemin.py"),
+    )
+    empty_path = tmp_path / "empty-path"
+    empty_path.mkdir()
+    monkeypatch.setenv("PATH", str(empty_path))
+    observed: list[Path] = []
+    original_exists = Path.exists
+
+    def record_candidates(path: Path) -> bool:
+        observed.append(path)
+        return original_exists(path)
+
+    monkeypatch.setattr(Path, "exists", record_candidates)
+    assert runtime.MAGEMinBackend._locate_binary(None) is None
+    assert tuple(observed) == empty_candidates
+    monkeypatch.setattr(Path, "exists", original_exists)
+    assert not _checked_extra_builds(lock, install_root, repos_root)
 
     for index in range(3):
         project_root = repos_root / f"magemin-case-{index}" / "project"
@@ -370,6 +399,12 @@ def test_check_reports_each_magemin_runtime_binary_candidate(
         selected.parent.mkdir(parents=True, exist_ok=True)
         selected.write_bytes(b"legacy MAGEMin executable")
         selected.chmod(0o755)
+        monkeypatch.setattr(
+            runtime,
+            "__file__",
+            str(project_root / "simulator" / "melt_backend" / "magemin.py"),
+        )
+        assert runtime.MAGEMinBackend._locate_binary(None) == selected
 
         expected_checkout = engine_root if index < 2 else selected.parent
         assert ("magemin", expected_checkout) in _checked_extra_builds(
@@ -381,14 +416,45 @@ def test_check_reports_each_magemin_runtime_binary_candidate(
 
 def test_check_reports_each_alphamelts_runtime_binary_candidate(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import engine_install_config as module
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
     lock = load_engine_lock(LOCK_PATH)
     repos_root = tmp_path / "repos"
     install_root = tmp_path / "home" / "repos" / "engine-bin"
+    order_root = (
+        repos_root
+        / "alphamelts-order"
+        / "project"
+        / "engines"
+        / "alphamelts"
+    )
+    order_root.mkdir(parents=True)
+    (order_root / "bundle-a").mkdir()
+    (order_root / "bundle-z").mkdir()
+    expected_candidates = module._legacy_alphamelts_binary_candidates(order_root)
+    backend = AlphaMELTSBackend()
+    observed: list[Path] = []
+    original_exists = Path.exists
 
-    for index in range(8):
+    def record_candidates(path: Path) -> bool:
+        if path != order_root:
+            observed.append(path)
+        return original_exists(path)
+
+    monkeypatch.setattr(Path, "exists", record_candidates)
+    assert backend._find_project_binary(order_root) is None
+    assert tuple(observed) == expected_candidates
+    monkeypatch.setattr(Path, "exists", original_exists)
+    assert ("alphamelts", order_root) not in _checked_extra_builds(
+        lock,
+        install_root,
+        repos_root,
+    )
+
+    for index in range(len(expected_candidates)):
         engine_root = (
             repos_root
             / f"alphamelts-case-{index}"
@@ -397,11 +463,16 @@ def test_check_reports_each_alphamelts_runtime_binary_candidate(
             / "alphamelts"
         )
         engine_root.mkdir(parents=True)
-        (engine_root / "bundle").mkdir()
-        selected = module._legacy_alphamelts_binary_candidates(engine_root)[index]
+        (engine_root / "bundle-a").mkdir()
+        (engine_root / "bundle-z").mkdir()
+        selected = module._legacy_alphamelts_binary_candidates(engine_root)[
+            index
+        ]
         selected.parent.mkdir(parents=True, exist_ok=True)
         selected.write_bytes(b"legacy alphaMELTS executable")
+        selected.chmod(0o755)
 
+        assert AlphaMELTSBackend()._find_project_binary(engine_root) == selected
         assert ("alphamelts", engine_root) in _checked_extra_builds(
             lock,
             install_root,
@@ -409,9 +480,70 @@ def test_check_reports_each_alphamelts_runtime_binary_candidate(
         )
 
 
-@pytest.mark.parametrize("engine", ("magemin", "alphamelts"))
+def test_check_reports_runtime_selected_alphamelts_launcher(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import engine_install_config as module
+    import simulator.engine_local_config as local_config
+    from simulator.melt_backend import alphamelts as runtime
+
+    class UnavailableVapoRock:
+        def initialize(self, _config: dict) -> None:
+            return None
+
+        def is_available(self) -> bool:
+            return False
+
+    lock = load_engine_lock(LOCK_PATH)
+    repos_root = tmp_path / "repos"
+    install_root = tmp_path / "home" / "repos" / "engine-bin"
+    project_root = repos_root / "launcher-only" / "project"
+    engine_root = project_root / "engines" / "alphamelts"
+    launcher = engine_root / "run_alphamelts.command"
+    launcher.parent.mkdir(parents=True)
+    launcher.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    launcher.chmod(0o755)
+    monkeypatch.setattr(
+        runtime,
+        "__file__",
+        str(project_root / "simulator" / "melt_backend" / "alphamelts.py"),
+    )
+    monkeypatch.setattr(local_config, "find_alphamelts_binary", lambda _root: None)
+    monkeypatch.setattr(runtime, "VapoRockBackend", UnavailableVapoRock)
+    empty_path = tmp_path / "empty-path"
+    empty_path.mkdir()
+    monkeypatch.setenv("PATH", str(empty_path))
+
+    backend = runtime.AlphaMELTSBackend()
+    assert backend.initialize({"mode": "subprocess"})
+    assert backend._engine_path == launcher
+    assert backend._binary_path is None
+    assert ("alphamelts", engine_root) in _checked_extra_builds(
+        lock,
+        install_root,
+        repos_root,
+    )
+
+    launcher.unlink()
+    unavailable = runtime.AlphaMELTSBackend()
+    with pytest.raises(ImportError, match="subprocess transport unavailable"):
+        unavailable.initialize({"mode": "subprocess"})
+    assert ("alphamelts", engine_root) not in _checked_extra_builds(
+        lock,
+        install_root,
+        repos_root,
+    )
+
+
+@pytest.mark.parametrize(
+    ("engine", "command"),
+    (("magemin", "MAGEMin"), ("alphamelts", "alphamelts")),
+    ids=("magemin", "alphamelts"),
+)
 def test_check_reports_runtime_path_lookup_inside_repos(
     engine: str,
+    command: str,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -422,12 +554,33 @@ def test_check_reports_runtime_path_lookup_inside_repos(
     install_root = tmp_path / "home" / "repos" / "engine-bin"
     path_bin = repos_root / "path-bin"
     path_bin.mkdir(parents=True)
-    command = module._legacy_engine_path_command(engine)
-    assert command is not None
     executable = path_bin / (command + (".exe" if os.name == "nt" else ""))
-    executable.write_text("legacy executable", encoding="utf-8")
+    executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
     executable.chmod(0o755)
     monkeypatch.setenv("PATH", str(path_bin))
+
+    assert module._legacy_engine_path_command(engine) == command
+    if engine == "magemin":
+        from simulator.melt_backend import magemin as runtime
+
+        project_root = repos_root / "runtime-magemin" / "project"
+        monkeypatch.setattr(
+            runtime,
+            "__file__",
+            str(project_root / "simulator" / "melt_backend" / "magemin.py"),
+        )
+        assert runtime.MAGEMinBackend._locate_binary(None) == executable
+    else:
+        from simulator.melt_backend import installer as runtime
+
+        project_root = repos_root / "runtime-alphamelts" / "project"
+        monkeypatch.setattr(
+            runtime,
+            "__file__",
+            str(project_root / "simulator" / "melt_backend" / "installer.py"),
+        )
+        assert runtime.EngineInstaller()._check_binary()
+        assert Path(runtime.shutil.which(command)) == executable
 
     assert (engine, path_bin) in _checked_extra_builds(
         lock,
