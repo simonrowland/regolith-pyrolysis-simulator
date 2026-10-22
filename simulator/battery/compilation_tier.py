@@ -100,6 +100,31 @@ _TE_FORMULA: dict[str, str] = {
     "And": "Al2SiO5",
     "Ky": "Al2SiO5",
     "Sil": "Al2SiO5",
+    # (a) rows. Formula is PurePhaseList.csv Formula. Berman
+    # FormulaOveride is empty, so the live call returns this string.
+    # Polymorph-confirmed first. Brc is omitted: Mg(OH)2 does not parse.
+    "Rt": "TiO2",
+    "Mag": "Fe3O4",
+    "An": "CaAl2Si2O8",
+    "Wo": "CaSiO3",
+    # Not an (a) row. Berman has two CaSiO3 crystals. Wo alone would be
+    # the unique candidate for unset CaSiO3, which is (c).
+    "pWo": "CaSiO3",
+    "Gh": "Ca2Al2SiO7",
+    "Grs": "Ca3Al2Si3O12",
+    "Hem": "Fe2O3",
+    "Spn": "CaTiSiO5",
+    "Kls": "KAlSiO4",
+    "Cal": "CaCO3",
+    "Ak": "Ca2MgSi2O7",
+    "CaTs": "CaAl2SiO6",
+    "Mgs": "MgCO3",
+    "Nph": "NaAlSiO4",
+    "Prp": "Mg3Al2Si3O12",
+    "Jd": "NaAlSi2O6",
+    "Chr": "FeCr2O4",
+    "Mtc": "CaMgSiO4",
+    "Prv": "CaTiO3",
 }
 
 _THERMO_QUANTITIES = (
