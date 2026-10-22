@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
+from literature_extract_test_utils import isolated_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/borisov-borisovskiy-2024-ti-zircon.yaml"
@@ -30,20 +31,6 @@ def _assert_render_pins(document: dict, pins: dict[str, str] = PINS) -> None:
     }
     for observation_id, value in pins.items():
         assert rows[observation_id]["values"]["component_amount"] == value
-
-
-def _isolated_root(tmp_path: Path, document: dict) -> Path:
-    literature = tmp_path / "data/literature"
-    extracts = literature / "extracts"
-    extracts.mkdir(parents=True)
-    (literature / "compilations").mkdir()
-    (literature / "INDEX.yaml").write_text(
-        "schema_version: literature_index.v1\nsources: []\n", encoding="utf-8"
-    )
-    (extracts / f"{document['source_id']}.yaml").write_text(
-        yaml.safe_dump(document, sort_keys=False, allow_unicode=True), encoding="utf-8"
-    )
-    return tmp_path
 
 
 def test_table1_render_pins_and_both_mutations_fail() -> None:
@@ -72,7 +59,7 @@ def test_glass_rows_migrate_as_points_with_printed_conditions(tmp_path: Path) ->
         pytest.skip("Borisov and Borisovskiy source PDF is absent")
 
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    result = migrate(_isolated_root(tmp_path, document), write=False)
+    result = migrate(isolated_root(tmp_path, document), write=False)
     rows = list(result.observations.values())
     assert len(rows) == 198
     assert all(row.value.kind is ValueKind.POINT and row.value.point is not None for row in rows)

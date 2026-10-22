@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.enums import PhaseRole, ValueKind
 from simulator.battery.migrate import migrate
+from literature_extract_test_utils import isolated_root
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.yaml"
@@ -30,20 +31,6 @@ def _assert_render_pins(document: dict, pins: dict[str, str] = PINS) -> None:
     }
     for observation_id, amount in pins.items():
         assert rows[observation_id]["values"]["component_amount"] == amount
-
-
-def _isolated_root(tmp_path: Path, document: dict) -> Path:
-    literature = tmp_path / "data/literature"
-    extracts = literature / "extracts"
-    extracts.mkdir(parents=True)
-    (literature / "compilations").mkdir()
-    (literature / "INDEX.yaml").write_text(
-        "schema_version: literature_index.v1\nsources: []\n", encoding="utf-8"
-    )
-    (extracts / f"{document['source_id']}.yaml").write_text(
-        yaml.safe_dump(document, sort_keys=False, allow_unicode=True), encoding="utf-8"
-    )
-    return tmp_path
 
 
 def test_table1_8_render_pins_and_both_mutations_fail() -> None:
@@ -69,7 +56,7 @@ def test_metal_and_glass_rows_migrate_as_points_with_temperature(tmp_path: Path)
     if not (corpus / "raw/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.pdf").is_file():
         pytest.skip("Haskin report PDF is absent")
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    result = migrate(_isolated_root(tmp_path, document), write=False)
+    result = migrate(isolated_root(tmp_path, document), write=False)
     rows = list(result.observations.values())
     assert len(rows) == 38
     assert all(row.value.kind is ValueKind.POINT and row.value.point is not None for row in rows)
