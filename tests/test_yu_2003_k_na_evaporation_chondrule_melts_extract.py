@@ -3,8 +3,6 @@ from __future__ import annotations
 from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
-from pathlib import Path
-import subprocess
 
 import pytest
 import yaml
@@ -13,18 +11,12 @@ from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.pdf_text import pdftotext_page_text
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
 SID = 'yu-2003-k-na-evaporation-chondrule-melts'
 EXTRACT = REPO_ROOT / 'data/literature/extracts' / f'{SID}.yaml'
-
-
-def _page_text(pdf: Path, page: int) -> str:
-    return subprocess.run(
-        ['pdftotext', '-f', str(page), '-l', str(page), '-layout', str(pdf), '-'],
-        check=True, capture_output=True, text=True,
-    ).stdout
 
 
 def _assert_table1_compositions(document: dict) -> None:
@@ -91,8 +83,8 @@ def test_yu_tables_migrate_and_keep_isotope_rows_bound_to_conditions() -> None:
     if not pdf.is_file():
         pytest.skip(f'corpus PDF unavailable: {pdf}')
 
-    table1 = _page_text(pdf, 3)
-    table2 = _page_text(pdf, 4)
+    table1 = pdftotext_page_text(pdf, 3)
+    table2 = pdftotext_page_text(pdf, 4)
     assert 'Table 1. Starting Compositions and Chondrules.' in table1
     assert '52.36' in next(line for line in table1.splitlines() if line.lstrip().startswith('SiO2'))
     assert '50.05' in next(line for line in table1.splitlines() if line.lstrip().startswith('SiO2'))

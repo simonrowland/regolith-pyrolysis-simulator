@@ -3,8 +3,6 @@ from __future__ import annotations
 from collections import Counter
 from copy import deepcopy
 from decimal import Decimal
-from pathlib import Path
-import subprocess
 
 import pytest
 import yaml
@@ -13,6 +11,7 @@ from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.pdf_text import pdftotext_page_text
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -49,13 +48,6 @@ def _table34_grid(document: dict) -> dict[str, dict[str, str]]:
 
 def _assert_table34_grid(document: dict, expected: dict[str, dict[str, str]]) -> None:
     assert _table34_grid(document) == expected
-
-
-def _page_text(pdf: Path, page: int) -> str:
-    return subprocess.run(
-        ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(pdf), "-"],
-        check=True, capture_output=True, text=True,
-    ).stdout
 
 
 def test_zhang_thesis_residues_migrate_with_species_temperature_and_conditions() -> None:
@@ -128,7 +120,7 @@ def test_table_3_4_full_grid_is_render_pinned_and_both_mutations_fail() -> None:
     pdf = regolith_corpus_root() / "raw" / SID / f"{SID}.pdf"
     if not pdf.is_file():
         pytest.skip(f"corpus PDF unavailable: {pdf}")
-    page = _page_text(pdf, 165)
+    page = pdftotext_page_text(pdf, 165)
     assert "Table 3.4." in page
     assert "HCHMg 2-2" in page and "HCHMg 2-3" in page
     assert "64.06" in page and "14.32" in page and "13.68" in page
