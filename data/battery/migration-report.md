@@ -4,11 +4,11 @@ rows in: 51641
 records out (observations): 128946
 works: 371
 experiments: 3863
-queue size: 88698
+queue size: 88695
 identical-payload dedupe aliases: 342
 metadata files: 48
 index sources: 370
-hard issues: 3268
+hard issues: 3278
 
 ## Spec vs measured
 
@@ -18019,7 +18019,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 84 |
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 190 |
 | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 48 |
-| `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 7 |
+| `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
 | `data/literature/extracts/fdm879.yaml` | 6 | 8 | 29 |
 | `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 75 | 254 |
@@ -18072,7 +18072,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 300 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 55 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 337 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 343 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 9 | 22 | 79 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 40 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
@@ -18300,7 +18300,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 49 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
 | `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 198 |
-| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 41 |
+| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 40 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 87 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml` | 6 | 6 | 6 |
@@ -18348,14 +18348,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3268
+hard issues: 3278
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
 | `conditional_field:derived_from` | 2131 |
-| `conditional_field:derivation` | 1137 |
+| `conditional_field:derivation` | 1143 |
+| `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
 
@@ -18412,8 +18413,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 228288
+advisory issues: 228088
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 228288 |
+| `identity_incomplete` | 228088 |
