@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
 
 from engine_install_config import (
     EngineLocalConfig,
+    EngineLock,
     EnginePaths,
     artifact_for_platform,
     check_engine_install,
@@ -21,6 +23,26 @@ from engine_install_config import (
 
 
 LOCK_PATH = Path(__file__).resolve().parents[1] / "engines" / "engines.lock.toml"
+
+
+def _checked_extra_builds(
+    lock: EngineLock,
+    install_root: Path,
+    repos_root: Path,
+) -> set[tuple[str, Path]]:
+    report = check_engine_install(
+        lock,
+        install_root,
+        repos_root=repos_root,
+        local_config=repos_root / "engines.local.toml",
+        library_root=repos_root / "home-lib",
+        host="fake-host",
+    )
+    return {
+        (drift.engine, drift.path)
+        for drift in report.drifts
+        if drift.code == "extra_build"
+    }
 
 
 def test_engine_lock_contains_the_reviewed_studio_source_pins(
@@ -320,6 +342,116 @@ def test_lock_rendering_does_not_discover_legacy_engine_paths(
             path_bin,
             home / "lib",
         )
+    )
+
+
+def test_check_reports_each_magemin_runtime_binary_candidate(
+    tmp_path: Path,
+) -> None:
+    import engine_install_config as module
+
+    lock = load_engine_lock(LOCK_PATH)
+    repos_root = tmp_path / "repos"
+    install_root = tmp_path / "home" / "repos" / "engine-bin"
+
+    for index in range(3):
+        project_root = repos_root / f"magemin-case-{index}" / "project"
+        engine_root = project_root / "engines" / "magemin"
+        candidates = module._legacy_magemin_binary_candidates(
+            engine_root,
+            sibling_root=project_root.parent,
+        )
+        assert candidates == (
+            engine_root / "MAGEMin",
+            engine_root / "bin" / "MAGEMin",
+            project_root.parent / "MAGEMin" / "MAGEMin",
+        )
+        selected = candidates[index]
+        selected.parent.mkdir(parents=True, exist_ok=True)
+        selected.write_bytes(b"legacy MAGEMin executable")
+        selected.chmod(0o755)
+
+        expected_checkout = engine_root if index < 2 else selected.parent
+        assert ("magemin", expected_checkout) in _checked_extra_builds(
+            lock,
+            install_root,
+            repos_root,
+        )
+
+
+def test_check_reports_each_alphamelts_runtime_binary_candidate(
+    tmp_path: Path,
+) -> None:
+    import engine_install_config as module
+
+    lock = load_engine_lock(LOCK_PATH)
+    repos_root = tmp_path / "repos"
+    install_root = tmp_path / "home" / "repos" / "engine-bin"
+
+    for index in range(8):
+        engine_root = (
+            repos_root
+            / f"alphamelts-case-{index}"
+            / "project"
+            / "engines"
+            / "alphamelts"
+        )
+        engine_root.mkdir(parents=True)
+        (engine_root / "bundle").mkdir()
+        selected = module._legacy_alphamelts_binary_candidates(engine_root)[index]
+        selected.parent.mkdir(parents=True, exist_ok=True)
+        selected.write_bytes(b"legacy alphaMELTS executable")
+
+        assert ("alphamelts", engine_root) in _checked_extra_builds(
+            lock,
+            install_root,
+            repos_root,
+        )
+
+
+@pytest.mark.parametrize("engine", ("magemin", "alphamelts"))
+def test_check_reports_runtime_path_lookup_inside_repos(
+    engine: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import engine_install_config as module
+
+    lock = load_engine_lock(LOCK_PATH)
+    repos_root = tmp_path / "repos"
+    install_root = tmp_path / "home" / "repos" / "engine-bin"
+    path_bin = repos_root / "path-bin"
+    path_bin.mkdir(parents=True)
+    command = module._legacy_engine_path_command(engine)
+    assert command is not None
+    executable = path_bin / (command + (".exe" if os.name == "nt" else ""))
+    executable.write_text("legacy executable", encoding="utf-8")
+    executable.chmod(0o755)
+    monkeypatch.setenv("PATH", str(path_bin))
+
+    assert (engine, path_bin) in _checked_extra_builds(
+        lock,
+        install_root,
+        repos_root,
+    )
+
+
+def test_check_reports_thermoengine_library_checkout(
+    tmp_path: Path,
+) -> None:
+    lock = load_engine_lock(LOCK_PATH)
+    repos_root = tmp_path / "repos"
+    install_root = tmp_path / "home" / "repos" / "engine-bin"
+    engine_root = repos_root / "legacy" / "engines" / "thermoengine"
+    for artifact in lock.engines["thermoengine"].artifacts:
+        path = engine_root / artifact
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"legacy ThermoEngine dylib")
+
+    assert ("thermoengine", engine_root) in _checked_extra_builds(
+        lock,
+        install_root,
+        repos_root,
     )
 
 

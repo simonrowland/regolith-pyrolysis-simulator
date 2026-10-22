@@ -1371,25 +1371,11 @@ class _MELTSBackendSupport(MeltBackend):
         return self._python_api_model
 
     def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
-        if not engine_root.exists():
-            return None
-        binary_names = (
-            'alphamelts2',
-            'alphamelts_macos',
-            'alphamelts_linux',
-            'alphamelts_win64.exe',
-        )
-        for name in binary_names:
-            direct = engine_root / name
-            if direct.exists():
-                return direct
-        for child in sorted(engine_root.iterdir()):
-            if not child.is_dir():
-                continue
-            for name in binary_names:
-                candidate = child / name
-                if candidate.exists():
-                    return candidate
+        from engine_install_config import _legacy_alphamelts_binary_candidates
+
+        for candidate in _legacy_alphamelts_binary_candidates(engine_root):
+            if candidate.exists():
+                return candidate
         return None
 
     def is_available(self) -> bool:

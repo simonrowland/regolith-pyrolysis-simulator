@@ -8,6 +8,7 @@ import logging
 import os
 import platform
 import re
+import shutil
 import socket
 import subprocess
 import tomllib
@@ -25,6 +26,10 @@ _ALPHAMELTS_BINARY_NAMES = (
     "alphamelts_linux",
     "alphamelts_win64.exe",
 )
+_LEGACY_ENGINE_PATH_COMMANDS = {
+    "alphamelts": "alphamelts",
+    "magemin": "MAGEMin",
+}
 
 _CONFIG_FILENAME = "engines.local.toml"
 _LOCK_FILENAME = "engines.lock.toml"
@@ -539,6 +544,10 @@ def _is_engine_checkout(candidate: Path, key: str, pin: EnginePin) -> bool:
         path.exists() for path in _legacy_alphamelts_binary_candidates(candidate)
     ):
         return True
+    if key == "magemin" and any(
+        path.is_file() for path in _legacy_magemin_binary_candidates(candidate)
+    ):
+        return True
     artifact_paths = list(pin.artifacts)
     artifact_paths.extend(
         relative
@@ -573,6 +582,15 @@ def _find_extra_builds(
                 ):
                     continue
                 found[key].append(candidate)
+    for key in lock.engines:
+        command = _legacy_engine_path_command(key)
+        executable = shutil.which(command) if command else None
+        if executable:
+            executable_path = Path(executable)
+            if _is_within(executable_path, repos_root) and not _is_within(
+                executable_path, install_root
+            ):
+                found[key].append(executable_path.parent)
     return {key: tuple(sorted(set(paths))) for key, paths in found.items() if paths}
 
 
@@ -921,11 +939,31 @@ def warn_legacy_once(engine: str, message: str) -> None:
     logger.warning(message)
 
 
+def _legacy_engine_path_command(engine: str) -> str | None:
+    return _LEGACY_ENGINE_PATH_COMMANDS.get(str(engine).strip().lower())
+
+
+def _legacy_magemin_binary_candidates(
+    engine_root: Path,
+    *,
+    sibling_root: Path | None = None,
+) -> tuple[Path, ...]:
+    """Return MAGEMin's in-tree and optional sibling checkout candidates."""
+    root = Path(engine_root)
+    candidates = (root / "MAGEMin", root / "bin" / "MAGEMin")
+    if sibling_root is not None:
+        candidates += (Path(sibling_root) / "MAGEMin" / "MAGEMin",)
+    return candidates
+
+
 def _legacy_alphamelts_binary_candidates(engine_root: Path) -> tuple[Path, ...]:
+    """Return candidates in the same direct-first order as the runtime adapter."""
     root = Path(engine_root)
     if not root.exists():
         return ()
     candidates = [root / name for name in _ALPHAMELTS_BINARY_NAMES]
+    if any(candidate.exists() for candidate in candidates):
+        return tuple(candidates)
     candidates.extend(
         child / name
         for child in sorted(root.iterdir())

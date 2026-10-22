@@ -1789,7 +1789,10 @@ def install_provenance(
                 if binary is None:
                     import shutil
 
-                    binary = shutil.which("alphamelts")
+                    from engine_install_config import _legacy_engine_path_command
+
+                    command = _legacy_engine_path_command("alphamelts")
+                    binary = shutil.which(command) if command else None
             binary_path = selected_path(binary)
             resolved_paths["alphamelts_selected_binary"] = (
                 str(binary_path) if binary_path is not None else None

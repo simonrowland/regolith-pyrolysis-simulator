@@ -1806,16 +1806,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             return None
 
         project_root = Path(__file__).resolve().parent.parent.parent
-        candidates = [
-            project_root / 'engines' / 'magemin' / 'MAGEMin',
-            project_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
-            project_root.parent / 'MAGEMin' / 'MAGEMin',
-        ]
+        from engine_install_config import (
+            _legacy_engine_path_command,
+            _legacy_magemin_binary_candidates,
+        )
+
+        candidates = _legacy_magemin_binary_candidates(
+            project_root / 'engines' / 'magemin',
+            sibling_root=project_root.parent,
+        )
         for candidate in candidates:
             if candidate.exists() and os.access(candidate, os.X_OK):
                 return candidate
 
-        which = shutil.which('MAGEMin')
+        command = _legacy_engine_path_command('magemin')
+        which = shutil.which(command) if command else None
         if which:
             return Path(which)
 
