@@ -17999,7 +17999,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/borisov-2018-compilation.yaml` | 435 | 435 | 1305 |
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 46 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
-| `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 38 |
+| `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 35 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 37 | 37 | 111 |
 | `data/literature/extracts/burnham-2015-europium-redox.yaml` | 151 | 151 | 302 |
 | `data/literature/extracts/busemann-2000-phase-q-noble-gases.yaml` | 40 | 308 | 804 |
@@ -18332,7 +18332,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/volovetskii-2012-iron-redox.yaml` | 3 | 30 | 3 |
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 6 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
-| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 69 |
+| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 65 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 86 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 48 |

@@ -78,31 +78,6 @@ experiments:
               table: '2'
               note: Printed initial weight 79.1 mg; unit conversion only
         output_unit: kg
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.502765581893791'
-          - - Al2O3
-            - '0.090283840430231'
-          - - MgO
-            - '0.15474029220659'
-          - - CaO
-            - '0.252210285469388'
-          amount_basis: mole_fraction
-      locator:
-        page: 15
-        table: '6'
-        note: Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - sample.printed_composition
-        parameters: []
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -288,96 +263,6 @@ experiments:
               table: '2'
               note: Printed initial weight 72.92 mg; unit conversion only
         output_unit: kg
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.5027655818937908435137918246'
-          - - Al2O3
-            - '0.09028384043023104368530294097'
-          - - MgO
-            - '0.1547402922065900795099231116'
-          - - CaO
-            - '0.252210285469388033290982123'
-          amount_basis: mole_fraction
-      locator:
-        page: 15
-        table: '6'
-        note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.47'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.38'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.42'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.63'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 15
-              table: '6'
-              note: Start EPMA wt%; row 2_low; total 99.90; same starting glass as 1_low
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -563,31 +448,6 @@ experiments:
               table: '2'
               note: Printed initial weight 38.69 mg; unit conversion only
         output_unit: kg
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.502726948745817'
-          - - Al2O3
-            - '0.0902682729887964'
-          - - MgO
-            - '0.154801423150046'
-          - - CaO
-            - '0.25220335511534'
-          amount_basis: mole_fraction
-      locator:
-        page: 15
-        table: '6'
-        note: Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - sample.printed_composition
-        parameters: []
-        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value

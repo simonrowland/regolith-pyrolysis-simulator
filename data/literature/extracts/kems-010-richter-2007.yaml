@@ -39,6 +39,18 @@ experiments:
         tag: value
         value: {MgO: '11.48', SiO2: '46', Al2O3: '19.39', CaO: '23.12'}
       locator: {note: Starting Type B CAI-like composition for vacuum evaporation experiments (Richter et al. 2007)}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - [MgO, '11.48']
+          - [SiO2, '46']
+          - [Al2O3, '19.39']
+          - [CaO, '23.12']
+      locator: {note: Starting Type B CAI-like composition for vacuum evaporation experiments (Richter et al. 2007)}
 - experiment_id: cai-r3-12
   bench_id: hashimoto-vacuum-furnace
   method: free_evaporation

@@ -877,6 +877,7 @@ def test_hashimoto_nonconvergence_is_partial_per_run_and_cohort_continues(
         )
     )
     assert calls == 2  # coarse interval, then the single half-step retry
+    assert len(per_run_results[0]) == 5
     refusal = per_run_results[0][3]
     assert refusal is not None
     assert isinstance(refusal, ResidueEngineNonconvergence)

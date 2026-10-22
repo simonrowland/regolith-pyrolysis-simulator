@@ -1615,6 +1615,10 @@ species:
         method_class: measured_kems
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
+        composition_role: &bischof_table6_1_low_start
+          value: initial_charge_only
+          locator: {published_page: 15, pdf_page_index: 15, table: '6', section: '4.1. EPMA'}
+          quote: 'Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16'
         points:
         - T_K: 1586.4
           p_Pa: 4.04e-05
@@ -3396,6 +3400,7 @@ species:
         method_class: measured_kems
         composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
+        composition_role: *bischof_table6_1_low_start
         points:
         - T_K: 1586.4
           p_Pa: 6.69e-05

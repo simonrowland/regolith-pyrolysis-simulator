@@ -238,9 +238,6 @@ observations:
       charge:
         tag: value
         value: 0
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'assumed_evaporation_coefficient_ratio'; refusing
@@ -264,12 +261,6 @@ observations:
     published_page: 133
     equation: '16'
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_cao_al2o3_residue_enrichment
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:
@@ -549,9 +540,6 @@ observations:
       charge:
         tag: value
         value: 0
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
@@ -576,12 +564,6 @@ observations:
     published_page: 123
     figure: '10'
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_reaction_order_endpoints
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:
@@ -810,9 +792,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.15, 2273.15]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
@@ -846,12 +825,6 @@ observations:
     figure: '10'
     paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy_quoted
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -870,9 +843,6 @@ observations:
       charge:
         tag: value
         value: 0
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
@@ -897,12 +867,6 @@ observations:
     published_page: 123
     figure: '10'
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -924,9 +888,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.15, 2273.15]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
@@ -960,12 +921,6 @@ observations:
     figure: '10'
     paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy_quoted
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -984,9 +939,6 @@ observations:
       charge:
         tag: value
         value: 0
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activation_energy_of_vaporization'; refusing to
@@ -1011,12 +963,6 @@ observations:
     published_page: 123
     figure: '10'
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_fcmas_qualitative_volatility_order
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -1416,9 +1362,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'free_evap_MgO_loss_with_VF'; refusing to pick
@@ -1441,12 +1384,6 @@ observations:
     line_range: 33-90
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   read_from: unknown:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - unknown:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_mg_geometry_class_b1
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -1468,9 +1405,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'free_evap_rate_geometry'; refusing to pick a number
@@ -1491,12 +1425,6 @@ observations:
     paragraph: molten spherule free evaporation graphite crucible
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   read_from: unknown:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - unknown:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_fcmas_free_evap_geometry
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -1518,9 +1446,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'free_evap_SiO2_loss_with_VF'; refusing to pick
@@ -1543,12 +1468,6 @@ observations:
     line_range: 33-90
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   read_from: unknown:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - unknown:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_geometry_class_b1
   experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
@@ -1570,9 +1489,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'free_evap_rate_geometry'; refusing to pick a number
@@ -1593,12 +1509,6 @@ observations:
     paragraph: molten spherule free evaporation graphite crucible
     source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
   read_from: unknown:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - unknown:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_stage_iv_cao_relative_volatility
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:
@@ -1664,9 +1574,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1973.15, 2273.15]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '0.01333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_material_composition'; refusing to pick
@@ -1690,12 +1597,6 @@ observations:
     table: '1'
     note: Chemical composition of the starting material (wt %, 100% normalized)
   read_from: pdf:kems-015-hashimoto-1983
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-015-hashimoto-1983
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table2_run_conditions
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:
@@ -148056,6 +147957,7 @@ observations:
           - - CaO
             - '0.03091541348737772304555125235'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -148457,6 +148359,7 @@ observations:
           - - CaO
             - '0.03091541348737772304555125235'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -148858,6 +148761,7 @@ observations:
           - - CaO
             - '0.03091541348737772304555125235'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -149259,6 +149163,7 @@ observations:
           - - CaO
             - '0.03091541348737772304555125235'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -149660,6 +149565,7 @@ observations:
           - - CaO
             - '0.03091541348737772304555125235'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -150061,6 +149967,7 @@ observations:
           - - CaO
             - '0.03475590003807251259666236311'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -150462,6 +150369,7 @@ observations:
           - - CaO
             - '0.03475590003807251259666236311'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -150863,6 +150771,7 @@ observations:
           - - CaO
             - '0.03475590003807251259666236311'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -151264,6 +151173,7 @@ observations:
           - - CaO
             - '0.03475590003807251259666236311'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -151665,6 +151575,7 @@ observations:
           - - CaO
             - '0.03475590003807251259666236311'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -152066,6 +151977,7 @@ observations:
           - - CaO
             - '0.03457685783009859556542737145'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -152467,6 +152379,7 @@ observations:
           - - CaO
             - '0.03457685783009859556542737145'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -152868,6 +152781,7 @@ observations:
           - - CaO
             - '0.03457685783009859556542737145'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -153269,6 +153183,7 @@ observations:
           - - CaO
             - '0.03457685783009859556542737145'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -153670,6 +153585,7 @@ observations:
           - - CaO
             - '0.03457685783009859556542737145'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -154071,6 +153987,7 @@ observations:
           - - CaO
             - '0.03645657656111497861791147309'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -154472,6 +154389,7 @@ observations:
           - - CaO
             - '0.03645657656111497861791147309'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -154873,6 +154791,7 @@ observations:
           - - CaO
             - '0.03645657656111497861791147309'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -155274,6 +155193,7 @@ observations:
           - - CaO
             - '0.03645657656111497861791147309'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -155675,6 +155595,7 @@ observations:
           - - CaO
             - '0.03645657656111497861791147309'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -156076,6 +155997,7 @@ observations:
           - - CaO
             - '0.03900387394525442299247120731'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -156477,6 +156399,7 @@ observations:
           - - CaO
             - '0.03900387394525442299247120731'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -156878,6 +156801,7 @@ observations:
           - - CaO
             - '0.03900387394525442299247120731'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -157279,6 +157203,7 @@ observations:
           - - CaO
             - '0.03900387394525442299247120731'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -157680,6 +157605,7 @@ observations:
           - - CaO
             - '0.03900387394525442299247120731'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -158081,6 +158007,7 @@ observations:
           - - CaO
             - '0.04426826563329916403804539316'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -158482,6 +158409,7 @@ observations:
           - - CaO
             - '0.04426826563329916403804539316'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -158883,6 +158811,7 @@ observations:
           - - CaO
             - '0.04426826563329916403804539316'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -159284,6 +159213,7 @@ observations:
           - - CaO
             - '0.04426826563329916403804539316'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -159685,6 +159615,7 @@ observations:
           - - CaO
             - '0.04426826563329916403804539316'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -160086,6 +160017,7 @@ observations:
           - - CaO
             - '0.03073863126157905739763719541'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -160487,6 +160419,7 @@ observations:
           - - CaO
             - '0.03073863126157905739763719541'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -160888,6 +160821,7 @@ observations:
           - - CaO
             - '0.03073863126157905739763719541'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -161289,6 +161223,7 @@ observations:
           - - CaO
             - '0.03073863126157905739763719541'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -161690,6 +161625,7 @@ observations:
           - - CaO
             - '0.03073863126157905739763719541'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -162091,6 +162027,7 @@ observations:
           - - CaO
             - '0.03348597399786109212688083724'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -162492,6 +162429,7 @@ observations:
           - - CaO
             - '0.03348597399786109212688083724'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -162893,6 +162831,7 @@ observations:
           - - CaO
             - '0.03348597399786109212688083724'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -163294,6 +163233,7 @@ observations:
           - - CaO
             - '0.03348597399786109212688083724'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -163695,6 +163635,7 @@ observations:
           - - CaO
             - '0.03348597399786109212688083724'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -164096,6 +164037,7 @@ observations:
           - - CaO
             - '0.03507987826700962371212832594'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -164497,6 +164439,7 @@ observations:
           - - CaO
             - '0.03507987826700962371212832594'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -164898,6 +164841,7 @@ observations:
           - - CaO
             - '0.03507987826700962371212832594'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -165299,6 +165243,7 @@ observations:
           - - CaO
             - '0.03507987826700962371212832594'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -165700,6 +165645,7 @@ observations:
           - - CaO
             - '0.03507987826700962371212832594'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -166101,6 +166047,7 @@ observations:
           - - CaO
             - '0.03877934512712203332887733361'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -166502,6 +166449,7 @@ observations:
           - - CaO
             - '0.03877934512712203332887733361'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -166903,6 +166851,7 @@ observations:
           - - CaO
             - '0.03877934512712203332887733361'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -167304,6 +167253,7 @@ observations:
           - - CaO
             - '0.03877934512712203332887733361'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -167705,6 +167655,7 @@ observations:
           - - CaO
             - '0.03877934512712203332887733361'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -168106,6 +168057,7 @@ observations:
           - - CaO
             - '0.0348474722061949768846818589'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -168507,6 +168459,7 @@ observations:
           - - CaO
             - '0.0348474722061949768846818589'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -168908,6 +168861,7 @@ observations:
           - - CaO
             - '0.0348474722061949768846818589'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -169309,6 +169263,7 @@ observations:
           - - CaO
             - '0.0348474722061949768846818589'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -169710,6 +169665,7 @@ observations:
           - - CaO
             - '0.0348474722061949768846818589'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -170111,6 +170067,7 @@ observations:
           - - CaO
             - '0.03846534651382026941941120495'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -170512,6 +170469,7 @@ observations:
           - - CaO
             - '0.03846534651382026941941120495'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -170913,6 +170871,7 @@ observations:
           - - CaO
             - '0.03846534651382026941941120495'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -171314,6 +171273,7 @@ observations:
           - - CaO
             - '0.03846534651382026941941120495'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -171715,6 +171675,7 @@ observations:
           - - CaO
             - '0.03846534651382026941941120495'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -172116,6 +172077,7 @@ observations:
           - - CaO
             - '0.03730625059104853189442712246'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -172517,6 +172479,7 @@ observations:
           - - CaO
             - '0.03730625059104853189442712246'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -172918,6 +172881,7 @@ observations:
           - - CaO
             - '0.03730625059104853189442712246'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -173319,6 +173283,7 @@ observations:
           - - CaO
             - '0.03730625059104853189442712246'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -173720,6 +173685,7 @@ observations:
           - - CaO
             - '0.03730625059104853189442712246'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -174121,6 +174087,7 @@ observations:
           - - CaO
             - '0.04294866897014058110244981302'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -174522,6 +174489,7 @@ observations:
           - - CaO
             - '0.04294866897014058110244981302'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -174923,6 +174891,7 @@ observations:
           - - CaO
             - '0.04294866897014058110244981302'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -175324,6 +175293,7 @@ observations:
           - - CaO
             - '0.04294866897014058110244981302'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -175725,6 +175695,7 @@ observations:
           - - CaO
             - '0.04294866897014058110244981302'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -176126,6 +176097,7 @@ observations:
           - - CaO
             - '0.04329535889949569194759252965'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -176527,6 +176499,7 @@ observations:
           - - CaO
             - '0.04329535889949569194759252965'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -176928,6 +176901,7 @@ observations:
           - - CaO
             - '0.04329535889949569194759252965'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -177329,6 +177303,7 @@ observations:
           - - CaO
             - '0.04329535889949569194759252965'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -177730,6 +177705,7 @@ observations:
           - - CaO
             - '0.04329535889949569194759252965'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -178131,6 +178107,7 @@ observations:
           - - CaO
             - '0.04421107523841427155845202194'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -178532,6 +178509,7 @@ observations:
           - - CaO
             - '0.04421107523841427155845202194'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -178933,6 +178911,7 @@ observations:
           - - CaO
             - '0.04421107523841427155845202194'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -179334,6 +179313,7 @@ observations:
           - - CaO
             - '0.04421107523841427155845202194'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -179735,6 +179715,7 @@ observations:
           - - CaO
             - '0.04421107523841427155845202194'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -180136,6 +180117,7 @@ observations:
           - - CaO
             - '0.03299963745470546090051008217'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -180537,6 +180519,7 @@ observations:
           - - CaO
             - '0.03299963745470546090051008217'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -180938,6 +180921,7 @@ observations:
           - - CaO
             - '0.03299963745470546090051008217'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -181339,6 +181323,7 @@ observations:
           - - CaO
             - '0.03299963745470546090051008217'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -181740,6 +181725,7 @@ observations:
           - - CaO
             - '0.03299963745470546090051008217'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -182141,6 +182127,7 @@ observations:
           - - CaO
             - '0.03239879926457862522247020106'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -182542,6 +182529,7 @@ observations:
           - - CaO
             - '0.03239879926457862522247020106'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -182943,6 +182931,7 @@ observations:
           - - CaO
             - '0.03239879926457862522247020106'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -183344,6 +183333,7 @@ observations:
           - - CaO
             - '0.03239879926457862522247020106'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -183745,6 +183735,7 @@ observations:
           - - CaO
             - '0.03239879926457862522247020106'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -184146,6 +184137,7 @@ observations:
           - - CaO
             - '0.03457562336569275284973166856'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -184547,6 +184539,7 @@ observations:
           - - CaO
             - '0.03457562336569275284973166856'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -184948,6 +184941,7 @@ observations:
           - - CaO
             - '0.03457562336569275284973166856'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -185349,6 +185343,7 @@ observations:
           - - CaO
             - '0.03457562336569275284973166856'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -185750,6 +185745,7 @@ observations:
           - - CaO
             - '0.03457562336569275284973166856'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -186151,6 +186147,7 @@ observations:
           - - CaO
             - '0.04231481315287108545751394843'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -186552,6 +186549,7 @@ observations:
           - - CaO
             - '0.04231481315287108545751394843'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -186953,6 +186951,7 @@ observations:
           - - CaO
             - '0.04231481315287108545751394843'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -187354,6 +187353,7 @@ observations:
           - - CaO
             - '0.04231481315287108545751394843'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -187755,6 +187755,7 @@ observations:
           - - CaO
             - '0.04231481315287108545751394843'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -188156,6 +188157,7 @@ observations:
           - - CaO
             - '0.04670361812165375666167774158'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -188557,6 +188559,7 @@ observations:
           - - CaO
             - '0.04670361812165375666167774158'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -188958,6 +188961,7 @@ observations:
           - - CaO
             - '0.04670361812165375666167774158'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -189359,6 +189363,7 @@ observations:
           - - CaO
             - '0.04670361812165375666167774158'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -189760,6 +189765,7 @@ observations:
           - - CaO
             - '0.04670361812165375666167774158'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -190161,6 +190167,7 @@ observations:
           - - CaO
             - '0.03612376287874102786946509237'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -190562,6 +190569,7 @@ observations:
           - - CaO
             - '0.03612376287874102786946509237'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -190963,6 +190971,7 @@ observations:
           - - CaO
             - '0.03612376287874102786946509237'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -191364,6 +191373,7 @@ observations:
           - - CaO
             - '0.03612376287874102786946509237'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -191765,6 +191775,7 @@ observations:
           - - CaO
             - '0.03612376287874102786946509237'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -192166,6 +192177,7 @@ observations:
           - - CaO
             - '0.04510769538009413288094081303'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -192567,6 +192579,7 @@ observations:
           - - CaO
             - '0.04510769538009413288094081303'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -192968,6 +192981,7 @@ observations:
           - - CaO
             - '0.04510769538009413288094081303'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -193369,6 +193383,7 @@ observations:
           - - CaO
             - '0.04510769538009413288094081303'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -193770,6 +193785,7 @@ observations:
           - - CaO
             - '0.04510769538009413288094081303'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -194171,6 +194187,7 @@ observations:
           - - CaO
             - '0.05261295464923630375903721359'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -194572,6 +194589,7 @@ observations:
           - - CaO
             - '0.05261295464923630375903721359'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -194973,6 +194991,7 @@ observations:
           - - CaO
             - '0.05261295464923630375903721359'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -195374,6 +195393,7 @@ observations:
           - - CaO
             - '0.05261295464923630375903721359'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -195775,6 +195795,7 @@ observations:
           - - CaO
             - '0.05261295464923630375903721359'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 116
         pdf_page_index: 6
@@ -216620,7 +216641,7 @@ observations:
               note: Run-mapped Table 4 phase compositions for printed physical charge 18B6(1).
         output_unit: mole_fraction
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::T=1973.15:h=c0adf83d7d0d
-  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
     quantity:
       tag: unknown
@@ -216656,6 +216677,7 @@ observations:
         - - CaO
           - '0.02585443302100830695634774455'
         amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -216696,6 +216718,7 @@ observations:
           - - CaO
             - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 122
         pdf_page_index: 12
@@ -216847,7 +216870,7 @@ observations:
               note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
         output_unit: K
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::T=2073.15:h=a05ce9a2cb7c
-  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
     quantity:
       tag: unknown
@@ -216883,6 +216906,7 @@ observations:
         - - CaO
           - '0.02585443302100830695634774455'
         amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -216923,6 +216947,7 @@ observations:
           - - CaO
             - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 122
         pdf_page_index: 12
@@ -217074,7 +217099,7 @@ observations:
               note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
         output_unit: K
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::T=2173.15:h=d5c5b8d545f4
-  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
     quantity:
       tag: unknown
@@ -217110,6 +217135,7 @@ observations:
         - - CaO
           - '0.02585443302100830695634774455'
         amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -217150,6 +217176,7 @@ observations:
           - - CaO
             - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 122
         pdf_page_index: 12
@@ -217301,7 +217328,7 @@ observations:
               note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
         output_unit: K
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F::T=2273.15:h=1dfa7c3f8b3a
-  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
   identity:
     quantity:
       tag: unknown
@@ -217337,6 +217364,7 @@ observations:
         - - CaO
           - '0.02585443302100830695634774455'
         amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -217377,6 +217405,7 @@ observations:
           - - CaO
             - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 122
         pdf_page_index: 12

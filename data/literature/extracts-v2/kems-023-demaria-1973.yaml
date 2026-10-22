@@ -7095,7 +7095,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -7118,6 +7118,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7160,7 +7167,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1400.0:row=10017:h=60df169fee87
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7173,7 +7194,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4311471091931851005512625625'
@@ -7196,6 +7217,13 @@ observations:
           - - P2O5
             - '0.0005817825557497747304128963893'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -7480,7 +7508,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -7503,6 +7531,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7545,7 +7580,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1500.0:row=10017:h=279efc049af6
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7558,7 +7607,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4311471091931851005512625625'
@@ -7581,6 +7630,13 @@ observations:
           - - P2O5
             - '0.0005817825557497747304128963893'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -7865,7 +7921,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -7886,6 +7942,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7928,7 +7991,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1400.0:row=12073:h=e710b7f1433b
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7941,7 +8018,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4276962562759165078431124469'
@@ -7962,6 +8039,13 @@ observations:
           - - K2O
             - '0.001663460884936076679979674698'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -8228,7 +8312,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -8249,6 +8333,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8291,7 +8382,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1500.0:row=12073:h=0cdb3eba1f97
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -8304,7 +8409,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4276962562759165078431124469'
@@ -8325,6 +8430,13 @@ observations:
           - - K2O
             - '0.001663460884936076679979674698'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -10930,7 +11042,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -10953,6 +11065,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10995,7 +11114,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2100.0:row=10017:h=bc0d169f5782
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -11008,7 +11141,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4311471091931851005512625625'
@@ -11031,6 +11164,13 @@ observations:
           - - P2O5
             - '0.0005817825557497747304128963893'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -11315,7 +11455,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -11338,6 +11478,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11380,7 +11527,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2200.0:row=10017:h=02e402d12d9e
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -11393,7 +11554,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4311471091931851005512625625'
@@ -11416,6 +11577,13 @@ observations:
           - - P2O5
             - '0.0005817825557497747304128963893'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -11700,7 +11868,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -11721,6 +11889,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11763,7 +11938,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2100.0:row=12073:h=dc8a5bc530df
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -11776,7 +11965,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4276962562759165078431124469'
@@ -11797,6 +11986,13 @@ observations:
           - - K2O
             - '0.001663460884936076679979674698'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -12063,7 +12259,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -12084,6 +12280,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12126,7 +12329,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2200.0:row=12073:h=80decee22021
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -12139,7 +12356,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4276962562759165078431124469'
@@ -12160,6 +12377,13 @@ observations:
           - - K2O
             - '0.001663460884936076679979674698'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
       locator:
         published_page: 176
         pdf_page_index: 2
