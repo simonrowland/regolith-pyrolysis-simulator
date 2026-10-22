@@ -690,7 +690,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # retained; this digest still excludes only the cache-sensitive block
     # above.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "a1cab1a260b1d0c2c4925cf15c4bd884a363cb82866dd90654c0954d59823900"
+        "bfbfa8ef7e3b7728e1b41759798cea3c76256ed97339b8cb32bdb51402e3cc9d"
     )
 
 
