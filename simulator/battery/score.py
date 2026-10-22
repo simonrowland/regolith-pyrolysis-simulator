@@ -5796,6 +5796,7 @@ def predict_with_engine(
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
                 _pow10_pressure_or_raise,
+                declared_antoine_segment_phase,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
             )
@@ -5808,6 +5809,33 @@ def predict_with_engine(
             coefficients, coefficient_block = wall_condensation_antoine_coefficients(
                 row, float(T)
             )
+            if coefficients.get("selection_refusal"):
+                left_basis = (
+                    f"{coefficients.get('left_segment')}({coefficients.get('left_phase')})"
+                )
+                right_basis = (
+                    f"{coefficients.get('right_segment')}({coefficients.get('right_phase')})"
+                )
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+                    refusal_detail={
+                        "reason": coefficients["selection_refusal"],
+                        "left_segment_basis": left_basis,
+                        "right_segment_basis": right_basis,
+                        "left_phase": coefficients.get("left_phase"),
+                        "right_phase": coefficients.get("right_phase"),
+                        "left_segment": coefficients.get("left_segment"),
+                        "right_segment": coefficients.get("right_segment"),
+                        "formula": formula,
+                        "temperature_K": str(T),
+                    },
+                    identity=identity,
+                )
             if not coefficients or coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
                 return EnginePrediction(
                     engine=engine,
@@ -5819,6 +5847,28 @@ def predict_with_engine(
                     refusal_detail={
                         "reason": "static_equilibrium_total_pressure_not_available",
                         "formula": formula,
+                    },
+                    identity=identity,
+                )
+            segment_phase = declared_antoine_segment_phase(coefficients)
+            reservoir_phase = reservoir[1]
+            if segment_phase is not None and segment_phase != reservoir_phase:
+                segment_name = str(coefficients.get("name") or coefficient_block)
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.IDENTITY_MISMATCH,
+                    refusal_detail={
+                        "reason": "antoine-reservoir-phase-mismatch",
+                        "observation_reservoir_basis": (
+                            f"{reservoir[0]}({reservoir_phase})"
+                        ),
+                        "segment_basis": f"{segment_name}({segment_phase})",
+                        "formula": formula,
+                        "segment": segment_name,
                     },
                     identity=identity,
                 )
@@ -5871,6 +5921,15 @@ def predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         ),
                     )
+            if segment_phase is None:
+                notices = notices + (
+                    Notice(
+                        kind=NoticeKind.INPUT_OMITTED,
+                        affected_quantities=(Quantity.P_SAT,),
+                        reason="antoine-segment-phase-undeclared",
+                        origin=observation.observation_id,
+                    ),
+                )
             sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
             return EnginePrediction(
                 engine=engine,

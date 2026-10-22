@@ -2377,38 +2377,30 @@ def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
     ) is extrapolated
 
 
-# Production static-equilibrium pressures at the pin commit. Segment phase
-# is not compared with the reservoir, and a gap returns the last segment.
-_ANTOINE_PHASE_CASES = (
-    ("Si", Decimal("2000"), Phase.CR, Decimal("4.410122194873473"), ()),
+# Matching-basis pressures captured from predict_with_engine. The mismatched
+# reservoir and the Si phase-boundary gap are refused below.
+_ANTOINE_MATCHING_CASES = (
     ("Si", Decimal("2000"), Phase.L, Decimal("4.410122194873473"), ()),
     ("Si", Decimal("1000"), Phase.CR, Decimal("1.5560633803943994E-11"), ()),
-    (
-        "Si",
-        Decimal("1690"),
-        Phase.CR,
-        Decimal("0.05792280364079257"),
-        ("pure_component_antoine_extrapolated",),
-    ),
-    (
-        "Si",
-        Decimal("1690"),
-        Phase.L,
-        Decimal("0.05792280364079257"),
-        ("pure_component_antoine_extrapolated",),
-    ),
     ("Si", Decimal("1800"), Phase.L, Decimal("0.320744894252916"), ()),
-    ("Mn", Decimal("1600"), Phase.CR, Decimal("366.4277112026563"), ()),
     ("Mn", Decimal("1400"), Phase.CR, Decimal("22.630450812668585"), ()),
-    ("Mn", Decimal("1519"), Phase.L, Decimal("135.85703758590856"), ()),
     ("Mn", Decimal("1519"), Phase.CR, Decimal("135.85703758590856"), ()),
-    ("Na", Decimal("1056"), Phase.L, Decimal("33991.26166001457"), ()),
+    (
+        "Na",
+        Decimal("1056"),
+        Phase.L,
+        Decimal("33991.26166001457"),
+        ("antoine-segment-phase-undeclared",),
+    ),
     (
         "Na",
         Decimal("1200"),
         Phase.L,
         Decimal("117402.20851973725"),
-        ("pure_component_antoine_extrapolated",),
+        (
+            "pure_component_antoine_extrapolated",
+            "antoine-segment-phase-undeclared",
+        ),
     ),
 )
 
@@ -2432,12 +2424,70 @@ def _static_psat(formula: str, temperature: Decimal, reservoir_phase: Phase):
     )
 
 
-def test_static_equilibrium_antoine_ignores_reservoir_phase_and_gap_boundaries() -> None:
-    for formula, temperature, phase, expected, notice_reasons in _ANTOINE_PHASE_CASES:
+def _assert_antoine_phase_refusal(
+    formula: str,
+    temperature: Decimal,
+    phase: Phase,
+    *,
+    reason: str,
+    observation_basis: str | None = None,
+    segment_basis: str | None = None,
+    left_basis: str | None = None,
+    right_basis: str | None = None,
+):
+    prediction = _static_psat(formula, temperature, phase)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert prediction.refusal_detail["reason"] == reason
+    if observation_basis is not None:
+        assert prediction.refusal_detail["observation_reservoir_basis"] == observation_basis
+        assert prediction.refusal_detail["segment_basis"] == segment_basis
+    if left_basis is not None:
+        assert prediction.refusal_detail["left_segment_basis"] == left_basis
+        assert prediction.refusal_detail["right_segment_basis"] == right_basis
+    return prediction
+
+
+def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_gaps() -> None:
+    for formula, temperature, phase, expected, notice_reasons in _ANTOINE_MATCHING_CASES:
         prediction = _static_psat(formula, temperature, phase)
         assert prediction.refusal_reason is None, (formula, temperature, phase)
         assert prediction.value == expected
         assert tuple(notice.reason for notice in prediction.notices) == notice_reasons
+
+    _assert_antoine_phase_refusal(
+        "Si",
+        Decimal("2000"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Si(cr)",
+        segment_basis="liquid_janaf(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1600"),
+        Phase.CR,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(cr)",
+        segment_basis="liquid_nist_janaf_chase_1998(l)",
+    )
+    _assert_antoine_phase_refusal(
+        "Mn",
+        Decimal("1519"),
+        Phase.L,
+        reason="antoine-reservoir-phase-mismatch",
+        observation_basis="Mn(l)",
+        segment_basis="solid_nist_janaf_chase_1998(cr)",
+    )
+    for phase in (Phase.CR, Phase.L):
+        _assert_antoine_phase_refusal(
+            "Si",
+            Decimal("1690"),
+            phase,
+            reason="antoine-gap-crosses-phase-boundary",
+            left_basis="crystal_janaf(cr)",
+            right_basis="liquid_janaf(l)",
+        )
 
     from engines.builtin.vapor_pressure import (
         vapor_pressure_antoine_coefficients,
@@ -2455,8 +2505,12 @@ def test_static_equilibrium_antoine_ignores_reservoir_phase_and_gap_boundaries()
     ):
         selected, block = selector(silicon, 1690.0)
         assert block == "pure_component_antoine"
-        assert selected["name"] == "liquid_janaf"
-        assert selected["phase"] == "liquid"
+        assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
+        assert "A" not in selected
+        crystal, _ = selector(silicon, 1500.0)
+        liquid, _ = selector(silicon, 1800.0)
+        assert crystal["name"] == "crystal_janaf"
+        assert liquid["name"] == "liquid_janaf"
 
 
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
