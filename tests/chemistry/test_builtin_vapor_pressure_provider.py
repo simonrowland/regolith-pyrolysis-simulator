@@ -27,6 +27,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from engines.antoine import _antoine_skip_notices_for_omitted_species
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
@@ -353,7 +354,40 @@ def _assert_antoine_skip_notice(
         f"species={species} site={site} reason={reason} "
         f"temperature_K={temperature_K:.3f}"
     )
-    assert expected in warnings
+    assert warnings.count(expected) == 1
+
+
+@pytest.mark.parametrize(
+    "pressure",
+    (0.0, -1.0, float("nan"), float("inf"), None),
+    ids=("zero", "negative", "nan", "infinity", "unavailable"),
+)
+def test_antoine_skip_notice_requires_finite_positive_resolved_pressure(
+    pressure,
+) -> None:
+    notice = (
+        "antoine_species_skipped: species=Fe "
+        "site=equilibrium.internal_analytical.metal_antoine "
+        "reason=missing_antoine_A temperature_K=2250.000"
+    )
+
+    assert _antoine_skip_notices_for_omitted_species(
+        [notice],
+        {"Fe": pressure},
+    ) == [notice]
+
+
+def test_antoine_skip_notice_is_removed_for_finite_positive_resolved_pressure():
+    notice = (
+        "antoine_species_skipped: species=Fe "
+        "site=equilibrium.internal_analytical.metal_antoine "
+        "reason=missing_antoine_A temperature_K=2250.000"
+    )
+
+    assert _antoine_skip_notices_for_omitted_species(
+        [notice],
+        {"Fe": 1.0},
+    ) == []
 
 
 @pytest.mark.parametrize(
@@ -3105,6 +3139,11 @@ def test_legacy_fallback_keeps_fe_pure_sidecar_above_pseudo_fit_range(
     assert result.vapor_pressures_Pa["Fe"] > 0.0
     assert result.vapor_pressures_source["Fe"] == (
         "builtin_authoritative:pure_component_derived_from_evaluation"
+    )
+    assert not any(
+        warning.startswith("antoine_species_skipped: ")
+        and "species=Fe " in warning
+        for warning in result.warnings
     )
     assert not any(
         "species=Fe" in warning
