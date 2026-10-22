@@ -118,6 +118,113 @@ def test_moved_rows_are_absent_from_observations() -> None:
     assert not any(row_id.startswith("suga03_t3_") for row_id in observation_ids)
 
 
+def test_table_3_starting_compositions_match_printed_rows_after_migration() -> None:
+    expected = {
+        "suga03_t3_starting_composition_x12.5": {
+            "starting_material_mol_percent": {
+                "anorthite": 46.67,
+                "diopside": 46.67,
+                "Ni2SiO4": 6.67,
+            },
+            "starting_material_join_fraction": {
+                "join": "An50Di50-Ni2SiO4",
+                "Ni2SiO4": 12.5,
+            },
+            "starting_composition_wt_percent": {
+                "SiO2": 47.44,
+                "Al2O3": 19.43,
+                "MgO": 7.68,
+                "NiO": 4.07,
+                "CaO": 21.38,
+                "total": 100.00,
+            },
+        },
+        "suga03_t3_starting_composition_x25": {
+            "starting_material_mol_percent": {
+                "anorthite": 42.86,
+                "diopside": 42.86,
+                "Ni2SiO4": 14.29,
+            },
+            "starting_material_join_fraction": {
+                "join": "An50Di50-Ni2SiO4",
+                "Ni2SiO4": 25.0,
+            },
+            "starting_composition_wt_percent": {
+                "SiO2": 46.12,
+                "Al2O3": 18.06,
+                "MgO": 7.14,
+                "NiO": 8.82,
+                "CaO": 19.87,
+                "total": 100.00,
+            },
+        },
+        "suga03_t3_starting_composition_x37.5": {
+            "starting_material_mol_percent": {
+                "anorthite": 38.46,
+                "diopside": 38.46,
+                "Ni2SiO4": 23.08,
+            },
+            "starting_material_join_fraction": {
+                "join": "An50Di50-Ni2SiO4",
+                "Ni2SiO4": 37.5,
+            },
+            "starting_composition_wt_percent": {
+                "SiO2": 44.55,
+                "Al2O3": 16.43,
+                "MgO": 6.50,
+                "NiO": 14.45,
+                "CaO": 18.08,
+                "total": 100.00,
+            },
+        },
+        "suga03_t3_starting_composition_x50": {
+            "starting_material_mol_percent": {
+                "anorthite": 33.33,
+                "diopside": 33.33,
+                "Ni2SiO4": 33.33,
+            },
+            "starting_material_join_fraction": {
+                "join": "An50Di50-Ni2SiO4",
+                "Ni2SiO4": 50.0,
+            },
+            "starting_composition_wt_percent": {
+                "SiO2": 42.66,
+                "Al2O3": 14.48,
+                "MgO": 5.72,
+                "NiO": 21.21,
+                "CaO": 15.93,
+                "total": 100.00,
+            },
+        },
+    }
+    document = _document()
+    source_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("context", [])
+    }
+    for observation_id, values in expected.items():
+        row = source_rows[observation_id]
+        assert row["type"] == "bulk_charge_analysis_context"
+        assert {key: row["values"][key] for key in values} == values
+
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    assert len(migrator.result.observations) == 18
+    assert not migrator.result.validation.hard_issues
+    migrated_context = {
+        row["observation_id"]: row
+        for rows in migrator.result.context_by_work.values()
+        for row in rows
+        if row["observation_id"] in expected
+    }
+    assert set(migrated_context) == set(expected)
+    for observation_id, values in expected.items():
+        row = migrated_context[observation_id]
+        assert row["type"] == "bulk_charge_analysis_context"
+        assert {key: row["values"][key] for key in values} == values
+
+
 def test_table_4_author_calculations_remain_numeric_context() -> None:
     document = _document()
     context = {
