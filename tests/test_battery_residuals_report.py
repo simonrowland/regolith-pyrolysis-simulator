@@ -352,6 +352,55 @@ def test_rowdiff_duplicate_tip_key_is_an_input_error(tmp_path: Path, capsys: pyt
     assert seen.getvalue() == "rowdiff_invalid\t3\tm\n"
 
 
+def test_rowdiff_duplicate_key_outside_the_filter_is_an_input_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A repeated key the report filter would drop is still an input error."""
+
+    key = "outside:T=1000::activity::melt_activity::openimcc"
+    bad = tmp_path / "bad.jsonl"
+    empty = tmp_path / "empty.jsonl"
+    _write_values(bad, ((key, "1"), (key, "2")))
+    empty.write_text('{"kind":"battery_store_stamp","revision":"show"}\n', encoding="utf-8")
+
+    base_sink = io.StringIO()
+    with pytest.raises(DuplicateResidualKey, match=r":3: duplicate residual key ") as raised:
+        rowdiff_report(bad, empty, t_min=Decimal("1500"), t_max=Decimal("2000"), out=base_sink)
+
+    assert raised.value.line == 3
+    assert raised.value.key == key
+    assert base_sink.getvalue() == ""
+    assert main(["rowdiff", str(bad), str(empty), "--t-min", "1500", "--t-max", "2000"]) == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert key in captured.err
+
+    tip_sink = io.StringIO()
+    with pytest.raises(DuplicateResidualKey, match=r":3: duplicate residual key ") as tip_raised:
+        rowdiff_report(empty, bad, t_min=Decimal("1500"), t_max=Decimal("2000"), out=tip_sink)
+
+    assert tip_raised.value.line == 3
+    assert tip_raised.value.key == key
+    assert tip_sink.getvalue() == f"rowdiff_invalid\t3\t{key}\n"
+    assert main(["rowdiff", str(empty), str(bad), "--t-min", "1500", "--t-max", "2000"]) == 1
+    captured = capsys.readouterr()
+    assert "base_rows" not in captured.out
+    assert f"rowdiff_invalid\t3\t{key}" in captured.out
+    assert key in captured.err
+
+    engine_base = io.StringIO()
+    with pytest.raises(DuplicateResidualKey, match=r":3: duplicate residual key ") as engine_raised:
+        rowdiff_report(bad, empty, engine="magemin", out=engine_base)
+    assert engine_raised.value.key == key
+    assert engine_base.getvalue() == ""
+
+    engine_tip = io.StringIO()
+    with pytest.raises(DuplicateResidualKey, match=r":3: duplicate residual key ") as engine_tip_raised:
+        rowdiff_report(empty, bad, engine="magemin", out=engine_tip)
+    assert engine_tip_raised.value.key == key
+    assert engine_tip.getvalue() == f"rowdiff_invalid\t3\t{key}\n"
+
+
 def _write_ledger(path: Path, n: int, value: str) -> None:
     with path.open("w", encoding="utf-8") as handle:
         handle.write('{"kind":"battery_store_stamp","revision":"mem"}\n')
@@ -372,8 +421,9 @@ def test_rowdiff_and_band_peak_memory_stay_compact(tmp_path: Path) -> None:
     That index is key to (status code, float). On this fixture it traces
     about 21 MB. The previous nine-field union of both sides traced
     28_871_392 bytes here and is over this cap, as is a full list of the
-    100_000 moves or a pair of RowView indexes. Keys only in the tip are a
-    separate set; this fixture has none. The band bound is unchanged.
+    100_000 moves or a pair of RowView indexes. Tip keys absent from the base
+    index are a separate set; this fixture has none, and no filter retains
+    a filtered base key either. The band bound is unchanged.
     """
 
     n = 100_000

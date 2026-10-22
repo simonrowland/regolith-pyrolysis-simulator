@@ -33,24 +33,29 @@ transitions per engine, numeric value changes, keys that were refused and
 are now scored, keys that were scored and are now refused, and keys added
 or removed inside the same filter. Newly scored and newly refused require
 the key in both files. A filter that drops a key does not count it as added
-or removed. A key may appear once among the rows a ledger contributes.
-A second appearance is an input error naming that key and its line. The
-base ledger is indexed once, as key to a status code and a float64 value
-or none, and a repeated base key is found while that index is built. The
-tip ledger is read once against that index. A base key already seen, and
-a tip-only key already seen, are the same error. Keys only in the tip are
-kept in a set, so that memory follows how many keys are only in the tip.
+or removed. Every non-empty key may appear once in a ledger, including a
+row the engine or temperature filter does not report. A second appearance
+is an input error naming that key and its line. The filter selects only
+the rows that are counted and compared. The base ledger is indexed once.
+An accepted row is key to a status code and a float64 value or none. A
+filtered base key is remembered only until that index is finished, so a
+repeat can be named, and that set is empty when every row is accepted.
+A repeated base key is found while the index is built. The tip ledger is
+read once. A base key the tip has already shown, and a tip key that is
+absent from the base index and has already been shown, are the same error.
+Tip keys absent from the base index, including filtered ones, stay in one
+set. That memory follows how many tip keys are not in the base index.
 Each tip change is written when that row is read. Detail lines already
 written stay; the output then gains an invalid trailer and the command
-exits nonzero. After a complete stream, keys still in the base index are
-only in the base ledger and are written then. The base index of the
-100_000-key overlapping fixture traces about 21 MB, about 210 MB per
-million base keys, dominated by the key text. That fixture has no tip-only
-keys. A nine-field record holding both sides traced 28_871_392 bytes on
-it. At most ``show`` value moves are kept, in a bounded heap of the
-largest relative changes; the counts include every change. A float64 value
-that does not round-trip through decimal text can hide a difference smaller
-than float64.
+exits nonzero. After a complete stream, accepted base keys the tip did not
+report are only in the base ledger and are written then. The base index of
+the 100_000-key overlapping fixture traces about 21 MB, about 210 MB per
+million base keys, dominated by the key text. That fixture has no tip keys
+absent from the base index. A nine-field record holding both sides traced
+28_871_392 bytes on it. At most ``show`` value moves are kept, in a bounded
+heap of the largest relative changes; the counts include every change. A
+float64 value that does not round-trip through decimal text can hide a
+difference smaller than float64.
 
 ``band`` reports, inside the temperature window, status counts and the
 median and root-mean-square of stored numeric values grouped by engine,
@@ -105,12 +110,18 @@ _RELATIVE_BUCKETS: tuple[Decimal, ...] = (
 _STATUS_NAMES = tuple(status.value for status in ResidualStatus)
 _STATUS_CODE = {name: index for index, name in enumerate(_STATUS_NAMES)}
 _UNKNOWN = -2
-# Added to a base status code once the tip stream has seen that key.
-# The marked codes are created once. A per-key sum would retain an int per key.
+# Offsets on a base status code. Seen means the tip has shown that key on
+# any row. Reported means an accepted tip row was compared. A seen key that
+# was not reported is still only in the base. The marked codes are created
+# once. A per-key sum would retain an int per key.
 _SEEN = 1000
-_MARKED_CODE = {
-    code: (code + _SEEN if code >= 0 else code - _SEEN)
-    for code in (*_STATUS_CODE.values(), _UNKNOWN)
+_REPORTED = 2000
+_STATUS_CODES = (*_STATUS_CODE.values(), _UNKNOWN)
+_SEEN_CODE = {
+    code: (code + _SEEN if code >= 0 else code - _SEEN) for code in _STATUS_CODES
+}
+_REPORTED_CODE = {
+    code: (code + _REPORTED if code >= 0 else code - _REPORTED) for code in _STATUS_CODES
 }
 _BaseSlot = tuple[int, float | None]
 
@@ -426,16 +437,50 @@ def _status_text(code: int, raw: str) -> str:
     return _STATUS_NAMES[code]
 
 
+def _signed_offset(code: int, magnitude: int) -> int:
+    """Move ``code`` away from zero by ``magnitude``. A negative magnitude strips a mark."""
+
+    return code + magnitude if code >= 0 else code - magnitude
+
+
 def _mark_seen(code: int) -> int:
-    marked = _MARKED_CODE.get(code)
+    marked = _SEEN_CODE.get(code)
     if marked is None:
-        marked = code + _SEEN if code >= 0 else code - _SEEN
-        _MARKED_CODE[code] = marked
+        marked = _signed_offset(code, _SEEN)
+        _SEEN_CODE[code] = marked
+    return marked
+
+
+def _mark_reported(code: int) -> int:
+    marked = _REPORTED_CODE.get(code)
+    if marked is None:
+        marked = _signed_offset(code, _REPORTED)
+        _REPORTED_CODE[code] = marked
     return marked
 
 
 def _is_seen(code: int) -> bool:
+    """True once the tip has shown this base key, including a reported row."""
+
     return code >= _SEEN or code <= -_SEEN
+
+
+def _is_reported(code: int) -> bool:
+    return code >= _REPORTED or code <= -_REPORTED
+
+
+def _plain_code(code: int) -> int:
+    """Status code with the seen or reported offset removed.
+
+    Reported is checked first. It is also seen, and stripping only the seen
+    offset would leave the reported mark in place.
+    """
+
+    if _is_reported(code):
+        return _signed_offset(code, -_REPORTED)
+    if _is_seen(code):
+        return _signed_offset(code, -_SEEN)
+    return code
 
 
 @dataclass
@@ -484,25 +529,33 @@ def _index_base(
     t_min: Decimal | None,
     t_max: Decimal | None,
 ) -> tuple[dict[str, _BaseSlot], int, dict[str, str], dict[str, tuple[str, str]]]:
-    """Index the base ledger as key to (status code, float or none).
+    """Index accepted base rows as key to (status code, float or none).
 
-    A repeated key raises. Refusal text and unknown status spellings are
-    kept only for keys that have them, not on the value slot.
+    Every non-empty key is checked before the engine and temperature filter.
+    A filtered key is remembered only so a later repeat can be named. It is
+    not a comparison row, and that set is dropped when the index is done.
+    A repeated key raises before any tip output. Refusal text and unknown
+    status spellings are kept only for accepted keys that have them.
     """
 
     index: dict[str, _BaseSlot] = {}
+    excluded: set[str] = set()
     unknown: dict[str, str] = {}
     reasons: dict[str, tuple[str, str]] = {}
     rows = 0
     for number, row in iter_residual_rows(path):
         view = _view(row)
-        if not _accept(view, engine, t_min, t_max):
+        accepted = _accept(view, engine, t_min, t_max)
+        if not view.key:
+            if accepted:
+                rows += 1
+            continue
+        if view.key in index or view.key in excluded:
+            raise DuplicateResidualKey(path, number, view.key)
+        if not accepted:
+            excluded.add(view.key)
             continue
         rows += 1
-        if not view.key:
-            continue
-        if view.key in index:
-            raise DuplicateResidualKey(path, number, view.key)
         code = _status_code(view.status)
         if code == _UNKNOWN:
             unknown[view.key] = view.status
@@ -701,16 +754,20 @@ def rowdiff_report(
 ) -> RowDiffReport:
     """Compare two residual ledgers by key.
 
-    The base ledger is indexed once, as key to (status code, float or none).
-    A repeated base key raises there, before the tip is read. The tip ledger
-    is read once. A second look at a base key is a duplicate, using the seen
-    mark already stored on that base entry. Keys only in the tip are kept in
-    a set so a repeat can be named; that set is the tip-only keys, not the
-    base index. A tip duplicate marks the output invalid and raises. Detail
-    lines already written are left in place. ``show`` keeps the largest
-    relative value moves in a bounded heap. Counts include every change.
-    ``retain_details`` keeps every changed key on the returned report. The
-    command path leaves that false.
+    The base ledger is indexed once. Accepted rows are key to (status code,
+    float or none). A repeated base key, including one the filter drops,
+    raises there, before the tip is read. The tip ledger is read once.
+    Every non-empty tip key is checked before the filter. A second look at
+    a base key uses the seen mark on that entry. Tip keys absent from the
+    base index, including filtered ones, stay in one set so a repeat can be
+    named. That set is not a copy of the base index. An accepted tip row is
+    marked reported and written then. A filtered tip row of an accepted base
+    key is not a comparison, and that base key is still only in the base.
+    A tip duplicate marks the output invalid and raises. Detail lines already
+    written are left in place. ``show`` keeps the largest relative value
+    moves in a bounded heap. Counts include every change. ``retain_details``
+    keeps every changed key on the returned report. The command path leaves
+    that false.
     """
 
     if show < 0:
@@ -726,21 +783,26 @@ def rowdiff_report(
         t_max=t_max,
     )
     running = _running(show)
-    added_seen: set[str] = set()
+    # Tip keys that are not in the base index, filtered or not. Not a copy of the index.
+    tip_extra: set[str] = set()
     tip_rows = 0
     for number, row in iter_residual_rows(tip):
         view = _view(row)
-        if not _accept(view, engine_value, t_min, t_max):
-            continue
-        tip_rows += 1
+        accepted = _accept(view, engine_value, t_min, t_max)
         if not view.key:
+            if accepted:
+                tip_rows += 1
             continue
         slot = index.get(view.key)
         if slot is not None:
             code, value = slot
             if _is_seen(code):
                 _duplicate_key(tip, number, view.key, out)
-            index[view.key] = (_mark_seen(code), value)
+            if not accepted:
+                index[view.key] = (_mark_seen(code), value)
+                continue
+            index[view.key] = (_mark_reported(code), value)
+            tip_rows += 1
             reason, detail = reasons.get(view.key, ("", ""))
             _note_matched(
                 running,
@@ -755,17 +817,21 @@ def rowdiff_report(
                 out=out,
             )
             continue
-        if view.key in added_seen:
+        if view.key in tip_extra:
             _duplicate_key(tip, number, view.key, out)
-        added_seen.add(view.key)
+        tip_extra.add(view.key)
+        if not accepted:
+            continue
+        tip_rows += 1
         _note_added(running, view, retain=retain_details, out=out)
-    # Unseen base keys were not in the tip ledger.
-    index = {key: slot for key, slot in index.items() if not _is_seen(slot[0])}
+    # Accepted base keys the tip did not report are only in the base ledger.
     for key, (code, _value) in index.items():
+        if _is_reported(code):
+            continue
         _note_removed(
             running,
             key,
-            code,
+            _plain_code(code),
             reasons,
             unknown,
             retain=retain_details,
