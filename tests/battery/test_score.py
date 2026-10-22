@@ -2377,6 +2377,88 @@ def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
     ) is extrapolated
 
 
+# Production static-equilibrium pressures at the pin commit. Segment phase
+# is not compared with the reservoir, and a gap returns the last segment.
+_ANTOINE_PHASE_CASES = (
+    ("Si", Decimal("2000"), Phase.CR, Decimal("4.410122194873473"), ()),
+    ("Si", Decimal("2000"), Phase.L, Decimal("4.410122194873473"), ()),
+    ("Si", Decimal("1000"), Phase.CR, Decimal("1.5560633803943994E-11"), ()),
+    (
+        "Si",
+        Decimal("1690"),
+        Phase.CR,
+        Decimal("0.05792280364079257"),
+        ("pure_component_antoine_extrapolated",),
+    ),
+    (
+        "Si",
+        Decimal("1690"),
+        Phase.L,
+        Decimal("0.05792280364079257"),
+        ("pure_component_antoine_extrapolated",),
+    ),
+    ("Si", Decimal("1800"), Phase.L, Decimal("0.320744894252916"), ()),
+    ("Mn", Decimal("1600"), Phase.CR, Decimal("366.4277112026563"), ()),
+    ("Mn", Decimal("1400"), Phase.CR, Decimal("22.630450812668585"), ()),
+    ("Mn", Decimal("1519"), Phase.L, Decimal("135.85703758590856"), ()),
+    ("Mn", Decimal("1519"), Phase.CR, Decimal("135.85703758590856"), ()),
+    ("Na", Decimal("1056"), Phase.L, Decimal("33991.26166001457"), ()),
+    (
+        "Na",
+        Decimal("1200"),
+        Phase.L,
+        Decimal("117402.20851973725"),
+        ("pure_component_antoine_extrapolated",),
+    ),
+)
+
+
+def _static_psat(formula: str, temperature: Decimal, reservoir_phase: Phase):
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
+    )
+    identity = F.psat_identity(
+        formula, T_K=temperature, reservoir_phase=reservoir_phase
+    )
+    observation = F.observation(
+        f"static-{formula}-{temperature}-{reservoir_phase.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        source_id="antoine-pin",
+    )
+    return predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, experiment=experiment
+    )
+
+
+def test_static_equilibrium_antoine_ignores_reservoir_phase_and_gap_boundaries() -> None:
+    for formula, temperature, phase, expected, notice_reasons in _ANTOINE_PHASE_CASES:
+        prediction = _static_psat(formula, temperature, phase)
+        assert prediction.refusal_reason is None, (formula, temperature, phase)
+        assert prediction.value == expected
+        assert tuple(notice.reason for notice in prediction.notices) == notice_reasons
+
+    from engines.builtin.vapor_pressure import (
+        vapor_pressure_antoine_coefficients,
+        wall_condensation_antoine_coefficients,
+    )
+    from simulator.battery.score import REPO_ROOT, load_yaml
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    silicon = vapor_pressure_legacy_view(
+        load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+    )["metals"]["Si"]
+    for selector in (
+        wall_condensation_antoine_coefficients,
+        vapor_pressure_antoine_coefficients,
+    ):
+        selected, block = selector(silicon, 1690.0)
+        assert block == "pure_component_antoine"
+        assert selected["name"] == "liquid_janaf"
+        assert selected["phase"] == "liquid"
+
+
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
