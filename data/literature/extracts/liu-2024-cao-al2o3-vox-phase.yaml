@@ -602,16 +602,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 1 initial charge composition.
     - observation_id: liu_2024_table3_sample_01_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -659,16 +649,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 1 initial charge composition.
     - observation_id: liu_2024_table3_sample_01_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -715,16 +695,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 1 initial charge composition.
     - observation_id: liu_2024_table3_sample_01_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -771,16 +741,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 1 initial charge composition.
     - observation_id: liu_2024_table3_sample_05_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -827,25 +787,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '49.36'
-                - - Al2O3
-                  - '48.99'
-                - - V2O5
-                  - '1.65'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 5 initial charge composition.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
     - observation_id: liu_2024_table3_sample_05_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -892,25 +837,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '49.36'
-                - - Al2O3
-                  - '48.99'
-                - - V2O5
-                  - '1.65'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 5 initial charge composition.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
     - observation_id: liu_2024_table3_sample_05_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -957,25 +887,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '49.36'
-                - - Al2O3
-                  - '48.99'
-                - - V2O5
-                  - '1.65'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 5 initial charge composition.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
     - observation_id: liu_2024_table3_sample_05_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1022,25 +937,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '49.36'
-                - - Al2O3
-                  - '48.99'
-                - - V2O5
-                  - '1.65'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 5 initial charge composition.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
     - observation_id: liu_2024_table3_sample_06_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1087,25 +987,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '16.82'
-                - - Al2O3
-                  - '76.47'
-                - - V2O5
-                  - '6.71'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 6 initial charge composition.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
     - observation_id: liu_2024_table3_sample_06_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1152,25 +1037,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '16.82'
-                - - Al2O3
-                  - '76.47'
-                - - V2O5
-                  - '6.71'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 6 initial charge composition.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
     - observation_id: liu_2024_table3_sample_06_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1217,25 +1087,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '16.82'
-                - - Al2O3
-                  - '76.47'
-                - - V2O5
-                  - '6.71'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 6 initial charge composition.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
     - observation_id: liu_2024_table3_sample_06_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1282,25 +1137,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '16.82'
-                - - Al2O3
-                  - '76.47'
-                - - V2O5
-                  - '6.71'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 6 initial charge composition.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
     - observation_id: liu_2024_table3_sample_13_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1347,25 +1187,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '12.54'
-                - - Al2O3
-                  - '81.01'
-                - - V2O5
-                  - '6.45'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 13 initial charge composition.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
     - observation_id: liu_2024_table3_sample_13_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1412,25 +1237,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '12.54'
-                - - Al2O3
-                  - '81.01'
-                - - V2O5
-                  - '6.45'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 13 initial charge composition.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
     - observation_id: liu_2024_table3_sample_13_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1477,25 +1287,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '12.54'
-                - - Al2O3
-                  - '81.01'
-                - - V2O5
-                  - '6.45'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 13 initial charge composition.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
     - observation_id: liu_2024_table3_sample_13_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1542,25 +1337,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '12.54'
-                - - Al2O3
-                  - '81.01'
-                - - V2O5
-                  - '6.45'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 13 initial charge composition.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
     - observation_id: liu_2024_table3_sample_14_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1607,25 +1387,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '3.34'
-                - - Al2O3
-                  - '92.99'
-                - - V2O5
-                  - '3.67'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 14 initial charge composition.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
     - observation_id: liu_2024_table3_sample_14_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1672,25 +1437,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '3.34'
-                - - Al2O3
-                  - '92.99'
-                - - V2O5
-                  - '3.67'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 14 initial charge composition.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
     - observation_id: liu_2024_table3_sample_14_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1737,25 +1487,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '3.34'
-                - - Al2O3
-                  - '92.99'
-                - - V2O5
-                  - '3.67'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 14 initial charge composition.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
     - observation_id: liu_2024_table3_sample_14_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -1802,25 +1537,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '3.34'
-                - - Al2O3
-                  - '92.99'
-                - - V2O5
-                  - '3.67'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 14 initial charge composition.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
     context:
     - observation_id: liu_2024_figure_1_context
       type: figure_context
@@ -2138,25 +1858,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '65.96'
-                - - Al2O3
-                  - '21.99'
-                - - V2O5
-                  - '12.05'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 4 initial charge composition.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
     - observation_id: liu_2024_table3_sample_04_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2203,25 +1908,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '65.96'
-                - - Al2O3
-                  - '21.99'
-                - - V2O5
-                  - '12.05'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 4 initial charge composition.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
     - observation_id: liu_2024_table3_sample_04_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2268,25 +1958,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '65.96'
-                - - Al2O3
-                  - '21.99'
-                - - V2O5
-                  - '12.05'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 4 initial charge composition.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
     - observation_id: liu_2024_table3_sample_04_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2333,25 +2008,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '65.96'
-                - - Al2O3
-                  - '21.99'
-                - - V2O5
-                  - '12.05'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 4 initial charge composition.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
     - observation_id: liu_2024_table3_sample_09_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2398,16 +2058,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 9 initial charge composition.
     - observation_id: liu_2024_table3_sample_09_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2455,16 +2105,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 9 initial charge composition.
     - observation_id: liu_2024_table3_sample_09_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2511,16 +2151,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 9 initial charge composition.
     - observation_id: liu_2024_table3_sample_09_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2567,16 +2197,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 9 initial charge composition.
     - observation_id: liu_2024_table3_sample_12_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2623,25 +2243,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.41'
-                - - Al2O3
-                  - '69.10'
-                - - V2O5
-                  - '4.49'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 12 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
     - observation_id: liu_2024_table3_sample_12_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2688,25 +2293,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.41'
-                - - Al2O3
-                  - '69.10'
-                - - V2O5
-                  - '4.49'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 12 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
     - observation_id: liu_2024_table3_sample_12_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2753,25 +2343,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.41'
-                - - Al2O3
-                  - '69.10'
-                - - V2O5
-                  - '4.49'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 12 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
     - observation_id: liu_2024_table3_sample_12_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2818,25 +2393,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.41'
-                - - Al2O3
-                  - '69.10'
-                - - V2O5
-                  - '4.49'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 12 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
     - observation_id: liu_2024_table3_sample_18_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2883,25 +2443,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '68.40'
-                - - Al2O3
-                  - '11.99'
-                - - V2O5
-                  - '19.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 18 initial charge composition.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
     - observation_id: liu_2024_table3_sample_18_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -2948,25 +2493,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '68.40'
-                - - Al2O3
-                  - '11.99'
-                - - V2O5
-                  - '19.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 18 initial charge composition.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
     - observation_id: liu_2024_table3_sample_18_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3013,25 +2543,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '68.40'
-                - - Al2O3
-                  - '11.99'
-                - - V2O5
-                  - '19.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 18 initial charge composition.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
     - observation_id: liu_2024_table3_sample_18_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3078,25 +2593,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '68.40'
-                - - Al2O3
-                  - '11.99'
-                - - V2O5
-                  - '19.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 18 initial charge composition.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
     context:
     - observation_id: liu_2024_table3_cao_solid_rows_context
       type: table_context
@@ -3241,25 +2741,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.23'
-                - - Al2O3
-                  - '58.90'
-                - - V2O5
-                  - '36.87'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 3 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
     - observation_id: liu_2024_table3_sample_03_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3306,25 +2791,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.23'
-                - - Al2O3
-                  - '58.90'
-                - - V2O5
-                  - '36.87'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 3 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
     - observation_id: liu_2024_table3_sample_03_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3371,25 +2841,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.23'
-                - - Al2O3
-                  - '58.90'
-                - - V2O5
-                  - '36.87'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 3 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
     - observation_id: liu_2024_table3_sample_03_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3436,25 +2891,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.23'
-                - - Al2O3
-                  - '58.90'
-                - - V2O5
-                  - '36.87'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 3 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
     - observation_id: liu_2024_table3_sample_07_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3501,25 +2941,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '7.00'
-                - - Al2O3
-                  - '86.85'
-                - - V2O5
-                  - '6.15'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 7 initial charge composition.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
     - observation_id: liu_2024_table3_sample_07_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3566,25 +2991,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '7.00'
-                - - Al2O3
-                  - '86.85'
-                - - V2O5
-                  - '6.15'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 7 initial charge composition.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
     - observation_id: liu_2024_table3_sample_07_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3631,25 +3041,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '7.00'
-                - - Al2O3
-                  - '86.85'
-                - - V2O5
-                  - '6.15'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 7 initial charge composition.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
     - observation_id: liu_2024_table3_sample_07_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3696,25 +3091,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '7.00'
-                - - Al2O3
-                  - '86.85'
-                - - V2O5
-                  - '6.15'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 7 initial charge composition.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
     - observation_id: liu_2024_table3_sample_11_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3762,16 +3142,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 11 initial charge composition.
     - observation_id: liu_2024_table3_sample_11_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3818,16 +3188,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 11 initial charge composition.
     - observation_id: liu_2024_table3_sample_11_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3874,16 +3234,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 11 initial charge composition.
     - observation_id: liu_2024_table3_sample_11_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3930,16 +3280,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 11 initial charge composition.
     - observation_id: liu_2024_table3_sample_16_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -3986,25 +3326,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '10.52'
-                - - Al2O3
-                  - '55.64'
-                - - V2O5
-                  - '33.84'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 16 initial charge composition.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
     - observation_id: liu_2024_table3_sample_16_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4051,25 +3376,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '10.52'
-                - - Al2O3
-                  - '55.64'
-                - - V2O5
-                  - '33.84'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 16 initial charge composition.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
     - observation_id: liu_2024_table3_sample_16_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4116,25 +3426,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '10.52'
-                - - Al2O3
-                  - '55.64'
-                - - V2O5
-                  - '33.84'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 16 initial charge composition.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
     - observation_id: liu_2024_table3_sample_16_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4181,25 +3476,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '10.52'
-                - - Al2O3
-                  - '55.64'
-                - - V2O5
-                  - '33.84'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 16 initial charge composition.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
     - observation_id: liu_2024_table3_sample_17_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4246,25 +3526,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.77'
-                - - Al2O3
-                  - '47.62'
-                - - V2O5
-                  - '25.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 17 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
     - observation_id: liu_2024_table3_sample_17_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4311,25 +3576,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.77'
-                - - Al2O3
-                  - '47.62'
-                - - V2O5
-                  - '25.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 17 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
     - observation_id: liu_2024_table3_sample_17_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4376,25 +3626,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.77'
-                - - Al2O3
-                  - '47.62'
-                - - V2O5
-                  - '25.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 17 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
     - observation_id: liu_2024_table3_sample_17_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4441,25 +3676,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '26.77'
-                - - Al2O3
-                  - '47.62'
-                - - V2O5
-                  - '25.61'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 17 initial charge composition.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
     context:
     - observation_id: liu_2024_table3_al2o3_solid_rows_context
       type: table_context
@@ -4638,16 +3858,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 2 initial charge composition.
     - observation_id: liu_2024_table3_sample_02_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4694,16 +3904,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 2 initial charge composition.
     - observation_id: liu_2024_table3_sample_02_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4750,16 +3950,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 2 initial charge composition.
     - observation_id: liu_2024_table3_sample_02_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4806,16 +3996,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for CaO'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 2 initial charge composition.
     - observation_id: liu_2024_table3_sample_08_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4862,16 +4042,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 8 initial charge composition.
     - observation_id: liu_2024_table3_sample_08_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4919,16 +4089,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 8 initial charge composition.
     - observation_id: liu_2024_table3_sample_08_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -4975,16 +4135,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 8 initial charge composition.
     - observation_id: liu_2024_table3_sample_08_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5031,16 +4181,6 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: unknown
-              reason: 'partial_composition: Table 1 prints a dash for Al2O3'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 8 initial charge composition.
     - observation_id: liu_2024_table3_sample_10_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5087,25 +4227,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.43'
-                - - Al2O3
-                  - '7.44'
-                - - V2O5
-                  - '88.13'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 10 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
     - observation_id: liu_2024_table3_sample_10_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5152,25 +4277,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.43'
-                - - Al2O3
-                  - '7.44'
-                - - V2O5
-                  - '88.13'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 10 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
     - observation_id: liu_2024_table3_sample_10_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5217,25 +4327,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.43'
-                - - Al2O3
-                  - '7.44'
-                - - V2O5
-                  - '88.13'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 10 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
     - observation_id: liu_2024_table3_sample_10_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5282,25 +4377,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '4.43'
-                - - Al2O3
-                  - '7.44'
-                - - V2O5
-                  - '88.13'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 10 initial charge composition.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
     - observation_id: liu_2024_table3_sample_15_glass_ca
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5347,25 +4427,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '6.26'
-                - - Al2O3
-                  - '2.19'
-                - - V2O5
-                  - '91.55'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 15 initial charge composition.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
     - observation_id: liu_2024_table3_sample_15_glass_al
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5412,25 +4477,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '6.26'
-                - - Al2O3
-                  - '2.19'
-                - - V2O5
-                  - '91.55'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 15 initial charge composition.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
     - observation_id: liu_2024_table3_sample_15_glass_v
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5477,25 +4527,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '6.26'
-                - - Al2O3
-                  - '2.19'
-                - - V2O5
-                  - '91.55'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 15 initial charge composition.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
     - observation_id: liu_2024_table3_sample_15_glass_o
       type: composition_series
       units: mass percent of elemental component as printed
@@ -5542,25 +4577,10 @@ species:
               pdf_page_index: 2
               page: 3
               note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_oxide_mass_percent
-                amount_basis: mass_percent
-                components:
-                - - CaO
-                  - '6.26'
-                - - Al2O3
-                  - '2.19'
-                - - V2O5
-                  - '91.55'
-            locator:
-              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
-              pdf_page_index: 2
-              page: 3
-              table: '1'
-              note: Table 1 sample 15 initial charge composition.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
     context:
     - observation_id: liu_2024_table3_vo2_solid_rows_context
       type: table_context

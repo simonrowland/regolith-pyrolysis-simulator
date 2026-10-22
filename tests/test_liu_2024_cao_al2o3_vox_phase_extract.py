@@ -177,19 +177,16 @@ def test_table3_migrates_every_component_with_temperature_and_conditions() -> No
         sample = int(raw["experiment"].rsplit("_", 1)[-1])
         initial = observation.identity.composition
         assert initial is not None
-        source_composition = values["point_conditions"]["composition"]
-        migrated_composition = observation.point_conditions["composition"]
-        assert migrated_composition.locator.page == 3
+        source_composition = values.get("composition_wt_pct")
+        assert "composition" not in observation.point_conditions
         if sample in INCOMPLETE_CHARGES:
-            assert source_composition["state"]["tag"] == "unknown"
+            assert source_composition is None
             assert initial.is_unknown
-            assert migrated_composition.state.is_unknown
-            assert "partial_composition" in migrated_composition.state.reason
         else:
-            assert source_composition["state"]["tag"] == "value"
+            assert source_composition is not None
+            assert set(source_composition) == {"CaO", "Al2O3", "V2O5"}
             assert initial.is_unknown
-            assert migrated_composition.state.is_unknown
-            assert "unsupported" in migrated_composition.state.reason
+            assert "unsupported" in initial.reason
 
         printed = str(values["component_amount_as_published"])
         if printed == "-":
