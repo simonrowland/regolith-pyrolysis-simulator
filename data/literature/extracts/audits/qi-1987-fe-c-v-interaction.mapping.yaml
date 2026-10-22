@@ -1,0 +1,116 @@
+source_id: qi-1987-fe-c-v-interaction
+source:
+  citation: Qi, G., Ji, C. and Che, Y. (1987), "Thermodynamic Activity Interaction Coefficients in Fe-C-V Melts", Transactions of the Japan Institute of Metals, 28(5), 412-423.
+  doi: 10.2320/matertrans1960.28.412
+  year: 1987
+extraction:
+  method: MinerU table mapping; final d-223 rows and sample bindings transcribed and checked against 600 dpi renders.
+  date: '2026-10-22'
+  worker: codex-resume-7103-1792656483
+review_status: draft
+tables:
+  - page: 1
+    table_index: 1
+    type: activity_coefficient
+    quantity: wagner_interaction_parameter
+    unit: dimensionless
+    evidence_class: quoted_attributed
+    attribution: "Reference as printed in each Table 1 row"
+    phase: l
+    experiment: qi1987-table1-literature-comparison
+    published_page: 412
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 1
+        species: C
+  - page: 2
+    table_index: 2
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table2-pure-iron-comparison
+    published_page: 413
+    temperature:
+      as_printed: 1623
+      unit: K
+    values:
+      - {column: 2, species: C}
+  - page: 2
+    table_index: 2
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table2-pure-iron-comparison
+    published_page: 413
+    temperature:
+      as_printed: 1673
+      unit: K
+    values:
+      - {column: 3, species: C}
+  - page: 2
+    table_index: 2
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table2-pure-iron-comparison
+    published_page: 413
+    temperature:
+      as_printed: 1773
+      unit: K
+    values:
+      - {column: 4, species: C}
+  - page: 3
+    table_index: 3
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table3-1623k
+    published_page: 414
+    temperature:
+      as_printed: 1623
+      unit: K
+    values:
+      - {column: 2, species: C}
+      - {column: 3, species: V}
+  - page: 3
+    table_index: 3
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table3-1673k
+    published_page: 414
+    temperature:
+      as_printed: 1673
+      unit: K
+    values:
+      - {column: 5, species: C}
+      - {column: 6, species: V}
+  - page: 3
+    table_index: 3
+    type: composition_series
+    quantity: equilibrium_phase_composition
+    unit: mass_percent
+    phase: metal
+    evidence_class: measured_direct
+    experiment: qi1987-table3-1773k
+    published_page: 414
+    temperature:
+      as_printed: 1773
+      unit: K
+    values:
+      - {column: 8, species: C}
+      - {column: 9, species: V}
+# Tables 4-5 are fitted interaction coefficients with no matching scalar field
+# for the printed rho/theta/pi terms; their full values are retained in context.
