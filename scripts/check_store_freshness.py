@@ -155,6 +155,16 @@ CODE_INPUTS = (
 #     produced no store change (observations=126296 queue=80926
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring and diagnostic changes are covered by the commits' tests.
+#   c21acfc5d, 6ba1b9771: t-1424 public battery tools. c21acfc5d names the
+#     residual-key spellings in simulator/battery/score.py and shares one key
+#     splitter with compilation_tier.py and pins.py (same strings). 6ba1b9771
+#     streams residual ledgers through iter_residual_payloads in score.py for
+#     scripts/battery_residuals_report.py. Migration's only import from these
+#     modules is the unchanged parse_species_formula, and neither commit
+#     touches scripts/battery_migrate.py, migrate.py, validate.py or data/.
+#     The landing train's full regen of b148 (on green 850a09e93) was a fixed
+#     point. This acknowledges STORE outputs only; the key and report changes
+#     are covered by the commits' tests.
 #   f74ef7a6f: scan-only parser; corpus census 24 source_form strings, 0 verdict changes.
 #     The census compared 29 occurrences across repo data and battery store
 #     inputs with the green implementation. This is the store-neutrality
@@ -186,6 +196,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23bee5e7b", "8c154cdb0", "ed246fcb7", "62224868f",
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",
     "9364d3828",
+    "c21acfc5d", "6ba1b9771",
     "f74ef7a6f",
     "d6ccae4b4",
     "7e0508bb5", "b37e28bac", "297df02b9",
