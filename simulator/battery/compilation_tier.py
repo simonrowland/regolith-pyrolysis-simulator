@@ -399,6 +399,119 @@ def _phase_compatible(product: _Product, identity: Identity) -> bool:
     return identity_name == product.polymorph
 
 
+# A segment written ``Fe(s)`` / ``Fe(cr)`` / ``Fe(c)`` names no allotrope.
+# ``_product_phase`` already drops those tokens; the set stays here so a
+# generic solid cannot become an allotrope mismatch if that parser changes.
+_GENERIC_ELEMENT_SOLIDS = frozenset({"s", "cr", "c"})
+
+
+def _element_basis_label(
+    formula: str, phase: Phase | None, allotrope: str | None
+) -> str:
+    if phase is None:
+        return formula
+    if allotrope:
+        return f"{formula}({phase.value},{allotrope})"
+    return f"{formula}({phase.value})"
+
+
+def _segment_element_bases(
+    segment: EllinghamFitSegment,
+) -> dict[str, tuple[Phase, str | None]]:
+    reactant_side = segment.phase_basis.split("->", 1)[0]
+    return {
+        formula: _product_phase(token)
+        for formula, token in _PHASED_SPECIES_RE.findall(reactant_side)
+        if formula != "O2"
+    }
+
+
+def _element_reference_refusal(
+    identity: Identity,
+    segment: EllinghamFitSegment,
+    *,
+    quantity: Quantity,
+    origin: str,
+    call_evidence: str,
+) -> ThermoAttempt | None:
+    """Refuse a declared reactant whose phase or allotrope is not this segment.
+
+    A missing reaction, and any reaction term whose phase is undeclared, are
+    not this refusal. The standard-pressure transform still owns those when
+    the printed pressure is not 1 bar; at 1 bar and a missing pressure they
+    keep answering. A generic segment solid admits any observation allotrope.
+    An omitted observation allotrope is not a mismatch. No CEA/JANAF alias
+    is applied: ``beta`` and ``b`` are different tokens.
+    """
+
+    reaction_state = identity.reaction
+    reaction = (
+        reaction_state.value
+        if isinstance(reaction_state, State) and reaction_state.is_value
+        else None
+    )
+    if reaction is None:
+        return None
+    if any(phase_token(term.species) is None for term in reaction.terms):
+        return None
+    segment_bases = _segment_element_bases(segment)
+    for term in reaction.terms:
+        if term.coefficient >= 0 or term.species.formula == "O2":
+            continue
+        cell_phase = phase_token(term.species)
+        if cell_phase is None:
+            continue
+        found = segment_bases.get(term.species.formula)
+        if found is None:
+            segment_phase: Phase | None = None
+            segment_allotrope = None
+        else:
+            segment_phase, segment_allotrope = found
+        cell_poly = polymorph_token(term.species)
+        cell_allotrope = None if cell_poly is None else cell_poly.value
+        observation_basis = _element_basis_label(
+            term.species.formula, cell_phase, cell_allotrope
+        )
+        segment_basis = _element_basis_label(
+            term.species.formula, segment_phase, segment_allotrope
+        )
+        extra: dict[str, object] = {
+            "element": term.species.formula,
+            "cell_phase": cell_phase.value,
+            "segment_phase": None if segment_phase is None else segment_phase.value,
+            "observation_element_basis": observation_basis,
+            "segment_element_basis": segment_basis,
+        }
+        if segment_phase is not cell_phase:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "identity-mismatch-element-reference-phase",
+                quantity=quantity,
+                origin=origin,
+                extra=extra,
+                call_evidence=call_evidence,
+            )
+        if (
+            cell_allotrope
+            and segment_allotrope
+            and segment_allotrope not in _GENERIC_ELEMENT_SOLIDS
+            and cell_allotrope != segment_allotrope
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "identity-mismatch-element-reference-allotrope",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    **extra,
+                    "cell_allotrope": cell_allotrope,
+                    "segment_allotrope": segment_allotrope,
+                },
+                call_evidence=call_evidence,
+            )
+    return None
+
+
 def _vaporock_gas_provenance(equil_module) -> str:
     """Identify the loaded JANAF table and checkout once per process."""
     cached = getattr(_vaporock_gas_provenance, "_identity", None)
@@ -485,6 +598,13 @@ def _ellingham_attempt(
     the segment's 0.442 kJ/mol O2 construction bound (0.221 kJ/mol oxide).
     log10 Kf from −3.7028 kJ/mol is 0.0879, 0.004 from the printed 0.092.
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
+
+    The segment's element basis is the reactant phase and allotrope printed
+    on ``phase_basis``. A declared reactant that names a different phase, or
+    a different named allotrope, is refused before this value is returned,
+    at every printed pressure including exactly 1 bar and a missing pressure.
+    When the bases match and the printed pressure is some other positive
+    value, the 1 bar fit is still shifted by Δν_g R T ln(p2/p1).
     """
 
     if quantity not in _ENGINE_ELLINGHAM_QUANTITIES:
@@ -567,6 +687,16 @@ def _ellingham_attempt(
             call_evidence=call + ":outside-segment",
         )
 
+    basis_refusal = _element_reference_refusal(
+        identity,
+        segment,
+        quantity=quantity,
+        origin=origin,
+        call_evidence=call,
+    )
+    if basis_refusal is not None:
+        return basis_refusal
+
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
     per_species = dG / (Decimal(product.coeff.numerator) / Decimal(product.coeff.denominator))
@@ -607,34 +737,6 @@ def _ellingham_attempt(
                 if reaction is not None
                 else ()
             )
-            if reaction is not None and all(
-                phase is not None for phase in reaction_phases
-            ):
-                segment_reactant_phases = {
-                    formula: _product_phase(token)[0]
-                    for formula, token in _PHASED_SPECIES_RE.findall(
-                        segment.phase_basis.split("->", 1)[0]
-                    )
-                    if formula != "O2"
-                }
-                for term, cell_phase in zip(reaction.terms, reaction_phases):
-                    if term.coefficient >= 0 or term.species.formula == "O2":
-                        continue
-                    segment_phase = segment_reactant_phases.get(term.species.formula)
-                    if segment_phase is not cell_phase:
-                        return _refuse(
-                            RefusalReason.IDENTITY_MISMATCH,
-                            "identity-mismatch-element-reference-phase",
-                            quantity=quantity,
-                            origin=origin,
-                            extra={
-                                "element": term.species.formula,
-                                "cell_phase": cell_phase.value,
-                                "segment_phase": (
-                                    None if segment_phase is None else segment_phase.value
-                                ),
-                            },
-                        )
             if reaction is None:
                 return _refuse(
                     RefusalReason.IDENTITY_UNKNOWN,

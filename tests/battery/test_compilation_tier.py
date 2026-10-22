@@ -74,6 +74,9 @@ def _na2o_liquid(quantity: Quantity = Quantity.DELTA_FG):
         T_K=_T,
         per=PerBasis.MOL_SPECIES,
         metal_formula="Na",
+        # 2200 K segment is 4 Na(g) + O2 -> 2 Na2O(l). Liquid Na is a
+        # different element basis and must not receive this number.
+        metal_phase=Phase.G,
         nu_metal=Fraction(4),
         nu_o2=Fraction(1),
     )
@@ -1469,6 +1472,8 @@ def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
     assert refused.refusal_detail["element"] == "Ca"
     assert refused.refusal_detail["cell_phase"] == Phase.CR.value
     assert refused.refusal_detail["segment_phase"] == Phase.G.value
+    assert refused.refusal_detail["observation_element_basis"] == "Ca(cr)"
+    assert refused.refusal_detail["segment_element_basis"] == "Ca(g)"
 
     gas_bar = F.cao_identity(
         Phase.CR,
@@ -1494,14 +1499,10 @@ def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
     assert abs((atm_attempt.value - bar_attempt.value) - expected_shift) < Decimal("1e-12")
 
 
-# Production attempt at the pin commit. Fe(gamma) is the 1200 K segment's
-# allotrope; Fe(alpha) and Fe(reference) are not, and Ca(cr) is not the
-# 1800 K Ca(g) segment. All of them still receive the segment number.
-_FEO_LIQUID_ALPHA_2000K = Decimal("-148.4464525")
+# Fe(gamma) is the 1200 K segment allotrope, so it keeps the segment number,
+# including the 1 atm shift. The mismatched bases below are refused.
 _FEO_CRYSTAL_1200K = Decimal("-194.25060000000002")
 _FEO_CRYSTAL_1200K_ATM = Decimal("-194.3162658956496301986338624")
-_CAO_CRYSTAL_CA_CR_1800K = Decimal("-440.1469291")
-_CAO_LOG10_CA_CR_1800K = Decimal("12.77248193991250291197131722")
 
 
 def _with_reactant_basis(
@@ -1550,7 +1551,31 @@ def _assert_ellingham_number(observation_id: str, identity, value: Decimal, evid
     return attempt
 
 
-def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressure() -> None:
+def _assert_element_basis_refusal(
+    observation_id: str,
+    identity,
+    detail: str,
+    observation_basis: str,
+    segment_basis: str,
+    *,
+    cell_phase: str,
+    segment_phase: str,
+):
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(observation_id, "exp-1", identity, Decimal("0")),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == detail
+    assert attempt.refusal_detail["observation_element_basis"] == observation_basis
+    assert attempt.refusal_detail["segment_element_basis"] == segment_basis
+    assert attempt.refusal_detail["cell_phase"] == cell_phase
+    assert attempt.refusal_detail["segment_phase"] == segment_phase
+    return attempt
+
+
+def test_ellingham_refuses_element_basis_mismatch_at_every_pressure() -> None:
     feo_liquid = F.oxide_identity(
         "FeO",
         Phase.L,
@@ -1563,18 +1588,25 @@ def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressur
         p_std=Decimal("100000"),
     )
     fe_alpha_liquid = _with_reactant_basis(feo_liquid, Phase.CR, Polymorph.ALPHA)
-    _assert_ellingham_number(
-        "feo-alpha-liquid-1bar",
-        fe_alpha_liquid,
-        _FEO_LIQUID_ALPHA_2000K,
-        "ellingham:Fe:l:T=2000",
-    )
-    _assert_ellingham_number(
-        "feo-alpha-liquid-missing-pressure",
-        replace(fe_alpha_liquid, standard_pressure_Pa=State.unknown("pressure not printed")),
-        _FEO_LIQUID_ALPHA_2000K,
-        "ellingham:Fe:l:T=2000",
-    )
+    for observation_id, identity in (
+        ("feo-alpha-liquid-1bar", fe_alpha_liquid),
+        (
+            "feo-alpha-liquid-missing-pressure",
+            replace(
+                fe_alpha_liquid,
+                standard_pressure_Pa=State.unknown("pressure not printed"),
+            ),
+        ),
+    ):
+        _assert_element_basis_refusal(
+            observation_id,
+            identity,
+            "identity-mismatch-element-reference-phase",
+            "Fe(cr,alpha)",
+            "Fe(l)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.L.value,
+        )
 
     feo_crystal = F.oxide_identity(
         "FeO",
@@ -1589,12 +1621,23 @@ def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressur
         polymorph="crystalline",
     )
     crystal_evidence = "ellingham:Fe:s:T=1200:generic-solid"
-    for name, polymorph in (
-        ("reference", Polymorph.REFERENCE),
-        ("alpha", Polymorph.ALPHA),
-        ("gamma", Polymorph.GAMMA),
-        ("omitted", None),
+    for name, polymorph, observation_basis in (
+        ("reference", Polymorph.REFERENCE, "Fe(cr,reference)"),
+        ("alpha", Polymorph.ALPHA, "Fe(cr,alpha)"),
     ):
+        refused = _assert_element_basis_refusal(
+            f"feo-crystal-{name}-1bar",
+            _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
+            "identity-mismatch-element-reference-allotrope",
+            observation_basis,
+            "Fe(cr,gamma)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.CR.value,
+        )
+        assert refused.refusal_detail["element"] == "Fe"
+        assert refused.refusal_detail["cell_allotrope"] == polymorph.value
+        assert refused.refusal_detail["segment_allotrope"] == "gamma"
+    for name, polymorph in (("gamma", Polymorph.GAMMA), ("omitted", None)):
         _assert_ellingham_number(
             f"feo-crystal-{name}-1bar",
             _with_reactant_basis(feo_crystal, Phase.CR, polymorph),
@@ -1602,11 +1645,14 @@ def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressur
             crystal_evidence,
         )
     fe_alpha_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.ALPHA)
-    _assert_ellingham_number(
+    _assert_element_basis_refusal(
         "feo-crystal-alpha-1atm",
         replace(fe_alpha_crystal, standard_pressure_Pa=State.of(Decimal("101325"))),
-        _FEO_CRYSTAL_1200K_ATM,
-        crystal_evidence,
+        "identity-mismatch-element-reference-allotrope",
+        "Fe(cr,alpha)",
+        "Fe(cr,gamma)",
+        cell_phase=Phase.CR.value,
+        segment_phase=Phase.CR.value,
     )
     fe_gamma_crystal = _with_reactant_basis(feo_crystal, Phase.CR, Polymorph.GAMMA)
     _assert_ellingham_number(
@@ -1623,18 +1669,20 @@ def test_ellingham_answers_element_basis_mismatch_at_one_bar_and_missing_pressur
         per=PerBasis.MOL_SPECIES,
         p_std=Decimal("100000"),
     )
-    _assert_ellingham_number(
-        "cao-cr-1bar",
-        cao_crystal,
-        _CAO_CRYSTAL_CA_CR_1800K,
-        "ellingham:Ca:s:T=1800:generic-solid",
-    )
-    _assert_ellingham_number(
-        "cao-cr-log10-1bar",
-        replace(cao_crystal, quantity=Quantity.LOG10_KF),
-        _CAO_LOG10_CA_CR_1800K,
-        "ellingham:Ca:s:T=1800:generic-solid",
-    )
+    for observation_id, identity in (
+        ("cao-cr-1bar", cao_crystal),
+        ("cao-cr-log10-1bar", replace(cao_crystal, quantity=Quantity.LOG10_KF)),
+    ):
+        refused = _assert_element_basis_refusal(
+            observation_id,
+            identity,
+            "identity-mismatch-element-reference-phase",
+            "Ca(cr)",
+            "Ca(g)",
+            cell_phase=Phase.CR.value,
+            segment_phase=Phase.G.value,
+        )
+        assert refused.refusal_detail["element"] == "Ca"
 
 
 def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
