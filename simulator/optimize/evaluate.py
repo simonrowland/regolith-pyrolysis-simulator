@@ -22,6 +22,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureRangeError,
 )
 from simulator.furnace_materials import setpoints_furnace_ceiling_C
+from simulator.thermal_window import resolve_thermal_preheat_interval
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
@@ -168,8 +169,6 @@ EXTRACTION_CLASS_GATES = frozenset((
     "extraction_completeness",
 ))
 PHYSICS_REFUSAL_GATE = "physics_refusal"
-DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
-DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 SYNTHETIC_BACKEND_NOT_RUN = "not_run"
 LAB_OVERLAY_SCOPE_FIELDS = (
     "lab_alpha_digest",
@@ -3577,14 +3576,19 @@ def _profile_thermal_window_schedule(
 ) -> Mapping[str, Any] | None:
     campaign = str(run_options.get("campaign", "") or "")
     temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
-    bounds = _numeric_interval(temp_range)
-    if bounds is None:
+    if temp_range is None:
         return None
-    low_C, high_C = bounds
-    if high_C < low_C:
-        raise EvaluationInputError(
-            f"{campaign}.temp_range_C must be ascending; got {temp_range!r}"
+    try:
+        preheat_interval = resolve_thermal_preheat_interval(
+            temp_range,
+            _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr"),
+            _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr"),
         )
+    except ValueError as exc:
+        raise EvaluationInputError(
+            f"{campaign}.temp_range_C preheat interval is invalid: {exc}"
+        ) from exc
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
     ceiling_C, ceiling_bound = _furnace_ceiling_C(
         constraints,
         setpoints,
@@ -3605,10 +3609,8 @@ def _profile_thermal_window_schedule(
         raise EvaluationInputError(
             f"{campaign}.duration_h must be positive for thermal window scheduling"
         )
-    preheat_ramp = _thermal_preheat_ramp_C_per_hr(profile, campaign)
-    preheat_hours = int(math.ceil(
-        max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / preheat_ramp
-    ))
+    preheat_ramp = preheat_interval.ramp_rate_C_per_hr
+    preheat_hours = preheat_interval.hours
     total_hours = int(math.ceil(preheat_hours + duration_h))
     window_ramp = (high_C - low_C) / duration_h if duration_h > 0.0 else 0.0
     max_hold_hr, max_hold_bound = _thermal_window_max_hold_bound(
@@ -3677,20 +3679,6 @@ def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
     if low == high:
         return low
     return (low + high) / 2.0
-
-
-def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) -> float:
-    value = _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr")
-    if value is None:
-        value = _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr")
-    if value is None:
-        return DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
-    numeric = _numeric_setting(value, sequence_policy="max")
-    if numeric is None or numeric <= 0.0:
-        raise EvaluationInputError(
-            f"{campaign}.preheat_ramp_C_per_hr must be positive"
-        )
-    return numeric
 
 
 def _furnace_ceiling_C(

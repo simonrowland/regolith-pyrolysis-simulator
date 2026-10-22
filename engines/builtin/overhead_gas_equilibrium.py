@@ -20,18 +20,6 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
-_OXIDE_MOLAR_MASS_G_MOL = {
-    "SiO2": 60.0843,
-    "MgO": 40.3044,
-    "Al2O3": 101.9613,
-    "TiO2": 79.866,
-    "Fe2O3": 159.6882,
-    "FeO": 71.844,
-    "CaO": 56.0774,
-    "Na2O": 61.9789,
-    "K2O": 94.196,
-}
-
 _DEFAULT_MELT_SPECIATION = {
     "AlO": {
         "parent_oxide": "Al2O3",
@@ -331,23 +319,16 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
     def _oxide_activity_proxy_gamma_1(composition_wt_pct: Any) -> dict[str, float]:
         if not isinstance(composition_wt_pct, Mapping):
             return {}
-        oxide_moles: dict[str, float] = {}
+        from simulator.accounting.formulas import project_oxide_composition
+
+        weights: dict[str, float] = {}
         for oxide, wt_pct in dict(composition_wt_pct).items():
-            molar_mass = _OXIDE_MOLAR_MASS_G_MOL.get(str(oxide))
-            if molar_mass is None:
-                continue
             if not is_declared_real_scalar(wt_pct, allow_numeric_str=True):
                 continue
             amount = max(0.0, float(wt_pct or 0.0))
             if amount > 0.0:
-                oxide_moles[str(oxide)] = amount / molar_mass
-        total = sum(oxide_moles.values())
-        if total <= 0.0:
-            return {}
-        return {
-            oxide: amount / total
-            for oxide, amount in sorted(oxide_moles.items())
-        }
+                weights[str(oxide)] = amount
+        return project_oxide_composition(weights, source_basis="wt_pct")
 
     @staticmethod
     def _positive_float_mapping(raw: Any) -> dict[str, float]:

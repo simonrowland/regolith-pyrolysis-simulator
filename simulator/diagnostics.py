@@ -10,6 +10,7 @@ from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
+from simulator.scalar_boundary import finite_float
 
 _EPS = 1e-12
 PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
@@ -107,7 +108,7 @@ def _uncertified_alpha_record(record: Mapping[str, Any]) -> bool:
 def _valid_sticking_probability(value: Any) -> bool:
     # alpha_s is a dimensionless sticking/accommodation probability, so its
     # physically admissible range is the closed interval [0, 1].
-    number = _finite_float(value)
+    number = finite_float(value)
     return number is not None and 0.0 <= number <= 1.0
 
 
@@ -175,7 +176,7 @@ def wall_sticking_alpha_provenance_notice(
     species_alpha = {
         str(species): float(alpha_s)
         for species, alpha_s in alpha_s_by_species.items()
-        if _finite_float(alpha_s) is not None
+        if finite_float(alpha_s) is not None
     }
     if not species_alpha:
         return {}
@@ -834,7 +835,7 @@ def _wall_deposit_kg_by_species(value: Any) -> dict[str, float] | None:
     found = False
     for key, nested in value.items():
         if isinstance(key, tuple) and len(key) == 2:
-            kg = _finite_float(nested)
+            kg = finite_float(nested)
             if kg is not None:
                 species = str(key[1])
                 totals[species] = totals.get(species, 0.0) + kg
@@ -842,14 +843,14 @@ def _wall_deposit_kg_by_species(value: Any) -> dict[str, float] | None:
             continue
         if isinstance(nested, Mapping):
             for species, raw_kg in nested.items():
-                kg = _finite_float(raw_kg)
+                kg = finite_float(raw_kg)
                 if kg is None:
                     continue
                 species_key = str(species)
                 totals[species_key] = totals.get(species_key, 0.0) + kg
                 found = True
             continue
-        kg = _finite_float(nested)
+        kg = finite_float(nested)
         if kg is not None:
             totals[str(key)] = totals.get(str(key), 0.0) + kg
             found = True
@@ -889,7 +890,7 @@ def _sum_wall_deposit_kg(value: Any) -> float | None:
                 total += subtotal
                 found = True
         return total if found else None
-    return _finite_float(value)
+    return finite_float(value)
 
 
 def _wall_deposit_authority_payload(
@@ -1196,7 +1197,7 @@ def _alpha_segment_species_has_provenance_record(
 
 
 def _positive_number(value: Any) -> bool:
-    number = _finite_float(value)
+    number = finite_float(value)
     return number is not None and number > _EPS
 
 
@@ -1317,7 +1318,7 @@ def _cumulative_wall_deposit_kg(
             if not isinstance(key, tuple) or len(key) != 2:
                 continue
             segment, species = str(key[0]), str(key[1])
-            amount = _finite_float(kg)
+            amount = finite_float(kg)
             if amount is None or amount <= _EPS:
                 continue
             pair = (segment, species)
@@ -1341,7 +1342,7 @@ def _deposit_last_hour_by_segment_species(
         for key, kg in raw.items():
             if not isinstance(key, tuple) or len(key) != 2:
                 continue
-            amount = _finite_float(kg)
+            amount = finite_float(kg)
             if amount is None or amount <= _EPS:
                 continue
             pair = (str(key[0]), str(key[1]))
@@ -1365,7 +1366,7 @@ def _deposit_first_hour_by_segment_species(
         for key, kg in raw.items():
             if not isinstance(key, tuple) or len(key) != 2:
                 continue
-            amount = _finite_float(kg)
+            amount = finite_float(kg)
             if amount is None or amount <= _EPS:
                 continue
             pair = (str(key[0]), str(key[1]))
@@ -1430,7 +1431,7 @@ def _later_max_segment_temperature_C(
         segment_temperatures = entry.get("pipe_segment_temperatures_C", {}) or {}
         if not isinstance(segment_temperatures, Mapping):
             continue
-        temperature = _finite_float(segment_temperatures.get(segment))
+        temperature = finite_float(segment_temperatures.get(segment))
         if temperature is None:
             continue
         later_max = (
@@ -1454,16 +1455,6 @@ def _positive_int(value: Any) -> int | None:
     except (TypeError, ValueError):
         return None
     return number if number >= 0 else None
-
-
-def _finite_float(value: Any) -> float | None:
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    if not math.isfinite(number):
-        return None
-    return number
 
 
 def _attach_pareto_source_notices(
@@ -1555,9 +1546,9 @@ def pressure_coating_pareto_diagnostic(
     )
     segment_records = tuple(knudsen_diagnostic.get("segments", ()) or ())
     if (
-        _finite_float(knudsen_diagnostic.get("gas_temperature_C")) is None
+        finite_float(knudsen_diagnostic.get("gas_temperature_C")) is None
         or not str(knudsen_diagnostic.get("carrier_gas") or "")
-        or _finite_float(knudsen_diagnostic.get("overhead_pressure_mbar")) is None
+        or finite_float(knudsen_diagnostic.get("overhead_pressure_mbar")) is None
         or not segment_records
     ):
         return _pressure_coating_pareto_unavailable(
@@ -1624,7 +1615,7 @@ def pressure_coating_pareto_diagnostic(
         None,
     )
     controlling_kn = (
-        _finite_float(controlling_record.get("knudsen_number"))
+        finite_float(controlling_record.get("knudsen_number"))
         if isinstance(controlling_record, Mapping)
         else None
     )
@@ -1867,7 +1858,7 @@ def pressure_coating_pareto_diagnostic(
 
 def _first_finite(*values: Any) -> float:
     for value in values:
-        parsed = _finite_float(value)
+        parsed = finite_float(value)
         if parsed is not None:
             return parsed
     return 0.0
@@ -1951,7 +1942,7 @@ def _knudsen_characteristic_lengths(
     for item in diagnostic.get("segments", ()) or ():
         if not isinstance(item, Mapping):
             continue
-        length = _finite_float(item.get("characteristic_length_m"))
+        length = finite_float(item.get("characteristic_length_m"))
         if length is not None and length > 0.0:
             lengths.append((str(item.get("name") or "segment"), length))
     return tuple(lengths)
@@ -1967,17 +1958,17 @@ def _molar_mass_kg_mol(
         data = vapor_pressures.get(section, {}) or {}
         species_data = data.get(species, {}) or {}
         if isinstance(species_data, Mapping):
-            mass_g_mol = _finite_float(species_data.get("molar_mass_g_mol"))
+            mass_g_mol = finite_float(species_data.get("molar_mass_g_mol"))
             if mass_g_mol is not None and mass_g_mol > 0.0:
                 return mass_g_mol / 1000.0
-    fallback = _finite_float(molar_mass_table.get(species))
+    fallback = finite_float(molar_mass_table.get(species))
     if fallback is not None and fallback > 0.0:
         return fallback / 1000.0
     return None
 
 
 def _cold_skull_envelope_for_replay(series: Mapping[str, Any]) -> dict[str, float] | None:
-    ceiling = _finite_float(series.get("frozen_skull_stir_ceiling"))
+    ceiling = finite_float(series.get("frozen_skull_stir_ceiling"))
     if ceiling is None:
         return None
     return {"frozen_skull_stir_ceiling": ceiling}
@@ -2009,7 +2000,7 @@ def _flatten_wall_deposit_species_kg(value: Any) -> dict[str, float]:
         if not isinstance(species_map, Mapping):
             continue
         for species, kg in species_map.items():
-            amount = _finite_float(kg)
+            amount = finite_float(kg)
             if amount is None:
                 continue
             name = str(species)
@@ -2060,7 +2051,7 @@ def condensation_authority_diagnostic(sim: Any) -> dict[str, Any]:
     for record in by_species.values():
         status = str(record.get("status") or "missing")
         status_counts[status] = status_counts.get(status, 0) + 1
-        closure_error = _finite_float(record.get("mass_closure_error_kg_hr"))
+        closure_error = finite_float(record.get("mass_closure_error_kg_hr"))
         if closure_error is not None:
             max_closure_error = max(max_closure_error, abs(closure_error))
     return {

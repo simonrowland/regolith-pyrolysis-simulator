@@ -8,8 +8,9 @@ import yaml
 
 from simulator.battery.enums import IdentityEqualKind, Quantity, StateTag
 from simulator.battery.identity import identity_equal
-from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validity import underdetermined_apparatus
+from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -23,8 +24,7 @@ def test_textual_shock_results_survive_real_migration_and_fidelity_mutation() ->
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
 
-    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
-    migrator._migrate_extract(EXTRACT)
+    migrator = migrate_one_extract(REPO_ROOT, EXTRACT, index=None, aliases={})
     migrator.finalize()
     observations = {
         observation.identity.species.formula: observation

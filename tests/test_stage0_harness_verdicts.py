@@ -28,6 +28,7 @@ from engines.builtin.melt_effect_adjustment import (
     strip_non_oxide_residuals,
     warn_tier_analytical_diagnostic,
 )
+from engines.builtin.cco_redox_buffer import cco_log10_fO2_bar
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 from simulator.melt_backend.base import (
@@ -621,6 +622,23 @@ def test_t139_carbon_model_exposes_cco_negative_vapor_and_burnout_interval():
     assert adj.perturbations[0].metadata["forms"]["redox_interval"][
         "interval_per_wt_pct"
     ] == pytest.approx((0.10, 0.50))
+
+
+def test_t139_cco_diagnostic_matches_reference_output_on_temperature_grid():
+    for temperature_K in (1273.15, 1473.15, 1723.15, 1873.15):
+        model = warn_tier_analytical_diagnostic(
+            "carbonaceous_organic",
+            T_K=temperature_K,
+        )
+
+        assert model is not None
+        diagnostic_log_fO2 = model["evaluated_at_T_K"]["cco_buffer"][
+            "log10_fO2_bar"
+        ]
+        assert diagnostic_log_fO2.hex() == cco_log10_fO2_bar(
+            temperature_K,
+            1.0,
+        ).hex()
 
 
 def test_magemin_ig_bulk_sum_closure_warning_grounded_and_engine_gated():

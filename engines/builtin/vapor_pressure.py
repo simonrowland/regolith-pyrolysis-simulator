@@ -421,19 +421,10 @@ def _o2_channel_term_and_potential(
 ) -> tuple[CompiledReactionTerm | None, GasChannelPotential | None]:
     """Route a legacy linear-space rail's O2 dependence through channel #1.
 
-    t-571 Phase 1: the O2 scalar no longer enters pressure math as a free
-    fugacity — it is wrapped by the owner-gated channel factory
-    (:func:`o2_potential_from_pO2_bar`, the registered Phase-1 runtime
-    owner), which applies the b-148 physical envelope clamp and records the
-    clamp/reference receipts.  The returned pair feeds
-    :func:`channel_linear_mass_action_factor`, which reproduces the exact
-    pre-migration expression ``(p_clamped / p_ref) ** e`` bit-for-bit:
-
-    - ``legacy_pO2_bar`` is ``clamp_physical_pO2_bar(pO2_bar)``, identical to
-      the legacy inline ``min(max(pO2, MIN), MAX)``;
-    - ``term.derived_exponent`` is ``-(-e)/1 == e`` exactly (IEEE negation
-      and division by 1.0 are exact), matching the legacy scalar exponent;
-    - ``p_ref`` keeps the legacy ``max(1e-30, ref or 1.0)`` normalization.
+    The owner-gated O2 factory validates finite-positive oxygen and records
+    a notice outside its stated evaluator band. The returned potential keeps
+    the actual input; mass action applies ``(p / p_ref) ** e`` with bar/bar
+    dimensionless. In-band results retain the pre-migration IEEE identity.
 
     Returns ``(None, None)`` for a zero exponent (no O2 dependence).
     """
@@ -729,6 +720,8 @@ def _continued_certified_effective_gamma(
     *,
     temperature_K: float,
     composition: Mapping[str, float],
+    composition_distance_L1: float,
+    composition_cap_L1: float | None = None,
 ) -> dict[str, Any]:
     """First-order continuation of one certified effective gamma.
 
@@ -738,8 +731,8 @@ def _continued_certified_effective_gamma(
     The flux multiplies the current bulk single-cation fraction X_i, which
     is known without a solve, by an effective γ_i. A refused solve withholds
     γ_i. Continue ln γ rather than γ: ln γ is the excess part of RT ln a, so
-    a step is linear in the quantity the equilibrium condition uses, and the
-    exponential stays positive for any finite step.
+    a step is linear in the quantity the equilibrium condition uses. Apply
+    the composition cap before exponentiation.
 
     One certified step supplies the secant. With progress s,
         ln γ_i(s) = ln γ_i,last + (ln γ_i,last − ln γ_i,prev) * s.
@@ -804,8 +797,21 @@ def _continued_certified_effective_gamma(
             ) / step
         )
         progress_variable = "composition"
+    gamma_progress_s = progress_s
+    if (
+        composition_cap_L1 is not None
+        and composition_distance_L1 > composition_cap_L1
+    ):
+        # Continue only to the declared composition boundary before exp():
+        # s_cap = s * (cap / D). Both cap and D are dimensionless L1
+        # distances, so s_cap and the ln-gamma exponent stay dimensionless.
+        # A zero cap gives s_cap = 0 and the exact certified gamma_last.
+        gamma_progress_s = (
+            0.0 if composition_cap_L1 <= 0.0
+            else progress_s * (composition_cap_L1 / composition_distance_L1)
+        )
     return {
-        "gamma": _ln_gamma_at_progress(certificate, progress_s, slope),
+        "gamma": _ln_gamma_at_progress(certificate, gamma_progress_s, slope),
         "method": "extrapolated_first_order_ln_gamma",
         "progress_s": progress_s,
         "progress_variable": progress_variable,
@@ -1242,36 +1248,23 @@ def _build_high_t_melt_activity_authority(
                 composition_distance = _high_t_composition_distance(
                     composition, certificate["composition_single_cation"],
                 )
+                cap = _EXTRAPOLATION_CAP_L1.get(parent)
+                past_cap = cap is not None and composition_distance > cap
                 continued = _continued_certified_effective_gamma(
                     certificate,
                     temperature_K=temperature_K,
                     composition=composition,
+                    composition_distance_L1=composition_distance,
+                    composition_cap_L1=(
+                        0.0 if past_cap and parent in prior_extrapolated else cap
+                    ),
                 )
-                cap = _EXTRAPOLATION_CAP_L1.get(parent)
-                past_cap = cap is not None and composition_distance > cap
                 if past_cap and parent in prior_extrapolated:
                     gamma = float(prior_extrapolated[parent])
                     method = "extrapolation_capped_frozen"
                     flag = "extrapolation_capped_frozen"
                 elif past_cap:
-                    # First refusal is already past the cap. Freeze at the
-                    # Taylor value on the cap boundary so the stored gamma
-                    # is the last in-cap step, not a fresh table value.
-                    # s_cap = s * (cap / D). cap and D are both L1, so the
-                    # ratio is dimensionless and s_cap is a progress.
-                    # cap == 0 (Na2O) or a missing slope keeps gamma_last.
-                    slope = continued["ln_gamma_slope"]
-                    if (
-                        cap is None or cap <= 0.0 or slope is None
-                        or composition_distance <= 0.0
-                    ):
-                        gamma = float(certificate["gamma_last"])
-                    else:
-                        gamma = _ln_gamma_at_progress(
-                            certificate,
-                            continued["progress_s"] * (cap / composition_distance),
-                            slope,
-                        )
+                    gamma = float(continued["gamma"])
                     method = "extrapolation_capped_frozen"
                     flag = "extrapolation_capped_frozen"
                 else:
@@ -2781,6 +2774,21 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
         vapor_pressure_authority_limits: dict[str, dict[str, Any]] = {}
+        transport_o2 = o2_potential_from_pO2_bar(
+            pO2_bar=transport_pO2_bar,
+            temperature_K=T_K,
+            reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+        )
+        transport_notice = transport_o2.observation_or_setpoint_receipt.get(
+            "extrapolation_notice"
+        )
+        if transport_notice is not None:
+            warnings.append(
+                f"{transport_notice['reason']}: "
+                f"pO2_bar={transport_notice['pO2_bar_used']!r} "
+                f"certified_band={transport_notice['certified_band']!r} "
+                "authority_level=extrapolated"
+            )
         if melt_dissociation_pO2_clamped and intrinsic_fO2_log is not None:
             # Visible, non-authoritative: redox returned a non-physical fO2;
             # mass action uses the physical envelope edge so oxygen-dependent
@@ -3470,13 +3478,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if parent_oxide != 'FeO':
                 # t-571: the Ellingham O2 denominator is sourced from the
                 # owner-gated O2 channel potential (melt_interface plane).
-                # In-envelope the factory's envelope clamp is the identity,
-                # so legacy_pO2_bar equals dissociation_pO2_bar bit-for-bit;
-                # out-of-envelope degraded transport fallbacks (>100 bar
-                # without intrinsic fO2) now receive the declared b-148
-                # envelope instead of mass-actioning a float sentinel.
-                # FeO intentionally retains the legacy transport denominator
-                # (Kress91 activity already carries melt redox).
+                # The potential retains the actual oxygen, including a domain
+                # notice beyond the evaluator band. FeO retains its transport
+                # denominator (Kress91 activity already carries melt redox).
                 dissociation_pO2_bar = o2_potential_from_pO2_bar(
                     pO2_bar=dissociation_pO2_bar,
                     temperature_K=T_K,
@@ -3883,9 +3887,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 # t-571: transport-plane O2 through channel #1.  The legacy
-                # form here applied no envelope clamp; the channel factory's
-                # clamp is the identity in-envelope (bit-identical) and now
-                # bounds out-of-envelope transport fallbacks (b-148 physics).
+                # form uses the actual transport oxygen; the channel factory
+                # records a notice outside its stated evaluator band.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
                     pO2_bar=transport_pO2_bar,
@@ -3925,19 +3928,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # t-571: the sqrt mass action consumes the owner-gated O2
                 # channel potential (transport_headspace plane).  The exact
                 # legacy expression sqrt(p_ref / p) is preserved — only the
-                # scalar source changes (typed, clamped, receipted).  The
-                # envelope clamp is the identity for fail-loud floored
-                # transport pO2 (>= 1e-9 bar); an out-of-envelope explicit
-                # control (>100 bar) now receives the b-148 envelope.
+                # scalar source is validated and receipted without substitution.
                 sio_o2_potential = o2_potential_from_pO2_bar(
                     pO2_bar=transport_pO2_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
-                mass_action = math.sqrt(
-                    sio_o2_potential.legacy_pO2_reference_bar
-                    / sio_o2_potential.legacy_pO2_bar
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                mass_action = _sio_oxygen_pressure_factor(
+                    sio_o2_potential.legacy_pO2_bar,
+                    sio_o2_potential.legacy_pO2_reference_bar,
                 )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * mass_action,
@@ -4001,6 +4003,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if name == "SiO" and oxide_extrapolated:
                     vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
                         oxide_vapor_extrapolations[name]
+                    )
+                oxygen_notice = (
+                    evaluation.extrapolation_notice
+                    if compiled_evaluator is not None
+                    else transport_notice if pO2_scaled else None
+                )
+                if oxygen_notice is not None:
+                    vapor_pressure_provenance[name].setdefault(
+                        "extrapolation_notice", dict(oxygen_notice)
                     )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][

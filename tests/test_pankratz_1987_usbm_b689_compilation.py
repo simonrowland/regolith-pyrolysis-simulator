@@ -6,7 +6,6 @@ import copy
 import hashlib
 import inspect
 import json
-import os
 import pathlib
 from pathlib import Path
 
@@ -15,6 +14,7 @@ import yaml
 
 from simulator import reference_data
 from simulator.reference_data import pankratz_1987_usbm_b689_loader as loader
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools import ingest_pankratz_1987_usbm_b689 as harvest
 
 
@@ -444,7 +444,7 @@ def test_valid_but_wrong_continuation_formula_cannot_certify():
 
 @pytest.fixture
 def corpus():
-    path = Path(os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos/regolith-corpus"))
+    path = regolith_corpus_root()
     if not (path / "raw" / harvest.SOURCE_ID).exists():
         pytest.skip("B689 source corpus unavailable")
     return path
