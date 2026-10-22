@@ -5924,6 +5924,18 @@ _KELLEY_ENTROPY_COLUMNS = (
 )
 _KELLEY_ENTROPY_T_K = Decimal("298.15")
 _TEMPERATURE_COLUMN_KEYS = frozenset({"t", "temperature", "temperature_k", "t_k"})
+# These sources print molar units for the series that carry a per-species basis.
+_MOLAR_BASIS_COMPILATION_SOURCES = frozenset(
+    {
+        "pankratz-1984-usbm-b677",
+        "pankratz-1987-usbm-b689",
+        "pankratz-1994-usbm-b696",
+        "kelley-king-1961-usbm-b592",
+    }
+)
+_MOLAR_COMPILATION_SERIES_UNITS = frozenset(
+    {"cal/mol·k", "kcal/mol", "cal./deg.-mole"}
+)
 
 
 @dataclass(frozen=True)
@@ -18450,6 +18462,17 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
+        molar_series_per = {
+            series.quantity: PerBasis.MOL_SPECIES
+            for series in column_series or ()
+            if source_id in _MOLAR_BASIS_COMPILATION_SOURCES
+            and series.source_units
+            and all(
+                unit is not None
+                and unit.strip().casefold() in _MOLAR_COMPILATION_SERIES_UNITS
+                for unit in series.source_units
+            )
+        }
         series_summary = False
         if column_series:
             mapped_quantities = {series.quantity for series in column_series}
@@ -18499,6 +18522,7 @@ class Migrator:
                     evidence=evidence,
                     temperature_K=series.temperature_K,
                     standard_pressure_Pa=p_std,
+                    per=molar_series_per.get(series.quantity),
                     method=State.of(MethodToken.TABULATION),
                     derivation=_compilation_conversion_derivation(
                         series.unit_trail,
@@ -18599,6 +18623,11 @@ class Migrator:
             evidence=evidence,
             temperature_K=t,
             standard_pressure_Pa=p_std,
+            per=(
+                molar_series_per.get(quantity.value)
+                if quantity.is_value
+                else None
+            ),
             method=State.of(MethodToken.TABULATION),
             derivation=_compilation_conversion_derivation(
                 sel.unit_trail,
