@@ -89,6 +89,22 @@ def test_cli_writes_markdown_report_to_file(tmp_path):
     assert "**Run provenance**: mass_kg=1000" in body
 
 
+def test_zero_hour_markdown_reports_vapor_pressure_as_unobserved(tmp_path):
+    output = tmp_path / "report.md"
+    rc = main([
+        "--feedstock", "lunar_mare_low_ti",
+        "--campaign", "C2A",
+        "--hours", "0",
+        "--output", str(output),
+        "--format", "markdown",
+    ])
+
+    assert rc == 0
+    body = output.read_text()
+    assert "vapor_pressure_active=unknown;" in body
+    assert "vapor_pressure_configured_shadows=" in body
+
+
 def test_cli_writes_json_report_to_file(tmp_path):
     """JSON output is round-trippable via json.loads and carries
     the metadata header (feedstock_id, campaign)."""

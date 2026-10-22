@@ -213,6 +213,7 @@ def _emit_report(
         )
         metadata = provenance["run_metadata"]
         engines_used = metadata.get("engines_used", {})
+        active_engines = engines_used.get("active", {})
         vapor_engine = engines_used.get("registry", {}).get(
             "vapor_pressure", {}
         )
@@ -226,8 +227,8 @@ def _emit_report(
             f"backend={metadata.get('backend', 'unknown')}; "
             f"backend_status={metadata.get('backend_status', 'unknown')}; "
             f"backend_authoritative={str(metadata.get('backend_authoritative', False)).lower()}; "
-            f"vapor_pressure_active={vapor_engine.get('authoritative', 'none')}; "
-            f"vapor_pressure_shadows={','.join(map(str, shadows)) or 'none'}; "
+            f"vapor_pressure_active={active_engines.get('vapor_pressure', 'unknown')}; "
+            f"vapor_pressure_configured_shadows={','.join(map(str, shadows)) or 'none'}; "
             "vapor_pressure_extrapolated_summaries="
             f"{int(extrapolation.get('total_count', 0) or 0)}\n"
         )
