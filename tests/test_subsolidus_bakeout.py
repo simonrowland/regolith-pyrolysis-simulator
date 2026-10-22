@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -17,7 +18,8 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import CampaignPhase, EvaporationFlux
+from simulator.runner import build_per_hour_summary
+from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux
 from simulator.subsolidus_bakeout import (
     CLEANED_MELT_ACCOUNT,
     FOULANT_ACCOUNT,
@@ -33,7 +35,12 @@ from simulator.subsolidus_bakeout import (
     seam_refusal,
     throttle_mass_rate_kg_hr,
 )
-from simulator.vapour_rail.channels import CHANNEL_REGISTRY, CHANNEL_S2
+from simulator.vapour_rail.channels import (
+    CHANNEL_REGISTRY,
+    CHANNEL_S2,
+    ChannelVerdictKind,
+    resolve_channel_potential,
+)
 
 _DATA = Path(__file__).resolve().parents[1] / "data"
 _REGISTRY = load_species_formulas(_DATA / "species_catalog.yaml")
@@ -759,6 +766,19 @@ def _s2_fraction(sim) -> float:
     return float(row["remaining_fraction"])
 
 
+def _campaign_sim(feedstock_key: str, feedstock: dict):
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
+        {feedstock_key: feedstock},
+        yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
+    )
+    sim.load_batch(feedstock_key, mass_kg=1000.0)
+    return sim
+
+
 def _arm_c0(sim, temperature_C: float = 600.0) -> None:
     sim.melt.campaign = CampaignPhase.C0
     sim.melt.temperature_C = temperature_C
@@ -776,15 +796,42 @@ def test_s2_and_so2_stay_unavailable_until_a_c0_domain_has_an_owner():
         so2_domain[0] <= envelope_low and so2_domain[1] >= envelope_high
     )
     assert CHANNEL_REGISTRY[CHANNEL_S2].runtime_owner is None
-    assert production_seam_refusal("S2", 900.0) == "missing_s2_channel_owner"
+    s2_potential = resolve_channel_potential(CHANNEL_S2, temperature_K=900.0)
+    assert s2_potential.verdict is ChannelVerdictKind.REFUSAL
+    assert s2_potential.refusal_code == "refused_sulfur_reservoir_owner_missing"
+    assert production_seam_refusal("S2", 900.0) == (
+        "refused_sulfur_reservoir_owner_missing"
+    )
     assert production_seam_refusal("SO2", 900.0) == "so2_c0_domain_unowned"
     owned = (300.0, 1300.0)
-    assert seam_refusal(
-        "S2", 900.0, runtime_owner="sulfur-owner", domain=owned,
-    ) is None
-    assert seam_refusal(
-        "SO2", 900.0, runtime_owner="sulfur-owner", domain=owned,
-    ) is None
+    # A covering domain does not admit either driver while S2's channel
+    # refuses and SO2 has no channel. An owner name is not an argument.
+    import simulator.subsolidus_bakeout as bakeout_module
+    saved_domains = bakeout_module._CATALOG_DOMAIN_CACHE
+    bakeout_module._CATALOG_DOMAIN_CACHE = {"S2": owned, "SO2": owned}
+    try:
+        assert production_seam_refusal("S2", 900.0) == (
+            "refused_sulfur_reservoir_owner_missing"
+        )
+        assert production_seam_refusal("SO2", 900.0) == "so2_c0_domain_unowned"
+        assert seam_refusal("S2", 900.0, domain=owned) is None
+        assert seam_refusal("SO2", 900.0, domain=owned) == "so2_c0_domain_unowned"
+
+        def _admit(*_args, **_kwargs):
+            return SimpleNamespace(
+                verdict=ChannelVerdictKind.POINT,
+                refusal_code=None,
+            )
+
+        import simulator.vapour_rail.channels as channel_module
+        original_resolve = channel_module.resolve_channel_potential
+        channel_module.resolve_channel_potential = _admit
+        try:
+            assert production_seam_refusal("S2", 900.0) is None
+        finally:
+            channel_module.resolve_channel_potential = original_resolve
+    finally:
+        bakeout_module._CATALOG_DOMAIN_CACHE = saved_domains
 
 
 def test_throttle_mass_rate_sums_committed_volatiles_only():
@@ -939,7 +986,9 @@ def test_missing_openimcc_and_the_seam_block_release():
         evaluator_loader=lambda: _supported,
     )
     assert blocked["committed"] is False
-    assert blocked["reactions"][0]["reason"] == "missing_s2_channel_owner"
+    assert blocked["reactions"][0]["reason"] == (
+        "refused_sulfur_reservoir_owner_missing"
+    )
     assert blocked["provider_status"] is None
     assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
         before
@@ -1067,6 +1116,110 @@ def test_first_melt_hands_hosts_and_oxides_once_and_leaves_iron():
     assert sim.atom_ledger.mol_by_account(CLEANED_MELT_ACCOUNT)["FeS_troilite"] == pytest.approx(
         fes - xi_fe
     )
+
+
+def test_frozen_c0_exit_then_melting_c0b_does_not_evaluate():
+    calls = {"n": 0}
+
+    def _loader():
+        calls["n"] += 1
+        return None
+
+    sim = _campaign_sim("feed", {
+        "label": "frozen then melt",
+        "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+    })
+    salt_before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"]
+    _arm_c0(sim, temperature_C=600.0)
+    frozen = sim._apply_c0_bakeout(liquid_fraction=0.0, evaluator_loader=_loader)
+    assert calls["n"] == 1
+    assert frozen["handoff"] is False
+    assert frozen["committed"] is False
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"] == pytest.approx(
+        salt_before
+    )
+
+    sim.melt.campaign_hour = 25
+    assert sim.campaign_mgr.check_endpoint(
+        sim.melt,
+        EvaporationFlux(),
+        CondensationTrain(),
+        sim.record,
+    ) is True
+    assert sim.campaign_mgr.last_c0_exit["outcome"] == "incomplete"
+    assert sim.campaign_mgr.last_c0_exit["backstop"] == "maximum_hold"
+
+    sim.melt.campaign = CampaignPhase.C0B
+    melted = sim._apply_c0_bakeout(liquid_fraction=0.2, evaluator_loader=_loader)
+    assert calls["n"] == 1
+    assert melted["handoff"] is True
+    assert melted["committed"] is False
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT).get("CaSO4", 0.0) == (
+        pytest.approx(0.0, abs=1e-12)
+    )
+    assert sim.atom_ledger.mol_by_account(CLEANED_MELT_ACCOUNT)["CaSO4"] == (
+        pytest.approx(salt_before)
+    )
+
+    hot_calls = {"n": 0}
+
+    def _hot_loader():
+        hot_calls["n"] += 1
+        return None
+
+    hot = _campaign_sim("feed", {
+        "label": "melt in C0",
+        "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+    })
+    _arm_c0(hot)
+    handoff = hot._apply_c0_bakeout(liquid_fraction=0.2, evaluator_loader=_hot_loader)
+    assert hot_calls["n"] == 0
+    assert handoff["handoff"] is True
+    assert handoff["committed"] is False
+
+
+def test_production_refusal_and_redox_notice_stay_on_the_run_record():
+    def _one(feedstock_key: str):
+        sim = _campaign_sim(feedstock_key, {
+            "label": feedstock_key,
+            "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+        })
+        _arm_c0(sim, temperature_C=600.0)
+        sim.step()
+        snapshot = sim.record.snapshots[-1]
+        diag = snapshot.subsolidus_bakeout_diagnostic
+        assert diag["committed"] is False
+        assert diag["notice"] == "redox_back_oxidation_not_modelled"
+        assert diag["reactions"]
+        assert all(
+            row.get("status") == "unavailable" and row.get("reason")
+            for row in diag["reactions"]
+        )
+        assert sim._subsolidus_bakeout_by_hour[-1]["notice"] == diag["notice"]
+        summary = sim._capture_campaign_summary("C0")
+        assert summary["subsolidus_bakeout"][-1]["notice"] == diag["notice"]
+        assert "subsolidus_bakeout_diagnostic" not in build_per_hour_summary(
+            sim, snapshot
+        )
+        kept = list(sim._subsolidus_bakeout_by_hour)
+        sim.melt.campaign = CampaignPhase.C0B
+        skipped = sim._apply_c0_bakeout(liquid_fraction=0.0)
+        assert skipped["skipped"] == "not_c0"
+        assert sim._subsolidus_bakeout_by_hour == kept
+
+    _one("ci_carbonaceous_chondrite")
+    _one("cm_carbonaceous_chondrite")
+
+    ordinary = _campaign_sim("s_type_asteroid_silicate", {
+        "label": "ordinary",
+        "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+    })
+    _arm_c0(ordinary)
+    plain = ordinary._apply_c0_bakeout(
+        liquid_fraction=0.0,
+        evaluator_loader=lambda: None,
+    )
+    assert plain["notice"] is None
 
 
 def test_redox_notice_is_feedstock_key_only_and_phosphorus_stays_put():

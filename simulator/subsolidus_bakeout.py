@@ -116,23 +116,20 @@ def seam_refusal(
     species_id: str,
     temperature_K: float,
     *,
-    runtime_owner: str | None,
     domain: tuple[float, float] | None,
 ) -> str | None:
-    """None when the driver may enter the flux provider. Otherwise a reason."""
-    if species_id == "S2" and not runtime_owner:
-        return "missing_s2_channel_owner"
-    if not _domain_admits_c0(domain, temperature_K):
-        if species_id == "SO2":
-            return "so2_c0_domain_unowned"
-        if species_id == "S2":
-            return "s2_c0_domain_unowned"
-        return "c0_domain_unowned"
-    if not runtime_owner:
-        if species_id == "SO2":
-            return "so2_c0_domain_unowned"
-        return "missing_s2_channel_owner"
-    return None
+    """Bakeout C0-domain check. None when the domain itself admits.
+
+    The sulfur runtime owner is the vapour-rail channel resolver, not a
+    name string passed in here. SO2 has no channel, so it stays unowned.
+    """
+    if species_id == "SO2":
+        return "so2_c0_domain_unowned"
+    if _domain_admits_c0(domain, temperature_K):
+        return None
+    if species_id == "S2":
+        return "s2_c0_domain_unowned"
+    return "c0_domain_unowned"
 
 
 def _catalog_domains() -> dict[str, tuple[float, float] | None]:
@@ -150,19 +147,28 @@ def _catalog_domains() -> dict[str, tuple[float, float] | None]:
 
 
 def production_seam_refusal(species_id: str, temperature_K: float) -> str | None:
-    """Read the channel registry and the species catalog. Do not hardcode them."""
-    from simulator.vapour_rail.channels import CHANNEL_REGISTRY, CHANNEL_S2
+    """Ask the sulfur channel, then apply the bakeout domain check.
 
-    domains = _catalog_domains()
+    A truthy owner name is not admission. S2 uses the channel resolver's
+    refusal. SO2 has no channel and stays on the domain refusal.
+    """
+    from simulator.vapour_rail.channels import (
+        CHANNEL_S2,
+        ChannelVerdictKind,
+        resolve_channel_potential,
+    )
+
     if species_id == "S2":
-        owner = CHANNEL_REGISTRY[CHANNEL_S2].runtime_owner
-    else:
-        owner = None
+        potential = resolve_channel_potential(
+            CHANNEL_S2,
+            temperature_K=float(temperature_K),
+        )
+        if potential.verdict is ChannelVerdictKind.REFUSAL:
+            return str(potential.refusal_code)
     return seam_refusal(
         species_id,
         temperature_K,
-        runtime_owner=owner,
-        domain=domains.get(species_id),
+        domain=_catalog_domains().get(species_id),
     )
 
 
