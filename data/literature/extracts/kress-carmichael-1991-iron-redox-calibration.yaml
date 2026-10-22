@@ -15,6 +15,10 @@ extraction:
   date: '2026-10-22'
   worker: codex-kc91-1022
 review_status: draft
+fidelity_samples:
+  - path: species.Fe.observations[kress_1991_table4_redox_series].values.rows[0].Fe2O3_wt_pct
+    value: '16.93'
+    locator: {published_page: 86, pdf_page_index: 4, table: '4', row: Q01}
 species:
   Fe:
     context:
@@ -45,8 +49,8 @@ species:
               published_page: 87
               pdf_page_index: 5
             reference_locator:
-              published_page: 91
-              pdf_page_index: 9
+              published_page: 92
+              pdf_page_index: 10
             source_id: kennedy-1948-oxygen-volatiles-iron-oxides
             work_id: 89fbf42cb1045f1ab8801cc1830202d26d6b7f67eb4e4c7ba2a77d220cedb72d
           - citation: Fudali, R. F. (1965). Oxygen fugacities of basaltic and andesitic magmas. Geochimica et Cosmochimica
@@ -55,8 +59,8 @@ species:
               published_page: 87
               pdf_page_index: 5
             reference_locator:
-              published_page: 91
-              pdf_page_index: 9
+              published_page: 92
+              pdf_page_index: 10
             source_id: fudali-1965-oxygen-fugacities-basalt-andesite
             work_id: ab9a41eda79eb05efce4a44727038279dad4d2e5d03b6b32a41ebc4974a2ab09
           - citation: Thornber, C. R., Roeder, P. L., and Foster, J. R. (1980). The effect of composition on the ferric-ferrous
