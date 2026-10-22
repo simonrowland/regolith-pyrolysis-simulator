@@ -1,0 +1,128 @@
+source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+source_identity:
+  title: Chr-Basalt
+  authors_year: Z, N (2025)
+  identifier: Mendeley Data version 3 DOI 10.17632/th5knvw2dh.3
+  source_archive_sha256: ce7d52987dce1de393953fe182c26537399ceb670bade5c12c4d08e101e3377a
+  source_pdf_identity: No PDF is present in the corpus for this dataset source id; this is a dataset archive rather than a PDF source.
+duplicate_check:
+  doi: Exact DOI checked across current extracts and origin/review/w* refs; no matching dataset source id.
+  title_author_year: Chr-Basalt and Z, N (2025) checked across current extracts and review refs; no matching extract.
+  source_identity: Official archive is Chr-Basalt Version 3, CC BY 4.0; its sidecar SHA-256 matches the downloaded archive.
+  related_published_source: zagrtdenov-2020-chromite-magnesiochromite-solubility is the same experimental study; Tables 1, 3, 4, and 5 are linked to its existing records and are not scored twice.
+table_tool:
+  result: not applicable; the source is a Mendeley XLSX/CSV dataset and has no PDF or MinerU tables.
+  disposition: Tables 1–5 read from the displayed workbook cells. Cell formatting was respected, including D(Cr) to one decimal and formula/basicity cells to their displayed decimal places.
+tables:
+  - table: '1'
+    locator:
+      record: Research data/Table 1. Starting materials.xlsx
+      sheet: Sheet1
+      cell_range: B2:Q7
+    disposition: context-only unheated starting materials
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+    reason: These are initial materials, not equilibrated glass/melt phase compositions. The displayed data are linked to source-2020 Table 1; the S2 total differs (98.75 vs 98.54 wt.%) and both are retained.
+    rows: 4
+    cell_audit: all four materials, analysis counts, oxide columns, Cr ppm, blank cells, and totals recorded from displayed workbook cells.
+  - table: '2'
+    locator:
+      record: Research data/Table 2. Conditions.xlsx
+      sheet: Sheet1
+      cell_range: B2:F15
+    disposition: context-only duplicate run conditions
+    candidate_quantity_tokens:
+      - transition_temperature
+    reason: The 12 runs and their 1440 °C / 24 h conditions duplicate the source-2020 experiment records; merged cells C4:C15, D4:D15, and each three-run E system block were applied only over their merged ranges.
+    rows: 12
+    cell_audit: each run, system block, buffer, merged temperature, and merged duration recorded; nonmerged blanks preserved.
+  - table: '3'
+    locator:
+      record: Research data/Table 3. Central parts of crystalline material.xlsx
+      sheet: Sheet1
+      cell_range: B1:K9
+    disposition: context-only crystal component compositions
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+    reason: The current PhaseRole enum has no crystal role. The seven center rows re-present source-2020 Table 2 and are linked there.
+    rows: 7
+    cell_audit: all oxide cells, D.L. cells, analysis counts, totals, and run identities recorded from displayed cells.
+  - table: '4'
+    locator:
+      record: Research data/Table 4. Compositions of rims of crystalline materials.xlsx
+      sheet: Sheet1
+      cell_range: B1:T19
+    disposition: context-only crystal rim compositions, D(Cr), and author-recalculated spinel formulas
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+      - distribution_ratio
+    reason: No crystal PhaseRole exists. D(Cr) derives from crystal/glass composition inputs that have no crystal-component token, so it remains context pending a corpus TABLE_CSV asset under controller t-1382. The AB2O4 formula terms are author-recalculated, not measured composition rows.
+    rows: 11
+    derived_inputs_csv: .agent-scratch/f45b-tables/zagrtdenov-2025-chromite-magnesiochromite-dataset/table4.csv
+    cell_audit: all composition cells, D.L. markers, totals, phases, D(Cr) displayed values, and formula terms recorded; D(Cr) preserved at displayed one-decimal precision.
+  - table: '5'
+    locator:
+      record: Research data/Table 5. Glass.xlsx
+      sheet: Sheet1
+      cell_range: B1:P17
+    disposition: context-only duplicate equilibrated glass compositions and auxiliary columns
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+    reason: All 12 post-quench samples already have typed oxide-component rows in source-2020 Table 3. Context links each component to the existing observation id. Dataset values differing from source-2020 remain separately printed in this context and are not scored twice.
+    rows: 12
+    cell_audit: all oxide values, parenthetical uncertainties, D.L. cells, totals, Cr ppm, optical basicity displayed to three decimals, and run identities recorded.
+workbooks_and_compilations:
+  - record: Research data/Dataset input.xlsx
+    study_rows: E19, E23, E24, E25, E26, E27, E28, E29, E30, E31, E33
+    compiled_literature_rows: 214
+    disposition: This-study inputs are separated from prior-work inputs; input cells repeat measurements represented by Tables 1–5 and the source-2020 extract. Zero-coded detection limits in prepared inputs are not treated as measured zero concentrations.
+  - record: Research data/Dataset output.xlsx
+    disposition: Model/calculation output including calculated log fO2, Cr ratios, and spinel formula terms. Calculated fO2 is not migrated as an experimental condition; no model outputs are scored as measurements.
+  - record: Research data/Nat_glass_data_sheets.xlsx
+    data_rows: 91200
+    disposition: Compiled natural glass/bulk samples without row-specific equilibrium T/atmosphere; composition rows are not typed as equilibrium_phase_composition.
+  - record: Research data/compiled CSV files
+    data_rows: 35267
+    disposition: Prior-work natural glass/bulk composition compilations, separated from this study's 11 runs; no row-specific equilibrium identity is supplied by this dataset inventory.
+figures:
+  digitisation: deferred to a figure pass
+  records:
+    - figure: '1'
+      asset: Research data/Figure 1. Crystals in melts photos.jpg
+      panels: E19 micrograph; E33 micrograph
+      marker_counts: 0 per panel
+    - figure: '2'
+      asset: Research data/Figure 2. Cr_ppm & D vs log fO2.jpeg
+      axes: log fO2 vs Cr ppm; log fO2 vs D(Cr) crystal/glass
+      series: Chr-MORB, Chr-Di63An37, Cr2O3-MORB, Cr2O3-Di63An37
+      marker_counts: 3, 2, 3, 3
+    - figure: '3'
+      asset: Research data/Figure 3. Calc vs. measured & independant dataset.jpeg
+      panels: eight comparison panels for Cr ratio, T, log fO2, and optical basicity
+      series: literature 187; this study 11; independent 33
+    - figure: '4'
+      asset: Research data/Figure 4. Models comparison.jpeg
+      panels: three rows by three columns; measured/calculated chromite fraction, T, and log fO2
+      series: Poustovetov & Roeder 220; Nikolaev et al. 220; this study model 220; y=x/bounds 0 markers
+    - figure: '5'
+      asset: Research data/Figure 5. Cr ppm vs. fO2.jpeg
+      axes: log fO2 vs Cr in glass, ppm
+      series: four this-study systems and Murck & Campbell/Roeder & Reynolds series as listed in the extract
+      marker_counts: counts from archived figure series data, as represented in figure records
+    - figure: '6'
+      asset: Research data/Figure 6. Natural Glasses, MainRatio vs OB.jpeg
+      panels: natural glass main ratio/basicity data and two model curves
+      series: basalt 72959; boninite 1064; picrite 1025; model curves 0 markers
+    - figure: '7'
+      asset: Research data/Figure 7. Buffers & Contour Main ratio vs logfO2 vs OB.jpeg
+      panels: Cr ppm vs T model curves; log fO2/basicity main-ratio contours
+      series: IW, FMQ-2, FMQ, FMQ+2, and contour set; 0 markers (continuous curves/contours)
+    - figure: S1
+      asset: Figures txt data/Supplementary figures/SF1. GOR132-G/
+      series: 10 reference-glass component panels, 17 measurements each
+    - figure: S2
+      asset: Figures txt data/Supplementary figures/SF2. KL2-G/KL2-G reference material.png; the PNG and both JPEG files show the same 11-panel chart, and the JPEG copies have identical SHA-256.
+      series: Na2O, CaO, MgO, TiO2, Al2O3, Cr ppm, SiO2, MnO, P2O5, FeO(t), and K2O panels; 17 measurements per panel
+    - figure: S3
+      asset: Figures txt data/Supplementary figures/SF3. E19/
+      series: 9 individual-glass component panels, 71 measurements each

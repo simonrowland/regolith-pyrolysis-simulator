@@ -1,0 +1,63 @@
+source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+source_identity:
+  doi: 10.1016/j.jnoncrysol.2010.09.045
+  title: Solubility of chromium oxide in binary soda-silicate melts
+  venue: Journal of Non-Crystalline Solids 356(50-51), 2734-2741 (2010)
+table_tool:
+  result: no tables emitted from the available MinerU page fragments
+  source_pages: [4, 12, 13, 14, 15, 24, 25, 26, 27, 28, 29]
+  disposition: born-digital Table 2 manually transcribed from pdftotext-layout; all Table 2 cells and row/column assignments checked against the 600 dpi physical page 21 render
+manual_tables:
+  - table: '1'
+    locator:
+      page: 20
+      pdf_page_index: 19
+      published_page: 19
+    disposition: context-only starting-glass composition
+    reason: The table reports starting glass elemental at.% before chromium saturation experiments; equilibrium_phase_composition would misidentify these as equilibrated experimental melt components, and no starting-material composition token fits.
+    captured_fields:
+      - aimed glass formula
+      - theoretical Na and Si at.%
+      - WDS Na and Si at.% and printed parenthetical standard deviations
+      - printed X in Na2O-xSiO2 and its parenthetical values
+  - table: '2'
+    locator:
+      page: 21
+      pdf_page_index: 20
+      published_page: 20
+    disposition: 80 typed equilibrium_phase_composition observations
+    table_rows: 20
+    components_per_row: 4
+    mapping:
+      temperature headings: values.T_C
+      Redox buffer row label: values.redox_buffer_as_published
+      printed logfO2: values.point_conditions.fO2_log.state.value; no reference unit is printed, so the family convention log10(bar) is recorded without conversion
+      composition column heading: values.point_conditions.composition.state.value.components
+      At.% Cr cell: values.value_as_published and values.component_amount as mole_fraction
+      parenthetical At.% Cr standard deviation: values.sigma_as_published and observation.uncertainty.sigma as dimensionless mole fraction
+      Air row: values.point_conditions.gas_mix
+    cell_audit:
+      machine_text: pdftotext-layout.txt, physical PDF page 21
+      render: 600 dpi physical PDF page 21
+      checked: 80 Cr amount and SD cells, 20 buffer/logfO2 labels, four temperature headings, and four composition headings
+  - table: '3'
+    locator:
+      page: 22
+      pdf_page_index: 21
+      published_page: 21
+    disposition: context-only fitted chromium-complex parameters
+    reason: x, y, z and the related slopes are author-derived model-fit parameters with no matching quantity token.
+    captured_fields:
+      - all printed slopes and parenthetical standard deviations
+      - all printed x, y, z coefficients, standard deviations, and averages
+      - fitted Cr(II), Cr(III), and Cr(VI) complex formulae
+  - table: '4'
+    locator:
+      page: 23
+      pdf_page_index: 22
+      published_page: 22
+    disposition: context-only reaction enthalpies and entropies
+    reason: Table 4 reports reaction ΔH° and ΔS° for chromium dissolution, oxidation, and reduction; these are not formation enthalpy from elements or absolute entropy.
+    captured_fields:
+      - all four melt compositions
+      - all six printed reaction thermodynamic values and their nonzero ± widths per composition

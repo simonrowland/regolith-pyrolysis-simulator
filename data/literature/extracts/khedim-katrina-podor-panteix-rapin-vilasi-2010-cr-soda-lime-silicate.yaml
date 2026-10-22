@@ -1,0 +1,676 @@
+schema_version: literature_extract.v1
+source_id: khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
+source:
+  citation: Khedim, H., Katrina, T., Podor, R., Panteix, P.-J., Rapin, C. & Vilasi, M. (2010). Solubility of Cr2O3 and speciation
+    of chromium in soda-lime-silicate melts. Journal of the American Ceramic Society, 93(5), 1347-1354.
+  doi: 10.1111/j.1551-2916.2009.03581.x
+  year: 2010
+  url: https://doi.org/10.1111/j.1551-2916.2009.03581.x
+extraction:
+  method: Born-digital author manuscript; pdftotext-layout was primary. The MinerU converter emitted no tables. Tables 1-5 were
+    transcribed and every cell checked against 600 dpi renders of physical PDF pages 21-25. Figure 1-10 metadata and marker counts
+    were checked against 600 dpi renders of physical pages 26-35; no plotted values were digitised.
+  date: '2026-10-22'
+  worker: fam45b-1022
+review_status: draft
+species:
+  Na2O:
+    observations: []
+    context:
+    - observation_id: khedim_katrina_2010_table1_starting_glass_compositions
+      type: starting_material_composition
+      locator:
+        page: 21
+        pdf_page_index: 20
+        table: '1'
+      phase: starting soda-silicate and soda-lime-silicate glasses
+      units: wt.% reagents; EPMA at.%; x as printed
+      values:
+        quantity_as_published: composition of glasses used as starting materials
+        candidate_quantity_tokens:
+        - equilibrium_phase_composition
+        schema_gap: No token represents the measured composition of the starting glasses; equilibrium_phase_composition would
+          misidentify starting materials as equilibrated phase compositions.
+        method_class: measured_direct
+        compositions_as_printed:
+        - aimed_glass: Na2O-1.5SiO2
+          Na2CO3_wt_percent: '69.68'
+          SiO2_wt_percent: '59.25'
+          CaCO3_wt_percent: '—'
+          EPMA_Na_at_percent: '25.95'
+          EPMA_Na_parenthetical: '0.40'
+          EPMA_Si_at_percent: '20.17'
+          EPMA_Si_parenthetical: '0.19'
+          EPMA_Ca_at_percent: '—'
+          x: '1.56'
+          x_parenthetical: '0.04'
+        - aimed_glass: Na2O-2SiO2
+          Na2CO3_wt_percent: '58.19'
+          SiO2_wt_percent: '65.97'
+          CaCO3_wt_percent: '—'
+          EPMA_Na_at_percent: '21.91'
+          EPMA_Na_parenthetical: '0.44'
+          EPMA_Si_at_percent: '22.38'
+          EPMA_Si_parenthetical: '0.22'
+          EPMA_Ca_at_percent: '—'
+          x: '2.04'
+          x_parenthetical: '0.06'
+        - aimed_glass: Na2O-2.5SiO2
+          Na2CO3_wt_percent: '49.95'
+          SiO2_wt_percent: '70.79'
+          CaCO3_wt_percent: '—'
+          EPMA_Na_at_percent: '19.22'
+          EPMA_Na_parenthetical: '0.49'
+          EPMA_Si_at_percent: '23.72'
+          EPMA_Si_parenthetical: '0.25'
+          EPMA_Ca_at_percent: '—'
+          x: '2.47'
+          x_parenthetical: '0.09'
+        - aimed_glass: Na2O-3SiO2
+          Na2CO3_wt_percent: '43.75'
+          SiO2_wt_percent: '74.41'
+          CaCO3_wt_percent: '—'
+          EPMA_Na_at_percent: '16.34'
+          EPMA_Na_parenthetical: '0.22'
+          EPMA_Si_at_percent: '25.16'
+          EPMA_Si_parenthetical: '0.11'
+          EPMA_Ca_at_percent: '—'
+          x: '3.08'
+          x_parenthetical: '0.06'
+        - aimed_glass: Na2O-3.5SiO2
+          Na2CO3_wt_percent: '38.93'
+          SiO2_wt_percent: '77.24'
+          CaCO3_wt_percent: '—'
+          EPMA_Na_at_percent: '15.00'
+          EPMA_Na_parenthetical: '0.33'
+          EPMA_Si_at_percent: '25.83'
+          EPMA_Si_parenthetical: '0.17'
+          EPMA_Ca_at_percent: '—'
+          x: '3.466'
+          x_parenthetical: '0.10'
+        - aimed_glass: Na2O-CaO-3SiO2
+          Na2CO3_wt_percent: '40.89'
+          SiO2_wt_percent: '60.42'
+          CaCO3_wt_percent: '35.21'
+          EPMA_Na_at_percent: '14.04'
+          EPMA_Na_parenthetical: '0.25'
+          EPMA_Si_at_percent: '21.32'
+          EPMA_Si_parenthetical: '0.15'
+          EPMA_Ca_at_percent: '7.02'
+          EPMA_Ca_parenthetical: '0.09'
+          x: '3.03'
+          x_parenthetical: '0.06'
+        - aimed_glass: Na2O-CaO-4SiO2
+          Na2CO3_wt_percent: '34.04'
+          SiO2_wt_percent: '67.06'
+          CaCO3_wt_percent: '29.31'
+          EPMA_Na_at_percent: '10.98'
+          EPMA_Na_parenthetical: '0.16'
+          EPMA_Si_at_percent: '23.64'
+          EPMA_Si_parenthetical: '0.12'
+          EPMA_Ca_at_percent: '5.85'
+          EPMA_Ca_parenthetical: '0.10'
+          x: '4.30'
+          x_parenthetical: '0.08'
+        - aimed_glass: Na2O-CaO-7SiO2
+          Na2CO3_wt_percent: '22.64'
+          SiO2_wt_percent: '78.08'
+          CaCO3_wt_percent: '19.50'
+          EPMA_Na_at_percent: '7.57'
+          EPMA_Na_parenthetical: '0.27'
+          EPMA_Si_at_percent: '26.82'
+          EPMA_Si_parenthetical: '0.14'
+          EPMA_Ca_at_percent: '3.70'
+          EPMA_Ca_parenthetical: '0.08'
+          x: '7.09'
+          x_parenthetical: '0.17'
+        note: Dashes are printed unreported entries, not zero. Parenthetical EPMA and x values are retained exactly as printed;
+          the cited paper identifies the EPMA parentheses as standard deviations.
+    - observation_id: khedim_katrina_2010_table2_quoted_log_na2o_activities
+      type: activity_series
+      locator:
+        page: 22
+        pdf_page_index: 21
+        table: '2'
+      T_C: 1250
+      phase: silicate melts
+      units: log10(activity), dimensionless, as printed
+      values:
+        quantity_as_published: log[aNa2O]
+        candidate_quantity_tokens:
+        - activity
+        schema_gap: This base has no printed_form field for logarithmic activities. Storing the printed negative logarithms as
+          activity values would misstate their physical quantity and range, so all nine cells remain context data.
+        method_class: quoted_attributed
+        standard_state_as_published: Not stated in this table or the cited-source labels; no reference state is inferred.
+        series:
+        - system: Na2O-SiO2
+          attribution: Neudorf and Elliott (1980), reference 50; "Thermodynamic Properties of Na2O-SiO2-CaO Melts at 1000°C to 1100°C", Metallurgical Transactions B-Process Metallurgy, 11[4] 607-614.
+          method_class: quoted_attributed
+          standard_state_as_published: Not stated in the cited-source label or this table.
+          rows:
+          - composition: Na2O-1.5SiO2
+            log10_activity_as_printed: '-7.66'
+          - composition: Na2O-2SiO2
+            log10_activity_as_printed: '-8.24'
+          - composition: Na2O-2.5SiO2
+            log10_activity_as_printed: '-8.77'
+          - composition: Na2O-3SiO2
+            log10_activity_as_printed: '-9.35'
+          - composition: Na2O-3.5SiO2
+            log10_activity_as_printed: '-9.62'
+          - composition: Na2O-4SiO2
+            log10_activity_as_printed: '-9.43'
+        - system: Na2O-CaO-SiO2
+          attribution: Abdelouhab et al. (2007), reference 46; "Determination of Na2O activities in silicate melts by EMF measurements", Journal of Non-Crystalline Solids.
+          method_class: quoted_attributed
+          standard_state_as_published: Not stated in the cited-source label or this table.
+          rows:
+          - composition: Na2O-CaO-3SiO2
+            log10_activity_as_printed: '-8.78'
+          - composition: Na2O-CaO-4SiO2
+            log10_activity_as_printed: '-9.69'
+          - composition: Na2O-CaO-7SiO2
+            log10_activity_as_printed: '-10.28'
+        note: These are values the authors state they applied from the cited works. They are not measured in this paper. The Table 2 caption assigns 1250°C to both series, while reference 50's printed title specifies 1000-1100°C; the paper does not reconcile the difference, so the table condition and citation are both retained without inference.
+    - observation_id: khedim_katrina_2010_table3_calculated_optical_basicity
+      type: thermodynamic_example
+      locator:
+        page: 23
+        pdf_page_index: 22
+        table: '3'
+      phase: binary and ternary silicate glasses
+      units: dimensionless optical basicity
+      values:
+        quantity_as_published: optical basicity
+        candidate_quantity_tokens:
+        - activity
+        schema_gap: Optical basicity is not oxide activity; no store quantity fits this calculated descriptor.
+        method_class: model_derived
+        model_as_printed: Duffy and Ingram optical-basicity model
+        values_as_printed:
+          binary_Na2O_xSiO2:
+          - x: '1.5'
+            optical_basicity: '0.748'
+          - x: '2'
+            optical_basicity: '0.703'
+          - x: '2.5'
+            optical_basicity: '0.663'
+          - x: '3'
+            optical_basicity: '0.648'
+          ternary_Na2O_CaO_xSiO2:
+          - x: '3'
+            optical_basicity: '0.718'
+          - x: '4'
+            optical_basicity: '0.678'
+          - x: '7'
+            optical_basicity: '0.612'
+    - observation_id: khedim_katrina_2010_table4_interpolated_log_activities
+      type: thermodynamic_example
+      locator:
+        page: 24
+        pdf_page_index: 23
+        table: '4'
+      T_C: 1250
+      phase: ternary Na2O-CaO-xSiO2 glasses and equivalent binary glasses
+      units: log10(activity), dimensionless, as printed
+      values:
+        quantity_as_published: log[aNa2O] and log[aO2-] with equivalent-binary compositions
+        candidate_quantity_tokens:
+        - activity
+        schema_gap: This base has no printed_form field for logarithmic activities; optical-basicity interpolations are not
+          direct activity observations.
+        method_class: model_derived
+        method_as_described: The authors interpolate oxide-ion activity from calculated optical basicity and compare ternary
+          results with binary-equivalent compositions.
+        values_as_printed:
+        - ternary_composition: Na2O-CaO-3SiO2
+          log_a_Na2O: '-8.75'
+          equivalent_binary_Na2O_SiO2: Na2O-2.5SiO2
+          log_a_O2_minus: '-7.97'
+          equivalent_binary_for_O2_minus: Na2O-1.7SiO2
+        - ternary_composition: Na2O-CaO-4SiO2
+          log_a_Na2O: '-9,66'
+          equivalent_binary_Na2O_SiO2: Na2O-3.3SiO2
+          log_a_O2_minus: '-8.60'
+          equivalent_binary_for_O2_minus: Na2O-2.2SiO2
+        - ternary_composition: Na2O-CaO-7SiO2
+          log_a_Na2O: '-10,42'
+          equivalent_binary_Na2O_SiO2: '—'
+          log_a_O2_minus: '-10.24'
+          equivalent_binary_for_O2_minus: Na2O-4SiO2
+        note: The printed NCS Na2O logarithms differ from the cited NCS values in Table 2; both tables are preserved separately
+          because Table 4 reports optical-basicity interpolation results and Table 2 reports cited values.
+  Cr:
+    observations: []
+    context:
+    - observation_id: khedim_katrina_2010_table5_reaction_thermodynamics
+      type: thermodynamic_example
+      locator:
+        page: 25
+        pdf_page_index: 24
+        table: '5'
+        note: The corresponding reaction definitions are printed as Eqs. 7-9 on physical PDF page 5.
+      phase: NC3S glass melt
+      units: kJ mol-1 for reaction enthalpy; J mol-1 K-1 for reaction entropy
+      values:
+        quantity_as_published: standard reaction enthalpies and entropies for chromium oxide dissolution, oxidation, and reduction
+        candidate_quantity_tokens:
+        - delta_fH
+        - S
+        schema_gap: These values are reaction ΔH° and ΔS° for Cr2O3 dissolution and chromium redox reactions, not formation enthalpy
+          from elements or absolute entropy.
+        method_class: author_derived
+        reaction_labels:
+          dissolution: Eq. 7; Cr2O3 crystal dissolves to Cr(III) oxo-complex in the melt.
+          oxidation: Eq. 8; Cr(III) oxo-complex reacts with O2 to form Cr(VI) oxo-complex in the melt.
+          reduction: Eq. 9; Cr(III) oxo-complex reduces to Cr(II) oxo-complex in the melt.
+        reaction_equations_as_printed:
+          dissolution: >-
+            1/2 Cr2O3(crystal) <-> Cr(III)O_x^(2x-3)-(melt) + (3/2 - x) O2-(melt)
+          oxidation: >-
+            Cr(III)O_x^(2x-3)-(melt) + 3/4 O2(gas) <-> Cr(VI)O_y^(2y-6)-(melt) + (x - y + 3/2) O2-(melt)
+          reduction: >-
+            Cr(III)O_x^(2x-3)-(melt) + (z - x + 1/2) O2-(melt) <-> Cr(VI)O_y^(2y-6)-(melt) + 3/4 O2(gas)
+        equation_9_note: The surrounding prose identifies Eq. 9 as reduction to Cr(II), but the printed equation writes Cr(VI)O_y as its product. The transcription preserves the printed formula and does not resolve the paper's inconsistency.
+        values_as_printed:
+          dissolution:
+            delta_H_kJ_mol: '33'
+            delta_H_uncertainty: '11'
+            delta_S_J_mol_K: '26'
+            delta_S_uncertainty: '9'
+          oxidation:
+            delta_H_kJ_mol: '50'
+            delta_H_uncertainty: '15'
+            delta_S_J_mol_K: '54'
+            delta_S_uncertainty: '16'
+          reduction:
+            delta_H_kJ_mol: '172'
+            delta_H_uncertainty: '37'
+            delta_S_J_mol_K: '61'
+            delta_S_uncertainty: '16'
+        uncertainty_note: Each nonzero ± width is retained; the table does not state a confidence level.
+    - observation_id: khedim_katrina_2010_figure1_deferred
+      type: figure_record
+      locator:
+        page: 26
+        pdf_page_index: 25
+        figure: '1'
+      phase: chromium oxide crystal in silicate melt
+      units: schematic; no numeric data
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: crystal and melt
+        axes_as_published: none
+        caption: Chemical reactions occurring when Cr2O3 crystals are in contact with the melt. The chromium oxide dissolves
+          to Cr(III) complexes following an acid-base reaction; Cr(III) species can be oxidized to Cr(VI) or reduced to Cr(II).
+        panel: single panel
+        series: []
+        digitisation: deferred to a figure pass
+        note: Conceptual reaction schematic; it contains no plotted data series.
+    - observation_id: khedim_katrina_2010_figure2_deferred
+      type: figure_record
+      locator:
+        page: 27
+        pdf_page_index: 26
+        figure: '2'
+      phase: melt; chromium measured in quenched glass
+      units: at.% Cr as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1200
+        - 1250
+        axes_as_published:
+          x: log fO2
+          y: Cr (at.%)
+        caption: Variation of Cr (at.%) content as function of log fO2.
+        panel: single panel
+        series:
+        - label: Na2O-CaO-3SiO2, 1200°C
+          marker: diamond
+          marker_count: 5
+        - label: Na2O-CaO-3SiO2, 1250°C
+          marker: triangle
+          marker_count: 5
+        - label: Na2O-CaO-7SiO2, 1250°C
+          marker: circle
+          marker_count: 5
+        digitisation: deferred to a figure pass
+        note: Log-fO2 reference unit is not stated on the plotted axis. No plotted values were read.
+    - observation_id: khedim_katrina_2010_figure3_deferred
+      type: figure_record
+      locator:
+        page: 28
+        pdf_page_index: 27
+        figure: '3'
+      phase: melt
+      units: logarithmic chromium redox ratios as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: log fO2
+          y: log[Cr(II)/Cr(III)] and log[Cr(VI)/Cr(III)]
+        caption: Logarithmic plot of both chromium redox ratios as a function of log fO2 for Na2O-CaO-3SiO2 at 1250°C.
+        panel: single panel
+        series:
+        - label: log[Cr(II)/Cr(III)]
+          marker: diamond
+          marker_count: 8
+        - label: log[Cr(VI)/Cr(III)]
+          marker: triangle
+          marker_count: 5
+        digitisation: deferred to a figure pass
+        note: Figure-caption regressions are recorded separately as printed model-derived values. No plotted values were read.
+    - observation_id: khedim_katrina_2010_figure4_deferred
+      type: figure_record
+      locator:
+        page: 29
+        pdf_page_index: 28
+        figure: '4'
+      phase: melt
+      units: logarithmic chromium redox ratios as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: log fO2
+          panel_A_y: log[Cr(II)/Cr(III)]
+          panel_B_y: log[Cr(VI)/Cr(III)]
+        caption: Variation of the two chromium redox ratios versus log fO2 for three Na2O-CaO-xSiO2 glass compositions at 1250°C.
+        panel: A-B
+        series:
+        - label: panel A; NC3S
+          marker: diamond
+          marker_count: 8
+        - label: panel A; NC4S
+          marker: open circle
+          marker_count: 8
+        - label: panel A; NC7S
+          marker: triangle
+          marker_count: 8
+        - label: panel B; NC3S
+          marker: diamond
+          marker_count: 7
+        - label: panel B; NC4S
+          marker: open circle
+          marker_count: 7
+        - label: panel B; NC7S
+          marker: triangle
+          marker_count: 7
+        digitisation: deferred to a figure pass
+        note: Marker counts are from the render; no plotted coordinates were read.
+    - observation_id: khedim_katrina_2010_figure5_deferred
+      type: figure_record
+      locator:
+        page: 30
+        pdf_page_index: 29
+        figure: '5'
+      phase: melt
+      units: logarithmic chromium redox ratios as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1200
+        - 1250
+        - 1300
+        axes_as_published:
+          x: log fO2
+          panel_A_y: log[Cr(II)/Cr(III)]
+          panel_B_y: log[Cr(VI)/Cr(III)]
+        caption: Variation of the two chromium redox ratios versus log fO2 for Na2O-CaO-3SiO2 at 1200, 1250, and 1300°C.
+        panel: A-B
+        series:
+        - label: panel A; 1200°C
+          marker: diamond
+          marker_count: 8
+        - label: panel A; 1250°C
+          marker: open circle
+          marker_count: 8
+        - label: panel A; 1300°C
+          marker: triangle
+          marker_count: 8
+        - label: panel B; 1200°C
+          marker: diamond
+          marker_count: 7
+        - label: panel B; 1250°C
+          marker: open circle
+          marker_count: 7
+        - label: panel B; 1300°C
+          marker: triangle
+          marker_count: 7
+        digitisation: deferred to a figure pass
+        note: Marker counts are from the render; no plotted coordinates were read.
+    - observation_id: khedim_katrina_2010_figure7_deferred
+      type: figure_record
+      locator:
+        page: 32
+        pdf_page_index: 31
+        figure: '7'
+      phase: ternary and binary silicate melts
+      units: log[Cr(VI)/Cr(III)] as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: log fO2
+          y: log[Cr(VI)/Cr(III)]
+        caption: Ternary Na2O-CaO-3SiO2 compared with different binary glass compositions at 1250°C.
+        panel: single panel
+        series:
+        - label: NC3S
+          marker: x
+          marker_count: 7
+        - label: Na2O-2.5SiO2
+          marker: diamond
+          marker_count: 7
+        - label: Na2O-2SiO2
+          marker: open circle
+          marker_count: 7
+        - label: Na2O-1.5SiO2
+          marker: triangle
+          marker_count: 7
+        digitisation: deferred to a figure pass
+        note: Binary comparison data are attributed to prior work in the paper; no plotted values were read.
+    - observation_id: khedim_katrina_2010_figure8_deferred
+      type: figure_record
+      locator:
+        page: 33
+        pdf_page_index: 32
+        figure: '8'
+      phase: ternary and binary silicate melts
+      units: log[Cr(VI)/Cr(III)] as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: log fO2
+          y: log[Cr(VI)/Cr(III)]
+        caption: Ternary Na2O-CaO-4SiO2 compared with different binary glass compositions at 1250°C.
+        panel: single panel
+        series:
+        - label: NC4S
+          marker: x
+          marker_count: 7
+        - label: Na2O-2.5SiO2
+          marker: triangle
+          marker_count: 7
+        - label: Na2O-3SiO2
+          marker: open circle
+          marker_count: 7
+        - label: Na2O-3.5SiO2
+          marker: diamond
+          marker_count: 7
+        digitisation: deferred to a figure pass
+        note: Binary comparison data are attributed to prior work in the paper; no plotted values were read.
+    - observation_id: khedim_katrina_2010_figure9_deferred
+      type: figure_record
+      locator:
+        page: 34
+        pdf_page_index: 33
+        figure: '9'
+      phase: ternary Na2O-CaO-3SiO2 melt
+      units: logarithmic chromium concentration and redox ratios as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: log[a(O2-)]
+          y: log[Cr(III)], log[Cr(II)/Cr(III)], and log[Cr(VI)/Cr(III)]
+        caption: Variation of chromium concentration and redox ratios as a function of log[a(O2-)] at 1250°C.
+        panel: single panel
+        series:
+        - label: log[Cr(III)]
+          marker: diamond
+          marker_count: 3
+        - label: log[Cr(II)/Cr(III)]
+          marker: triangle
+          marker_count: 3
+        - label: log[Cr(VI)/Cr(III)]
+          marker: open circle
+          marker_count: 3
+        digitisation: deferred to a figure pass
+        note: Printed regression equations are retained separately as model-derived text; no plotted values were read.
+    - observation_id: khedim_katrina_2010_figure10_deferred
+      type: figure_record
+      locator:
+        page: 35
+        pdf_page_index: 34
+        figure: '10'
+      phase: NC3S glass
+      units: logarithmic equilibrium constants versus inverse temperature as plotted
+      values:
+        method_class: figure_only
+        species_formula: Cr
+        phase_label: melt
+        axes_as_published:
+          x: 10^4/T (K^-1)
+          y: fitted log K' for dissolution, reduction, and oxidation
+        caption: Representation of log K'Tdiss, log K'Tred, and log K'Tox as a function of inverse temperature for NC3S.
+        panel: single panel
+        series:
+        - label: log K'Tdiss
+          marker: diamond
+          marker_count: 3
+        - label: log K'Tred
+          marker: triangle
+          marker_count: 3
+        - label: log K'Tox
+          marker: open circle
+          marker_count: 3
+        digitisation: deferred to a figure pass
+        note: Printed Arrhenius regression equations are retained separately as model-derived text; no plotted values were read.
+  O2-:
+    observations: []
+    context:
+    - observation_id: khedim_katrina_2010_figure6_deferred
+      type: figure_record
+      locator:
+        page: 31
+        pdf_page_index: 30
+        figure: '6'
+      phase: binary and ternary silicate melts
+      units: logarithmic oxide-ion activity versus optical basicity
+      values:
+        method_class: figure_only
+        species_formula: O2-
+        phase_label: melt
+        T_C:
+        - 1250
+        axes_as_published:
+          x: calculated optical basicity
+          y: log a(O2-)
+        caption: Log a(O2-) in binary melts at 1250°C as a function of calculated optical basicity; dotted lines extrapolate
+          a(O2-) in ternary melts from their optical basicity values.
+        panel: single panel
+        series:
+        - label: binary Na2O-SiO2 measured points
+          marker: diamond
+          marker_count: 5
+        - label: ternary NC3S and NC4S extrapolation guides
+          marker: dotted line and arrows
+          marker_count: 0
+        digitisation: deferred to a figure pass
+        note: This figure carries calculated optical-basicity comparisons; no plotted values were read.
+    - observation_id: khedim_katrina_2010_printed_figure_fit_equations
+      type: thermodynamic_example
+      locator:
+        page: 28
+        pdf_page_index: 27
+        figure: '3'
+        note: Equations are printed above the Figure 3 plot, not digitised from plotted coordinates.
+      phase: Na2O-CaO-3SiO2 melt at 1250°C
+      units: dimensionless regression slopes/intercepts and R-squared
+      values:
+        quantity_as_published: fitted logarithmic chromium redox-ratio equations
+        method_class: model_derived
+        equations:
+        - response: log[Cr(II)/Cr(III)]
+          equation_as_printed: log[Cr(II)/Cr(III)] = -0.248 log fO2 - 2.773
+          R_squared: '0.994'
+        - response: log[Cr(VI)/Cr(III)]
+          equation_as_printed: log[Cr(VI)/Cr(III)] = 0.747 log fO2 + 1.139
+          R_squared: '0.998'
+    - observation_id: khedim_katrina_2010_figure9_printed_fit_equations
+      type: thermodynamic_example
+      locator:
+        page: 34
+        pdf_page_index: 33
+        figure: '9'
+      phase: NC3S melt at 1250°C
+      units: dimensionless regression coefficients and R-squared
+      values:
+        quantity_as_published: fitted logarithmic chromium concentrations and redox ratios versus log activity
+        method_class: model_derived
+        equations_as_printed:
+        - response: log[Cr(III)]
+          equation: log[Cr(III)] = -0.03 log[a(Na2O)] - 0,89
+          R_squared: '0.95'
+        - response: log[Cr(II)/Cr(III)]
+          equation: log[Cr(II)/Cr(III)] = -0.07 log[a(Na2O)] - 0,92
+          R_squared: '0.95'
+        - response: log[Cr(VI)/Cr(III)]
+          equation: log[Cr(VI)/Cr(III)] = 0.5 log[a(Na2O)] + 4,86
+          R_squared: '0.99'
+    - observation_id: khedim_katrina_2010_figure10_printed_fit_equations
+      type: thermodynamic_example
+      locator:
+        page: 35
+        pdf_page_index: 34
+        figure: '10'
+      phase: NC3S glass
+      units: regression intercepts, slopes on 1/T, and R-squared
+      values:
+        quantity_as_published: fitted temperature relations for chromium reaction equilibrium constants
+        method_class: model_derived
+        equations_as_printed:
+        - response: log K'Tdiss
+          equation: log K'Tdiss = 1.381 - 1724/T
+          R_squared: '0.980'
+        - response: log K'Tred
+          equation: log K'Tred = 3.138 - 8989/T
+          R_squared: '0.934'
+        - response: log K'Tox
+          equation: log K'Tox = 2.828 - 2619/T
+          R_squared: '0.973'

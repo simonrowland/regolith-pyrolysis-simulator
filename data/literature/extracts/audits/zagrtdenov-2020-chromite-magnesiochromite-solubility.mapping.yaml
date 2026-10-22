@@ -1,0 +1,208 @@
+source_id: zagrtdenov-2020-chromite-magnesiochromite-solubility
+source_identity:
+  title: New model of chromite and magnesiochromite solubility in silicate melts
+  authors_year: Zagrtdenov, Toplis, Borisova & Guignard (2020)
+  identifier: arXiv:2005.07063; PDF says revised for Geochimica et Cosmochimica Acta; no DOI printed in this
+    PDF
+  pdf_sha256: 2c70be9f765f783431584ed8ed52a2df9fad821cf193cbbaa852ebdd0bb393eb
+duplicate_check:
+  doi: No DOI printed in this PDF; checked arXiv:2005.07063 and the derived arXiv DOI against extracts.
+  title_author_year: No exact title or Zagrtdenov/Toplis/Borisova/Guignard 2020 extract found.
+  review_w_branches: No matching extract found in available origin/review/w* refs.
+  source_pdf_identity: pdfinfo gives a 42-page Microsoft Word 2016 PDF. First page title/authors match this
+    preprint and says revised for Geochimica et Cosmochimica Acta.
+table_tool:
+  result: zero tables emitted; available MinerU fragments do not contain table blocks
+  disposition: Tables 1–3 manually transcribed from born-digital pdftotext-layout and checked cell by cell
+    against 600 dpi renders.
+manual_tables:
+- table: '1'
+  locator:
+    page: 39
+    pdf_page_index: 38
+    published_page: 39
+    table: '1'
+  disposition: context-only starting-material compositions
+  reason: These are unheated starting materials, not the equilibrated glass phase measured in Table 3; current
+    phase-composition identity does not represent the starting powders/glasses.
+  row_count: 4
+  cell_audit:
+    machine_text: pdftotext-layout.txt physical PDF page 39
+    render: 600 dpi physical PDF page 39
+    checked: all rows and columns, including blank cells, footnotes and row/column assignments
+- table: '2'
+  locator:
+    page: 40
+    pdf_page_index: 39
+    published_page: 40
+    table: '2'
+  disposition: crystal compositions and log Kd retained in context; derived-input CSV in .agent-scratch
+  reason: PhaseRole has no crystal role; Log Kd is logarithmic while distribution_ratio stores a direct ratio.
+  row_count: 17
+  capture: all 17 rows, crystal phase, buffer, center/rim, analysis count, oxide cells, D.L., total and Log
+    Kd
+  cell_audit:
+    machine_text: pdftotext-layout.txt physical PDF page 40
+    render: 600 dpi physical PDF page 40
+    checked: all table cells, footnotes and row/column assignments
+- table: '3'
+  locator:
+    page: 41
+    pdf_page_index: 40
+    published_page: 41
+    table: '3'
+  disposition: numeric equilibrated glass oxide components typed as scalar wt_percent rows; D.L. components
+    typed unknown; auxiliary columns in context
+  row_count: 12
+  typed_components_per_sample:
+  - Na2O
+  - SiO2
+  - Al2O3
+  - K2O
+  - CaO
+  - MnO
+  - FeO
+  - MgO
+  - TiO2
+  - P2O5
+  - Cr2O3
+  typed_component_observations: 132
+  context_auxiliary_columns:
+  - Total
+  - Cr ppm
+  - optical basicity
+  - number of analyses
+  cell_audit:
+    machine_text: pdftotext-layout.txt physical PDF page 41
+    render: 600 dpi physical PDF page 41
+    checked: all means, nonzero SDs, D.L. cells, analysis counts, auxiliary values, and row/column assignments
+derived_value_inputs:
+- value: author-tabulated Log Kd
+  source_table: '2'
+  input_csv: .agent-scratch/f45b-tables/zagrtdenov-2020-chromite-magnesiochromite-solubility/table2.csv
+  why: Crystal Cr2O3 inputs have no phase-composition token; the printed Log Kd also has no logarithmic distribution-ratio
+    token.
+figures:
+  digitisation: deferred to a figure pass
+  render_checks: 600 dpi physical PDF pages 26–38; no plotted coordinates read
+  records:
+  - figure: '1'
+    page: 26
+    caption_locator_page: 24
+    series:
+    - MORB and boninitic glass analyses after PetDB
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '2'
+    page: 27
+    caption_locator_page: 24
+    series:
+    - E19 reflected-light image
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '3'
+    page: 28
+    caption_locator_page: 24
+    series:
+    - Chr-MORB
+    - Chr-Di63An37
+    - Cr2O3-MORB
+    - Cr2O3-Di63An37
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '4'
+    page: 29
+    caption_locator_page: 24
+    series:
+    - Chr-MORB
+    - Chr-Di63An37
+    - Cr2O3-MORB
+    - Cr2O3-Di63An37
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '5'
+    page: 30
+    caption_locator_page: 24
+    series:
+    - E33 back-scattered electron image
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '6'
+    page: 31
+    caption_locator_page: 24
+    series:
+    - All data
+    - This study
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '7'
+    page: 32
+    caption_locator_page: 24
+    series:
+    - Poustovetov & Roeder 1200 °C
+    - Poustovetov & Roeder 1250 °C
+    - Forsythe & Fisk 1150 °C
+    - Forsythe & Fisk 1164 °C
+    - Forsythe & Fisk 1200 °C
+    - Forsythe & Fisk 1260 °C
+    - Forsythe & Fisk 1300 °C
+    - This study Chr-MORB
+    - This study Chr-Di63An37
+    - This study Cr2O3-MORB
+    - This study Cr2O3-Di63An37
+    - Murck & Campbell QFM
+    - Murck & Campbell 1250 °C
+    - Murck & Campbell 1400 °C
+    - Roeder & Reynolds 1400 °C
+    - Roeder & Reynolds 1300 °C
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '8'
+    page: 33
+    caption_locator_page: 24
+    series:
+    - Picrite
+    - Oceanic glasses PetDB
+    - Basalt
+    - Boninite
+    - Dacite
+    - Andesite
+    - Rhyolite
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '9'
+    page: 34
+    caption_locator_page: 24
+    series:
+    - equation 19b at log fO2 -8.4 and optical basicity 0.588
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '10'
+    page: 35
+    caption_locator_page: 25
+    series:
+    - equation 19b curve
+    - FMQ reference line
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '11'
+    page: 36
+    caption_locator_page: 25
+    series:
+    - IW
+    - FMQ-2
+    - FMQ
+    - FMQ+2
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '12'
+    page: 37
+    caption_locator_page: 25
+    series:
+    - equation 19b concentration contours
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: '13'
+    page: 38
+    caption_locator_page: 25
+    series:
+    - This study model
+    - Poustovetov & Roeder (2000)
+    - y=x reference
+    marker_census: counts recorded where separable; overlaps/dense markers are explicitly unresolved
+  - figure: 13(b)
+    page: 38
+    caption_locator_page: 25
+    series:
+    - This study model
+    - Nikolaev et al. (2018)
+    - y=x reference
+    marker_census: two plotted comparison series and y=x; counts unresolved for dense series

@@ -1,0 +1,88 @@
+source_id: khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
+source_identity:
+  doi: 10.1111/j.1551-2916.2009.03581.x
+  title: Solubility of Cr2O3 and speciation of chromium in soda-lime-silicate melts
+  venue: Journal of the American Ceramic Society 93(5), 1347-1354 (2010)
+table_tool:
+  result: no tables emitted from the available MinerU page fragments
+  source_pages: [4, 5, 6, 14, 15, 16, 28, 35]
+  disposition: Tables 1-5 transcribed from the born-digital layout and checked against 600 dpi renders.
+manual_tables:
+- table: '1'
+  locator:
+    page: 21
+    pdf_page_index: 20
+  disposition: context-only starting-glass compositions
+  reason: These are measured starting materials; equilibrium_phase_composition would misidentify them as equilibrated phases.
+  captured_fields:
+  - all eight aimed compositions
+  - all reagent wt.% values and printed dashes
+  - all EPMA Na, Si, and Ca at.% cells and parenthetical widths
+  - all printed x values and parenthetical widths
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 21
+    render: 600 dpi physical PDF page 21
+    checked: all table cells
+- table: '2'
+  locator:
+    page: 22
+    pdf_page_index: 21
+  disposition: context-only quoted logarithmic Na2O activities
+  reason: The base has no printed_form field for logarithmic activities; all nine values retain their quoted attribution and composition.
+  captured_fields:
+  - six Na2O-SiO2 compositions and log[aNa2O] values attributed to reference 50
+  - three Na2O-CaO-SiO2 compositions and log[aNa2O] values attributed to reference 46
+  - printed temperature 1250°C
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 22
+    render: 600 dpi physical PDF page 22
+    checked: all nine value cells, composition labels, and both source headings
+- table: '3'
+  locator:
+    page: 23
+    pdf_page_index: 22
+  disposition: context-only calculated optical basicities
+  reason: Optical basicity is not an oxide activity or an existing stored quantity.
+  captured_fields:
+  - four binary composition/basicity pairs
+  - three ternary composition/basicity pairs
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 23
+    render: 600 dpi physical PDF page 23
+    checked: all seven calculated values and composition headings
+- table: '4'
+  locator:
+    page: 24
+    pdf_page_index: 23
+  disposition: context-only interpolated logarithmic activities and equivalent compositions
+  reason: The logarithmic activities cannot be represented by the available activity token; the values are retained as printed, including decimal commas.
+  captured_fields:
+  - three log[aNa2O] values
+  - three equivalent binary Na2O-SiO2 compositions
+  - three log[aO2-] values
+  - three equivalent binary compositions for aO2-
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 24
+    render: 600 dpi physical PDF page 24
+    checked: all activity, composition, and dash cells
+- table: '5'
+  locator:
+    page: 25
+    pdf_page_index: 24
+  disposition: context-only reaction enthalpies and entropies
+  reason: The tabulated quantities are reaction ΔH° and ΔS°, not formation enthalpy from elements or absolute entropy.
+  captured_fields:
+  - six reaction thermodynamic values
+  - all six nonzero ± widths
+  cell_audit:
+    machine_text: pdftotext-layout.txt, physical PDF page 25
+    render: 600 dpi physical PDF page 25
+    checked: all six central values and six uncertainty widths
+figures:
+- figures: '1-10'
+  locators:
+    pdf_pages: [26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+  disposition: figure records only; digitisation deferred
+  cell_audit:
+    render: 600 dpi physical PDF pages 26-35
+    checked: captions, axes, series labels, and marker counts; no plotted coordinates were read
