@@ -96,7 +96,6 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         "temperature_C",
         "fO2_log",
         "fO2_delta_QFM",
-        "total_pressure_Pa",
         "composition",
         "fO2_control",
     }
@@ -107,6 +106,10 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
             continue
         for condition in required_conditions:
             assert point_conditions[condition].locator is not None, obs.observation_id
+        printed_total = point_conditions.get("total_pressure_Pa")
+        if printed_total is not None:
+            assert printed_total.state.is_value, obs.observation_id
+            assert printed_total.locator is not None, obs.observation_id
         temperature = point_conditions["temperature_C"]
         if temperature.state.is_unknown:
             assert temperature.locator is not None, obs.observation_id

@@ -206,7 +206,8 @@ def test_berry_valence_migration_stamps_identity_conditions_and_quench():
         assert obs.identity.composition is not None and obs.identity.composition.is_unknown
         assert profile_for(obs.identity).required == required_axes
         assert obs.point_conditions is not None
-        for name in ("T_C", "fO2_log", "total_pressure_Pa", "composition"):
+        assert "total_pressure_Pa" not in obs.point_conditions
+        for name in ("T_C", "fO2_log", "composition"):
             assert obs.point_conditions[name].state.is_unknown
             assert obs.point_conditions[name].locator.page == 5
         assert obs.point_conditions["quench_state"].state.value == "not_stated"

@@ -159,15 +159,16 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
         "T_C",
         "atmosphere",
         "fO2_Pa",
-        "total_pressure_Pa",
         "composition",
         "temperature_K",
     }
     expected_ii = expected_i - {"temperature_K"}
     for row in table_i:
         assert expected_i <= set(row["point_conditions"])
+        assert "total_pressure_Pa" not in row["point_conditions"]
     for row in table_ii:
         assert expected_ii <= set(row["point_conditions"])
+        assert "total_pressure_Pa" not in row["point_conditions"]
 
     context = next(
         row

@@ -91,9 +91,9 @@ def test_nazarov_real_migration_pins_render_and_row_conditions() -> None:
             conditions["composition"].state.value.basis
             == "formula_derived_from_synthetic_anorthite"
         )
-        for axis in ("total_pressure_Pa", "fO2_Pa"):
-            assert conditions[axis].state.tag is StateTag.UNKNOWN
-            assert conditions[axis].locator.published_page == 172
+        assert "total_pressure_Pa" not in conditions
+        assert conditions["fO2_Pa"].state.tag is StateTag.UNKNOWN
+        assert conditions["fO2_Pa"].locator.published_page == 172
 
     relation = next(
         observation

@@ -88,11 +88,12 @@ def test_isolated_migration_keeps_activity_axes_and_refuses_schema_gaps():
         "temperature_K",
         "composition",
         "fO2_Pa",
-        "total_pressure_Pa",
         "fO2_control",
     }
     for observation in result.observations.values():
-        assert required_conditions <= set(observation.point_conditions or {})
+        conditions = observation.point_conditions or {}
+        assert required_conditions <= set(conditions)
+        assert "total_pressure_Pa" not in conditions
 
     activities = [o for o in result.observations.values() if o.admission.status.value == "admitted"]
     assert len(activities) == 105

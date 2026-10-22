@@ -493,7 +493,6 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         "temperature_K",
         "fO2_log",
         "fO2_control",
-        "total_pressure_Pa",
         "composition",
     )
     assert all(row.identity.temperature_K.is_value for row in rows)
@@ -506,6 +505,13 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         )
         for row in rows
     )
+    for row in rows:
+        point_total = (row.point_conditions or {}).get("total_pressure_Pa")
+        identity_total = row.identity.total_pressure_Pa
+        if identity_total is not None and identity_total.is_value:
+            assert point_total is not None and point_total.state.is_value
+        else:
+            assert point_total is None
 
     pressure_cells = {
         "berry_2004_table3_ad_r25",
@@ -565,18 +571,17 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
         assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
         assert not row.derived_from
         pressure = row.identity.total_pressure_Pa
-        point_pressure = row.point_conditions["total_pressure_Pa"]
         if row in log_ratios:
             assert pressure is not None and pressure.is_unknown
         else:
             assert pressure is None or pressure.is_unknown
-        assert point_pressure.state.is_unknown
+        assert (row.point_conditions or {}).get("total_pressure_Pa") is None
     for row in slope_rows:
         control = row.point_conditions["fO2_control"]
         assert control.state.is_unknown
         assert control.locator == row.locator
         assert row.point_conditions["fO2_log"].locator == row.locator
-        assert row.point_conditions["total_pressure_Pa"].locator == row.locator
+        assert "total_pressure_Pa" not in row.point_conditions
     assert {
         row.value.point for row in log_ratios
     } == {
@@ -924,15 +929,19 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
             "fO2_Pa",
             "fO2_control",
             "atmosphere",
-            "total_pressure_Pa",
             "printed_composition",
             "CaO_SiO2_mass_pct_ratio",
         ):
             condition = conditions[key]
             assert condition.locator.published_page == 63
+        assert "total_pressure_Pa" not in conditions
+        assert row.identity.total_pressure_Pa is not None
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.total_pressure_Pa.reason == (
+            "no total_pressure_Pa mapped from source"
+        )
         assert conditions["temperature_K"].state.value == row.identity.temperature_K.value
         assert conditions["fO2_Pa"].state.value.kind is ValueKind.POINT
-        assert conditions["total_pressure_Pa"].state.is_unknown
         assert conditions["printed_composition"].state.is_value
         assert conditions["CaO_SiO2_mass_pct_ratio"].state.is_value
 def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():

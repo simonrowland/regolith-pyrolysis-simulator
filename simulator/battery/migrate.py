@@ -8255,6 +8255,29 @@ def _partial_pressure_point_condition(
     return located_value(total.value, locator)
 
 
+def _without_unprinted_total_pressure(
+    point_conditions: Mapping[str, Located[Any]] | None,
+) -> Mapping[str, Located[Any]] | None:
+    """Point conditions carry total pressure only when it is a printed value.
+
+    An unprinted total is not a set point. As an unknown it stops same-point
+    matching; filling it with the in-cell partial sum would be circular. The
+    identity axis is left as the migrator already filled it.
+    """
+
+    if not point_conditions or "total_pressure_Pa" not in point_conditions:
+        return point_conditions
+    located = point_conditions["total_pressure_Pa"]
+    if isinstance(located, Located) and located.state.is_value:
+        return point_conditions
+    kept = {
+        key: value
+        for key, value in point_conditions.items()
+        if key != "total_pressure_Pa"
+    }
+    return kept or None
+
+
 
 def _knudsen_effusion_chamber_background_not_for_identity(
     method: State[MethodToken] | None,
@@ -19634,6 +19657,14 @@ class Migrator:
             if parent_id not in self.result.observations:
                 self._author_derivations.pop(parent_id, None)
 
+    def _drop_unprinted_point_totals(self) -> None:
+        for observation_id, observation in list(self.result.observations.items()):
+            stripped = _without_unprinted_total_pressure(observation.point_conditions)
+            if stripped is not observation.point_conditions:
+                self.result.observations[observation_id] = replace(
+                    observation, point_conditions=stripped
+                )
+
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
@@ -19677,6 +19708,7 @@ class Migrator:
                 self.result.measured.doi_works += 1
             else:
                 self.result.measured.no_doi_works += 1
+        self._drop_unprinted_point_totals()
         validation = validate_corpus(
             self.result.works,
             self.result.experiments,
