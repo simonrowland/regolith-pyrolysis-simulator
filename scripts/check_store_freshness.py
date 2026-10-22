@@ -63,9 +63,13 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
-#   4c988b9c3: phase aliases (d-243). It aliases the ig-reachable MAGEMin
-#     and Berman pure phases in simulator/battery/compilation_tier.py, which
-#     answers at score time. A full regen at the line's merge with green
+#   4c988b9c3: phase aliases (d-243). Its only migrate-input change adds
+#     Berman pure-phase formulas to the score-time _TE_FORMULA table in
+#     simulator/battery/compilation_tier.py; the matching MAGEMin specs
+#     (simulator/melt_backend/magemin.py) and Berman polymorphs
+#     (engines/alphamelts/thermoengine.py) are read only by the pure-phase
+#     scorer, and migration reads none of the three. A full regen at the line's
+#     merge with green
 #     2e651d553 (ef682bc85, studio-2) was a fixed point: no store file changed.
 #     This acknowledges STORE outputs only; the alias answers (d-243) are
 #     covered by the commit's tests.
