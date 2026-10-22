@@ -1182,13 +1182,20 @@ class OverheadGasModel:
 
         # Controlled/background atmosphere partial pressures.
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
+        controlled_o2_floors_mbar = {}
         if atmosphere_name in {
             'CONTROLLED_O2',
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
-        } and melt.pO2_mbar > 0.0:
-            gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
+        }:
+            controlled_o2_floors_mbar = (
+                self._controlled_o2_partial_pressure_floors_mbar(melt)
+            )
+            if 'O2' in controlled_o2_floors_mbar:
+                gas.composition['O2'] = max(
+                    gas.composition.get('O2', 0.0),
+                    controlled_o2_floors_mbar['O2'],
+                )
 
         if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
@@ -1213,16 +1220,12 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         } and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
+            for species, floor_mbar in controlled_o2_floors_mbar.items():
+                if species == 'O2':
+                    continue
+                gas.composition[species] = max(
+                    gas.composition.get(species, 0.0),
+                    floor_mbar,
                 )
 
         partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
@@ -1282,6 +1285,29 @@ class OverheadGasModel:
             for species, rate in evap_flux.species_kg_hr.items()
         }
 
+    @staticmethod
+    def _controlled_o2_partial_pressure_floors_mbar(
+        melt: MeltState,
+    ) -> dict[str, float]:
+        """Return the commanded O2 and background partial-pressure floors."""
+
+        floors_mbar: dict[str, float] = {}
+        if melt.pO2_mbar > 0.0:
+            floors_mbar['O2'] = melt.pO2_mbar
+
+        background_species = str(
+            getattr(melt, 'background_gas_species', '') or '').strip()
+        if background_species and background_species.upper() != 'O2':
+            background_fraction = float(
+                getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0
+            )
+            background_fraction = min(1.0, max(0.0, background_fraction))
+            floors_mbar[background_species] = (
+                max(0.0, melt.p_total_mbar - melt.pO2_mbar)
+                * background_fraction
+            )
+        return floors_mbar
+
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
                                  overhead_holdup_mol: Mapping[str, float],
                                  *,
@@ -1339,22 +1365,16 @@ class OverheadGasModel:
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }:
-            if melt.pO2_mbar > 0.0:
-                gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
-                    gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
+            controlled_o2_floors_mbar = (
+                self._controlled_o2_partial_pressure_floors_mbar(melt)
+            )
+            for species, floor_mbar in controlled_o2_floors_mbar.items():
+                gas.composition[species] = max(
+                    gas.composition.get(species, 0.0),
+                    floor_mbar,
+                )
             gas.pressure_mbar = max(  # mbar — controlled total pressure floor
                 gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
-                )
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:
