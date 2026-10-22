@@ -583,30 +583,41 @@ def _finite_step_fluxes(
 
 def _residue_oxygen_balance(terms, inventory, pressure_at, temperature):
     """The shared channel stoichiometry and pressure-root call for both paths."""
-    return _solve_vacuum_oxygen_balance(
-        pressure_at,
-        tuple(
-            _VacuumOxygenChannel(
-                species=term.source.species,
-                molar_mass_kg_per_mol=term.molar_mass_kg_mol,
-                oxygen_atoms=term.atom_counts.get("O", 0.0),
-                parent_oxygen_demand=term.parent_oxygen_demand,
-                pO2_exponent=(
-                    term.atom_counts.get("O", 0.0)
-                    - term.parent_oxygen_demand
+    try:
+        return _solve_vacuum_oxygen_balance(
+            pressure_at,
+            tuple(
+                _VacuumOxygenChannel(
+                    species=term.source.species,
+                    molar_mass_kg_per_mol=term.molar_mass_kg_mol,
+                    oxygen_atoms=term.atom_counts.get("O", 0.0),
+                    parent_oxygen_demand=term.parent_oxygen_demand,
+                    pO2_exponent=(
+                        term.atom_counts.get("O", 0.0)
+                        - term.parent_oxygen_demand
+                    )
+                    / 2.0,
+                    alpha=float(term.source.alpha),
+                    alpha_source=term.source.alpha_source,
+                    active=(
+                        term.parent_moles_per_product == 0.0
+                        or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
+                    ),
                 )
-                / 2.0,
-                alpha=float(term.source.alpha),
-                alpha_source=term.source.alpha_source,
-                active=(
-                    term.parent_moles_per_product == 0.0
-                    or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
-                ),
-            )
-            for term in terms
-        ),
-        temperature_K=temperature,
-    )
+                for term in terms
+            ),
+            temperature_K=temperature,
+        )
+    except ResidueInventoryRefusal:
+        raise
+    except ValueError as exc:
+        # The shared root still emits ValueError for this contract violation.
+        # Preserve its distinction without changing that owner's acceptance.
+        if str(exc).startswith("pressure law exponent mismatch for "):
+            raise ResidueInventoryRefusal(
+                "residue_pressure_law_exponent_mismatch", str(exc)
+            ) from exc
+        raise
 
 
 def integrate_residue_inventory(
@@ -955,14 +966,16 @@ def integrate_knudsen_residue_inventory(
             rates = {}
             for term in terms:
                 species = term.source.species
+                parent = term.source.parent_oxide
+                if parent is not None and current.get(parent, 0.0) <= 0.0:
+                    rates[species] = 0.0
+                    continue
                 if species not in pressures:
                     raise ResidueInventoryRefusal("channel_missing", species)
                 pressure = float(pressures[species])
                 if not math.isfinite(pressure) or pressure < 0.0:
                     raise ResidueInventoryRefusal("residue_pressure_invalid", species)
-                parent = term.source.parent_oxide
-                rates[species] = (pressure / math.sqrt(term.molar_mass_kg_mol)
-                                  if parent is None or current.get(parent, 0.0) > 0.0 else 0.0)
+                rates[species] = pressure / math.sqrt(term.molar_mass_kg_mol)
             denominator = math.fsum(term.molar_mass_kg_mol * rates[term.source.species] for term in terms)
             if not math.isfinite(denominator) or denominator <= 0.0:
                 raise ResidueInventoryRefusal("knudsen_extent_unreachable")
