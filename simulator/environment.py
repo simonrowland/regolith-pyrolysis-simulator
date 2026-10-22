@@ -6,7 +6,10 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
+
+_OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K = 8.31446
 
 DEFAULT_VACUUM_FLOOR_BAR = 1.0e-9
 MOON_VACUUM_FLOOR_BAR = 1.3e-12
@@ -36,6 +39,46 @@ _BODY_VACUUM_FLOOR_BAR = {
 
 class CoverGasCompositionUnavailable(ValueError):
     """The declared cover gas does not specify a usable composition."""
+
+
+def overhead_gas_temperature_K(
+    explicit_temperature_K: object,
+    request_temperature_C: float,
+) -> float:
+    """Resolve the provider's explicit headspace T or request-T fallback."""
+    return max(
+        0.0,
+        float(
+            explicit_temperature_K
+            or request_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        ),
+    )
+
+
+def ideal_gas_partial_pressures_bar(
+    holdup_mol: Mapping[str, float],
+    volume_m3: float,
+    temperature_K: float,
+) -> dict[str, float]:
+    """Project finite ideal-gas inventories to partial pressures in bar.
+
+    The six-significant-digit gas constant preserves the legacy provider's
+    numeric result; the state module keeps its own copy for existing callers.
+    Algebra: p_bar=nRT/V/1e5. R*T/V has J/m³ = Pa, then 1e5 Pa/bar converts
+    units; zero V or T retains the legacy empty-result limit.
+    """
+    if volume_m3 <= 0.0 or temperature_K <= 0.0:
+        return {}
+    scale = (
+        _OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K
+        * temperature_K
+        / (volume_m3 * 1.0e5)
+    )
+    return {
+        str(species): max(0.0, float(mol)) * scale
+        for species, mol in dict(holdup_mol or {}).items()
+        if max(0.0, float(mol)) > 0.0
+    }
 
 
 def controlled_background_partial_pressure(

@@ -60,6 +60,28 @@ def test_dispatch_reports_ideal_gas_partial_pressures(
     assert partials["SiO"] == pytest.approx(1.0 * scale)
     assert diagnostic["p_O2_bar"] == pytest.approx(2.0 * scale)
     assert diagnostic["p_total_bar"] == pytest.approx(3.0 * scale)
+    assert diagnostic["headspace_temperature_K"].hex() == "0x1.d44999999999ap+10"
+
+
+def test_dispatch_defaults_headspace_temperature_to_request_temperature(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+) -> None:
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        control_inputs={"headspace_volume_m3": 0.085},
+    )
+
+    assert result.diagnostic["headspace_temperature_K"].hex() == (
+        "0x1.bb4999999999ap+10"
+    )
 
 
 def test_eos_partial_pressures_are_bit_pinned() -> None:
