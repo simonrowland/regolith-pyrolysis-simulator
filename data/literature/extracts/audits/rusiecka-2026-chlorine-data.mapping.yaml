@@ -61,15 +61,17 @@ transcription:
     Cr2O3*: Cr2O3
     NiO*: NiO
     H2O: H2O
-  component_values_emitted: 816
+  component_values_emitted: 1751
   blank_component_cells: []
   capacity_values_emitted: 126
   capacity_values_range: AB3:AB128
-  duplicate_composition_ranges:
-    Thomas and Wood 2023: B3:R39; existing extract thomas-2022-chlorine-bonding-silicate-melts; sample IDs bind rows.
-    Thomas and Wood 2021: B40:R70; existing extract thomas-wood-2021-chlorine-silicate-melts; sample IDs bind rows.
-    Rusiecka and Wood 2025: B71:R80; existing extract rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts; sample IDs
-      bind rows.
+  emitted_composition_ranges:
+    Thomas and Wood 2023 workbook: B6:R6, B9:R21, B23:R26, B34:R39; these vectors are absent from the cited Thomas extract.
+    Thomas and Wood 2021 workbook: B40:R70; the cited extract stores starting mixes, not these measured glass vectors.
+  omitted_duplicate_composition_rows:
+    Thomas and Wood 2023: rows 3–5, 7–8, 22, and 30–33 match vectors in thomas-2022-chlorine-bonding-silicate-melts under the same IDs.
+    Thomas and Wood 2023 renamed IDs: row 27 CMAS+Na-2 matches CMAS+Na+2; row 28 Fo5Di48An47 matches CNMAS-1; row 29 En17An43Di40 matches CNMAS-2.
+    Rusiecka and Wood 2025: rows 71–80 match vectors in rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts under the same IDs.
   omitted_columns:
     S: Printed Total; no species formula/component token, not reconstructed or treated as another oxide.
     AD:CG: Calculated molar transforms and regression features; not independent measured compositions. Raw printed wt.% components
