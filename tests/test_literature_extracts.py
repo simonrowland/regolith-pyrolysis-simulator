@@ -5194,17 +5194,52 @@ def test_konta_1975_table_i_render_pins_and_residue_migration() -> None:
         for species_data in document["species"].values()
         for item in species_data.get("observations", [])
     }
+    yaml_text = path.read_text(encoding="utf-8")
+    assert "total_pressure_atm" not in yaml_text
+    assert "pressure_atm" not in yaml_text
+    assert not any(
+        key in {"total_pressure_atm", "pressure_atm", "total_pressure_Pa"}
+        for item in observations.values()
+        for key in item["values"]
+    )
     assert len(
         [
             item
             for item in observations.values()
             if item["values"].get("quantity") == "residue_component_composition"
+            and item["values"].get("analyte") != "H2O"
         ]
     ) == 132  # 11 oxides × 6 runs × raw and separately printed water-free basis.
+    water_rows = [
+        item for item in observations.values()
+        if item["values"].get("analyte") == "H2O"
+    ]
+    assert len(water_rows) == 21  # H2O+, H2O-, and recalculated combined-water cells.
+    assert observations["konta_1975_natural_H2O+_raw"]["values"]["printed_value_wt_pct"] == "3.16"
+    assert observations["konta_1975_natural_H2O-_raw"]["values"]["printed_value_wt_pct"] == "1.84"
+    assert len(document["experiments"]) == 6
+    for experiment in document["experiments"]:
+        sample_mass = experiment["sample"]["mass_kg"]
+        assert sample_mass["state"]["value"]["point"] == "0.010"
+        assert sample_mass["locator"]["page"] == 3
+        assert sample_mass["locator"]["published_page"] == 72
     assert observations["konta_1975_5.91_SiO2_raw"]["values"]["SiO2_wt_pct"] == "77.04"
     assert observations["konta_1975_10.52_Al2O3_raw"]["values"]["Al2O3_wt_pct"] == "18.14"
     assert observations["konta_1975_13.92_SiO2_water_free"]["values"]["SiO2_wt_pct"] == "69.41"
     assert observations["konta_1975_condensate_10.52_SiO2"]["values"]["value_wt_pct"] == "90.60"
+    condensate_rows = [
+        item for item in observations.values()
+        if item["values"].get("quantity") == "condensate_composition"
+    ]
+    assert len(condensate_rows) == 56  # Eight analytes × seven printed columns.
+    assert all(item["values"]["status"] == "typed_refusal" for item in condensate_rows)
+    assert all("schema_gap" in item["values"] for item in condensate_rows)
+    assert observations["konta_1975_condensate_8.26_SiO2"]["values"]["printed_form"] == "*"
+    assert observations["konta_1975_condensate_10.15_SiO2"]["values"]["printed_form"] == "—"
+    assert observations["konta_1975_condensate_5.91_SiO2"]["values"]["printed_form"] == "—"
+    assert observations["konta_1975_condensate_8.26_Na2O"]["values"]["value_wt_pct"] == "0.21"
+    assert observations["konta_1975_condensate_10.15_Na2O"]["values"]["printed_form"] == "—"
+    assert sum("T_C" in item["values"] for item in condensate_rows) == 48
 
     migrator = battery_migrate.Migrator(REPO_ROOT)
     migrator._migrate_extract(path)
@@ -5216,15 +5251,27 @@ def test_konta_1975_table_i_render_pins_and_residue_migration() -> None:
         if item.source_id == source_id
         and item.identity.quantity.is_value
         and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and item.identity.species.formula != "H2O"
     ]
     assert len(residue_rows) == 132
     assert result.validation is not None and not result.validation.hard_issues
     for item in residue_rows:
         assert item.identity.temperature_K.is_value
         assert item.identity.composition.is_value
-        assert item.identity.total_pressure_Pa.is_value
+        assert item.identity.total_pressure_Pa.is_unknown
+        assert item.identity.sample_mass_kg.is_value
+        assert item.identity.sample_mass_kg.value == Decimal("0.010")
         assert "temperature_K" in item.point_conditions
         assert "starting_composition" in item.point_conditions
+        assert "thermal_function_A" in item.point_conditions
+    migrated_condensates = [
+        item for item in result.observations.values()
+        if item.source_id == source_id
+        and item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.CONDENSATE_COMPOSITION
+    ]
+    assert len(migrated_condensates) == 56
+    assert sum(item.identity.temperature_K.is_value for item in migrated_condensates) == 48
     assert next(
-        item for item in residue_rows if item.observation_id.endswith("konta_1975_5.91_SiO2_raw")
+        item for item in residue_rows if "konta_1975_5.91_SiO2_raw" in item.observation_id
     ).value.point == Decimal("77.04")

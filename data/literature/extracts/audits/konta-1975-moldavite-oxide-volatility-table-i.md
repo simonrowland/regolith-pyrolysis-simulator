@@ -1,6 +1,6 @@
 # Konta & Mráz (1975), Table I full-cell audit
 
-The staged standalone converter was used: `/private/tmp/claude-501/main-review/tools/mineru_table_draft.py`; generated draft index is retained in dispatch scratch and compared against the extract. Numeric cells below were checked against the 300 dpi render of PDF p. 5; MinerU and pdftotext were used as independent transcription aids. The render resolves OCR `o`/`0` and apostrophe/decimal confusion. No OCR redo was needed.
+The standalone MinerU table-draft utility was used to convert the machine table and compare the extract. Numeric cells below were checked against the 300 dpi render of PDF p. 5; MinerU and pdftotext were used as independent transcription aids. The render resolves OCR `o`/`0` and apostrophe/decimal confusion. No OCR redo was needed.
 
 Printed row count: 15 analytical rows on the raw basis (13 oxide/water rows plus Total and Total Fe2O3); 14 rows in recalculated section (11 oxide rows plus combined water, Total, Total Fe2O3); 8 condensate analyte rows. Six melt columns plus natural sediment in every composition section.
 
@@ -45,17 +45,17 @@ Printed row count: 15 analytical rows on the raw basis (13 oxide/water rows plus
 
 ## Condensate cells (PDF p. 5; render check (b))
 
-| Row | A10.15 | A10.52 | A11.98 | A13.92 |
-|---|---:|---:|---:|---:|
-| SiO2 | — | 90.60 | — | 86.42 |
-| Al2O3 | — | 3.85 | — | 6.89 |
-| Fe2O3 | — | 4.10 | — | 5.15 |
-| Na2O | 0.21 | 0.52 | 0.33 | 0.61 |
-| K2O | 1.16 | 1.16 | 0.66 | 1.19 |
-| TiO2 | — | 0.24 | — | 0.17 |
-| MgO | — | nil | — | nil |
-| CaO | — | nil | — | nil |
+| Row | Natural | A5.91 / 1600 C | A8.26 / 1700 C | A10.15 / 1900 C | A10.52 / 1800 C | A11.98 / 2100 C | A13.92 / 2000 C |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| SiO2 | — | — | * | — | 90.60 | * | 86.42 |
+| Al2O3 | — | — | * | — | 3.85 | * | 6.89 |
+| Fe2O3 | — | — | * | — | 4.10 | * | 5.15 |
+| Na2O | — | — | 0.21 | — | 0.52 | 0.33 | 0.61 |
+| K2O | — | — | 1.16 | — | 1.16 | 0.66 | 1.19 |
+| TiO2 | — | — | * | — | 0.24 | * | 0.17 |
+| MgO | — | — | * | — | nil | * | nil |
+| CaO | — | — | * | — | nil | * | nil |
 
-Column assignment: headers in the render confirm A10.15 is the 1900 C column immediately before A10.52 at 1800 C. Every numeric cell in all three sections is render-checked. Machine evidence: MinerU content-list table block `page_idx=4` (absolute PDF p. 5) and `pdftotext-layout.txt` Table I on printed p. 74/PDF p. 5. The OCR layer contains legacy glyph confusions, so cells are classified (b), not as dual-read (a). Compare reports no-match for numeric values because the source uses raised middle-dot decimals (e.g. `77·04`) that the staged parser does not normalize; each was resolved against the render.
+Column assignment: headers in the render confirm A10.15 is the 1900 C column immediately before A10.52 at 1800 C. In the condensate rows the first alkali values 0.21 and 1.16 are under A8.26 / 1700 C; A10.15 contains dashes. Every numeric cell and every dash/asterisk cell in all three sections is render-checked. Machine evidence: MinerU content-list table block `page_idx=4` (absolute PDF p. 5) and `pdftotext-layout.txt` Table I on printed p. 74/PDF p. 5. The OCR layer contains legacy glyph confusions, so cells are classified (b), not as dual-read (a). Compare reports no-match for numeric values because the source uses raised middle-dot decimals (e.g. `77·04`) that the staged parser does not normalize; each was resolved against the render.
 
-Schema gaps: current residue quantity selectors admit SiO2, Al2O3, FeO, MgO, CaO oxide-wt-percent fields only. The other printed oxide rows are retained as typed refusals in the extract. The mass-percent condensate vector is also retained with typed-refusal status because the current condensate profile expects a component mole-fraction vector and no printed mole fractions exist. No quantity/API/schema was changed.
+Schema gaps: current residue quantity selectors admit SiO2, Al2O3, FeO, MgO, CaO oxide-wt-percent fields only. The other printed oxide rows and printed water rows are retained as typed refusals in the extract. The mass-percent condensate vector is retained with typed-refusal status because no component mole fractions are printed. No quantity/API/schema was changed.
