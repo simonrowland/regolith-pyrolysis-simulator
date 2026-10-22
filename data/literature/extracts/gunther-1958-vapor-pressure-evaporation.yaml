@@ -1,0 +1,1202 @@
+schema_version: literature_extract.v1
+source_id: gunther-1958-vapor-pressure-evaporation
+source:
+  citation: Günther, K.-G. (1958), "Zur Messung von Dampfdruck und Verdampfungsgeschwindigkeit an glasbildenden
+    Substanzen", Glastechnische Berichte 31(1):9–15.
+  doi: 10.34657/16740
+  year: 1958
+extraction:
+  method: MinerU machine tables transcribed and checked against rendered PDF pages 5–6; comma decimals retained
+    as decimal points and printed pressure scale retained without multiplication
+  date: '2026-10-22'
+  worker: codex-resume-85228-1792707932
+  audit: Tabellen 1 and 3 each contain 18 data rows. Every temperature, pressure, experiment number and orifice
+    area was checked against the page render. The scanned pdftotext-layout.txt is empty; MinerU supplied the machine
+    transcription. The staged MinerU compare reports 12 exact matches and 24 comma-decimal mismatches; all 24
+    mismatches were resolved against the PDF renders, and row/column assignments were checked against the renders.
+    The pressure column is printed p·10^4
+    [Torr], so the pressure cells below are preserved as printed and are not multiplied by 10^-4. The migrator lacks
+    a pressure field for this scaled printed form; numerical pressures remain typed-refused pending a schema token.
+    The SiO orifice area is kept per point as printed. Figure 5 is figure-only and excluded.
+review_status: draft
+fidelity_samples:
+- path: species.SiO.observations[gunther_1958_table1_sio_pressure].values.points[0].pressure_as_printed
+  value: '1300'
+  note: Render-checked Table 1, Versuch 1, pressure cell as printed (p·10^4 Torr).
+  locator: {page: 5, published_page: 13, table: '1', note: Versuch 1}
+- path: species.B2O3.observations[gunther_1958_table3_b2o3_pressure].values.points[0].pressure_as_printed
+  value: '1.42'
+  note: Render-checked Table 3, Versuch 10, pressure cell as printed (p·10^4 Torr).
+  locator: {page: 6, published_page: 14, table: '3', note: Versuch 10}
+species:
+  SiO:
+    observations:
+    - observation_id: gunther_1958_table1_sio_pressure
+      type: psat_series
+      method: knudsen_effusion
+      regime: knudsen_effusion
+      locator:
+        page: 5
+        published_page: 13
+        table: '1'
+        pdf_page: 5
+      phase: gas
+      units: p·10^4 [Torr] as printed; T [K]
+      values:
+        quantity: p_sat
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: typed_refusal
+        gas_species: SiO
+        condensed_phase_as_published: solid SiO body, amorphous
+        condensed_phase_note: The paper states that the SiO body partly decomposes back into Si + SiO2 at the evaporation
+          temperatures (p. 13, footnote 4).
+        pressure_scale_as_published: p·10^4 [Torr] (stored values must be multiplied by 10^-4 Torr to obtain p)
+        refusal_reason: No migrator/schema token represents a pressure value with the printed 10^-4 Torr scale;
+          pressure is retained verbatim and not pre-multiplied.
+        status: typed_refusal
+        points:
+        - experiment_number: '1'
+          T_K: 1468
+          P: 1300.0
+          pressure_as_printed: '1300'
+          orifice_area_as_printed: '4.1'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1468'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '4.1'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 1
+            pdf_page: 5
+          value: 1300.0
+        - experiment_number: '2'
+          T_K: 1520
+          P: 3690.0
+          pressure_as_printed: '3690'
+          orifice_area_as_printed: '4.1'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1520'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '4.1'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 2
+            pdf_page: 5
+          value: 3690.0
+        - experiment_number: '3'
+          T_K: 1307
+          P: 22.4
+          pressure_as_printed: '22.4'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1307'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 3
+            pdf_page: 5
+          value: 22.4
+        - experiment_number: '7'
+          T_K: 1329
+          P: 41.0
+          pressure_as_printed: '41.0'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1329'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 7
+            pdf_page: 5
+          value: 41.0
+        - experiment_number: '6'
+          T_K: 1339
+          P: 50.7
+          pressure_as_printed: '50.7'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1339'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 6
+            pdf_page: 5
+          value: 50.7
+        - experiment_number: '8'
+          T_K: 1359
+          P: 89.0
+          pressure_as_printed: '89.0'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1359'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 8
+            pdf_page: 5
+          value: 89.0
+        - experiment_number: '4'
+          T_K: 1366
+          P: 110.0
+          pressure_as_printed: '110'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1366'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 4
+            pdf_page: 5
+          value: 110.0
+        - experiment_number: '5'
+          T_K: 1392
+          P: 195.0
+          pressure_as_printed: '195'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1392'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 5
+            pdf_page: 5
+          value: 195.0
+        - experiment_number: '9'
+          T_K: 1419
+          P: 377.0
+          pressure_as_printed: '377'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1419'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 9
+            pdf_page: 5
+          value: 377.0
+        - experiment_number: '10'
+          T_K: 1439
+          P: 632.0
+          pressure_as_printed: '632'
+          orifice_area_as_printed: '17.6'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1439'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 10
+            pdf_page: 5
+          value: 632.0
+        - experiment_number: '17'
+          T_K: 1202
+          P: 0.98
+          pressure_as_printed: '0.98'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1202'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 17
+            pdf_page: 5
+          value: 0.98
+        - experiment_number: '15'
+          T_K: 1245
+          P: 3.44
+          pressure_as_printed: '3.44'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1245'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 15
+            pdf_page: 5
+          value: 3.44
+        - experiment_number: '16'
+          T_K: 1249
+          P: 4.35
+          pressure_as_printed: '4.35'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1249'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 16
+            pdf_page: 5
+          value: 4.35
+        - experiment_number: '18'
+          T_K: 1257
+          P: 5.26
+          pressure_as_printed: '5.26'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1257'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 18
+            pdf_page: 5
+          value: 5.26
+        - experiment_number: '14'
+          T_K: 1303
+          P: 23.2
+          pressure_as_printed: '23.2'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1303'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 14
+            pdf_page: 5
+          value: 23.2
+        - experiment_number: '11'
+          T_K: 1309
+          P: 20.7
+          pressure_as_printed: '20.7'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1309'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 11
+            pdf_page: 5
+          value: 20.7
+        - experiment_number: '12'
+          T_K: 1335
+          P: 44.1
+          pressure_as_printed: '44.1'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1335'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 12
+            pdf_page: 5
+          value: 44.1
+        - experiment_number: '13'
+          T_K: 1361
+          P: 99.0
+          pressure_as_printed: '99.0'
+          orifice_area_as_printed: '58.5'
+          orifice_area_unit_as_printed: 10^-3 cm^2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1361'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '58.5'
+              locator:
+                page: 5
+                published_page: 13
+                table: '1'
+                pdf_page: 5
+          locator:
+            page: 5
+            published_page: 13
+            table: '1'
+            note: Versuch 13
+            pdf_page: 5
+          value: 99.0
+      admission_status: typed_refusal
+  B2O3:
+    observations:
+    - observation_id: gunther_1958_table3_b2o3_pressure
+      type: psat_series
+      method: knudsen_effusion
+      regime: knudsen_effusion
+      locator:
+        page: 6
+        published_page: 14
+        table: '3'
+        pdf_page: 6
+      phase: gas
+      units: p·10^4 [Torr] as printed; T [K]
+      values:
+        quantity: p_sat
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: typed_refusal
+        gas_species: B2O3
+        condensed_phase_as_published: B2O3 body
+        pressure_scale_as_published: p·10^4 [Torr] (stored values must be multiplied by 10^-4 Torr to obtain p)
+        refusal_reason: No migrator/schema token represents a pressure value with the printed 10^-4 Torr scale;
+          pressure is retained verbatim and not pre-multiplied.
+        orifice_area_as_published: 17.6·10^-3 cm^2
+        status: typed_refusal
+        points:
+        - experiment_number: '10'
+          T_K: 1268
+          P: 1.42
+          pressure_as_printed: '1.42'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1268'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 10
+            pdf_page: 6
+          value: 1.42
+        - experiment_number: '18'
+          T_K: 1273
+          P: 1.63
+          pressure_as_printed: '1.63'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1273'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 18
+            pdf_page: 6
+          value: 1.63
+        - experiment_number: '9'
+          T_K: 1300
+          P: 3.56
+          pressure_as_printed: '3.56'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1300'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 9
+            pdf_page: 6
+          value: 3.56
+        - experiment_number: '17'
+          T_K: 1313
+          P: 4.75
+          pressure_as_printed: '4.75'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1313'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 17
+            pdf_page: 6
+          value: 4.75
+        - experiment_number: '11'
+          T_K: 1348
+          P: 13.4
+          pressure_as_printed: '13.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1348'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 11
+            pdf_page: 6
+          value: 13.4
+        - experiment_number: '8'
+          T_K: 1350
+          P: 9.65
+          pressure_as_printed: '9.65'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 8
+            pdf_page: 6
+          value: 9.65
+        - experiment_number: '16'
+          T_K: 1368
+          P: 16.4
+          pressure_as_printed: '16.4'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1368'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 16
+            pdf_page: 6
+          value: 16.4
+        - experiment_number: '12'
+          T_K: 1382
+          P: 33.3
+          pressure_as_printed: '33.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1382'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 12
+            pdf_page: 6
+          value: 33.3
+        - experiment_number: '1'
+          T_K: 1388
+          P: 21.6
+          pressure_as_printed: '21.6'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1388'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 1
+            pdf_page: 6
+          value: 21.6
+        - experiment_number: '7'
+          T_K: 1418
+          P: 35.3
+          pressure_as_printed: '35.3'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1418'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 7
+            pdf_page: 6
+          value: 35.3
+        - experiment_number: '15'
+          T_K: 1433
+          P: 66.8
+          pressure_as_printed: '66.8'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1433'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 15
+            pdf_page: 6
+          value: 66.8
+        - experiment_number: '2'
+          T_K: 1453
+          P: 67.1
+          pressure_as_printed: '67.1'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1453'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 2
+            pdf_page: 6
+          value: 67.1
+        - experiment_number: '13'
+          T_K: 1468
+          P: 129.0
+          pressure_as_printed: '129'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1468'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 13
+            pdf_page: 6
+          value: 129.0
+        - experiment_number: '6'
+          T_K: 1498
+          P: 186.0
+          pressure_as_printed: '186'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1498'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 6
+            pdf_page: 6
+          value: 186.0
+        - experiment_number: '3'
+          T_K: 1510
+          P: 177.0
+          pressure_as_printed: '177'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1510'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 3
+            pdf_page: 6
+          value: 177.0
+        - experiment_number: '14'
+          T_K: 1533
+          P: 384.0
+          pressure_as_printed: '384'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1533'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 14
+            pdf_page: 6
+          value: 384.0
+        - experiment_number: '4'
+          T_K: 1560
+          P: 436.0
+          pressure_as_printed: '436'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 4
+            pdf_page: 6
+          value: 436.0
+        - experiment_number: '5'
+          T_K: 1593
+          P: 845.0
+          pressure_as_printed: '845'
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1593'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+            orifice_area_as_printed:
+              state:
+                tag: value
+                value: '17.6'
+              locator:
+                page: 6
+                published_page: 14
+                table: '3'
+                pdf_page: 6
+          locator:
+            page: 6
+            published_page: 14
+            table: '3'
+            note: Versuch 5
+            pdf_page: 6
+          value: 845.0
+      admission_status: typed_refusal
