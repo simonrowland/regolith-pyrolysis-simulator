@@ -36,7 +36,15 @@ from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.yield_disposition import OriginUnresolvedError
 from simulator.accounting.run_artifact import build_run_artifact
-from simulator.chemistry.kernel import ProviderUnavailableError
+from simulator.chemistry.kernel import (
+    CapabilityProfile,
+    ChemistryIntent,
+    ChemistryProvider,
+    IntentRequest,
+    IntentResult,
+    ProviderRegistry,
+    ProviderUnavailableError,
+)
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
 from simulator.optimize.recipe import (
@@ -110,6 +118,44 @@ def test_json_safe_nonfinite_numbers_export_null():
     assert _json_safe(
         {"nan": float("nan"), "inf": [float("inf"), -float("inf")]}
     ) == {"nan": None, "inf": [None, None]}
+
+
+def test_engines_used_marks_uninvoked_fallback_as_unknown():
+    class UnusedMageminFallback(ChemistryProvider):
+        def capability_profile(self) -> CapabilityProfile:
+            return CapabilityProfile(
+                provider_id="magemin-shadow",
+                intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
+                is_authoritative_for=frozenset(
+                    {ChemistryIntent.GATE_LIQUID_FRACTION}
+                ),
+            )
+
+        def dispatch(self, request: IntentRequest) -> IntentResult:
+            raise AssertionError("uninvoked fallback must not dispatch")
+
+    registry = ProviderRegistry()
+    registry.register(
+        UnusedMageminFallback(),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+        fallback=True,
+    )
+    sim = SimpleNamespace(
+        _chem_kernel=SimpleNamespace(registry=registry),
+        _c7_product_report=None,
+        campaign_mgr=None,
+    )
+
+    engines_used = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+    )._engines_used(sim)
+
+    assert engines_used["registry"]["gate_liquid_fraction"]["fallback"] == (
+        "magemin-shadow"
+    )
+    assert engines_used["active"]["gate_liquid_fraction"] == "unknown"
 
 
 def test_completed_run_wires_product_classification_and_markdown() -> None:
