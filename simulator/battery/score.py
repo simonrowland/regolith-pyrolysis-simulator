@@ -13819,6 +13819,18 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
         return False
     if rail == Rail.MELT_ACTIVITY.value:
+        # No call means the engine was never asked. An unsupported refusal
+        # is then not an observation, for every engine, including those that
+        # report melt activity when they are run. "unsupported_species" is
+        # the hero-census reason string, not OUTSIDE_SUPPORTED_SPECIES.
+        called = isinstance(execution, Mapping) and bool(
+            execution.get("call_evidence")
+        )
+        if not called and reason in {
+            RefusalReason.UNSUPPORTED.value,
+            "unsupported_species",
+        }:
+            return False
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
         if engine not in MELT_ACTIVITY_ENGINES:

@@ -5406,6 +5406,52 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
     )
 
 
+def test_magemin_melt_activity_call_stays_observable() -> None:
+    """A melt-activity run stays observable. An unasked unsupported refusal does not."""
+
+    called = {
+        "rail": Rail.MELT_ACTIVITY.value,
+        "candidate_request": {"engine": Engine.MAGEMIN.value},
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=test:exit=None",
+        },
+        "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+    }
+    assert _residual_engine_observable(called)
+    assert _residual_engine_observable(
+        {
+            **called,
+            "refusal": {"reason": "unsupported_species"},
+        }
+    )
+    # The domain gate refuses before a call. That refusal is still an
+    # observation: the reason is metric_domain, not unsupported.
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "execution": {"state": ExecutionState.NOT_PROBED.value},
+            "refusal": {"reason": RefusalReason.METRIC_DOMAIN.value},
+        }
+    )
+    for engine in (
+        Engine.MAGEMIN,
+        Engine.OPENIMCC,
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+        Engine.INTERNAL_ANALYTICAL,
+    ):
+        for reason in (RefusalReason.UNSUPPORTED.value, "unsupported_species"):
+            assert not _residual_engine_observable(
+                {
+                    "rail": Rail.MELT_ACTIVITY.value,
+                    "candidate_request": {"engine": engine.value},
+                    "refusal": {"reason": reason},
+                }
+            )
+
+
 def _hero_deck_score_row(
     *,
     rail: str,
