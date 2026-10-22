@@ -75,6 +75,16 @@ CODE_INPUTS = (
 #     changes, and does not import binary_pot_battery.py. A full regen at the line's merge with green
 #     2e651d553 (11711159b, studio-2) was a fixed point: no store file changed.
 #     This acknowledges STORE outputs only; the scoring moves (d-242) are
+#   f53dcec23, 826f5848e, bff436549, 25796706a, 8adec237c, 9196346ee: the
+#     VapoRock gas-basis line (d-236). They change the VapoRock gas-thermo
+#     predictor in compilation_tier.py, which answers at score time, and add
+#     read-only accessors that it calls: JANAFTabulatedGas and
+#     janaf_tabulated_gas_thermo in generators/janaf.py, and
+#     reference_enthalpy_zero_is_ideal_gas in generators/usgs_b1259.py and
+#     usgs_b1452.py. Migration imports those modules but calls none of the new
+#     functions. A full regen at the line's merge with green 2c7bcb1cc
+#     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
+#     acknowledges STORE outputs only; the predictor's value moves (d-236) are
 #     covered by the commits' tests.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
@@ -212,6 +222,7 @@ CODE_INPUTS = (
 #     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "19f472447", "67678d3d4", "0c5b7486a",
+    "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
