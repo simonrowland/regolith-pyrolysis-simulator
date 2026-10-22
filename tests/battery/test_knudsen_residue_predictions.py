@@ -49,6 +49,24 @@ def test_langmuir_pressure_refactor_numeric_pin():
     assert result.atom_closure_mol == {"Fe": 0.0, "Mg": 0.0, "O": 0.0}
 
 
+def test_hashimoto_exhaustion_closure_refactor_numeric_pin():
+    from simulator.battery.residue import _hashimoto_integrate_geometry
+    result = _hashimoto_integrate_geometry(
+        {"FeO": 6.84e-10, "MgO": 1.0},
+        tuple(ResidueChannel(s, s, p, 1.0, "pin")
+              for s, p in (("Fe", "FeO"), ("Mg", "MgO"), ("O2", None))),
+        lambda n, p: {"Fe": 5e-8 * 10**(-p / 2) * n.get("FeO", 0),
+                      "Mg": 2e-8 * 10**(-p / 2) * n.get("MgO", 0), "O2": 10**p * 1e5},
+        temperature_K=2000, duration_s=1, steps=1,
+        geometry_policy_id="sphere_constant", initial_area_m2=0.0001,
+    )
+    assert {k: v.hex() for k, v in result.inventory_mol.items()} == {
+        "FeO": "0x0.0p+0", "MgO": "0x1.fffffff8fbf2dp-1"}
+    assert {k: v.hex() for k, v in result.atom_closure.items()} == {
+        "Fe": "0x0.0p+0", "O": "-0x1.29356b3000000p-55", "Mg": "0x0.0p+0"}
+    assert result.exhaustion_notices[0]["remaining_moles"] == 6.84e-10
+
+
 def _channels(gas="FeO"):
     return (ResidueChannel(gas, gas, "FeO", 1.0, "equilibrium effusion"),
             ResidueChannel("O2", "O2", None, 1.0, "equilibrium effusion"))
