@@ -63,6 +63,15 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   19f472447, 67678d3d4, 0c5b7486a: recovery 2/4 (d-242). They change
+#     score-time code in simulator/battery/score.py only: 19f472447 moves the
+#     battery-handle cache and the Kress redox inputs to their owners (Fe-redox
+#     material and refusal records); 67678d3d4 scores MELTS Fe3+/Fe2+ from the
+#     engine's reported split; 0c5b7486a matches vapour species reported with
+#     the exact _gas suffix. A full regen at the line's merge with green
+#     2e651d553 (11711159b, studio-2) was a fixed point: no store file changed.
+#     This acknowledges STORE outputs only; the scoring moves (d-242) are
+#     covered by the commits' tests.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
 #     closure fallbacks, in simulator/battery/source_oxygen.py and score.py.
@@ -198,6 +207,7 @@ CODE_INPUTS = (
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "19f472447", "67678d3d4", "0c5b7486a",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
