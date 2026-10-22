@@ -119,3 +119,44 @@ def test_named_views_preserve_lumped_volume_and_zero_storage_stages(monkeypatch)
     with pytest.raises(TypeError):
         volumes[0].species_mol['Ar'] = 0.0
     assert sim.atom_ledger.mol_by_account() == before
+
+
+@pytest.mark.parametrize('flow', [0.01, 0.1])
+def test_native_fe_and_oxygen_reach_second_tick_evaporation(monkeypatch, flow):
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.physical_constants import PA_PER_MBAR
+
+    sim, _ = frozen_mars(monkeypatch, flow)
+    start = len(sim.atom_ledger.transitions)
+    sim.step()
+    sources = {'Ar': flow * 3600.0}
+    for transition in sim.atom_ledger.transitions[start:]:
+        if transition.name == 'overhead_bleed':
+            continue
+        for lot in transition.credits:
+            if str(lot.account) == 'process.overhead_gas':
+                for species, mol in lot.species_moles_for(sim.atom_ledger.registry).items():
+                    sources[species] = sources.get(species, 0.0) + mol
+    # Independent steady, well-mixed balance: g_i = y_i * F_out and
+    # sum(y_i)=1 give p_i=P*g_i/sum(g). One-hour source moles have a
+    # dimensionless ratio; P supplies mbar. No gas source gives no partial.
+    expected = {species: sim.melt.p_total_mbar * mol / sum(sources.values())
+                for species, mol in sources.items()}
+    assert sources['Fe'] > 1.0
+    assert sources['O2'] > 100.0
+    assert sim._melt_headspace_composition_mbar.get('Fe', 0.0) == pytest.approx(expected['Fe'])
+    assert sim._melt_headspace_composition_mbar['O2'] == pytest.approx(expected['O2'])
+
+    consumed_fe_Pa = []
+    dispatch = sim._dispatch_only
+
+    def observe(intent, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            consumed_fe_Pa.append(kwargs['control_inputs']['overhead_partials_Pa']['Fe'])
+        return dispatch(intent, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', observe)
+    snapshot = sim.step()
+    assert snapshot.hour == 2
+    assert consumed_fe_Pa
+    assert consumed_fe_Pa == pytest.approx([expected['Fe'] * PA_PER_MBAR] * len(consumed_fe_Pa))
