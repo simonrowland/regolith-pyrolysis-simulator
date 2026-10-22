@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import os
 import subprocess
-import sys
+from collections.abc import Iterator
 from decimal import Decimal
 from pathlib import Path
 
@@ -14,17 +14,26 @@ from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS_ROOT = Path(__file__).resolve().parent
-if str(TESTS_ROOT) not in sys.path:
-    sys.path.insert(0, str(TESTS_ROOT))
-from literature_extract_test_helpers import iter_locators
-
 SID = "stolyarova-2021-ti-al-kems-ru"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS_ROOT = Path(
     os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
 )
 PDF = CORPUS_ROOT / "raw" / SID / f"{SID}.pdf"
+
+
+def iter_locators(node: object) -> Iterator[dict[str, object]]:
+    if isinstance(node, dict):
+        if "page" in node and any(
+            key in node
+            for key in ("pdf_page_index", "published_page", "table", "figure", "section")
+        ):
+            yield node
+        for value in node.values():
+            yield from iter_locators(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from iter_locators(value)
 
 # Independent transcription of every Table 3 cell from the 600-dpi render of
 # physical page 6. The time field is the printed row label; None is a dash or
