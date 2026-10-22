@@ -1,0 +1,44 @@
+source_id: neubert-2025-vanadium-slag-evaporation
+source:
+  citation: 'Neubert, L., Tinkova, N., Volkova, O., Shyrokykh, T., and Seetharaman, S. (2025). Extraction of Vanadium from CaO–SiO2–MgO–Al2O3 Slags Based on Vaporization of Vanadium Pentoxide. Steel Research International 96, 2300681.'
+  doi: 10.1002/srin.202300681
+  year: 2025
+extraction:
+  method: MinerU table draft; Table 3 numeric cells emitted, then grouped as one scalar phase-composition row per printed component and sample.
+  date: '2026-10-22'
+  worker: fam39-1022
+tables:
+- page: 4
+  table_index: 3
+  type: composition_series
+  quantity: equilibrium_phase_composition
+  unit: wt%
+  evidence_class: measured_direct
+  phase: l
+  published_page: '2300681 (4 of 8)'
+  rows: all
+  values:
+  - column: 6
+    species: CaO
+  - column: 7
+    species: SiO2
+  - column: 8
+    species: Fe2O3
+  - column: 9
+    species: MgO
+  - column: 10
+    species: Al2O3
+  - column: 11
+    species: MnO
+  - column: 12
+    species: Cr2O3
+  - column: 13
+    species: K2O
+  - column: 14
+    species: P2O5
+  - column: 15
+    species: Na2O
+  - column: 16
+    species: TiO2
+  - column: 17
+    species: V2O5
