@@ -569,6 +569,94 @@ def _composition_wt_pct_from_moles(
     }
 
 
+def ferric_folded_to_feot_notices(
+    *,
+    fe2o3_wt_pct: float,
+    feo_total_wt_pct: float,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """The one notice pair for an Fe-atom fold of Fe2O3 onto FeOt."""
+
+    return (
+        {
+            "code": "openimcc_fe2o3_fold",
+            "fe2o3_wt_pct": fe2o3_wt_pct,
+            "feo_total_wt_pct": feo_total_wt_pct,
+            "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
+            "basis": "Fe_atoms",
+        },
+        {
+            "code": "openimcc_ferric_component_collapsed",
+            "message": "ferric component collapsed until d-072",
+        },
+    )
+
+
+def positive_fe2o3(composition: Mapping[str, Any]) -> bool:
+    """True when the composition carries a positive finite Fe2O3 amount."""
+
+    if not isinstance(composition, Mapping):
+        return False
+    raw = composition.get("Fe2O3")
+    if isinstance(raw, bool) or not isinstance(raw, numbers.Real):
+        return False
+    value = float(raw)
+    return math.isfinite(value) and value > 0.0
+
+
+def _oxide_wt_pct_known(composition_mol: Mapping[str, Any]) -> dict[str, float]:
+    """Wt% over oxides with a molar mass. Unknown names stay out of the notice."""
+
+    masses: dict[str, float] = {}
+    for name, amount in composition_mol.items():
+        if str(name) not in MOLAR_MASS or isinstance(amount, bool):
+            continue
+        if not isinstance(amount, numbers.Real):
+            continue
+        value = float(amount)
+        if math.isfinite(value) and value > 0.0:
+            masses[str(name)] = value
+    if not masses:
+        return {}
+    return _composition_wt_pct_from_moles(masses)
+
+
+def fold_ferric_to_feot(
+    composition_mol: Mapping[str, Any],
+) -> tuple[Mapping[str, Any], tuple[dict[str, Any], ...]]:
+    """Fold positive Fe2O3 onto FeOt before OpenIMCC evaluate.
+
+    OpenIMCC refuses raw Fe2O3. Iron atoms stay on the FeO mole basis
+    owned by feot_equivalent_moles: n(FeOt) = n(FeO) + 2 * n(Fe2O3).
+    No positive Fe2O3 returns the same mapping and no notices, so a
+    ferrous row is unchanged. Fe2O3 of zero is not ferric iron.
+    """
+
+    if not isinstance(composition_mol, Mapping) or not positive_fe2o3(
+        composition_mol
+    ):
+        return composition_mol, ()
+    canonical = _canonical_composition(dict(composition_mol))
+    coerced = dict(canonical)
+    for name in ("FeO", "Fe2O3"):
+        raw = coerced.get(name)
+        if isinstance(raw, bool) or not isinstance(raw, numbers.Real):
+            continue
+        coerced[name] = float(raw)
+    # n(FeOt) = n(FeO) + 2 * n(Fe2O3). Do not retype that sum here.
+    feot_moles = feot_equivalent_moles(coerced)
+    folded = {
+        key: value for key, value in canonical.items() if key != "Fe2O3"
+    }
+    folded["FeO"] = feot_moles
+    source_wt = _oxide_wt_pct_known(canonical)
+    folded_wt = _oxide_wt_pct_known(folded)
+    fold_notice, redox_notice = ferric_folded_to_feot_notices(
+        fe2o3_wt_pct=source_wt.get("Fe2O3", 0.0),
+        feo_total_wt_pct=folded_wt.get("FeO", 0.0),
+    )
+    return folded, (fold_notice, redox_notice)
+
+
 def _cleaned_melt_policy(
     composition_mol: Mapping[str, float],
 ) -> tuple[dict[str, float], dict[str, Any]]:
@@ -688,19 +776,14 @@ def _cleaned_melt_policy(
         policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
     _feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(source_wt_pct)
     if fe2o3_wt_pct > 0.0:
-        policy["fe2o3_fold"] = {
-            "code": "openimcc_fe2o3_fold",
-            "fe2o3_wt_pct": fe2o3_wt_pct,
-            "feo_total_wt_pct": _composition_wt_pct_from_moles(
+        fold_notice, redox_notice = ferric_folded_to_feot_notices(
+            fe2o3_wt_pct=fe2o3_wt_pct,
+            feo_total_wt_pct=_composition_wt_pct_from_moles(
                 cleaned_composition_mol
             ).get("FeO", 0.0),
-            "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
-            "basis": "Fe_atoms",
-        }
-        policy["fe_redox_notice"] = {
-            "code": "openimcc_ferric_component_collapsed",
-            "message": "ferric component collapsed until d-072",
-        }
+        )
+        policy["fe2o3_fold"] = fold_notice
+        policy["fe_redox_notice"] = redox_notice
     return cleaned_composition_mol, policy
 
 
@@ -848,6 +931,8 @@ def evaluate(
     are explicit and default to refusal. Positive ``Fe2O3`` remains an openimcc typed refusal
     because the IMCC adapter requires the caller's
     redox model to convert it to the FeO-equivalent convention first.
+    The battery scorer folds first via ``fold_ferric_to_feot``; this
+    function still refuses a raw ferric composition.
     """
 
     package = _require_openimcc()
