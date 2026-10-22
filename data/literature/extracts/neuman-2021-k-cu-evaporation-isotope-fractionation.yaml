@@ -1,0 +1,2354 @@
+schema_version: literature_extract.v1
+source_id: neuman-2021-k-cu-evaporation-isotope-fractionation
+source:
+  citation: Neuman, M., Holzheid, A., Lodders, K., Fegley, B. Jr., Jolliff, B.L., Koefoed, P., Chen, H. & Wang,
+    K. (2022; online 2021), High temperature evaporation and isotopic fractionation of K and Cu, Geochimica et Cosmochimica
+    Acta.
+  doi: 10.1016/j.gca.2021.09.035
+  year: 2022
+extraction:
+  method: Born-digital pdftotext-layout transcription; Table 2 checked cell-by-cell against the page 51 render.
+    MinerU source directory was absent.
+  date: '2026-10-22'
+  worker: wave51-F56
+  provenance_path: corpus/text/neuman-2021-k-cu-evaporation-isotope-fractionation/pdftotext-layout.txt
+  audit_path: data/literature/extracts/neuman-2021-k-cu-evaporation-isotope-fractionation-audit.md
+  table_1_starting_composition:
+    locator: &id001
+      page: 11
+      pdf_page_index: 10
+      published_page: 11
+      table: '1'
+    basis: XRF and INAA, wt%; all Fe as Fe2O3
+    composition_wt_pct: &id005
+      SiO2: '46.24'
+      TiO2: '2.51'
+      Al2O3: '13.91'
+      Fe2O3: '12.48'
+      MnO: '0.15'
+      MgO: '9.38'
+      CaO: '9.53'
+      Cr2O3: '0.05'
+      Na2O: '2.82'
+      K2O: '1.45'
+      P2O5: '0.46'
+    one_sigma_wt_pct: &id002
+      SiO2: '0.09'
+      TiO2: '0.03'
+      Al2O3: '0.07'
+      Fe2O3: '0.07'
+      MnO: '0.01'
+      MgO: '0.06'
+      CaO: '0.04'
+      Cr2O3: '0.002'
+      Na2O: '0.10'
+      K2O: '0.07'
+      P2O5: '0.02'
+    sum_wt_pct: '98.97'
+  table_2_printed_run_count: 20
+  table_2_fraction_remaining_schema_gap: The printed values are (element/Ca)/(element/Ca)0 ratios, with RSD in percent.
+    They can exceed 1.0 and are not mass-loss fractions. No fraction-remaining quantity token exists; retained in
+    series as explicitly typed-refused context.
+  method_schema_gap: The closed method tokens do not include evaporation in a 1-atm gas-mixing furnace. The printed
+    apparatus/regime description is retained; no vacuum, Langmuir, or KEMS token is substituted.
+  table_3_model_derived_context:
+    locator:
+      page: 30
+      pdf_page_index: 29
+      published_page: 30
+      table: '3'
+    status: model_derived_context_not_admitted_as_observations
+    reason: Table 3 reports model-derived alpha_kin, alpha_evp and vapor saturation; inputs/parents are not stored
+      as observations here, so these are retained as contextual printed values only.
+    study_rows:
+    - atmosphere: CO-CO2
+      element: K
+      mass_41: 40.9618253
+      mass_39: '38.9637065'
+      alpha_kin: 0.97530507
+      delta_kin: -25.004966
+      alpha_evp: 0.9944
+      delta_evp: -5.6157388
+      S: 0.7754
+    - atmosphere: CO-CO2
+      element: Cu
+      mass_65: '64.927790'
+      mass_63: '62.929597'
+      alpha_kin: 0.98449194
+      delta_kin: -15.629568
+      alpha_evp: 0.9961
+      delta_evp: -3.9076248
+      S: '0.7500'
+    - atmosphere: Air
+      element: K
+      mass_41: 40.9618253
+      mass_39: '38.9637065'
+      alpha_kin: 0.97530507
+      delta_kin: -25.004966
+      alpha_evp: 0.9972
+      delta_evp: -2.8039273
+      S: 0.8879
+    other_literature_rows_as_printed:
+    - atmosphere: Air
+      attribution: Sossi et al. (2020)
+      element: Cu
+      alpha_evp: 0.9972
+      S: 0.8206
+    - atmosphere: Air
+      attribution: Sossi et al. (2020)
+      element: Zn
+      alpha_evp: 0.9959
+      S: 0.7329
+    - atmosphere: CO-CO2
+      attribution: Sossi et al. (2020)
+      element: Cu
+      alpha_evp: 0.9979
+      S: 0.8655
+    - atmosphere: CO-CO2
+      attribution: Sossi et al. (2020)
+      element: Zn
+      alpha_evp: 0.9967 to 0.9978
+      S: 0.7851 to 0.8568
+    - atmosphere: Ar
+      attribution: Ni et al. (2021)
+      element: Cu
+      alpha_evp: 0.996
+      S: 0.7436
+    - atmosphere: Ar
+      attribution: Wimpenny et al. (2019)
+      element: Zn
+      alpha_evp: 0.99879
+      S: 0.9213
+  figures_not_extracted:
+  - Figures 3–5 report figure-read isotope/depletion series; excluded as figure-only candidates.
+review_status: draft
+experiments:
+- experiment_id: ortenberg-basalt-1atm-series
+  method: gas_mixing_furnace_evaporation
+  locator: &id003
+    page: 9
+    pdf_page_index: 8
+    published_page: 9
+    section: Experimental methods
+  sample:
+    identity: Ortenberg basalt from Gaulsberg quarry, Upper Hesse, Germany
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '46.24'
+          - - TiO2
+            - '2.51'
+          - - Al2O3
+            - '13.91'
+          - - Fe2O3
+            - '12.48'
+          - - MnO
+            - '0.15'
+          - - MgO
+            - '9.38'
+          - - CaO
+            - '9.53'
+          - - Cr2O3
+            - '0.05'
+          - - Na2O
+            - '2.82'
+          - - K2O
+            - '1.45'
+          - - P2O5
+            - '0.46'
+      locator: *id001
+    initial_composition_1sigma_wt_pct: *id002
+    all_iron_reported_as: Fe2O3
+    trace_elements_ppm_as_reported:
+      Cu:
+        value: 50
+        uncertainty: 3
+        method: ICP-MS
+      Zn:
+        value: 115
+        uncertainty: 6
+        method: ICP-MS
+      Zn_INAA:
+        value: 126
+        uncertainty: 4
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature varies by run; Table 2 gives per-run T_C
+      locator: &id004
+        page: 51
+        pdf_page_index: 50
+        published_page: 51
+        table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id003
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: air or CO-CO2 mixture varies by run; gas mixture proportions are not assigned per Table 2 row
+      locator: *id003
+    regime:
+      regime_class:
+        tag: unknown
+        reason: gas-mixing furnace at 1 atm; no flow-regime class stated
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: oxygen fugacity is gas-controlled and reported absolutely in Table 2; no buffer basis is needed
+      locator: *id004
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_applicable
+      locator:
+        page: 51
+        published_page: 51
+        table: '2'
+        note: Run durations vary by row and are stored on each observation point; no single experiment-level duration applies.
+  apparatus:
+    furnace:
+      value: Furnace tube with alumina crucible; CO-CO2 mixture or compressed dry air flowed at approximately 200
+        cm3/min.
+      locator: *id003
+    crucible:
+      value: Pre-baked alumina crucible, OD 8 mm and ID 6 mm.
+      locator: *id003
+    temperature_stability:
+      value: ±1 °C of constant setpoint.
+      locator: *id003
+fidelity_samples:
+- path: species.K.observations[neuman_2021_table2_k_isotope_and_remaining_ratio].values.series[0].isotope_delta_isotope_delta
+  value: '0.051'
+  locator:
+    page: 51
+    published_page: 51
+    table: '2'
+    note: 8B13A Δ41K, render-checked
+- path: species.Cu.observations[neuman_2021_table2_cu_isotope_and_remaining_ratio].values.series[0].isotope_delta_isotope_delta
+  value: '-0.153'
+  locator:
+    page: 51
+    published_page: 51
+    table: '2'
+    note: 8B13A Δ65Cu, render-checked
+- path: species.Zn.observations[neuman_2021_table2_zn_isotope_and_remaining_ratio].values.series[0].isotope_delta_isotope_delta
+  value: '0.076'
+  locator:
+    page: 51
+    published_page: 51
+    table: '2'
+    note: 8B13A Δ66Zn, render-checked
+species:
+  K:
+    observations:
+    - observation_id: neuman_2021_table2_k_isotope_and_remaining_ratio
+      experiment: ortenberg-basalt-1atm-series
+      type: rate_series
+      locator: *id004
+      phase: glass
+      quench_status: asserted_preserved
+      quench_statement_locator: &id006
+        page: 11
+        pdf_page_index: 10
+        published_page: 11
+        section: Experimental methods
+        note: Quench by rapid withdrawal to subsolidus furnace zone; paper states chemical diffusion during runs
+          and quenching is not a concern (also p. 23).
+      regime: 1_atm_gas_mixing_furnace
+      units: per mil; dimensionless ratio; RSD percent
+      uncertainty:
+        note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 41K/39K
+        isotope_reference: delta of run-product glass minus starting material; no absolute standard named for these
+          table values
+        composition_wt_pct: *id005
+        total_pressure_Pa: 101325
+        starting_material_composition_locator: *id001
+        quench_status: asserted_preserved
+        quench_statement_locator: *id006
+        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
+          mass_loss_fraction is semantically wrong.
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_K_printed: '0.051'
+          isotope_delta_isotope_delta: '0.051'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.959'
+          fraction_remaining_RSD_percent_as_printed: '1.03'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id027
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1573.15'
+              locator: &id007
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 8B13A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id007
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_K_printed: '0.026'
+          isotope_delta_isotope_delta: '0.026'
+          two_SE_per_mil: '0.10'
+          fraction_remaining_ratio_as_printed: '0.969'
+          fraction_remaining_RSD_percent_as_printed: '0.86'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id028
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1573.15'
+              locator: &id008
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 17B13A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id008
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_K_printed: '0.059'
+          isotope_delta_isotope_delta: '0.059'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.975'
+          fraction_remaining_RSD_percent_as_printed: '2.21'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id029
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id009
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 10B13A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id009
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_K_printed: '0.071'
+          isotope_delta_isotope_delta: '0.071'
+          two_SE_per_mil: '0.10'
+          fraction_remaining_ratio_as_printed: '0.973'
+          fraction_remaining_RSD_percent_as_printed: '1.47'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id030
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1575.15'
+              locator: &id010
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 9B13A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id010
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_K_printed: '-0.005'
+          isotope_delta_isotope_delta: '-0.005'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.996'
+          fraction_remaining_RSD_percent_as_printed: '2.44'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id031
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id011
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 13B13A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id011
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_K_printed: '0.101'
+          isotope_delta_isotope_delta: '0.101'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.964'
+          fraction_remaining_RSD_percent_as_printed: '1.09'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id032
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1651.15'
+              locator: &id012
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 27B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id012
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_K_printed: '0.177'
+          isotope_delta_isotope_delta: '0.177'
+          two_SE_per_mil: '0.06'
+          fraction_remaining_ratio_as_printed: '0.947'
+          fraction_remaining_RSD_percent_as_printed: '0.83'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id033
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1652.15'
+              locator: &id013
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 24B14A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id013
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_K_printed: '0.153'
+          isotope_delta_isotope_delta: '0.153'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.935'
+          fraction_remaining_RSD_percent_as_printed: '0.83'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id034
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1651.15'
+              locator: &id014
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 28B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id014
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_K_printed: '0.257'
+          isotope_delta_isotope_delta: '0.257'
+          two_SE_per_mil: '0.09'
+          fraction_remaining_ratio_as_printed: '0.937'
+          fraction_remaining_RSD_percent_as_printed: '1.23'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id035
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1652.15'
+              locator: &id015
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 20B14A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id015
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          logfO2: '-0.68'
+          dIW: '9.02'
+          delta_K_printed: '0.150'
+          isotope_delta_isotope_delta: '0.150'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.958'
+          fraction_remaining_RSD_percent_as_printed: '0.94'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id036
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1673.15'
+              locator: &id016
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 19B14A
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.68'
+              locator: *id016
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: dry air
+              locator: *id003
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          logfO2: '-3.93'
+          dIW: '6.82'
+          delta_K_printed: '0.163'
+          isotope_delta_isotope_delta: '0.163'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.965'
+          fraction_remaining_RSD_percent_as_printed: '0.90'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id037
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id017
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 18B13
+            fO2_log:
+              state:
+                tag: value
+                value: '-3.93'
+              locator: *id017
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          logfO2: '-4.36'
+          dIW: '6.39'
+          delta_K_printed: '0.229'
+          isotope_delta_isotope_delta: '0.229'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.962'
+          fraction_remaining_RSD_percent_as_printed: '0.86'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id038
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id018
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 16B13
+            fO2_log:
+              state:
+                tag: value
+                value: '-4.36'
+              locator: *id018
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          logfO2: '-7.87'
+          dIW: '2.88'
+          delta_K_printed: '0.139'
+          isotope_delta_isotope_delta: '0.139'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.949'
+          fraction_remaining_RSD_percent_as_printed: '1.64'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id039
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1573.15'
+              locator: &id019
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 15B13
+            fO2_log:
+              state:
+                tag: value
+                value: '-7.87'
+              locator: *id019
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          logfO2: '-9.80'
+          dIW: '0.95'
+          delta_K_printed: '0.181'
+          isotope_delta_isotope_delta: '0.181'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.940'
+          fraction_remaining_RSD_percent_as_printed: '0.86'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id040
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id020
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 14B13
+            fO2_log:
+              state:
+                tag: value
+                value: '-9.80'
+              locator: *id020
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          logfO2: '-11.62'
+          dIW: '-0.87'
+          delta_K_printed: '0.494'
+          isotope_delta_isotope_delta: '0.494'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.919'
+          fraction_remaining_RSD_percent_as_printed: '1.45'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id041
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1574.15'
+              locator: &id021
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 12B13
+            fO2_log:
+              state:
+                tag: value
+                value: '-11.62'
+              locator: *id021
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          logfO2: '-3.20'
+          dIW: '6.50'
+          delta_K_printed: '0.190'
+          isotope_delta_isotope_delta: '0.190'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.951'
+          fraction_remaining_RSD_percent_as_printed: '1.08'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id042
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1674.15'
+              locator: &id022
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 21B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-3.20'
+              locator: *id022
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-4.07'
+          dIW: '5.62'
+          delta_K_printed: '0.145'
+          isotope_delta_isotope_delta: '0.145'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.966'
+          fraction_remaining_RSD_percent_as_printed: '0.90'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id043
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1674.15'
+              locator: &id023
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 22B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-4.07'
+              locator: *id023
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          logfO2: '-7.38'
+          dIW: '2.31'
+          delta_K_printed: '0.451'
+          isotope_delta_isotope_delta: '0.451'
+          two_SE_per_mil: '0.10'
+          fraction_remaining_ratio_as_printed: '0.931'
+          fraction_remaining_RSD_percent_as_printed: '1.91'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id044
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1674.15'
+              locator: &id024
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 23B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-7.38'
+              locator: *id024
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-8.93'
+          dIW: '0.77'
+          delta_K_printed: '0.637'
+          isotope_delta_isotope_delta: '0.637'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.897'
+          fraction_remaining_RSD_percent_as_printed: '1.52'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id045
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1674.15'
+              locator: &id025
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 25B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-8.93'
+              locator: *id025
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          logfO2: '-10.69'
+          dIW: '-0.99'
+          delta_K_printed: '1.373'
+          isotope_delta_isotope_delta: '1.373'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.805'
+          fraction_remaining_RSD_percent_as_printed: '0.83'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: &id046
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '1674.15'
+              locator: &id026
+                page: 51
+                pdf_page_index: 50
+                published_page: 51
+                table: '2'
+                note: Run 26B14
+            fO2_log:
+              state:
+                tag: value
+                value: '-10.69'
+              locator: *id026
+            total_pressure_Pa:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '101325'
+              locator:
+                page: 9
+                pdf_page_index: 8
+                published_page: 9
+                section: Experimental methods
+                note: Furnace total pressure was 1 atm for all runs.
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_oxides
+                  amount_basis: mass_percent
+                  components:
+                  - - SiO2
+                    - '46.24'
+                  - - TiO2
+                    - '2.51'
+                  - - Al2O3
+                    - '13.91'
+                  - - Fe2O3
+                    - '12.48'
+                  - - MnO
+                    - '0.15'
+                  - - MgO
+                    - '9.38'
+                  - - CaO
+                    - '9.53'
+                  - - Cr2O3
+                    - '0.05'
+                  - - Na2O
+                    - '2.82'
+                  - - K2O
+                    - '1.45'
+                  - - P2O5
+                    - '0.46'
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: CO-CO2 gas mixture
+              locator: *id003
+  Cu:
+    observations:
+    - observation_id: neuman_2021_table2_cu_isotope_and_remaining_ratio
+      experiment: ortenberg-basalt-1atm-series
+      type: rate_series
+      locator: *id004
+      phase: glass
+      quench_status: asserted_preserved
+      quench_statement_locator: *id006
+      regime: 1_atm_gas_mixing_furnace
+      units: per mil; dimensionless ratio; RSD percent
+      uncertainty:
+        note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_reference: delta of run-product glass minus starting material; no absolute standard named for these
+          table values
+        composition_wt_pct: *id005
+        total_pressure_Pa: 101325
+        starting_material_composition_locator: *id001
+        quench_status: asserted_preserved
+        quench_statement_locator: *id006
+        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
+          mass_loss_fraction is semantically wrong.
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Cu_printed: '-0.153'
+          isotope_delta_isotope_delta: '-0.153'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.031'
+          fraction_remaining_RSD_percent_as_printed: '1.15'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id027
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Cu_printed: '-0.070'
+          isotope_delta_isotope_delta: '-0.070'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.052'
+          fraction_remaining_RSD_percent_as_printed: '1.58'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id028
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Cu_printed: '-0.198'
+          isotope_delta_isotope_delta: '-0.198'
+          two_SE_per_mil: '0.02'
+          fraction_remaining_ratio_as_printed: '1.002'
+          fraction_remaining_RSD_percent_as_printed: '1.48'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id029
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Cu_printed: '-0.317'
+          isotope_delta_isotope_delta: '-0.317'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '0.983'
+          fraction_remaining_RSD_percent_as_printed: '0.44'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id030
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Cu_printed: '-0.202'
+          isotope_delta_isotope_delta: '-0.202'
+          two_SE_per_mil: '0.02'
+          fraction_remaining_ratio_as_printed: '1.032'
+          fraction_remaining_RSD_percent_as_printed: '1.21'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id031
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Cu_printed: '-0.145'
+          isotope_delta_isotope_delta: '-0.145'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.019'
+          fraction_remaining_RSD_percent_as_printed: '0.44'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id032
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Cu_printed: '-0.449'
+          isotope_delta_isotope_delta: '-0.449'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.155'
+          fraction_remaining_RSD_percent_as_printed: '0.44'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id033
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Cu_printed: '-0.248'
+          isotope_delta_isotope_delta: '-0.248'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.019'
+          fraction_remaining_RSD_percent_as_printed: '0.87'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id034
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Cu_printed: '-0.373'
+          isotope_delta_isotope_delta: '-0.373'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.218'
+          fraction_remaining_RSD_percent_as_printed: '0.71'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id035
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          logfO2: '-0.68'
+          dIW: '9.02'
+          delta_Cu_printed: '-0.491'
+          isotope_delta_isotope_delta: '-0.491'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '0.955'
+          fraction_remaining_RSD_percent_as_printed: '0.44'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id036
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          logfO2: '-3.93'
+          dIW: '6.82'
+          delta_Cu_printed: '0.347'
+          isotope_delta_isotope_delta: '0.347'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.018'
+          fraction_remaining_RSD_percent_as_printed: '0.53'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id037
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          logfO2: '-4.36'
+          dIW: '6.39'
+          delta_Cu_printed: '0.537'
+          isotope_delta_isotope_delta: '0.537'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '1.021'
+          fraction_remaining_RSD_percent_as_printed: '0.42'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id038
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          logfO2: '-7.87'
+          dIW: '2.88'
+          delta_Cu_printed: '5.469'
+          isotope_delta_isotope_delta: '5.469'
+          two_SE_per_mil: '0.02'
+          fraction_remaining_ratio_as_printed: '0.414'
+          fraction_remaining_RSD_percent_as_printed: '0.86'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id039
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          logfO2: '-9.80'
+          dIW: '0.95'
+          delta_Cu_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.072'
+          fraction_remaining_RSD_percent_as_printed: '0.73'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id040
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          logfO2: '-11.62'
+          dIW: '-0.87'
+          delta_Cu_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.019'
+          fraction_remaining_RSD_percent_as_printed: '0.80'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id041
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          logfO2: '-3.20'
+          dIW: '6.50'
+          delta_Cu_printed: '0.714'
+          isotope_delta_isotope_delta: '0.714'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '0.853'
+          fraction_remaining_RSD_percent_as_printed: '0.42'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id042
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-4.07'
+          dIW: '5.62'
+          delta_Cu_printed: '1.534'
+          isotope_delta_isotope_delta: '1.534'
+          two_SE_per_mil: '0.03'
+          fraction_remaining_ratio_as_printed: '0.730'
+          fraction_remaining_RSD_percent_as_printed: '0.60'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id043
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          logfO2: '-7.38'
+          dIW: '2.31'
+          delta_Cu_printed: '8.512'
+          isotope_delta_isotope_delta: '8.512'
+          two_SE_per_mil: '0.02'
+          fraction_remaining_ratio_as_printed: '0.094'
+          fraction_remaining_RSD_percent_as_printed: '1.74'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id044
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-8.93'
+          dIW: '0.77'
+          delta_Cu_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.029'
+          fraction_remaining_RSD_percent_as_printed: '2.29'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id045
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          logfO2: '-10.69'
+          dIW: '-0.99'
+          delta_Cu_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.024'
+          fraction_remaining_RSD_percent_as_printed: '0.67'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id046
+  Zn:
+    observations:
+    - observation_id: neuman_2021_table2_zn_isotope_and_remaining_ratio
+      experiment: ortenberg-basalt-1atm-series
+      type: rate_series
+      locator: *id004
+      phase: glass
+      quench_status: asserted_preserved
+      quench_statement_locator: *id006
+      regime: 1_atm_gas_mixing_furnace
+      units: per mil; dimensionless ratio; RSD percent
+      uncertainty:
+        note: Table 2 gives 2 SE; SE is standard deviation divided by square root of total measurements.
+        confidence_level: not_stated
+        locator: *id004
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 66Zn/64Zn
+        isotope_reference: delta of run-product glass minus starting material; no absolute standard named for these
+          table values
+        composition_wt_pct: *id005
+        total_pressure_Pa: 101325
+        starting_material_composition_locator: *id001
+        quench_status: asserted_preserved
+        quench_statement_locator: *id006
+        fraction_remaining_schema_gap: No quantity token represents the printed Ca-normalized element ratio remaining;
+          mass_loss_fraction is semantically wrong.
+        series:
+        - run: 8B13A
+          T_C: '1300'
+          duration_h: '45.6'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Zn_printed: '0.076'
+          isotope_delta_isotope_delta: '0.076'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.610'
+          fraction_remaining_RSD_percent_as_printed: '0.39'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id027
+        - run: 17B13A
+          T_C: '1300'
+          duration_h: '72.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Zn_printed: '0.203'
+          isotope_delta_isotope_delta: '0.203'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.532'
+          fraction_remaining_RSD_percent_as_printed: '1.73'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id028
+        - run: 10B13A
+          T_C: '1301'
+          duration_h: '118.5'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Zn_printed: '0.417'
+          isotope_delta_isotope_delta: '0.417'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.436'
+          fraction_remaining_RSD_percent_as_printed: '2.37'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id029
+        - run: 9B13A
+          T_C: '1302'
+          duration_h: '168.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Zn_printed: '0.513'
+          isotope_delta_isotope_delta: '0.513'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.360'
+          fraction_remaining_RSD_percent_as_printed: '0.63'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id030
+        - run: 13B13A
+          T_C: '1301'
+          duration_h: '189.2'
+          logfO2: '-0.68'
+          dIW: '10.07'
+          delta_Zn_printed: '0.514'
+          isotope_delta_isotope_delta: '0.514'
+          two_SE_per_mil: '0.11'
+          fraction_remaining_ratio_as_printed: '0.353'
+          fraction_remaining_RSD_percent_as_printed: '1.12'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id031
+        - run: 27B14
+          T_C: '1378'
+          duration_h: '48.3'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Zn_printed: '0.178'
+          isotope_delta_isotope_delta: '0.178'
+          two_SE_per_mil: '0.08'
+          fraction_remaining_ratio_as_printed: '0.349'
+          fraction_remaining_RSD_percent_as_printed: '0.58'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id032
+        - run: 24B14A
+          T_C: '1379'
+          duration_h: '95.9'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Zn_printed: '0.030'
+          isotope_delta_isotope_delta: '0.030'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.328'
+          fraction_remaining_RSD_percent_as_printed: '1.14'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id033
+        - run: 28B14
+          T_C: '1378'
+          duration_h: '120.0'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Zn_printed: '0.063'
+          isotope_delta_isotope_delta: '0.063'
+          two_SE_per_mil: '0.06'
+          fraction_remaining_ratio_as_printed: '0.297'
+          fraction_remaining_RSD_percent_as_printed: '0.60'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id034
+        - run: 20B14A
+          T_C: '1379'
+          duration_h: '169.2'
+          logfO2: '-0.68'
+          dIW: '9.23'
+          delta_Zn_printed: '0.167'
+          isotope_delta_isotope_delta: '0.167'
+          two_SE_per_mil: '0.09'
+          fraction_remaining_ratio_as_printed: '0.261'
+          fraction_remaining_RSD_percent_as_printed: '0.59'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id035
+        - run: 19B14A
+          T_C: '1400'
+          duration_h: '48.2'
+          logfO2: '-0.68'
+          dIW: '9.02'
+          delta_Zn_printed: '0.084'
+          isotope_delta_isotope_delta: '0.084'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.347'
+          fraction_remaining_RSD_percent_as_printed: '1.09'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id036
+        - run: 18B13
+          T_C: '1301'
+          duration_h: '48.0'
+          logfO2: '-3.93'
+          dIW: '6.82'
+          delta_Zn_printed: '2.548'
+          isotope_delta_isotope_delta: '2.548'
+          two_SE_per_mil: '0.07'
+          fraction_remaining_ratio_as_printed: '0.446'
+          fraction_remaining_RSD_percent_as_printed: '0.49'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id037
+        - run: 16B13
+          T_C: '1301'
+          duration_h: '47.9'
+          logfO2: '-4.36'
+          dIW: '6.39'
+          delta_Zn_printed: '4.400'
+          isotope_delta_isotope_delta: '4.400'
+          two_SE_per_mil: '0.11'
+          fraction_remaining_ratio_as_printed: '0.309'
+          fraction_remaining_RSD_percent_as_printed: '0.54'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id038
+        - run: 15B13
+          T_C: '1300'
+          duration_h: '48.0'
+          logfO2: '-7.87'
+          dIW: '2.88'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.059'
+          fraction_remaining_RSD_percent_as_printed: '1.15'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id039
+        - run: 14B13
+          T_C: '1301'
+          duration_h: '47.8'
+          logfO2: '-9.80'
+          dIW: '0.95'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.034'
+          fraction_remaining_RSD_percent_as_printed: '0.65'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id040
+        - run: 12B13
+          T_C: '1301'
+          duration_h: '47.7'
+          logfO2: '-11.62'
+          dIW: '-0.87'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.032'
+          fraction_remaining_RSD_percent_as_printed: '1.60'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id041
+        - run: 21B14
+          T_C: '1401'
+          duration_h: '47.6'
+          logfO2: '-3.20'
+          dIW: '6.50'
+          delta_Zn_printed: '3.131'
+          isotope_delta_isotope_delta: '3.131'
+          two_SE_per_mil: '0.06'
+          fraction_remaining_ratio_as_printed: '0.203'
+          fraction_remaining_RSD_percent_as_printed: '0.46'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id042
+        - run: 22B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-4.07'
+          dIW: '5.62'
+          delta_Zn_printed: '5.960'
+          isotope_delta_isotope_delta: '5.960'
+          two_SE_per_mil: '0.06'
+          fraction_remaining_ratio_as_printed: '0.089'
+          fraction_remaining_RSD_percent_as_printed: '0.42'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id043
+        - run: 23B14
+          T_C: '1401'
+          duration_h: '51.1'
+          logfO2: '-7.38'
+          dIW: '2.31'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.034'
+          fraction_remaining_RSD_percent_as_printed: '2.42'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id044
+        - run: 25B14
+          T_C: '1401'
+          duration_h: '47.8'
+          logfO2: '-8.93'
+          dIW: '0.77'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.039'
+          fraction_remaining_RSD_percent_as_printed: '1.67'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id045
+        - run: 26B14
+          T_C: '1401'
+          duration_h: '47.5'
+          logfO2: '-10.69'
+          dIW: '-0.99'
+          delta_Zn_printed: null
+          isotope_delta_isotope_delta: null
+          two_SE_per_mil: null
+          fraction_remaining_ratio_as_printed: '0.027'
+          fraction_remaining_RSD_percent_as_printed: '5.27'
+          fraction_remaining_quantity_status: typed_refusal
+          point_conditions: *id046
