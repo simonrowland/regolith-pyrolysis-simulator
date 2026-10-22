@@ -20,6 +20,15 @@ review_status: draft
 fidelity_samples:
 - species: SiO2
   observation_id: nam2025_t101_s1_l_v2o5
+  field: component_amount
+  value: '0.7584'
+  locator:
+    source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+    pdf_page_index: 195
+    page: 196
+    table: '10.1'
+- species: SiO2
+  observation_id: nam2025_t101_s1_l_v2o5
   field: component_amount_as_published
   value: 75.84 mol%
   locator:
@@ -2847,121 +2856,6 @@ species:
           V2O3: 14.54 (1.5381)
         duration_days_as_printed: '10'
         row_note: Printed dashes for MgSiO3 analyses are retained as dashes.
-    - observation_id: nam2025_t92_s1_l_sio2
-      type: table_context
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 1, EPMA L row; SiO2 component.
-      units: mol% as printed
-      values:
-        quantity: equilibrium_phase_composition
-        candidate_tokens:
-        - equilibrium_phase_composition
-        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
-        sample_id_as_printed: '1'
-        phase_as_printed: L
-        phase_assemblage_as_printed: SiO2 + L
-        temperature_C_as_printed: '1000'
-        analysis_count_as_printed: 9
-        composition_cells_as_printed:
-          SiO2: 0 (0)
-        printed_zero_as_published: 0 mol%
-    - observation_id: nam2025_t92_s2_l_sio2
-      type: table_context
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 2, EPMA L row; SiO2 component.
-      units: mol% as printed
-      values:
-        quantity: equilibrium_phase_composition
-        candidate_tokens:
-        - equilibrium_phase_composition
-        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
-        sample_id_as_printed: '2'
-        phase_as_printed: L
-        phase_assemblage_as_printed: SiO2 + V2O5 + L
-        temperature_C_as_printed: '1200'
-        analysis_count_as_printed: 24
-        composition_cells_as_printed:
-          SiO2: 0 (0)
-        printed_zero_as_published: 0 mol%
-    - observation_id: nam2025_t92_s3_l_sio2
-      type: table_context
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 3, EPMA L row; SiO2 component.
-      units: mol% as printed
-      values:
-        quantity: equilibrium_phase_composition
-        candidate_tokens:
-        - equilibrium_phase_composition
-        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
-        sample_id_as_printed: '3'
-        phase_as_printed: L
-        phase_assemblage_as_printed: SiO2 + L
-        temperature_C_as_printed: '1300'
-        analysis_count_as_printed: 15
-        composition_cells_as_printed:
-          SiO2: 0 (0)
-        printed_zero_as_published: 0 mol%
-    - observation_id: nam2025_t92_s4_l_sio2
-      type: table_context
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 4, EPMA L row; SiO2 component.
-      units: mol% as printed
-      values:
-        quantity: equilibrium_phase_composition
-        candidate_tokens:
-        - equilibrium_phase_composition
-        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
-        sample_id_as_printed: '4'
-        phase_as_printed: L
-        phase_assemblage_as_printed: SiO2 + L
-        temperature_C_as_printed: '1400'
-        analysis_count_as_printed: 20
-        composition_cells_as_printed:
-          SiO2: 0 (0)
-        printed_zero_as_published: 0 mol%
-    - observation_id: nam2025_t92_s5_l_sio2
-      type: table_context
-      locator:
-        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-        pdf_page_index: 159
-        page: 160
-        published_page: 141
-        table: '9.2'
-        note: Table 9.2 sample 5, EPMA L row; SiO2 component.
-      units: mol% as printed
-      values:
-        quantity: equilibrium_phase_composition
-        candidate_tokens:
-        - equilibrium_phase_composition
-        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
-        sample_id_as_printed: '5'
-        phase_as_printed: L
-        phase_assemblage_as_printed: SiO2 + VO2 + L
-        temperature_C_as_printed: '1600'
-        analysis_count_as_printed: 10
-        composition_cells_as_printed:
-          SiO2: 0 (0)
-        printed_zero_as_published: 0 mol%
   SiO2:
     observations:
     - observation_id: nam2025_t61_s14_l_cao
@@ -4807,6 +4701,121 @@ species:
       uncertainty:
         sigma: '0.2748'
     context:
+    - observation_id: nam2025_t92_s1_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 1, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '1'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1000'
+        analysis_count_as_printed: 9
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s2_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 2, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '2'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + V2O5 + L
+        temperature_C_as_printed: '1200'
+        analysis_count_as_printed: 24
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s3_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 3, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '3'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1300'
+        analysis_count_as_printed: 15
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s4_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 4, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '4'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + L
+        temperature_C_as_printed: '1400'
+        analysis_count_as_printed: 20
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
+    - observation_id: nam2025_t92_s5_l_sio2
+      type: table_context
+      locator:
+        source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
+        pdf_page_index: 159
+        page: 160
+        published_page: 141
+        table: '9.2'
+        note: Table 9.2 sample 5, EPMA L row; SiO2 component.
+      units: mol% as printed
+      values:
+        quantity: equilibrium_phase_composition
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Printed zero mol% retained as context; zero component amounts are not scoreable.
+        sample_id_as_printed: '5'
+        phase_as_printed: L
+        phase_assemblage_as_printed: SiO2 + VO2 + L
+        temperature_C_as_printed: '1600'
+        analysis_count_as_printed: 10
+        composition_cells_as_printed:
+          SiO2: 0 (0)
+        printed_zero_as_published: 0 mol%
     - observation_id: nam2025_figure_9_1_deferred
       type: figure_context
       locator:

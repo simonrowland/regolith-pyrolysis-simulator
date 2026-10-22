@@ -170,11 +170,11 @@ def _table_grid(document: dict, table: str) -> list[str]:
             sample = str(values["sample_id_as_printed"])
             phase = str(values["phase_as_printed"])
             key = (sample, phase)
-            grouped[key] = {
+            entry = grouped.setdefault(key, {
                 "count": str(values["analysis_count_as_printed"]),
                 "temperature": str(values["temperature_C_as_printed"]),
-                **{formula: str(cell) for formula, cell in values["composition_cells_as_printed"].items()},
-            }
+            })
+            entry.update({formula: str(cell) for formula, cell in values["composition_cells_as_printed"].items()})
     result = []
     for (sample, phase), values in sorted(grouped.items(), key=lambda pair: (int(pair[0][0]), pair[0][1])):
         cells = ";".join(values.get(formula, "") for formula in formulas)
@@ -287,8 +287,17 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
         and row.get("values", {}).get("printed_zero_as_published") == "0 mol%"
     ]
     assert len(zero_context) == 5
+    assert {container for container, body in document["species"].items()
+            if any(row in zero_context for row in body.get("context", []))} == {"SiO2"}
+    assert {row["observation_id"] for row in zero_context} == {
+        f"nam2025_t92_s{sample}_l_sio2" for sample in range(1, 6)
+    }
     assert all(row["locator"]["table"] == "9.2" for row in zero_context)
     assert all(row["values"]["composition_cells_as_printed"]["SiO2"] == "0 (0)" for row in zero_context)
+    liquid_lines = [line for line in _table_grid(document, "9.2") if "|L|" in line]
+    assert [line.rsplit("|", 1)[1].split(";")[-1] for line in liquid_lines] == [
+        "9.23 (0.4466)", "9.61 (0.8494)", "11.47 (0.1604)", "13.73 (0.2733)", "96.33 (0.3153)"
+    ]
     assert not any(
         row.get("observation_id", "").startswith("nam2025_t92_")
         and row.get("values", {}).get("component_amount_as_published") == "0 mol%"
