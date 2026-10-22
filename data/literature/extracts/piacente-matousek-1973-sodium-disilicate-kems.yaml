@@ -29,26 +29,103 @@ fidelity_samples:
     table: II
 - path: species.Na.observations[piacente_1973_run_5_0_partial_pressure].values.points[5].P_Na_times_10^7_atm_as_printed
   value: '12.18'
-  note: Table IV, run 5.0, row 6 at 1523 K; printed value preserved despite possible factor-of-ten slip.
+  note: Table IV, run 5.0, row 6 at 1523 K; render-verified and retained as printed despite the factor-of-ten discrepancy
+    with rows 1–5.
+  locator:
+    published_page: 275
+    pdf_page_index: 6
+    table: IV
+- path: species.Na.observations[piacente_1973_run_5_0_partial_pressure].values.points[6].P_Na_times_10^7_atm_as_printed
+  value: '17.35'
+  note: Table IV, run 5.0, row 7 at 1531 K; render-verified and retained as printed despite the factor-of-ten discrepancy
+    with rows 1–5.
+  locator:
+    published_page: 275
+    pdf_page_index: 6
+    table: IV
+- path: species.Na.observations[piacente_1973_run_5_0_partial_pressure].values.points[7].P_Na_times_10^7_atm_as_printed
+  value: '22.67'
+  note: Table IV, run 5.0, row 8 at 1546 K; render-verified and retained as printed despite the factor-of-ten discrepancy
+    with rows 1–5.
   locator:
     published_page: 275
     pdf_page_index: 6
     table: IV
 benches:
-- id: piacente-1973-kems
+- id: piacente-1973-mo-cell
   identity:
     basis: described_in_this_work
   apparatus_family:
     state:
       tag: value
       value: Knudsen effusion mass spectrometer
+    locator: &id001
+      published_page: 270
+      pdf_page_index: 1
+      section: Experimental and Results
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
     locator:
       published_page: 270
       pdf_page_index: 1
       section: Experimental and Results
+      note: Molybdenum cell described; Table I identifies the runs.
+- id: piacente-1973-mgo-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometer
+    locator: *id001
+  cell_materials:
+  - state:
+      tag: value
+      value: MgO
+    locator:
+      published_page: 272
+      pdf_page_index: 3
+      table: II
+      note: MgO crucible; instrument constant 4.8 × 10^-3.
+- id: piacente-1973-re-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometer
+    locator: *id001
+  cell_materials:
+  - state:
+      tag: value
+      value: Re
+    locator:
+      published_page: 274
+      pdf_page_index: 5
+      section: Evaporation from rhenium crucible
+      note: Rhenium cell; instrument constant 6.2 × 10^-2.
+- id: piacente-1973-ta-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometer
+    locator: *id001
+  cell_materials:
+  - state:
+      tag: value
+      value: Ta
+    locator:
+      published_page: 276
+      pdf_page_index: 7
+      section: Evaporation from tantalum crucible
+      note: Tantalum cell; instrument constant 1.5 × 10^-3.
 experiments:
 - experiment_id: run-1.0
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -60,7 +137,7 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: &id001
+      locator: &id002
         published_page: 272
         pdf_page_index: 3
         table: I
@@ -69,36 +146,25 @@ experiments:
       state:
         tag: unknown
         reason: not_published
-      locator: *id001
+      locator: *id002
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id001
+      locator: *id002
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Mo
-        locator: &id002
-          published_page: 270
-          pdf_page_index: 1
-          section: Experimental and Results
-          note: Molybdenum cell described; Table I identifies the runs.
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 4.46 × 10^-3
-        locator: *id001
+        locator: *id002
   sample:
     printed_composition:
       state:
@@ -117,7 +183,7 @@ experiments:
         section: Experimental and Results
         note: 'Starting glass composition as printed: 34.1 Na2O and 65.9 SiO2 wt.%'
 - experiment_id: run-2.1
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -129,38 +195,31 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: *id001
+      locator: *id002
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
         reason: not_published
-      locator: *id001
+      locator: *id002
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id001
+      locator: *id002
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Mo
-        locator: *id002
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 1.1 × 10^-3
-        locator: *id001
+        locator: *id002
   sample:
     printed_composition:
       state:
@@ -175,7 +234,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-2.2
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -187,38 +246,31 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: *id001
+      locator: *id002
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
         reason: not_published
-      locator: *id001
+      locator: *id002
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id001
+      locator: *id002
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Mo
-        locator: *id002
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 1.1 × 10^-3
-        locator: *id001
+        locator: *id002
   sample:
     printed_composition:
       state:
@@ -233,7 +285,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-2.3
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -245,38 +297,31 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: *id001
+      locator: *id002
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
         reason: not_published
-      locator: *id001
+      locator: *id002
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id001
+      locator: *id002
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Mo
-        locator: *id002
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 1.1 × 10^-3
-        locator: *id001
+        locator: *id002
   sample:
     printed_composition:
       state:
@@ -291,7 +336,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-3.0
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mgo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -324,17 +369,6 @@ experiments:
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: MgO
-        locator: &id005
-          published_page: 272
-          pdf_page_index: 3
-          table: II
-          note: MgO crucible; instrument constant 4.8 × 10^-3.
     - name: instrument_constant
       unit: as_printed
       value:
@@ -356,7 +390,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-3.1
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mgo-cell
   method: knudsen_effusion
   locator:
     published_page: 272
@@ -386,13 +420,6 @@ experiments:
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: MgO
-        locator: *id005
     - name: instrument_constant
       unit: as_printed
       value:
@@ -414,7 +441,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-4.0
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-re-cell
   method: knudsen_effusion
   locator:
     published_page: 275
@@ -426,7 +453,7 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: &id006
+      locator: &id005
         published_page: 275
         pdf_page_index: 6
         table: III
@@ -435,36 +462,25 @@ experiments:
       state:
         tag: unknown
         reason: not_published
-      locator: *id006
+      locator: *id005
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id006
+      locator: *id005
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Re
-        locator: &id013
-          published_page: 274
-          pdf_page_index: 5
-          section: Evaporation from rhenium crucible
-          note: Rhenium cell; instrument constant 6.2 × 10^-2.
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 6.2 × 10^-2
-        locator: *id006
+        locator: *id005
   sample:
     printed_composition:
       state:
@@ -479,7 +495,7 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-5.0
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-ta-cell
   method: knudsen_effusion
   locator:
     published_page: 275
@@ -491,7 +507,7 @@ experiments:
       state:
         tag: unknown
         reason: reported point temperatures are stored on each observation
-      locator: &id007
+      locator: &id006
         published_page: 275
         pdf_page_index: 6
         table: IV
@@ -500,36 +516,25 @@ experiments:
       state:
         tag: unknown
         reason: not_published
-      locator: *id007
+      locator: *id006
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
-      locator: *id007
+      locator: *id006
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   apparatus:
     other_facts:
-    - name: cell_material_as_printed
-      unit: as_printed
-      value:
-        state:
-          tag: value
-          value: Ta
-        locator: &id014
-          published_page: 276
-          pdf_page_index: 7
-          section: Evaporation from tantalum crucible
-          note: Tantalum cell; instrument constant 1.5 × 10^-3.
     - name: instrument_constant
       unit: as_printed
       value:
         state:
           tag: value
           value: 1.5 × 10^-3
-        locator: *id007
+        locator: *id006
   sample:
     printed_composition:
       state:
@@ -544,9 +549,9 @@ experiments:
             - '65.9'
       locator: *id003
 - experiment_id: run-mo-fit
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mo-cell
   method: knudsen_effusion
-  locator: &id008
+  locator: &id007
     published_page: 271
     pdf_page_index: 2
     paragraph: Evaporation from Mo cell
@@ -555,11 +560,11 @@ experiments:
       state:
         tag: unknown
         reason: fit applies across the source's reported temperature series
-      locator: *id008
+      locator: *id007
 - experiment_id: run-mgo-fit
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-mgo-cell
   method: knudsen_effusion
-  locator: &id009
+  locator: &id008
     published_page: 273
     pdf_page_index: 4
     paragraph: Evaporation from MgO cell
@@ -568,11 +573,11 @@ experiments:
       state:
         tag: unknown
         reason: fit applies across the source's reported temperature series
-      locator: *id009
+      locator: *id008
 - experiment_id: run-re-fit
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-re-cell
   method: knudsen_effusion
-  locator: &id010
+  locator: &id009
     published_page: 274
     pdf_page_index: 5
     paragraph: Evaporation from Re cell
@@ -581,11 +586,11 @@ experiments:
       state:
         tag: unknown
         reason: fit applies across the source's reported temperature series
-      locator: *id010
+      locator: *id009
 - experiment_id: run-ta-fit
-  bench_id: piacente-1973-kems
+  bench_id: piacente-1973-ta-cell
   method: knudsen_effusion
-  locator: &id011
+  locator: &id010
     published_page: 276
     pdf_page_index: 7
     paragraph: Evaporation from Ta cell
@@ -594,9 +599,8 @@ experiments:
       state:
         tag: unknown
         reason: fit applies across the source's reported temperature series
-      locator: *id011
+      locator: *id010
 - experiment_id: four-cell-mean
-  bench_id: piacente-1973-kems
   method: knudsen_effusion
   locator:
     published_page: 276
@@ -636,7 +640,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: &id012
+        composition_wt_pct: &id011
           Na2O: '34.1'
           SiO2: '65.9'
         parent_formula: Na2O.2SiO2
@@ -648,7 +652,7 @@ species:
         points:
         - T_K: '1350'
           ion_intensity_as_printed: '27.8'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '8.4'
           pressure_atm: '8.4E-7'
           locator:
@@ -659,7 +663,7 @@ species:
             note: Run 1.0; printed row 1.
         - T_K: '1390'
           ion_intensity_as_printed: '61.7'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '19.2'
           pressure_atm: '0.00000192'
           locator:
@@ -670,7 +674,7 @@ species:
             note: Run 1.0; printed row 2.
         - T_K: '1415'
           ion_intensity_as_printed: '105.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '33.1'
           pressure_atm: '0.00000331'
           locator:
@@ -681,7 +685,7 @@ species:
             note: Run 1.0; printed row 3.
         - T_K: '1410'
           ion_intensity_as_printed: '92.5'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '29.0'
           pressure_atm: '0.00000290'
           locator:
@@ -692,7 +696,7 @@ species:
             note: Run 1.0; printed row 4.
         - T_K: '1375'
           ion_intensity_as_printed: '48.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '13.7'
           pressure_atm: '0.00000137'
           locator:
@@ -703,7 +707,7 @@ species:
             note: Run 1.0; printed row 5.
         - T_K: '1415'
           ion_intensity_as_printed: '105.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '33.1'
           pressure_atm: '0.00000331'
           locator:
@@ -714,7 +718,7 @@ species:
             note: Run 1.0; printed row 6.
         - T_K: '1430'
           ion_intensity_as_printed: '140.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '44.7'
           pressure_atm: '0.00000447'
           locator:
@@ -725,7 +729,7 @@ species:
             note: Run 1.0; printed row 7.
         - T_K: '1502'
           ion_intensity_as_printed: '360.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '121.0'
           pressure_atm: '0.00001210'
           locator:
@@ -736,7 +740,7 @@ species:
             note: Run 1.0; printed row 8.
         - T_K: '1536'
           ion_intensity_as_printed: '440.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '151.0'
           pressure_atm: '0.00001510'
           locator:
@@ -747,7 +751,7 @@ species:
             note: Run 1.0; printed row 9.
         - T_K: '1543'
           ion_intensity_as_printed: '480.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '158.0'
           pressure_atm: '0.00001580'
           locator:
@@ -758,7 +762,7 @@ species:
             note: Run 1.0; printed row 10.
         - T_K: '1553'
           ion_intensity_as_printed: '720.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '250.0'
           pressure_atm: '0.00002500'
           locator:
@@ -767,10 +771,6 @@ species:
             table: I
             row: 11
             note: Run 1.0; printed row 11.
-      equipment:
-        cell_material_and_liner:
-          value: Mo
-          locator: *id002
     - observation_id: piacente_1973_run_2_1_partial_pressure
       type: partial_pressure
       experiment: run-2.1
@@ -792,7 +792,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -802,7 +802,7 @@ species:
         points:
         - T_K: '1395'
           ion_intensity_as_printed: '15.5'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '19.6'
           pressure_atm: '0.00000196'
           locator:
@@ -813,7 +813,7 @@ species:
             note: Run 2.1; printed row 1.
         - T_K: '1431'
           ion_intensity_as_printed: '26.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '32.9'
           pressure_atm: '0.00000329'
           locator:
@@ -824,7 +824,7 @@ species:
             note: Run 2.1; printed row 2.
         - T_K: '1424'
           ion_intensity_as_printed: '24.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '31.0'
           pressure_atm: '0.00000310'
           locator:
@@ -835,7 +835,7 @@ species:
             note: Run 2.1; printed row 3.
         - T_K: '1434'
           ion_intensity_as_printed: '32.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '41.7'
           pressure_atm: '0.00000417'
           locator:
@@ -846,7 +846,7 @@ species:
             note: Run 2.1; printed row 4.
         - T_K: '1441'
           ion_intensity_as_printed: '33.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '43.2'
           pressure_atm: '0.00000432'
           locator:
@@ -857,7 +857,7 @@ species:
             note: Run 2.1; printed row 5.
         - T_K: '1458'
           ion_intensity_as_printed: '42.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '55.5'
           pressure_atm: '0.00000555'
           locator:
@@ -868,7 +868,7 @@ species:
             note: Run 2.1; printed row 6.
         - T_K: '1490'
           ion_intensity_as_printed: '67.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '90.7'
           pressure_atm: '0.00000907'
           locator:
@@ -879,7 +879,7 @@ species:
             note: Run 2.1; printed row 7.
         - T_K: '1480'
           ion_intensity_as_printed: '60.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '80.6'
           pressure_atm: '0.00000806'
           locator:
@@ -890,7 +890,7 @@ species:
             note: Run 2.1; printed row 8.
         - T_K: '1502'
           ion_intensity_as_printed: '78.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '106.0'
           pressure_atm: '0.00001060'
           locator:
@@ -901,7 +901,7 @@ species:
             note: Run 2.1; printed row 9.
         - T_K: '1453'
           ion_intensity_as_printed: '38.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '50.1'
           pressure_atm: '0.00000501'
           locator:
@@ -912,7 +912,7 @@ species:
             note: Run 2.1; printed row 10.
         - T_K: '1463'
           ion_intensity_as_printed: '46.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '61.2'
           pressure_atm: '0.00000612'
           locator:
@@ -923,7 +923,7 @@ species:
             note: Run 2.1; printed row 11.
         - T_K: '1494'
           ion_intensity_as_printed: '70.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '94.5'
           pressure_atm: '0.00000945'
           locator:
@@ -932,10 +932,6 @@ species:
             table: I
             row: 12
             note: Run 2.1; printed row 12.
-      equipment:
-        cell_material_and_liner:
-          value: Mo
-          locator: *id002
     - observation_id: piacente_1973_run_2_2_partial_pressure
       type: partial_pressure
       experiment: run-2.2
@@ -957,7 +953,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -967,7 +963,7 @@ species:
         points:
         - T_K: '1424'
           ion_intensity_as_printed: '23.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '29.7'
           pressure_atm: '0.00000297'
           locator:
@@ -978,7 +974,7 @@ species:
             note: Run 2.2; printed row 1.
         - T_K: '1444'
           ion_intensity_as_printed: '28.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '36.6'
           pressure_atm: '0.00000366'
           locator:
@@ -989,7 +985,7 @@ species:
             note: Run 2.2; printed row 2.
         - T_K: '1463'
           ion_intensity_as_printed: '37.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '49.2'
           pressure_atm: '0.00000492'
           locator:
@@ -1000,7 +996,7 @@ species:
             note: Run 2.2; printed row 3.
         - T_K: '1487'
           ion_intensity_as_printed: '45.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '60.7'
           pressure_atm: '0.00000607'
           locator:
@@ -1011,7 +1007,7 @@ species:
             note: Run 2.2; printed row 4.
         - T_K: '1497'
           ion_intensity_as_printed: '54.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '73.2'
           pressure_atm: '0.00000732'
           locator:
@@ -1022,7 +1018,7 @@ species:
             note: Run 2.2; printed row 5.
         - T_K: '1453'
           ion_intensity_as_printed: '31.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '40.9'
           pressure_atm: '0.00000409'
           locator:
@@ -1033,7 +1029,7 @@ species:
             note: Run 2.2; printed row 6.
         - T_K: '1419'
           ion_intensity_as_printed: '19.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '24.4'
           pressure_atm: '0.00000244'
           locator:
@@ -1044,7 +1040,7 @@ species:
             note: Run 2.2; printed row 7.
         - T_K: '1506'
           ion_intensity_as_printed: '60.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '82.0'
           pressure_atm: '0.00000820'
           locator:
@@ -1055,7 +1051,7 @@ species:
             note: Run 2.2; printed row 8.
         - T_K: '1511'
           ion_intensity_as_printed: '68.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '92.7'
           pressure_atm: '0.00000927'
           locator:
@@ -1066,7 +1062,7 @@ species:
             note: Run 2.2; printed row 9.
         - T_K: '1516'
           ion_intensity_as_printed: '80.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '110.0'
           pressure_atm: '0.00001100'
           locator:
@@ -1077,7 +1073,7 @@ species:
             note: Run 2.2; printed row 10.
         - T_K: '1526'
           ion_intensity_as_printed: '90.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '124.0'
           pressure_atm: '0.00001240'
           locator:
@@ -1086,10 +1082,6 @@ species:
             table: I
             row: 11
             note: Run 2.2; printed row 11.
-      equipment:
-        cell_material_and_liner:
-          value: Mo
-          locator: *id002
     - observation_id: piacente_1973_run_2_3_partial_pressure
       type: partial_pressure
       experiment: run-2.3
@@ -1111,7 +1103,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -1121,7 +1113,7 @@ species:
         points:
         - T_K: '1540'
           ion_intensity_as_printed: '140.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '189.0'
           pressure_atm: '0.00001890'
           locator:
@@ -1132,7 +1124,7 @@ species:
             note: Run 2.3; printed row 1.
         - T_K: '1352'
           ion_intensity_as_printed: '9.5'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '11.6'
           pressure_atm: '0.00000116'
           locator:
@@ -1143,7 +1135,7 @@ species:
             note: Run 2.3; printed row 2.
         - T_K: '1395'
           ion_intensity_as_printed: '21.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '26.5'
           pressure_atm: '0.00000265'
           locator:
@@ -1154,7 +1146,7 @@ species:
             note: Run 2.3; printed row 3.
         - T_K: '1424'
           ion_intensity_as_printed: '32.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '41.4'
           pressure_atm: '0.00000414'
           locator:
@@ -1165,7 +1157,7 @@ species:
             note: Run 2.3; printed row 4.
         - T_K: '1439'
           ion_intensity_as_printed: '39.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '51.0'
           pressure_atm: '0.00000510'
           locator:
@@ -1176,7 +1168,7 @@ species:
             note: Run 2.3; printed row 5.
         - T_K: '1453'
           ion_intensity_as_printed: '50.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '66.1'
           pressure_atm: '0.00000661'
           locator:
@@ -1187,7 +1179,7 @@ species:
             note: Run 2.3; printed row 6.
         - T_K: '1475'
           ion_intensity_as_printed: '65.0'
-          ion_intensity_scale_as_printed: × 10^-13 working units
+          ion_intensity_scale_as_printed: × 10^13 working units
           P_Na_times_10^7_atm_as_printed: '87.1'
           pressure_atm: '0.00000871'
           locator:
@@ -1196,10 +1188,6 @@ species:
             table: I
             row: 7
             note: Run 2.3; printed row 7.
-      equipment:
-        cell_material_and_liner:
-          value: Mo
-          locator: *id002
     - observation_id: piacente_1973_run_3_0_partial_pressure
       type: partial_pressure
       experiment: run-3.0
@@ -1221,7 +1209,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -1361,10 +1349,6 @@ species:
             table: II
             row: 12
             note: Run 3.0; printed row 12.
-      equipment:
-        cell_material_and_liner:
-          value: MgO
-          locator: *id005
     - observation_id: piacente_1973_run_3_1_partial_pressure
       type: partial_pressure
       experiment: run-3.1
@@ -1386,7 +1370,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -1526,10 +1510,6 @@ species:
             table: II
             row: 12
             note: Run 3.1; printed row 12.
-      equipment:
-        cell_material_and_liner:
-          value: MgO
-          locator: *id005
     - observation_id: piacente_1973_run_4_0_partial_pressure
       type: partial_pressure
       experiment: run-4.0
@@ -1551,7 +1531,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -1636,10 +1616,6 @@ species:
             table: III
             row: 7
             note: Run 4.0; printed row 7.
-      equipment:
-        cell_material_and_liner:
-          value: Re
-          locator: *id013
     - observation_id: piacente_1973_run_5_0_partial_pressure
       type: partial_pressure
       experiment: run-5.0
@@ -1661,7 +1637,7 @@ species:
         admission_status: admitted
         method: knudsen_effusion
         method_as_printed: mass spectrometric Knudsen effusion
-        composition_wt_pct: *id012
+        composition_wt_pct: *id011
         parent_formula: Na2O.2SiO2
         reservoir:
           formula: Na2O.2SiO2
@@ -1734,7 +1710,8 @@ species:
             pdf_page_index: 6
             table: IV
             row: 6
-            note: Run 5.0; printed row 6.
+            note: 'Run 5.0; printed row 6. Audit flag: the printed pressure coefficient is a factor of ten below the relation
+              in the first five rows; retained as printed.'
         - T_K: '1531'
           ion_intensity_as_printed: '17'
           ion_intensity_scale_as_printed: × 10^-12
@@ -1745,7 +1722,8 @@ species:
             pdf_page_index: 6
             table: IV
             row: 7
-            note: Run 5.0; printed row 7.
+            note: 'Run 5.0; printed row 7. Audit flag: the printed pressure coefficient is a factor of ten below the relation
+              in the first five rows; retained as printed.'
         - T_K: '1546'
           ion_intensity_as_printed: '20'
           ion_intensity_scale_as_printed: × 10^-12
@@ -1756,15 +1734,12 @@ species:
             pdf_page_index: 6
             table: IV
             row: 8
-            note: Run 5.0; printed row 8.
-      equipment:
-        cell_material_and_liner:
-          value: Ta
-          locator: *id014
+            note: 'Run 5.0; printed row 8. Audit flag: the printed pressure coefficient is a factor of ten below the relation
+              in the first five rows; retained as printed.'
     - observation_id: piacente_1973_mo_enthalpy_fit
       type: gibbs_table
       experiment: run-mo-fit
-      locator: *id008
+      locator: *id007
       phase: gas
       condensed_form:
         state: liquid
@@ -1782,7 +1757,7 @@ species:
         admission_status: admitted
         enthalpy_model: second_law_enthalpy_of_vaporization
         units: kcal/mol
-        derived_from: &id015
+        derived_from: &id012
         - piacente_1973_run_1_0_partial_pressure
         - piacente_1973_run_2_1_partial_pressure
         - piacente_1973_run_2_2_partial_pressure
@@ -1791,7 +1766,7 @@ species:
           relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
             enthalpy.
           output_unit: kcal/mol
-          inputs: *id015
+          inputs: *id012
         uncertainty_as_printed:
           width: '1.4'
           unit: kcal/mol
@@ -1801,7 +1776,7 @@ species:
     - observation_id: piacente_1973_mgo_enthalpy_fit
       type: gibbs_table
       experiment: run-mgo-fit
-      locator: *id009
+      locator: *id008
       phase: gas
       condensed_form:
         state: liquid
@@ -1819,14 +1794,14 @@ species:
         admission_status: admitted
         enthalpy_model: second_law_enthalpy_of_vaporization
         units: kcal/mol
-        derived_from: &id016
+        derived_from: &id013
         - piacente_1973_run_3_0_partial_pressure
         - piacente_1973_run_3_1_partial_pressure
         derivation:
           relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
             enthalpy.
           output_unit: kcal/mol
-          inputs: *id016
+          inputs: *id013
         uncertainty_as_printed:
           width: '0.8'
           unit: kcal/mol
@@ -1836,7 +1811,7 @@ species:
     - observation_id: piacente_1973_re_enthalpy_fit
       type: gibbs_table
       experiment: run-re-fit
-      locator: *id010
+      locator: *id009
       phase: gas
       condensed_form:
         state: liquid
@@ -1854,13 +1829,13 @@ species:
         admission_status: admitted
         enthalpy_model: second_law_enthalpy_of_vaporization
         units: kcal/mol
-        derived_from: &id017
+        derived_from: &id014
         - piacente_1973_run_4_0_partial_pressure
         derivation:
           relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
             enthalpy.
           output_unit: kcal/mol
-          inputs: *id017
+          inputs: *id014
         uncertainty_as_printed:
           width: '6.7'
           unit: kcal/mol
@@ -1870,7 +1845,7 @@ species:
     - observation_id: piacente_1973_ta_enthalpy_fit
       type: gibbs_table
       experiment: run-ta-fit
-      locator: *id011
+      locator: *id010
       phase: gas
       condensed_form:
         state: liquid
@@ -1888,13 +1863,13 @@ species:
         admission_status: admitted
         enthalpy_model: second_law_enthalpy_of_vaporization
         units: kcal/mol
-        derived_from: &id018
+        derived_from: &id015
         - piacente_1973_run_5_0_partial_pressure
         derivation:
           relation: Least-squares fit of log10 P_Na versus reciprocal temperature; converted to the reported second-law evaporation
             enthalpy.
           output_unit: kcal/mol
-          inputs: *id018
+          inputs: *id015
         uncertainty_as_printed:
           width: '3.0'
           unit: kcal/mol
@@ -1920,7 +1895,7 @@ species:
         present_work_kcal_mol: '67.6'
         method_class: model_derived
         admission_status: admitted
-        derived_from: &id019
+        derived_from: &id016
         - piacente_1973_mo_enthalpy_fit
         - piacente_1973_mgo_enthalpy_fit
         - piacente_1973_re_enthalpy_fit
@@ -1928,7 +1903,7 @@ species:
         derivation:
           relation: Mean of the four cell-specific fitted sodium evaporation enthalpies.
           output_unit: kcal/mol
-          inputs: *id019
+          inputs: *id016
         uncertainty_as_printed:
           width: '4.0'
           unit: kcal/mol
@@ -1956,11 +1931,11 @@ species:
         present_work_kcal_mol: '67.6'
         method_class: model_derived
         admission_status: admitted
-        derived_from: *id019
+        derived_from: *id016
         derivation:
           relation: Mean of the four cell-specific fitted sodium evaporation enthalpies.
           output_unit: kcal/mol
-          inputs: *id019
+          inputs: *id016
         uncertainty_as_printed:
           width: '3.0'
           unit: kcal/mol

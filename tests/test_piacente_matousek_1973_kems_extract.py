@@ -45,16 +45,47 @@ def test_piacente_matousek_1973_table_rows_and_render_pins() -> None:
         for row in extract["species"]["Na"]["observations"]
         if row["type"] == "partial_pressure"
     }
-    assert {
-        observation_id: row["equipment"]["cell_material_and_liner"]["value"]
-        for observation_id, row in pressure_series.items()
-    } == expected_cell_materials
+    source_benches = {
+        bench["id"]: bench["cell_materials"][0]["state"]["value"]
+        for bench in extract["benches"]
+    }
+    assert source_benches == {
+        "piacente-1973-mo-cell": "Mo",
+        "piacente-1973-mgo-cell": "MgO",
+        "piacente-1973-re-cell": "Re",
+        "piacente-1973-ta-cell": "Ta",
+    }
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     result = migrator.result
     assert len(result.observations) == 86
     assert not result.validation.hard_issues
+
+    from simulator.battery.score import _cell_material_class, _uniform_modelled_reactive_cell
+
+    expected_benches = {
+        "Mo": ("piacente-1973-mo-cell", "reactive", "Mo"),
+        "MgO": ("piacente-1973-mgo-cell", "not_inert", None),
+        "Re": ("piacente-1973-re-cell", "reactive", None),
+        "Ta": ("piacente-1973-ta-cell", "reactive", None),
+    }
+    bench_ids = {}
+    for material, (bench_suffix, expected_class, expected_modelled) in expected_benches.items():
+        bench = next(item for item in result.benches.values() if item.id.endswith(f"::bench::{bench_suffix}"))
+        assert bench.cell_materials is not None and len(bench.cell_materials) == 1
+        cell = bench.cell_materials[0]
+        assert cell.state.is_value and cell.state.value.value == material
+        assert cell.locator is not None
+        assert _cell_material_class(bench.cell_materials) == expected_class
+        assert _uniform_modelled_reactive_cell(bench.cell_materials) == expected_modelled
+        bench_ids[material] = bench.id
+    for observation_id, material in expected_cell_materials.items():
+        experiment_name = pressure_series[observation_id]["experiment"]
+        experiment = next(item for item in result.experiments.values() if item.experiment_id.endswith(f"::{experiment_name}"))
+        assert experiment.bench_id == bench_ids[material]
+    means = [item for item in result.experiments.values() if item.experiment_id.endswith("::four-cell-mean")]
+    assert len(means) == 1 and means[0].bench_id is None
 
     pressure_rows = [
         row
@@ -79,6 +110,17 @@ def test_piacente_matousek_1973_table_rows_and_render_pins() -> None:
     for observation_id, temperature, expected_pa in pins:
         row = _migrated_at(result.observations, observation_id, temperature)
         assert row.value.point == expected_pa
+
+    table_iv = pressure_series["piacente_1973_run_5_0_partial_pressure"]["values"]["points"]
+    for index, temperature, printed in ((5, "1523", "12.18"), (6, "1531", "17.35"), (7, "1546", "22.67")):
+        point = table_iv[index]
+        assert point["T_K"] == temperature
+        assert point["P_Na_times_10^7_atm_as_printed"] == printed
+        assert "factor of ten" in point["locator"]["note"]
+    sample_paths = {sample["path"]: sample["value"] for sample in extract["fidelity_samples"]}
+    for index, printed in ((5, "12.18"), (6, "17.35"), (7, "22.67")):
+        path = f"species.Na.observations[piacente_1973_run_5_0_partial_pressure].values.points[{index}].P_Na_times_10^7_atm_as_printed"
+        assert sample_paths[path] == printed
 
     for observation_id, temperature in (
         ("piacente_1973_run_2_1_partial_pressure", "1490"),
@@ -119,8 +161,15 @@ def test_piacente_matousek_1973_table_rows_and_render_pins() -> None:
     assert source_fits["piacente_1973_ta_enthalpy_fit"]["derived_from"] == [
         "piacente_1973_run_5_0_partial_pressure"
     ]
+    expected_mean_parents = {
+        "piacente_1973_mo_enthalpy_fit",
+        "piacente_1973_mgo_enthalpy_fit",
+        "piacente_1973_re_enthalpy_fit",
+        "piacente_1973_ta_enthalpy_fit",
+    }
     assert all(
-        fit["derived_from"] == list(source_fits)[:4]
+        set(fit["derived_from"]) == expected_mean_parents
+        and len(fit["derived_from"]) == len(expected_mean_parents)
         for fit_id, fit in source_fits.items()
         if fit_id.startswith("piacente_1973_four_cell_mean_")
     )
