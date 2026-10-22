@@ -558,6 +558,34 @@ def _finite_step_fluxes(
     }
 
 
+def _residue_oxygen_balance(terms, inventory, pressure_at, temperature):
+    """The shared channel stoichiometry and pressure-root call for both paths."""
+    return _solve_vacuum_oxygen_balance(
+        pressure_at,
+        tuple(
+            _VacuumOxygenChannel(
+                species=term.source.species,
+                molar_mass_kg_per_mol=term.molar_mass_kg_mol,
+                oxygen_atoms=term.atom_counts.get("O", 0.0),
+                parent_oxygen_demand=term.parent_oxygen_demand,
+                pO2_exponent=(
+                    term.atom_counts.get("O", 0.0)
+                    - term.parent_oxygen_demand
+                )
+                / 2.0,
+                alpha=float(term.source.alpha),
+                alpha_source=term.source.alpha_source,
+                active=(
+                    term.parent_moles_per_product == 0.0
+                    or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
+                ),
+            )
+            for term in terms
+        ),
+        temperature_K=temperature,
+    )
+
+
 def integrate_residue_inventory(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
@@ -654,29 +682,8 @@ def integrate_residue_inventory(
         balance = None
         if buffered_logp is None:
             try:
-                balance = _solve_vacuum_oxygen_balance(
-                pressure_at,
-                tuple(
-                    _VacuumOxygenChannel(
-                        species=term.source.species,
-                        molar_mass_kg_per_mol=term.molar_mass_kg_mol,
-                        oxygen_atoms=term.atom_counts.get("O", 0.0),
-                        parent_oxygen_demand=term.parent_oxygen_demand,
-                        pO2_exponent=(
-                            term.atom_counts.get("O", 0.0)
-                            - term.parent_oxygen_demand
-                        )
-                        / 2.0,
-                        alpha=float(term.source.alpha),
-                        alpha_source=term.source.alpha_source,
-                        active=(
-                            term.parent_moles_per_product == 0.0
-                            or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
-                        ),
-                    )
-                    for term in terms
-                ),
-                temperature_K=temperature,
+                balance = _residue_oxygen_balance(
+                    terms, inventory, pressure_at, temperature
                 )
             except ValueError as exc:
                 # No positive parent pressure is the zero-flux limit, not a
