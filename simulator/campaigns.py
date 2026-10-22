@@ -2234,6 +2234,17 @@ class CampaignManager:
                 STAGE0_RELEASE_KINETICS,
             )
 
+            # First melt ends C0 under either switch value, ahead of a
+            # temperature hold and ahead of an operator or configured
+            # maximum hold. The switch only chooses the other exit.
+            if self.c0_first_melt_backstop:
+                self.last_c0_exit = {
+                    "outcome": "incomplete",
+                    "backstop": "first_melt",
+                    "kinetics": STAGE0_RELEASE_KINETICS,
+                }
+                return True
+
             if C0_EXIT_MODE == "temperature_hold":
                 soft = self._configured_endpoint(campaign, 'soft_endpoint')
                 min_temperature_C = self._endpoint_float(
@@ -2267,13 +2278,6 @@ class CampaignManager:
                 raise ValueError(f"unknown C0_EXIT_MODE {C0_EXIT_MODE!r}")
 
             max_hold_hr = self._max_hold_hr(campaign)
-            if self.c0_first_melt_backstop:
-                self.last_c0_exit = {
-                    "outcome": "incomplete",
-                    "backstop": "first_melt",
-                    "kinetics": STAGE0_RELEASE_KINETICS,
-                }
-                return True
             if completed_campaign_hour >= max_hold_hr:
                 self.last_c0_exit = {
                     "outcome": "incomplete",

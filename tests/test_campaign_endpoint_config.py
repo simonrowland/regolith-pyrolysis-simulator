@@ -306,6 +306,50 @@ def test_c0_first_melt_beats_an_operator_max_hours_override():
     assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
 
 
+def test_c0_first_melt_holds_under_both_exit_modes(monkeypatch):
+    """First melt stays incomplete and ahead of an operator stop in both modes."""
+    import simulator.campaigns as campaigns
+
+    assert C0_EXIT_MODE == "backstop"
+    cases = (
+        ("backstop", False),
+        ("temperature_hold", False),
+        ("backstop", True),
+        ("temperature_hold", True),
+    )
+    for mode, operator_stop in cases:
+        monkeypatch.setattr(campaigns, "C0_EXIT_MODE", mode)
+        manager = CampaignManager(_setpoints())
+        if operator_stop:
+            manager.overrides["C0"] = {"max_hours": 1.0}
+        manager.c0_first_melt_backstop = True
+        assert manager.check_endpoint(
+            _melt(CampaignPhase.C0, 0, temperature_C=200.0),
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+        ) is True
+        assert manager.last_c0_exit == {
+            "outcome": "incomplete",
+            "backstop": "first_melt",
+            "kinetics": STAGE0_RELEASE_KINETICS,
+        }
+
+    monkeypatch.setattr(campaigns, "C0_EXIT_MODE", "temperature_hold")
+    manager = CampaignManager(_setpoints())
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 10, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "temperature_hold"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
+    assert manager.last_c0_exit["release_curves"] == "uncertified"
+    assert manager.last_c0_exit["ticket"] == "t-1417"
+
+
 def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:
     return HourSnapshot(
         campaign=CampaignPhase.C4,
