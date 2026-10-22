@@ -1589,7 +1589,17 @@ class PyrolysisRun:
             run_metadata["liner_life_diagnostic"] = _safe_failure_value(
                 lambda: _json_safe(build_liner_life_diagnostic()),
                 section="run_metadata.liner_life_diagnostic",
-                upstream=run_metadata.get("hours_completed"),
+                failure_record={
+                    "status": "failed",
+                    "authority": "diagnostic_only",
+                    "level": "info",
+                    "binding": False,
+                    "gating": False,
+                    "material_id": furnace_material_id,
+                    "refusal": {
+                        "reason": "liner_life_diagnostic_attachment_failed",
+                    },
+                },
             )
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
@@ -5442,6 +5452,7 @@ def _safe_failure_value(
     *,
     section: str,
     upstream: Any = None,
+    failure_record: Mapping[str, Any] | None = None,
 ) -> Any:
     if (
         isinstance(upstream, Mapping)
@@ -5451,6 +5462,8 @@ def _safe_failure_value(
     try:
         return builder()
     except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
+        if failure_record is not None:
+            return dict(failure_record)
         failure = _safe_exception_text(exc)
         _, separator, message = failure.partition(": ")
         return {
