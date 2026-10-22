@@ -6,6 +6,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = REPO_ROOT / "data/literature/extracts/zagrtdenov-2020-chromite-magnesiochromite-solubility.yaml"
@@ -58,12 +59,8 @@ TABLE2_GRID = [
 TABLE2_COMPONENTS = ("Al2O3", "SiO2", "MnO", "FeO", "MgO", "TiO2", "Cr2O3", "V2O3")
 
 
-def _context(document, observation_id):
-    return next(row for row in document["species"]["Cr"]["context"] if row["observation_id"] == observation_id)
-
-
 def _table1_grid(document):
-    row = _context(document, "zagrtdenov_2020_table1_starting_material_compositions")
+    row = find_context_row(document, "zagrtdenov_2020_table1_starting_material_compositions")
     return [
         (entry["starting_material"], tuple(entry["cells_as_printed"][column] for column in TABLE1_COLUMNS))
         for entry in row["values"]["rows_as_printed"]
@@ -82,7 +79,7 @@ def _stored_cell(raw):
 
 
 def _table2_grid(document):
-    rows = _context(document, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")["values"]["rows_as_printed"]
     actual = []
     for row in rows:
         components = []
@@ -114,7 +111,7 @@ def _table3_grid(document):
         rows.setdefault(sample, {})[values["formula"]] = cell
     metadata = {
         row["sample"]: (row["system_as_printed"], row["buffer_as_printed"])
-        for row in _context(document, "zagrtdenov_2020_table3_noncomponent_columns")["values"]["rows_as_printed"]
+        for row in find_context_row(document, "zagrtdenov_2020_table3_noncomponent_columns")["values"]["rows_as_printed"]
     }
     return [
         (sample, *metadata[sample], tuple(rows[sample][formula] for formula in FORMULAS))
@@ -163,7 +160,7 @@ def test_render_transcriptions_bind_every_table_and_detect_mutations():
         assert _table2_grid(document) == changed_expected_table2
 
     changed_table2_extract = deepcopy(document)
-    table2_row = _context(changed_table2_extract, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")["values"]["rows_as_printed"][0]
+    table2_row = find_context_row(changed_table2_extract, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")["values"]["rows_as_printed"][0]
     table2_row["composition_wt_percent_as_printed"]["Al2O3"]["mean_wt_percent_as_printed"] = "14.17"
     with pytest.raises(AssertionError):
         assert _table2_grid(changed_table2_extract) == _stored_table2_grid()
@@ -254,19 +251,19 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
 
 def test_context_preserves_starting_crystal_tables_auxiliary_columns_and_model_fit():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    table1 = _context(document, "zagrtdenov_2020_table1_starting_material_compositions")
+    table1 = find_context_row(document, "zagrtdenov_2020_table1_starting_material_compositions")
     assert len(table1["values"]["rows_as_printed"]) == 4
     assert table1["values"]["rows_as_printed"][2]["cells_as_printed"]["Cr_ppm"] == "275"
 
-    table2 = _context(document, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")
+    table2 = find_context_row(document, "zagrtdenov_2020_table2_crystal_compositions_and_log_kd")
     assert len(table2["values"]["rows_as_printed"]) == 17
     assert table2["values"]["rows_as_printed"][0]["log10_chromium_distribution_coefficient_as_printed"] == "1.78"
     assert table2["values"]["rows_as_printed"][-1]["composition_wt_percent_as_printed"]["Cr2O3"]["mean_wt_percent_as_printed"] == "73.35"
 
-    table3_aux = _context(document, "zagrtdenov_2020_table3_noncomponent_columns")
+    table3_aux = find_context_row(document, "zagrtdenov_2020_table3_noncomponent_columns")
     assert len(table3_aux["values"]["rows_as_printed"]) == 12
     assert table3_aux["values"]["rows_as_printed"][9]["Cr_ppm_as_printed"] == "6824(56)"
-    model = _context(document, "zagrtdenov_2020_model_eq19b_fit")
+    model = find_context_row(document, "zagrtdenov_2020_model_eq19b_fit")
     assert model["values"]["coefficient_values_with_uncertainty_as_printed"]["a"] == "-7.01 ± 2.10"
     assert model["values"]["fit_comparison_as_printed"]["R_squared"] == "0.94"
 

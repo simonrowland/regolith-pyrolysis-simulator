@@ -7,6 +7,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = REPO_ROOT / "data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml"
@@ -68,20 +69,11 @@ def _table1_grid(document):
     ]
 
 
-def _context(document, observation_id):
-    return next(
-        row
-        for species in document["species"].values()
-        for row in species["context"]
-        if row["observation_id"] == observation_id
-    )
-
-
 def test_table2_grid_matches_independent_600dpi_transcription():
     """Pin the nine printed cells, composition labels, and cited attribution."""
     document = _load_extract()
     assert _table2_grid(document) == _TABLE2_EXPECTED
-    table2 = _context(document, "khedim_katrina_2010_table2_quoted_log_na2o_activities")
+    table2 = find_context_row(document, "khedim_katrina_2010_table2_quoted_log_na2o_activities")
     assert table2["T_C"] == 1250
     assert table2["values"]["method_class"] == "quoted_attributed"
     assert "printed_form field" in table2["values"]["schema_gap"]
@@ -91,7 +83,7 @@ def test_table2_cell_or_independent_grid_mutation_is_rejected():
     """The render transcription and extract each independently guard a table cell."""
     document = _load_extract()
     mutated_document = deepcopy(document)
-    _context(mutated_document, "khedim_katrina_2010_table2_quoted_log_na2o_activities")["values"]["series"][0]["rows"][0][
+    find_context_row(mutated_document, "khedim_katrina_2010_table2_quoted_log_na2o_activities")["values"]["series"][0]["rows"][0][
         "log10_activity_as_printed"
     ] = "-7.65"
     with pytest.raises(AssertionError):
@@ -107,7 +99,7 @@ def test_tables_1_3_4_and_5_match_independent_600dpi_transcriptions():
     document = _load_extract()
     assert _table1_grid(document) == _TABLE1_EXPECTED
 
-    table3 = _context(document, "khedim_katrina_2010_table3_calculated_optical_basicity")
+    table3 = find_context_row(document, "khedim_katrina_2010_table3_calculated_optical_basicity")
     basicity = table3["values"]["values_as_printed"]
     assert [(row["x"], row["optical_basicity"]) for row in basicity["binary_Na2O_xSiO2"]] == [
         ("1.5", "0.748"), ("2", "0.703"), ("2.5", "0.663"), ("3", "0.648")
@@ -116,7 +108,7 @@ def test_tables_1_3_4_and_5_match_independent_600dpi_transcriptions():
         ("3", "0.718"), ("4", "0.678"), ("7", "0.612")
     ]
 
-    table4 = _context(document, "khedim_katrina_2010_table4_interpolated_log_activities")
+    table4 = find_context_row(document, "khedim_katrina_2010_table4_interpolated_log_activities")
     assert [
         (
             row["ternary_composition"], row["log_a_Na2O"], row["equivalent_binary_Na2O_SiO2"],
@@ -129,7 +121,7 @@ def test_tables_1_3_4_and_5_match_independent_600dpi_transcriptions():
         ("Na2O-CaO-7SiO2", "-10,42", "—", "-10.24", "Na2O-4SiO2"),
     ]
 
-    table5 = _context(document, "khedim_katrina_2010_table5_reaction_thermodynamics")
+    table5 = find_context_row(document, "khedim_katrina_2010_table5_reaction_thermodynamics")
     values = table5["values"]["values_as_printed"]
     assert [
         (row["delta_H_kJ_mol"], row["delta_H_uncertainty"], row["delta_S_J_mol_K"], row["delta_S_uncertainty"])

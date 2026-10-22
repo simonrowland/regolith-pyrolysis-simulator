@@ -5,6 +5,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
+from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = REPO_ROOT / "data/literature/extracts/zagrtdenov-2025-chromite-magnesiochromite-dataset.yaml"
@@ -76,32 +77,28 @@ TABLE5 = [
 ]
 
 
-def _context(document, observation_id):
-    return next(row for row in document["species"]["Cr"]["context"] if row["observation_id"] == observation_id)
-
-
 def _table1_grid(document):
-    rows = _context(document, "zagrtdenov_2025_table1_starting_material_compositions")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2025_table1_starting_material_compositions")["values"]["rows_as_printed"]
     return [(row["starting_material_as_printed"], row["number_of_analyses_as_printed"], tuple(row["cells_as_printed"][name] for name in TABLE1_COLUMNS)) for row in rows]
 
 
 def _table2_grid(document):
-    rows = _context(document, "zagrtdenov_2025_table2_conditions")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2025_table2_conditions")["values"]["rows_as_printed"]
     return [(row["run_as_printed"], row["temperature_C_as_printed"], row["duration_hours_as_printed"], row["system_as_printed"], row["buffer_as_printed"]) for row in rows]
 
 
 def _table3_grid(document):
-    rows = _context(document, "zagrtdenov_2025_table3_crystal_centers")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2025_table3_crystal_centers")["values"]["rows_as_printed"]
     return [(row["run_as_printed"], row["number_of_analyses_as_printed"], tuple(row["cells_as_printed"][name] for name in TABLE3_COLUMNS)) for row in rows]
 
 
 def _table4_grid(document):
-    rows = _context(document, "zagrtdenov_2025_table4_crystal_rims")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2025_table4_crystal_rims")["values"]["rows_as_printed"]
     return [(row["run_as_printed"], row["number_of_analyses_as_printed"], row["phase_as_printed"], tuple(row["composition_wt_percent_as_printed"][name] for name in TABLE4_COLUMNS), row["total_wt_percent_as_printed"], row["D_Cr_cryst_glass_as_displayed"], tuple(row["spinel_formula_AB2O4_recalculation_as_displayed"][name] for name in TABLE4_FORMULA)) for row in rows]
 
 
 def _table5_grid(document):
-    rows = _context(document, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
+    rows = find_context_row(document, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
     return [(row["sample_as_printed"], row["number_of_analyses_as_printed"], tuple(row["composition_wt_percent_as_printed"][name] for name in TABLE5_COLUMNS), row["total_wt_percent_as_printed"], row["Cr_ppm_as_printed"], row["optical_basicity_as_displayed"]) for row in rows]
 
 
@@ -122,7 +119,7 @@ def test_dataset_workbook_tables_are_bound_to_the_printed_rows_and_mutation_chec
         assert _table5_grid(document) == expected
 
     changed = deepcopy(document)
-    table5 = _context(changed, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
+    table5 = find_context_row(changed, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
     table5[1]["composition_wt_percent_as_printed"]["Cr2O3"] = "0.922±0.080"
     with pytest.raises(AssertionError):
         assert _table5_grid(changed) == TABLE5
@@ -136,7 +133,7 @@ def test_dataset_workbook_tables_are_bound_to_the_printed_rows_and_mutation_chec
         assert _table4_grid(document) == expected_table4
 
     changed_table4 = deepcopy(document)
-    table4 = _context(changed_table4, "zagrtdenov_2025_table4_crystal_rims")["values"]["rows_as_printed"]
+    table4 = find_context_row(changed_table4, "zagrtdenov_2025_table4_crystal_rims")["values"]["rows_as_printed"]
     table4[0]["composition_wt_percent_as_printed"]["MgO"] = "13.70±0.33"
     with pytest.raises(AssertionError):
         assert _table4_grid(changed_table4) == TABLE4
@@ -145,18 +142,18 @@ def test_dataset_workbook_tables_are_bound_to_the_printed_rows_and_mutation_chec
 def test_dataset_separates_own_runs_compilations_and_duplicate_2020_measurements():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     context = document["species"]["Cr"]["context"]
-    table5 = _context(document, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
+    table5 = find_context_row(document, "zagrtdenov_2025_table5_glass")["values"]["rows_as_printed"]
     assert len(table5) == 12
     assert table5[1]["related_observation_ids"]["Cr2O3"] == "zagrtdenov_2020_E23_cr2o3"
     assert table5[1]["Cr_ppm_as_printed"] == "6308±54"
     assert table5[10]["Cr_ppm_as_printed"] == "4095±45"
-    inventory = _context(document, "zagrtdenov_2025_input_output_workbooks")["values"]
+    inventory = find_context_row(document, "zagrtdenov_2025_input_output_workbooks")["values"]
     assert inventory["this_study_runs"] == ["E19", "E23", "E24", "E25", "E26", "E27", "E28", "E29", "E30", "E31", "E33"]
     assert inventory["compiled_literature_row_count"] == 214
-    natural = _context(document, "zagrtdenov_2025_compiled_natural_glass_data")["values"]
+    natural = find_context_row(document, "zagrtdenov_2025_compiled_natural_glass_data")["values"]
     assert natural["compiled_csv_data_rows_total"] == 35267
     assert natural["natural_glass_data_rows"] == 91200
-    assert _context(document, "zagrtdenov_2025_table4_crystal_rims")["values"]["derivation_note"].find("controller, t-1382") >= 0
+    assert find_context_row(document, "zagrtdenov_2025_table4_crystal_rims")["values"]["derivation_note"].find("controller, t-1382") >= 0
     figures = [row for row in context if row["type"] == "figure_record"]
     assert len(figures) == 10
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
