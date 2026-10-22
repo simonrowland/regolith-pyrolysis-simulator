@@ -483,6 +483,9 @@ QUANTITY_ALIASES = {
     "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
     "open_furnace_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
     "residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    # Zhang 2021 Table 1. Same observable as residue_composition_vs_time;
+    # the EPMA prefix is the method, not a different quantity.
+    "epma_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
 }
 
 # guard_09_05: legacy rail names including underscored aliases.
@@ -3106,6 +3109,31 @@ def _is_engine_oxide_component(name: str) -> bool:
     return component is not None and component[2]
 
 
+def residue_oxide_names() -> tuple[str, ...]:
+    """Printed residue oxides the composition identity can carry.
+
+    Owner: ``_COMPOSITION_COMPONENTS``. A name whose canonical output key
+    differs is excluded, so FeOT (total iron printed as FeO) cannot enter
+    the residue rail as a second FeO. Elemental sulfur is not an oxide.
+    FeO and Fe2O3 stay distinct components.
+    """
+
+    names: list[str] = []
+    for name, (_mass_formula, canonical, _engine) in _COMPOSITION_COMPONENTS.items():
+        if name != canonical or "O" not in name:
+            continue
+        names.append(name)
+    return tuple(names)
+
+
+def residue_component_source_fields() -> tuple[str, ...]:
+    """Fields admitted as residue_component_composition. One list, this owner."""
+
+    return ("residue_ppm",) + tuple(
+        f"{name}_wt_pct" for name in residue_oxide_names()
+    )
+
+
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
@@ -3447,7 +3475,7 @@ def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         return None
     components = {
         oxide: obj[f"{oxide}_wt_pct"]
-        for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
+        for oxide in residue_oxide_names()
         if f"{oxide}_wt_pct" in obj
     }
     return _oxide_map_from_mapping(components, declared_map=True)
@@ -8133,15 +8161,37 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T",
     ),
     Quantity.ISOTOPE_DELTA: ("isotope_delta_isotope_delta",),
-    Quantity.RESIDUE_COMPONENT_COMPOSITION: (
-        "residue_ppm",
-        "SiO2_wt_pct",
-        "Al2O3_wt_pct",
-        "FeO_wt_pct",
-        "MgO_wt_pct",
-        "CaO_wt_pct",
-    ),
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: residue_component_source_fields(),
 }
+
+
+def residue_point_component_items(
+    raw_item: Mapping[str, Any],
+) -> tuple[tuple[str, Mapping[str, Any]], ...]:
+    """One (field, payload) per residue component printed on a row.
+
+    A suffixed ``{oxide}_wt_pct`` column wins, then ``residue_ppm``.
+    Otherwise a bare component name the allowlist carries is read as that
+    oxide's wt% (Zhang 2021 Table 1 prints ``Na2O`` and ``K2O``). FeOT is
+    not one of those names, so a ``FeOT_wt_pct`` column is not FeO.
+    """
+
+    fields = QUANTITY_SOURCE_FIELDS[Quantity.RESIDUE_COMPONENT_COMPOSITION]
+    oxide_fields = tuple(field for field in fields if field.endswith("_wt_pct"))
+    if any(field in raw_item for field in oxide_fields):
+        return tuple((field, raw_item) for field in oxide_fields)
+    if "residue_ppm" in raw_item:
+        return (("residue_ppm", raw_item),)
+    items: list[tuple[str, Mapping[str, Any]]] = []
+    allowed = {field.removesuffix("_wt_pct") for field in oxide_fields}
+    for name in residue_oxide_names():
+        if name not in allowed or name not in raw_item:
+            continue
+        synthetic = dict(raw_item)
+        synthetic[f"{name}_wt_pct"] = raw_item[name]
+        items.append((f"{name}_wt_pct", synthetic))
+    return tuple(items)
+
 
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
 AXIS_TEMPERATURE_K = "temperature_K"
@@ -14671,26 +14721,34 @@ class Migrator:
                 and q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             ):
                 return
-        if (
-            q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and isinstance(values.get("series"), list)
-            and values["series"]
+        residue_rows: list[Any] | None = None
+        if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION and isinstance(
+            values, Mapping
         ):
+            series_rows = values.get("series")
+            run_rows = values.get("runs")
+            if isinstance(series_rows, list) and series_rows:
+                residue_rows = series_rows
+            elif isinstance(run_rows, list) and run_rows:
+                residue_rows = run_rows
+        if residue_rows:
             residue_fields = QUANTITY_SOURCE_FIELDS[q_token]
-            oxide_fields = tuple(
-                field for field in residue_fields if field.endswith("_wt_pct")
+            points = (
+                exploded
+                if residue_rows is values.get("series")
+                else [
+                    {"index": index, "item": item, "units": obs.get("units")}
+                    for index, item in enumerate(residue_rows)
+                ]
             )
-            for point in exploded:
+            for point in points:
                 raw_item = point.get("item")
                 if not isinstance(raw_item, Mapping):
                     continue
-                component_fields = (
-                    oxide_fields
-                    if any(field in raw_item for field in oxide_fields)
-                    else (("residue_ppm",) if "residue_ppm" in raw_item else ())
-                )
                 point_index = int(point.get("index", 0))
-                for component_index, field in enumerate(component_fields):
+                for component_index, (field, payload) in enumerate(
+                    residue_point_component_items(raw_item)
+                ):
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -14699,11 +14757,11 @@ class Migrator:
                     ):
                         cell_units = "wt % (100% normalized) as published"
                     cell_selection = select_declared_source(
-                        quantity, cell_units, {field: raw_item.get(field)}
+                        quantity, cell_units, {field: payload.get(field)}
                     )
                     if not cell_selection.available:
                         continue
-                    cell_item = dict(raw_item)
+                    cell_item = dict(payload)
                     for other in residue_fields:
                         if other != field:
                             cell_item.pop(other, None)

@@ -5822,6 +5822,113 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
+def test_unmodelled_residue_component_refuses_typed_never_scores_zero() -> None:
+    """K2O is a residue oxide. An engine that does not model it refuses typed.
+
+    Generic cells do not predict residue composition at all. Sossi predicts
+    Mn and Ti ppm only. Hashimoto projects the oxides in that run's inventory
+    and refuses a formula the projection does not carry. None of these paths
+    may report 0.
+    """
+
+    from types import SimpleNamespace
+
+    from simulator.battery.score import (
+        ENGINE_CHANNELS,
+        _hashimoto_residue_prediction,
+        _sossi_residue_prediction,
+        predict_with_engine,
+    )
+
+    identity = replace(
+        F.psat_identity("K2O"),
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        subtype=State.of("oxide_wt_percent"),
+        species=Species("K2O", Phase.L),
+    )
+    zhang = F.observation(
+        "zhang-k2o-residue",
+        "zhang-k2o",
+        identity,
+        Decimal("0.28"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-006-zhang-2021",
+    )
+    for engine in ENGINE_CHANNELS:
+        prediction = predict_with_engine(engine, zhang)
+        assert prediction.value is None
+        assert prediction.value != Decimal("0")
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+
+    sossi = F.observation(
+        "sossi-k2o-residue",
+        "sossi-k2o",
+        identity,
+        Decimal("0.28"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-012-sossi-2019",
+    )
+    empty_context = ScoreContext(works={}, experiments={}, observations={})
+    sossi_prediction = _sossi_residue_prediction(
+        empty_context,
+        sossi,
+        Engine.OPENIMCC,
+        {},
+    )
+    assert sossi_prediction.value is None
+    assert sossi_prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert sossi_prediction.refusal_detail["reason"] == "channel_missing"
+    assert sossi_prediction.refusal_detail["element"] == "K2O"
+
+    experiment_id = "kems-015-hashimoto-1983::experiment::run-1"
+    hashimoto = F.observation(
+        "hashimoto-k2o-residue",
+        experiment_id,
+        identity,
+        Decimal("0.28"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-015-hashimoto-1983",
+    )
+    oxides = {"SiO2": 30.0, "FeO": 10.0, "Al2O3": 5.0, "MgO": 20.0, "CaO": 4.0}
+    band = {name: (value - 1.0, value + 1.0) for name, value in oxides.items()}
+    provenance = {
+        "geometry_refusal_by_geometry": {"sphere_shrinking": None},
+        "integration": {},
+    }
+
+    def _row(arm: str) -> SimpleNamespace:
+        return SimpleNamespace(
+            alpha_arm=arm,
+            primary_geometry_policy_id="sphere_shrinking",
+            primary_oxide_wt_pct=dict(oxides),
+            geometry_oxide_wt_pct={"sphere_shrinking": dict(oxides)},
+            sensitivity_band_wt_pct=dict(band),
+            provenance=dict(provenance),
+        )
+
+    cache = {
+        ("kems-015-hashimoto-1983", Engine.INTERNAL_ANALYTICAL): {
+            experiment_id + "::alpha_common_unity_sensitivity": _row(
+                "alpha_common_unity_sensitivity"
+            ),
+            experiment_id + "::alpha_runtime_catalog": _row("alpha_runtime_catalog"),
+        }
+    }
+    hashimoto_prediction = _hashimoto_residue_prediction(
+        empty_context,
+        hashimoto,
+        Engine.INTERNAL_ANALYTICAL,
+        cache,
+    )
+    assert hashimoto_prediction.value is None
+    assert hashimoto_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert hashimoto_prediction.refusal_detail["reason"] == (
+        "hashimoto_oxide_prediction_missing:K2O"
+    )
+
+
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:
     from simulator.battery.score import (
         metric_operation_for_identity,

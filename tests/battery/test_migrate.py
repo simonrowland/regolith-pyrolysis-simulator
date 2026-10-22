@@ -37,6 +37,7 @@ from simulator.battery.enums import (
     Polymorph,
     PolymorphRejectionKind,
     Quantity,
+    MetricOperation,
     Rail,
     ResidualStatus,
     ReferenceStateConvention,
@@ -78,6 +79,9 @@ from simulator.battery.migrate import (
     split_qualified_quantity,
     QUANTITY_ALIASES,
     QUANTITY_SOURCE_FIELDS,
+    residue_component_source_fields,
+    residue_oxide_names,
+    residue_point_component_items,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -5883,6 +5887,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "ion_intensity_ratio": "ion_intensity_ratio",
     "open_furnace_residue_composition_vs_time": "residue_component_composition",
     "residue_composition_vs_time": "residue_component_composition",
+    "epma_residue_composition_vs_time": "residue_component_composition",
 }
 _CENSUS_CLOSED_QUANTITIES = {
     "p_sat",
@@ -6184,14 +6189,7 @@ def _series_census(
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
                     if q_token == "residue_component_composition":
-                        residue_fields = (
-                            "residue_ppm",
-                            "SiO2_wt_pct",
-                            "Al2O3_wt_pct",
-                            "FeO_wt_pct",
-                            "MgO_wt_pct",
-                            "CaO_wt_pct",
-                        )
+                        residue_fields = residue_component_source_fields()
                         for field in residue_fields:
                             if field not in item:
                                 continue
@@ -13532,6 +13530,12 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
             "wt % (100% normalized) as published",
             "3.57",
         ),
+        (
+            "epma_residue_composition_vs_time",
+            "K2O_wt_pct",
+            "wt_percent",
+            "0.28",
+        ),
     )
     assert QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION] == "subtype_defined"
     for legacy_quantity, field, units, printed_value in cases:
@@ -15404,3 +15408,158 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         assert {
             observation.evidence.attribution for observation in observations
         } == {expected_attribution}
+
+
+def _zhang_residue_points(result):
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-006-zhang-2021"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.value.kind is ValueKind.POINT
+    ]
+
+
+def test_residue_allowlist_carries_every_identity_oxide_except_total_iron() -> None:
+    """FeOT is total iron as FeO. Admitting it would collapse iron into FeO."""
+
+    names = residue_oxide_names()
+    fields = residue_component_source_fields()
+    assert fields[0] == "residue_ppm"
+    assert "FeOT" not in names
+    assert "S" not in names
+    assert "FeO" in names and "Fe2O3" in names
+    for oxide in ("Na2O", "K2O", "TiO2", "Cr2O3", "MnO", "Fe2O3", "P2O5", "Rb2O"):
+        assert oxide in names
+        assert f"{oxide}_wt_pct" in fields
+    both = residue_point_component_items(
+        {"FeO_wt_pct": "11", "Fe2O3_wt_pct": "22", "FeOT_wt_pct": "99"}
+    )
+    assert [field for field, _payload in both if field.endswith("_wt_pct") and "Fe" in field] == [
+        "FeO_wt_pct",
+        "Fe2O3_wt_pct",
+    ]
+    assert residue_point_component_items({"FeOT_wt_pct": "99", "T_C": 1400}) == ()
+    bare = residue_point_component_items({"FeO": "11", "Fe2O3": "22"})
+    assert [field for field, _payload in bare] == ["FeO_wt_pct", "Fe2O3_wt_pct"]
+    assert bare[0][1]["FeO_wt_pct"] == "11"
+    assert bare[1][1]["Fe2O3_wt_pct"] == "22"
+
+
+def test_zhang_2021_table1_alkali_residue_pins(tmp_path: Path) -> None:
+    """Page-checked Zhang 2021 Table 1 (PDF p. 71), row Bas1400C60m.
+
+    The printed row is 1400 C, 60 min, Na2O 0.01 wt%, K2O 0.28 wt%.
+    The extract stores those two oxides as bare keys on values.runs under
+    epma_residue_composition_vs_time, not as Na2O_wt_pct / K2O_wt_pct.
+    Bas1400C90m prints Na2O as b.d.l.; that cell is absent, not zero.
+    initial_glass_Na2O_wt_pct 2.27 is the starting glass, not a residue cell.
+    """
+
+    from simulator.battery.score import metric_operation_for_identity
+
+    result = _migrate_real_extract(tmp_path, "kems-006-zhang-2021.yaml")
+    points = _zhang_residue_points(result)
+    pinned = [
+        observation
+        for observation in points
+        if "Bas1400C60m" in (observation.locator.note or "")
+    ]
+    by_formula = {observation.identity.species.formula: observation for observation in pinned}
+    assert set(by_formula) == {"Na2O", "K2O"}
+    sodium = by_formula["Na2O"]
+    potassium = by_formula["K2O"]
+    assert sodium.value.point == Decimal("0.01")
+    assert potassium.value.point == Decimal("0.28")
+    for observation in (sodium, potassium):
+        assert observation.locator.page == 71
+        assert observation.locator.table == "1"
+        assert observation.identity.temperature_K.value == Decimal("1673.15")
+        assert observation.identity.subtype.is_value
+        assert observation.identity.subtype.value == "oxide_wt_percent"
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.L
+        assert observation.point_conditions["time_min"].state.value == Decimal("60")
+        assert (
+            metric_operation_for_identity(observation.identity)
+            is MetricOperation.ABSOLUTE
+        )
+    assert sodium.identity.species.formula != potassium.identity.species.formula
+    below_detection = [
+        observation
+        for observation in points
+        if "Bas1400C90m" in (observation.locator.note or "")
+        and observation.identity.species.formula == "Na2O"
+    ]
+    assert below_detection == []
+    assert all(observation.value.point != Decimal("0") for observation in points)
+    assert all(observation.value.point != Decimal("2.27") for observation in points if observation.identity.species.formula == "Na2O")
+
+
+def test_removing_k2o_from_the_residue_allowlist_drops_the_zhang_pin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mutation: the Bas1400C60m K2O pin is red without K2O on the allowlist.
+
+    residue_component_source_fields() is the only admission list. Dropping
+    K2O_wt_pct there (this patch) stops the 0.28 wt% cell. Na2O 0.01 stays.
+    """
+
+    fields = tuple(
+        field
+        for field in residue_component_source_fields()
+        if field != "K2O_wt_pct"
+    )
+    assert "K2O_wt_pct" not in fields
+    monkeypatch.setitem(
+        QUANTITY_SOURCE_FIELDS,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        fields,
+    )
+    result = _migrate_real_extract(tmp_path, "kems-006-zhang-2021.yaml")
+    points = _zhang_residue_points(result)
+    pinned = [
+        observation
+        for observation in points
+        if "Bas1400C60m" in (observation.locator.note or "")
+    ]
+    assert [observation.identity.species.formula for observation in pinned] == ["Na2O"]
+    assert pinned[0].value.point == Decimal("0.01")
+    assert all(observation.identity.species.formula != "K2O" for observation in points)
+
+
+def test_residue_migration_keeps_feo_and_fe2o3_distinct(tmp_path: Path) -> None:
+    """A row that prints both oxides emits both. FeOT_wt_pct does not become FeO."""
+
+    doc = yaml.safe_load(
+        (
+            REPO_ROOT / "data/literature/extracts/kems-006-zhang-2021.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    run = next(
+        item
+        for body in doc["species"].values()
+        for observation in body["observations"]
+        for item in observation["values"].get("runs") or []
+        if isinstance(item, dict) and item.get("sample") == "Bas1400C60m"
+    )
+    run["FeO_wt_pct"] = "11"
+    run["Fe2O3_wt_pct"] = "22"
+    run["FeOT_wt_pct"] = "99"
+    result = _migrate_real_extract(
+        tmp_path,
+        "kems-006-zhang-2021.yaml",
+        extract_doc=doc,
+    )
+    pinned = [
+        observation
+        for observation in _zhang_residue_points(result)
+        if "Bas1400C60m" in (observation.locator.note or "")
+    ]
+    by_formula = {
+        observation.identity.species.formula: observation.value.point
+        for observation in pinned
+    }
+    assert by_formula == {"FeO": Decimal("11"), "Fe2O3": Decimal("22")}
+    assert Decimal("99") not in by_formula.values()
