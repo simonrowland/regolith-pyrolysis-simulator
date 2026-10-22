@@ -62,3 +62,38 @@ def test_open_inert_pipe_keeps_source_only_pressure(carrier):
     )
     assert transport["vapor_pressure_mbar"].hex() == expected.hex()
     assert model.species_partial_pressures(flux, expected)["Fe"].hex() == expected.hex()
+
+
+@pytest.mark.parametrize("carrier", ["Kr", "N2"])
+def test_declared_carrier_legacy_full_total_pin(carrier):
+    model, melt, flux, capacity = _boundary(carrier)
+    gas = model.update(flux, melt, CondensationTrain.create_default(),
+                       effective_transport_capacity=capacity)
+    # Current defect: all 10.2 mbar is charged to Fe, in addition to the
+    # independently retained 0.2 mbar O2 and 10 mbar carrier floors.
+    assert {key: value.hex() for key, value in gas.composition.items()} == {
+        "Fe": "0x1.4666666666666p+3", "O2": "0x1.999999999999ap-3",
+        carrier: "0x1.4000000000000p+3",
+    }
+    assert gas.pressure_mbar.hex() == "0x1.4666666666666p+4"
+
+
+def test_lab_schedule_argon_legacy_pin():
+    from simulator.campaigns import CampaignManager
+    from simulator.state import CampaignPhase
+    from test_lab_geometry_runtime import dynamic_lab_schedule
+
+    manager = CampaignManager({})
+    manager.overrides["C2A"] = {"lab_schedule": dynamic_lab_schedule()}
+    melt = MeltState(temperature_C=1700.0, campaign=CampaignPhase.C2A)
+    manager.apply_lab_schedule_controls(melt, melt.campaign, sample_time_h=1.0)
+    manager.apply_sweep_flow_control(melt)
+    assert melt.sweep_mol_per_s is None
+    assert melt.p_total_mbar.hex() == "0x1.a000000000000p+3"
+    assert melt.background_gas_species == "Ar"
+    assert melt.background_gas_mole_fraction == 1.0
+    model = OverheadGasModel({"enabled": False})
+    flux = EvaporationFlux(total_kg_hr=0.02, species_kg_hr={"SiO": 0.02})
+    transport = model.estimate_transport_state(flux, melt)
+    assert transport["vapor_pressure_mbar"].hex() == "0x1.a000000000000p+3"
+    assert model.species_partial_pressures(flux, transport["vapor_pressure_mbar"])["SiO"].hex() == "0x1.a000000000000p+3"
