@@ -279,7 +279,7 @@ it does not introduce a new schema version.
   "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
-    "active": {                               // flat intent -> authoritative provider_id
+    "active": {                               // flat intent -> observed provider_id, "unknown", or "multiple"
       "vapor_pressure": "builtin-vapor-pressure",
       "stage0_pretreatment": "builtin-stage0-pretreatment",
       ...
@@ -350,12 +350,19 @@ it does not introduce a new schema version.
 * `engines_used.registry` is sourced from
   `ChemistryKernel.registry.capability_summary()` -- the same surface
   used to audit the current builtin-authoritative / VapoRock-shadow
-  `VAPOR_PRESSURE` split. It is **filtered, not the full registry**: the
-  runner drops `backend_equilibrium` unconditionally, `ca_aluminothermic_step`
-  when the run produced no C7 product report, and `oxygen_bubbler` when the run
-  did not request the O2 bubbler. `engines_used.active` is derived from the
-  same filtered map, so an intent absent from either is not evidence that no
-  provider is registered for it.
+  `VAPOR_PRESSURE` split. It is configuration, **filtered, not the full
+  registry**: the runner drops `backend_equilibrium` unconditionally,
+  `ca_aluminothermic_step` when the run produced no C7 product report, and
+  `oxygen_bubbler` when the run did not request the O2 bubbler.
+  `engines_used.requested` is also configuration. `engines_used.active` uses
+  the same filtered intent set but reports a provider ID only when that
+  provider returned a usable result that passed kernel validation during this
+  run. `unavailable`, `unsupported`, `not_attempted`, and `non_authoritative`
+  results do not count as active. `unknown` means no usable result was observed
+  (including intents whose engagement is not tracked); `multiple` means more
+  than one provider returned a usable result for the intent. Diagnostic
+  shadows are listed under `registry.shadows` and are not reported as active
+  providers.
 * `diagnostic_gate_authority_notice` is emitted when the authoritative
   `GATE_LIQUID_FRACTION` provider is dispatch-authoritative but lacks
   ledger-transition authority. It is diagnostic provenance only: it does not

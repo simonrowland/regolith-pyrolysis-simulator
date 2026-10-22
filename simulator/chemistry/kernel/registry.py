@@ -42,6 +42,7 @@ class ProviderRegistry:
         self._authoritative: dict[ChemistryIntent, ChemistryProvider] = {}
         self._fallback: dict[ChemistryIntent, ChemistryProvider] = {}
         self._shadows: dict[ChemistryIntent, list[ChemistryProvider]] = {}
+        self._engaged_provider_ids: dict[ChemistryIntent, set[str]] = {}
 
     def register(
         self,
@@ -324,6 +325,33 @@ class ProviderRegistry:
             | frozenset(self._fallback)
             | frozenset(self._shadows)
         )
+
+    def _record_engagement(
+        self, intent: ChemistryIntent, provider_id: str
+    ) -> None:
+        """Record a provider that returned a usable result in this run."""
+
+        self._engaged_provider_ids.setdefault(intent, set()).add(provider_id)
+
+    def _engagement_summary(self) -> dict[str, str]:
+        """Return provider IDs, ``unknown``, or ``multiple`` per intent.
+
+        A registry survives replacement of the ``ChemistryKernel`` facade
+        between batches, so this runtime history remains available to the
+        run artifact. An intent with no recorded usable result is ``unknown``
+        because registration alone is not evidence of engagement.
+        """
+
+        summary: dict[str, str] = {}
+        for intent in sorted(self.registered_intents(), key=lambda i: i.value):
+            provider_ids = self._engaged_provider_ids.get(intent, set())
+            if not provider_ids:
+                summary[intent.value] = "unknown"
+            elif len(provider_ids) == 1:
+                summary[intent.value] = next(iter(provider_ids))
+            else:
+                summary[intent.value] = "multiple"
+        return summary
 
     def capability_summary(self) -> dict[str, dict[str, object]]:
         """Snapshot of registered providers, keyed by intent.value.

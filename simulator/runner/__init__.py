@@ -1735,12 +1735,14 @@ class PyrolysisRun:
         related projections so downstream tooling can pick the level
         it cares about:
 
-        * ``active`` -- the flat ``{intent: provider_id}`` view the
-          spec literally names, sourced from the authoritative slot of
-          each intent registered with the kernel.
+        * ``active`` -- the flat ``{intent: provider_id}`` view for
+          providers whose usable result passed kernel validation
+          during this run. ``unknown`` means registration exists but no
+          usable provider result was observed; ``multiple`` means more
+          than one provider returned a usable result for the intent.
         * ``requested`` -- the operator's ``--engine`` / engines yaml
           overrides (forward-compat for Goal #19).
-        * ``registry`` -- the full kernel ``capability_summary``
+        * ``registry`` -- the filtered kernel ``capability_summary``
           (``{intent: {authoritative, fallback, shadows}}``) so a
           shadow-vs-authoritative audit doesn't need to re-walk the
           kernel.
@@ -1754,8 +1756,10 @@ class PyrolysisRun:
             registry = kernel.registry
         except AttributeError:
             capability = {}
+            engagement = {}
         else:
             capability = registry.capability_summary()
+            engagement = registry._engagement_summary()
         internal_intents = {"backend_equilibrium"}
         if not getattr(sim, "_c7_product_report", None):
             internal_intents.add("ca_aluminothermic_step")
@@ -1766,11 +1770,7 @@ class PyrolysisRun:
             for intent, slots in capability.items()
             if intent not in internal_intents
         }
-        active = {
-            intent: slots["authoritative"]
-            for intent, slots in capability.items()
-            if isinstance(slots, Mapping) and slots.get("authoritative")
-        }
+        active = {intent: engagement[intent] for intent in capability}
         return {
             "active": active,
             "requested": echoed,

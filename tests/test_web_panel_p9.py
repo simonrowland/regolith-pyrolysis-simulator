@@ -150,7 +150,10 @@ def _complete_metadata(**overrides) -> dict:
         "started_at_utc": "2026-07-20T12:34:56Z",
         "kernel_commit_sha": "0123456789abcdef0123456789abcdef",
         "engines_used": {
-            "active": {"vapor_pressure": "builtin-vapor-pressure"},
+            "active": {
+                "vapor_pressure": "builtin-vapor-pressure",
+                "gate_liquid_fraction": "unknown",
+            },
             "requested": {"gate_liquid_fraction": "magemin"},
             "registry": {
                 "gate_liquid_fraction": {
@@ -185,7 +188,7 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     run_input = _article(html, "Run input provenance")
     backend = _article(html, "Backend evidence &amp; degradation")
     identity = _article(html, "Artifact engine identity")
-    engine_chain = _article(html, "Configured engines (engines_used)")
+    engine_chain = _article(html, "Engine activity and configuration (engines_used)")
 
     assert 'id="sec-p9-provenance"' in html
     assert _badge_value(html, "Feedstock") == "Lunar Mare Low Ti"
@@ -216,12 +219,11 @@ def test_p9_real_run_renders_complete_provenance() -> None:
     assert f'title="{sha}"' in _detail_value(identity, "Kernel commit SHA")
     assert _detail_value(identity, "Cache version") == "magemin-7.2"
     assert _detail_value(identity, "Backend wire token") == "magemin"
-    # Emitter: active = authoritative-slot projection; requested = config echo; not execution.
-    assert "Authoritative slots (registry projection)" in engine_chain
+    assert "Observed provider results" in engine_chain
     assert "Requested providers (config echo)" in engine_chain
-    assert "not an invocation or execution trace" in engine_chain
+    assert "returned a usable result" in engine_chain
     assert "Engine chain" not in engine_chain
-    assert "Active providers" not in engine_chain
+    assert "unknown" in _detail_value(engine_chain, "Observed provider results")
     assert "builtin-vapor-pressure" in _detail_value(engine_chain, "Vapor Pressure")
     requested = _detail_value(engine_chain, "Requested providers (config echo)")
     assert _detail_value(requested, "Gate Liquid Fraction") == '<span class="sec-p9-mono-value">magemin</span>'
@@ -316,7 +318,7 @@ def test_p9_absent_provenance_stays_pending_without_defaults() -> None:
     assert "Real engine active not emitted" in _badge_value(html, "Real engine active")
     assert "Real engine active not emitted" in _detail_value(backend, "Real engine active")
     assert "Started at (UTC) not emitted" in html
-    assert "Configured engines (engines_used) not emitted" in html
+    assert "Engine activity and configuration (engines_used) not emitted" in html
     assert "Label source not emitted" in html
     additives = _detail_value(run_input, "Additives")
     assert "Additives not emitted" in additives
@@ -395,7 +397,7 @@ def test_p9_nullable_authority_flags_do_not_claim_provider_absence() -> None:
     identity = _article(html, "Artifact engine identity")
     backend = _article(html, "Backend evidence &amp; degradation")
     contributors = _detail_value(backend, "Contributors")
-    engine_chain = _article(html, "Configured engines (engines_used)")
+    engine_chain = _article(html, "Engine activity and configuration (engines_used)")
 
     identity_authority = _detail_value(identity, "Authoritative")
     identity_fallback = _detail_value(identity, "Fallback provider")
@@ -455,7 +457,9 @@ def test_p9_partial_fields_are_not_inferred_from_related_values() -> None:
     assert "source-from-list" in _detail_value(backend, "Label sources")
     assert "Degradation reason not emitted" in _detail_value(backend, "Degradation reason")
     assert "legacy-origin" in _detail_value(backend, "Degraded from")
-    assert "Configured engines (engines_used) not emitted" in _article(html, "Configured engines (engines_used)")
+    assert "Engine activity and configuration (engines_used) not emitted" in _article(
+        html, "Engine activity and configuration (engines_used)"
+    )
     assert "Kernel commit SHA not emitted" in _detail_value(run_input, "Kernel commit SHA")
     assert "header-identity-sha" in _detail_value(identity, "Kernel commit SHA")
     charge_mass = _detail_value(run_input, "Charge mass")
@@ -494,7 +498,10 @@ def test_p9_malformed_parent_records_are_not_reported_as_absent() -> None:
     assert "terminal.run_metadata is malformed; expected an object" in html
     assert "header.engine_identity is malformed; expected an object" in html
     assert "Real engine active unavailable because a parent record is malformed" in html
-    assert "Configured engines (engines_used) unavailable because a parent record is malformed" in html
+    assert (
+        "Engine activity and configuration (engines_used) unavailable because a parent record is malformed"
+        in html
+    )
     assert "Feedstock ID unavailable because its parent record is malformed" in _detail_value(run_input, "Feedstock ID")
     assert "Backend status unavailable because its parent record is malformed" in _detail_value(backend, "Backend status")
     assert "Charge mass unavailable because its parent record is malformed" in _detail_value(run_input, "Charge mass")
@@ -538,7 +545,9 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "Label source emitted as null" in _detail_value(backend, "Label source")
     assert "Label sources: emitted list is empty" in _detail_value(backend, "Label sources")
     assert "Degraded from emitted as null" in _detail_value(backend, "Degraded from")
-    assert "Configured engines (engines_used) emitted as null" in _article(html, "Configured engines (engines_used)")
+    assert "Engine activity and configuration (engines_used) emitted as null" in _article(
+        html, "Engine activity and configuration (engines_used)"
+    )
 
     null_additives_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -555,7 +564,9 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "No additive entries in emitted map" in _detail_value(
         _article(empty_maps_html, "Run input provenance"), "Additives"
     )
-    assert "Emitted map is empty" in _article(empty_maps_html, "Configured engines (engines_used)")
+    assert "Emitted map is empty" in _article(
+        empty_maps_html, "Engine activity and configuration (engines_used)"
+    )
 
     malformed_shapes_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -572,7 +583,9 @@ def test_p9_present_empty_malformed_null_and_zero_states_stay_distinct() -> None
     assert "Additives map is malformed" in _detail_value(malformed_run_input, "Additives")
     assert "Real engine active is malformed" in _detail_value(malformed_backend, "Real engine active")
     assert "Real engine active is malformed" in _badge_value(malformed_shapes_html, "Real engine active")
-    assert "Configured engines (engines_used) is malformed" in _article(malformed_shapes_html, "Configured engines (engines_used)")
+    assert "Engine activity and configuration (engines_used) is malformed" in _article(
+        malformed_shapes_html, "Engine activity and configuration (engines_used)"
+    )
 
     malformed_mass_html = _render_panel({
         "header": {"engine_identity": {"name": "state-check"}},
@@ -649,7 +662,7 @@ def test_p9_dynamic_keys_and_identifier_attributes_are_escaped_exactly_once() ->
     additives = _detail_value(run_input, "Additives")
     identity = _article(html, "Artifact engine identity")
     identifier = _detail_value(identity, "Kernel commit SHA")
-    engine_chain = _article(html, "Configured engines (engines_used)")
+    engine_chain = _article(html, "Engine activity and configuration (engines_used)")
     requested = _detail_value(engine_chain, "Requested providers (config echo)")
 
     assert "&lt;img src=x onerror=bad()&gt;" in additives

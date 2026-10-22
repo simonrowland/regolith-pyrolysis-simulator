@@ -9,9 +9,9 @@
   const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const MALFORMED_RECORD = Symbol("malformed provenance record");
-  // Registry projection + operator request echo (runner._engines_used), not an
-  // invocation/execution chain. Labels must not claim engines "ran" or "were used".
-  const ENGINES_USED_TITLE = "Configured engines (engines_used)";
+  // Active reports accepted chemistry-kernel results; registry and request
+  // fields remain configuration projections.
+  const ENGINES_USED_TITLE = "Engine activity and configuration (engines_used)";
   const PROVENANCE_LABELS = Object.freeze({
     started_at_utc: "Started at (UTC)",
     backend_real_active: "Real engine active",
@@ -40,9 +40,9 @@
     "backend_real_active"
   ]));
   const FIELD_LABELS = Object.freeze({
-    active: "Authoritative slots (registry projection)",
+    active: "Observed provider results",
     requested: "Requested providers (config echo)",
-    registry: "Provider registry",
+    registry: "Configured provider registry",
     authoritative: "Authoritative provider",
     fallback: "Fallback provider",
     shadows: "Shadow providers",
@@ -410,7 +410,7 @@
 
     return `<section id="sec-p9-provenance" class="sec-p9-provenance" aria-labelledby="sec-p9-provenance-title">` +
       `<h2 id="sec-p9-provenance-title"><span class="sect">P9</span>Run &amp; engine provenance</h2>` +
-      `<p class="sub">Emitted run identity, backend state, evidence class, and configured engines. No confidence tier is computed in the viewer. Run-level grade rendering is deferred to the report provenance section.</p>` +
+      `<p class="sub">Emitted run identity, backend state, evidence class, observed provider results, and engine configuration. No confidence tier is computed in the viewer. Run-level grade rendering is deferred to the report provenance section.</p>` +
       `${artifactNotice}${metadataNotice}${identityNotice}<div class="sec-p9-badges">${badges}</div>` +
       degradationStateContext +
       `<details class="sec-p9-details"><summary>Full run, engine, and label provenance</summary>` +
@@ -419,7 +419,7 @@
       `<article><h3>Backend evidence &amp; degradation</h3><dl class="sec-p9-facts">${backendFacts}${optionalTrustFields}</dl></article>` +
       `<article><h3>Artifact engine identity</h3>${identityDetail(identity)}</article>` +
       `<article class="sec-p9-engine-chain"><h3>${ENGINES_USED_TITLE}</h3>` +
-      `<p class="sec-p9-note">Provider registry projection and operator request echo as emitted — not an invocation or execution trace. Does not establish real-backend activity.</p>` +
+      `<p class="sec-p9-note">Selected provider IDs returned a usable result through the chemistry kernel during this run. Unknown means no usable result was observed; multiple means more than one provider returned a usable result for the intent. Registry and requested maps describe configuration. This does not establish real-backend activity.</p>` +
       `${enginesUsedValue(metadata)}</article></div></details></section>`;
   }
 

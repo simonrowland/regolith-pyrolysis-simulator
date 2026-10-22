@@ -823,6 +823,16 @@ class ChemistryKernel:
                 diagnostic=tagged_diagnostic,
                 warnings=result.warnings,
             )
+        # Not-attempted, unsupported, non-authoritative, and unavailable
+        # responses did not supply the selected provider result for the
+        # run artifact's active-engine field.
+        if str(result.status) not in {
+            "unavailable",
+            "unsupported",
+            "not_attempted",
+            "non_authoritative",
+        }:
+            self._registry._record_engagement(intent, profile.provider_id)
         return result
 
     def commit_batch(

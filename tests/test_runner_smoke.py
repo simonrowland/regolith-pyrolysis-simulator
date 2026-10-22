@@ -39,6 +39,7 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
+    ChemistryKernel,
     ChemistryProvider,
     IntentRequest,
     IntentResult,
@@ -89,6 +90,29 @@ from simulator.three_product_report_markdown import (
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "runner"
 
 
+class _MageminFallbackProvider(ChemistryProvider):
+    def __init__(self) -> None:
+        self.dispatch_count = 0
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id="magemin-shadow",
+            intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
+            is_authoritative_for=frozenset(
+                {ChemistryIntent.GATE_LIQUID_FRACTION}
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        self.dispatch_count += 1
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=None,
+            control_audit=None,
+        )
+
+
 # Mass-balance tolerance for every snapshot in the golden fixtures.
 # Mirrors the existing simulator-wide tolerance enforced by
 # ``tests/test_mass_balance.py``; surfacing the same number here means a
@@ -121,22 +145,10 @@ def test_json_safe_nonfinite_numbers_export_null():
 
 
 def test_engines_used_marks_uninvoked_fallback_as_unknown():
-    class UnusedMageminFallback(ChemistryProvider):
-        def capability_profile(self) -> CapabilityProfile:
-            return CapabilityProfile(
-                provider_id="magemin-shadow",
-                intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
-                is_authoritative_for=frozenset(
-                    {ChemistryIntent.GATE_LIQUID_FRACTION}
-                ),
-            )
-
-        def dispatch(self, request: IntentRequest) -> IntentResult:
-            raise AssertionError("uninvoked fallback must not dispatch")
-
+    provider = _MageminFallbackProvider()
     registry = ProviderRegistry()
     registry.register(
-        UnusedMageminFallback(),
+        provider,
         [ChemistryIntent.GATE_LIQUID_FRACTION],
         fallback=True,
     )
@@ -156,6 +168,45 @@ def test_engines_used_marks_uninvoked_fallback_as_unknown():
         "magemin-shadow"
     )
     assert engines_used["active"]["gate_liquid_fraction"] == "unknown"
+    assert provider.dispatch_count == 0
+
+
+def test_engines_used_reports_kernel_dispatched_fallback():
+    provider = _MageminFallbackProvider()
+    registry = ProviderRegistry()
+    registry.register(
+        provider,
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+        fallback=True,
+    )
+    kernel = ChemistryKernel(
+        ledger=AtomLedger(),
+        registry=registry,
+        species_formula_registry={},
+        allow_fallback_intents=frozenset(
+            {ChemistryIntent.GATE_LIQUID_FRACTION}
+        ),
+    )
+
+    kernel.dispatch(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+    )
+    engines_used = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+    )._engines_used(
+        SimpleNamespace(
+            _chem_kernel=kernel,
+            _c7_product_report=None,
+            campaign_mgr=None,
+        )
+    )
+
+    assert engines_used["active"]["gate_liquid_fraction"] == "magemin-shadow"
+    assert provider.dispatch_count == 1
 
 
 def test_completed_run_wires_product_classification_and_markdown() -> None:
@@ -1219,8 +1270,7 @@ def _assert_schema_shape(payload: dict) -> None:
     assert "active" in engines_used
     assert "requested" in engines_used
     assert "registry" in engines_used
-    # engines_used.active is the flat {intent: provider_id} view spec'd
-    # by Goal #18 CHECKLIST item 3.
+    # engines_used.active is the flat intent -> provider ID / unknown / multiple view.
     assert isinstance(engines_used["active"], dict)
     for intent, provider in engines_used["active"].items():
         assert isinstance(intent, str)
