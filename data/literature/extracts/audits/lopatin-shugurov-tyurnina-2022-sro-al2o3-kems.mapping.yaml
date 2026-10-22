@@ -1,0 +1,131 @@
+source_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+source_file: raw/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems.docx
+extract: data/literature/extracts/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems.yaml
+tool: No table-tool CLI or MinerU draft utility is present on the assigned base. The DOCX native table grid was
+  parsed from OOXML; the mapping below records the explicit cell and header-scale assignments used in the extract.
+tables:
+- table: S2
+  xml_table: 2
+  printed_phase: SrO(s)
+  row_count_including_headers: 56
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+    - formula: SrO
+      index: 2
+      header: SrO10^-2
+      scale_factor:
+        header: SrO10^-2
+        exponent: -2
+        direction: multiply
+    - formula: O
+      index: 3
+      header: O
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
+- table: S3
+  xml_table: 3
+  printed_phase: Sr4Al2O7(s)
+  row_count_including_headers: 13
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+    - formula: O
+      index: 2
+      header: O
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
+- table: S4
+  xml_table: 4
+  printed_phase: Sr3Al2O6(s)
+  row_count_including_headers: 14
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+    - formula: O
+      index: 2
+      header: O
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
+- table: S5
+  xml_table: 5
+  printed_phase: SrAl2O4(s)
+  row_count_including_headers: 12
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+    - formula: O
+      index: 2
+      header: O
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
+- table: S6
+  xml_table: 6
+  printed_phase: SrAl4O7(s)
+  row_count_including_headers: 18
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+      scale_factor:
+        header: p_i 10^-2, Pa
+        exponent: -2
+        direction: multiply
+    - formula: O
+      index: 2
+      header: O
+      scale_factor:
+        header: p_i 10^-2, Pa
+        exponent: -2
+        direction: multiply
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
+- table: S7
+  xml_table: 7
+  printed_phase: SrAl12O19(s)
+  row_count_including_headers: 10
+  columns:
+    T_K:
+      index: 0
+      header: Temperature, K
+    species:
+    - formula: Sr
+      index: 1
+      header: Sr
+      scale_factor:
+        header: p_i 10^-2, Pa
+        exponent: -2
+        direction: multiply
+    - formula: O
+      index: 2
+      header: O
+      scale_factor:
+        header: p_i 10^-2, Pa
+        exponent: -2
+        direction: multiply
+  cell_rules: Blank and '-' cells are omitted as unreported values, never converted to zero. The S5 O cells 510^-3
+    and 910^-3 are 5×10^-3 and 9×10^-3 Pa, respectively.
