@@ -152,7 +152,11 @@ def test_render_transcription_matches_independent_table_grids(document):
                     oxygen = observation["values"]["oxygen_partial_pressure"]
                     assert printed_decimal(oxygen["value"]) == printed_decimal(p_o2)
                     assert oxygen["units"] == "atm"
-                    assert "inferred" in oxygen["derivation"].casefold()
+                    assert oxygen["inferred"] is True
+                    assert (
+                        "A-0 abstract 4.70e-11 Pa / Table 4 4.64e-16 = "
+                        "1.013e5 Pa per unit = 1 atm"
+                    ) in oxygen["derivation"]
 
     for sample, components in TABLE6.items():
         for formula, printed in components.items():
@@ -198,12 +202,11 @@ def test_every_typed_row_migrates_as_its_printed_point_with_identity_and_conditi
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.value == Decimal(str(raw["values"]["T_K"]))
         assert temperature.locator.page == raw["locator"]["page"]
-        oxygen = observation.point_conditions["fO2_Pa"]
         if raw["locator"].get("table") == "4" and raw["values"]["sample_id_as_printed"] != "A-0":
-            assert oxygen.inference is not None
-            assert oxygen.locator.table == "4"
-            assert observation.identity.fO2_Pa.value == oxygen.state.value.point
+            assert observation.identity.fO2_Pa.is_unknown
+            assert "fO2_Pa" not in observation.point_conditions
         else:
+            oxygen = observation.point_conditions["fO2_Pa"]
             assert oxygen.state.value.point == Decimal("4.70e-11")
             assert oxygen.locator.page == 2
         if raw["values"]["quantity"] == "equilibrium_phase_composition":
