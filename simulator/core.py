@@ -522,7 +522,6 @@ from simulator.chemistry.kernel import (
     normalize_oxygen_sink_channel_mode,
 )
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
 # engines.builtin.vapor_pressure -> simulator.chemistry.kernel ->
@@ -1608,6 +1607,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
+        self._headspace_co2_dissociation_diagnostic = {}
         self._last_vapour_batch = None
         self._last_vapour_batch_report = None
         self._last_vapour_batch_flux_overlay = {}
@@ -3691,21 +3691,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             ),
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): the
-            # induction-stirring knob lives on the melt state, set by
-            # campaign overrides (``simulator/campaigns.py:152``) and
-            # defaults to ``6.0`` for the standard 4-8× range. Pass it
-            # through so the boundary-layer flux uses the enhanced
-            # Sherwood rather than the laminar 3.66 asymptote. Route
-            # via ``clamp_stir_factor`` for symmetry with the operator-
-            # boundary writers in campaigns.py / session.py and so a
-            # ``None`` field (corrupt-state recovery, partially-built
-            # melt) maps to the fail-closed default rather than raising
-            # ``TypeError`` on ``float(None)``. Codex /code-review
-            # max-effort, Phase B.
+            # stirring state lives on the melt and defaults to axial 6,
+            # radial 1. Both axes are passed explicitly below. Radial
+            # sets the gas-side Sherwood proxy; stock radial 1 keeps
+            # Sh = 3.66, and values above 1 increase Sh. Axial does not
+            # enter Sherwood on this route; it remains the legacy
+            # diagnostic and metal-stratification input. These operator
+            # values are clamped, and a ``None`` field maps to the
+            # fail-closed default rather than raising ``TypeError``.
             #
             # 0.5.3 Phase B (2-axis stirring): split the single scalar
-            # ``stir_factor`` into ``stir_state.axial`` (evap H-K-L
-            # multiplier) + ``stir_state.radial`` (Sh enhancement).
+            # ``stir_factor`` into ``stir_state.axial`` (evaporation
+            # diagnostic and metal-stratification input) +
+            # ``stir_state.radial`` (gas-side Sh enhancement).
             # The legacy ``stir_factor=`` kwarg on condensation carries
             # the axial value for audit-history continuity (the legacy
             # field is preserved on ``CondensationModel`` so a
@@ -4144,13 +4142,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _headspace_floor_o2_mol(self) -> float:
-        return self._headspace_o2_mol_for_pO2_bar(self._vacuum_floor_bar())
+        return self._headspace_o2_mol_for_pO2_bar(self._oxygen_numerical_floor_bar())
 
     def _effective_headspace_floor_o2_mol(self) -> float:
         return self._headspace_o2_mol_for_pO2_bar(
             max(
                 self._headspace_control_floor_pO2_bar(),
-                self._vacuum_floor_bar(),
+                self._oxygen_numerical_floor_bar(),
             )
         )
 
@@ -4222,9 +4220,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             residual_o2_mol
         )
         return max(
-            incoming_sweep_pO2,
-            residual_pO2,
-            self._vacuum_floor_bar(),
+            self._headspace_equilibrated_pO2_bar(max(incoming_sweep_pO2, residual_pO2)),
+            self._oxygen_numerical_floor_bar(),
         )
 
     def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
@@ -4246,9 +4243,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             return self._inert_sweep_transport_pO2_bar(head_o2_mol)
         return max(
-            float(ledger_pO2_bar),
-            self._headspace_control_floor_pO2_bar(),
-            self._vacuum_floor_bar(),
+            self._headspace_equilibrated_pO2_bar(max(
+                float(ledger_pO2_bar), self._headspace_control_floor_pO2_bar(),
+            )),
+            self._oxygen_numerical_floor_bar(),
         )
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
@@ -6675,7 +6673,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # step; solve dn against that target so the ledger move and potential
         # increment remain paired, rather than clipping fO2 after booking dn.
         effective_transport_pO2 = min(
-            max(transport_pO2, self._vacuum_floor_bar()),
+            max(transport_pO2, self._oxygen_numerical_floor_bar()),
             10.0 ** self._melt_redox_fO2_upper_bound_log(),
         )
         if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
@@ -7294,7 +7292,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return intrinsic_melt_fO2(
             comp,
             T_K,
-            vacuum_floor_bar=self._vacuum_floor_bar(),
+            vacuum_floor_bar=self._oxygen_numerical_floor_bar(),
         )
 
     def _compute_fe_redox_split_diagnostic(
@@ -7329,7 +7327,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         log_iw = (
             -27215.0 / T_K + 6.57
             if T_K > 0.0
-            else math.log10(self._vacuum_floor_bar())
+            else math.log10(self._oxygen_numerical_floor_bar())
         )
         base = {
             'fO2_log': float(fO2_log),
@@ -9608,7 +9606,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
                 kernel_result = self._dispatch_only(
                     ChemistryIntent.SILICATE_EQUILIBRIUM,
-                    control_inputs={},
+                    control_inputs={
+                        'pO2_bar': self._vapor_pressure_dispatch_pO2_bar(),
+                        'vacuum_floor_bar': self._vacuum_floor_bar(),
+                        'pO2_admission': 'environment',
+                    },
                     fO2_log=intrinsic_fO2_log,
                     fe_redox_policy='intrinsic',
                 )
@@ -9651,6 +9653,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     backend_kwargs['vapor_transport_floor_bar'] = (
                         self._vacuum_floor_bar()
                     )
+                if self._backend_accepts_kwarg('vapor_transport_pO2_admission'):
+                    backend_kwargs['vapor_transport_pO2_admission'] = 'environment'
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
@@ -9764,7 +9768,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # removed at flip time per the goal spec ("comparing against the
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
-        self._refresh_vapor_pressures_from_kernel(result)
+        self._refresh_vapor_pressures_from_kernel(
+            result, simulation_hour=int(self.melt.hour) + 1,
+        )
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
@@ -9844,6 +9850,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
+        simulation_hour: int | None = None,
         observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
@@ -9852,6 +9859,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
         legacy internal analytical path) produces an EquilibriumResult.
+
+        ``simulation_hour`` enables trajectory continuation for runtime calls;
+        standalone equilibrium probes omit it.
 
         Behaviour:
           - Below 400 K this method returns before kernel dispatch and preserves
@@ -9881,12 +9891,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
 
         T_C = float(self.melt.temperature_C)
+        co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
+        if co2_diagnostic:
+            for notice in co2_diagnostic['notices']:
+                warning = f"{notice['code']}: T_gas={notice['temperature_K']:g} K; {notice['reason']}"
+                if warning not in result.warnings:
+                    result.warnings.append(warning)
         if T_C + 273.15 < 400:
             self._last_high_t_melt_activity = {}
             self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
+            if co2_diagnostic:
+                self._last_vapor_pressure_diagnostic = {'co2_dissociation': dict(co2_diagnostic)}
             return
 
         backend_vp = dict(getattr(result, 'vapor_pressures_Pa', {}) or {})
@@ -9933,6 +9951,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'backend_vapor_pressures_Pa': dict(backend_vp),
                 }
                 self._last_vapor_pressures_source = {}
+                if getattr(self, '_headspace_co2_dissociation_diagnostic', None):
+                    diagnostic['co2_dissociation'] = dict(self._headspace_co2_dissociation_diagnostic)
                 self._last_vapor_pressure_diagnostic = diagnostic
                 self._last_high_t_melt_activity = {}
                 self._last_high_t_melt_activity_temperature_K = None
@@ -9966,8 +9986,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
         vacuum_floor = (
-            float(self._vacuum_floor_bar())
-            if callable(getattr(self, '_vacuum_floor_bar', None))
+            float(self._oxygen_numerical_floor_bar())
+            if callable(getattr(self, '_oxygen_numerical_floor_bar', None))
             else DEFAULT_VACUUM_FLOOR_BAR
         )
         ambient_pressure_bar = (
@@ -9980,7 +10000,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
         )
         high_t_control_inputs: dict[str, Any] = {}
-        if T_C + 273.15 > VAPOROCK_T_MAX_K:
+        from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
+
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=T_C + 273.15, controls={},
+            quantity_class="activity",
+        ):
             high_t_control_inputs = {
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
@@ -9991,21 +10016,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity_previous': getattr(
                     self, '_last_high_t_melt_activity', {}
                 ),
-                'simulation_hour': int(self.melt.hour) + 1,
-                'high_t_melt_activity_crossing': (
-                    getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    is not None
-                    and getattr(
-                        self,
-                        '_last_high_t_melt_activity_temperature_K',
-                        None,
-                    )
-                    <= VAPOROCK_T_MAX_K
-                ),
+                'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
             'control_inputs': {
@@ -10033,6 +10044,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+
+        def append_kernel_warnings(
+            messages: tuple[str, ...] | str,
+        ) -> None:
+            if not messages:
+                return
+            additions = (
+                (messages,)
+                if isinstance(messages, str)
+                else tuple(messages)
+            )
+            existing = diagnostic.get('kernel_vapor_pressure_warnings')
+            if not isinstance(existing, list):
+                existing = [existing] if existing is not None else []
+            existing.extend(additions)
+            diagnostic['kernel_vapor_pressure_warnings'] = existing
+
+        append_kernel_warnings(getattr(kernel_result, 'warnings', ()) or ())
         self._last_high_t_melt_activity = dict(
             diagnostic.get("high_t_melt_activity") or {}
         )
@@ -10175,36 +10204,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         f"continue on backend vapor pressures. Diagnostic "
                         f"keys: {diagnostic_keys!r}"
                     )
-                # Codex challenge pre-0.5.1 P2 (2026-05-27): defensive
-                # warning-append. The diagnostic dict is free-form per
-                # the provider contract, so the
-                # ``kernel_vapor_pressure_warnings`` slot may already
-                # hold a non-list value (None, str, etc.); coerce to
-                # list before appending.
-                existing_warnings = diagnostic.get(
-                    'kernel_vapor_pressure_warnings')
-                if not isinstance(existing_warnings, list):
-                    existing_warnings = (
-                        [existing_warnings]
-                        if existing_warnings is not None else []
-                    )
-                existing_warnings.append(
+                append_kernel_warnings(
                     f"VAPOR_PRESSURE returned status={kernel_status!r}; "
                     f"falling back to backend vapor pressures under "
                     f"allow_fallback_vapor=True."
                 )
-                diagnostic['kernel_vapor_pressure_warnings'] = existing_warnings
                 if backend_sources:
                     result.vapor_pressures_source = dict(backend_sources)
                 diagnostic['vapor_pressures_source'] = dict(
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
-        kernel_activities = diagnostic.get('activities') or {}
+        high_t_activity = diagnostic.get('high_t_melt_activity') or {}
+        parent_activities = high_t_activity.get('selected_parent_activities')
+        kernel_activities = parent_activities or diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
+            if parent_activities:
+                result.diagnostics = {
+                    **(getattr(result, 'diagnostics', {}) or {}),
+                    'activities_provider': high_t_activity['selected_parent_activities_provider'],
+                    'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
+                    'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
+                }
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
+        co2_diagnostic = getattr(self, '_headspace_co2_dissociation_diagnostic', {})
+        if co2_diagnostic:
+            diagnostic['co2_dissociation'] = dict(co2_diagnostic)
         self._last_vapor_pressure_diagnostic = diagnostic
         note_high_t_fallback = getattr(
             self, '_note_high_t_melt_activity_fallback', None

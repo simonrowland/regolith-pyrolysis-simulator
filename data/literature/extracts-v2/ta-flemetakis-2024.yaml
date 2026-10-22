@@ -1396,6 +1396,7 @@ observations:
         - - B2O3
           - '0.09252098722348309772279706416'
         amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_glass_composition'; refusing to pick
@@ -1422,39 +1423,24 @@ observations:
     source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
   read_from: pdf:ta-flemetakis-2024
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '13.74'
-          B2O3: '10.55'
-          CaO: '20.62'
-          MgO: '9.49'
-          SiO2: '44.97'
-          total: '99.38'
-      locator:
-        published_page: 174
-        pdf_page_index: 2
-        table: '1'
-        section: 2.1 Starting material
-        source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
+          - - SiO2
+            - '0.4569559968617644642969536782'
           - - Al2O3
-            - '0.08227344463968649392973033831'
-          - - B2O3
-            - '0.09252098722348309772279706422'
-          - - CaO
-            - '0.2244951650563371819165428931'
+            - '0.08227344463968649392973033826'
           - - MgO
             - '0.1437544062187287621339760261'
-          - - SiO2
-            - '0.4569559968617644642969536785'
+          - - CaO
+            - '0.224495165056337181916542893'
+          - - B2O3
+            - '0.09252098722348309772279706416'
           amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
       locator:
         published_page: 174
         pdf_page_index: 2
@@ -1467,6 +1453,26 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.97'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -1481,46 +1487,6 @@ observations:
           - state:
               tag: value
               value: '101.960077'
-            locator:
-              published_page: 174
-              pdf_page_index: 2
-              table: '1'
-              section: 2.1 Starting material
-              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - original_B2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.55'
-            locator:
-              published_page: 174
-              pdf_page_index: 2
-              table: '1'
-              section: 2.1 Starting material
-              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - M_B2O3_g_mol
-          - state:
-              tag: value
-              value: '69.617'
-            locator:
-              published_page: 174
-              pdf_page_index: 2
-              table: '1'
-              section: 2.1 Starting material
-              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '20.62'
-            locator:
-              published_page: 174
-              pdf_page_index: 2
-              table: '1'
-              section: 2.1 Starting material
-              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
             locator:
               published_page: 174
               pdf_page_index: 2
@@ -1547,20 +1513,40 @@ observations:
               table: '1'
               section: 2.1 Starting material
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - original_SiO2_wt_pct
+        - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '44.97'
+              value: '20.62'
             locator:
               published_page: 174
               pdf_page_index: 2
               table: '1'
               section: 2.1 Starting material
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
-        - - M_SiO2_g_mol
+        - - M_CaO_g_mol
           - state:
               tag: value
-              value: '60.083'
+              value: '56.077000000000005'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
             locator:
               published_page: 174
               pdf_page_index: 2
@@ -1568,6 +1554,22 @@ observations:
               section: 2.1 Starting material
               source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '13.74'
+          B2O3: '10.55'
+          CaO: '20.62'
+          MgO: '9.49'
+          SiO2: '44.97'
+          total: '99.38'
+      locator:
+        published_page: 174
+        pdf_page_index: 2
+        table: '1'
+        section: 2.1 Starting material
+        source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
 - observation_id: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=12df5a282809
   experiment_id: 10.5194/ejm-36-173-2024::ta-flemetakis-2024
   identity:

@@ -332,6 +332,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         redox_mode: Optional[str] = None,
         vapor_transport_pO2_bar: Optional[float] = None,
         vapor_transport_floor_bar: Optional[float] = None,
+        vapor_transport_pO2_admission: str = 'environment',
     ) -> EquilibriumResult:
         return super().equilibrate(
             temperature_C=temperature_C,
@@ -344,6 +345,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             redox_mode=redox_mode,
             vapor_transport_pO2_bar=vapor_transport_pO2_bar,
             vapor_transport_floor_bar=vapor_transport_floor_bar,
+            vapor_transport_pO2_admission=vapor_transport_pO2_admission,
         )
 
     def _equilibrate_prepared(

@@ -442,6 +442,7 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     raw = {field: _typed(components), "mass_kg": _located({"kind": "point", "point": "0.001"})}
     if field == "printed_composition":
         raw[field]["locator"]["note"] = "Printed starting material composition"
+        raw["composition_role"] = "initial_charge_only"
     if field == "printed_composition" and existing_unknown:
         raw["initial_composition"] = {"state": {"tag": "unknown", "reason": "not printed on a molar basis"}}
     sample = M._sample_from_plain(raw)
@@ -590,6 +591,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     if boundary == "sample_printed":
         printed["locator"]["note"] = "Printed starting material composition"
         sample["printed_composition"] = conditions.pop("printed_composition")
+        sample["composition_role"] = "initial_charge_only"
     elif boundary == "row_printed_row_initial":
         conditions["composition"] = canonical
     if source_extract:
@@ -597,9 +599,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     else:
         inputs = _serialized_consumer_inputs(sample, conditions)
         waypoint = inputs.waypoints["normalized_composition"]
-        expected_valid = component == "MgO" or (
-            component == "FeOT" and boundary == "sample_printed"
-        )
+        expected_valid = component == "MgO"
         if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
@@ -608,9 +608,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
             )
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
-    expected_valid = component == "MgO" or (
-        component == "FeOT" and boundary == "sample_printed"
-    )
+    expected_valid = component == "MgO"
     for request in requests:
         assert (request.payload is not None) == expected_valid
         if component == "FeOT" and expected_valid:

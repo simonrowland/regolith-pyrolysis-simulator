@@ -78,159 +78,33 @@ experiments:
           basis: printed_oxides
           components:
           - - SiO2
-            - '0.5226508780512647327686871688'
+            - '0.522650878051'
           - - TiO2
-            - '0.007450970521666675864658847771'
+            - '0.007450970522'
           - - Al2O3
-            - '0.09186126415983606031527388527'
+            - '0.09186126416'
           - - FeO
-            - '0.08360483248003905551512051168'
+            - '0.08360483248'
           - - MnO
-            - '0.001747652234872601342381195539'
+            - '0.001747652235'
           - - MgO
-            - '0.1368799899499452779858934599'
+            - '0.13687998995'
           - - CaO
-            - '0.1357412059451461588276430933'
+            - '0.135741205945'
           - - Na2O
-            - '0.01960256253777322478085063111'
+            - '0.019602562538'
           - - K2O
-            - '0.0004606441194562125994912063457'
+            - '0.000460644119'
           amount_basis: mole_fraction
       locator:
         table: Extended Data Table 1
-        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        note: Starting row; major-element wt% as printed
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.66'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.11'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.69'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.2'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '8.9'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.28'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -447,159 +321,33 @@ experiments:
           basis: printed_oxides
           components:
           - - SiO2
-            - '0.5226508780512647327686871688'
+            - '0.522650878051'
           - - TiO2
-            - '0.007450970521666675864658847771'
+            - '0.007450970522'
           - - Al2O3
-            - '0.09186126415983606031527388527'
+            - '0.09186126416'
           - - FeO
-            - '0.08360483248003905551512051168'
+            - '0.08360483248'
           - - MnO
-            - '0.001747652234872601342381195539'
+            - '0.001747652235'
           - - MgO
-            - '0.1368799899499452779858934599'
+            - '0.13687998995'
           - - CaO
-            - '0.1357412059451461588276430933'
+            - '0.135741205945'
           - - Na2O
-            - '0.01960256253777322478085063111'
+            - '0.019602562538'
           - - K2O
-            - '0.0004606441194562125994912063457'
+            - '0.000460644119'
           amount_basis: mole_fraction
       locator:
         table: Extended Data Table 1
-        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        note: Starting row; major-element wt% as printed
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.66'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.11'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.69'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.2'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '8.9'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.28'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -816,178 +564,33 @@ experiments:
           basis: printed_oxides
           components:
           - - SiO2
-            - '0.5226508780512647327686871688'
+            - '0.522650878051'
           - - TiO2
-            - '0.007450970521666675864658847771'
+            - '0.007450970522'
           - - Al2O3
-            - '0.09186126415983606031527388527'
+            - '0.09186126416'
           - - FeO
-            - '0.08360483248003905551512051168'
+            - '0.08360483248'
           - - MnO
-            - '0.001747652234872601342381195539'
+            - '0.001747652235'
           - - MgO
-            - '0.1368799899499452779858934599'
+            - '0.13687998995'
           - - CaO
-            - '0.1357412059451461588276430933'
+            - '0.135741205945'
           - - Na2O
-            - '0.01960256253777322478085063111'
+            - '0.019602562538'
           - - K2O
-            - '0.0004606441194562125994912063457'
+            - '0.000460644119'
           amount_basis: mole_fraction
       locator:
         table: Extended Data Table 1
-        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed 0 and
-          Total 99.8 omitted.
+        note: Starting row; major-element wt% as printed
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.66'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.11'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.69'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.2'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '8.9'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.28'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed
-                0 and Total 99.8 omitted.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1205,159 +808,33 @@ experiments:
           basis: printed_oxides
           components:
           - - SiO2
-            - '0.5226508780512647327686871688'
+            - '0.522650878051'
           - - TiO2
-            - '0.007450970521666675864658847771'
+            - '0.007450970522'
           - - Al2O3
-            - '0.09186126415983606031527388527'
+            - '0.09186126416'
           - - FeO
-            - '0.08360483248003905551512051168'
+            - '0.08360483248'
           - - MnO
-            - '0.001747652234872601342381195539'
+            - '0.001747652235'
           - - MgO
-            - '0.1368799899499452779858934599'
+            - '0.13687998995'
           - - CaO
-            - '0.1357412059451461588276430933'
+            - '0.135741205945'
           - - Na2O
-            - '0.01960256253777322478085063111'
+            - '0.019602562538'
           - - K2O
-            - '0.0004606441194562125994912063457'
+            - '0.000460644119'
           amount_basis: mole_fraction
       locator:
         table: Extended Data Table 1
-        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        note: Starting row; major-element wt% as printed
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.66'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '0.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.11'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '9.69'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MnO_wt_pct
-          - state:
-              tag: value
-              value: '0.2'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MnO_g_mol
-          - state:
-              tag: value
-              value: '70.937044'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '8.9'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '12.28'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '1.96'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.07'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              table: Extended Data Table 1
-              note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:

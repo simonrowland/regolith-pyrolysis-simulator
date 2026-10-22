@@ -2846,14 +2846,18 @@ def _internal_analytical_vapor_pressure_adapter(
         vapor_pressures_source={},
         liquid_fraction=None,
     )
+    simulation_hour = int(core.melt.hour) + 1
     if include_diagnostic_shadows:
         core._refresh_vapor_pressures_from_kernel(
-            equilibrium, observation_pO2_bar=po2_bar,
+            equilibrium,
+            simulation_hour=simulation_hour,
+            observation_pO2_bar=po2_bar,
         )
     else:
         core._refresh_vapor_pressures_from_kernel(
             equilibrium,
             include_diagnostic_shadows=False,
+            simulation_hour=simulation_hour,
             observation_pO2_bar=po2_bar,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
@@ -3018,6 +3022,19 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
+        # One core serves every cell. Certificates, held gammas, the
+        # previous-temperature clock, the fallback-step log and the last
+        # vapour diagnostic are the previous cell's trajectory. Clear them
+        # here, before this cell's own refresh. Below 400 K the refresh
+        # returns without replacing that diagnostic, and the adapter reads
+        # it. Callers that walk one cell's trajectory (the adapter, residue
+        # integration) do not re-enter here between steps, so that history
+        # stays.
+        core = self._core
+        core._last_high_t_melt_activity = {}
+        core._last_high_t_melt_activity_temperature_K = None
+        core._high_t_melt_activity_fallback_steps = []
+        core._last_vapor_pressure_diagnostic = {}
         if (
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
@@ -4055,6 +4072,11 @@ def equilibrate_cell(
         parameters = {}
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
+    if po2.mode == PO2_COMMANDED:
+        if "vapor_transport_pO2_bar" in parameters:
+            kwargs["vapor_transport_pO2_bar"] = po2.po2_bar
+        if "vapor_transport_pO2_admission" in parameters:
+            kwargs["vapor_transport_pO2_admission"] = "observation"
     if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
         from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
         from simulator.melt_backend.base import multivalent_components

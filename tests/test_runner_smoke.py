@@ -693,6 +693,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "c2a_staged_gas",
     "metal_phase_stratification",
     "condensation_refusals_by_species",
+    "high_t_melt_activity",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({

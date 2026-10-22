@@ -1,4 +1,4 @@
-"""Body/environment pressure floors for vacuum-sensitive chemistry."""
+"""Total ambient pressure limits, declared cover gas, and numerical O2 guards."""
 
 from __future__ import annotations
 
@@ -34,6 +34,58 @@ _BODY_VACUUM_FLOOR_BAR = {
 }
 
 
+class CoverGasCompositionUnavailable(ValueError):
+    """The declared cover gas does not specify a usable composition."""
+
+
+def controlled_background_partial_pressure(
+    total_pressure: float, oxygen_partial_pressure: float, mole_fraction: float,
+) -> float:
+    """Background share of the non-commanded-O2 pressure, in input units.
+
+    Dalton: P=P_O2+P_background, hence p_i=y_i*max(P-P_O2,0).
+    y_i is dimensionless. At P=P_O2 no background remains; y_i=1 fills
+    the entire residual. Preserve the existing boundary fraction clamp.
+    """
+    fraction = min(1.0, max(0.0, float(mole_fraction)))
+    return max(0.0, total_pressure - oxygen_partial_pressure) * fraction
+
+
+def cover_gas_partial_pressures(
+    atmosphere: str, total_pressure: float,
+) -> dict[str, float]:
+    """Project the existing atmosphere declaration to known gas partials.
+
+    Output pressure units match the input (bar or mbar).
+
+    A percentage specifies that species only; the unreported balance is not
+    invented as oxygen. Air explicitly denotes the 0.21 oxygen mole fraction.
+    """
+    pressure = float(total_pressure)
+    if not math.isfinite(pressure) or pressure < 0.0:
+        raise ValueError("cover-gas total_pressure must be finite and >= 0")
+    if pressure == 0.0:
+        return {}
+    token = str(atmosphere).strip().upper().replace(" ", "")
+    if token == "AIR":
+        return {"O2": pressure * 0.21, "N2": pressure * 0.79}
+    if token in {"CO2", "O2", "N2", "AR", "KR", "HE"}:
+        species = {"AR": "Ar", "KR": "Kr", "HE": "He"}.get(token, token)
+        return {species: pressure}
+    if token.endswith("%CO2"):
+        try:
+            fraction = float(token[:-4]) / 100.0
+        except ValueError:
+            fraction = math.nan
+        if math.isfinite(fraction) and 0.0 < fraction <= 1.0:
+            # Ideal gas: p_i = y_i P. y_i is dimensionless, so bar stays bar;
+            # y=1 gives pure gas and y->0 gives no partial of this species.
+            return {"CO2": pressure * fraction}
+    raise CoverGasCompositionUnavailable(
+        f"cover-gas composition missing or unknown in atmosphere={atmosphere!r}"
+    )
+
+
 def normalize_body_name(body: object) -> str:
     """Return the canonical body token, or empty string for unknown/missing."""
 
@@ -58,7 +110,7 @@ def _positive_finite_bar(value: object, *, field: str) -> float:
 
 
 def vacuum_floor_bar_for_body(body: object) -> float:
-    """Resolve the chemistry vacuum floor for a body token.
+    """Resolve the total-pressure vacuum/ambient limit for a body token.
 
     Grounding:
     - Moon: owner-reviewed nanotorr correction sets 1.3e-12 bar; NASA
@@ -90,6 +142,20 @@ def vacuum_floor_bar_for_environment(
             ambient_pressure_bar,
             field="ambient_pressure_bar",
         )
+    return vacuum_floor_bar_for_body(canonical)
+
+
+def oxygen_numerical_floor_bar_for_body(body: object) -> float:
+    """Division/log guard, never an ambient oxygen measurement.
+
+    Preserve the historical airless-body resolution. Mars's CO2 total pressure
+    is not an oxygen lower bound; use the historical numerical guard there.
+    The Moon's 1.3e-12 bar and asteroid's 1e-14 bar remain numerical guards,
+    not claims that their exospheres are pure oxygen.
+    """
+    canonical = normalize_body_name(body)
+    if canonical == "mars":
+        return DEFAULT_VACUUM_FLOOR_BAR
     return vacuum_floor_bar_for_body(canonical)
 
 
