@@ -1748,6 +1748,10 @@ class RecipeSchema:
             validated.values,
             c3_zero_levels=c3_alkali_zero_levels_for_schema(self),
         )
+        # Keep sampled doses explicit so plant nulls cannot restore credit defaults.
+        for path in C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH:
+            if path in validated.values:
+                canonical_values[path] = float(validated.values[path])
         runtime_values = {
             path: value
             for path, value in canonical_values.items()
@@ -2715,7 +2719,7 @@ def _canonical_c3_alkali_dosing_recipe_values(
         if dose_kg is None:
             continue
         if dose_kg <= zero_level_kg:
-            canonical.pop(path, None)
+            canonical[path] = 0.0
         else:
             canonical[path] = dose_kg
     return canonical

@@ -45,6 +45,8 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
+    C3_ALKALI_DOSING_K_KG_PATH,
+    C3_ALKALI_DOSING_NA_KG_PATH,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -2328,6 +2330,8 @@ def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effe
         {
             STAGE0_REDOX_OXIDANT_KG_PATH: 12.5,
             STAGE0_CARBON_REDUCTANT_KG_PATH: 7.25,
+            C3_ALKALI_DOSING_NA_KG_PATH: 0.0,
+            C3_ALKALI_DOSING_K_KG_PATH: 0.0,
         }
     )
 
@@ -2348,7 +2352,9 @@ def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effe
 
     assert dosed_spec.stage0_redox_oxidant_kg == pytest.approx(12.5)
     assert dosed_spec.stage0_carbon_reductant_kg == pytest.approx(7.25)
-    assert schema.to_setpoints_patch(patch) == {}
+    assert schema.to_setpoints_patch(patch) == {
+        "campaigns": {"C3": {"alkali_dosing": {"Na_kg": 0.0, "K_kg": 0.0}}}
+    }
     assert dict(dosed_config.additives_kg) == dict(undosed_config.additives_kg) == {}
     assert cache_key(dosed_spec) != cache_key(undosed_spec)
 

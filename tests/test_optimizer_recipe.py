@@ -1467,6 +1467,12 @@ def test_c3_alkali_dosing_deadband_canonicalizes_to_disabled_state() -> None:
             ),
         }
     ).validated(schema)
+    zero = RecipePatch(
+        {
+            C3_ALKALI_DOSING_NA_KG_PATH: 0.0,
+            C3_ALKALI_DOSING_K_KG_PATH: 0.0,
+        }
+    ).validated(schema)
     active = RecipePatch(
         {
             C3_ALKALI_DOSING_NA_KG_PATH: (
@@ -1478,8 +1484,18 @@ def test_c3_alkali_dosing_deadband_canonicalizes_to_disabled_state() -> None:
         }
     ).validated(schema)
 
-    assert schema.to_setpoints_patch(near_zero) == {}
-    assert near_zero.recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    expected_off = {
+        "campaigns": {"C3": {"alkali_dosing": {"Na_kg": 0.0, "K_kg": 0.0}}}
+    }
+    expected_near_zero = {
+        "campaigns": {
+            "C3": {"alkali_dosing": {"Na_kg": 1e-12, "K_kg": 0.56}}
+        }
+    }
+    assert schema.to_setpoints_patch(zero) == expected_off
+    assert schema.to_setpoints_patch(near_zero) == expected_near_zero
+    assert near_zero.recipe_id(schema) == zero.recipe_id(schema)
+    assert near_zero.recipe_id(schema) != RecipePatch({}).recipe_id(schema)
     assert schema.to_setpoints_patch(active)["campaigns"]["C3"]["alkali_dosing"][
         "Na_kg"
     ] == pytest.approx(

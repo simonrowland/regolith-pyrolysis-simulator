@@ -14,7 +14,7 @@ import pytest
 import yaml
 
 from simulator.campaigns import CampaignManager
-from simulator.recipe_io import RecipeIOError, load_recipe_patch_for_charge
+from simulator.recipe_io import load_recipe_patch_for_charge
 from simulator.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -24,7 +24,7 @@ from simulator.recipe import (
     c3_alkali_zero_level_kg,
     resolve_c3_alkali_credit_dose_kg,
 )
-from simulator.runner import _c3_alkali_dosing_kg_by_species
+from simulator.runner import _c3_alkali_dosing_kg_by_species, _deep_merge_setpoints
 from simulator.state import BatchRecord, CampaignPhase
 
 
@@ -84,14 +84,63 @@ def test_scaled_schema_keeps_a_one_kilogram_dose() -> None:
     stripped = RecipePatch(
         {C3_ALKALI_DOSING_NA_KG_PATH: 0.110}
     ).validated(reference)
-    assert reference.to_setpoints_patch(stripped) == {}
+    assert reference.to_setpoints_patch(stripped) == {
+        "campaigns": {"C3": {"alkali_dosing": {"Na_kg": 0.110}}}
+    }
+
+
+def test_rendered_c3_off_doses_survive_plant_setpoints_merge() -> None:
+    plant = _plant_setpoints()
+    schema = RecipeSchema()
+    reference_cases = (
+        (
+            RecipePatch({C3_ALKALI_DOSING_NA_KG_PATH: 0.0}),
+            {"Na": 0.0, "K": 23.0},
+        ),
+        (
+            RecipePatch(
+                {
+                    C3_ALKALI_DOSING_NA_KG_PATH: 1.0,
+                    C3_ALKALI_DOSING_K_KG_PATH: 0.4,
+                }
+            ),
+            {"Na": 0.0, "K": 0.0},
+        ),
+        (
+            RecipePatch(
+                {
+                    C3_ALKALI_DOSING_NA_KG_PATH: 0.0,
+                    C3_ALKALI_DOSING_K_KG_PATH: 10.0,
+                }
+            ),
+            {"Na": 0.0, "K": 10.0},
+        ),
+    )
+    for patch, expected in reference_cases:
+        merged = _deep_merge_setpoints(plant, schema.to_setpoints_patch(patch))
+        doses = {
+            species: resolve_c3_alkali_credit_dose_kg(merged, species, 1000.0)
+            for species in ("Na", "K")
+        }
+        assert doses == pytest.approx(expected)
+
+    scaled = RecipeSchema().scaled_for_charge(1.0)
+    explicit_off = RecipePatch(
+        {
+            C3_ALKALI_DOSING_NA_KG_PATH: 0.0,
+            C3_ALKALI_DOSING_K_KG_PATH: 0.0,
+        }
+    )
+    merged = _deep_merge_setpoints(plant, scaled.to_setpoints_patch(explicit_off))
+    doses = {
+        species: resolve_c3_alkali_credit_dose_kg(merged, species, 1.0)
+        for species in ("Na", "K")
+    }
+    assert doses == pytest.approx({"Na": 0.0, "K": 0.0})
 
 
 def test_charge_scaled_recipe_dose_is_not_an_empty_patch(tmp_path: Path) -> None:
-    """Studio c3dose: Na 0.110 / K 0.023 on the reference deadband becomes
-    an empty patch and the runner refuses it. The same file at 1 kg is
-    a real credit dose and must load.
-    """
+    """A 1 kg credit dose survives scaling; reference deadband doses load as OFF."""
     recipe = tmp_path / "c3dose.yaml"
     recipe.write_text(
         "campaigns:\n"
@@ -105,8 +154,14 @@ def test_charge_scaled_recipe_dose_is_not_an_empty_patch(tmp_path: Path) -> None
     dosing = loaded["campaigns"]["C3"]["alkali_dosing"]
     assert dosing["Na_kg"] == pytest.approx(0.110)
     assert dosing["K_kg"] == pytest.approx(0.023)
-    with pytest.raises(RecipeIOError, match="empty setpoints_patch"):
-        load_recipe_patch_for_charge(recipe, 1000.0)
+    loaded_off = load_recipe_patch_for_charge(recipe, 1000.0)
+    assert loaded_off["campaigns"]["C3"]["alkali_dosing"] == {
+        "Na_kg": 0.110,
+        "K_kg": 0.023,
+    }
+    merged = _deep_merge_setpoints(_plant_setpoints(), loaded_off)
+    assert resolve_c3_alkali_credit_dose_kg(merged, "Na", 1000.0) == 0.0
+    assert resolve_c3_alkali_credit_dose_kg(merged, "K", 1000.0) == 0.0
 
 
 def test_absent_skip_still_enters_c3_and_pauses_before_c4() -> None:
