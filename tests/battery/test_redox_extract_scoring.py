@@ -23,7 +23,8 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import load_yaml, write_outputs
+from simulator.battery.migrate import Migrator, load_yaml, write_outputs
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,
@@ -278,6 +279,31 @@ def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():
     assert "FeO(l)" in notice.reason
 
 
+def test_sossi_internal_analytical_numeric_count_matches_green():
+    context, observations = _sossi_aithala_redox_context()
+    sossi_ids = [
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+    ]
+    assert len(sossi_ids) == 12
+    sossi_context = replace(
+        context,
+        observations={key: observations[key] for key in sossi_ids},
+        origins={key: context.origins[key] for key in sossi_ids},
+    )
+    residuals, _ = score_store(
+        sossi_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.REDOX,
+    )
+    assert len(residuals) == 12
+    assert all(residual.numeric is not None for residual in residuals)
+    assert all(
+        residual.status is not ResidualStatus.REFUSED for residual in residuals
+    )
+
+
 def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical():
     context, _observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
@@ -353,6 +379,18 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     prediction155 = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row155)
     assert prediction4.value is not None
     assert abs(prediction4.value - Decimal("1.838360613")) < Decimal("1e-9")
+    printed_log = row4.point_conditions["fO2_log"].state.value
+    if isinstance(printed_log, Value):
+        printed_log = printed_log.point
+    assert isinstance(printed_log, Decimal)
+    canonical_fo2 = log10_fo2_to_pa(printed_log)
+    assert prediction4.identity is not None
+    assert prediction4.identity.fO2_Pa is not None
+    assert prediction4.identity.fO2_Pa.value == canonical_fo2
+    assert prediction4.identity.fO2_Pa.value == row4.identity.fO2_Pa.value
+    float_reconstruction = Decimal(str(100000.0 * 10.0 ** float(printed_log)))
+    if canonical_fo2 != float_reconstruction:
+        assert prediction4.identity.fO2_Pa.value != float_reconstruction
     assert prediction155.value is not None
     assert abs(prediction155.value - Decimal("3.277000246")) < Decimal("1e-9")
     assert prediction4.refusal_reason is None
