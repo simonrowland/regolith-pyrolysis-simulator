@@ -40,9 +40,9 @@ def _assignments(tree: ast.AST):
     for node in ast.walk(tree):
         if isinstance(node, ast.Assign):
             names = [name for target in node.targets for name in _target_names(target)]
-            yield names, node.value, node.lineno
+            yield names, node.value
         elif isinstance(node, ast.AnnAssign) and node.value is not None:
-            yield _target_names(node.target), node.value, node.lineno
+            yield _target_names(node.target), node.value
 
 
 def _resolve_path(node: ast.AST, aliases: dict[str, str]) -> str | None:
@@ -88,17 +88,6 @@ def _private_path(path: str | None) -> str | None:
     except ValueError:
         return None
     return PurePosixPath(*parts[index:]).as_posix()
-
-
-def _format_readers(readers: set[str]) -> str:
-    grouped: dict[str, set[int]] = {}
-    for reader in readers:
-        source, line_list = reader.rsplit(":", 1)
-        grouped.setdefault(source, set()).update(map(int, line_list.split(",")))
-    return "; ".join(
-        f"{source}:{','.join(map(str, sorted(lines)))}"
-        for source, lines in sorted(grouped.items())
-    )
 
 
 def _source_files(root: Path) -> list[Path]:
@@ -190,9 +179,9 @@ def _readers(
                     ):
                         # Raw strings used as provenance labels are not file inputs.
                         continue
-                    reference = f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    reader = source.relative_to(root).as_posix()
                     for name in names:
-                        paths.setdefault(path, set()).add(reference)
+                        paths.setdefault(path, set()).add(reader)
                         paths_by_name.setdefault(name, set()).add(path)
                         if isinstance(node, ast.Assign) and node in tree.body:
                             aliases[name] = path
@@ -200,9 +189,9 @@ def _readers(
                 names = _target_names(node.target)
                 path = _private_path(_resolve_path(node.value, aliases))
                 if path is not None:
-                    reference = f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    reader = source.relative_to(root).as_posix()
                     for name in names:
-                        paths.setdefault(path, set()).add(reference)
+                        paths.setdefault(path, set()).add(reader)
                         paths_by_name.setdefault(name, set()).add(path)
                         if node in tree.body:
                             aliases[name] = path
@@ -214,7 +203,7 @@ def _readers(
             if len(name_paths) == 1 or node.id in collection_names:
                 for path in name_paths:
                     paths[path].add(
-                        f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                        source.relative_to(root).as_posix()
                     )
 
         for node in ast.walk(tree):
@@ -235,18 +224,18 @@ def _readers(
             path = _private_path(_resolve_path(target, aliases))
             if path is not None:
                 paths.setdefault(path, set()).add(
-                    f"{source.relative_to(root).as_posix()}:{node.lineno}"
+                    source.relative_to(root).as_posix()
                 )
 
         # The corpus root is a module-level path string consumed by the glob
         # reader; it is not itself a file to copy.
-        for names, value, line in _assignments(tree):
+        for names, value in _assignments(tree):
             if not any(name.endswith("SUBPATH") for name in names):
                 continue
             path = _private_path(_resolve_path(value, aliases))
             if path is not None:
                 paths.setdefault(path, set()).add(
-                    f"{source.relative_to(root).as_posix()}:{line}"
+                    source.relative_to(root).as_posix()
                 )
                 for name in names:
                     aliases[name] = path
@@ -257,7 +246,7 @@ def _glob_specs(
     root: Path,
     trees: dict[Path, ast.AST],
     aliases_by_file: dict[Path, dict[str, str]],
-) -> list[tuple[str, Path, int]]:
+) -> list[tuple[str, Path]]:
     specs = []
     for source, tree in trees.items():
         aliases = aliases_by_file[source]
@@ -283,8 +272,8 @@ def _glob_specs(
             if base is None and len(subpaths) == 1:
                 base = subpaths[0]
             if base is not None:
-                specs.append(((PurePosixPath(base) / pattern).as_posix(), source, node.lineno))
-    return sorted(set(specs), key=lambda item: (item[0], str(item[1]), item[2]))
+                specs.append(((PurePosixPath(base) / pattern).as_posix(), source))
+    return sorted(set(specs), key=lambda item: (item[0], str(item[1])))
 
 
 def _files(root: Path, pattern: str) -> set[str]:
@@ -319,32 +308,20 @@ def _profile_paths(
     return profiles
 
 
-def _reader_lines(tree: ast.AST, method: str) -> set[int]:
-    return {
-        node.lineno
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr == method
-    }
-
-
 def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
     path_readers, trees, aliases = _readers(root)
     globs = _glob_specs(root, trees, aliases)
     c6_pattern = next(
-        path for path, _source, _line in globs
+        path for path, _source in globs
         if path == "docs-private/grind/manifest-c6-*.json"
     )
     literature_pattern = next(
-        path for path, _source, _line in globs
+        path for path, _source in globs
         if path == "docs-private/deep-research/literature/*/benchmark-fixture.yaml"
     )
-    c6_reader_source = next(source for path, source, _line in globs if path == c6_pattern)
-    literature_source = next(source for path, source, _line in globs if path == literature_pattern)
+    c6_reader_source = next(source for path, source in globs if path == c6_pattern)
+    literature_source = next(source for path, source in globs if path == literature_pattern)
     c6_tree = trees[c6_reader_source]
-    literature_tree = trees[literature_source]
-
     c6_names = {
         node.value
         for node in ast.walk(c6_tree)
@@ -363,41 +340,8 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
         if path.startswith("docs-private/grind/manifest-c6-") and path.endswith(".json")
     }
     profiles = _profile_paths(root, c6_manifest_paths, "docs-private/grind")
-    profile_test_lines = {
-        node.lineno
-        for node in ast.walk(c6_tree)
-        if isinstance(node, ast.Subscript)
-        and isinstance(node.slice, ast.Constant)
-        and node.slice.value == "profile"
-    }
-    epoch_path = root / "scripts" / "epoch_grind.py"
-    epoch_tree = ast.parse(epoch_path.read_text(encoding="utf-8"))
-    profile_epoch_lines = {
-        node.lineno
-        for node in ast.walk(epoch_tree)
-        if isinstance(node, ast.Attribute)
-        and node.attr == "profile"
-        and isinstance(node.value, ast.Name)
-        and node.value.id == "job"
-    } | {
-        node.lineno
-        for node in ast.walk(epoch_tree)
-        if isinstance(node, ast.Call)
-        and (
-            isinstance(node.func, ast.Name)
-            and node.func.id == "_file_sha256"
-            or isinstance(node.func, ast.Name)
-            and node.func.id == "_load_mapping"
-            and node.args
-            and isinstance(node.args[0], ast.Name)
-            and node.args[0].id == "profile_path"
-        )
-    }
-    profile_reader = "; ".join(
-        (
-            f"{c6_reader_source.relative_to(root).as_posix()}:{','.join(map(str, sorted(profile_test_lines)))}",
-            f"scripts/epoch_grind.py:{','.join(map(str, sorted(profile_epoch_lines)))}",
-        )
+    profile_readers = sorted(
+        {c6_reader_source.relative_to(root).as_posix(), "scripts/epoch_grind.py"}
     )
 
     tracked = _tracked_papers(root)
@@ -407,14 +351,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
         if PurePosixPath(path).parent.name not in tracked
     }
     literature = corpus_files
-    corpus_read_lines = _reader_lines(literature_tree, "read_text")
-    corpus_call_line = next(
-        line for path, source, line in globs if path == literature_pattern and source == literature_source
-    )
-    corpus_reader = (
-        f"{literature_source.relative_to(root).as_posix()}:"
-        f"{','.join(map(str, sorted(corpus_read_lines | {corpus_call_line})))}"
-    )
+    corpus_readers = [literature_source.relative_to(root).as_posix()]
 
     entries: list[dict[str, Any]] = []
     corpus_root = PurePosixPath(literature_pattern).parts[:-2]
@@ -424,7 +361,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
             {
                 "kind": "directory",
                 "path": f"{corpus_root_path}/",
-                "reader": corpus_reader,
+                "readers": corpus_readers,
                 "copy": False,
             }
         )
@@ -438,61 +375,60 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
             continue
         if PurePosixPath(path).suffix:
             entries.append(
-                {"kind": "file", "path": path, "reader": _format_readers(readers)}
+                {"kind": "file", "path": path, "readers": sorted(readers)}
             )
 
-    c6_call_line = next(line for path, _source, line in globs if path == c6_pattern)
-    c6_required_reader = f"{c6_reader_source.relative_to(root).as_posix()}:44,203"
+    c6_readers = [c6_reader_source.relative_to(root).as_posix()]
     entries.append(
         {
             "kind": "glob",
             "path": c6_pattern,
-            "reader": f"{c6_reader_source.relative_to(root).as_posix()}:{c6_call_line},203",
+            "readers": c6_readers,
             "required": [
                 {
                     "path": path,
-                    "reader": _format_readers(
-                        path_readers.get(path, set()) | {c6_required_reader}
-                    ),
+                    "readers": sorted(path_readers.get(path, set()) | set(c6_readers)),
                 }
                 for path in sorted(c6_paths)
             ],
         }
     )
     entries.extend(
-        {"kind": "file", "path": path, "reader": profile_reader}
+        {"kind": "file", "path": path, "readers": profile_readers}
         for path in sorted(profiles)
     )
     entries.append(
         {
             "kind": "glob",
             "path": literature_pattern,
-            "reader": f"{literature_source.relative_to(root).as_posix()}:{corpus_call_line}",
+            "readers": corpus_readers,
             "required": [
-                {"path": path, "reader": corpus_reader} for path in sorted(literature)
+                {"path": path, "readers": corpus_readers} for path in sorted(literature)
             ],
         }
     )
     known_patterns = {c6_pattern, literature_pattern}
     extra_patterns = sorted(
-        {pattern for pattern, _source, _line in globs} - known_patterns
+        {pattern for pattern, _source in globs} - known_patterns
     )
     for pattern in extra_patterns:
         required_paths = _files(root, pattern)
-        readers = {
-            f"{source.relative_to(root).as_posix()}:{line}"
-            for candidate, source, line in globs
-            if candidate == pattern
-        }
+        readers = sorted(
+            {
+                source.relative_to(root).as_posix()
+                for candidate, source in globs
+                if candidate == pattern
+            }
+        )
         entries.append(
             {
                 "kind": "glob",
                 "path": pattern,
-                "reader": _format_readers(readers),
+                "readers": readers,
                 "required": [
                     {
                         "path": path,
-                        "reader": _format_readers(readers),
+                        "readers": readers,
                     }
                     for path in sorted(required_paths)
                 ],
@@ -503,7 +439,7 @@ def derive_manifest(root: Path = ROOT) -> dict[str, Any]:
     conftest = trees[root / "conftest.py"]
     strict_env = next(
         node.value
-        for names, value, _line in _assignments(conftest)
+        for names, value in _assignments(conftest)
         if "DOCS_PRIVATE_MANIFEST_STRICT_ENV" in names
         for node in [value]
         if isinstance(node, ast.Constant) and isinstance(node.value, str)

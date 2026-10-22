@@ -298,18 +298,18 @@ def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None
     for entry in manifest["entries"]:
         kind = entry["kind"]
         path = entry["path"]
-        reader = entry["reader"]
+        readers = ", ".join(entry["readers"])
         input_path = repo_root / path
         if kind == "file":
             if not input_path.is_file():
-                missing.append(f"{path} (read by {reader})")
+                missing.append(f"{path} (read by {readers})")
         elif kind == "directory":
             if not input_path.is_dir():
-                missing.append(f"{path} (read by {reader})")
+                missing.append(f"{path} (read by {readers})")
         elif kind == "glob":
             required = entry["required"]
             if not required:
-                missing.append(f"{path} (no required named files; read by {reader})")
+                missing.append(f"{path} (no required named files; read by {readers})")
                 continue
             matched = {
                 match.relative_to(repo_root).as_posix()
@@ -317,13 +317,13 @@ def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None
             }
             for required_entry in required:
                 required_path = required_entry["path"]
-                required_reader = required_entry["reader"]
+                required_readers = ", ".join(required_entry["readers"])
                 if required_path not in matched or not (
                     repo_root / required_path
                 ).is_file():
                     missing.append(
                         f"{required_path} (required by glob {path}; "
-                        f"read by {required_reader})"
+                        f"read by {required_readers})"
                     )
         else:
             raise pytest.UsageError(

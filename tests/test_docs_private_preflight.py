@@ -45,7 +45,7 @@ def test_strict_docs_private_preflight_errors_with_missing_manifest_entry(
             {
                 "kind": "file",
                 "path": "docs-private/missing-input.yaml",
-                "reader": "tests/example.py:42",
+                "readers": ["tests/example.py"],
             }
         ],
     )
@@ -55,7 +55,7 @@ def test_strict_docs_private_preflight_errors_with_missing_manifest_entry(
         _invoke_sessionstart(tmp_path, monkeypatch)
 
     assert "docs-private/missing-input.yaml" in str(error.value)
-    assert "tests/example.py:42" in str(error.value)
+    assert "tests/example.py" in str(error.value)
 
 
 def test_strict_docs_private_preflight_accepts_present_glob_members(
@@ -76,19 +76,19 @@ def test_strict_docs_private_preflight_accepts_present_glob_members(
             {
                 "kind": "file",
                 "path": "docs-private/direct.yaml",
-                "reader": "tests/example.py:5",
+                "readers": ["tests/example.py"],
             },
             {
                 "kind": "directory",
                 "path": "docs-private/directory",
-                "reader": "tests/example.py:7",
+                "readers": ["tests/example.py"],
             },
             {
                 "kind": "glob",
                 "path": "docs-private/items/*.yaml",
-                "reader": "tests/example.py:10",
+                "readers": ["tests/example.py"],
                 "required": [
-                    {"path": member, "reader": "tests/example.py:11"}
+                    {"path": member, "readers": ["tests/example.py"]}
                 ],
             }
         ],
@@ -107,7 +107,7 @@ def test_docs_private_preflight_is_inert_without_strict_environment(
             {
                 "kind": "file",
                 "path": "docs-private/missing-input.yaml",
-                "reader": "tests/example.py:42",
+                "readers": ["tests/example.py"],
             }
         ],
     )
@@ -168,10 +168,7 @@ def test_docs_private_manifest_matches_reader_generator() -> None:
     assert generated_manifest == committed
 
 
-def test_docs_private_generator_ignores_manifest_being_generated(
-    tmp_path: Path,
-) -> None:
-    root = tmp_path
+def _docs_private_generator_fixture(root: Path):
     tests_dir = root / "tests"
     tests_dir.mkdir()
     (root / "conftest.py").write_text(
@@ -236,6 +233,28 @@ def test_docs_private_generator_ignores_manifest_being_generated(
     assert spec is not None and spec.loader is not None
     generator = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(generator)
+    return generator, committed_manifest
+
+
+def test_docs_private_generator_ignores_reader_line_shifts(
+    tmp_path: Path,
+) -> None:
+    generator, _committed_manifest = _docs_private_generator_fixture(tmp_path)
+    generated_before = generator.derive_manifest(tmp_path)
+
+    reader_path = tmp_path / "tests" / "test_c6_grind_manifests.py"
+    reader_path.write_text(
+        "\n" + reader_path.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+
+    assert generator.derive_manifest(tmp_path) == generated_before
+
+
+def test_docs_private_generator_ignores_manifest_being_generated(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path
+    generator, committed_manifest = _docs_private_generator_fixture(root)
 
     generated_before = generator.derive_manifest(root)
     profile_path = "docs-private/grind/profiles/alpha.yaml"
@@ -268,19 +287,19 @@ def test_docs_private_generator_ignores_manifest_being_generated(
             {
                 "kind": "file",
                 "path": "docs-private/grind/profiles/invented.yaml",
-                "reader": "tests/example.py:1",
+                "readers": ["tests/example.py"],
             },
             {
                 "kind": "file",
                 "path": "docs-private/invented-reader.yaml",
-                "reader": "tests/example.py:1",
+                "readers": ["tests/example.py"],
             },
         ]
     )
     mutated_corpus["required"].append(
         {
             "path": "docs-private/deep-research/literature/invented/benchmark-fixture.yaml",
-            "reader": "tests/example.py:1",
+            "readers": ["tests/example.py"],
         }
     )
     committed_manifest.write_text(
