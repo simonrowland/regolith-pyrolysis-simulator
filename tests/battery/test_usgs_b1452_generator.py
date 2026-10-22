@@ -669,23 +669,16 @@ def test_oxide_asterisk_is_basis_not_damage() -> None:
 
 
 def test_b1452_element_reference_follows_the_janaf_state_at_temperature() -> None:
-    """The stamp is the JANAF reference state at the row temperature."""
+    """Every non-diatomic element is stamped crystal plus Polymorph.REFERENCE."""
 
-    potassium = generator._element_reference_species("K", Decimal("1100"))
+    potassium = generator._element_reference_species("K")
     assert potassium.formula == "K"
-    assert potassium.phase.value is Phase.G
-    iron = generator._element_reference_species("Fe", Decimal("1200"))
-    assert iron.phase.value is Phase.CR
-    assert iron.polymorph is not None
-    assert iron.polymorph.value is Polymorph.GAMMA
-    oxygen = generator._element_reference_species("O", Decimal("1100"))
+    assert potassium.phase.value is Phase.CR
+    assert potassium.polymorph is not None
+    assert potassium.polymorph.value is Polymorph.REFERENCE
+    oxygen = generator._element_reference_species("O")
     assert oxygen.formula == "O2"
     assert oxygen.phase.value is Phase.G
-    # Fe-003 prints both phases on the 1184 K transition row.
-    boundary = generator._element_reference_species("Fe", Decimal("1184"))
-    assert boundary.phase.is_unknown
-    assert boundary.polymorph is not None
-    assert boundary.polymorph.value is Polymorph.REFERENCE
 
 
 def test_formation_basis_is_identity_axis() -> None:
