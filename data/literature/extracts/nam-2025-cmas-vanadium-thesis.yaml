@@ -379,18 +379,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id013
           pO2_Pa:
             state:
               tag: value
@@ -409,6 +397,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.2061'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.2061'
     - observation_id: nam2025_t81_s3_l_v2o3
@@ -441,18 +433,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id013
           pO2_Pa:
             state:
               tag: value
@@ -466,6 +446,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.2061'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.2061'
     - observation_id: nam2025_t82_transition_1a
@@ -702,11 +686,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: unknown
-              reason: printed_initial_composition_does_not_sum_to_100; do_not_reconstruct
-            locator: *id003
           pO2_Pa:
             state:
               tag: value
@@ -754,11 +733,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: unknown
-              reason: printed_initial_composition_does_not_sum_to_100; do_not_reconstruct
-            locator: *id003
           pO2_Pa:
             state:
               tag: value
@@ -806,11 +780,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: unknown
-              reason: printed_initial_composition_does_not_sum_to_100; do_not_reconstruct
-            locator: *id003
           pO2_Pa:
             state:
               tag: value
@@ -858,20 +827,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.15'
-                - - SiO2
-                  - '0.35'
-                - - V2O5
-                  - '0.5'
-            locator: *id004
           pO2_Pa:
             state:
               tag: value
@@ -884,6 +839,11 @@ species:
             locator: *id021
         sigma_as_published: '0.3852'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.15'
+          SiO2: '0.35'
+          V2O5: '0.5'
       uncertainty:
         sigma: '0.3852'
     - observation_id: nam2025_t101_s4_l_sio2
@@ -918,20 +878,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.15'
-                - - SiO2
-                  - '0.35'
-                - - V2O5
-                  - '0.5'
-            locator: *id004
           pO2_Pa:
             state:
               tag: value
@@ -944,6 +890,11 @@ species:
             locator: *id021
         sigma_as_published: '0.5929'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.15'
+          SiO2: '0.35'
+          V2O5: '0.5'
       uncertainty:
         sigma: '0.5929'
     - observation_id: nam2025_t101_s4_l_v2o5
@@ -978,20 +929,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.15'
-                - - SiO2
-                  - '0.35'
-                - - V2O5
-                  - '0.5'
-            locator: *id004
           pO2_Pa:
             state:
               tag: value
@@ -1004,6 +941,11 @@ species:
             locator: *id021
         sigma_as_published: '0.2807'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.15'
+          SiO2: '0.35'
+          V2O5: '0.5'
       uncertainty:
         sigma: '0.2807'
     context:
@@ -1530,19 +1472,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id008
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1550,6 +1479,10 @@ species:
           locator: *id008
         sigma_as_published: '0.1438'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.1438'
     - observation_id: nam2025_t61_s11_l_v2o3
@@ -1581,19 +1514,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id008
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1601,6 +1521,10 @@ species:
           locator: *id008
         sigma_as_published: '0.1438'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.1438'
     - observation_id: nam2025_t61_s12_l_cao
@@ -1632,19 +1556,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id009
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1652,6 +1563,10 @@ species:
           locator: *id009
         sigma_as_published: '0.2409'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.2409'
     - observation_id: nam2025_t61_s12_l_v2o3
@@ -1683,19 +1598,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id009
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1703,6 +1605,10 @@ species:
           locator: *id009
         sigma_as_published: 0. 2409
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.2409'
     - observation_id: nam2025_t61_s16_l_cao
@@ -1734,19 +1640,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.9'
-                - - V2O3
-                  - '0.1'
-            locator: *id011
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1754,6 +1647,10 @@ species:
           locator: *id011
         sigma_as_published: '0.1124'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.9'
+          V2O3: '0.1'
       uncertainty:
         sigma: '0.1124'
     - observation_id: nam2025_t61_s16_l_v2o3
@@ -1785,19 +1682,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.9'
-                - - V2O3
-                  - '0.1'
-            locator: *id011
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1805,6 +1689,10 @@ species:
           locator: *id011
         sigma_as_published: '0.1124'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.9'
+          V2O3: '0.1'
       uncertainty:
         sigma: '0.1124'
     - observation_id: nam2025_t61_s17_l_cao
@@ -1836,19 +1724,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.9'
-                - - V2O3
-                  - '0.1'
-            locator: *id012
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1856,6 +1731,10 @@ species:
           locator: *id012
         sigma_as_published: '0.3339'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.9'
+          V2O3: '0.1'
       uncertainty:
         sigma: '0.3339'
     - observation_id: nam2025_t61_s17_l_v2o3
@@ -1887,19 +1766,6 @@ species:
         analysis_count_as_published: 10
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.9'
-                - - V2O3
-                  - '0.1'
-            locator: *id012
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -1907,6 +1773,10 @@ species:
           locator: *id012
         sigma_as_published: '0.3339'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.9'
+          V2O3: '0.1'
       uncertainty:
         sigma: '0.3339'
     context:
@@ -3008,19 +2878,6 @@ species:
         analysis_count_as_published: 9
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.75'
-                - - V2O3
-                  - '0.25'
-            locator: *id010
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -3028,6 +2885,10 @@ species:
           locator: *id010
         sigma_as_published: '0.7261'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.75'
+          V2O3: '0.25'
       uncertainty:
         sigma: '0.7261'
     - observation_id: nam2025_t61_s14_l_v2o3
@@ -3059,19 +2920,6 @@ species:
         analysis_count_as_published: 9
         method_class: measured_direct
         admission_status: admitted
-        point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - CaO
-                  - '0.75'
-                - - V2O3
-                  - '0.25'
-            locator: *id010
         log_fO2:
           value: '-10'
           units: log10(atm)
@@ -3079,6 +2927,10 @@ species:
           locator: *id010
         sigma_as_published: '0.7261'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          CaO: '0.75'
+          V2O3: '0.25'
       uncertainty:
         sigma: '0.7261'
     - observation_id: nam2025_t81_s4_l_al2o3
@@ -3111,18 +2963,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id014
           pO2_Pa:
             state:
               tag: value
@@ -3136,6 +2976,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.6193'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.6193'
     - observation_id: nam2025_t81_s4_l_v2o3
@@ -3168,18 +3012,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id014
           pO2_Pa:
             state:
               tag: value
@@ -3193,6 +3025,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.6193'
         duration_days_as_published: '2'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.6193'
     - observation_id: nam2025_t81_s5_l1_al2o3
@@ -3225,23 +3061,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: &id028
-              source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-              pdf_page_index: 143
-              page: 144
-              published_page: 125
-              table: '8.1'
           pO2_Pa:
             state:
               tag: value
@@ -3255,6 +3074,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.9148'
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.9148'
     - observation_id: nam2025_t81_s5_l1_v2o3
@@ -3287,18 +3110,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id028
           pO2_Pa:
             state:
               tag: value
@@ -3312,6 +3123,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.9148'
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.9148'
     - observation_id: nam2025_t81_s5_l2_al2o3
@@ -3344,18 +3159,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id015
           pO2_Pa:
             state:
               tag: value
@@ -3369,6 +3172,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.8695'
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.8695'
     - observation_id: nam2025_t81_s5_l2_v2o3
@@ -3401,18 +3208,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.3'
-                - - V2O5
-                  - '0.7'
-            locator: *id015
           pO2_Pa:
             state:
               tag: value
@@ -3426,6 +3221,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.8695'
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.3'
+          V2O5: '0.7'
       uncertainty:
         sigma: '0.8695'
     - observation_id: nam2025_t82_liquid_1b_v2o5
@@ -3759,18 +3558,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id016
           pO2_Pa:
             state:
               tag: value
@@ -3784,6 +3571,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         uncertainty_as_published: sigma = 0; zero uncertainty omitted
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
     - observation_id: nam2025_t92_s1_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3814,18 +3605,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id016
           pO2_Pa:
             state:
               tag: value
@@ -3839,6 +3618,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.4466'
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.4466'
     - observation_id: nam2025_t92_s2_l_sio2
@@ -3871,18 +3654,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.5'
-                - - V2O3
-                  - '0.5'
-            locator: *id017
           pO2_Pa:
             state:
               tag: value
@@ -3896,6 +3667,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         uncertainty_as_published: sigma = 0; zero uncertainty omitted
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.5'
+          V2O3: '0.5'
     - observation_id: nam2025_t92_s2_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -3926,18 +3701,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.5'
-                - - V2O3
-                  - '0.5'
-            locator: *id017
           pO2_Pa:
             state:
               tag: value
@@ -3951,6 +3714,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.8494'
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.5'
+          V2O3: '0.5'
       uncertainty:
         sigma: '0.8494'
     - observation_id: nam2025_t92_s3_l_sio2
@@ -3983,18 +3750,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id018
           pO2_Pa:
             state:
               tag: value
@@ -4008,6 +3763,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         uncertainty_as_published: sigma = 0; zero uncertainty omitted
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
     - observation_id: nam2025_t92_s3_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -4038,18 +3797,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id018
           pO2_Pa:
             state:
               tag: value
@@ -4063,6 +3810,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.1604'
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.1604'
     - observation_id: nam2025_t92_s4_l_sio2
@@ -4095,18 +3846,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.8'
-                - - V2O3
-                  - '0.2'
-            locator: *id019
           pO2_Pa:
             state:
               tag: value
@@ -4120,6 +3859,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         uncertainty_as_published: sigma = 0; zero uncertainty omitted
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.8'
+          V2O3: '0.2'
     - observation_id: nam2025_t92_s4_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -4150,18 +3893,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.8'
-                - - V2O3
-                  - '0.2'
-            locator: *id019
           pO2_Pa:
             state:
               tag: value
@@ -4175,6 +3906,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.2733'
         duration_days_as_published: '3'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.8'
+          V2O3: '0.2'
       uncertainty:
         sigma: '0.2733'
     - observation_id: nam2025_t92_s5_l_sio2
@@ -4207,18 +3942,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id020
           pO2_Pa:
             state:
               tag: value
@@ -4232,6 +3955,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         uncertainty_as_published: sigma = 0; zero uncertainty omitted
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
     - observation_id: nam2025_t92_s5_l_v2o3
       type: composition_series
       units: mol% oxide component as printed
@@ -4262,18 +3989,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - SiO2
-                  - '0.7'
-                - - V2O3
-                  - '0.3'
-            locator: *id020
           pO2_Pa:
             state:
               tag: value
@@ -4287,6 +4002,10 @@ species:
         pO2_as_published: 0.21 atm (air)
         sigma_as_published: '0.3153'
         duration_days_as_published: '1'
+        composition_mol:
+          basis: printed_mole_fraction
+          SiO2: '0.7'
+          V2O3: '0.3'
       uncertainty:
         sigma: '0.3153'
     - observation_id: nam2025_t101_s1_l_al2o3
@@ -4321,20 +4040,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.57'
-                - - SiO2
-                  - '0.15'
-                - - V2O5
-                  - '0.28'
-            locator: *id001
           pO2_Pa:
             state:
               tag: value
@@ -4347,6 +4052,11 @@ species:
             locator: *id021
         sigma_as_published: '1.3425'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.57'
+          SiO2: '0.15'
+          V2O5: '0.28'
       uncertainty:
         sigma: '1.3425'
     - observation_id: nam2025_t101_s1_l_sio2
@@ -4381,20 +4091,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.57'
-                - - SiO2
-                  - '0.15'
-                - - V2O5
-                  - '0.28'
-            locator: *id001
           pO2_Pa:
             state:
               tag: value
@@ -4407,6 +4103,11 @@ species:
             locator: *id021
         sigma_as_published: '1.5993'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.57'
+          SiO2: '0.15'
+          V2O5: '0.28'
       uncertainty:
         sigma: '1.5993'
     - observation_id: nam2025_t101_s1_l_v2o5
@@ -4441,20 +4142,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.57'
-                - - SiO2
-                  - '0.15'
-                - - V2O5
-                  - '0.28'
-            locator: *id001
           pO2_Pa:
             state:
               tag: value
@@ -4467,6 +4154,11 @@ species:
             locator: *id021
         sigma_as_published: '2.6066'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.57'
+          SiO2: '0.15'
+          V2O5: '0.28'
       uncertainty:
         sigma: '2.6066'
     - observation_id: nam2025_t101_s2_l_al2o3
@@ -4501,20 +4193,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.4'
-                - - SiO2
-                  - '0.3'
-                - - V2O5
-                  - '0.3'
-            locator: *id002
           pO2_Pa:
             state:
               tag: value
@@ -4527,6 +4205,11 @@ species:
             locator: *id021
         sigma_as_published: '1.2392'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.4'
+          SiO2: '0.3'
+          V2O5: '0.3'
       uncertainty:
         sigma: '1.2392'
     - observation_id: nam2025_t101_s2_l_sio2
@@ -4561,20 +4244,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.4'
-                - - SiO2
-                  - '0.3'
-                - - V2O5
-                  - '0.3'
-            locator: *id002
           pO2_Pa:
             state:
               tag: value
@@ -4587,6 +4256,11 @@ species:
             locator: *id021
         sigma_as_published: '1.8800'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.4'
+          SiO2: '0.3'
+          V2O5: '0.3'
       uncertainty:
         sigma: '1.8800'
     - observation_id: nam2025_t101_s2_l_v2o5
@@ -4621,20 +4295,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.4'
-                - - SiO2
-                  - '0.3'
-                - - V2O5
-                  - '0.3'
-            locator: *id002
           pO2_Pa:
             state:
               tag: value
@@ -4647,6 +4307,11 @@ species:
             locator: *id021
         sigma_as_published: '2.2806'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.4'
+          SiO2: '0.3'
+          V2O5: '0.3'
       uncertainty:
         sigma: '2.2806'
     - observation_id: nam2025_t101_s5_l_al2o3
@@ -4681,20 +4346,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.2'
-                - - SiO2
-                  - '0.7'
-                - - V2O5
-                  - '0.1'
-            locator: *id005
           pO2_Pa:
             state:
               tag: value
@@ -4707,6 +4358,11 @@ species:
             locator: *id021
         sigma_as_published: '0.0297'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.2'
+          SiO2: '0.7'
+          V2O5: '0.1'
       uncertainty:
         sigma: '0.0297'
     - observation_id: nam2025_t101_s5_l_sio2
@@ -4741,20 +4397,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.2'
-                - - SiO2
-                  - '0.7'
-                - - V2O5
-                  - '0.1'
-            locator: *id005
           pO2_Pa:
             state:
               tag: value
@@ -4767,6 +4409,11 @@ species:
             locator: *id021
         sigma_as_published: '0.1051'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.2'
+          SiO2: '0.7'
+          V2O5: '0.1'
       uncertainty:
         sigma: '0.1051'
     - observation_id: nam2025_t101_s5_l_v2o5
@@ -4801,20 +4448,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.2'
-                - - SiO2
-                  - '0.7'
-                - - V2O5
-                  - '0.1'
-            locator: *id005
           pO2_Pa:
             state:
               tag: value
@@ -4827,6 +4460,11 @@ species:
             locator: *id021
         sigma_as_published: '0.1122'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.2'
+          SiO2: '0.7'
+          V2O5: '0.1'
       uncertainty:
         sigma: '0.1122'
     - observation_id: nam2025_t101_s6_l1_al2o3
@@ -4861,25 +4499,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: &id029
-              source_path: raw/nam-2025-cmas-vanadium-thesis/nam-2025-cmas-vanadium-thesis.pdf
-              pdf_page_index: 195
-              page: 196
-              published_page: 177
-              table: '10.1'
           pO2_Pa:
             state:
               tag: value
@@ -4892,6 +4511,11 @@ species:
             locator: *id021
         sigma_as_published: '0.1577'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '0.1577'
     - observation_id: nam2025_t101_s6_l1_sio2
@@ -4926,20 +4550,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: *id029
           pO2_Pa:
             state:
               tag: value
@@ -4952,6 +4562,11 @@ species:
             locator: *id021
         sigma_as_published: '0.9695'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '0.9695'
     - observation_id: nam2025_t101_s6_l1_v2o5
@@ -4986,20 +4601,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: *id029
           pO2_Pa:
             state:
               tag: value
@@ -5012,6 +4613,11 @@ species:
             locator: *id021
         sigma_as_published: '0.8287'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '0.8287'
     - observation_id: nam2025_t101_s6_l2_al2o3
@@ -5046,20 +4652,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: *id006
           pO2_Pa:
             state:
               tag: value
@@ -5072,6 +4664,11 @@ species:
             locator: *id021
         sigma_as_published: '0.2064'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '0.2064'
     - observation_id: nam2025_t101_s6_l2_sio2
@@ -5106,20 +4703,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: *id006
           pO2_Pa:
             state:
               tag: value
@@ -5132,6 +4715,11 @@ species:
             locator: *id021
         sigma_as_published: '1.8119'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '1.8119'
     - observation_id: nam2025_t101_s6_l2_v2o5
@@ -5166,20 +4754,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.57'
-                - - V2O5
-                  - '0.38'
-            locator: *id006
           pO2_Pa:
             state:
               tag: value
@@ -5192,6 +4766,11 @@ species:
             locator: *id021
         sigma_as_published: '1.6495'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.57'
+          V2O5: '0.38'
       uncertainty:
         sigma: '1.6495'
     - observation_id: nam2025_t101_s7_l_al2o3
@@ -5226,20 +4805,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.76'
-                - - V2O5
-                  - '0.19'
-            locator: *id007
           pO2_Pa:
             state:
               tag: value
@@ -5252,6 +4817,11 @@ species:
             locator: *id021
         sigma_as_published: '0.0754'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.76'
+          V2O5: '0.19'
       uncertainty:
         sigma: '0.0754'
     - observation_id: nam2025_t101_s7_l_sio2
@@ -5286,20 +4856,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.76'
-                - - V2O5
-                  - '0.19'
-            locator: *id007
           pO2_Pa:
             state:
               tag: value
@@ -5312,6 +4868,11 @@ species:
             locator: *id021
         sigma_as_published: '0.3120'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.76'
+          V2O5: '0.19'
       uncertainty:
         sigma: '0.3120'
     - observation_id: nam2025_t101_s7_l_v2o5
@@ -5346,20 +4907,6 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
-          composition:
-            state:
-              tag: value
-              value:
-                basis: printed_mole_fraction
-                amount_basis: mole_fraction
-                components:
-                - - Al2O3
-                  - '0.05'
-                - - SiO2
-                  - '0.76'
-                - - V2O5
-                  - '0.19'
-            locator: *id007
           pO2_Pa:
             state:
               tag: value
@@ -5372,6 +4919,11 @@ species:
             locator: *id021
         sigma_as_published: '0.2748'
         duration_days_as_published: '7'
+        composition_mol:
+          basis: printed_mole_fraction
+          Al2O3: '0.05'
+          SiO2: '0.76'
+          V2O5: '0.19'
       uncertainty:
         sigma: '0.2748'
     context:

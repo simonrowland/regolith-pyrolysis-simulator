@@ -255,8 +255,14 @@ def test_all_typed_rows_migrate_with_printed_species_temperature_and_oxygen() ->
             if raw.get("experiment") == "nam2025_t101_s3":
                 assert not observation.identity.composition.is_value
                 assert "sum 111 mol% as printed" in values["sample_composition_as_published"]
-            elif "composition" in values.get("point_conditions", {}):
+            elif "composition_mol" in values:
                 assert observation.identity.composition.is_value
+                expected_composition = {
+                    formula: Decimal(str(amount))
+                    for formula, amount in values["composition_mol"].items()
+                    if formula != "basis"
+                }
+                assert dict(observation.identity.composition.value.components) == expected_composition
         else:
             assert observation.identity.quantity.value is Quantity.TRANSITION_TEMPERATURE
 
