@@ -498,6 +498,73 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     assert detail["unsourced_channels"] == ["Ca"]
 
 
+@pytest.mark.parametrize("gases", [("Ca",), ("Ca", "Ca2")],
+                         ids=["single-gas", "shared-parent-gases"])
+def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
+    gases, prescribed_pressure_engine, fig3_source, r11_inputs, monkeypatch,
+):
+    import simulator.battery.residue as residue
+    from simulator.accounting.formulas import parse_formula
+    from simulator.battery.enums import ValueKind
+    from simulator.battery.records import State, Value
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    row, experiment = r11_inputs
+    # One mol of CaO, with its mass from the production formula resolver,
+    # independently of the corner helper or its per-step substitutions.
+    ceiling = float(parse_formula("CaO").molar_mass_kg_per_mol())
+    mass = replace(experiment.sample.mass_kg, state=State.of(
+        Value(ValueKind.POINT, point=Decimal(str(ceiling)))
+    ))
+    experiment = replace(experiment, sample=replace(experiment.sample, mass_kg=mass))
+    channels = [(name, ("CaO", 1 if name == "Ca" else 2, -0.5 if name == "Ca" else -1.0))
+                for name in gases] + [("O2", (None, 0.0, 1.0))]
+    monkeypatch.setattr(binary_pot_battery, "_openimcc_gas_channels_and_omission_notices",
+                        lambda *_: (channels, ()))
+    monkeypatch.setattr(residue, "_initial_oxide_wt_percent", lambda _: {"CaO": 100.0})
+    monkeypatch.setattr(residue, "_mass_loss_thermal_segments", lambda *_: (
+        1173.15, 120.0, ((2073.15, 120.0), (2073.15, 120.0)),
+    ))
+    # Positive pressures place the high root inside the existing bracket but
+    # below the provider's flux threshold, so all three trajectories retain
+    # the parent. Both gases diverge at the supplier-free maximizing corner.
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *_, **__: (
+        lambda _inventory, logp: {"Ca": 1e-25 / (10.0**logp)**0.5,
+                                  "Ca2": 1e-40 / 10.0**logp, "O2": 1e5 * 10.0**logp}
+    ))
+    integrations = []
+    original = residue._hashimoto_integrate_geometry
+
+    def integrate(*args, **kwargs):
+        if "on_step" in kwargs:
+            integrations.append((kwargs["geometry_policy_id"], kwargs["steps"], kwargs["duration_s"]))
+        result = original(*args, **kwargs)
+        assert result.inventory_mol == {"CaO": 1.0}
+        assert result.evaporated_mol == {}
+        return result
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
+    with pytest.raises(ResidueInventoryRefusal) as failure:
+        residue.predict_mass_loss_fraction(
+            "openimcc", experiment, temperature_K=2073.15,
+            source_document=fig3_source, observation=row,
+        )
+    assert failure.value.reason == "alpha_not_sourced"
+    bound = json.loads(failure.value.detail)
+    assert integrations == [("sphere_constant", 2, 120.0),
+                            ("sphere_shrinking", 2, 120.0), ("sphere_shrinking", 2, 120.0)]
+    assert bound["bound_kg"] == pytest.approx(ceiling, rel=1e-14, abs=0.0)
+    assert bound["inventory_capped_channels"] == list(gases)
+    cap = bound["inventory_bound_kg_by_parent"]["CaO"]
+    assert cap["uncapped_bound_kg"] == pytest.approx(6 * len(gases) * ceiling, rel=1e-14, abs=0.0)
+    assert cap["ceiling_kg"] == cap["applied_bound_kg"] == ceiling
+    assert 0.0 < bound["preheat_bound_kg"] < ceiling
+    assert bound["bound_kg"] == pytest.approx(
+        sum(bound["unsourced_bound_kg_by_channel"].values()) + bound["preheat_bound_kg"],
+        rel=1e-14, abs=0.0,
+    )
+
+
 def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch):
     pytest.importorskip("openimcc")
     row, experiment = r11_inputs
@@ -513,6 +580,7 @@ def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch)
     assert bound["corner_ordering_verified"]
     assert bound["corner_steps"] > 0
     assert bound["unsourced_bound_kg_by_channel"]["AlO2"] > 0.0
+    assert bound["inventory_bound_kg_by_parent"] == {}
     assert bound["preheat_bound_kg"] > 0.0
     assert bound["joint_arm_loss_kg_non_gating"] is not None
 

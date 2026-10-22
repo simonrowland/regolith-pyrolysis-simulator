@@ -1456,8 +1456,9 @@ def predict_mass_loss_fraction(
                       if parent and str(species) not in fits)
 
     bounds_by_channel = {species: 0.0 for species in unsourced}
+    preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
     corner_records = []
-    preheat_capped_channels = set()
+    inventory_capped_channels = set()
 
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
@@ -1486,22 +1487,18 @@ def predict_mass_loss_fraction(
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
-        preheat_ceiling_kg = 0.0
-
         def measure(incoming, active_channels, area, duration):
-            nonlocal preheat_ceiling_kg
             bounds, corners = _mass_loss_corner_bounds(
                 incoming, active_channels, pressure_model, unsourced=unsourced,
                 temperature_K=at_K, area_m2=area, duration_s=duration,
                 include_sourced=rectangle,
             )
-            if rectangle:
-                preheat_ceiling_kg += math.fsum(bounds.values())
-                preheat_capped_channels.update(corners["inventory_capped_channels"])
-                return
+            inventory_capped_channels.update(corners["inventory_capped_channels"])
+            target = preheat_bounds_by_channel if rectangle else bounds_by_channel
             for species, amount in bounds.items():
-                bounds_by_channel[species] += amount
-            corner_records.append(corners)
+                target[species] += amount
+            if not rectangle:
+                corner_records.append(corners)
 
         result = _hashimoto_integrate_geometry(
             inventory, channels, pressure_model, temperature_K=at_K,
@@ -1519,11 +1516,11 @@ def predict_mass_loss_fraction(
             * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
             for term in terms if term.source.parent_oxide is not None
         }
-        return result.inventory_mol, (preheat_ceiling_kg if rectangle else math.fsum(parent_loss.values()))
+        return result.inventory_mol, math.fsum(parent_loss.values())
 
     # The unknown preheat is an upper rectangle only: do not debit it as a
     # measured trajectory. All its removal, not just unsourced channels, joins B.
-    _unused_inventory, preheat_bound_kg = run_segment(
+    _unused_inventory, _unused_loss = run_segment(
         initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
         rectangle=True, unsourced_unity=True
     )
@@ -1545,7 +1542,31 @@ def predict_mass_loss_fraction(
             except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
                 joint_refusal = {"reason": exc.reason, "detail": exc.detail}
         documented_loss_kg += loss
+    channel_parents = {str(species): parent for species, (parent, *_rest) in gas_channels if parent}
+    inventory_bounds_by_parent = {}
+    # A divergent channel can remove at most its initial parent mass, ONCE:
+    # splitting time or sharing that parent between gases creates no matter.
+    # Cap the accumulated parent sum, including preheat, rather than shadow-
+    # debiting the point state. This leaves the original trajectories intact.
+    # Proportional attribution preserves B=sum(channels)+preheat; it is not a
+    # physical debit. Two 60 s full-parent claims become m0, never 2*m0.
+    for parent in sorted({channel_parents[species] for species in inventory_capped_channels}):
+        species = [name for name, oxide in channel_parents.items() if oxide == parent]
+        total = math.fsum(mapping.get(name, 0.0)
+                          for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                          for name in species)
+        ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
+        scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
+        inventory_bounds_by_parent[parent] = {
+            "uncapped_bound_kg": total, "ceiling_kg": ceiling,
+            "applied_bound_kg": min(total, ceiling),
+        }
+        for mapping in (bounds_by_channel, preheat_bounds_by_channel):
+            for name in species:
+                if name in mapping:
+                    mapping[name] *= scale
     unsourced_bound_kg = math.fsum(bounds_by_channel.values())
+    preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
     point_loss_kg = documented_loss_kg
     uncertainty = getattr(observation, "uncertainty", None)
     uncertainty_kg = None
@@ -1573,9 +1594,8 @@ def predict_mass_loss_fraction(
             name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
             for name in ("pO2_low_bar", "pO2_high_bar")
         } if corner_records else {},
-        "inventory_capped_channels": sorted(preheat_capped_channels | {
-            species for c in corner_records for species in c["inventory_capped_channels"]
-        }),
+        "inventory_capped_channels": sorted(inventory_capped_channels),
+        "inventory_bound_kg_by_parent": inventory_bounds_by_parent,
     }
     try:
         diagnostics = _mass_loss_bound_gate(
