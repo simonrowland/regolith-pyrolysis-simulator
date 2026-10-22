@@ -1,0 +1,1755 @@
+schema_version: literature_extract.v1
+source_id: farah-1998-vanadium-silicate-melts-thesis
+source:
+  citation: Farah, H. (1998). Redox chemistry and ESR studies of vanadium in quenched silicate melts. PhD thesis,
+    University of New South Wales.
+  doi: 10.26190/unsworks/11435
+  year: 1998
+extraction:
+  method: MinerU table drafts transcribed as context because no existing token represents vanadium valence ratios
+    or average valency; all five target tables were checked against 600 dpi page renders. Relevant figures are listed
+    for deferred digitisation only.
+  date: '2026-10-22'
+  worker: fam41-1022
+  provenance_path: extracts/farah-1998-vanadium-silicate-melts-thesis.yaml
+review_status: draft
+species:
+  V:
+    observations: []
+    context:
+    - observation_id: farah_1998_table_4_1_master_melt_compositions
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 95
+        page: 96
+        published_page: 72
+        table: Table 4.1
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        reason_untyped: 'This is a partial master-charge recipe table: it mixes molar ratios and oxide percentages,
+          reports dashes rather than a complete phase vector, and does not give a measured-phase temperature. The
+          New Zealand Steel row is a whole multiphase slag bulk analysis. No listed composition token matches all
+          of these rows without changing their meaning.'
+        printed_data:
+          columns:
+          - melt
+          - Na2O/SiO2_molar_ratio
+          - CaO/SiO2_molar_ratio
+          - V2O5_mol_percent
+          - Al2O3_wt_percent
+          - MgO_wt_percent
+          - Fe2O3_mol_percent
+          rows:
+          - - A
+            - '0.5'
+            - '-'
+            - '1'
+            - '-'
+            - '-'
+            - '-'
+          - - B
+            - '0.5'
+            - '-'
+            - '5'
+            - '-'
+            - '-'
+            - '-'
+          - - C
+            - '1.0'
+            - '-'
+            - '5'
+            - '-'
+            - '-'
+            - '-'
+          - - D
+            - '0.5'
+            - '-'
+            - '10'
+            - '-'
+            - '-'
+            - '-'
+          - - E
+            - '-'
+            - '0.7'
+            - '5'
+            - '-'
+            - '-'
+            - '-'
+          - - F
+            - '-'
+            - '0.9'
+            - '5'
+            - '-'
+            - '-'
+            - '-'
+          - - G
+            - '-'
+            - '1.23'
+            - '5'
+            - '-'
+            - '-'
+            - '-'
+          - - H
+            - '-'
+            - '0.7'
+            - '1'
+            - '-'
+            - '-'
+            - '-'
+          - - I
+            - '-'
+            - '0.9'
+            - '1'
+            - '-'
+            - '-'
+            - '-'
+          - - J
+            - '-'
+            - '1.21'
+            - '3'
+            - '-'
+            - '-'
+            - '-'
+          - - K
+            - '-'
+            - '1.23'
+            - '5'
+            - '3.22'
+            - '-'
+            - '-'
+          - - L
+            - '-'
+            - '1.22'
+            - '5'
+            - '5.44'
+            - '-'
+            - '-'
+          - - M
+            - '-'
+            - '1.22'
+            - '5'
+            - '7.87'
+            - '-'
+            - '-'
+          - - N
+            - '-'
+            - '1.57'
+            - '5'
+            - '-'
+            - '3.50'
+            - '-'
+          - - O
+            - '-'
+            - '1.51'
+            - '5'
+            - '-'
+            - '4.87'
+            - '-'
+          - - P*
+            - '-'
+            - '0.71'
+            - '4'
+            - '-'
+            - '-'
+            - '-'
+          - - Q*
+            - '-'
+            - '0.71'
+            - '10'
+            - '-'
+            - '-'
+            - '-'
+          - - R*
+            - '-'
+            - '1.14'
+            - '10'
+            - '-'
+            - '-'
+            - '-'
+          - - S*
+            - '-'
+            - '1.66'
+            - '10'
+            - '-'
+            - '-'
+            - '-'
+          - - T*
+            - '-'
+            - '1.25'
+            - '10'
+            - '-'
+            - '-'
+            - '10'
+          - - U*
+            - '-'
+            - '1.56'
+            - '10'
+            - '-'
+            - '-'
+            - '10'
+          new_zealand_steel_slag_bulk_wt_percent:
+            Fe(total)_wt_percent: '12.72'
+            CaO_wt_percent: '51.41'
+            SiO2_wt_percent: '9.85'
+            Al2O3_wt_percent: '2.35'
+            MgO_wt_percent: '8.77'
+            V2O3_wt_percent: '4.11'
+            TiO2_wt_percent: '3.72'
+            Cr2O3_wt_percent: '0.324'
+            MnO_wt_percent: '2.16'
+            P2O5_wt_percent: '1.365'
+            S_wt_percent: '0.185'
+          note: Dashes are unreported cells, not zero. The table describes master melts prepared for experiments;
+            it is not a per-run equilibrated phase-composition table.
+      units: Na2O/SiO2 and CaO/SiO2 are molar ratios; V2O5 and Fe2O3 are mol%; Al2O3 and MgO are wt%; the New Zealand
+        Steel bulk analysis is wt%.
+    - observation_id: farah_1998_table_5_1_equilibrium_redox_ratios
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 117
+        page: 118
+        published_page: 94
+        table: Table 5.1
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: &id001
+        - fe3_fe2_ratio
+        - ion_intensity_ratio
+        reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio
+          is Fe-specific and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+        printed_data:
+          printed_condition: pO2 = 10^-10 atm
+          rows:
+          - sample: A
+            temperature_C: '1125'
+            V4+/V5+: '0.535'
+            V3+/V4+: '-'
+          - sample: A
+            temperature_C: '1225'
+            V4+/V5+: '1.138'
+            V3+/V4+: '0.355'
+          - sample: A
+            temperature_C: '1325'
+            V4+/V5+: '4.345'
+            V3+/V4+: '0.331'
+          - sample: B
+            temperature_C: '1225'
+            V4+/V5+: '3.926'
+            V3+/V4+: '-'
+          - sample: C
+            temperature_C: '1225'
+            V4+/V5+: '0.111'
+            V3+/V4+: '-'
+          - sample: D
+            temperature_C: '1225'
+            V4+/V5+: '2.911'
+            V3+/V4+: '0.344'
+          composition_binding: Melt A-D identities and compositions are given in Table 4.1; temperatures and ratio
+            cells are reproduced here. A dash is unreported, not zero.
+          printed_ratio_headers:
+          - V4+/V5+
+          - V3+/V4+
+      units: redox ratios are dimensionless; pO2 is atm; temperature is °C.
+    - observation_id: farah_1998_table_5_2_average_vanadium_valency
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 127
+        page: 128
+        published_page: 104
+        table: Table 5.2
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *id001
+        reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio
+          is Fe-specific and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+        printed_data:
+          printed_quantity: average vanadium valency (a of V^a+)
+          sample_columns:
+          - A_1125C
+          - A_1225C
+          - A_1325C
+          - B_1225C
+          - C_1225C
+          - D_1225C
+          rows:
+          - log10_pO2_atm: '-2'
+            values:
+            - '4.964'
+            - '4.948'
+            - '4.909'
+            - '4.969'
+            - '4.999'
+            - '4.957'
+          - log10_pO2_atm: '-4'
+            values:
+            - '4.942'
+            - '4.849'
+            - - '4.797'
+              - '4.714'
+            - '4.946'
+            - '4.998'
+            - '4.930'
+          - log10_pO2_atm: '-6'
+            values:
+            - '4.725'
+            - '4.804'
+            - '4.608'
+            - '4.881'
+            - - '4.993'
+              - '4.982'
+            - '4.851'
+          - log10_pO2_atm: '-8'
+            values:
+            - '4.804'
+            - '4.702'
+            - '4.412'
+            - '4.662'
+            - - '4.986'
+              - '4.981'
+            - '4.679'
+          - log10_pO2_atm: '-10'
+            values:
+            - '4.639'
+            - '4.243'
+            - - '3.935'
+              - '3.935'
+            - '4.203'
+            - - '4.90'
+              - '4.933'
+            - '4.00'
+          - log10_pO2_atm: '-12'
+            values:
+            - '4.421'
+            - '3.390'
+            - '3.485'
+            - '3.988'
+            - - '4.75'
+              - '4.602'
+            - '-'
+          - log10_pO2_atm: '-14'
+            values:
+            - '3.491'
+            - '3.365'
+            - '3.338'
+            - '-'
+            - '-'
+            - '-'
+          stacked_values: Where two values are printed vertically in one cell, both remain in that cell as an ordered
+            list; the table does not label them as separate conditions.
+      units: pO2 is atm; average valency is dimensionless; sample temperatures are part of the column headings.
+    - observation_id: farah_1998_table_7_1_slag_redox_ratios
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 170
+        page: 171
+        published_page: 147
+        table: Table 7.1
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *id001
+        reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio
+          is Fe-specific and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+        printed_data:
+          printed_condition: 1600°C; the two ratio columns are at pO2 = 10^-2 atm and 10^-8 atm, respectively
+          rows:
+          - slag: F
+            CaO/SiO2_molar_ratio: '0.9'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '-'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.765'
+            V3+/V4+_at_log10_pO2_atm_-8: '2.71'
+          - slag: G
+            CaO/SiO2_molar_ratio: '1.23'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '-'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.573'
+            V3+/V4+_at_log10_pO2_atm_-8: '1.653'
+          - slag: J
+            CaO/SiO2_molar_ratio: '1.21'
+            V2O5_mol_percent: '3'
+            Al2O3_wt_percent: '-'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '1.005'
+            V3+/V4+_at_log10_pO2_atm_-8: '0.719'
+          - slag: K
+            CaO/SiO2_molar_ratio: '1.23'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '3.22'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.403'
+            V3+/V4+_at_log10_pO2_atm_-8: '1.500'
+          - slag: L
+            CaO/SiO2_molar_ratio: '1.22'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '5.44'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.444'
+            V3+/V4+_at_log10_pO2_atm_-8: '1.803'
+          - slag: M
+            CaO/SiO2_molar_ratio: '1.22'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '7.87'
+            MgO_wt_percent: '-'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.574'
+            V3+/V4+_at_log10_pO2_atm_-8: '2.072'
+          - slag: N
+            CaO/SiO2_molar_ratio: '1.57'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '-'
+            MgO_wt_percent: '3.50'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.140'
+            V3+/V4+_at_log10_pO2_atm_-8: '1.438'
+          - slag: O
+            CaO/SiO2_molar_ratio: '1.51'
+            V2O5_mol_percent: '5'
+            Al2O3_wt_percent: '-'
+            MgO_wt_percent: '4.87'
+            V4+/V5+_at_log10_pO2_atm_-2: '0.107'
+            V3+/V4+_at_log10_pO2_atm_-8: '2.769'
+          note: Each row is bound to the slag label and recipe printed in the table. Table 4.1 gives the master-melt
+            identities. Dashes are unreported, not zero.
+      units: CaO/SiO2 is molar ratio; V2O5 is mol%; Al2O3 and MgO are wt%; redox ratios are dimensionless; pO2 is
+        atm.
+    - observation_id: farah_1998_table_7_2_average_slag_vanadium_valency
+      type: measured_table_no_token
+      locator:
+        pdf_page_index: 184
+        page: 185
+        published_page: 161
+        table: Table 7.2
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *id001
+        reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio
+          is Fe-specific and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+        printed_data:
+          printed_condition: 1600°C
+          sample_columns:
+          - F
+          - G
+          - J
+          - K
+          - L
+          - M
+          - N
+          - O
+          rows:
+          - log10_pO2_atm: '-2'
+            values:
+            - '4.567'
+            - '4.636'
+            - '4.499'
+            - '4.693'
+            - '4.692'
+            - '4.635'
+            - '4.877'
+            - '4.903'
+          - log10_pO2_atm: '-4'
+            values:
+            - '4.000'
+            - '4.121'
+            - '4.398'
+            - '4.139'
+            - '4.139'
+            - '4.219'
+            - '4.692'
+            - '4.743'
+          - log10_pO2_atm: '-6'
+            values:
+            - '3.653'
+            - '4.000'
+            - '4.017'
+            - '4.016'
+            - '4.016'
+            - '4.000'
+            - '4.559'
+            - '4.606'
+          - log10_pO2_atm: '-8'
+            values:
+            - '3.264'
+            - '3.377'
+            - '3.582'
+            - '3.357'
+            - '3.357'
+            - '3.326'
+            - '3.410'
+            - '3.369'
+          - log10_pO2_atm: '-9'
+            values:
+            - '3.151'
+            - '3.251'
+            - '3.401'
+            - '3.234'
+            - '3.233'
+            - '3.195'
+            - '3.410'
+            - '3.369'
+          note: Each value is bound to its printed slag column and pO2 row. The final pressure is 10^-9 atm, verified
+            on the page render.
+      units: pO2 is atm; average valency is dimensionless.
+    - observation_id: farah_1998_fig_5_3_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 112
+        page: 113
+        published_page: 89
+        figure: '5.3'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1125
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system
+          (Melt A, V2O5=1 mol%) at 1125°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt A: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'Melt A: V3+/V4+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_4_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 112
+        page: 113
+        published_page: 89
+        figure: '5.4'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system
+          (Melt A, V2O5=1 mol%) at 1225°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt A: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'Melt A: V3+/V4+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_5_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 113
+        page: 114
+        published_page: 90
+        figure: '5.5'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1325
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system
+          (Melt A, V2O5=1 mol%) at 1325°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt A: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'Melt A: V3+/V4+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_6_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 115
+        page: 116
+        published_page: 92
+        figure: '5.6'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system
+          (Melt B, V2O5=5 mol%) at 1225°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt B: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'Melt B: V3+/V4+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_7_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 115
+        page: 116
+        published_page: 92
+        figure: '5.7'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-SiO2-V2O5 system (Melt
+          C, V2O5=5 mol%) at 1225°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt C: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_8_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 116
+        page: 117
+        published_page: 93
+        figure: '5.8'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system
+          (Melt D, V2O5=10 mol%) at 1225°C.
+        panel: none
+        points: []
+        series:
+        - label: 'Melt D: V4+/V5+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'Melt D: V3+/V4+'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_9_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 119
+        page: 120
+        published_page: 96
+        figure: '5.9'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the plotted series include multiple experimental temperatures or cited comparison data
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Comparison of redox ratios of vanadium as a function of oxygen partial pressure between Na2O-2SiO2-V2O5
+          (Melt A, 1125°C) and Johnston [1] (1085°C).
+        panel: none
+        points: []
+        series:
+        - label: 'this work: Melt A, 1125°C'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Johnston [1], 1085°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_10_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 120
+        page: 121
+        published_page: 97
+        figure: '5.10'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the plotted series include multiple experimental temperatures or cited comparison data
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium oxidation state
+        caption: Comparison of average oxidation state of vanadium for Na2O-2SiO2-V2O5 (Melt A) with Johnston [1]
+          and Mittelstadt & Schwerdfeger [2].
+        panel: none
+        points: []
+        series:
+        - label: 'this work: Melt A'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Johnston [1]
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Mittelstadt & Schwerdfeger [2]
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_11_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 121
+        page: 122
+        published_page: 98
+        figure: '5.11'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the plotted series include multiple experimental temperatures or cited comparison data
+        axes:
+          x: log pO2 (atm)
+          y: log(V4+/V5+)
+        caption: Comparison of V4+/V5+ ratios as a function of oxygen partial pressures for Na2O-2SiO2-V2O5 (Melt
+          A) at different temperatures.
+        panel: none
+        points: []
+        series:
+        - label: Melt A, 1125°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt A, 1225°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt A, 1325°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_12_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 123
+        page: 124
+        published_page: 100
+        figure: '5.12'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C:
+            state:
+              tag: unknown
+              reason: the plotted series include multiple experimental temperatures or cited comparison data
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium oxidation state
+        caption: Comparison of average oxidation state of vanadium as a function of oxygen partial pressures for
+          Melt A at different temperatures.
+        panel: none
+        points: []
+        series:
+        - label: Melt A, 1125°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt A, 1225°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt A, 1325°C
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_13_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 125
+        page: 126
+        published_page: 102
+        figure: '5.13'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log(V4+/V5+)
+        caption: Effect of change in basicity on V4+/V5+ ratios (1225°C).
+        panel: none
+        points: []
+        series:
+        - label: Melt B, Na2O/SiO2=0.5
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt C, Na2O/SiO2=1.0
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_14_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 125
+        page: 126
+        published_page: 102
+        figure: '5.14'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium oxidation state
+        caption: Comparison of average oxidation state of vanadium as a function of oxygen partial pressures at
+          different basicity ratios (1225°C).
+        panel: none
+        points: []
+        series:
+        - label: Melt B, Na2O/SiO2=0.5
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt C, Na2O/SiO2=1.0
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_15_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 126
+        page: 127
+        published_page: 103
+        figure: '5.15'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratio
+        caption: Effect of change in total vanadium content on V4+/V5+ ratios (1225°C).
+        panel: none
+        points: []
+        series:
+        - label: Melt A, V2O5=1 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt B, V2O5=5 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt D, V2O5=10 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_5_16_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 128
+        page: 129
+        published_page: 105
+        figure: '5.16'
+      values:
+        identity:
+          species: V
+          phase: glass
+          T_C: 1225
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium valency
+        caption: Effect of change in total vanadium content on average valence of vanadium (1225°C).
+        panel: none
+        points: []
+        series:
+        - label: Melt A, V2O5=1 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt B, V2O5=5 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Melt D, V2O5=10 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_3_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 158
+        page: 159
+        published_page: 135
+        figure: '7.3'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag F),
+          basicity=0.9 (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag F
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_4_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 160
+        page: 161
+        published_page: 137
+        figure: '7.4'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag G),
+          basicity=1.23 (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag G
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_5_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 160
+        page: 161
+        published_page: 137
+        figure: '7.5'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: total vanadium (wt%)
+        caption: 'Trends in total vanadium content with respect to oxygen pressures at different basicity ratios:
+          slag E=0.7, F=0.9 and G=1.23 (1600°C).'
+        panel: none
+        points: []
+        series:
+        - label: slag E, CaO/SiO2=0.7
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag F, CaO/SiO2=0.9
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag G, CaO/SiO2=1.23
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_7_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 163
+        page: 164
+        published_page: 140
+        figure: '7.7'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag J)
+          (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag J
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_8_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 165
+        page: 166
+        published_page: 142
+        figure: '7.8'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag
+          K) with 3.22 wt% Al2O3 (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag K, Al2O3=3.22 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_9_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 165
+        page: 166
+        published_page: 142
+        figure: '7.9'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag
+          L) with 5.44 wt% Al2O3 (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag L, Al2O3=5.44 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_10_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 166
+        page: 167
+        published_page: 143
+        figure: '7.10'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag
+          M) with 7.87 wt% Al2O3 (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag M, Al2O3=7.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_12_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 168
+        page: 169
+        published_page: 145
+        figure: '7.12'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-MgO-SiO2-V2O5 (slag
+          N) with 3.5 wt% MgO (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag N, MgO=3.5 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_13_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 169
+        page: 170
+        published_page: 146
+        figure: '7.13'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-MgO-SiO2-V2O5 (slag
+          O) with 4.87 wt% MgO (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag O, MgO=4.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_14_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 172
+        page: 173
+        published_page: 149
+        figure: '7.14'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: vanadium redox-species fractions
+        caption: 'Dependence of fraction of redox species of vanadium (CaO-SiO2-V2O5 system) on oxygen partial pressures
+          at CaO/SiO2: a=0.9 (slag F), b=1.23 (slag G), 1600°C.'
+        panel: a,b
+        points: []
+        series:
+        - label: 'panel a: slag F'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'panel b: slag G'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_15_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 173
+        page: 174
+        published_page: 150
+        figure: '7.15'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: 'panel a: log pO2 (atm); panel b: CaO/SiO2 molar ratio'
+          y: vanadium redox ratios
+        caption: Change in vanadium redox ratios (CaO-SiO2-V2O5 system) with log pO2 at basicity ratios F=0.9 and
+          G=1.23; ratios versus CaO/SiO2 for slags F-O (1600°C).
+        panel: a,b
+        points: []
+        series:
+        - label: 'panel a: slag F'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'panel a: slag G'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'panel b: slags F-O'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_16_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 175
+        page: 176
+        published_page: 152
+        figure: '7.16'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium valency
+        caption: Variation of average vanadium valency with basicity (CaO-SiO2-V2O5 system) over investigated oxygen
+          pressures (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag F, CaO/SiO2=0.9
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag G, CaO/SiO2=1.23
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_17_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 176
+        page: 177
+        published_page: 153
+        figure: '7.17'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: overall oxidation state x in VOx
+        caption: Comparison of overall oxidation state x in VOx in CaO-SiO2-V2O5 with Mittelstadt and Schwerdfeger
+          [2] at basicities 1.0 and 1.36 (1600°C).
+        panel: a,b
+        points: []
+        series:
+        - label: 'present work: slag F, basicity 0.9'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Mittelstadt & Schwerdfeger [2], basicity 1.0
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: 'present work: slag G, basicity 1.23'
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: Mittelstadt & Schwerdfeger [2], basicity 1.36
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_18_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 178
+        page: 179
+        published_page: 155
+        figure: '7.18'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log(V3+/V4+)
+        caption: Change in redox ratios (V3+/V4+) in CaO-SiO2-Al2O3-V2O5 with oxygen pressures at different alumina
+          levels (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag G, Al2O3=0 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag K, Al2O3=3.22 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag L, Al2O3=5.44 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag M, Al2O3=7.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_19_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 178
+        page: 179
+        published_page: 155
+        figure: '7.19'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium valency
+        caption: Average vanadium valency at different alumina levels (CaO-SiO2-Al2O3-V2O5 system) (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag K, Al2O3=3.22 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag L, Al2O3=5.44 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag M, Al2O3=7.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_20_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 180
+        page: 181
+        published_page: 157
+        figure: '7.20'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratio
+        caption: Effect of MgO addition on vanadium redox ratios over different oxygen pressures (CaO-MgO-SiO2-V2O5
+          system) (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag G, MgO=0 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag N, MgO=3.5 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag O, MgO=4.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_21_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 180
+        page: 181
+        published_page: 157
+        figure: '7.21'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: (CaO+MgO)/SiO2 molar ratio
+          y: log vanadium redox ratio
+        caption: Comparison of vanadium redox ratios between present work (slags G, N, O) and Inoue & Suito [6]
+          (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: Inoue & Suito [6]
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: present work
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: extrapolation of Inoue & Suito [6]
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_22_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 182
+        page: 183
+        published_page: 159
+        figure: '7.22'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium valency
+        caption: Change in average vanadium valency with oxygen pressures at different magnesia contents for CaO-MgO-SiO2-V2O5
+          slags N and O (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slag N, MgO=3.5 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag O, MgO=4.87 wt%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_23_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 182
+        page: 183
+        published_page: 159
+        figure: '7.23'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: log vanadium redox ratios
+        caption: 'Effect of total vanadium content on vanadium redox ratios in CaO-SiO2-V2O5: 3 mol% V2O5 slag J
+          and 5 mol% slag G.'
+        panel: none
+        points: []
+        series:
+        - label: V3+/V4+, slag J
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: V3+/V4+, slag G
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: V4+/V5+, slag J
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: V4+/V5+, slag G
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_24_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 183
+        page: 184
+        published_page: 160
+        figure: '7.24'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: log pO2 (atm)
+          y: average vanadium valency
+        caption: 'Change in average vanadium valency in CaO-SiO2-V2O5 at different V2O5 contents: 3 mol% slag J
+          and 5 mol% slag G (1600°C).'
+        panel: none
+        points: []
+        series:
+        - label: slag J, V2O5=3 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        - label: slag G, V2O5=5 mol%
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_25_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 187
+        page: 188
+        published_page: 164
+        figure: '7.25'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: optical basicity
+          y: log(V4+/V5+) at pO2=10^-2 atm
+        caption: Variation of V4+/V5+ ratios as a function of optical basicity of slags.
+        panel: none
+        points: []
+        series:
+        - label: slags F,G,J,K,L,M,N,O
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_fig_7_26_vanadium_redox
+      type: figure_record
+      locator:
+        pdf_page_index: 187
+        page: 188
+        published_page: 164
+        figure: '7.26'
+      values:
+        identity:
+          species: V
+          phase: slag
+          T_C: 1600
+        axes:
+          x: optical basicity
+          y: log(V3+/V4+) at pO2=10^-8 atm
+        caption: Change in V3+/V4+ ratios as a function of optical basicity of slags (1600°C).
+        panel: none
+        points: []
+        series:
+        - label: slags F,G,K,L,M,N,O
+          marker_count: null
+          marker_count_status: not counted; digitisation deferred
+        attribution: this work unless a cited source is named in the series label
+        digitisation: deferred to a figure pass
+        quantity_token: null
+        printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the
+          caption and axes
+        schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency
+          quantity token. Figure points were not digitised.
+      units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+    - observation_id: farah_1998_text_summary_fig_7_16_valency
+      type: measured_text_no_token
+      locator:
+        pdf_page_index: 174
+        page: 175
+        published_page: 151
+      values:
+        method_class: measured_tabulated
+        candidate_quantity_tokens: *id001
+        reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio
+          is Fe-specific and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+        printed_summary: The overall oxidation state varied between 3.1 and 4.7 for slags F and G at 1600°C; it
+          was slightly higher for slag G.
+        figures:
+        - '7.16'
+      units: average vanadium oxidation state is dimensionless; temperature is °C.
