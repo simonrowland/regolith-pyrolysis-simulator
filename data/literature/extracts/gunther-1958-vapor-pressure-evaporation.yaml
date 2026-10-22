@@ -12,7 +12,8 @@ extraction:
   worker: codex-resume-85228-1792707932
   audit: Tabellen 1 and 3 each contain 18 data rows. Every temperature, pressure, experiment number and orifice
     area was checked against the page render. The scanned pdftotext-layout.txt is empty; MinerU supplied the machine
-    transcription. The staged MinerU compare reports 12 exact matches and 24 comma-decimal mismatches; all 24
+    transcription. The standalone tools/mineru_table_draft.py (offer-21 line) compare reports 12 exact matches and
+    24 comma-decimal mismatches; all 24
     mismatches were resolved against the PDF renders, and row/column assignments were checked against the renders.
     The pressure column is printed p·10^4
     [Torr], so the pressure cells below are preserved as printed and are not multiplied by 10^-4. The migrator lacks
