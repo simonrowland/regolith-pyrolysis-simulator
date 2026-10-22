@@ -1681,6 +1681,46 @@ def test_alo2_pathological_fO2_no_longer_explodes() -> None:
     assert exploded.pressure_pa == pytest.approx(capped.pressure_pa, rel=0.0, abs=0.0)
 
 
+def test_composite_thermo_continuation_is_continuous_at_constituent_edges() -> None:
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    epsilon_K = 1.0e-6
+
+    for species_id in ("MnO_gas", "CoO_gas"):
+        evaluator = catalog.evaluator_for(species_id)
+        assert evaluator.reference_model.physical_composite_ood is True
+
+        for edge_K, outside_offset_K in (
+            (1000.0, -epsilon_K),
+            (3000.0, epsilon_K),
+        ):
+            edge = evaluator.evaluate(
+                edge_K,
+                source_activity=1.0,
+                pO2_bar=1.0,
+            )
+            outside = evaluator.evaluate(
+                edge_K + outside_offset_K,
+                source_activity=1.0,
+                pO2_bar=1.0,
+            )
+
+            assert edge.out_of_range is True, species_id
+            assert outside.out_of_range is True, species_id
+            assert math.isfinite(edge.pressure_pa) and edge.pressure_pa > 0.0
+            assert math.isfinite(outside.pressure_pa) and outside.pressure_pa > 0.0
+            relative_jump = abs(outside.pressure_pa - edge.pressure_pa) / max(
+                outside.pressure_pa, edge.pressure_pa
+            )
+            assert relative_jump < 1.0e-6, (
+                species_id,
+                edge_K,
+                edge.pressure_pa,
+                outside.pressure_pa,
+            )
+
+
 def test_physical_melt_dissociation_pO2_bar_clamps_sentinel() -> None:
     from engines.builtin.vapor_pressure import physical_melt_dissociation_pO2_bar
     from simulator.physical_constants import (
