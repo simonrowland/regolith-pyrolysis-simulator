@@ -53,21 +53,19 @@ campaigns:
   # - C6: Mg-thermite target is Ca/REE terminal slag after Al extraction.
 
   # --------------------------------------------------------------------------
-  # C0 -- Vacuum Bakeoff & Volatile Recovery
+  # C0 -- Dry Inert Bakeoff & Volatile Recovery
   # --------------------------------------------------------------------------
   C0:
-    label: "Vacuum Bakeoff & Volatile Recovery"
+    label: "Dry Inert Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
-    # Owner's provisional fiat ramp under d-235 (owner, relayed by physics
-    # 2026-10-22). Not bounded by the model: fiat C0 gas is ledgered at load
-    # time, so transport has no load to bound, and there is no furnace
-    # heating-power model. Replace when t-1417's release curves exist (d-225).
-    # Continuous transit from the 25 C load temperature to the 940-950 C exit
-    # band: (940 - 25) / 200 = 4.575 h, (950 - 25) / 200 = 4.625 h, about
-    # 4.6 h. min_hold_hr stays 10.
+    # Owner d-240's provisional ramp; release curves remain uncertified
+    # (t-1417), and no furnace heating-power model bounds this rate.
     dT_dt_C_per_hr: 200
-    atmosphere: "hard_vacuum"
-    pO2_mbar: null                       # deep vacuum
+    carrier_gas: "Ar"
+    p_total_mbar_default: 1.0
+    pO2_mbar_default: 0.0
+    # Owner d-244 purity limit over each C0 hold.
+    alkali_retention_budget_fraction: 1.0e-3
     target_species: ["H2O", "CO2", "S2", "CHNOPS"]
     products:
       volatiles:
@@ -77,19 +75,14 @@ campaigns:
         mass_kg: 5.0                     # nanophase Fe0, magnetic separation, zero energy
         note: "nanophase Fe0, magnetic separation, zero energy"
     endpoint:
-      type: "ir_signal_decay"
-      threshold: 0.05
+      type: "computed_alkali_and_evacuation_exit"
     max_hold_hr: 25
-    soft_endpoint:
-      type: "temperature_min_after_min_hold"
-      min_hold_hr: 10
-      temperature_min_C: 940
     termination_class: "C"
     duration_h: "included_in_ramp"
     notes: >
-      Volatile release complete by ~700 C; alkali onset >900 C
-      (thermally separated). Native Fe separated magnetically at
-      zero additional energy cost.
+      Dry 1 mbar Ar cover; the computed Na+K purity threshold and gas
+      evacuation bound define this predict-and-flag exit. Unreleased
+      cryo-train species remain flagged for later collection or cleanup.
 
   # --------------------------------------------------------------------------
   # C0b -- Standardised P-Cleanup (mild oxidative hold)

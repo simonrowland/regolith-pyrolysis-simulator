@@ -150,6 +150,22 @@ def initial_c0_inventory_kg(
     return out
 
 
+def initial_c0_gas_inventory_kg(initial_inventory: Any) -> float:
+    """Mass of the fiat C0 gas ledgered by Stage 0 at load time."""
+    gas = getattr(initial_inventory, "gas_volatiles_kg", None)
+    if not isinstance(gas, Mapping):
+        return 0.0
+    total = 0.0
+    for value in gas.values():
+        try:
+            kg = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(kg) and kg > 0.0:
+            total += kg
+    return total
+
+
 def remaining_c0_inventory_kg(
     ledger: Any,
     registry: Mapping[str, Any] | None,

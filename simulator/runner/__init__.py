@@ -59,7 +59,7 @@ from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import (
     CampaignManager,
     CampaignPressureSetpointRefusal,
-    c0_temperature_hold_run_notice,
+    c0_exit_run_notice,
 )
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
@@ -1453,7 +1453,7 @@ class PyrolysisRun:
         _attach_rump_expectation_notice(run_metadata, sim)
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
         _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
-        _attach_c0_temperature_hold_notice(run_metadata, sim)
+        _attach_c0_exit_notice(run_metadata, sim)
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -3621,14 +3621,14 @@ def _attach_high_t_melt_activity_fallback_notice(
         )
 
 
-def _attach_c0_temperature_hold_notice(
+def _attach_c0_exit_notice(
     run_metadata: dict[str, Any],
     sim: Any,
 ) -> None:
-    """Copy the one temperature-hold exit record onto run provenance."""
+    """Copy the computed C0 exit record onto run provenance."""
     if sim is None:
         return
-    notice = c0_temperature_hold_run_notice(sim)
+    notice = c0_exit_run_notice(sim)
     if notice:
         run_metadata["c0_exit"] = _json_safe(notice)
 
@@ -5443,7 +5443,7 @@ def _runner_failure_result(
     _attach_rump_expectation_notice(run_metadata, sim)
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
-    _attach_c0_temperature_hold_notice(run_metadata, sim)
+    _attach_c0_exit_notice(run_metadata, sim)
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
         if sim is not None

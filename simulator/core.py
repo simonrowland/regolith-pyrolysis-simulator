@@ -456,7 +456,9 @@ from simulator.accounting.completeness import (
 from simulator.accounting.stage0_inventory import (
     STAGE0_RELEASE_KINETICS,
     depletion_record,
+    initial_c0_gas_inventory_kg,
 )
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.alphamelts_reference_pressure import (
     alphamelts_condensed_phase_pressure_bar,
     annotate_alphamelts_reference_pressure,
@@ -12937,6 +12939,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self.melt.campaign = campaign
         self.melt.campaign_hour = 0
+        if campaign == CampaignPhase.C0:
+            self.campaign_mgr.c0_exit_prediction = None
+            self.campaign_mgr.last_c0_exit = None
         self.paused_for_decision = False
         self.pending_decision = None
 
@@ -12962,6 +12967,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
         )
+        if campaign == CampaignPhase.C0:
+            self.campaign_mgr.c0_exit_prediction = self._predict_c0_exit()
 
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -13654,6 +13661,313 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     diagnostic[key] = provider_diagnostic[key]
         return self._record_subsolidus_bakeout(diagnostic)
 
+    def _c0_pipe_capacity_kg_hr(
+        self,
+        inlet_flux: EvaporationFlux,
+    ) -> float:
+        """Return C0 exhaust capacity from the same owner used by the live cap."""
+        state = self.overhead_model.estimate_transport_state(
+            inlet_flux,
+            self.melt,
+            p_downstream_bar=self._headspace_downstream_pressure_bar(None),
+        )
+        capacity = float(state["pipe_conductance_kg_hr"])
+        if not math.isfinite(capacity) or capacity < 0.0:
+            raise ValueError(
+                "pipe_conductance_kg_hr must be finite and non-negative; "
+                f"got {capacity!r}"
+            )
+        return capacity
+
+    @staticmethod
+    def _c0_capacity_scale(demand_kg_hr: float, capacity_kg_hr: float) -> float:
+        if demand_kg_hr <= 0.0 or demand_kg_hr <= capacity_kg_hr:
+            return 1.0
+        return 0.0 if capacity_kg_hr == 0.0 else capacity_kg_hr / demand_kg_hr
+
+    def _predict_c0_exit(
+        self,
+        *,
+        alkali_retention_budget_fraction: float | None = None,
+        p_total_mbar: float | None = None,
+        pO2_mbar: float | None = None,
+    ) -> dict[str, Any]:
+        """Predict the C0 temperature and evacuation exit with live owners.
+
+        Each integer ramp temperature is evaluated with the analytical
+        equilibrium, evaporation, finite-parent depletion, and C0 pipe-cap
+        owners. The accepted point is the highest sampled temperature whose
+        capped Na+K source stays inside the configured feed-loss budget.
+        """
+        cfg = self.campaign_mgr._campaign_config(CampaignPhase.C0)
+        budget_raw = (
+            cfg.get('alkali_retention_budget_fraction')
+            if alkali_retention_budget_fraction is None
+            else alkali_retention_budget_fraction
+        )
+        budget = float(budget_raw)
+        if not math.isfinite(budget) or budget <= 0.0:
+            raise ValueError(
+                'C0.alkali_retention_budget_fraction must be finite and positive'
+            )
+
+        temperature_range = cfg.get('temp_range_C')
+        if not isinstance(temperature_range, (list, tuple)) or len(temperature_range) != 2:
+            raise ValueError('C0.temp_range_C must contain exactly two values')
+        low_C = float(temperature_range[0])
+        high_C, ramp_C_per_hr = self.campaign_mgr._configured_temperature_ramp(
+            CampaignPhase.C0
+        )
+        _, ramp_C_per_hr = self.campaign_mgr._apply_ramp_override(
+            CampaignPhase.C0, high_C, ramp_C_per_hr
+        )
+        high_C = min(float(high_C), float(self.campaign_mgr.furnace_max_T_C))
+        start_temperature_C = float(self.melt.temperature_C)
+        total_pressure_mbar = float(
+            self.melt.p_total_mbar if p_total_mbar is None else p_total_mbar
+        )
+        oxygen_pressure_mbar = float(
+            self.melt.pO2_mbar if pO2_mbar is None else pO2_mbar
+        )
+        if (
+            not math.isfinite(total_pressure_mbar)
+            or total_pressure_mbar < 0.0
+            or not math.isfinite(oxygen_pressure_mbar)
+            or oxygen_pressure_mbar < 0.0
+            or oxygen_pressure_mbar > total_pressure_mbar
+        ):
+            raise ValueError('C0 cover pressures must be finite and 0 <= pO2 <= p_total')
+
+        initial_inventory = getattr(
+            getattr(self, 'record', None), 'initial_inventory', None
+        )
+        gas_mass_kg = initial_c0_gas_inventory_kg(initial_inventory)
+        atom_accounts = self.atom_ledger.mol_by_account()
+        alkali_feed_mass_kg = 0.0
+        for account in atom_accounts:
+            if str(account).startswith('reservoir.'):
+                continue
+            atoms = self.atom_ledger.atom_moles_by_account(account)
+            for element in ('Na', 'K'):
+                alkali_feed_mass_kg += (
+                    float(atoms.get(element, 0.0))
+                    * ATOMIC_WEIGHTS_G_PER_MOL[element]
+                    / 1000.0
+                )
+
+        max_hold_hr = self.campaign_mgr._max_hold_hr(CampaignPhase.C0)
+        max_runtime_hr = float(math.ceil(max_hold_hr))
+        original_state = (
+            self.melt.temperature_C,
+            self.melt.p_total_mbar,
+            self.melt.pO2_mbar,
+            self.melt.atmosphere,
+            self.melt.background_gas_species,
+            self.melt.campaign,
+        )
+        self.melt.atmosphere = Atmosphere.ARGON_FLOW
+        self.melt.background_gas_species = 'Ar'
+        self.melt.p_total_mbar = total_pressure_mbar
+        self.melt.pO2_mbar = oxygen_pressure_mbar
+
+        def evaluate(temperature_C: float) -> dict[str, Any]:
+            self.melt.temperature_C = float(temperature_C)
+            self.melt.atmosphere = (
+                Atmosphere.CONTROLLED_O2_FLOW
+                if oxygen_pressure_mbar > 0.0
+                else Atmosphere.ARGON_FLOW
+            )
+            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+            equilibrium = self._get_equilibrium()
+            flux = self._calculate_evaporation(equilibrium)
+            inlet = self._subsolidus_transport_inlet_flux(flux)
+            demand_kg_hr = float(inlet.total_kg_hr)
+            gas_species = getattr(initial_inventory, 'gas_volatiles_kg', {}) or {}
+            # These load-time kg values define the evacuating gas mixture.
+            # A one-hour normalization supplies kg/h to the transport owner's
+            # composition calculation; pipe capacity is independent of the
+            # normalization's magnitude.
+            evacuation_flux = EvaporationFlux(
+                species_kg_hr={
+                    str(species): float(kg)
+                    for species, kg in gas_species.items()
+                    if float(kg) > 0.0
+                }
+            )
+            if not evacuation_flux.species_kg_hr:
+                evacuation_flux = inlet
+            evacuation_flux.update_totals()
+            # The sensitivity's O2 branch changes source equilibrium above;
+            # the Ar-flow boundary still owns C_evac with the same pump side.
+            self.melt.atmosphere = Atmosphere.ARGON_FLOW
+            capacity_kg_hr = self._c0_pipe_capacity_kg_hr(evacuation_flux)
+            scale = self._c0_capacity_scale(demand_kg_hr, capacity_kg_hr)
+            limited_flux = EvaporationFlux(
+                species_kg_hr={
+                    species: float(rate) * scale
+                    for species, rate in inlet.species_kg_hr.items()
+                    if float(rate) > 0.0
+                }
+            )
+            limited_flux.update_totals()
+            t_temperature_hr = max(
+                0.0,
+                (float(temperature_C) - start_temperature_C)
+                / float(ramp_C_per_hr),
+            )
+            # Premise: the Stage-0 gas load is fiat-ledgered at batch load and
+            # the live C0 pipe owner supplies its evacuation mass capacity.
+            # Algebra: t_evac = M_C0_gas / C_evac. Units:
+            # kg / (kg/h) = h. Sanity: lunar M_C0_gas is approximately zero,
+            # so t_evac is approximately zero and the T_exit term decides.
+            t_evac_hr = (
+                gas_mass_kg / capacity_kg_hr
+                if capacity_kg_hr > 0.0
+                else (0.0 if gas_mass_kg <= 0.0 else math.inf)
+            )
+            exit_window_hr = max(t_temperature_hr, t_evac_hr)
+            runtime_exit_window_hr = (
+                float(math.ceil(exit_window_hr))
+                if math.isfinite(exit_window_hr)
+                else math.inf
+            )
+            hold_hr = min(runtime_exit_window_hr, max_runtime_hr)
+            integrated = self._apply_analytic_evaporation_depletion(
+                limited_flux,
+                dt_hr=hold_hr,
+            )
+            alkali_to_train_kg = 0.0
+            for species, rate in integrated.species_kg_hr.items():
+                atom_moles = self._atom_moles_for_kg(
+                    species, float(rate) * hold_hr
+                )
+                for element in ('Na', 'K'):
+                    alkali_to_train_kg += (
+                        float(atom_moles.get(element, 0.0))
+                        * ATOMIC_WEIGHTS_G_PER_MOL[element]
+                        / 1000.0
+                    )
+            loss_fraction = (
+                alkali_to_train_kg / alkali_feed_mass_kg
+                if alkali_feed_mass_kg > 0.0
+                else None
+            )
+            return {
+                'T_exit_C': float(temperature_C),
+                'T_exit_reached_hr': t_temperature_hr,
+                't_evac_hr': t_evac_hr,
+                'M_C0_gas_kg': gas_mass_kg,
+                'C_evac_kg_hr': capacity_kg_hr,
+                'C_evac_temperature_C': float(temperature_C),
+                'requested_exit_window_hr': exit_window_hr,
+                'runtime_exit_window_hr': runtime_exit_window_hr,
+                'hold_used_for_budget_hr': hold_hr,
+                'Na_plus_K_to_train_kg': alkali_to_train_kg,
+                'Na_plus_K_feed_mass_kg': alkali_feed_mass_kg,
+                'Na_plus_K_feed_loss_fraction': loss_fraction,
+                'alkali_retention_budget_fraction': budget,
+                'budget_authority': 'owner:d-244',
+                'budget_provenance': (
+                    'owner d-244, purity limit'
+                    if alkali_retention_budget_fraction is None
+                    else 'sensitivity; owner d-244 purity limit'
+                ),
+                'cover': {
+                    'carrier_gas': 'Ar',
+                    'p_total_mbar': total_pressure_mbar,
+                    'pO2_mbar': oxygen_pressure_mbar,
+                },
+                'liquid_fraction': getattr(equilibrium, 'liquid_fraction', None),
+                'phase_state': 'unknown; analytical liquid-law extrapolated',
+                'phase_state_ticket': 't-1460',
+                'release_curves': 'uncertified (t-1417)',
+            }
+
+        try:
+            self.melt.campaign = CampaignPhase.C0
+            if alkali_feed_mass_kg <= 0.0:
+                result = evaluate(high_C)
+                result.update({
+                    'T_exit_C': None,
+                    'T_exit_reached_hr': None,
+                    'Na_plus_K_to_train_kg': None,
+                    'Na_plus_K_feed_loss_fraction': None,
+                    'hold_used_for_budget_hr': None,
+                    'prediction_status': 'unavailable_no_initial_NaK_inventory',
+                })
+                return result
+
+            first_C = int(math.floor(high_C))
+            last_C = int(math.ceil(max(low_C, start_temperature_C)))
+            selected = None
+            for temperature_C in range(first_C, last_C - 1, -1):
+                candidate = evaluate(float(temperature_C))
+                loss_fraction = candidate['Na_plus_K_feed_loss_fraction']
+                if loss_fraction is not None and loss_fraction <= budget:
+                    selected = candidate
+                    break
+            if selected is None:
+                return {
+                    'T_exit_C': None,
+                    't_evac_hr': None,
+                    'M_C0_gas_kg': gas_mass_kg,
+                    'C_evac_kg_hr': None,
+                    'requested_exit_window_hr': None,
+                    'runtime_exit_window_hr': None,
+                    'Na_plus_K_to_train_kg': None,
+                    'Na_plus_K_feed_mass_kg': alkali_feed_mass_kg,
+                    'Na_plus_K_feed_loss_fraction': None,
+                    'alkali_retention_budget_fraction': budget,
+                    'budget_authority': 'owner:d-244',
+                    'budget_provenance': 'owner d-244, purity limit',
+                    'cover': {
+                        'carrier_gas': 'Ar',
+                        'p_total_mbar': total_pressure_mbar,
+                        'pO2_mbar': oxygen_pressure_mbar,
+                    },
+                    'phase_state': 'unknown; analytical liquid-law extrapolated',
+                    'phase_state_ticket': 't-1460',
+                    'release_curves': 'uncertified (t-1417)',
+                    'prediction_status': 'no_ramp_temperature_satisfies_budget',
+                }
+            selected['prediction_status'] = 'ok'
+            selected['T_exit_resolution_C'] = 1.0
+            return selected
+        except Exception as exc:
+            return {
+                'T_exit_C': None,
+                't_evac_hr': None,
+                'M_C0_gas_kg': gas_mass_kg,
+                'C_evac_kg_hr': None,
+                'requested_exit_window_hr': None,
+                'runtime_exit_window_hr': None,
+                'Na_plus_K_to_train_kg': None,
+                'Na_plus_K_feed_mass_kg': alkali_feed_mass_kg,
+                'Na_plus_K_feed_loss_fraction': None,
+                'alkali_retention_budget_fraction': budget,
+                'budget_authority': 'owner:d-244',
+                'budget_provenance': 'owner d-244, purity limit',
+                'cover': {
+                    'carrier_gas': 'Ar',
+                    'p_total_mbar': total_pressure_mbar,
+                    'pO2_mbar': oxygen_pressure_mbar,
+                },
+                'phase_state': 'unknown; analytical liquid-law extrapolated',
+                'phase_state_ticket': 't-1460',
+                'release_curves': 'uncertified (t-1417)',
+                'prediction_status': f'unavailable:{type(exc).__name__}:{exc}',
+            }
+        finally:
+            (
+                self.melt.temperature_C,
+                self.melt.p_total_mbar,
+                self.melt.pO2_mbar,
+                self.melt.atmosphere,
+                self.melt.background_gas_species,
+                self.melt.campaign,
+            ) = original_state
+            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+
     def _cap_c0_joint_release_to_pipe_capacity(
         self,
         evap_flux: EvaporationFlux,
@@ -13680,20 +13994,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         demand = float(inlet.total_kg_hr)
         if not math.isfinite(demand) or demand <= 0.0:
             return evap_flux
-        state = self.overhead_model.estimate_transport_state(
-            inlet,
-            self.melt,
-            p_downstream_bar=self._headspace_downstream_pressure_bar(None),
-        )
-        capacity = float(state["pipe_conductance_kg_hr"])
-        if not math.isfinite(capacity) or capacity < 0.0:
-            raise ValueError(
-                "pipe_conductance_kg_hr must be finite and non-negative; "
-                f"got {capacity!r}"
-            )
+        capacity = self._c0_pipe_capacity_kg_hr(inlet)
         if demand <= capacity:
             return evap_flux
-        scale = 0.0 if capacity == 0.0 else capacity / demand
+        scale = self._c0_capacity_scale(demand, capacity)
         self._scale_c0_joint_release(evap_flux, scale, demand, capacity)
         return evap_flux
 
@@ -14192,6 +14496,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                     'throttle_reason': str(
                         getattr(self, '_last_throttle_reason', '') or ''
+                    ),
+                    'target_inventory_diagnostic': dict(
+                        getattr(self, '_last_target_inventory_diagnostic', {})
+                        or {}
                     ),
                 },
             )

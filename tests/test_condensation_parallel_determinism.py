@@ -19,12 +19,12 @@ from simulator.state import (
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
     "temp_range_C": [20, 950],
-    "dT_dt_C_per_hr": 50,
+    "dT_dt_C_per_hr": 200,
     "max_hold_hr": 25,
-    "soft_endpoint": {
-        "min_hold_hr": 10,
-        "temperature_min_C": 940,
-    },
+    "carrier_gas": "Ar",
+    "p_total_mbar_default": 1.0,
+    "pO2_mbar_default": 0.0,
+    "alkali_retention_budget_fraction": 1.0e-3,
 }
 _ROOT = Path(__file__).resolve().parents[1]
 

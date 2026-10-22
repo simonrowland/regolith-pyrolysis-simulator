@@ -233,27 +233,28 @@ class _CampaignOverrideStore(dict):
             self[str(key)] = value
 
 
-def c0_temperature_hold_exit_record(
+def c0_exit_record(
     kinetics: str,
     *,
+    backstop: str,
     ramp_C_per_hr: float,
+    prediction: Mapping[str, object],
+    unreleased_inventory: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    """One predict-and-flag record for a temperature-hold C0 exit.
+    """One predict-and-flag record for any C0 exit.
 
-    Owner ruling d-235. The release curves are fiat-ledgered and
-    uncertified until t-1417. Authority level is the published
-    out-of-domain predict-and-flag level.
+    The release curves remain uncertified until t-1417. The analytical
+    liquid-law continuation is extrapolated below the unverified feed
+    solidus; the real engines refuse these full-catalog compositions.
 
-    The same record carries the C0 ramp's authority. That ramp is the
-    owner's provisional fiat, not a model bound: fiat C0 gas is ledgered
-    at load time and there is no furnace heating-power model.
-    ``ramp_C_per_hr`` is the ramp resolved for this exit.
-
-    Callers copy this record; they do not build a second notice.
+    ``prediction`` is computed by the core physics and transport owners.
+    This layer only records the result and flags inventory that remains.
     """
     from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
 
     authority = PUBLISHED_AUTHORITY_OUTSIDE
+    if backstop not in {"computed_exit", "maximum_hold", "first_melt"}:
+        raise ValueError(f"unknown C0 exit backstop {backstop!r}")
     ramp = float(ramp_C_per_hr)
     if not math.isfinite(ramp) or ramp <= 0.0:
         raise ValueError(
@@ -261,38 +262,39 @@ def c0_temperature_hold_exit_record(
         )
     return {
         "outcome": "incomplete",
-        "backstop": "temperature_hold",
+        "backstop": backstop,
         "kinetics": kinetics,
-        "release_curves": "uncertified",
+        "release_curves": "uncertified (t-1417)",
         "ticket": "t-1417",
         "authority": authority,
         "message": (
-            "C0 release curves are fiat-ledgered and uncertified (t-1417); "
+            "C0 gas is fiat-ledgered at load and release curves are "
+            "uncertified (t-1417); any computed T_exit is a "
+            "liquid-law extrapolation with unknown real-engine phase state; "
             f"authority level {authority}."
         ),
         "ramp_C_per_hr": ramp,
         "ramp_authority": "owner_fiat",
         "ramp_model_bounded": False,
+        **dict(prediction),
+        "unreleased_inventory_at_exit": dict(unreleased_inventory or {}),
+        "sulfates_routed_to": "melt_or_C0b",
     }
 
 
-def c0_temperature_hold_run_notice(sim: object) -> dict[str, object] | None:
-    """The temperature-hold exit record once, or None if that exit did not fire."""
+def c0_exit_run_notice(sim: object) -> dict[str, object] | None:
+    """Return the C0 exit record, or None if C0 did not exit."""
     manager = getattr(sim, "campaign_mgr", None)
     record = getattr(manager, "last_c0_exit", None)
     if not isinstance(record, Mapping):
         return None
-    if record.get("backstop") != "temperature_hold":
+    if record.get("backstop") not in {
+        "computed_exit",
+        "maximum_hold",
+        "first_melt",
+    }:
         return None
     return dict(record)
-
-
-# Owner ruling d-235 (2026-10-22). "temperature_hold" is the selected C0
-# exit until measured release curves exist (t-1417): temperature plus
-# minimum hold, incomplete, with the predict-and-flag record above.
-# "backstop" remains reachable and still exits only on first melt or the
-# maximum hold. The maximum hold stays a backstop, not the selected exit.
-C0_EXIT_MODE = "temperature_hold"
 
 
 class CampaignManager:
@@ -376,6 +378,7 @@ class CampaignManager:
         self.last_c2a_staged_max_hold_adjustment: dict[str, object] | None = None
         self.last_c3_na_hold_adjustment: dict[str, object] | None = None
         self.last_c0_exit: dict[str, object] | None = None
+        self.c0_exit_prediction: dict[str, object] | None = None
         self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
@@ -1559,15 +1562,15 @@ class CampaignManager:
             self.last_c4_termination = None
 
         if campaign == CampaignPhase.C0:
-            ambient_pressure = max(
-                0.0, float(getattr(melt, 'ambient_pressure_mbar', 0.0) or 0.0))
-            if ambient_pressure > 0:
-                melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
-                melt.p_total_mbar = ambient_pressure
-            else:
-                melt.atmosphere = Atmosphere.HARD_VACUUM
-                melt.p_total_mbar = 0.0
-            melt.pO2_mbar = 0.0
+            cfg = self._campaign_config(campaign)
+            melt.atmosphere = Atmosphere.ARGON_FLOW
+            melt.background_gas_species = _canonical_carrier_gas_key(
+                str(cfg.get('carrier_gas', 'Ar') or 'Ar')
+            )
+            melt.p_total_mbar = self._pressure_config_float(
+                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
+            melt.pO2_mbar = self._pressure_config_float(
+                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
 
         elif campaign == CampaignPhase.C0B:
             cfg = self._campaign_config(campaign)
@@ -1759,6 +1762,15 @@ class CampaignManager:
         """
         result = self._get_base_temp_target(campaign, campaign_hour, melt)
         target_T, ramp_rate = self._apply_ramp_override(campaign, result[0], result[1])
+        if campaign == CampaignPhase.C0:
+            prediction = self.c0_exit_prediction
+            predicted_exit_C = (
+                prediction.get("T_exit_C")
+                if isinstance(prediction, Mapping)
+                else None
+            )
+            if predicted_exit_C is not None:
+                target_T = min(float(target_T), float(predicted_exit_C))
         return (self._clamp_to_furnace_max(target_T), ramp_rate)
 
     def _clamp_to_furnace_max(self, target_T: Optional[float]) -> Optional[float]:
@@ -2235,9 +2247,9 @@ class CampaignManager:
         Runtime completion on the paths in this function (not IR peak
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
-        - C0: C0_EXIT_MODE. Selected temperature_hold is an incomplete
-          predict-and-flag exit (d-235, t-1417). Maximum hold and first
-          melt stay incomplete backstops.
+        - C0: computed Na+K budget temperature and evacuation bound,
+          incomplete and predict-and-flag (t-1417). Maximum hold and
+          first melt stay incomplete backstops.
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -2284,64 +2296,67 @@ class CampaignManager:
                 return True
 
         if campaign == CampaignPhase.C0:
-            # No measured release curve is loaded (t-1417). The selected
-            # mode cannot complete this campaign on temperature alone.
             from simulator.accounting.stage0_inventory import (
                 STAGE0_RELEASE_KINETICS,
             )
 
-            # First melt ends C0 under either switch value, ahead of a
-            # temperature hold and ahead of an operator or configured
-            # maximum hold. The switch only chooses the other exit.
+            prediction = self.c0_exit_prediction
+            prediction_payload = (
+                dict(prediction) if isinstance(prediction, Mapping) else {}
+            )
+            raw_unreleased = (
+                transport_state.get("target_inventory_diagnostic", {})
+                if isinstance(transport_state, Mapping)
+                else {}
+            )
+            unreleased_inventory = (
+                raw_unreleased if isinstance(raw_unreleased, Mapping) else {}
+            )
+
+            # First melt has priority over the computed exit and maximum hold.
             if self.c0_first_melt_backstop:
-                self.last_c0_exit = {
-                    "outcome": "incomplete",
-                    "backstop": "first_melt",
-                    "kinetics": STAGE0_RELEASE_KINETICS,
-                }
+                _target_T, ramp_C_per_hr = self.get_temp_target(
+                    campaign, int(melt.campaign_hour), melt)
+                self.last_c0_exit = c0_exit_record(
+                    STAGE0_RELEASE_KINETICS,
+                    backstop="first_melt",
+                    ramp_C_per_hr=ramp_C_per_hr,
+                    prediction=prediction_payload,
+                    unreleased_inventory=unreleased_inventory,
+                )
                 return True
 
-            if C0_EXIT_MODE == "temperature_hold":
-                soft = self._configured_endpoint(campaign, 'soft_endpoint')
-                min_temperature_C = self._endpoint_float(
-                    campaign, soft, 'temperature_min_C')
-                min_hold_hr = self._float(
-                    ovr.get('min_hold_hr'),
-                    self._endpoint_float(campaign, soft, 'min_hold_hr'),
-                )
-                max_hold_hr = self._max_hold_hr(campaign)
+            if isinstance(prediction, Mapping):
+                exit_temperature_C = prediction.get('T_exit_C')
+                exit_window_hr = prediction.get('runtime_exit_window_hr')
                 if (
-                    melt.temperature_C >= min_temperature_C
-                    and melt.campaign_hour >= min_hold_hr
+                    exit_temperature_C is not None
+                    and exit_window_hr is not None
+                    and float(melt.temperature_C) >= float(exit_temperature_C)
+                    and completed_campaign_hour >= float(exit_window_hr)
                 ):
                     _target_T, ramp_C_per_hr = self.get_temp_target(
-                        campaign,
-                        int(melt.campaign_hour),
-                        melt,
-                    )
-                    self.last_c0_exit = c0_temperature_hold_exit_record(
+                        campaign, int(melt.campaign_hour), melt)
+                    self.last_c0_exit = c0_exit_record(
                         STAGE0_RELEASE_KINETICS,
+                        backstop="computed_exit",
                         ramp_C_per_hr=ramp_C_per_hr,
+                        prediction=prediction_payload,
+                        unreleased_inventory=unreleased_inventory,
                     )
                     return True
-                if completed_campaign_hour >= max_hold_hr:
-                    self.last_c0_exit = {
-                        "outcome": "incomplete",
-                        "backstop": "maximum_hold",
-                        "kinetics": STAGE0_RELEASE_KINETICS,
-                    }
-                    return True
-                return False
-            if C0_EXIT_MODE != "backstop":
-                raise ValueError(f"unknown C0_EXIT_MODE {C0_EXIT_MODE!r}")
 
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
-                self.last_c0_exit = {
-                    "outcome": "incomplete",
-                    "backstop": "maximum_hold",
-                    "kinetics": STAGE0_RELEASE_KINETICS,
-                }
+                _target_T, ramp_C_per_hr = self.get_temp_target(
+                    campaign, int(melt.campaign_hour), melt)
+                self.last_c0_exit = c0_exit_record(
+                    STAGE0_RELEASE_KINETICS,
+                    backstop="maximum_hold",
+                    ramp_C_per_hr=ramp_C_per_hr,
+                    prediction=prediction_payload,
+                    unreleased_inventory=unreleased_inventory,
+                )
                 return True
             return False
 
