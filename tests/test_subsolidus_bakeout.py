@@ -2,11 +2,22 @@
 
 from __future__ import annotations
 
+import math
+from pathlib import Path
+
 import pytest
 
+from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting import resolve_species_formula
+from simulator.accounting.formulas import load_species_formulas
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+
+_DATA = Path(__file__).resolve().parents[1] / "data"
+_REGISTRY = load_species_formulas(_DATA / "species_catalog.yaml")
 
 
 def _sim(feedstocks):
@@ -179,3 +190,324 @@ def test_limited_carbon_still_gives_feso4_the_post_caso4_remainder():
 
     snapshot = sim._make_snapshot()
     assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def _molar(species: str) -> float:
+    return resolve_species_formula(species, _REGISTRY).molar_mass_kg_per_mol()
+
+
+def _hk_driver_mol_h(
+    *,
+    species: str,
+    temperature_K: float,
+    p_eq_Pa: float,
+    p_bulk_Pa: float,
+    alpha: float,
+    area_m2: float,
+) -> float:
+    """Free-molecular Hertz-Knudsen driver rate. Gas and melt resistance are off."""
+    molar = _molar(species)
+    k_hk = math.sqrt(
+        molar / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
+    delta_p = max(0.0, p_eq_Pa - p_bulk_Pa)
+    flux_kg_s_m2 = delta_p * alpha * k_hk
+    return flux_kg_s_m2 * area_m2 * 3600.0 / molar
+
+
+def _bakeout_view() -> ProviderAccountView:
+    return ProviderAccountView(
+        accounts={"process.cleaned_melt": {}},
+        species_formula_registry=_REGISTRY,
+    )
+
+
+def _dispatch_bakeout(**controls):
+    provider = BuiltinEvaporationFluxProvider()
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=_bakeout_view(),
+        temperature_C=float(controls.pop("temperature_C")),
+        pressure_bar=1.0e-6,
+        fO2_log=None,
+        control_inputs={"solid_host_bakeout": True, **controls},
+    )
+    return provider.dispatch(request)
+
+
+def _troilite_reaction(**overrides):
+    reaction = {
+        "reaction_id": "troilite_decomposition",
+        "status": "supported",
+        "driving_gas_species_id": "S2",
+        "host_species_id": "FeS_troilite",
+        "host_remaining_mol": 2.0,
+        "extent_bound_mol_rxn": 2.0,
+        "stoichiometry": [
+            {
+                "species_id": "FeS_troilite",
+                "phase": "troilite",
+                "nu_mol_per_mol_rxn": -1.0,
+            },
+            {"species_id": "Fe", "phase": "metal", "nu_mol_per_mol_rxn": 1.0},
+            {"species_id": "S2", "phase": "gas", "nu_mol_per_mol_rxn": 0.5},
+        ],
+    }
+    reaction.update(overrides)
+    return reaction
+
+
+def _sulfate_reaction(**overrides):
+    reaction = {
+        "reaction_id": "anhydrite_decomposition",
+        "status": "supported",
+        "driving_gas_species_id": "SO2",
+        "host_species_id": "CaSO4",
+        "host_remaining_mol": 5.0,
+        "extent_bound_mol_rxn": 5.0,
+        "stoichiometry": [
+            {
+                "species_id": "CaSO4",
+                "phase": "anhydrite",
+                "nu_mol_per_mol_rxn": -1.0,
+            },
+            {"species_id": "CaO", "phase": "crystal", "nu_mol_per_mol_rxn": 1.0},
+            {"species_id": "SO2", "phase": "gas", "nu_mol_per_mol_rxn": 1.0},
+            {"species_id": "O2", "phase": "gas", "nu_mol_per_mol_rxn": 0.5},
+        ],
+    }
+    reaction.update(overrides)
+    return reaction
+
+
+def test_solid_host_below_400_k_is_unavailable():
+    result = _dispatch_bakeout(
+        temperature_C=25.0,
+        vapour_batch_flux_pressures_Pa={"S2": 10.0},
+        solid_host_area_m2=1.0,
+        max_throughput_kg_hr=10.0,
+        dt_hr=1.0,
+        alpha={"S2": 0.2},
+        molar_mass_kg_mol={"S2": _molar("S2")},
+        reactions=[_troilite_reaction()],
+    )
+    assert result.status == "unavailable"
+    assert result.transition is None
+    assert result.diagnostic["reason"] == "below_400_K"
+    assert result.diagnostic.get("released_mol_by_species", {}) == {}
+
+
+def test_solid_host_missing_batch_pressure_keeps_the_seam_reason():
+    result = _dispatch_bakeout(
+        temperature_C=626.85,
+        solid_host_area_m2=1.0,
+        max_throughput_kg_hr=10.0,
+        dt_hr=1.0,
+        alpha={"S2": 0.2},
+        molar_mass_kg_mol={"S2": _molar("S2")},
+        reactions=[_troilite_reaction()],
+    )
+    assert result.status == "unavailable"
+    assert result.diagnostic["reason"] == "missing_vapour_batch_flux_pressures_Pa"
+    assert result.transition is None
+
+
+def test_solid_host_missing_area_alpha_and_pump_are_typed_refusals():
+    common = {
+        "temperature_C": 626.85,
+        "vapour_batch_flux_pressures_Pa": {"S2": 10.0},
+        "dt_hr": 1.0,
+        "molar_mass_kg_mol": {"S2": _molar("S2")},
+        "reactions": [_troilite_reaction()],
+    }
+    missing_area = _dispatch_bakeout(
+        **common,
+        max_throughput_kg_hr=10.0,
+        alpha={"S2": 0.2},
+    )
+    assert missing_area.status == "refused"
+    assert missing_area.diagnostic["reason"] == "missing_solid_area"
+
+    missing_alpha = _dispatch_bakeout(
+        **common,
+        solid_host_area_m2=0.4,
+        max_throughput_kg_hr=10.0,
+        allow_unmeasured_alpha_fallback=True,
+        alpha={},
+    )
+    assert missing_alpha.status == "refused"
+    assert missing_alpha.diagnostic["reason"] == (
+        "missing_sourced_evaporation_coefficient"
+    )
+    assert missing_alpha.diagnostic.get("released_mol_by_species", {}) == {}
+
+    missing_pump = _dispatch_bakeout(
+        **common,
+        solid_host_area_m2=0.4,
+        max_throughput_kg_hr=0.0,
+        alpha={"S2": 1.0},
+    )
+    assert missing_pump.status == "refused"
+    assert missing_pump.diagnostic["reason"] == "missing_pump_throughput"
+
+
+def test_explicit_alpha_sets_the_unconstrained_s2_demand():
+    temperature_K = 900.0
+    alpha = 1.0
+    area_m2 = 0.25
+    p_eq = 12.0
+    dt_hr = 1.0
+    result = _dispatch_bakeout(
+        temperature_C=temperature_K - 273.15,
+        vapour_batch_flux_pressures_Pa={"S2": p_eq},
+        overhead_partials_Pa={"S2": 2.0},
+        solid_host_area_m2=area_m2,
+        max_throughput_kg_hr=1.0e6,
+        dt_hr=dt_hr,
+        alpha={"S2": alpha},
+        molar_mass_kg_mol={"S2": _molar("S2"), "Fe": _molar("Fe")},
+        reactions=[
+            _troilite_reaction(
+                extent_bound_mol_rxn=1.0e6,
+                host_remaining_mol=1.0e6,
+            )
+        ],
+    )
+    driver_mol_h = _hk_driver_mol_h(
+        species="S2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=2.0,
+        alpha=alpha,
+        area_m2=area_m2,
+    )
+    extent = driver_mol_h * dt_hr / 0.5
+    assert result.status == "ok"
+    assert result.transition is None
+    assert result.diagnostic["hk_demand_mol_by_species"]["S2"] == pytest.approx(
+        extent * 0.5, rel=1e-12
+    )
+    assert result.diagnostic["hk_demand_mol_hr_by_species"]["S2"] == pytest.approx(
+        driver_mol_h, rel=1e-12
+    )
+    assert result.diagnostic["hk_demand_peak_mol_hr_by_species"]["S2"] == (
+        pytest.approx(driver_mol_h, rel=1e-12)
+    )
+    assert result.diagnostic["released_mol_by_species"]["S2"] == pytest.approx(
+        extent * 0.5, rel=1e-12
+    )
+    assert result.diagnostic["release_mol_hr_by_species"]["S2"] == pytest.approx(
+        driver_mol_h, rel=1e-12
+    )
+    assert "Fe" not in result.diagnostic["released_mol_by_species"]
+    assert result.diagnostic["accepted_extent_mol_by_reaction"][
+        "troilite_decomposition"
+    ] == pytest.approx(extent, rel=1e-12)
+
+
+def test_inventory_cap_and_pump_scale_share_one_extent():
+    temperature_K = 1000.0
+    alpha = 0.4
+    p_eq = 20.0
+    per_m2 = _hk_driver_mol_h(
+        species="SO2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=0.0,
+        alpha=alpha,
+        area_m2=1.0,
+    )
+    area_m2 = 2.0 / per_m2
+    molar = {"SO2": _molar("SO2"), "O2": _molar("O2"), "CaO": _molar("CaO")}
+    unconstrained_extent = 2.0
+    inventory_extent = 1.0
+    inventory_gas_kg_h = (
+        inventory_extent * molar["SO2"] + 0.5 * inventory_extent * molar["O2"]
+    )
+    throughput = 0.5 * inventory_gas_kg_h
+    result = _dispatch_bakeout(
+        temperature_C=temperature_K - 273.15,
+        vapour_batch_flux_pressures_Pa={"SO2": p_eq},
+        solid_host_area_m2=area_m2,
+        max_throughput_kg_hr=throughput,
+        dt_hr=1.0,
+        alpha={"SO2": alpha},
+        molar_mass_kg_mol=molar,
+        reactions=[
+            _sulfate_reaction(host_remaining_mol=1.0, extent_bound_mol_rxn=10.0)
+        ],
+    )
+    assert result.status == "ok"
+    demand = result.diagnostic["hk_demand_mol_by_species"]
+    released = result.diagnostic["released_mol_by_species"]
+    assert demand["SO2"] == pytest.approx(unconstrained_extent, rel=1e-9)
+    assert demand["O2"] == pytest.approx(0.5 * unconstrained_extent, rel=1e-9)
+    assert "CaO" not in demand
+    assert result.diagnostic["pump_peak_demand_kg_hr"] == pytest.approx(
+        inventory_gas_kg_h, rel=1e-9
+    )
+    assert result.diagnostic["pump_scale"] == pytest.approx(0.5, rel=1e-12)
+    accepted = 0.5 * inventory_extent
+    assert released["SO2"] == pytest.approx(accepted, rel=1e-9)
+    assert released["O2"] == pytest.approx(0.5 * accepted, rel=1e-9)
+    assert released["SO2"] < demand["SO2"]
+    assert "CaO" not in released
+    assert result.diagnostic["release_mol_hr_by_species"]["O2"] == pytest.approx(
+        released["O2"], rel=1e-12
+    )
+
+
+def test_competing_branches_share_one_host_inventory():
+    temperature_K = 900.0
+    alpha = 0.25
+    p_eq = 8.0
+    per_m2 = _hk_driver_mol_h(
+        species="S2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=0.0,
+        alpha=alpha,
+        area_m2=1.0,
+    )
+    area_m2 = 0.4 / per_m2
+    result = _dispatch_bakeout(
+        temperature_C=temperature_K - 273.15,
+        vapour_batch_flux_pressures_Pa={"S2": p_eq},
+        solid_host_area_m2=area_m2,
+        max_throughput_kg_hr=1.0e6,
+        dt_hr=1.0,
+        alpha={"S2": alpha},
+        molar_mass_kg_mol={"S2": _molar("S2")},
+        reactions=[
+            _troilite_reaction(
+                reaction_id="b_branch",
+                host_remaining_mol=1.0,
+                extent_bound_mol_rxn=10.0,
+            ),
+            _troilite_reaction(
+                reaction_id="a_branch",
+                host_remaining_mol=1.0,
+                extent_bound_mol_rxn=10.0,
+            ),
+        ],
+    )
+    accepted = result.diagnostic["accepted_extent_mol_by_reaction"]
+    assert accepted["a_branch"] == pytest.approx(0.8, rel=1e-9)
+    assert accepted["b_branch"] == pytest.approx(0.2, rel=1e-9)
+    assert accepted["a_branch"] + accepted["b_branch"] == pytest.approx(1.0, rel=1e-9)
+
+
+def test_refused_reaction_does_not_enter_released_demand():
+    result = _dispatch_bakeout(
+        temperature_C=626.85,
+        vapour_batch_flux_pressures_Pa={"S2": 10.0},
+        solid_host_area_m2=1.0,
+        max_throughput_kg_hr=10.0,
+        dt_hr=1.0,
+        alpha={"S2": 0.2},
+        molar_mass_kg_mol={"S2": _molar("S2")},
+        reactions=[_troilite_reaction(status="thermochemistry_missing")],
+    )
+    assert result.status == "unavailable"
+    assert result.diagnostic.get("released_mol_by_species", {}) == {}
+    assert result.diagnostic.get("hk_demand_mol_by_species", {}) == {}

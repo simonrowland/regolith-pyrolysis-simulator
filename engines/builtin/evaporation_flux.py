@@ -776,6 +776,354 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     )
 
 
+# Positive stand-in so the series helper's diameter gate stays closed.
+# Gas resistance is off on this path, so the value is not a pipe length.
+_SOLID_HOST_GUARD_DIAMETER_M = 1.0
+
+
+def _solid_host_positive(value: Any) -> float | None:
+    number = _solid_host_nonnegative(value)
+    if number is None or number <= 0.0:
+        return None
+    return number
+
+
+def _solid_host_nonnegative(value: Any) -> float | None:
+    if not is_declared_real_scalar(value):
+        return None
+    number = float(value)
+    if not math.isfinite(number) or number < 0.0:
+        return None
+    return number
+
+
+def _solid_host_alpha(alpha_controls: Any, species: str) -> float | None:
+    """Sourced coefficient only. A missing species does not become 1."""
+    if not isinstance(alpha_controls, Mapping):
+        return None
+    if species in alpha_controls:
+        return _solid_host_positive(alpha_controls.get(species))
+    if "*" in alpha_controls:
+        return _solid_host_positive(alpha_controls.get("*"))
+    return None
+
+
+def _solid_host_terms(
+    stoichiometry: Any,
+) -> list[tuple[str, str, float]] | None:
+    if not isinstance(stoichiometry, (list, tuple)) or not stoichiometry:
+        return None
+    terms: list[tuple[str, str, float]] = []
+    for row in stoichiometry:
+        if not isinstance(row, Mapping):
+            return None
+        species = str(row.get("species_id") or "").strip()
+        phase = str(row.get("phase") or "").strip()
+        nu = row.get("nu_mol_per_mol_rxn")
+        if not species or not phase or not is_declared_real_scalar(nu):
+            return None
+        number = float(nu)
+        if not math.isfinite(number) or number == 0.0:
+            return None
+        terms.append((species, phase, number))
+    return terms
+
+
+def _add_amount(target: dict[str, float], species: str, amount: float) -> None:
+    if amount <= 0.0:
+        return
+    target[species] = target.get(species, 0.0) + amount
+
+
+def _solid_host_bakeout_result(
+    *,
+    controls: Mapping[str, Any],
+    control_audit: Any,
+    temperature_K: float,
+) -> IntentResult:
+    """Solid-host Hertz-Knudsen demand, pump cap, and accepted extents.
+
+    The oxide-parent path is not used. Condensed coproducts share the
+    accepted extent but do not enter the pump aggregate. Unconstrained
+    demand is published separately from the inventory-capped peak the
+    pump compares, and from the committed release.
+    """
+    intent = ChemistryIntent.EVAPORATION_FLUX
+    empty_flux = {"evaporation_flux_kg_hr": {}}
+
+    def _done(status: str, reason: str | None, **extra: Any) -> IntentResult:
+        diagnostic: dict[str, Any] = {"solid_host_bakeout": True, **empty_flux}
+        if reason:
+            diagnostic["reason"] = reason
+        diagnostic.update(extra)
+        return IntentResult(
+            intent=intent,
+            status=status,
+            transition=None,
+            control_audit=control_audit,
+            diagnostic=diagnostic,
+        )
+
+    if temperature_K < 400.0:
+        return _done("unavailable", "below_400_K")
+    if "vapour_batch_flux_pressures_Pa" not in controls:
+        return _done("unavailable", "missing_vapour_batch_flux_pressures_Pa")
+    area_m2 = _solid_host_positive(controls.get("solid_host_area_m2"))
+    if area_m2 is None:
+        return _done("refused", "missing_solid_area")
+    throughput = _solid_host_positive(controls.get("max_throughput_kg_hr"))
+    if throughput is None:
+        return _done("refused", "missing_pump_throughput")
+    dt_hr = _solid_host_positive(controls.get("dt_hr"))
+    if dt_hr is None:
+        return _done("unavailable", "missing_dt_hr")
+
+    pressures = controls.get("vapour_batch_flux_pressures_Pa") or {}
+    if not isinstance(pressures, Mapping):
+        return _done("unavailable", "missing_vapour_batch_flux_pressures_Pa")
+    overhead = controls.get("overhead_partials_Pa") or {}
+    if not isinstance(overhead, Mapping):
+        overhead = {}
+    molar_mass = controls.get("molar_mass_kg_mol") or {}
+    if not isinstance(molar_mass, Mapping):
+        molar_mass = {}
+    reactions = controls.get("reactions") or []
+    if not isinstance(reactions, (list, tuple)):
+        return _done("unavailable", "missing_reactions")
+
+    priced: list[dict[str, Any]] = []
+    unavailable: list[dict[str, str]] = []
+    host_remaining: dict[str, float] = {}
+    unsourced_alpha: list[str] = []
+
+    for reaction in reactions:
+        if not isinstance(reaction, Mapping):
+            unavailable.append({
+                "reaction_id": "",
+                "reason": "malformed_reaction",
+            })
+            continue
+        reaction_id = str(reaction.get("reaction_id") or "")
+        status = str(reaction.get("status") or "")
+        if status != "supported":
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": status or "unsupported_reaction",
+            })
+            continue
+        terms = _solid_host_terms(reaction.get("stoichiometry"))
+        driver = str(reaction.get("driving_gas_species_id") or "").strip()
+        host_species = str(reaction.get("host_species_id") or "").strip()
+        host_mol = _solid_host_nonnegative(reaction.get("host_remaining_mol"))
+        bound_raw = reaction.get("extent_bound_mol_rxn")
+        if (
+            terms is None
+            or not driver
+            or not host_species
+            or host_mol is None
+            or not is_declared_real_scalar(bound_raw)
+        ):
+            bound_missing = (
+                terms is not None
+                and bool(driver)
+                and bool(host_species)
+                and host_mol is not None
+            )
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": (
+                    "missing_extent_bound" if bound_missing else "malformed_reaction"
+                ),
+            })
+            continue
+        bound = float(bound_raw)
+        if not math.isfinite(bound) or bound < 0.0:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_extent_bound",
+            })
+            continue
+        host_term = next(
+            (term for term in terms if term[0] == host_species and term[2] < 0.0),
+            None,
+        )
+        driver_term = next(
+            (term for term in terms if term[0] == driver and term[2] > 0.0),
+            None,
+        )
+        if host_term is None or driver_term is None:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "malformed_reaction",
+            })
+            continue
+        alpha = _solid_host_alpha(controls.get("alpha"), driver)
+        if alpha is None:
+            unsourced_alpha.append(reaction_id or driver)
+            continue
+        driver_mass = _solid_host_positive(molar_mass.get(driver))
+        if driver_mass is None:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_molar_mass",
+            })
+            continue
+        missing_product_mass = False
+        for species, phase, nu in terms:
+            if phase == "gas" and nu > 0.0 and _solid_host_positive(
+                molar_mass.get(species)
+            ) is None:
+                missing_product_mass = True
+                break
+        if missing_product_mass:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_molar_mass",
+            })
+            continue
+        p_eq_raw = pressures.get(driver)
+        if not is_declared_real_scalar(p_eq_raw):
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_vapour_batch_flux_pressures_Pa",
+            })
+            continue
+        p_eq = float(p_eq_raw)
+        if not math.isfinite(p_eq) or p_eq < 0.0:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_vapour_batch_flux_pressures_Pa",
+            })
+            continue
+        p_bulk_raw = overhead.get(driver, 0.0)
+        if not is_declared_real_scalar(p_bulk_raw):
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_vapour_batch_flux_pressures_Pa",
+            })
+            continue
+        p_bulk = float(p_bulk_raw)
+        if not math.isfinite(p_bulk) or p_bulk < 0.0:
+            unavailable.append({
+                "reaction_id": reaction_id,
+                "reason": "missing_vapour_batch_flux_pressures_Pa",
+            })
+            continue
+        series = _series_resistance_evaporation_flux_kg_m2_s(
+            driver,
+            p_eq,
+            p_bulk,
+            temperature_K,
+            driver_mass,
+            alpha,
+            knudsen_number=math.inf,
+            pipe_diameter_m=_SOLID_HOST_GUARD_DIAMETER_M,
+            overhead_pressure_pa=0.0,
+            gas_resistance_enabled=False,
+            melt_resistance_enabled=False,
+        )
+        driver_kg_h = series.flux_kg_s_m2 * area_m2 * 3600.0
+        driver_mol_h = driver_kg_h / driver_mass
+        unconstrained = driver_mol_h * dt_hr / driver_term[2]
+        previous = host_remaining.get(host_species)
+        host_remaining[host_species] = (
+            host_mol if previous is None else min(previous, host_mol)
+        )
+        priced.append({
+            "reaction_id": reaction_id,
+            "host_species": host_species,
+            "host_nu_abs": abs(host_term[2]),
+            "unconstrained": max(0.0, unconstrained),
+            "extent_bound": bound,
+            "terms": terms,
+        })
+
+    if unsourced_alpha:
+        return _done(
+            "refused",
+            "missing_sourced_evaporation_coefficient",
+            unsourced_alpha_reactions=sorted(unsourced_alpha),
+            unavailable_reactions=unavailable,
+        )
+    if not priced:
+        return _done(
+            "unavailable",
+            unavailable[0]["reason"] if unavailable else "no_reactions",
+            unavailable_reactions=unavailable,
+        )
+
+    priced.sort(key=lambda row: row["reaction_id"])
+    running = dict(host_remaining)
+    inventory_capped: dict[str, float] = {}
+    for row in priced:
+        host_left = running.get(row["host_species"], 0.0)
+        host_cap = host_left / row["host_nu_abs"] if row["host_nu_abs"] else 0.0
+        capped = min(row["unconstrained"], host_cap, row["extent_bound"])
+        capped = max(0.0, capped)
+        inventory_capped[row["reaction_id"]] = capped
+        running[row["host_species"]] = max(
+            0.0, host_left - capped * row["host_nu_abs"]
+        )
+
+    peak_kg_h = 0.0
+    for row in priced:
+        extent = inventory_capped[row["reaction_id"]]
+        for species, phase, nu in row["terms"]:
+            if phase != "gas" or nu <= 0.0:
+                continue
+            mass = float(molar_mass[species])
+            peak_kg_h += extent * nu * mass / dt_hr
+    scale = 1.0
+    if peak_kg_h > throughput:
+        scale = throughput / peak_kg_h
+
+    demand_mol: dict[str, float] = {}
+    demand_mol_h: dict[str, float] = {}
+    demand_kg_h: dict[str, float] = {}
+    released_mol: dict[str, float] = {}
+    release_mol_h: dict[str, float] = {}
+    released_kg_h: dict[str, float] = {}
+    accepted: dict[str, float] = {}
+    unconstrained_by_reaction: dict[str, float] = {}
+    for row in priced:
+        accepted_extent = inventory_capped[row["reaction_id"]] * scale
+        accepted[row["reaction_id"]] = accepted_extent
+        unconstrained_by_reaction[row["reaction_id"]] = row["unconstrained"]
+        for species, phase, nu in row["terms"]:
+            if phase != "gas" or nu <= 0.0:
+                continue
+            mass = float(molar_mass[species])
+            demand = row["unconstrained"] * nu
+            released = accepted_extent * nu
+            _add_amount(demand_mol, species, demand)
+            _add_amount(demand_mol_h, species, demand / dt_hr)
+            _add_amount(demand_kg_h, species, demand / dt_hr * mass)
+            _add_amount(released_mol, species, released)
+            _add_amount(release_mol_h, species, released / dt_hr)
+            _add_amount(released_kg_h, species, released / dt_hr * mass)
+
+    return _done(
+        "ok",
+        None,
+        hk_demand_mol_by_species=demand_mol,
+        hk_demand_mol_hr_by_species=demand_mol_h,
+        hk_demand_peak_mol_hr_by_species=dict(demand_mol_h),
+        hk_demand_kg_hr_by_species=demand_kg_h,
+        hk_demand_peak_kg_hr_by_species=dict(demand_kg_h),
+        pump_peak_demand_kg_hr=peak_kg_h,
+        released_mol_by_species=released_mol,
+        release_mol_hr_by_species=release_mol_h,
+        released_kg_hr_by_species=released_kg_h,
+        accepted_extent_mol_by_reaction=accepted,
+        unconstrained_extent_mol_by_reaction=unconstrained_by_reaction,
+        inventory_capped_extent_mol_by_reaction=inventory_capped,
+        pump_scale=scale,
+        unavailable_reactions=unavailable,
+        max_throughput_kg_hr=throughput,
+        dt_hr=dt_hr,
+    )
+
+
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_FLUX`` provider (Hertz-Knudsen-Langmuir).
 
@@ -841,6 +1189,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                         "and dp_eq/dC_i"
                     ),
                 },
+            )
+        if controls.get("solid_host_bakeout"):
+            return _solid_host_bakeout_result(
+                controls=controls,
+                control_audit=control_audit,
+                temperature_K=T_K,
             )
         if T_K < 400:
             # Mirrors _calculate_evaporation: below 400 K, no significant
