@@ -1,0 +1,315 @@
+schema_version: literature_extract.v1
+source_id: neumann-1954-liquid-k-evaporation-coefficient
+source:
+  citation: 'Neumann, K. (1954), "Der Verdampfungskoeffizient des flüssigen Kaliums", Z. Phys. Chem. 2(3-4), 215-228.'
+  doi: 10.1524/zpch.1954.2.3_4.215
+  year: 1954
+extraction:
+  method: >-
+    Machine-text transcription from pdftotext-layout.txt and the MinerU table block;
+    Table 1 was cross-checked against both reads and its rendered page 2. Table 2
+    is absent from the MinerU chunk; every numeric cell on PDF page 13 was checked
+    against a pdftoppm render because pdftotext lost or garbled exponents. The
+    staged standalone MinerU converter was used for the required presence compare:
+    /private/tmp/claude-501/main-review/tools/mineru_table_draft.py.
+  date: '2026-10-22'
+  worker: codex
+  provenance_path: raw/neumann-1954-liquid-k-evaporation-coefficient/neumann-1954-liquid-k-evaporation-coefficient.pdf
+  note: >-
+    Table 2 measures pure liquid potassium, not a silicate melt, between 66.6 and
+    119.2 °C (339.75–392.35 K). This is direct evidence relevant to the runtime's
+    K entry flagged no_direct_k_sticking_coefficient in
+    vacuum_pyrolysis_sticking.yaml; it is a measured evaporation coefficient,
+    not a sticking measurement. The paper reports alpha near 1 and no temperature
+    dependence over this range.
+  audit:
+    printed_row_counts: {table_1: 12, table_2: 5}
+    table_1: >-
+      PDF p2: MinerU HTML and pdftotext agree on the numeric alpha and delta cells,
+      including comma decimals and the printed ± on the Prüger water row. The
+      render confirms each row/column assignment and the species formula C9H6;
+      pdftotext's CCI, is an OCR error. Delta is the printed free angular ratio,
+      retained as context because this extract's quantity is alpha. Schema gap:
+      no free-angular-ratio quantity token exists. Neumann's K row is retained as
+      his own summary value, not attributed to prior work.
+    table_2: >-
+      PDF p13: render checked all numeric cells in rows 66.6, 66.7, 104.5, 111.0,
+      and 119.2: theta, p, 2a0, 2b0, t, A, B, l−2a0, and alpha. The render resolves
+      the text layer's lost exponents; the five row headings and column assignments
+      match the printed table. Alpha values are measured_reduced from the authors'
+      measured droplet evaporation and their printed equations (4)–(6). p is
+      model-derived context computed with Neumann–Völker's equation; the paper's
+      underlying equation inputs are not tabulated here, so p is not extracted as
+      a separate model-derived observation.
+    table_2_render_values: >-
+      Row order (theta_C, p_mmHg, 2a0_cm, 2b0_cm, t, A_cm_s, B_cm3_s,
+      l_minus_2a0_cm, alpha): (66.6,1.20e-6,0.15,0.12,200 h,2.55e-8,1.6e-10,0.55,0.89);
+      (66.7,1.21e-6,0.12,0.11,211 h,2.7e-8,0.7e-10,0.18,0.93);
+      (104.5,2.66e-5,0.12,0.10,180 min,0.93e-6,2.7e-9,0.38,1.01);
+      (111.0,4.23e-5,0.11,0.10,220 min,1.45e-6,2.7e-9,0.29,1.00);
+      (119.2,7.4e-5,0.12,0.10,190 min,2.40e-6,6.0e-9,0.38,0.95).
+    mineru_compare: >-
+      Staged standalone converter produced one p2 table draft. The required compare
+      completed with total=0 because this tool version does not scan alpha values;
+      p13 has no MinerU table. p2 numeric assignment was separately checked against
+      the render; p13 numeric cells are all recorded above as render-checked.
+    identity_mapping_gap: >-
+      The real migrator preserves every Table 2 row's temperature_K and located
+      total_pressure_Pa in point_conditions, but its existing alpha identity path
+      does not bind point_conditions.total_pressure_Pa to Identity.total_pressure_Pa.
+      The task requires that printed P reach identity and also forbids migrator
+      changes in an extraction task; this is escalated as a scope blocker.
+    schema_gaps:
+    - 'Table 1 delta: free angular ratio has no schema quantity token; kept as printed context.'
+    - 'Table 2 pressure p is model-derived, but its Neumann–Völker equation inputs are not stored in this source; retained as context, not a typed pressure observation.'
+review_status: draft
+fidelity_samples:
+- path: species.K.observations[neumann_1954_k_alpha_table2].values.points[2].alpha
+  value: 1.01
+  locator: {page: 13, table: '2', note: 'Rendered value in the 104.5 °C row.'}
+species:
+  K:
+    observations:
+    - observation_id: neumann_1954_k_alpha_table1_summary
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      standard_state: evaporation of pure liquid potassium
+      regime: langmuir_free_evaporation
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        alpha: 1
+        note: 'Neumann identifies this value as from this work; the five individual Table 2 rows are transcribed separately.'
+    - observation_id: neumann_1954_k_alpha_table2
+      type: alpha
+      locator: {page: 13, table: '2'}
+      phase: l
+      standard_state: evaporation of pure liquid potassium droplets into high vacuum
+      regime: langmuir_free_evaporation
+      units: dimensionless alpha; table dimensions as printed
+      uncertainty: {note: No numerical uncertainty for alpha is printed.}
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        gas_species: K(g)
+        method: langmuir_free_evaporation
+        reduction: 'A and B from equations (4)–(6); alpha calculated as stated by the authors.'
+        points:
+        - alpha: 0.89
+          T_C: 66.6
+          p_mmHg_as_published: '1.20e-6'
+          droplet_initial_diameter_2a0_cm: 0.15
+          droplet_initial_diameter_2b0_cm: 0.12
+          duration: {value: 200, unit: h}
+          A_cm_per_s: '2.55e-8'
+          B_cm3_per_s: '1.6e-10'
+          l_minus_2a0_cm: 0.55
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1.5999e-4'}}, locator: {page: 13, table: '2', note: 'Printed p = 1.20×10^-6 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
+            fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
+        - alpha: 0.93
+          T_C: 66.7
+          p_mmHg_as_published: '1.21e-6'
+          droplet_initial_diameter_2a0_cm: 0.12
+          droplet_initial_diameter_2b0_cm: 0.11
+          duration: {value: 211, unit: h}
+          A_cm_per_s: '2.7e-8'
+          B_cm3_per_s: '0.7e-10'
+          l_minus_2a0_cm: 0.18
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1.6132e-4'}}, locator: {page: 13, table: '2', note: 'Printed p = 1.21×10^-6 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
+            fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
+        - alpha: 1.01
+          T_C: 104.5
+          p_mmHg_as_published: '2.66e-5'
+          droplet_initial_diameter_2a0_cm: 0.12
+          droplet_initial_diameter_2b0_cm: 0.10
+          duration: {value: 180, unit: min}
+          A_cm_per_s: '0.93e-6'
+          B_cm3_per_s: '2.7e-9'
+          l_minus_2a0_cm: 0.38
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0035464'}}, locator: {page: 13, table: '2', note: 'Printed p = 2.66×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
+            fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
+        - alpha: 1.00
+          T_C: 111.0
+          p_mmHg_as_published: '4.23e-5'
+          droplet_initial_diameter_2a0_cm: 0.11
+          droplet_initial_diameter_2b0_cm: 0.10
+          duration: {value: 220, unit: min}
+          A_cm_per_s: '1.45e-6'
+          B_cm3_per_s: '2.7e-9'
+          l_minus_2a0_cm: 0.29
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0056395'}}, locator: {page: 13, table: '2', note: 'Printed p = 4.23×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
+            fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
+        - alpha: 0.95
+          T_C: 119.2
+          p_mmHg_as_published: '7.4e-5'
+          droplet_initial_diameter_2a0_cm: 0.12
+          droplet_initial_diameter_2b0_cm: 0.10
+          duration: {value: 190, unit: min}
+          A_cm_per_s: '2.40e-6'
+          B_cm3_per_s: '6.0e-9'
+          l_minus_2a0_cm: 0.38
+          point_conditions:
+            total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0098659'}}, locator: {page: 13, table: '2', note: 'Printed p = 7.4×10^-5 mm; context pressure from Neumann–Völker equation, converted with 1 mmHg = 133.322 Pa.'}}
+            fO2_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 13, table: '2', note: 'No oxygen fugacity or oxygen pressure is stated.'}}
+  Hg:
+    observations:
+    - observation_id: neumann_1954_hg_alpha_knudsen_1915
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Knudsen 1915 [1]'
+        alpha: 1.00
+        delta_free_angular_ratio: null
+        note: 'Delta is blank in the table.'
+    - observation_id: neumann_1954_hg_alpha_volmer_estermann_1921
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Volmer and Estermann 1921 [2]'
+        alpha: 1.00
+        delta_free_angular_ratio: null
+        note: 'Delta is blank in the table.'
+  CCl4:
+    observations:
+    - observation_id: neumann_1954_ccl4_alpha_alty_pruger_baranaev
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Alty 1931 [3], Prüger 1940 [4], Baranaev 1939 [5]'
+        alpha: 1
+        delta_free_angular_ratio: 1
+  C9H6:
+    observations:
+    - observation_id: neumann_1954_c9h6_alpha_baranaev_1939
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Baranaev 1939 [5]'
+        alpha: 0.9
+        delta_free_angular_ratio: 0.85
+        printed_species: C9H6
+  CHCl3:
+    observations:
+    - observation_id: neumann_1954_chcl3_alpha_baranaev_1939
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Baranaev 1939 [5]'
+        alpha: 0.16
+        delta_free_angular_ratio: 0.54
+  C2H5OH:
+    observations:
+    - observation_id: neumann_1954_c2h5oh_alpha_baranaev_1939
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Baranaev 1939 [5]'
+        alpha: 0.02
+        delta_free_angular_ratio: 0.02
+    - observation_id: neumann_1954_c2h5oh_alpha_bucka_1950
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Bucka 1950 [6]'
+        alpha: 0.024
+        delta_free_angular_ratio: 0.02
+  CH3OH:
+    observations:
+    - observation_id: neumann_1954_ch3oh_alpha_baranaev_1939
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Baranaev 1939 [5]'
+        alpha: 0.045
+        delta_free_angular_ratio: 0.05
+  C3H5(OH)3:
+    observations:
+    - observation_id: neumann_1954_glycerol_alpha_wyllie_1949
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Wyllie 1949 [7]'
+        alpha: 0.05
+        delta_free_angular_ratio: null
+        note: 'Delta is blank in the table.'
+  H2O:
+    observations:
+    - observation_id: neumann_1954_h2o_alpha_alty_mackay_1935
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Alty and Mackay 1935 [3]'
+        alpha: 0.04
+        delta_free_angular_ratio: 0.04
+    - observation_id: neumann_1954_h2o_alpha_pruger_1940
+      type: alpha
+      locator: {page: 2, table: '1'}
+      phase: l
+      units: dimensionless alpha
+      uncertainty: {note: 'Printed α = 0.02 ± 0.04; confidence level not stated.'}
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Prüger 1940 [4]'
+        alpha: 0.02
+        alpha_uncertainty: 0.04
+        delta_free_angular_ratio: 0.04
