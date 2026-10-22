@@ -1,0 +1,3836 @@
+schema_version: literature_extract.v1
+source_id: shugurov-2024-gaseous-cerates-si
+source:
+  citation: 'Shugurov SM, Lopatin SI, Zhinkina OA, Panin AI, Panina NS (2024). Thermodynamics of gaseous strontium
+    and calcium cerates studied by Knudsen effusion mass spectrometry and estimation of relative electron ionization
+    cross-section for CeO2(g). Rapid Communications in Mass Spectrometry 38(21): e9894.'
+  doi: 10.1002/rcm.9894
+  url: https://doi.org/10.1002/rcm.9894
+  year: 2024
+  corpus_asset: raw/shugurov-2024-gaseous-cerates-si/shugurov-2024-gaseous-cerates-si.docx
+  source_pdf_status: no source PDF located; publisher DOCX supplementary information only
+extraction:
+  method: Native OOXML table-cell transcription from publisher supplementary DOCX, cross-checked against macOS
+    textutil text export.
+  date: '2026-10-22'
+  worker: fam43-1022
+  scope_note: Tables S1 and S2 provide the measured partial pressures; supplied SI does not give the individual
+    run compositions.
+review_status: draft
+fidelity_samples:
+- path: species.CeO2.observations[shugurov_2024_s1_ceo2_partial_pressure].values.points[0].P_atm
+  value: '10.2e-4'
+  locator:
+    table: S1
+    note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+- path: species.CaCeO3.observations[shugurov_2024_s2_caceo3_partial_pressure].values.points[0].P_atm
+  value: '5.60e-9'
+  locator:
+    table: S2
+    note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+species:
+  CeO2:
+    observations:
+    - observation_id: shugurov_2024_s1_ceo2_partial_pressure
+      type: psat_series
+      locator:
+        table: S1
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: SrO-CeO2 system as titled in Table S1
+      regime: kems_effusion
+      sample_composition_as_published: SrO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2218
+      - 2249
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: CeO2
+        formula: CeO2
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S1 prints the column in 10^-4 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2226'
+          T_K: 2226
+          P_atm_as_printed: '10.2'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '10.2e-4'
+          value_as_published: 10.2 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator: &id001
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id001
+          locator: *id001
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '11.4'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '11.4e-4'
+          value_as_published: 11.4 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id002
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id002
+          locator: *id002
+        - T_K_as_printed: '2235'
+          T_K: 2235
+          P_atm_as_printed: '11.2'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '11.2e-4'
+          value_as_published: 11.2 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2235'
+              locator: &id003
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id003
+          locator: *id003
+        - T_K_as_printed: '2232'
+          T_K: 2232
+          P_atm_as_printed: '11.8'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '11.8e-4'
+          value_as_published: 11.8 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2232'
+              locator: &id004
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id004
+          locator: *id004
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '10.0'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '10.0e-4'
+          value_as_published: 10.0 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id005
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id005
+          locator: *id005
+        - T_K_as_printed: '2237'
+          T_K: 2237
+          P_atm_as_printed: '9.55'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '9.55e-4'
+          value_as_published: 9.55 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2237'
+              locator: &id006
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id006
+          locator: *id006
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '8.84'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '8.84e-4'
+          value_as_published: 8.84 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id007
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id007
+          locator: *id007
+        - T_K_as_printed: '2223'
+          T_K: 2223
+          P_atm_as_printed: '14.3'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '14.3e-4'
+          value_as_published: 14.3 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2223'
+              locator: &id008
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id008
+          locator: *id008
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '15.2'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '15.2e-4'
+          value_as_published: 15.2 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id009
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id009
+          locator: *id009
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '14.6'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '14.6e-4'
+          value_as_published: 14.6 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id010
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id010
+          locator: *id010
+        - T_K_as_printed: '2227'
+          T_K: 2227
+          P_atm_as_printed: '14.5'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '14.5e-4'
+          value_as_published: 14.5 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2227'
+              locator: &id011
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id011
+          locator: *id011
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '13.5'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '13.5e-4'
+          value_as_published: 13.5 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id012
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id012
+          locator: *id012
+        - T_K_as_printed: '2224'
+          T_K: 2224
+          P_atm_as_printed: '13.4'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '13.4e-4'
+          value_as_published: 13.4 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2224'
+              locator: &id013
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id013
+          locator: *id013
+        - T_K_as_printed: '2218'
+          T_K: 2218
+          P_atm_as_printed: '12.9'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '12.9e-4'
+          value_as_published: 12.9 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2218'
+              locator: &id014
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id014
+          locator: *id014
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '16.4'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '16.4e-4'
+          value_as_published: 16.4 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id015
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id015
+          locator: *id015
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '16.0'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '16.0e-4'
+          value_as_published: 16.0 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id016
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id016
+          locator: *id016
+        - T_K_as_printed: '2247'
+          T_K: 2247
+          P_atm_as_printed: '15.6'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '15.6e-4'
+          value_as_published: 15.6 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2247'
+              locator: &id017
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id017
+          locator: *id017
+        - T_K_as_printed: '2244'
+          T_K: 2244
+          P_atm_as_printed: '14.5'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '14.5e-4'
+          value_as_published: 14.5 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2244'
+              locator: &id018
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id018
+          locator: *id018
+        - T_K_as_printed: '2249'
+          T_K: 2249
+          P_atm_as_printed: '14.2'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '14.2e-4'
+          value_as_published: 14.2 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2249'
+              locator: &id019
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id019
+          locator: *id019
+        - T_K_as_printed: '2245'
+          T_K: 2245
+          P_atm_as_printed: '12.5'
+          pressure_scale_as_printed: 10^-4 atm
+          P_atm: '12.5e-4'
+          value_as_published: 12.5 × 10^-4 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2245'
+              locator: &id020
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id020
+          locator: *id020
+    - observation_id: shugurov_2024_s2_ceo2_partial_pressure
+      type: psat_series
+      locator:
+        table: S2
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: CaO-CeO2 system as titled in Table S2
+      regime: kems_effusion
+      sample_composition_as_published: CaO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2154
+      - 2208
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: CeO2
+        formula: CeO2
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S2 prints the column in 10^-5 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          P_atm_as_printed: '11.1'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '11.1e-5'
+          value_as_published: 11.1 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2167'
+              locator: &id021
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id021
+          locator: *id021
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '10.7'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '10.7e-5'
+          value_as_published: 10.7 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id022
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id022
+          locator: *id022
+        - T_K_as_printed: '2154'
+          T_K: 2154
+          P_atm_as_printed: '10.3'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '10.3e-5'
+          value_as_published: 10.3 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2154'
+              locator: &id023
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id023
+          locator: *id023
+        - T_K_as_printed: '2155'
+          T_K: 2155
+          P_atm_as_printed: '9.14'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.14e-5'
+          value_as_published: 9.14 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2155'
+              locator: &id024
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id024
+          locator: *id024
+        - T_K_as_printed: '2157'
+          T_K: 2157
+          P_atm_as_printed: '9.05'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.05e-5'
+          value_as_published: 9.05 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2157'
+              locator: &id025
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id025
+          locator: *id025
+        - T_K_as_printed: '2165'
+          T_K: 2165
+          P_atm_as_printed: '8.64'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '8.64e-5'
+          value_as_published: 8.64 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2165'
+              locator: &id026
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id026
+          locator: *id026
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '9.27'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.27e-5'
+          value_as_published: 9.27 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id027
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id027
+          locator: *id027
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '8.97'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '8.97e-5'
+          value_as_published: 8.97 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id028
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id028
+          locator: *id028
+        - T_K_as_printed: '2166'
+          T_K: 2166
+          P_atm_as_printed: '9.52'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.52e-5'
+          value_as_published: 9.52 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2166'
+              locator: &id029
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id029
+          locator: *id029
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '8.62'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '8.62e-5'
+          value_as_published: 8.62 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id030
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id030
+          locator: *id030
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '9.27'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.27e-5'
+          value_as_published: 9.27 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id031
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id031
+          locator: *id031
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '8.40'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '8.40e-5'
+          value_as_published: 8.40 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id032
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id032
+          locator: *id032
+        - T_K_as_printed: '2162'
+          T_K: 2162
+          P_atm_as_printed: '9.17'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.17e-5'
+          value_as_published: 9.17 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2162'
+              locator: &id033
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id033
+          locator: *id033
+        - T_K_as_printed: '2198'
+          T_K: 2198
+          P_atm_as_printed: '10.6'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '10.6e-5'
+          value_as_published: 10.6 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator: &id034
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id034
+          locator: *id034
+        - T_K_as_printed: '2192'
+          T_K: 2192
+          P_atm_as_printed: '13.0'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '13.0e-5'
+          value_as_published: 13.0 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2192'
+              locator: &id035
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id035
+          locator: *id035
+        - T_K_as_printed: '2200'
+          T_K: 2200
+          P_atm_as_printed: '10.7'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '10.7e-5'
+          value_as_published: 10.7 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2200'
+              locator: &id036
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id036
+          locator: *id036
+        - T_K_as_printed: '2208'
+          T_K: 2208
+          P_atm_as_printed: '12.5'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '12.5e-5'
+          value_as_published: 12.5 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2208'
+              locator: &id037
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id037
+          locator: *id037
+        - T_K_as_printed: '2199'
+          T_K: 2199
+          P_atm_as_printed: '12.0'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '12.0e-5'
+          value_as_published: 12.0 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2199'
+              locator: &id038
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id038
+          locator: *id038
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '12.6'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '12.6e-5'
+          value_as_published: 12.6 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id039
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id039
+          locator: *id039
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '12.4'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '12.4e-5'
+          value_as_published: 12.4 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id040
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id040
+          locator: *id040
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '9.70'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '9.70e-5'
+          value_as_published: 9.70 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id041
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 21
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id041
+          locator: *id041
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '5.62'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '5.62e-5'
+          value_as_published: 5.62 × 10^-5 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id042
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 22
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id042
+          locator: *id042
+    context:
+    - observation_id: shugurov_2024_s6_ceo2_computed_molecular_properties
+      type: model_table_context
+      locator:
+        table: S6
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+        methods_as_printed:
+        - PBE0
+        - M06
+        - MP2(Full)
+        calculated_values:
+        - characteristic: R(Ce-O), Å
+          PBE0: '1.798'
+          M06: '1.784'
+          MP2(Full): '1.819'
+        - characteristic: <O-Ce-O, deg
+          PBE0: '140'
+          M06: '149'
+          MP2(Full): '116'
+        - characteristic: A1
+          PBE0: '77'
+          M06: '96'
+          MP2(Full): '142'
+        - characteristic: B2
+          PBE0: '810'
+          M06: '808'
+          MP2(Full): '779'
+        - characteristic: A1
+          PBE0: '814'
+          M06: '829'
+          MP2(Full): '826'
+      title_as_printed: Theoretical characteristics of CeO2(g) ground state
+    - observation_id: shugurov_2024_s6_ceo2_quoted_experiment
+      type: quoted_table_context
+      locator:
+        table: S6
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: quoted_molecular_structure_or_vibrational_values
+        method_class: quoted_attributed
+        attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+        reason_not_typed: No store quantity represents the reported molecular characteristic.
+        values_as_printed:
+        - characteristic: B2
+          value_as_printed: '759'
+        - characteristic: A1
+          value_as_printed: '777'
+      title_as_printed: Experimental comparison values in Table S6
+    - observation_id: shugurov_2024_s13_total_energies
+      type: model_table_context
+      locator:
+        table: S13
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: a.u.
+      values:
+        quantity: calculated_total_electronic_energy_plus_zero_point_energy
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - delta_fG
+        reason_not_typed: Absolute calculated molecular total energies are not formation enthalpies or Gibbs energies.
+        printed_cells:
+        - - Species
+          - Method
+        - - ''
+          - PBE0
+          - M06
+          - MP2(Full)
+        - - CaO
+          - '-752.5736198'
+          - '-752.7759304'
+          - '-752.2215567'
+        - - SrO
+          - '-105.85480715'
+          - '-105.870680847'
+          - '-105.7585942'
+        - - CeO2
+          - '-625.476253'
+          - '-625.601399'
+          - '-625.311721'
+        - - CaO+ CeO2
+          - '-1378.0498728'
+          - '-1378.3773294'
+          - '-1377.5332777'
+        - - SrO+ CeO2
+          - '-731.33106015'
+          - '-731.472079847'
+          - '-731.0703152'
+        - - CaCeO3 (C3v)
+          - '-1378.1943348'
+          - '-1378.5108443'
+          - '-1377.6975273'
+        - - CaCeO3 (Cs)
+          - '-1378.1970919'
+          - '-1378.5147311'
+          - '-1377.69212690'
+        - - SrCeO3 (C3v)
+          - '-731.4766738'
+          - '-731.6039787'
+          - '-731.2311115'
+        - - SrCeO3 (Cs)
+          - '-731.4760405'
+          - '-731.6048064'
+          - '-731.2239472'
+      title_as_printed: Relevant energies E_tot = E_el + ZPE
+  SrO:
+    observations:
+    - observation_id: shugurov_2024_s1_sro_partial_pressure
+      type: psat_series
+      locator:
+        table: S1
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: SrO-CeO2 system as titled in Table S1
+      regime: kems_effusion
+      sample_composition_as_published: SrO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2218
+      - 2249
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: SrO
+        formula: SrO
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S1 prints the column in 10^-5 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2226'
+          T_K: 2226
+          P_atm_as_printed: '1.90'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '1.90e-5'
+          value_as_published: 1.90 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator: &id043
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id043
+          locator: *id043
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '2.00'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '2.00e-5'
+          value_as_published: 2.00 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id044
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id044
+          locator: *id044
+        - T_K_as_printed: '2235'
+          T_K: 2235
+          P_atm_as_printed: '1.87'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '1.87e-5'
+          value_as_published: 1.87 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2235'
+              locator: &id045
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id045
+          locator: *id045
+        - T_K_as_printed: '2232'
+          T_K: 2232
+          P_atm_as_printed: '2.22'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '2.22e-5'
+          value_as_published: 2.22 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2232'
+              locator: &id046
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id046
+          locator: *id046
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '1.91'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '1.91e-5'
+          value_as_published: 1.91 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id047
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id047
+          locator: *id047
+        - T_K_as_printed: '2237'
+          T_K: 2237
+          P_atm_as_printed: '1.91'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '1.91e-5'
+          value_as_published: 1.91 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2237'
+              locator: &id048
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id048
+          locator: *id048
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '1.38'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '1.38e-5'
+          value_as_published: 1.38 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id049
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id049
+          locator: *id049
+        - T_K_as_printed: '2223'
+          T_K: 2223
+          P_atm_as_printed: '3.81'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.81e-5'
+          value_as_published: 3.81 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2223'
+              locator: &id050
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id050
+          locator: *id050
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '3.82'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.82e-5'
+          value_as_published: 3.82 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id051
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id051
+          locator: *id051
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '3.68'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.68e-5'
+          value_as_published: 3.68 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id052
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id052
+          locator: *id052
+        - T_K_as_printed: '2227'
+          T_K: 2227
+          P_atm_as_printed: '3.40'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.40e-5'
+          value_as_published: 3.40 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2227'
+              locator: &id053
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id053
+          locator: *id053
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '3.14'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.14e-5'
+          value_as_published: 3.14 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id054
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id054
+          locator: *id054
+        - T_K_as_printed: '2224'
+          T_K: 2224
+          P_atm_as_printed: '3.40'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.40e-5'
+          value_as_published: 3.40 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2224'
+              locator: &id055
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id055
+          locator: *id055
+        - T_K_as_printed: '2218'
+          T_K: 2218
+          P_atm_as_printed: '3.12'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.12e-5'
+          value_as_published: 3.12 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2218'
+              locator: &id056
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id056
+          locator: *id056
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '3.56'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.56e-5'
+          value_as_published: 3.56 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id057
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id057
+          locator: *id057
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '3.56'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.56e-5'
+          value_as_published: 3.56 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id058
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id058
+          locator: *id058
+        - T_K_as_printed: '2247'
+          T_K: 2247
+          P_atm_as_printed: '3.30'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.30e-5'
+          value_as_published: 3.30 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2247'
+              locator: &id059
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id059
+          locator: *id059
+        - T_K_as_printed: '2244'
+          T_K: 2244
+          P_atm_as_printed: '3.29'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '3.29e-5'
+          value_as_published: 3.29 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2244'
+              locator: &id060
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id060
+          locator: *id060
+        - T_K_as_printed: '2249'
+          T_K: 2249
+          P_atm_as_printed: '2.61'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '2.61e-5'
+          value_as_published: 2.61 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2249'
+              locator: &id061
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id061
+          locator: *id061
+        - T_K_as_printed: '2245'
+          T_K: 2245
+          P_atm_as_printed: '2.47'
+          pressure_scale_as_printed: 10^-5 atm
+          P_atm: '2.47e-5'
+          value_as_published: 2.47 × 10^-5 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2245'
+              locator: &id062
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id062
+          locator: *id062
+    context:
+    - observation_id: shugurov_2024_s5_sro_computed_molecular_properties
+      type: model_table_context
+      locator:
+        table: S5
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+        methods_as_printed:
+        - PBE0
+        - M06
+        - MP2(Full)
+        calculated_values:
+        - characteristic: Re, Å
+          PBE0: '1.897'
+          M06: '1.890'
+          MP2(Full): '1.925'
+        - characteristic: ωe, cm-1
+          PBE0: '702'
+          M06: '685'
+          MP2(Full): '649'
+      title_as_printed: Theoretical characteristics of SrO(g) ground state
+    - observation_id: shugurov_2024_s5_sro_quoted_experiment
+      type: quoted_table_context
+      locator:
+        table: S5
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: quoted_molecular_structure_or_vibrational_values
+        method_class: quoted_attributed
+        attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+        reason_not_typed: No store quantity represents the reported molecular characteristic.
+        values_as_printed:
+        - characteristic: Re, Å
+          value_as_printed: '1.920'
+        - characteristic: ωe, cm-1
+          value_as_printed: '653'
+      title_as_printed: Experimental comparison values in Table S5
+  SrCeO3:
+    observations:
+    - observation_id: shugurov_2024_s1_srceo3_partial_pressure
+      type: psat_series
+      locator:
+        table: S1
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: SrO-CeO2 system as titled in Table S1
+      regime: kems_effusion
+      sample_composition_as_published: SrO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2218
+      - 2249
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: SrCeO3
+        formula: SrCeO3
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S1 prints the column in 10^-8 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2226'
+          T_K: 2226
+          P_atm_as_printed: '9.39'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.39e-8'
+          value_as_published: 9.39 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2226'
+              locator: &id063
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id063
+          locator: *id063
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '8.85'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '8.85e-8'
+          value_as_published: 8.85 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id064
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id064
+          locator: *id064
+        - T_K_as_printed: '2235'
+          T_K: 2235
+          P_atm_as_printed: '9.98'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.98e-8'
+          value_as_published: 9.98 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2235'
+              locator: &id065
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id065
+          locator: *id065
+        - T_K_as_printed: '2232'
+          T_K: 2232
+          P_atm_as_printed: '9.42'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.42e-8'
+          value_as_published: 9.42 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2232'
+              locator: &id066
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id066
+          locator: *id066
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '7.21'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '7.21e-8'
+          value_as_published: 7.21 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id067
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id067
+          locator: *id067
+        - T_K_as_printed: '2237'
+          T_K: 2237
+          P_atm_as_printed: '5.00'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '5.00e-8'
+          value_as_published: 5.00 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2237'
+              locator: &id068
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id068
+          locator: *id068
+        - T_K_as_printed: '2236'
+          T_K: 2236
+          P_atm_as_printed: '4.99'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '4.99e-8'
+          value_as_published: 4.99 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2236'
+              locator: &id069
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id069
+          locator: *id069
+        - T_K_as_printed: '2223'
+          T_K: 2223
+          P_atm_as_printed: '15.0'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '15.0e-8'
+          value_as_published: 15.0 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2223'
+              locator: &id070
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id070
+          locator: *id070
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '15.0'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '15.0e-8'
+          value_as_published: 15.0 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id071
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id071
+          locator: *id071
+        - T_K_as_printed: '2229'
+          T_K: 2229
+          P_atm_as_printed: '12.9'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '12.9e-8'
+          value_as_published: 12.9 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2229'
+              locator: &id072
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id072
+          locator: *id072
+        - T_K_as_printed: '2227'
+          T_K: 2227
+          P_atm_as_printed: '13.6'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '13.6e-8'
+          value_as_published: 13.6 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2227'
+              locator: &id073
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id073
+          locator: *id073
+        - T_K_as_printed: '2230'
+          T_K: 2230
+          P_atm_as_printed: '9.29'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.29e-8'
+          value_as_published: 9.29 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2230'
+              locator: &id074
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id074
+          locator: *id074
+        - T_K_as_printed: '2224'
+          T_K: 2224
+          P_atm_as_printed: '9.27'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.27e-8'
+          value_as_published: 9.27 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2224'
+              locator: &id075
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id075
+          locator: *id075
+        - T_K_as_printed: '2218'
+          T_K: 2218
+          P_atm_as_printed: '9.24'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.24e-8'
+          value_as_published: 9.24 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2218'
+              locator: &id076
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id076
+          locator: *id076
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '10.8'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '10.8e-8'
+          value_as_published: 10.8 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id077
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id077
+          locator: *id077
+        - T_K_as_printed: '2240'
+          T_K: 2240
+          P_atm_as_printed: '10.8'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '10.8e-8'
+          value_as_published: 10.8 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2240'
+              locator: &id078
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id078
+          locator: *id078
+        - T_K_as_printed: '2247'
+          T_K: 2247
+          P_atm_as_printed: '10.1'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '10.1e-8'
+          value_as_published: 10.1 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2247'
+              locator: &id079
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id079
+          locator: *id079
+        - T_K_as_printed: '2244'
+          T_K: 2244
+          P_atm_as_printed: '9.35'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '9.35e-8'
+          value_as_published: 9.35 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2244'
+              locator: &id080
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id080
+          locator: *id080
+        - T_K_as_printed: '2249'
+          T_K: 2249
+          P_atm_as_printed: '8.65'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '8.65e-8'
+          value_as_published: 8.65 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2249'
+              locator: &id081
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id081
+          locator: *id081
+        - T_K_as_printed: '2245'
+          T_K: 2245
+          P_atm_as_printed: '6.48'
+          pressure_scale_as_printed: 10^-8 atm
+          P_atm: '6.48e-8'
+          value_as_published: 6.48 × 10^-8 atm
+          composition_as_printed: SrO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2245'
+              locator: &id082
+                table: S1
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id082
+          locator: *id082
+    context:
+    - observation_id: shugurov_2024_s1_sr_reaction_enthalpy_calculations
+      type: model_table_context
+      locator:
+        table: S1
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: kJ/mol
+      values:
+        quantity: negative_reaction_enthalpy_at_0K
+        method_class: model_derived
+        reaction_as_printed: reaction (8), M=Sr; values are −ΔrH⁰(0)
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: These are calculated reaction enthalpy values at 0 K for the stated molecular structures,
+          not formation enthalpies from elements or partial molar enthalpies.
+        calculation_as_printed: Rigid-rotor harmonic-oscillator thermodynamic functions for C3v and Cs structures
+          evaluated using quantum chemical calculations.
+        runs:
+        - T_K_as_printed: '2226'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '381.4'
+            Cs: '327.0'
+        - T_K_as_printed: '2229'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '377.6'
+            Cs: '323.2'
+        - T_K_as_printed: '2235'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '382.5'
+            Cs: '327.9'
+        - T_K_as_printed: '2232'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '376.7'
+            Cs: '322.3'
+        - T_K_as_printed: '2236'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '378.3'
+            Cs: '323.7'
+        - T_K_as_printed: '2237'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '372.5'
+            Cs: '317.9'
+        - T_K_as_printed: '2236'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '379.8'
+            Cs: '325.3'
+        - T_K_as_printed: '2223'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '370.3'
+            Cs: '316.1'
+        - T_K_as_printed: '2230'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '370.2'
+            Cs: '315.8'
+        - T_K_as_printed: '2229'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '368.7'
+            Cs: '314.3'
+        - T_K_as_printed: '2227'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '371.0'
+            Cs: '316.6'
+        - T_K_as_printed: '2230'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '367.3'
+            Cs: '312.9'
+        - T_K_as_printed: '2224'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '364.9'
+            Cs: '310.7'
+        - T_K_as_printed: '2218'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '366.1'
+            Cs: '312.0'
+        - T_K_as_printed: '2240'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '365.5'
+            Cs: '310.9'
+        - T_K_as_printed: '2240'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '366.0'
+            Cs: '311.3'
+        - T_K_as_printed: '2247'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '367.9'
+            Cs: '313.0'
+        - T_K_as_printed: '2244'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '367.4'
+            Cs: '312.6'
+        - T_K_as_printed: '2249'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '371.3'
+            Cs: '316.4'
+        - T_K_as_printed: '2245'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '368.8'
+            Cs: '314.0'
+        average_values_as_printed:
+          C3v: 371.7 ± 4.7
+          Cs: 317.2 ± 4.7
+      title_as_printed: Table S1 −ΔrH⁰(0) values for reaction (8), M=Sr
+    - observation_id: shugurov_2024_s10_srceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S10
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule SrCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000      1.166288000
+
+            O        0.000000000      1.550314000     -0.038590000
+
+            O       -1.342611000     -0.775157000     -0.038590000
+
+            O        1.342611000     -0.775157000     -0.038590000
+
+            Sr       0.000000000      0.000000000     -1.755751000'
+          - 'Ce       0.720208000      0.939339000      0.000000000
+
+            O       -0.066508000     -0.433234000      1.345531000
+
+            O       -0.066508000     -0.433234000     -1.345531000
+
+            O       -0.066508000      2.576376000      0.000000000
+
+            Sr      -1.057261000     -1.793709000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nA1\nE\nA1\nE\nA1"
+          - "206\n268       \n321\n447\n572 \n741"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "76\n133       \n223       \n242       \n336     \n  485        \n534       \n608       \n804"
+      title_as_printed: PBE0 molecular structures and harmonic frequencies for SrCeO3
+    - observation_id: shugurov_2024_s11_srceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S11
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule SrCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000     -1.147639140
+
+            O       -1.548562864      0.000000000      0.059579296
+
+            O        0.774281432      1.341094779      0.059579296
+
+            O        0.774281432     -1.341094779      0.059579296
+
+            Sr       0.000000000      0.000000000      1.793992835'
+          - 'Ce       0.728024000      0.942458000      0.000000000
+
+            O       -0.063167000     -0.436145000      1.348463000
+
+            O       -0.063167000     -0.436145000     -1.348463000
+
+            O       -0.063167000      2.563202000      0.000000000
+
+            Sr      -1.071300000     -1.794470000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nA1\nE\nA1\nE\nA1"
+          - "180\n263       \n316\n438\n545 \n724"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "77 \n122       \n230       \n238       \n303     \n  473         \n532       \n591       \n806"
+      title_as_printed: M06 molecular structures and harmonic frequencies for SrCeO3
+    - observation_id: shugurov_2024_s12_srceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S12
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule SrCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000      1.169013000
+
+            O        0.000000000      1.557887000     -0.041041000
+
+            O       -1.349170000     -0.778944000     -0.041041000
+
+            O        1.349170000     -0.778944000     -0.041041000
+
+            Sr       0.000000000      0.000000000     -1.758362000'
+          - 'Ce       0.842674000      0.851327000      0.000000000
+
+            O       -0.062003000     -0.428605000      1.361863000
+
+            O       -0.062003000     -0.428605000     -1.361863000
+
+            O       -0.062003000      2.448052000      0.000000000
+
+            Sr      -1.247027000     -1.634307000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nA1\nE\nA1\nE\nA1"
+          - "216\n269       \n322\n448\n574 \n736"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "76\n163       \n229       \n244       \n343     \n  486         \n522       \n611       \n794"
+      title_as_printed: MP2(Full) molecular structures and harmonic frequencies for SrCeO3
+    - observation_id: shugurov_2024_figure_s1_xrd
+      type: figure_record
+      locator:
+        figure: S1
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: not stated
+      values:
+        quantity: powder_x_ray_diffraction_patterns
+        species:
+        - SrCeO3
+        - 50 mol% CaO + 50 mol% CeO2
+        phase: crystalline solids
+        temperature: not stated
+        axes_as_printed: not recoverable from the available DOCX text layer
+        caption: Experimental and theoretical x-ray diffraction patterns of a) SrCeO3 and b) sample containing
+          50 mol.% CaO and 50 mol.% CeO2.
+        panels:
+        - panel: a
+          system: SrCeO3
+          series:
+          - experimental
+          - theoretical
+          marker_count: not assessed
+        - panel: b
+          system: 50 mol% CaO + 50 mol% CeO2
+          series:
+          - experimental
+          - theoretical
+          marker_count: not assessed
+        digitisation: deferred to a figure pass
+        note: Only the DOCX SI and embedded EMF assets are present; a paginated PDF is absent and no local EMF
+          renderer is available. No numerical values were estimated.
+      title_as_printed: Supplementary Figure S1
+  CaO:
+    observations:
+    - observation_id: shugurov_2024_s2_cao_partial_pressure
+      type: psat_series
+      locator:
+        table: S2
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: CaO-CeO2 system as titled in Table S2
+      regime: kems_effusion
+      sample_composition_as_published: CaO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2154
+      - 2208
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: CaO
+        formula: CaO
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S2 prints the column in 10^-7 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          P_atm_as_printed: '3.71'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '3.71e-7'
+          value_as_published: 3.71 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2167'
+              locator: &id083
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id083
+          locator: *id083
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '3.69'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '3.69e-7'
+          value_as_published: 3.69 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id084
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id084
+          locator: *id084
+        - T_K_as_printed: '2154'
+          T_K: 2154
+          P_atm_as_printed: '3.69'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '3.69e-7'
+          value_as_published: 3.69 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2154'
+              locator: &id085
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id085
+          locator: *id085
+        - T_K_as_printed: '2155'
+          T_K: 2155
+          P_atm_as_printed: '3.69'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '3.69e-7'
+          value_as_published: 3.69 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2155'
+              locator: &id086
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id086
+          locator: *id086
+        - T_K_as_printed: '2157'
+          T_K: 2157
+          P_atm_as_printed: '4.00'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.00e-7'
+          value_as_published: 4.00 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2157'
+              locator: &id087
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id087
+          locator: *id087
+        - T_K_as_printed: '2165'
+          T_K: 2165
+          P_atm_as_printed: '4.32'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.32e-7'
+          value_as_published: 4.32 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2165'
+              locator: &id088
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id088
+          locator: *id088
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '4.00'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.00e-7'
+          value_as_published: 4.00 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id089
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id089
+          locator: *id089
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '4.01'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.01e-7'
+          value_as_published: 4.01 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id090
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id090
+          locator: *id090
+        - T_K_as_printed: '2166'
+          T_K: 2166
+          P_atm_as_printed: '4.33'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.33e-7'
+          value_as_published: 4.33 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2166'
+              locator: &id091
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id091
+          locator: *id091
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '4.00'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.00e-7'
+          value_as_published: 4.00 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id092
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id092
+          locator: *id092
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '4.31'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.31e-7'
+          value_as_published: 4.31 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id093
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id093
+          locator: *id093
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '4.01'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.01e-7'
+          value_as_published: 4.01 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id094
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id094
+          locator: *id094
+        - T_K_as_printed: '2162'
+          T_K: 2162
+          P_atm_as_printed: '4.01'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '4.01e-7'
+          value_as_published: 4.01 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2162'
+              locator: &id095
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id095
+          locator: *id095
+        - T_K_as_printed: '2198'
+          T_K: 2198
+          P_atm_as_printed: '5.33'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '5.33e-7'
+          value_as_published: 5.33 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator: &id096
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id096
+          locator: *id096
+        - T_K_as_printed: '2192'
+          T_K: 2192
+          P_atm_as_printed: '6.57'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '6.57e-7'
+          value_as_published: 6.57 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2192'
+              locator: &id097
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id097
+          locator: *id097
+        - T_K_as_printed: '2200'
+          T_K: 2200
+          P_atm_as_printed: '6.90'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '6.90e-7'
+          value_as_published: 6.90 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2200'
+              locator: &id098
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id098
+          locator: *id098
+        - T_K_as_printed: '2208'
+          T_K: 2208
+          P_atm_as_printed: '8.19'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '8.19e-7'
+          value_as_published: 8.19 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2208'
+              locator: &id099
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id099
+          locator: *id099
+        - T_K_as_printed: '2199'
+          T_K: 2199
+          P_atm_as_printed: '7.21'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '7.21e-7'
+          value_as_published: 7.21 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2199'
+              locator: &id100
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id100
+          locator: *id100
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '8.50'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '8.50e-7'
+          value_as_published: 8.50 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id101
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id101
+          locator: *id101
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '7.24'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '7.24e-7'
+          value_as_published: 7.24 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id102
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id102
+          locator: *id102
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '9.13'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '9.13e-7'
+          value_as_published: 9.13 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id103
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 21
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id103
+          locator: *id103
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '9.44'
+          pressure_scale_as_printed: 10^-7 atm
+          P_atm: '9.44e-7'
+          value_as_published: 9.44 × 10^-7 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id104
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 22
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id104
+          locator: *id104
+    context:
+    - observation_id: shugurov_2024_s4_cao_computed_molecular_properties
+      type: model_table_context
+      locator:
+        table: S4
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+        methods_as_printed:
+        - PBE0
+        - M06
+        - MP2(Full)
+        calculated_values:
+        - characteristic: Re, Å
+          PBE0: '1.787'
+          M06: '1.797'
+          MP2(Full): '1.817'
+        - characteristic: ωe, cm-1
+          PBE0: '808'
+          M06: '794'
+          MP2(Full): '714'
+      title_as_printed: Theoretical characteristics of CaO(g) ground state
+    - observation_id: shugurov_2024_s4_cao_quoted_experiment
+      type: quoted_table_context
+      locator:
+        table: S4
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, cm-1
+      values:
+        quantity: quoted_molecular_structure_or_vibrational_values
+        method_class: quoted_attributed
+        attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+        reason_not_typed: No store quantity represents the reported molecular characteristic.
+        values_as_printed:
+        - characteristic: Re, Å
+          value_as_printed: '1.822'
+        - characteristic: ωe, cm-1
+          value_as_printed: '732'
+      title_as_printed: Experimental comparison values in Table S4
+  CaCeO3:
+    observations:
+    - observation_id: shugurov_2024_s2_caceo3_partial_pressure
+      type: psat_series
+      locator:
+        table: S2
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      phase: gas
+      condensed_form: CaO-CeO2 system as titled in Table S2
+      regime: kems_effusion
+      sample_composition_as_published: CaO-CeO2 system; individual run composition is not stated in the supplied
+        SI
+      T_range_K:
+      - 2154
+      - 2208
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        gas_species: CaCeO3
+        formula: CaCeO3
+        method: Knudsen effusion mass spectrometry (as named in the parent article title)
+        pressure_scale_note: Table S2 prints the column in 10^-9 atm; P_atm applies that printed header factor
+          and value_as_published preserves the printed mantissa and scale.
+        points:
+        - T_K_as_printed: '2167'
+          T_K: 2167
+          P_atm_as_printed: '5.60'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.60e-9'
+          value_as_published: 5.60 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2167'
+              locator: &id105
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 1
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id105
+          locator: *id105
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '6.14'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '6.14e-9'
+          value_as_published: 6.14 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id106
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 2
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id106
+          locator: *id106
+        - T_K_as_printed: '2154'
+          T_K: 2154
+          P_atm_as_printed: '5.57'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.57e-9'
+          value_as_published: 5.57 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2154'
+              locator: &id107
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 3
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id107
+          locator: *id107
+        - T_K_as_printed: '2155'
+          T_K: 2155
+          P_atm_as_printed: '5.01'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.01e-9'
+          value_as_published: 5.01 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2155'
+              locator: &id108
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 4
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id108
+          locator: *id108
+        - T_K_as_printed: '2157'
+          T_K: 2157
+          P_atm_as_printed: '5.02'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.02e-9'
+          value_as_published: 5.02 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2157'
+              locator: &id109
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 5
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id109
+          locator: *id109
+        - T_K_as_printed: '2165'
+          T_K: 2165
+          P_atm_as_printed: '5.04'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.04e-9'
+          value_as_published: 5.04 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2165'
+              locator: &id110
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 6
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id110
+          locator: *id110
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '5.02'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.02e-9'
+          value_as_published: 5.02 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id111
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 7
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id111
+          locator: *id111
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '5.03'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.03e-9'
+          value_as_published: 5.03 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id112
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 8
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id112
+          locator: *id112
+        - T_K_as_printed: '2166'
+          T_K: 2166
+          P_atm_as_printed: '5.04'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.04e-9'
+          value_as_published: 5.04 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2166'
+              locator: &id113
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 9
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id113
+          locator: *id113
+        - T_K_as_printed: '2159'
+          T_K: 2159
+          P_atm_as_printed: '4.46'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '4.46e-9'
+          value_as_published: 4.46 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2159'
+              locator: &id114
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 10
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id114
+          locator: *id114
+        - T_K_as_printed: '2158'
+          T_K: 2158
+          P_atm_as_printed: '3.90'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '3.90e-9'
+          value_as_published: 3.90 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2158'
+              locator: &id115
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 11
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id115
+          locator: *id115
+        - T_K_as_printed: '2164'
+          T_K: 2164
+          P_atm_as_printed: '4.47'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '4.47e-9'
+          value_as_published: 4.47 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2164'
+              locator: &id116
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 12
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id116
+          locator: *id116
+        - T_K_as_printed: '2162'
+          T_K: 2162
+          P_atm_as_printed: '3.91'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '3.91e-9'
+          value_as_published: 3.91 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2162'
+              locator: &id117
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 13
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id117
+          locator: *id117
+        - T_K_as_printed: '2198'
+          T_K: 2198
+          P_atm_as_printed: '5.68'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.68e-9'
+          value_as_published: 5.68 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2198'
+              locator: &id118
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 14
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id118
+          locator: *id118
+        - T_K_as_printed: '2192'
+          T_K: 2192
+          P_atm_as_printed: '5.10'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.10e-9'
+          value_as_published: 5.10 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2192'
+              locator: &id119
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 15
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id119
+          locator: *id119
+        - T_K_as_printed: '2200'
+          T_K: 2200
+          P_atm_as_printed: '5.69'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.69e-9'
+          value_as_published: 5.69 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2200'
+              locator: &id120
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 16
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id120
+          locator: *id120
+        - T_K_as_printed: '2208'
+          T_K: 2208
+          P_atm_as_printed: '5.14'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.14e-9'
+          value_as_published: 5.14 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2208'
+              locator: &id121
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 17
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id121
+          locator: *id121
+        - T_K_as_printed: '2199'
+          T_K: 2199
+          P_atm_as_printed: '5.68'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '5.68e-9'
+          value_as_published: 5.68 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2199'
+              locator: &id122
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 18
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id122
+          locator: *id122
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '4.56'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '4.56e-9'
+          value_as_published: 4.56 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id123
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 19
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id123
+          locator: *id123
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '4.56'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '4.56e-9'
+          value_as_published: 4.56 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id124
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 20
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id124
+          locator: *id124
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '3.99'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '3.99e-9'
+          value_as_published: 3.99 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id125
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 21
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id125
+          locator: *id125
+        - T_K_as_printed: '2207'
+          T_K: 2207
+          P_atm_as_printed: '2.28'
+          pressure_scale_as_printed: 10^-9 atm
+          P_atm: '2.28e-9'
+          value_as_published: 2.28 × 10^-9 atm
+          composition_as_printed: CaO-CeO2 system; run composition not stated in the supplied SI
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value:
+                  kind: point
+                  point: '2207'
+              locator: &id126
+                table: S2
+                note: publisher supplementary-information DOCX; no matching paginated PDF found; data row 22
+            composition:
+              state:
+                tag: unknown
+                reason: not_reported_in_supplied_supplement
+              locator: *id126
+          locator: *id126
+    context:
+    - observation_id: shugurov_2024_s2_ca_reaction_enthalpy_calculations
+      type: model_table_context
+      locator:
+        table: S2
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: kJ/mol
+      values:
+        quantity: negative_reaction_enthalpy_at_0K
+        method_class: model_derived
+        reaction_as_printed: reaction (8), M=Ca; values are −ΔrH⁰(0)
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: These are calculated reaction enthalpy values at 0 K for the stated molecular structures,
+          not formation enthalpies from elements or partial molar enthalpies.
+        calculation_as_printed: Rigid-rotor harmonic-oscillator thermodynamic functions for C3v and Cs structures
+          evaluated using quantum chemical calculations.
+        runs:
+        - T_K_as_printed: '2167'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '436.5'
+            Cs: '383.1'
+        - T_K_as_printed: '2158'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '437.1'
+            Cs: '383.9'
+        - T_K_as_printed: '2154'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '435.2'
+            Cs: '382.1'
+        - T_K_as_printed: '2155'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '435.7'
+            Cs: '382.6'
+        - T_K_as_printed: '2157'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '434.8'
+            Cs: '381.7'
+        - T_K_as_printed: '2165'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '435.9'
+            Cs: '382.5'
+        - T_K_as_printed: '2159'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '434.8'
+            Cs: '381.6'
+        - T_K_as_printed: '2164'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '436.4'
+            Cs: '383.0'
+        - T_K_as_printed: '2166'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '434.4'
+            Cs: '381.0'
+        - T_K_as_printed: '2159'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '434.0'
+            Cs: '380.8'
+        - T_K_as_printed: '2158'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '428.8'
+            Cs: '375.6'
+        - T_K_as_printed: '2164'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '435.4'
+            Cs: '382.1'
+        - T_K_as_printed: '2162'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '431.1'
+            Cs: '377.8'
+        - T_K_as_printed: '2198'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '436.9'
+            Cs: '382.7'
+        - T_K_as_printed: '2192'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '426.3'
+            Cs: '372.3'
+        - T_K_as_printed: '2200'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '432.6'
+            Cs: '378.3'
+        - T_K_as_printed: '2208'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '426.2'
+            Cs: '371.8'
+        - T_K_as_printed: '2199'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '429.4'
+            Cs: '375.2'
+        - T_K_as_printed: '2207'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '423.0'
+            Cs: '368.6'
+        - T_K_as_printed: '2207'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '426.2'
+            Cs: '371.7'
+        - T_K_as_printed: '2207'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '424.0'
+            Cs: '369.6'
+        - T_K_as_printed: '2207'
+          negative_reaction_enthalpy_at_0K_kJ_mol:
+            C3v: '423.2'
+            Cs: '368.7'
+        average_values_as_printed:
+          C3v: 431.7 ± 4.9
+          Cs: 378.0 ± 5.3
+      title_as_printed: Table S2 −ΔrH⁰(0) values for reaction (8), M=Ca
+    - observation_id: shugurov_2024_s3_structure_energy_comparison
+      type: model_table_context
+      locator:
+        table: S3
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: kJ/mol
+      values:
+        quantity: computed_favorable_molecular_structures_and_energy_differences
+        method_class: model_derived
+        printed_cells:
+        - - ''
+          - CaCeO3
+          - SrCeO3
+        - - MP2
+          - C3v (~14 kJ/mol)
+          - C3v (~19 kJ/mol)
+        - - PBE0
+          - Cs  (~7 kJ/mol)
+          - Cs  (~2 kJ/mol)
+        - - M06
+          - Cs  (~10 kJ/mol)
+          - Cs  (~2 kJ/mol)
+        reason_not_typed: No store quantity represents computed molecular structure preference or relative structure
+          energy.
+      title_as_printed: Energetically favorable structures using different methods and energy difference between
+        the various structures for the same species
+    - observation_id: shugurov_2024_s7_caceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S7
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule CaCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000      0.835080000
+
+            O        0.000000000      1.530177000     -0.395550000
+
+            O       -1.325172000     -0.765089000     -0.395550000
+
+            O        1.325172000     -0.765089000     -0.395550000
+
+            Ca       0.000000000      0.000000000     -1.947073000'
+          - 'Ce       0.510117000      0.610216000      0.000000000
+
+            O       -0.274225000     -0.786284000      1.328224000
+
+            O       -0.274225000     -0.786284000     -1.328224000
+
+            O       -0.274225000      2.244068000      0.000000000
+
+            Ca      -1.150268000     -2.038226000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nE\nA1\nA1\nE\nA1"
+          - "227       \n332\n344 \n505\n584\n  742"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "83 \n129       \n234       \n309       \n354     \n  528         \n574       \n639       \n810"
+      title_as_printed: PBE0 molecular structures and harmonic frequencies for CaCeO3
+    - observation_id: shugurov_2024_s8_caceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S8
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule CaCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000      0.838892000
+
+            O        0.000000000      1.528429000     -0.393909000
+
+            O       -1.323659000     -0.764215000     -0.393909000
+
+            O        1.323659000     -0.764215000     -0.393909000
+
+            Ca       0.000000000      0.000000000     -1.960096000'
+          - 'Ce       0.510206000      0.615913000      0.000000000
+
+            O       -0.273143000     -0.788763000      1.333521000
+
+            O       -0.273143000     -0.788763000     -1.333521000
+
+            O       -0.273143000      2.236356000      0.000000000
+
+            Ca      -1.151826000     -2.049680000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nE\nA1\nA1\nE\nA1"
+          - "212       \n328\n341 \n504\n560\n  724"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "76 \n113       \n231       \n303       \n320    \n  514         \n559      \n626       \n810"
+      title_as_printed: M06 molecular structures and harmonic frequencies for CaCeO3
+    - observation_id: shugurov_2024_s9_caceo3_molecular_model_data
+      type: model_table_context
+      locator:
+        table: S9
+        note: publisher supplementary-information DOCX; no matching paginated PDF found
+      units: Å, degrees, dimensionless coordinates, cm-1
+      values:
+        quantity: computed_molecular_coordinates_and_harmonic_frequencies
+        method_class: model_derived
+        candidate_tokens_considered:
+        - delta_fH
+        - partial_molar_enthalpy
+        reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational
+          frequencies.
+        printed_cells:
+        - - Molecule CaCeO3
+        - - Structure I (C3v, 1A1)
+          - Structure II (Cs, 1A’)
+        - - 'Ce       0.000000000      0.000000000      0.836966000
+
+            O        0.000000000      1.536037000     -0.400329000
+
+            O       -1.330247000     -0.768018000     -0.400329000
+
+            O        1.330247000     -0.768018000     -0.400329000
+
+            Ca       0.000000000      0.000000000     -1.946806000'
+          - 'Ce       0.594352000      0.555782000      0.000000000
+
+            O       -0.308940000     -0.749167000      1.344802000
+
+            O       -0.308940000     -0.749167000     -1.344802000
+
+            O       -0.308940000      2.148287000      0.000000000
+
+            Ca      -1.352894000     -1.871749000      0.000000000'
+        - - Symmetry label
+          - Vibrational frequencies, cm-1
+          - Symmetry label
+          - Vibrational frequencies, cm-1
+        - - "E \nE\nA1\nA1\nE\nA1"
+          - "252       \n333\n349 \n507\n588\n  739"
+          - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+          - "87 \n159       \n237       \n309       \n375    \n  528         \n570      \n636      \n799"
+      title_as_printed: MP2(Full) molecular structures and harmonic frequencies for CaCeO3
