@@ -63,6 +63,17 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   f53dcec23, 826f5848e, bff436549, 25796706a, 8adec237c, 9196346ee: the
+#     VapoRock gas-basis line (d-236). They change the VapoRock gas-thermo
+#     predictor in compilation_tier.py, which answers at score time, and add
+#     read-only accessors that it calls: JANAFTabulatedGas and
+#     janaf_tabulated_gas_thermo in generators/janaf.py, and
+#     reference_enthalpy_zero_is_ideal_gas in generators/usgs_b1259.py and
+#     usgs_b1452.py. Migration imports those modules but calls none of the new
+#     functions. A full regen at the line's merge with green 2c7bcb1cc
+#     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
+#     acknowledges STORE outputs only; the predictor's value moves (d-236) are
+#     covered by the commits' tests.
 #   80fad2bfa: the OpenIMCC af0f2a2 pin bump. The Sossi residue prediction path
 #     (simulator/battery/residue.py and score.py _sossi_residue_prediction) sends melt evaluation
 #     only the melt pack's oxides and passes the existing UNCERTIFIED MnO activity extension to the
@@ -185,6 +196,7 @@ CODE_INPUTS = (
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
     "80fad2bfa",
     "09c498b65",
     "1b78b5697", "574800443", "149df2858",
