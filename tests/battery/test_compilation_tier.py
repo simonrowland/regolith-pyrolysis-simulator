@@ -1685,6 +1685,78 @@ def test_ellingham_refuses_element_basis_mismatch_at_every_pressure() -> None:
         assert refused.refusal_detail["element"] == "Ca"
 
 
+_MNO_LIQUID_2200K = Decimal("-215.05499999999998")
+_MNO_CRYSTAL_1800K = Decimal("-248.185")
+
+
+def _mno_identity(phase: Phase, temperature: str, metal_phase: Phase = Phase.L):
+    return F.oxide_identity(
+        "MnO",
+        phase,
+        T_K=Decimal(temperature),
+        metal_formula="Mn",
+        metal_phase=metal_phase,
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+        polymorph="crystalline" if phase is Phase.CR else None,
+    )
+
+
+def test_ellingham_mno_liquid_label_answers_with_the_crystal_segment_coefficients() -> None:
+    """MnO(lit. liquid range) is parsed as liquid and returns the copied dG.
+
+    Captured from predict_thermo_attempt. The crystal neighbour at 1800 K
+    is the segment those coefficients belong to. Solid MnO at 2200 K and
+    liquid MnO outside the label's range already refuse.
+    """
+
+    liquid = _assert_ellingham_number(
+        "mno-liquid-2200",
+        _mno_identity(Phase.L, "2200"),
+        _MNO_LIQUID_2200K,
+        "ellingham:Mn:lit. liquid range:T=2200",
+    )
+    assert liquid.notices[0].reason == (
+        "Ellingham segment (2058.0, 2600.0) authority reconstructed_limited"
+    )
+    crystal = _assert_ellingham_number(
+        "mno-crystal-1800",
+        _mno_identity(Phase.CR, "1800"),
+        _MNO_CRYSTAL_1800K,
+        "ellingham:Mn:s:T=1800:generic-solid",
+    )
+    assert crystal.notices[0].reason == (
+        "Ellingham segment (1519.0, 2058.0) authority reconstructed_limited"
+    )
+    for observation_id, identity in (
+        ("mno-crystal-2200", _mno_identity(Phase.CR, "2200")),
+        ("mno-liquid-1800", _mno_identity(Phase.L, "1800")),
+    ):
+        refused = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(observation_id, "exp-1", identity, Decimal("0")),
+        )
+        assert refused.value is None
+        assert refused.refusal_reason is RefusalReason.UNSUPPORTED
+        assert refused.refusal_detail["reason"] == (
+            "ellingham-phase-or-polymorph-not-in-fit"
+        )
+    outside = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "mno-liquid-2700",
+            "exp-1",
+            _mno_identity(Phase.L, "2700"),
+            Decimal("0"),
+        ),
+    )
+    assert outside.value is None
+    assert outside.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+    assert outside.call_evidence == "ellingham:Mn:lit. liquid range:T=2700:outside-segment"
+
+
 def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
     identity = F.cao_identity(
         Phase.CR,
