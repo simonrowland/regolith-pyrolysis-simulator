@@ -1,0 +1,3048 @@
+schema_version: literature_extract.v1
+source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+source:
+  citation: Miao Q, Li M, Yan B (2023). Experimental Determination of the Standard Gibbs Energy of Formation of
+    Fe3−xVxO4 at 1473 K. Metals 13, 1498.
+  doi: 10.3390/met13081498
+  url: https://doi.org/10.3390/met13081498
+  year: 2023
+  provenance_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  note: Table 3 reports measured Fe contents in liquid copper equilibrated with Fe3−xVxO4. The authors' chemical-potential
+    and formation-Gibbs calculations remain contextual where no quantity token or registered table asset fits. The
+    high-pressure legend discrepancy in Figures 2–3 is preserved.
+extraction:
+  method: manual_from_pdftotext_layout_mineru_tables_and_600dpi_render_checks
+  date: '2026-10-22'
+  worker: codex-fam46-1022
+  note: Table 3's 18 Fe-in-Cu mass-percent and mole-fraction values are typed as scalar equilibrium-phase composition
+    rows and checked against the physical page 6 render. The MinerU emitter does not support the d-223 phase-composition
+    scalar mapping, so no emit mapping was generated. Tables 2, 3 chemical-potential differences, 4–6, and Figures
+    1–3 retain printed values or metadata in context; derived Table 6 awaits a corpus table asset under t-1382.
+review_status: draft
+fidelity_samples:
+- species: Fe
+  observation_id: miao_2023_table3_1_1_fe_mass_percent
+  field: component_amount
+  value: '0.52'
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+- species: Fe
+  observation_id: miao_2023_table3_3_6_fe_mole_fraction
+  field: component_amount
+  value: '0.0009'
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+- species: V
+  observation_id: miao_2023_text_v2o3_delta_fg_1473k
+  field: delta_fG
+  value: '-864690.7'
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 7
+    page: 8
+    section: 3.2 Chemical Potential of V
+experiments:
+- experiment_id: miao_2023_sample_1_1
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-1; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id001
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id002
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id003
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_1_2
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-2; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.4
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id004
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id005
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id006
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_1_3
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-3; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.2
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id007
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id008
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id009
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_1_4
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-4; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id010
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id011
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id012
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_1_5
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-5; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.8
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id013
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id014
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id015
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_1_6
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 1-6; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.6
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 1-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id016
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '2.4216675e-7'
+      locator: &id017
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 2
+      locator: &id018
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+- experiment_id: miao_2023_sample_2_1
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-1; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.8
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id019
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id020
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id021
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_2_2
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-2; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id022
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id023
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id024
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_2_3
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-3; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.4
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id025
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id026
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id027
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_2_4
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-4; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.2
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id028
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id029
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id030
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_2_5
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-5; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id031
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id032
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id033
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_2_6
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 2-6; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.8
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 2-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id034
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '9.6968025e-7'
+      locator: &id035
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 1
+      locator: &id036
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+- experiment_id: miao_2023_sample_3_1
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-1; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.8
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id037
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id038
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id039
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+- experiment_id: miao_2023_sample_3_2
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-2; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.6
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id040
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id041
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id042
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+- experiment_id: miao_2023_sample_3_3
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-3; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.2
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id043
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id044
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id045
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+- experiment_id: miao_2023_sample_3_4
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-4; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.0
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id046
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id047
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id048
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+- experiment_id: miao_2023_sample_3_5
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-5; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id049
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id050
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id051
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+- experiment_id: miao_2023_sample_3_6
+  method: solid_state_preparation_then_liquid_copper_equilibration
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3 equilibration result for sample 3-6; method details on physical page 5.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 sample 3-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator: &id052
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 4
+        page: 5
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+    pO2_Pa:
+      state:
+        tag: value
+        value: '3.8807475e-6'
+      locator: &id053
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+    gas_mix:
+      state:
+        tag: value
+        value: CO/CO2 volume ratio 0.5
+      locator: &id054
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+species:
+  Fe:
+    observations:
+    - observation_id: miao_2023_table3_1_1_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-1; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.52'
+        component_amount_as_published: 0.52 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-1
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id001
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id002
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id003
+    - observation_id: miao_2023_table3_1_1_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-1; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0059'
+        component_amount_as_published: 0.0059 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-1
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id001
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id002
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id003
+    - observation_id: miao_2023_table3_1_2_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-2; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.45'
+        component_amount_as_published: 0.45 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-2
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id004
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id005
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id006
+    - observation_id: miao_2023_table3_1_2_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-2; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0051'
+        component_amount_as_published: 0.0051 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-2
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id004
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id005
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id006
+    - observation_id: miao_2023_table3_1_3_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-3; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.38'
+        component_amount_as_published: 0.38 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-3
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id007
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id008
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id009
+    - observation_id: miao_2023_table3_1_3_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-3; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0043'
+        component_amount_as_published: 0.0043 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-3
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id007
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id008
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id009
+    - observation_id: miao_2023_table3_1_4_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-4; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.35'
+        component_amount_as_published: 0.35 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-4
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id010
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id011
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id012
+    - observation_id: miao_2023_table3_1_4_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-4; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0040'
+        component_amount_as_published: 0.0040 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-4
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id010
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id011
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id012
+    - observation_id: miao_2023_table3_1_5_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-5; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.24'
+        component_amount_as_published: 0.24 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-5
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id013
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id014
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id015
+    - observation_id: miao_2023_table3_1_5_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-5; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0027'
+        component_amount_as_published: 0.0027 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-5
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id013
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id014
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id015
+    - observation_id: miao_2023_table3_1_6_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-6; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.18'
+        component_amount_as_published: 0.18 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 1-6
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id016
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id017
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id018
+    - observation_id: miao_2023_table3_1_6_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_1_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_1_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1-6; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0020'
+        component_amount_as_published: 0.0020 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 1-6
+        pO2_as_published: 2.39 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id016
+          pO2_Pa:
+            state:
+              tag: value
+              value: '2.4216675e-7'
+            locator: *id017
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 2
+            locator: *id018
+    - observation_id: miao_2023_table3_2_1_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-1; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.41'
+        component_amount_as_published: 0.41 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-1
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id019
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id020
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id021
+    - observation_id: miao_2023_table3_2_1_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-1; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0047'
+        component_amount_as_published: 0.0047 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-1
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id019
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id020
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id021
+    - observation_id: miao_2023_table3_2_2_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-2; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.36'
+        component_amount_as_published: 0.36 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-2
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id022
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id023
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id024
+    - observation_id: miao_2023_table3_2_2_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-2; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0041'
+        component_amount_as_published: 0.0041 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-2
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id022
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id023
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id024
+    - observation_id: miao_2023_table3_2_3_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-3; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.31'
+        component_amount_as_published: 0.31 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-3
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id025
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id026
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id027
+    - observation_id: miao_2023_table3_2_3_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-3; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0035'
+        component_amount_as_published: 0.0035 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-3
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id025
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id026
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id027
+    - observation_id: miao_2023_table3_2_4_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-4; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.24'
+        component_amount_as_published: 0.24 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-4
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id028
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id029
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id030
+    - observation_id: miao_2023_table3_2_4_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-4; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0027'
+        component_amount_as_published: 0.0027 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-4
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id028
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id029
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id030
+    - observation_id: miao_2023_table3_2_5_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-5; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.15'
+        component_amount_as_published: 0.15 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-5
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id031
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id032
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id033
+    - observation_id: miao_2023_table3_2_5_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-5; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0017'
+        component_amount_as_published: 0.0017 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-5
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id031
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id032
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id033
+    - observation_id: miao_2023_table3_2_6_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-6; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.08'
+        component_amount_as_published: 0.08 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 2-6
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id034
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id035
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id036
+    - observation_id: miao_2023_table3_2_6_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_2_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_2_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2-6; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0009'
+        component_amount_as_published: 0.0009 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 2-6
+        pO2_as_published: 9.57 × 10^-12 atm
+        gas_mix_as_published: CO/CO2 volume ratio 1
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id034
+          pO2_Pa:
+            state:
+              tag: value
+              value: '9.6968025e-7'
+            locator: *id035
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 1
+            locator: *id036
+    - observation_id: miao_2023_table3_3_1_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-1; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.31'
+        component_amount_as_published: 0.31 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-1
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id037
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id038
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id039
+    - observation_id: miao_2023_table3_3_1_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_1
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_1
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-1; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0035'
+        component_amount_as_published: 0.0035 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-1
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id037
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id038
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id039
+    - observation_id: miao_2023_table3_3_2_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-2; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.28'
+        component_amount_as_published: 0.28 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-2
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id040
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id041
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id042
+    - observation_id: miao_2023_table3_3_2_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_2
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_2
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-2; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0032'
+        component_amount_as_published: 0.0032 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-2
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id040
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id041
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id042
+    - observation_id: miao_2023_table3_3_3_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-3; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.20'
+        component_amount_as_published: 0.20 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-3
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id043
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id044
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id045
+    - observation_id: miao_2023_table3_3_3_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_3
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_3
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-3; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0023'
+        component_amount_as_published: 0.0023 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-3
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id043
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id044
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id045
+    - observation_id: miao_2023_table3_3_4_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-4; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.19'
+        component_amount_as_published: 0.19 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-4
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id046
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id047
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id048
+    - observation_id: miao_2023_table3_3_4_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_4
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_4
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-4; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0022'
+        component_amount_as_published: 0.0022 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-4
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id046
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id047
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id048
+    - observation_id: miao_2023_table3_3_5_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-5; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.17'
+        component_amount_as_published: 0.17 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-5
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id049
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id050
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id051
+    - observation_id: miao_2023_table3_3_5_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_5
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_5
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-5; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0019'
+        component_amount_as_published: 0.0019 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-5
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id049
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id050
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id051
+    - observation_id: miao_2023_table3_3_6_fe_mass_percent
+      type: composition_series
+      units: mass percent Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-6; mass % of Fe in Cu column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1199.85'
+        component_amount: '0.08'
+        component_amount_as_published: 0.08 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        sample_id_as_printed: 3-6
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id052
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id053
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id054
+    - observation_id: miao_2023_table3_3_6_fe_mole_fraction
+      type: composition_series
+      units: mole fraction Fe in liquid Cu as printed
+      experiment: miao_2023_sample_3_6
+      regime: quench_equilibration
+      assemblage_id: miao_2023_assemblage_3_6
+      phase_assemblage_as_printed: Fe3−xVxO4 + liquid Cu
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3-6; xFe(Cu) column.
+      phase: l
+      note: The paper reports the average of three ICP-OES Fe measurements (error below 10 ppm, with no per-row sigma). Measurements were made after quenching the equilibrated sample in a water-cooled chamber; the copper
+        solidified before mechanical separation. The assigned liquid metal phase is the equilibrium phase at 1473
+        K; the paper does not claim a quench-preservation correction.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: metal
+        basis: mole_fraction
+        T_C: '1199.85'
+        component_amount: '0.0009'
+        component_amount_as_published: 0.0009 mole fraction
+        method_class: measured_tabulated
+        admission_status: admitted
+        sample_id_as_printed: 3-6
+        pO2_as_published: 3.83 × 10^-11 atm
+        gas_mix_as_published: CO/CO2 volume ratio 0.5
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1473'
+            locator: *id052
+          pO2_Pa:
+            state:
+              tag: value
+              value: '3.8807475e-6'
+            locator: *id053
+          gas_mix:
+            state:
+              tag: value
+              value: CO/CO2 volume ratio 0.5
+            locator: *id054
+    - observation_id: miao_2023_text_fev2o4_delta_fg_1473k
+      type: gibbs_table
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 9
+        page: 10
+        section: 3.3 Standard Gibbs Energy of Formation
+        note: Figure 2 discussion; the quoted FactSage value is also shown by a star marker in Figure 2.
+      T_K: 1473
+      phase: condensed_solid
+      units: J/mol
+      values:
+        quantity: delta_fG
+        formula: FeV2O4
+        delta_fG: '-1061678.1'
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: FactSage System, reference [26].
+    - observation_id: miao_2023_text_fe3o4_delta_fg_1473k
+      type: gibbs_table
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 10
+        page: 11
+        section: 3.3 Standard Gibbs Energy of Formation
+        note: Figure 3 discussion; the quoted FactSage value is also shown by a star marker in Figure 3.
+      T_K: 1473
+      phase: condensed_solid
+      units: J/mol
+      values:
+        quantity: delta_fG
+        formula: Fe3O4
+        delta_fG: '-648765.3'
+        method_class: quoted_attributed
+        admission_status: admitted
+        attribution: FactSage System, reference [26].
+    context:
+    - observation_id: miao_2023_table2_single_phase_limits
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '2'
+        note: Table 2 prints the lower and upper Fe/V ratios delimiting the single-phase spinel field.
+      units: Fe/V molar ratio; pO2 in atm, all as printed
+      values:
+        typed_quantity_as_printed: Fe/V molar-ratio limits of the Fe3−xVxO4 single-phase area
+        candidate_tokens: []
+        schema_gap_or_disposition: Table 2 gives phase-field boundary ratios, not measured compositions or a quantity
+          with a store token; values are retained as printed.
+        attribution: Present work; the paper describes the preceding FeO–V2O3 phase diagram as prior work [21].
+        columns_as_printed:
+        - pO2 / atm
+        - ys
+        - yL
+        rows_as_printed:
+        - - 2.39 × 10^-12
+          - '0.524'
+          - '1.604'
+        - - 9.57 × 10^-12
+          - '0.565'
+          - '2.300'
+        - - 3.83 × 10^-11
+          - '0.567'
+          - '3.098'
+    - observation_id: miao_2023_table3_mu_fe_context
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: The last Table 3 column is calculated by Equation (12) using the liquid-Cu Henry constant 24.1 relative
+          to pure solid Fe (reference [30]).
+      units: J/mol, as printed
+      values:
+        typed_quantity_as_printed: calculated µFe − µθFe column
+        candidate_tokens: []
+        method_class: model_derived
+        schema_gap_or_disposition: Chemical-potential differences have no quantity token. The Table 3 Fe mass-percent
+          and xFe(Cu) columns are typed as equilibrium-phase composition; the printed µFe column is retained here.
+          Table 5 repeats these µFe numbers and is not counted a second time.
+        columns_as_printed:
+        - sample
+        - µFe − µθFe (J/mol)
+        rows_as_printed:
+        - - 1-1
+          - '-23861.3'
+        - - 1-2
+          - '-25630.8'
+        - - 1-3
+          - '-27700.2'
+        - - 1-4
+          - '-28706.8'
+        - - 1-5
+          - '-33325.5'
+        - - 1-6
+          - '-36847.6'
+        - - 2-1
+          - '-26770.1'
+        - - 2-2
+          - '-28362.0'
+        - - 2-3
+          - '-30192.4'
+        - - 2-4
+          - '-33325.5'
+        - - 2-5
+          - '-39079.9'
+        - - 2-6
+          - '-46777.0'
+        - - 3-1
+          - '-30192.4'
+        - - 3-2
+          - '-31438.4'
+        - - 3-3
+          - '-35557.6'
+        - - 3-4
+          - '-36185.6'
+        - - 3-5
+          - '-37547.4'
+        - - 3-6
+          - '-46777.0'
+    - observation_id: miao_2023_table4_mu_fe_fits
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 7
+        page: 8
+        table: '4'
+        note: Table 4 is the authors' fit. The middle expression is retained exactly as printed without adding parentheses.
+      units: µFe function equations, pO2 in atm; as printed
+      values:
+        typed_quantity_as_printed: fitted functional relations between µFe and Fe/V ratio
+        candidate_tokens: []
+        method_class: model_derived
+        schema_gap_or_disposition: These regression relations and coefficients are model fits, not measured activity
+          or chemical-potential points; no numeric model curve is digitized.
+        columns_as_printed:
+        - pO2 / atm
+        - functional relation between µFe and y
+        rows_as_printed:
+        - - 2.39 × 10^-12
+          - µFe = µθFe + RT ln(−0.0048 + 0.092y)
+        - - 9.57 × 10^-12
+          - µFe = µθFe + RT ln − 0.0488 + 0.092y
+        - - 3.83 × 10^-11
+          - µFe = µθFe + RT ln(−0.0116 + 0.033y)
+    - observation_id: miao_2023_table5_mu_v_page_8
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 7
+        page: 8
+        table: '5'
+        note: Table 5 derives µV from the Table 4 fit, Table 2 ys boundaries, Equation (18), and the printed V2O3
+          standard Gibbs energy.
+      units: J/mol, as printed
+      values:
+        typed_quantity_as_printed: derived µV − µθV column
+        candidate_tokens: []
+        method_class: model_derived
+        schema_gap_or_disposition: The table reports Equation (18) derived chemical-potential differences; no chemical-potential
+          quantity token fits. Table 5's repeated µFe column is stored only in the Table 3 context row.
+        columns_as_printed:
+        - sample
+        - µV − µθV (J/mol)
+        rows_as_printed:
+        - - 1-1
+          - '-200496.5'
+        - - 1-2
+          - '-197958.8'
+        - - 1-3
+          - '-195406.8'
+        - - 1-4
+          - '-192835.2'
+        - - 1-5
+          - '-190234.6'
+        - - 1-6
+          - '-187586.3'
+    - observation_id: miao_2023_table5_mu_v_page_9
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 8
+        page: 9
+        table: '5'
+        note: Table 5 derives µV from the Table 4 fit, Table 2 ys boundaries, Equation (18), and the printed V2O3
+          standard Gibbs energy.
+      units: J/mol, as printed
+      values:
+        typed_quantity_as_printed: derived µV − µθV column
+        candidate_tokens: []
+        method_class: model_derived
+        schema_gap_or_disposition: The table reports Equation (18) derived chemical-potential differences; no chemical-potential
+          quantity token fits. Table 5's repeated µFe column is stored only in the Table 3 context row.
+        columns_as_printed:
+        - sample
+        - µV − µθV (J/mol)
+        rows_as_printed:
+        - - 2-1
+          - '-237836.0'
+        - - 2-2
+          - '-234273.1'
+        - - 2-3
+          - '-230479.1'
+        - - 2-4
+          - '-226331.9'
+        - - 2-5
+          - '-221577.7'
+        - - 2-6
+          - '-215523.2'
+        - - 3-1
+          - '-249849.2'
+        - - 3-2
+          - '-247033.0'
+        - - 3-3
+          - '-241291.1'
+        - - 3-4
+          - '-238348.9'
+        - - 3-5
+          - '-232253.9'
+        - - 3-6
+          - '-222086.1'
+    - observation_id: miao_2023_table6_delta_fg_page_9
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 8
+        page: 9
+        table: '6'
+        note: Table 6 lists the author-calculated formation Gibbs energies at 1473 K; y and pO2 are repeated from
+          Table 1/3.
+      units: J/mol, as printed
+      values:
+        typed_quantity_as_printed: calculated standard Gibbs energy of formation of Fe3−xVxO4
+        quantity: delta_fG
+        candidate_tokens:
+        - delta_fG
+        method_class: model_derived
+        schema_gap_or_disposition: The printed values are retained in context because their µFe and µV inputs are
+          not stored as observations and no corpus table asset can be registered in this run; derivation pending
+          a corpus table asset (controller, t-1382).
+        derived_from_as_printed:
+        - Table 3 µFe − µθFe
+        - Table 5 µV − µθV
+        - Equation (21)
+        columns_as_printed:
+        - sample
+        - ΔfG of Fe3−xVxO4 (J/mol)
+        rows_as_printed:
+        - - 1-1
+          - '-930820.9'
+        - - 1-2
+          - '-947729.6'
+        - - 1-3
+          - '-967218.6'
+        - - 1-4
+          - '-987740.2'
+        - - 1-5
+          - '-1016918.9'
+        - - 1-6
+          - '-1048605.1'
+    - observation_id: miao_2023_table6_delta_fg_page_10
+      type: table_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 9
+        page: 10
+        table: '6'
+        note: Table 6 lists the author-calculated formation Gibbs energies at 1473 K; y and pO2 are repeated from
+          Table 1/3.
+      units: J/mol, as printed
+      values:
+        typed_quantity_as_printed: calculated standard Gibbs energy of formation of Fe3−xVxO4
+        quantity: delta_fG
+        candidate_tokens:
+        - delta_fG
+        method_class: model_derived
+        schema_gap_or_disposition: The printed values are retained in context because their µFe and µV inputs are
+          not stored as observations and no corpus table asset can be registered in this run; derivation pending
+          a corpus table asset (controller, t-1382).
+        derived_from_as_printed:
+        - Table 3 µFe − µθFe
+        - Table 5 µV − µθV
+        - Equation (21)
+        columns_as_printed:
+        - sample
+        - ΔfG of Fe3−xVxO4 (J/mol)
+        rows_as_printed:
+        - - 2-1
+          - '-927899.3'
+        - - 2-2
+          - '-944122.7'
+        - - 2-3
+          - '-962382.6'
+        - - 2-4
+          - '-984614.1'
+        - - 2-5
+          - '-1012433.4'
+        - - 2-6
+          - '-1043021.7'
+        - - 3-1
+          - '-851470.1'
+        - - 3-2
+          - '-861457.0'
+        - - 3-3
+          - '-887027.6'
+        - - 3-4
+          - '-898199.8'
+        - - 3-5
+          - '-924783.2'
+        - - 3-6
+          - '-990774.3'
+    - observation_id: miao_2023_figure1_activity_context
+      type: figure_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 6
+        page: 7
+        figure: '1'
+        note: Figure 1 on physical page 7; numeric points deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: exp[(µFe−µθFe)/RT], equivalent to the Fe component activity relative to pure
+          solid Fe
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: Fe component in Fe3−xVxO4
+        phase: spinel solid solution
+        T_K: '1473'
+        axes_as_printed: 'x: Fe/V molar ratio y; y: exp[(µFe−µθFe)/RT]'
+        caption_as_printed: Plots of exp[(µFe−µθFe)/RT] against Fe/V ratio of Fe3−xVxO4 and the linear fitting results.
+        panels:
+        - single
+        series:
+        - pO2 = 2.39 × 10^-12 atm (6 markers; red squares; linear fit)
+        - pO2 = 9.57 × 10^-12 atm (6 markers; orange squares; linear fit)
+        - pO2 = 3.83 × 10^-11 atm (6 markers; blue squares; linear fit)
+        marker_count_per_series:
+          2.39 × 10^-12 atm: 6
+          9.57 × 10^-12 atm: 6
+          3.83 × 10^-11 atm: 6
+        attribution: Present work; standard state µθFe is pure solid Fe.
+        schema_gap_or_disposition: No numeric values were estimated from the figure.
+    - observation_id: miao_2023_figure2_delta_fg_context
+      type: figure_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 9
+        page: 10
+        figure: '2'
+        note: Figure 2 on physical page 10; numeric points deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: standard Gibbs energy of formation of Fe3−xVxO4
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: Fe3−xVxO4
+        phase: spinel solid solution
+        T_K: '1473'
+        axes_as_printed: 'x: Fe/V molar ratio; y: ΔfG/10^5 J/mol'
+        caption_as_printed: The changing trend of ΔfG of Fe3−xVxO4 with Fe/V ratio under different oxygen partial
+          pressures.
+        panels:
+        - single
+        series:
+        - pO2 = 2.39 × 10^-12 atm (6 markers)
+        - pO2 = 9.57 × 10^-12 atm (6 markers)
+        - pO2 = 2.83 × 10^-11 atm in figure legend (6 markers)
+        - FeV2O4, FactSage reference [26], star marker (1)
+        marker_count_per_series:
+          2.39 × 10^-12 atm: 6
+          9.57 × 10^-12 atm: 6
+          2.83 × 10^-11 atm (figure legend): 6
+          FeV2O4 reference: 1
+        attribution: Present-study series; FeV2O4 star from FactSage System [26].
+        printed_discrepancy: The high-pressure figure legend reads 2.83 × 10^-11 atm, while Tables 1, 3, 5, 6 and
+          Figure 1 print 3.83 × 10^-11 atm; both are retained as printed.
+        schema_gap_or_disposition: No numeric values were estimated from the figure.
+    - observation_id: miao_2023_figure3_delta_fg_context
+      type: figure_context
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 10
+        page: 11
+        figure: '3'
+        note: Figure 3 on physical page 11; numeric points deferred.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: standard Gibbs energy of formation of Fe3−xVxO4 and regular-solution model
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: Fe3−xVxO4
+        phase: spinel solid solution
+        T_K: '1473'
+        axes_as_printed: 'x: x/2 in Fe3−xVxO4; y: ΔfG/10^5 J/mol'
+        caption_as_printed: Comparing the present determined ΔfG of Fe3−xVxO4 with the model calculating results.
+        panels:
+        - single
+        series:
+        - pO2 = 2.39 × 10^-12 atm (6 present-study markers)
+        - pO2 = 9.57 × 10^-12 atm (6 present-study markers)
+        - pO2 = 2.83 × 10^-11 atm in figure legend (6 present-study markers)
+        - Fe3O4 FactSage reference [26] (1 star)
+        - FeV2O4 FactSage reference [26] (1 pentagon)
+        - regular-solution model, Equation (23) (curve; 0 markers)
+        marker_count_per_series:
+          2.39 × 10^-12 atm: 6
+          9.57 × 10^-12 atm: 6
+          2.83 × 10^-11 atm (figure legend): 6
+          Fe3O4 reference: 1
+          FeV2O4 reference: 1
+          Equation (23) curve: 0
+        attribution: Present-study series; FactSage System [26] end members; Equation (23) model.
+        printed_discrepancy: The high-pressure figure legend reads 2.83 × 10^-11 atm, while Tables 1, 3, 5, 6 and
+          Figure 1 print 3.83 × 10^-11 atm; both are retained as printed.
+        schema_gap_or_disposition: No numeric values were estimated from the figure.
+  V:
+    observations:
+    - observation_id: miao_2023_text_v2o3_delta_fg_1473k
+      type: gibbs_table
+      locator:
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        pdf_page_index: 7
+        page: 8
+        section: 3.2 Chemical Potential of V
+        note: Text following Equation (18); prints the reported V2O3 value at 1473 K without an inline attribution.
+      T_K: 1473
+      phase: condensed_solid
+      units: J/mol
+      values:
+        quantity: delta_fG
+        formula: V2O3
+        delta_fG: '-864690.7'
+        method_class: quoted_unattributed
+        admission_status: admitted
+        attribution: No inline source is named; the text says reported value.
+    context: []
