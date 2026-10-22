@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -11,6 +10,11 @@ import yaml
 from simulator.battery.enums import Phase, PhaseRole, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.identity import celsius_to_kelvin
 from tests.battery.factories import migrate_one_extract
+from tests.battery.literature_extract_grids import (
+    assert_observation_grid_matches,
+    decimal_text,
+    read_observation_grid_fixture,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,19 +41,10 @@ GRID_FIELDS = (
 )
 
 
-def _decimal_text(value: object) -> str:
-    if value in (None, ""):
-        return ""
-    return format(Decimal(str(value)).normalize(), "f")
-
-
 def _read_fixture() -> list[dict[str, str]]:
-    with RENDER_GRID.open(encoding="utf-8", newline="") as stream:
-        rows = list(csv.DictReader(stream, delimiter="\t"))
-    for row in rows:
-        for field in ("T_C", "pO2_Pa", "component_amount", "sigma"):
-            row[field] = _decimal_text(row[field])
-    return rows
+    return read_observation_grid_fixture(
+        RENDER_GRID, ("T_C", "pO2_Pa", "component_amount", "sigma")
+    )
 
 
 def _extract_grid(document: dict) -> list[dict[str, str]]:
@@ -65,19 +60,19 @@ def _extract_grid(document: dict) -> list[dict[str, str]]:
                 "species_formula": values.get("formula", species_formula),
                 "sample_id": values["sample_id_as_published"],
                 "experiment": observation["experiment"],
-                "T_C": _decimal_text(values["T_C"]),
+                "T_C": decimal_text(values["T_C"]),
                 "phase_label": values["phase_label"],
                 "phase_label_as_published": values["phase_label_as_published"],
                 "condition_as_published": values.get(
                     "pO2_as_published", values.get("redox_condition_as_published", "")
                 ),
-                "pO2_Pa": _decimal_text(oxygen_state.get("value")),
+                "pO2_Pa": decimal_text(oxygen_state.get("value")),
                 "preheat_as_published": str(values["preheat_as_published"]),
                 "basis": values["basis"],
                 "phase_role": values["phase_label"],
-                "component_amount": _decimal_text(values["component_amount"]),
+                "component_amount": decimal_text(values["component_amount"]),
                 "component_amount_as_published": str(values["component_amount_as_published"]),
-                "sigma": _decimal_text(uncertainty.get("sigma")),
+                "sigma": decimal_text(uncertainty.get("sigma")),
                 "page": str(observation["locator"]["page"]),
                 "table": str(observation["locator"]["table"]),
             }
@@ -86,11 +81,7 @@ def _extract_grid(document: dict) -> list[dict[str, str]]:
 
 
 def _assert_grid_matches(document: dict, fixture: list[dict[str, str]]) -> None:
-    actual = _extract_grid(document)
-    expected = sorted(fixture, key=lambda row: row["observation_id"])
-    assert [tuple(row[field] for field in GRID_FIELDS) for row in actual] == [
-        tuple(row[field] for field in GRID_FIELDS) for row in expected
-    ]
+    assert_observation_grid_matches(_extract_grid(document), fixture, GRID_FIELDS)
 
 
 def test_render_grid_covers_every_typed_component_and_rejects_mutations() -> None:
