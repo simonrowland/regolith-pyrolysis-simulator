@@ -1,0 +1,1089 @@
+schema_version: literature_extract.v1
+source_id: shilov-2026-sro-la2o3-kems
+source:
+  citation: >-
+    Shilov AL, Stolyarova VL, Vorozhtcov VA, Lopatin SI, Silnikov NM, Fedorova AV, Almjashev VI (2026).
+    Thermodynamic properties and vaporization processes in the SrO-La2O3 system at high temperatures.
+    Zhurnal Obshchei Khimii 96(9-10):1154-1168.
+  doi: 10.7868/S3034559626090129
+  year: 2026
+  corpus_asset: raw/shilov-2026-sro-la2o3-kems/shilov-2026-sro-la2o3-kems.pdf
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription of Table 2 and printed text values; table row-to-column assignment
+    was checked against 600 dpi page renders. Figure coordinates were not digitised.
+  date: '2026-10-22'
+  worker: fam43-1022
+review_status: draft
+fidelity_samples:
+  - path: species.Sr.observations[shilov_2026_table2_sr_sample1].values.points[0].P_Pa
+    value: '0.40'
+    locator:
+      page: 7
+      published_page: 1160
+      pdf_page_index: 6
+      table: '2'
+  - path: species.Sr.observations[shilov_2026_table2_sr_sample2].values.points[1].P_Pa
+    value: '0.050'
+    locator:
+      page: 7
+      published_page: 1160
+      pdf_page_index: 6
+      table: '2'
+  - path: species.SrO.observations[shilov_2026_table2_sro_sample1].values.points[4].activity
+    value: '0.16'
+    locator:
+      page: 7
+      published_page: 1160
+      pdf_page_index: 6
+      table: '2'
+species:
+  Sr:
+    observations:
+      - observation_id: shilov_2026_table2_sr_sample1
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          table: '2'
+          note: Table 2 sample 1 section, rows 1-5.
+        phase: gas
+        condensed_form: solid ceramic sample
+        regime: kems_effusion
+        sample_id_as_printed: '1'
+        sample_composition_as_printed: SrO:La2O3 = 90:10 mol% by synthesis; Table 1 XRF result is 88 ± 8:12 ± 5 mol%.
+        T_range_K: [1740, 1855]
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: admitted
+          gas_species: Sr
+          formula: Sr
+          method: Knudsen effusion mass spectrometry with ion-current comparison.
+          points:
+            - T_K_as_printed: '1740'
+              T_K: 1740
+              P_Pa: '0.40'
+              sigma: '0.06'
+              value_as_published: '0.40 ± 0.06 Pa'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1740'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 1}
+                composition: &shilov_sample1_composition
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_synthesis_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SrO, '0.90']
+                        - [La2O3, '0.10']
+                  locator:
+                    page: 7
+                    published_page: 1160
+                    pdf_page_index: 6
+                    table: '2'
+                    note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 1}
+            - T_K_as_printed: '1777'
+              T_K: 1777
+              P_Pa: '0.64'
+              sigma: '0.10'
+              value_as_published: '0.64 ± 0.10 Pa'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1777'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 2}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 2}
+            - T_K_as_printed: '1809'
+              T_K: 1809
+              P_Pa: '0.97'
+              sigma: '0.15'
+              value_as_published: '0.97 ± 0.15 Pa'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1809'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 3}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 3}
+            - T_K_as_printed: '1832'
+              T_K: 1832
+              P_Pa: '1.29'
+              sigma: '0.19'
+              value_as_published: '1.29 ± 0.19 Pa'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1832'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 4}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 4}
+            - T_K_as_printed: '1855'
+              T_K: 1855
+              P_Pa: '1.7'
+              sigma: '0.3'
+              value_as_published: '1.7 ± 0.3 Pa'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1855'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 5}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 5}
+        uncertainty:
+          note: Printed uncertainties are retained in each point; confidence level is not stated.
+      - observation_id: shilov_2026_table2_sr_sample2
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          table: '2'
+          note: Table 2 sample 2 section, rows 6-12.
+        phase: gas
+        condensed_form: solid ceramic sample
+        regime: kems_effusion
+        sample_id_as_printed: '2'
+        sample_composition_as_printed: SrO:La2O3 = 50:50 mol% by synthesis; Table 1 XRF result is 49 ± 4:51 ± 6 mol%.
+        T_range_K: [1617, 1775]
+        units: Pa
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          evidence_class: measured_direct
+          admission_status: admitted
+          gas_species: Sr
+          formula: Sr
+          method: Knudsen effusion mass spectrometry with ion-current comparison.
+          points:
+            - T_K_as_printed: '1623'
+              T_K: 1623
+              P_Pa: '0.060'
+              sigma: '0.009'
+              value_as_published: '0.060 ± 0.009 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1623'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 6}
+                composition: &shilov_sample2_composition
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_synthesis_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SrO, '0.50']
+                        - [La2O3, '0.50']
+                  locator:
+                    page: 7
+                    published_page: 1160
+                    pdf_page_index: 6
+                    table: '2'
+                    note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 6}
+            - T_K_as_printed: '1617'
+              T_K: 1617
+              P_Pa: '0.050'
+              sigma: '0.008'
+              value_as_published: '0.050 ± 0.008 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1617'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 7}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 7}
+            - T_K_as_printed: '1662'
+              T_K: 1662
+              P_Pa: '0.08'
+              sigma: '0.01'
+              value_as_published: '0.08 ± 0.01 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1662'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 8}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 8}
+            - T_K_as_printed: '1696'
+              T_K: 1696
+              P_Pa: '0.18'
+              sigma: '0.03'
+              value_as_published: '0.18 ± 0.03 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1696'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 9}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 9}
+            - T_K_as_printed: '1743'
+              T_K: 1743
+              P_Pa: '0.29'
+              sigma: '0.04'
+              value_as_published: '0.29 ± 0.04 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1743'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 10}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 10}
+            - T_K_as_printed: '1775'
+              T_K: 1775
+              P_Pa: '0.42'
+              sigma: '0.06'
+              value_as_published: '0.42 ± 0.06 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1775'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 11}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 11}
+            - T_K_as_printed: '1770'
+              T_K: 1770
+              P_Pa: '0.39'
+              sigma: '0.06'
+              value_as_published: '0.39 ± 0.06 Pa'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1770'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 12}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 12}
+        uncertainty:
+          note: Printed uncertainties are retained in each point; confidence level is not stated.
+    context:
+      - observation_id: shilov_2026_fig2_sr_partial_pressure
+        type: figure_record
+        locator:
+          page: 6
+          published_page: 1159
+          pdf_page_index: 5
+          figure: '2'
+        phase: gas
+        T_range_K: [1529, 1855]
+        units: log10(Pa) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: Sr
+          method_class: figure_only
+          digitisation: deferred to a figure pass
+          caption: >-
+            Temperature dependences of atomic strontium partial pressure over sample 1 (90:10 mol%), sample 2
+            (50:50 mol%) and pure SrO; the dotted line is the estimate from equation (9) for sample 1.
+          axes_as_printed:
+            x: 10^4/T, K^-1
+            y: lg p(Sr, Pa)
+          series:
+            - label: '1; sample 1, SrO:La2O3 = 90:10 mol%; filled squares'
+              marker_count: 5
+              T_range_K: [1740, 1855]
+              evidence: measured_direct
+            - label: '2; sample 2, SrO:La2O3 = 50:50 mol%; filled circles'
+              marker_count: 7
+              T_range_K: [1617, 1775]
+              evidence: measured_direct
+            - label: '3; pure SrO; open squares'
+              marker_count: 6
+              T_range_K: [1529, 1655]
+              evidence: measured_direct
+            - label: dotted estimate for sample 1 from equation (9)
+              marker_count: 0
+              evidence: model_derived
+          note: The curves and points are not digitised; only the three marker counts were visually counted.
+      - observation_id: shilov_2026_table1_sample_characterization
+        type: sample_characterization
+        locator:
+          page: 4
+          published_page: 1157
+          pdf_page_index: 3
+          table: '1'
+        units: mol% oxides and phase names as printed
+        values:
+          quantity: whole_sample_oxide_composition_and_phase_analysis
+          method_class: measured_direct
+          candidate_tokens_considered:
+            - equilibrium_phase_composition
+          reason_not_typed: >-
+            XRF gives whole-sample bulk compositions and XRD identifies multiple hydrated oxide phases; no single
+            equilibrated phase composition vector is printed, so equilibrium_phase_composition does not fit.
+          preparation_as_printed: Tablets were fired for 20 h at 1723 K in an atmospheric-pressure furnace.
+          samples:
+            - sample_id: '1'
+              nominal_composition: 'SrO:La2O3 = 90:10 mol%'
+              xrf_composition: 'SrO:La2O3 = (88 ± 8):(12 ± 5) mol%'
+              phases: 'La(OH)3, La2O3, Sr(OH)2·H2O, Sr(OH)2·8H2O'
+            - sample_id: '2'
+              nominal_composition: 'SrO:La2O3 = 50:50 mol%'
+              xrf_composition: 'SrO:La2O3 = (49 ± 4):(51 ± 6) mol%'
+              phases: 'La(OH)3, Sr(OH)2·H2O'
+      - observation_id: shilov_2026_fig1_xrd_sample1
+        type: figure_record
+        locator:
+          page: 5
+          published_page: 1158
+          pdf_page_index: 4
+          figure: '1'
+          panel: a
+        phase: crystalline multiphase sample
+        units: intensity and 2θ in degrees as plotted
+        values:
+          quantity: powder_X_ray_diffraction_pattern
+          system: SrO-La2O3
+          sample_id_as_printed: '1'
+          temperature_as_printed: not stated for the diffraction scan
+          method_class: figure_only
+          digitisation: deferred to a figure pass
+          caption: X-ray diffraction pattern of sample 1 in the SrO-La2O3 system, prepared with SrO:La2O3 = 90:10 mol%.
+          axes_as_printed:
+            x: '2θ, degrees'
+            y: intensity
+          series:
+            - label: measured sample 1 diffraction pattern
+              marker_count: 0
+            - label: La(OH)3 reference reflections
+              marker_count: 0
+            - label: La2O3 reference reflections
+              marker_count: 0
+            - label: Sr(OH)2·H2O reference reflections
+              marker_count: 0
+            - label: Sr(OH)2·8H2O reference reflections
+              marker_count: 0
+          note: Continuous traces and reference reflection ticks; no discrete data markers are plotted.
+      - observation_id: shilov_2026_fig1_xrd_sample2
+        type: figure_record
+        locator:
+          page: 5
+          published_page: 1158
+          pdf_page_index: 4
+          figure: '1'
+          panel: b
+        phase: crystalline multiphase sample
+        units: intensity and 2θ in degrees as plotted
+        values:
+          quantity: powder_X_ray_diffraction_pattern
+          system: SrO-La2O3
+          sample_id_as_printed: '2'
+          temperature_as_printed: not stated for the diffraction scan
+          method_class: figure_only
+          digitisation: deferred to a figure pass
+          caption: X-ray diffraction pattern of sample 2 in the SrO-La2O3 system, prepared with SrO:La2O3 = 50:50 mol%.
+          axes_as_printed:
+            x: '2θ, degrees'
+            y: intensity
+          series:
+            - label: measured sample 2 diffraction pattern
+              marker_count: 0
+            - label: La(OH)3 reference reflections
+              marker_count: 0
+            - label: Sr(OH)2·H2O reference reflections
+              marker_count: 0
+          note: Continuous traces and reference reflection ticks; no discrete data markers are plotted.
+      - observation_id: shilov_2026_appearance_energies
+        type: measurement_context
+        locator:
+          page: 5
+          published_page: 1158
+          pdf_page_index: 4
+          section: Results and discussion
+        units: eV
+        values:
+          quantity: ion_appearance_energy
+          candidate_tokens_considered:
+            - ion_intensity
+            - partial_pressure
+          method_class: measured_direct
+          values_as_printed:
+            - ion: Sr+
+              appearance_energy: '5.8 ± 0.3'
+              note: Consistent within uncertainty with the Sr ionization energy.
+            - ion: La+
+              appearance_energy: '9.6 ± 0.5'
+              note: The paper attributes La+ to dissociative ionization of LaO.
+            - ion: LaO+
+              appearance_energy: '5.0 ± 0.3'
+              note: Consistent within uncertainty with the LaO ionization energy.
+          reason_not_typed: No ion-appearance-energy quantity exists in simulator/battery/enums.py.
+      - observation_id: shilov_2026_table2_pressure_fit_equations
+        type: model_fit
+        locator:
+          page: 6
+          published_page: 1159
+          pdf_page_index: 5
+          section: Results and discussion
+          equation: '8-10'
+        units: log10(Pa) and K as printed in equations
+        values:
+          quantity: temperature_dependence_of_strontium_partial_pressure
+          method_class: model_derived
+          candidate_tokens_considered:
+            - p_partial
+          reason_not_typed: >-
+            These are fitted equation coefficients rather than additional partial-pressure point values; the p_partial
+            token stores measured pressure points, not regression coefficients.
+          fits:
+            - series: pure SrO
+              equation: 'lg p^s(Sr, Pa) = -(19400 ± 800)/T + (11.2 ± 0.5)'
+              T_range_K: [1529, 1655]
+            - series: sample 1, SrO:La2O3 = 90:10 mol%
+              equation: 'lg p1(Sr, Pa) = -(17650 ± 260)/T + (9.74 ± 0.15)'
+              T_range_K: [1740, 1855]
+            - series: sample 2, SrO:La2O3 = 50:50 mol%
+              equation: 'lg p2(Sr, Pa) = -(16700 ± 700)/T + (9.0 ± 0.4)'
+              T_range_K: [1617, 1775]
+  SrO:
+    observations:
+      - observation_id: shilov_2026_table2_sro_sample1
+        type: activity_coefficient
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          table: '2'
+          note: Table 2 sample 1 section, rows 1-5.
+        phase: cr
+        regime: kems_effusion
+        sample_id_as_printed: '1'
+        sample_composition_as_printed: SrO:La2O3 = 90:10 mol% by synthesis; Table 1 XRF result is 88 ± 8:12 ± 5 mol%.
+        T_range_K: [1740, 1855]
+        units: dimensionless activity as printed
+        standard_state: &shilov_sro_standard
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SrO
+                phase: {tag: value, value: cr}
+                polymorph: {tag: unknown, reason: The activity reference names SrO but does not specify its polymorph.}
+              component_basis: SrO
+          inferred: true
+          note: >-
+            Equation (17) references the individual pure SrO evaporating from the comparison cell at the run
+            temperature. Its stable phase is crystalline SrO: the JANAF 4th edition SrO(cr) table O-013 places the
+            crystal-to-liquid transition at 2938 K, more than 100 K above all reference temperatures here. The
+            paper does not name a polymorph.
+          locator:
+            page: 10
+            published_page: 1163
+            pdf_page_index: 9
+            section: Experimental part
+            equation: '17'
+        values:
+          quantity: activity
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          admission_status: admitted
+          component: SrO
+          formula: SrO
+          method: Differential mass spectrometry using equation (17) and an individual SrO comparison sample.
+          points:
+            - T_K_as_printed: '1740'
+              T_K: 1740
+              activity: '0.20'
+              sigma: '0.08'
+              value_as_published: '0.20 ± 0.08'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1740'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 1}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 1}
+            - T_K_as_printed: '1777'
+              T_K: 1777
+              activity: '0.18'
+              sigma: '0.07'
+              value_as_published: '0.18 ± 0.07'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1777'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 2}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 2}
+            - T_K_as_printed: '1809'
+              T_K: 1809
+              activity: '0.18'
+              sigma: '0.07'
+              value_as_published: '0.18 ± 0.07'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1809'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 3}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 3}
+            - T_K_as_printed: '1832'
+              T_K: 1832
+              activity: '0.17'
+              sigma: '0.06'
+              value_as_published: '0.17 ± 0.06'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1832'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 4}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 4}
+            - T_K_as_printed: '1855'
+              T_K: 1855
+              activity: '0.16'
+              sigma: '0.06'
+              value_as_published: '0.16 ± 0.06'
+              composition_as_printed: SrO:La2O3 = 90:10 mol% (sample 1)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1855'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 5}
+                composition: *shilov_sample1_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 5}
+        uncertainty:
+          note: Printed uncertainties are retained in each point; confidence level is not stated.
+      - observation_id: shilov_2026_table2_sro_sample2
+        type: activity_coefficient
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          table: '2'
+          note: Table 2 sample 2 section, rows 6-12.
+        phase: cr
+        regime: kems_effusion
+        sample_id_as_printed: '2'
+        sample_composition_as_printed: SrO:La2O3 = 50:50 mol% by synthesis; Table 1 XRF result is 49 ± 4:51 ± 6 mol%.
+        T_range_K: [1617, 1775]
+        units: dimensionless activity as printed
+        standard_state: *shilov_sro_standard
+        values:
+          quantity: activity
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          admission_status: admitted
+          component: SrO
+          formula: SrO
+          method: Differential mass spectrometry using equation (17) and an individual SrO comparison sample.
+          points:
+            - T_K_as_printed: '1623'
+              T_K: 1623
+              activity: '0.19'
+              sigma: '0.07'
+              value_as_published: '0.19 ± 0.07'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1623'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 6}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 6}
+            - T_K_as_printed: '1617'
+              T_K: 1617
+              activity: '0.17'
+              sigma: '0.06'
+              value_as_published: '0.17 ± 0.06'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1617'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 7}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 7}
+            - T_K_as_printed: '1662'
+              T_K: 1662
+              activity: '0.11'
+              sigma: '0.04'
+              value_as_published: '0.11 ± 0.04'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1662'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 8}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 8}
+            - T_K_as_printed: '1696'
+              T_K: 1696
+              activity: '0.17'
+              sigma: '0.06'
+              value_as_published: '0.17 ± 0.06'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1696'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 9}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 9}
+            - T_K_as_printed: '1743'
+              T_K: 1743
+              activity: '0.12'
+              sigma: '0.04'
+              value_as_published: '0.12 ± 0.04'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1743'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 10}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 10}
+            - T_K_as_printed: '1775'
+              T_K: 1775
+              activity: '0.10'
+              sigma: '0.04'
+              value_as_published: '0.10 ± 0.04'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1775'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 11}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 11}
+            - T_K_as_printed: '1770'
+              T_K: 1770
+              activity: '0.10'
+              sigma: '0.04'
+              value_as_published: '0.10 ± 0.04'
+              composition_as_printed: SrO:La2O3 = 50:50 mol% (sample 2)
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1770'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 12}
+                composition: *shilov_sample2_composition
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2', row: 12}
+        uncertainty:
+          note: Printed uncertainties are retained in each point; confidence level is not stated.
+      - observation_id: shilov_2026_table2_sro_weighted_activity_1750k
+        type: activity_coefficient
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          table: '2'
+          note: Text below Table 2 reports the weighted activity at the 16.8 mol% SrO two-phase boundary.
+        phase: cr
+        T_range_K: [1750, 1750]
+        units: dimensionless activity as printed
+        standard_state: *shilov_sro_standard
+        derived_from:
+          - shilov_2026_table2_sro_sample1
+          - shilov_2026_table2_sro_sample2
+        derivation:
+          relation: >-
+            Weighted activity at 1750 K from equations (11) and (12), treating the samples as in the two-phase
+            solid-solution field; the 16.8 mol% SrO boundary composition is reported from the NUCLEA phase diagram.
+          inputs:
+            - shilov_2026_table2_sro_sample1
+            - shilov_2026_table2_sro_sample2
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          component: SrO
+          formula: SrO
+          points:
+            - T_K: '1750'
+              activity: '0.13'
+              sigma: '0.04'
+              value_as_published: '0.13 ± 0.04'
+              composition_as_published: '16.8 mol% SrO at 1750 K; NUCLEA phase-diagram boundary cited as [28].'
+              composition_mol: {basis: attributed_phase_boundary_mole_fraction, SrO: '0.168', La2O3: '0.832'}
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1750'}}
+                  locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2'}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: attributed_phase_boundary_mole_fraction
+                      amount_basis: mole_fraction
+                      components:
+                        - [SrO, '0.168']
+                        - [La2O3, '0.832']
+                  locator:
+                    page: 7
+                    published_page: 1160
+                    pdf_page_index: 6
+                    table: '2'
+                    note: The paper states that the NUCLEA boundary is 16.8-100.0 mol% SrO at 1750 K.
+              locator: {page: 7, published_page: 1160, pdf_page_index: 6, table: '2'}
+      - observation_id: shilov_2026_table2_sro_sample1_activity_1900k_estimate
+        type: activity_coefficient
+        locator:
+          page: 8
+          published_page: 1161
+          pdf_page_index: 7
+          section: Model results
+        phase: cr
+        T_range_K: [1900, 1900]
+        units: dimensionless activity as printed
+        standard_state: *shilov_sro_standard
+        derived_from:
+          - shilov_2026_table2_sro_sample1
+        derivation:
+          relation: Extrapolated from equation (11) to 1900 K as reported by the authors.
+          inputs:
+            - shilov_2026_table2_sro_sample1
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          component: SrO
+          formula: SrO
+          points:
+            - T_K: '1900'
+              activity: '0.15'
+              sigma: '0.06'
+              value_as_published: '0.15 ± 0.06'
+              composition_mol: {basis: printed_XRF_mole_fraction_central_values, SrO: '0.88', La2O3: '0.12'}
+              sample_id_as_printed: '1'
+              composition_as_published: 'SrO:La2O3 = (88 ± 8):(12 ± 5) mol%'
+              caveat: Estimated from equations (11) and (12); the authors note phase changes at 1900 K are not accounted for.
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1900'}}
+                  locator: {page: 8, published_page: 1161, pdf_page_index: 7, section: Model results}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_XRF_mole_fraction_central_values
+                      amount_basis: mole_fraction
+                      components:
+                        - [SrO, '0.88']
+                        - [La2O3, '0.12']
+                  locator:
+                    page: 4
+                    published_page: 1157
+                    pdf_page_index: 3
+                    table: '1'
+                    note: Central XRF composition values; the printed ratio is (88 ± 8):(12 ± 5) mol%.
+              locator: {page: 8, published_page: 1161, pdf_page_index: 7, section: Model results}
+      - observation_id: shilov_2026_table2_sro_sample2_activity_1900k_estimate
+        type: activity_coefficient
+        locator:
+          page: 8
+          published_page: 1161
+          pdf_page_index: 7
+          section: Model results
+        phase: cr
+        T_range_K: [1900, 1900]
+        units: dimensionless activity as printed
+        standard_state: *shilov_sro_standard
+        derived_from:
+          - shilov_2026_table2_sro_sample2
+        derivation:
+          relation: Extrapolated from equation (12) to 1900 K as reported by the authors.
+          inputs:
+            - shilov_2026_table2_sro_sample2
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          component: SrO
+          formula: SrO
+          points:
+            - T_K: '1900'
+              activity: '0.07'
+              sigma: '0.03'
+              value_as_published: '0.07 ± 0.03'
+              composition_mol: {basis: printed_XRF_mole_fraction_central_values, SrO: '0.49', La2O3: '0.51'}
+              sample_id_as_printed: '2'
+              composition_as_published: 'SrO:La2O3 = (49 ± 4):(51 ± 6) mol%'
+              caveat: Estimated from equations (11) and (12); the authors note phase changes at 1900 K are not accounted for.
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1900'}}
+                  locator: {page: 8, published_page: 1161, pdf_page_index: 7, section: Model results}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: printed_XRF_mole_fraction_central_values
+                      amount_basis: mole_fraction
+                      components:
+                        - [SrO, '0.49']
+                        - [La2O3, '0.51']
+                  locator:
+                    page: 4
+                    published_page: 1157
+                    pdf_page_index: 3
+                    table: '1'
+                    note: Central XRF composition values; the printed ratio is (49 ± 4):(51 ± 6) mol%.
+              locator: {page: 8, published_page: 1161, pdf_page_index: 7, section: Model results}
+      - observation_id: shilov_2026_sample1_partial_molar_enthalpy
+        type: gibbs_table
+        locator:
+          page: 6
+          published_page: 1159
+          pdf_page_index: 5
+          section: Results and discussion
+        phase: cr
+        units: kJ_per_declared_mol_basis
+        derived_from: [shilov_2026_table2_sro_sample1]
+        derivation:
+          relation: Partial molar mixing enthalpy estimated from the slope coefficient of equation (11).
+          inputs: [shilov_2026_table2_sro_sample1]
+          output_unit: kJ_per_declared_mol_basis
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          formula: SrO
+          points:
+            - T_K: '1798'
+              partial_molar_enthalpy_as_printed: {value: '49', units: kJ/mol, as_printed: '49 ± 3 kJ/mol'}
+              sigma: '3'
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.90', La2O3: '0.10'}
+              sample_id_as_printed: '1'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1798'}}
+                  locator: {page: 6, published_page: 1159, pdf_page_index: 5, section: Results and discussion}
+                composition: *shilov_sample1_composition
+              locator: {page: 6, published_page: 1159, pdf_page_index: 5, section: Results and discussion}
+      - observation_id: shilov_2026_sample2_partial_molar_enthalpy
+        type: gibbs_table
+        locator:
+          page: 6
+          published_page: 1159
+          pdf_page_index: 5
+          section: Results and discussion
+        phase: cr
+        units: kJ_per_declared_mol_basis
+        derived_from: [shilov_2026_table2_sro_sample2]
+        derivation:
+          relation: Partial molar mixing enthalpy estimated from the slope coefficient of equation (12).
+          inputs: [shilov_2026_table2_sro_sample2]
+          output_unit: kJ_per_declared_mol_basis
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: admitted
+          formula: SrO
+          points:
+            - T_K: '1696'
+              partial_molar_enthalpy_as_printed: {value: '80', units: kJ/mol, as_printed: '80 ± 30 kJ/mol'}
+              sigma: '30'
+              composition_mol: {basis: printed_synthesis_mole_fraction, SrO: '0.50', La2O3: '0.50'}
+              sample_id_as_printed: '2'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: {kind: point, point: '1696'}}
+                  locator: {page: 6, published_page: 1159, pdf_page_index: 5, section: Results and discussion}
+                composition: *shilov_sample2_composition
+              locator: {page: 6, published_page: 1159, pdf_page_index: 5, section: Results and discussion}
+    context:
+      - observation_id: shilov_2026_table2_activity_fit_equations
+        type: model_fit
+        locator:
+          page: 6
+          published_page: 1159
+          pdf_page_index: 5
+          section: Results and discussion
+          equation: '11-12'
+        units: log10(activity) and K as printed in equations
+        values:
+          quantity: temperature_dependence_of_sro_activity
+          method_class: model_derived
+          candidate_tokens_considered:
+            - activity
+            - activity_coefficient_temperature_fit
+          reason_not_typed: >-
+            Activity stores point values, while activity_coefficient_temperature_fit is specifically a fit of log10 gamma;
+            these equations fit log10 activity instead and are not additional point values.
+          fits:
+            - series: sample 1, SrO:La2O3 = 90:10 mol%
+              equation: 'lg a1(SrO) = (2550 ± 170)/T - (2.16 ± 0.10)'
+              T_range_K: [1740, 1855]
+            - series: sample 2, SrO:La2O3 = 50:50 mol%
+              equation: 'lg a2(SrO) = (3940 ± 1340)/T - (3.2 ± 0.8)'
+              T_range_K: [1617, 1775]
+      - observation_id: shilov_2026_partial_molar_entropy_values
+        type: thermodynamic_values
+        locator:
+          page: 7
+          published_page: 1160
+          pdf_page_index: 6
+          section: Results and discussion
+        units: J/(mol K)
+        values:
+          quantity: partial_molar_entropy_of_mixing
+          candidate_tokens_considered:
+            - S
+          method_class: measured_reduced
+          values_as_printed:
+            - sample_id: '1'
+              temperature_K: 1798
+              value: '41 ± 2'
+            - sample_id: '2'
+              temperature_K: 1696
+              value: '61 ± 15'
+          reason_not_typed: >-
+            Quantity.S is absolute entropy; no partial-molar entropy quantity exists in simulator/battery/enums.py.
+            These values are retained here rather than filed as absolute entropy.
+      - observation_id: shilov_2026_redlich_kister_parameters
+        type: model_parameters
+        locator:
+          page: 8
+          published_page: 1161
+          pdf_page_index: 7
+          section: Model results
+          equations: '13-15'
+        units: kJ/mol and dimensionless coefficient as printed
+        values:
+          quantity: redlich_kister_excess_gibbs_model_parameters
+          method_class: model_derived
+          candidate_tokens_considered:
+            - interaction_parameter
+          parameters:
+            - temperature_K: 1750
+              coefficient_B: '-0.325'
+              context: Estimated for the SrO solid solution in La2O3 using the activity at 16.8 mol% SrO.
+            - temperature_K: 1900
+              coefficient_B: '-7.6 ± 4.5'
+              context: Estimated from activities extrapolated to 1900 K for samples 1 and 2.
+            - temperature_K: 1750
+              excess_Gibbs_energy_bound: 'not less than -1.0 kJ/mol'
+              context: The paper describes a small negative deviation in the SrO solid solution in La2O3.
+          reason_not_typed: >-
+            The printed B is a Redlich-Kister polynomial coefficient, while the available interaction_parameter
+            mapping is for Wagner parameters; excess Gibbs energy also has no matching quantity token.
+      - observation_id: shilov_2026_fig3_excess_gibbs_1750k
+        type: figure_record
+        locator:
+          page: 8
+          published_page: 1161
+          pdf_page_index: 7
+          figure: '3'
+        phase: cr
+        T_range_K: [1750, 1750]
+        units: kJ/mol as plotted
+        values:
+          quantity: excess_Gibbs_energy_of_SrO_solid_solution_in_La2O3
+          component: SrO
+          system: SrO-La2O3
+          method_class: model_derived
+          digitisation: deferred to a figure pass
+          caption: Excess Gibbs energy in the SrO solid solution in La2O3 at 1750 K.
+          axes_as_printed:
+            x: mole fraction SrO
+            x_ticks: ['0.00', '0.04', '0.08', '0.12', '0.16']
+            y: ΔG^E, kJ/mol
+            y_ticks: ['-1', '0', '1', '2', '3', '4']
+          series:
+            - label: Redlich-Kister polynomial (15)
+              marker_count: 0
+              evidence: model_derived
+            - label: NUCLEA database
+              marker_count: 0
+              evidence: model_derived
+          note: Smooth model curves only; no discrete markers or digitised values.
+      - observation_id: shilov_2026_fig4_excess_gibbs_1900k
+        type: figure_record
+        locator:
+          page: 9
+          published_page: 1162
+          pdf_page_index: 8
+          figure: '4'
+        phase: cr
+        T_range_K: [1900, 1900]
+        units: kJ/mol as plotted
+        values:
+          quantity: excess_Gibbs_energy_of_SrO-La2O3_system
+          system: SrO-La2O3
+          components: [SrO, La2O3]
+          method_class: model_derived
+          digitisation: deferred to a figure pass
+          caption: Excess Gibbs energy in the SrO-La2O3 system at 1900 K.
+          axes_as_printed:
+            x: mole fraction SrO
+            x_ticks: ['0.0', '0.2', '0.4', '0.6', '0.8', '1.0']
+            y: ΔG^E, kJ/mol
+            y_ticks: ['-30', '-25', '-20', '-15', '-10', '-5', '0', '5']
+          series:
+            - label: Redlich-Kister polynomial (15)
+              marker_count: 0
+              evidence: model_derived
+            - label: OPTAR model
+              marker_count: 0
+              evidence: model_derived
+            - label: NUCLEA database
+              marker_count: 0
+              evidence: model_derived
+          note: Smooth model curves only; no discrete markers or digitised values.
+      - observation_id: shilov_2026_glta_exchange_energies
+        type: model_parameters
+        locator:
+          page: 9
+          published_page: 1162
+          pdf_page_index: 8
+          section: Model results
+        units: kJ/mol
+        values:
+          quantity: GLTAS_lattice_exchange_energy
+          method_class: quoted_attributed
+          attribution: Reference [27], Shilov et al. (2025), High-temperature description of ceramics based on the SrO-La2O3-TiO2-ZrO2(HfO2)-Fe2O3 systems.
+          value_as_printed: '144.5'
+          reason_not_typed: >-
+            This prior value is quoted from reference [27]; the available interaction_parameter token stores Wagner
+            parameters and cannot represent a GLTAS lattice exchange energy.
+      - observation_id: shilov_2026_glta_exchange_energy_from_activity
+        type: model_parameters
+        locator:
+          page: 9
+          published_page: 1162
+          pdf_page_index: 8
+          section: Model results
+        units: kJ/mol
+        values:
+          quantity: GLTAS_lattice_exchange_energy
+          method_class: model_derived
+          candidate_tokens_considered:
+            - interaction_parameter
+          value_as_printed: '147.7'
+          reason_not_typed: >-
+            The paper calculates this value from the SrO activity measured in the current study; the available
+            interaction_parameter token stores Wagner parameters and cannot represent a GLTAS lattice exchange energy.
