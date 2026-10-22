@@ -41,8 +41,28 @@ def _point(result, observation_id: str) -> Decimal:
 def test_di_donato_granati_2000_migrates_printed_activity_cells() -> None:
     result = _migrate("di-donato-granati-2000.yaml")
     assert len(result.observations) == 95
+    assert result.validation.hard_issues == ()
     assert _point(result, "di_donato_2000_t2_slag1_r1") == Decimal("0.015")
     assert _point(result, "di_donato_2000_t4_slag1_r2") == Decimal("0.078")
+    assert all(
+        observation.identity.reference_state.is_value
+        for observation in result.observations.values()
+    )
+    for observation_id, formula in (
+        ("di_donato_2000_t2_slag1_r1", "FeO"),
+        ("di_donato_2000_t4_slag1_r1", "MnO"),
+        ("di_donato_2000_t5_slag3_r6", "Cr2O3"),
+    ):
+        observation = next(
+            row
+            for row in result.observations.values()
+            if row.observation_id.endswith(f"::{observation_id}")
+        )
+        standard_state = observation.identity.reference_state.value
+        assert standard_state.convention.value == "raoultian_pure_endmember"
+        assert standard_state.endmember.formula == formula
+        assert standard_state.endmember.phase.is_unknown
+        assert standard_state.endmember.polymorph.is_unknown
     assert all(
         observation.identity.temperature_K.is_value
         and observation.point_conditions["temperature_K"].state.is_value
