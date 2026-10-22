@@ -147,6 +147,48 @@ def _lineage(row: Observation, rows: Mapping[str, Observation], seen: frozenset[
     return species - {"O", "O2"}, used
 
 
+def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locator]:
+    from simulator.battery.generators.janaf import (
+        _fusion_table_points,
+        _interpolate_formation_gibbs,
+    )
+
+    points, digest = _fusion_table_points("O-001")
+    gibbs = _interpolate_formation_gibbs(points, temperature_K)
+    constant = math.exp(-float(gibbs) * 1000.0 / (GAS_CONSTANT * float(temperature_K)))
+    janaf = Locator(
+        source_path="data/literature/compilations/janaf/tables/O-001.yaml",
+        record=digest,
+    )
+    return gibbs, constant, janaf
+
+
+def _po2_pa_from_atomic_oxygen(pressure_pa: Decimal, constant: float) -> Decimal:
+    # Premise: JANAF O-001 is 1/2 O2 = O, o=K_O(T)*sqrt(q),
+    # with o=pO/(1 bar), q=pO2/(1 bar), so q=(o/K_O)^2.
+    # Source atm -> Pa -> bar BEFORE squaring; 1 atm=1.01325 bar.
+    # At 1933 K JANAF G=126.02894 kJ/mol, K_O=3.930428016e-4:
+    # W pO=6.8e-10 atm gives q=3.073062243e-12 bar. Shornikov's
+    # 2.65e-9 atm O gives 4.667080363e-11 bar, agreeing within 0.36%
+    # with its printed O2=4.59e-11 atm=4.6508175e-11 bar.
+    return Decimal(str((float(pressure_pa) / 100000.0 / constant) ** 2 * 100000.0))
+
+
+def _atomic_oxygen_equilibrium_parameters(
+    temperature_K: Decimal,
+    temperature_locator: Locator | None,
+    gibbs: Decimal,
+    constant: float,
+    janaf: Locator,
+) -> tuple[tuple[str, Located], ...]:
+    return (
+        ("temperature_K", Located(State.of(temperature_K), locator=temperature_locator)),
+        ("JANAF_O_001_delta_fG_kJ_mol", Located(State.of(gibbs), locator=janaf)),
+        ("K_O", Located(State.of(Decimal(str(constant))), locator=janaf)),
+    )
+
+
+
 def resolve_source_oxygen(
     reference: Observation,
     observations: Iterable[Observation],
@@ -257,26 +299,14 @@ def resolve_source_oxygen(
             source = molecular[0]
     params = [("source_pressure_Pa", Located(State.of(source.value.point), locator=source.locator))]
     if source.identity.species.formula == "O":
-        from simulator.battery.generators.janaf import _fusion_table_points, _interpolate_formation_gibbs
-
         temperature = reference.identity.temperature_K.value
-        points, digest = _fusion_table_points("O-001")
-        gibbs = _interpolate_formation_gibbs(points, temperature)
-        constant = math.exp(-float(gibbs) * 1000.0 / (GAS_CONSTANT * float(temperature)))
-        # Premise: JANAF O-001 is 1/2 O2 = O, o=K_O(T)*sqrt(q),
-        # with o=pO/(1 bar), q=pO2/(1 bar), so q=(o/K_O)^2.
-        # Source atm -> Pa -> bar BEFORE squaring; 1 atm=1.01325 bar.
-        # At 1933 K JANAF G=126.02894 kJ/mol, K_O=3.930428016e-4:
-        # W pO=6.8e-10 atm gives q=3.073062243e-12 bar. Shornikov's
-        # 2.65e-9 atm O gives 4.667080363e-11 bar, agreeing within 0.36%
-        # with its printed O2=4.59e-11 atm=4.6508175e-11 bar.
-        pressure = Decimal(str((float(source.value.point) / 100000.0 / constant) ** 2 * 100000.0))
-        janaf = Locator(source_path=f"data/literature/compilations/janaf/tables/O-001.yaml", record=digest)
-        params.extend((
-            ("temperature_K", Located(State.of(temperature), locator=source.locator)),
-            ("JANAF_O_001_delta_fG_kJ_mol", Located(State.of(gibbs), locator=janaf)),
-            ("K_O", Located(State.of(Decimal(str(constant))), locator=janaf)),
-        ))
+        gibbs, constant, janaf = _janaf_atomic_oxygen(temperature)
+        pressure = _po2_pa_from_atomic_oxygen(source.value.point, constant)
+        params.extend(
+            _atomic_oxygen_equilibrium_parameters(
+                temperature, source.locator, gibbs, constant, janaf
+            )
+        )
         arithmetic = "pO2_Pa=100000*(pO_Pa/100000/K_O)^2; JANAF O-001"
     else:
         pressure = source.value.point
