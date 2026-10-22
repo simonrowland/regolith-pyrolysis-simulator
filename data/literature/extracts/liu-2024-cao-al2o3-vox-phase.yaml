@@ -1,0 +1,4977 @@
+schema_version: literature_extract.v1
+source_id: liu-2024-cao-al2o3-vox-phase
+source:
+  citation: Liu C, Xie X, Qiu J, Li W, Huo G (2024). The Phase Diagram of a CaO-Al2O3-VOx Slag System
+    under Argon Atmosphere at 1500 C. Metals 14, 108.
+  doi: 10.3390/met14010108
+  url: https://doi.org/10.3390/met14010108
+  year: 2024
+  provenance_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  note: The physical page render confirms Table 1 sample rows 3-6 and 12-15, which pdftotext-layout omitted
+    in its two-column extraction.
+extraction:
+  method: manual_from_pdftotext_layout_and_600dpi_render_checks
+  date: '2026-10-22'
+  worker: codex-fam46-1022
+  note: Table 3 glass EDS values are one scalar row per printed element. Table 1 starting charges bind
+    by sample; dashes remain incomplete and yield unknown composition conditions. Complete charges retain
+    printed V2O5 in sample.printed_composition, but the migrator cannot convert V2O5 to its internal composition
+    identity, which remains unknown. Table 3 solid rows have no d-223 solid PhaseRole; Table 4 valence
+    fractions have no phase-composition denominator token; Table 5 depends on Table 4 and awaits a corpus
+    table asset under t-1382. Tables 3-5 are retained in untracked CSV inputs. Figures 1-8 are deferred.
+review_status: draft
+fidelity_samples:
+- species: CaO
+  observation_id: liu_2024_table3_sample_04_glass_ca
+  field: component_amount
+  value: '47.84'
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+- species: Al2O3
+  observation_id: liu_2024_table3_sample_07_glass_v
+  field: component_amount
+  value: '19.70'
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+- species: CaO
+  observation_id: liu_2024_table3_sample_18_glass_o
+  field: component_amount
+  value: '34.74'
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+experiments:
+- experiment_id: liu_2024_sample_01
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 1 initial charge, mass%: CaO 47.70; Al2O3 -; V2O5 52.30'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 1 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_02
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 2 initial charge, mass%: CaO -; Al2O3 7.75; V2O5 92.25'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 2 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_03
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 3 initial charge, mass%: CaO 4.23; Al2O3 58.90; V2O5 36.87'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 3 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_04
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 4 initial charge, mass%: CaO 65.96; Al2O3 21.99; V2O5 12.05'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 4 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_05
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 5 initial charge, mass%: CaO 49.36; Al2O3 48.99; V2O5 1.65'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 5 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_06
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 6 initial charge, mass%: CaO 16.82; Al2O3 76.47; V2O5 6.71'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 6 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_07
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 7 initial charge, mass%: CaO 7.00; Al2O3 86.85; V2O5 6.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 7 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_08
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 8 initial charge, mass%: CaO 9.20; Al2O3 -; V2O5 90.80'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 8 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_09
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 9 initial charge, mass%: CaO 78.49; Al2O3 -; V2O5 21.51'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 9 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_10
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 10 initial charge, mass%: CaO 4.43; Al2O3 7.44; V2O5 88.13'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 10 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_11
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 11 initial charge, mass%: CaO -; Al2O3 52.25; V2O5 47.75'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 11 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_12
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 12 initial charge, mass%: CaO 26.41; Al2O3 69.10; V2O5 4.49'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 12 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_13
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 13 initial charge, mass%: CaO 12.54; Al2O3 81.01; V2O5 6.45'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 13 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_14
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 14 initial charge, mass%: CaO 3.34; Al2O3 92.99; V2O5 3.67'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 14 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_15
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 15 initial charge, mass%: CaO 6.26; Al2O3 2.19; V2O5 91.55'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 15 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_16
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 16 initial charge, mass%: CaO 10.52; Al2O3 55.64; V2O5 33.84'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 16 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_17
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 17 initial charge, mass%: CaO 26.77; Al2O3 47.62; V2O5 25.61'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 17 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+- experiment_id: liu_2024_sample_18
+  method: melt_equilibration_quench
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 18 initial charge, mass%: CaO 68.40; Al2O3 11.99; V2O5 19.61'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Table 1 sample 18 initial charge.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+species:
+  SiO2:
+    observations:
+    - observation_id: liu_2024_table3_sample_01_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_01
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_01
+      phase_assemblage_as_printed: Glass
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '40.58'
+        component_amount_as_published: 40.58 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_01_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_01
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_01
+      phase_assemblage_as_printed: Glass
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed. The printed dash means this component was unreported,
+        not zero.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: null
+        component_amount_as_published: '-'
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_01_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_01
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_01
+      phase_assemblage_as_printed: Glass
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '26.44'
+        component_amount_as_published: 26.44 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_01_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_01
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_01
+      phase_assemblage_as_printed: Glass
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 1 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '32.98'
+        component_amount_as_published: 32.98 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_05_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_05
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 5 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '42.34'
+        component_amount_as_published: 42.34 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
+    - observation_id: liu_2024_table3_sample_05_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_05
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 5 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '17.94'
+        component_amount_as_published: 17.94 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
+    - observation_id: liu_2024_table3_sample_05_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_05
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 5 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '3.69'
+        component_amount_as_published: 3.69 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
+    - observation_id: liu_2024_table3_sample_05_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_05
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 5 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '36.03'
+        component_amount_as_published: 36.03 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '49.36'
+          Al2O3: '48.99'
+          V2O5: '1.65'
+    - observation_id: liu_2024_table3_sample_06_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_06
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 6 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '33.79'
+        component_amount_as_published: 33.79 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
+    - observation_id: liu_2024_table3_sample_06_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_06
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 6 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '11.79'
+        component_amount_as_published: 11.79 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
+    - observation_id: liu_2024_table3_sample_06_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_06
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 6 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '17.50'
+        component_amount_as_published: 17.50 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
+    - observation_id: liu_2024_table3_sample_06_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_06
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 6 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '36.92'
+        component_amount_as_published: 36.92 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '16.82'
+          Al2O3: '76.47'
+          V2O5: '6.71'
+    - observation_id: liu_2024_table3_sample_13_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 13 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '30.10'
+        component_amount_as_published: 30.10 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
+    - observation_id: liu_2024_table3_sample_13_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 13 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '12.84'
+        component_amount_as_published: 12.84 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
+    - observation_id: liu_2024_table3_sample_13_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 13 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '20.39'
+        component_amount_as_published: 20.39 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
+    - observation_id: liu_2024_table3_sample_13_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_13
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 13 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '36.67'
+        component_amount_as_published: 36.67 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '12.54'
+          Al2O3: '81.01'
+          V2O5: '6.45'
+    - observation_id: liu_2024_table3_sample_14_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 14 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '25.88'
+        component_amount_as_published: 25.88 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
+    - observation_id: liu_2024_table3_sample_14_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 14 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '5.82'
+        component_amount_as_published: 5.82 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
+    - observation_id: liu_2024_table3_sample_14_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 14 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '30.08'
+        component_amount_as_published: 30.08 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
+    - observation_id: liu_2024_table3_sample_14_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_14
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 14 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '38.22'
+        component_amount_as_published: 38.22 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '3.34'
+          Al2O3: '92.99'
+          V2O5: '3.67'
+    context:
+    - observation_id: liu_2024_figure_1_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 2
+        page: 3
+        figure: '1'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: nominal charge compositions
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: initial charge
+        T_C: not applicable
+        axes_as_printed: 'x/y: ternary mass-percent composition; vertices CaO, Al2O3, V2O5'
+        caption_as_printed: Design composition of samples in the CaO-Al2O3-VOx system, mass%.
+        panels:
+        - single
+        series:
+        - samples 1#-18#
+        marker_count_per_series:
+          samples 1#-18#: 18
+        attribution: present work
+        schema_gap_or_disposition: design composition diagram; no measured equilibrium points
+    - observation_id: liu_2024_figure_2_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 4
+        page: 5
+        figure: '2'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: phase assemblage and phase morphology
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: quenched SEM image
+        T_C: '1500'
+        axes_as_printed: no numeric axes (micrographs)
+        caption_as_printed: 'Typical SEM images of samples in the CaO-Al2O3-VOx system at 1500 C: (a)
+          glass + CaO + Ca3Al2O6, (b) glass + CaAl2O4 + CaAl4O7, (c) glass + CaAl4O7 + CaAl12O19, (d)
+          glass + CaAl12O19 + Al2O3, (e) glass + CaO, (f) glass + CaAl2O4, (g) glass + CaAl4O7, (h) glass
+          + CaAl12O19, (i) glass + Al2O3, (j) glass + VO2, and (k) glass.'
+        panels:
+        - 'a: sample 5#'
+        - 'b: sample 6#'
+        - 'c: sample 13#'
+        - 'd: sample 14#'
+        - 'e: samples 4#, 9#, 18#'
+        - 'f: sample 12#'
+        - 'g: sample 17#'
+        - 'h: sample 7#'
+        - 'i: samples 3#, 16#'
+        - 'j: samples 2#, 8#, 10#, 15#'
+        - 'k: sample 1#'
+        series: []
+        marker_count_per_series: {}
+        attribution: present work
+        schema_gap_or_disposition: panel images identify phase assemblages; no numeric points
+    - observation_id: liu_2024_figure_3_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        figure: '3'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: X-ray diffraction intensity
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: post-quench crystalline phase
+        T_C: '1500'
+        axes_as_printed: 'x: 2theta (degrees); y: intensity (a.u.)'
+        caption_as_printed: XRD results of slag sample 10#.
+        panels:
+        - single
+        series:
+        - sample 10 XRD trace
+        marker_count_per_series:
+          sample 10 XRD trace: 0
+        attribution: present work
+        schema_gap_or_disposition: continuous diffractogram; numerical trace values are not printed
+    - observation_id: liu_2024_figure_4_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 7
+        page: 8
+        figure: '4'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: XPS intensity by vanadium valence state
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: quenched glass
+        T_C: '1500'
+        axes_as_printed: 'x: binding energy (eV); y: intensity (a.u.)'
+        caption_as_printed: XPS spectrum results of samples in the CaO-Al2O3-VOx system at 1500 C.
+        panels:
+        - 'a: sample 1#'
+        - 'b: sample 3#'
+        - 'c: sample 4#'
+        - 'd: sample 7#'
+        - 'e: sample 9#'
+        - 'f: sample 11#'
+        - 'g: sample 12#'
+        - 'h: sample 13#'
+        - 'i: sample 14#'
+        - 'j: sample 15#'
+        - 'k: sample 16#'
+        - 'l: sample 17#'
+        series:
+        - original data
+        - fitted envelope
+        - V2+ peak
+        - V3+ peak
+        - V4+ peak
+        - V5+ peak
+        marker_count_per_series:
+          original data: 0
+          fitted envelope: 0
+          V2+ peak: 0
+          V3+ peak: 0
+          V4+ peak: 0
+          V5+ peak: 0
+        attribution: present work
+        schema_gap_or_disposition: continuous XPS spectra; Figure 4 panels a-i are on page 7 and j-l on
+          page 8
+    - observation_id: liu_2024_figure_5_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 8
+        page: 9
+        figure: '5'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: liquid represented by quenched glass
+        T_C: '1500'
+        axes_as_printed: 'axes: Ca, Al, V, O composition'
+        caption_as_printed: The positions of the glass compositions in the Ca-Al-V-O three-dimensional
+          phase diagram.
+        panels:
+        - single
+        series:
+        - glass sample liquidus points
+        - compound reference points
+        marker_count_per_series:
+          glass sample liquidus points: 18
+          compound reference points: 5
+        attribution: present work
+        schema_gap_or_disposition: author-drawn three-dimensional phase diagram; values deferred
+        quantity: equilibrium_phase_composition
+    - observation_id: liu_2024_figure_6_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 8
+        page: 9
+        figure: '6'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: liquid and coexisting solid phases
+        T_C: '1500'
+        axes_as_printed: 'composition axes: CaO, Al2O3, V2O5, VO2'
+        caption_as_printed: Phase diagram of CaO-Al2O3-V2O5-VO2 at 1500 C and p(O2) = 10^-3 atm.
+        panels:
+        - single
+        series:
+        - liquidus points
+        - compound points
+        - tie lines
+        - isobaric oxygen-potential line
+        - schematic liquidus boundary
+        marker_count_per_series:
+          liquidus points: 18
+          compound points: 5
+          tie lines: 0
+          isobaric oxygen-potential line: 0
+          schematic liquidus boundary: 0
+        attribution: present work
+        schema_gap_or_disposition: author-constructed phase diagram; plotted condition p(O2) = 10^-3 atm;
+          values deferred
+        quantity: equilibrium_phase_composition
+        pO2_as_printed: 10^-3 atm
+    - observation_id: liu_2024_figure_7_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 10
+        page: 11
+        figure: '7'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: liquid and coexisting solid phases
+        T_C: '1500'
+        axes_as_printed: 'ternary mass-percent composition axes: CaO, Al2O3, VO2'
+        caption_as_printed: Isothermal section of the CaO-Al2O3-VO2 system at 1500 C, mass%.
+        panels:
+        - single
+        series:
+        - liquid points at 1500 C in references
+        - liquid points at 1500 C in this paper
+        - liquidus
+        marker_count_per_series:
+          liquid points at 1500 C in references: 2
+          liquid points at 1500 C in this paper: 4
+          liquidus: 0
+        attribution: present work
+        schema_gap_or_disposition: author-constructed isothermal section; markers counted in the 600 dpi
+          render; values deferred
+        quantity: equilibrium_phase_composition
+    - observation_id: liu_2024_figure_8_context
+      type: figure_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 10
+        page: 11
+        figure: '8'
+        note: Figure values are not digitized in this wave.
+      units: no numeric figure points stored
+      values:
+        typed_quantity_as_printed: equilibrium_phase_composition
+        method_class: figure_only
+        digitisation: deferred to a figure pass
+        species: CaO-Al2O3-VOx system
+        phase: liquid and coexisting solid phases
+        T_C: '1500'
+        axes_as_printed: 'ternary mass-percent composition axes: CaO, Al2O3, V2O5'
+        caption_as_printed: Isothermal section of the CaO-Al2O3-V2O5 system at 1500 C, mass%.
+        panels:
+        - single
+        series:
+        - liquid points at 1500 C in references
+        - liquid points at 1500 C in this paper
+        - liquidus
+        marker_count_per_series:
+          liquid points at 1500 C in references: 4
+          liquid points at 1500 C in this paper: 2
+          liquidus: 0
+        attribution: present work
+        schema_gap_or_disposition: author-constructed isothermal section; markers counted in the 600 dpi
+          render; values deferred
+        quantity: equilibrium_phase_composition
+  CaO:
+    observations:
+    - observation_id: liu_2024_table3_sample_04_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_04
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_04
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 4 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '47.84'
+        component_amount_as_published: 47.84 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
+    - observation_id: liu_2024_table3_sample_04_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_04
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_04
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 4 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '11.55'
+        component_amount_as_published: 11.55 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
+    - observation_id: liu_2024_table3_sample_04_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_04
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_04
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 4 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '11.06'
+        component_amount_as_published: 11.06 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
+    - observation_id: liu_2024_table3_sample_04_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_04
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_04
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 4 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '29.55'
+        component_amount_as_published: 29.55 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '65.96'
+          Al2O3: '21.99'
+          V2O5: '12.05'
+    - observation_id: liu_2024_table3_sample_09_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_09
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 9 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '42.20'
+        component_amount_as_published: 42.20 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_09_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_09
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 9 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed. The printed dash means this component was unreported,
+        not zero.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: null
+        component_amount_as_published: '-'
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_09_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_09
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 9 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '22.79'
+        component_amount_as_published: 22.79 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_09_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_09
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_09
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 9 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '35.01'
+        component_amount_as_published: 35.01 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_12_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_12
+      phase_assemblage_as_printed: Glass + CaAl2O4
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 12 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '39.30'
+        component_amount_as_published: 39.30 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
+    - observation_id: liu_2024_table3_sample_12_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_12
+      phase_assemblage_as_printed: Glass + CaAl2O4
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 12 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '21.09'
+        component_amount_as_published: 21.09 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
+    - observation_id: liu_2024_table3_sample_12_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_12
+      phase_assemblage_as_printed: Glass + CaAl2O4
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 12 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '6.69'
+        component_amount_as_published: 6.69 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
+    - observation_id: liu_2024_table3_sample_12_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_12
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_12
+      phase_assemblage_as_printed: Glass + CaAl2O4
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 12 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '32.92'
+        component_amount_as_published: 32.92 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.41'
+          Al2O3: '69.10'
+          V2O5: '4.49'
+    - observation_id: liu_2024_table3_sample_18_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_18
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 18 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '43.80'
+        component_amount_as_published: 43.80 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
+    - observation_id: liu_2024_table3_sample_18_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_18
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 18 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '6.14'
+        component_amount_as_published: 6.14 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
+    - observation_id: liu_2024_table3_sample_18_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_18
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 18 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '15.32'
+        component_amount_as_published: 15.32 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
+    - observation_id: liu_2024_table3_sample_18_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_18
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_18
+      phase_assemblage_as_printed: Glass + CaO
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 18 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '34.74'
+        component_amount_as_published: 34.74 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '68.40'
+          Al2O3: '11.99'
+          V2O5: '19.61'
+    context:
+    - observation_id: liu_2024_table3_cao_solid_rows_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: solid-phase elemental EDS compositions
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role;
+          these rows cannot be typed as liquid-phase composition. Blank sample-number cells remain blank;
+          sample_group records visual row grouping only.
+        rows_as_printed:
+        - sample_id_as_printed: ''
+          sample_group: 4
+          phase_as_printed: CaO
+          Ca_mass_percent: '61.69'
+          Al_mass_percent: '2.34'
+          V_mass_percent: '2.21'
+          O_mass_percent: '33.76'
+          assemblage_id: liu_2024_sample_04
+          phase_assemblage_as_printed: Glass + CaO
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 5
+          phase_as_printed: CaO
+          Ca_mass_percent: '63.14'
+          Al_mass_percent: '2.83'
+          V_mass_percent: '-'
+          O_mass_percent: '34.03'
+          assemblage_id: liu_2024_sample_05
+          phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 5
+          phase_as_printed: Ca3Al2O6
+          Ca_mass_percent: '42.33'
+          Al_mass_percent: '17.94'
+          V_mass_percent: '3.68'
+          O_mass_percent: '36.05'
+          assemblage_id: liu_2024_sample_05
+          phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 6
+          phase_as_printed: CaAl2O4
+          Ca_mass_percent: '27.56'
+          Al_mass_percent: '29.83'
+          V_mass_percent: '4.32'
+          O_mass_percent: '38.29'
+          assemblage_id: liu_2024_sample_06
+          phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 9
+          phase_as_printed: CaO
+          Ca_mass_percent: '49.54'
+          Al_mass_percent: '-'
+          V_mass_percent: '2.04'
+          O_mass_percent: '48.42'
+          assemblage_id: liu_2024_sample_09
+          phase_assemblage_as_printed: Glass + CaO
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 12
+          phase_as_printed: CaAl2O4
+          Ca_mass_percent: '27.97'
+          Al_mass_percent: '32.70'
+          V_mass_percent: ''
+          O_mass_percent: '39.33'
+          assemblage_id: liu_2024_sample_12
+          phase_assemblage_as_printed: Glass + CaAl2O4
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 18
+          phase_as_printed: CaO
+          Ca_mass_percent: '29.67'
+          Al_mass_percent: '0.79'
+          V_mass_percent: '2.57'
+          O_mass_percent: '66.97'
+          assemblage_id: liu_2024_sample_18
+          phase_assemblage_as_printed: Glass + CaO
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        method_class: measured_direct
+  Al2O3:
+    observations:
+    - observation_id: liu_2024_table3_sample_03_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_03
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '11.02'
+        component_amount_as_published: 11.02 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
+    - observation_id: liu_2024_table3_sample_03_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_03
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '4.13'
+        component_amount_as_published: 4.13 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
+    - observation_id: liu_2024_table3_sample_03_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_03
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '40.42'
+        component_amount_as_published: 40.42 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
+    - observation_id: liu_2024_table3_sample_03_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_03
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_03
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 3 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '44.43'
+        component_amount_as_published: 44.43 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.23'
+          Al2O3: '58.90'
+          V2O5: '36.87'
+    - observation_id: liu_2024_table3_sample_07_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_07
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_07
+      phase_assemblage_as_printed: Glass + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 7 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '28.82'
+        component_amount_as_published: 28.82 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
+    - observation_id: liu_2024_table3_sample_07_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_07
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_07
+      phase_assemblage_as_printed: Glass + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 7 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '12.46'
+        component_amount_as_published: 12.46 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
+    - observation_id: liu_2024_table3_sample_07_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_07
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_07
+      phase_assemblage_as_printed: Glass + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 7 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '19.70'
+        component_amount_as_published: 19.70 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
+    - observation_id: liu_2024_table3_sample_07_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_07
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_07
+      phase_assemblage_as_printed: Glass + CaAl12O19
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 7 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '39.02'
+        component_amount_as_published: 39.02 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '7.00'
+          Al2O3: '86.85'
+          V2O5: '6.15'
+    - observation_id: liu_2024_table3_sample_11_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_11
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 11 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed. The printed dash means this component was unreported,
+        not zero.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: null
+        component_amount_as_published: '-'
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_11_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_11
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 11 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '15.74'
+        component_amount_as_published: 15.74 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_11_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_11
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 11 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '40.60'
+        component_amount_as_published: 40.60 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_11_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_11
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_11
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 11 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '43.66'
+        component_amount_as_published: 43.66 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_16_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_16
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_16
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 16 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '20.26'
+        component_amount_as_published: 20.26 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
+    - observation_id: liu_2024_table3_sample_16_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_16
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_16
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 16 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '3.30'
+        component_amount_as_published: 3.30 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
+    - observation_id: liu_2024_table3_sample_16_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_16
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_16
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 16 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '35.19'
+        component_amount_as_published: 35.19 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
+    - observation_id: liu_2024_table3_sample_16_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_16
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_16
+      phase_assemblage_as_printed: Glass + Al2O3
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 16 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '41.25'
+        component_amount_as_published: 41.25 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '10.52'
+          Al2O3: '55.64'
+          V2O5: '33.84'
+    - observation_id: liu_2024_table3_sample_17_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_17
+      phase_assemblage_as_printed: Glass + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 17 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '32.90'
+        component_amount_as_published: 32.90 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
+    - observation_id: liu_2024_table3_sample_17_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_17
+      phase_assemblage_as_printed: Glass + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 17 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '5.07'
+        component_amount_as_published: 5.07 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
+    - observation_id: liu_2024_table3_sample_17_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_17
+      phase_assemblage_as_printed: Glass + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 17 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '24.73'
+        component_amount_as_published: 24.73 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
+    - observation_id: liu_2024_table3_sample_17_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_17
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_17
+      phase_assemblage_as_printed: Glass + CaAl4O7
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 17 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '37.30'
+        component_amount_as_published: 37.30 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '26.77'
+          Al2O3: '47.62'
+          V2O5: '25.61'
+    context:
+    - observation_id: liu_2024_table3_al2o3_solid_rows_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: solid-phase elemental EDS compositions
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role;
+          these rows cannot be typed as liquid-phase composition. Blank sample-number cells remain blank;
+          sample_group records visual row grouping only.
+        rows_as_printed:
+        - sample_id_as_printed: ''
+          sample_group: 3
+          phase_as_printed: Al2O3
+          Ca_mass_percent: '-'
+          Al_mass_percent: '49.06'
+          V_mass_percent: '4.56'
+          O_mass_percent: '46.38'
+          assemblage_id: liu_2024_sample_03
+          phase_assemblage_as_printed: Glass + Al2O3
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 6
+          phase_as_printed: CaAl4O7
+          Ca_mass_percent: '16.41'
+          Al_mass_percent: '39.95'
+          V_mass_percent: '-'
+          O_mass_percent: '43.64'
+          assemblage_id: liu_2024_sample_06
+          phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 7
+          phase_as_printed: CaAl12O19
+          Ca_mass_percent: '-'
+          Al_mass_percent: '47.97'
+          V_mass_percent: '-'
+          O_mass_percent: '52.03'
+          assemblage_id: liu_2024_sample_07
+          phase_assemblage_as_printed: Glass + CaAl12O19
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 11
+          phase_as_printed: Al2O3
+          Ca_mass_percent: '-'
+          Al_mass_percent: '48.13'
+          V_mass_percent: '5.82'
+          O_mass_percent: '46.05'
+          assemblage_id: liu_2024_sample_11
+          phase_assemblage_as_printed: Glass + Al2O3
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 13
+          phase_as_printed: CaAl4O7
+          Ca_mass_percent: '17.44'
+          Al_mass_percent: '41.20'
+          V_mass_percent: '-'
+          O_mass_percent: '41.37'
+          assemblage_id: liu_2024_sample_13
+          phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 13
+          phase_as_printed: CaAl12O19
+          Ca_mass_percent: '6.84'
+          Al_mass_percent: '45.13'
+          V_mass_percent: '-'
+          O_mass_percent: '48.03'
+          assemblage_id: liu_2024_sample_13
+          phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 14
+          phase_as_printed: CaAl12O19
+          Ca_mass_percent: '5.77'
+          Al_mass_percent: '48.11'
+          V_mass_percent: '-'
+          O_mass_percent: '46.12'
+          assemblage_id: liu_2024_sample_14
+          phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 14
+          phase_as_printed: Al2O3
+          Ca_mass_percent: '-'
+          Al_mass_percent: '42.17'
+          V_mass_percent: '-'
+          O_mass_percent: '57.83'
+          assemblage_id: liu_2024_sample_14
+          phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 16
+          phase_as_printed: Al2O3
+          Ca_mass_percent: '0.43'
+          Al_mass_percent: '49.49'
+          V_mass_percent: '4.60'
+          O_mass_percent: '45.48'
+          assemblage_id: liu_2024_sample_16
+          phase_assemblage_as_printed: Glass + Al2O3
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 17
+          phase_as_printed: CaAl4O7
+          Ca_mass_percent: '16.00'
+          Al_mass_percent: '37.49'
+          V_mass_percent: '-'
+          O_mass_percent: '46.51'
+          assemblage_id: liu_2024_sample_17
+          phase_assemblage_as_printed: Glass + CaAl4O7
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        method_class: measured_direct
+  VO2:
+    observations:
+    - observation_id: liu_2024_table3_sample_02_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_02
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_02
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed. The printed dash means this component was unreported,
+        not zero.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: null
+        component_amount_as_published: '-'
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_02_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_02
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_02
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '2.80'
+        component_amount_as_published: 2.80 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_02_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_02
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_02
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '42.93'
+        component_amount_as_published: 42.93 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_02_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_02
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_02
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 2 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '54.27'
+        component_amount_as_published: 54.27 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_08_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_08
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_08
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 8 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '13.45'
+        component_amount_as_published: 13.45 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_08_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_08
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_08
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 8 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed. The printed dash means this component was unreported,
+        not zero.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: null
+        component_amount_as_published: '-'
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_08_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_08
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_08
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 8 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '43.00'
+        component_amount_as_published: 43.00 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_08_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_08
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_08
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 8 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '43.55'
+        component_amount_as_published: 43.55 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+    - observation_id: liu_2024_table3_sample_10_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_10
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 10 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '6.97'
+        component_amount_as_published: 6.97 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
+    - observation_id: liu_2024_table3_sample_10_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_10
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 10 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '2.88'
+        component_amount_as_published: 2.88 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
+    - observation_id: liu_2024_table3_sample_10_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_10
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 10 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '43.77'
+        component_amount_as_published: 43.77 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
+    - observation_id: liu_2024_table3_sample_10_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_10
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_10
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 10 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '46.38'
+        component_amount_as_published: 46.38 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '4.43'
+          Al2O3: '7.44'
+          V2O5: '88.13'
+    - observation_id: liu_2024_table3_sample_15_glass_ca
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_15
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 15 glass EDS Ca mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '14.97'
+        component_amount_as_published: 14.97 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
+    - observation_id: liu_2024_table3_sample_15_glass_al
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_15
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 15 glass EDS Al mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '1.38'
+        component_amount_as_published: 1.38 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
+    - observation_id: liu_2024_table3_sample_15_glass_v
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_15
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 15 glass EDS V mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: V
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '41.10'
+        component_amount_as_published: 41.10 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
+    - observation_id: liu_2024_table3_sample_15_glass_o
+      type: composition_series
+      units: mass percent of elemental component as printed
+      experiment: liu_2024_sample_15
+      regime: quench_equilibration
+      assemblage_id: liu_2024_sample_15
+      phase_assemblage_as_printed: Glass + VO2
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3 sample 15 glass EDS O mass percent.
+      phase: l
+      note: Table 3 calls this quenched phase Glass. Per the F46 slag rule it represents the liquid at
+        1500 C; sample was equilibrated 24 h and ice-water quenched for 3 s. SEM-EDS detection error is
+        reported as 1%; no per-row sigma is printed.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: melt
+        basis: wt_percent
+        T_C: '1500'
+        component_amount: '42.55'
+        component_amount_as_published: 42.55 mass%
+        method_class: measured_direct
+        admission_status: admitted
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '1773.15'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints the equilibration temperature as 1500 C; converted to kelvin.
+          pO2_Pa:
+            state:
+              tag: value
+              value: '101.325'
+            locator:
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+              pdf_page_index: 2
+              page: 3
+              note: Section 2 prints PO2 = 10^-3 atm; converted to pascal.
+        composition_wt_pct:
+          CaO: '6.26'
+          Al2O3: '2.19'
+          V2O5: '91.55'
+    context:
+    - observation_id: liu_2024_table3_vo2_solid_rows_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 5
+        page: 6
+        table: '3'
+        note: Table 3; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: solid-phase elemental EDS compositions
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role;
+          these rows cannot be typed as liquid-phase composition. Blank sample-number cells remain blank;
+          sample_group records visual row grouping only.
+        rows_as_printed:
+        - sample_id_as_printed: ''
+          sample_group: 2
+          phase_as_printed: VO2
+          Ca_mass_percent: '-'
+          Al_mass_percent: '-'
+          V_mass_percent: '49.57'
+          O_mass_percent: '50.43'
+          assemblage_id: liu_2024_sample_02
+          phase_assemblage_as_printed: Glass + VO2
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 8
+          phase_as_printed: VO2
+          Ca_mass_percent: '-'
+          Al_mass_percent: '-'
+          V_mass_percent: '51.14'
+          O_mass_percent: '48.86'
+          assemblage_id: liu_2024_sample_08
+          phase_assemblage_as_printed: Glass + VO2
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 10
+          phase_as_printed: VO2
+          Ca_mass_percent: '-'
+          Al_mass_percent: '1.50'
+          V_mass_percent: '49.46'
+          O_mass_percent: '49.04'
+          assemblage_id: liu_2024_sample_10
+          phase_assemblage_as_printed: Glass + VO2
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        - sample_id_as_printed: ''
+          sample_group: 15
+          phase_as_printed: VO2
+          Ca_mass_percent: '0.94'
+          Al_mass_percent: '0.35'
+          V_mass_percent: '46.21'
+          O_mass_percent: '52.49'
+          assemblage_id: liu_2024_sample_15
+          phase_assemblage_as_printed: Glass + VO2
+          T_C_as_printed: 1500 C
+          pO2_as_printed: 10^-3 atm
+        method_class: measured_direct
+  V:
+    observations: []
+    context:
+    - observation_id: liu_2024_table2_xps_reference_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 3
+        page: 4
+        table: '2'
+        note: Table 2; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: V2p binding-energy, spin-orbit splitting, and FWHM reference values
+        candidate_tokens:
+        - binding_energy
+        - spectral_peak_separation
+        - spectral_line_width
+        schema_gap_or_disposition: Table 2 quotes XPS peak-fitting reference parameters from [36], not
+          phase-equilibrium observations; no existing quantity token fits binding energy or peak width.
+        rows_as_printed:
+        - oxidation_state: '+2'
+          V2p3_2_binding_energy_eV: '513.67'
+          binding_energy_std_dev_eV: '0.2'
+          V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+          V2p3_2_FWHM_eV: 2.0~2.3
+          V2p1_2_FWHM_eV: 2.6~3.4
+        - oxidation_state: '+3'
+          V2p3_2_binding_energy_eV: '515.30'
+          binding_energy_std_dev_eV: '0.2'
+          V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+          V2p3_2_FWHM_eV: 2.7~4.0
+          V2p1_2_FWHM_eV: 3.1~4.7
+        - oxidation_state: '+4'
+          V2p3_2_binding_energy_eV: '516.30'
+          binding_energy_std_dev_eV: '0.2'
+          V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+          V2p3_2_FWHM_eV: 2.2~3.2
+          V2p1_2_FWHM_eV: 3.1~3.7
+        - oxidation_state: '+5'
+          V2p3_2_binding_energy_eV: '517.18'
+          binding_energy_std_dev_eV: '0.6'
+          V2p1_2_minus_V2p3_2_eV: 7.33~7.48
+          V2p3_2_FWHM_eV: 1.0~1.5
+          V2p1_2_FWHM_eV: '2.6'
+        method_class: quoted_attributed
+        attribution_as_printed: '[36]'
+    - observation_id: liu_2024_table4_xps_valence_fractions_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 7
+        page: 8
+        table: '4'
+        note: Table 4; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: relative contents of V5+, V4+, and V3+ in equilibrium slag samples
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 4 gives XPS-derived fractions among vanadium valence states,
+          not component fractions of the whole glass phase; no token carries that denominator. Values
+          remain as printed mole%.
+        rows_as_printed:
+        - sample: 1#
+          sample_number_as_printed: '1'
+          V5+_mole_percent: '77.29'
+          V4+_mole_percent: '17.85'
+          V3+_mole_percent: '4.07'
+        - sample: 3#
+          sample_number_as_printed: '3'
+          V5+_mole_percent: '70.18'
+          V4+_mole_percent: '23.06'
+          V3+_mole_percent: '6.76'
+        - sample: 4#
+          sample_number_as_printed: '4'
+          V5+_mole_percent: '83.77'
+          V4+_mole_percent: '6.83'
+          V3+_mole_percent: '9.40'
+        - sample: 7#
+          sample_number_as_printed: '7'
+          V5+_mole_percent: '78.09'
+          V4+_mole_percent: '19.77'
+          V3+_mole_percent: '2.14'
+        - sample: 9#
+          sample_number_as_printed: '9'
+          V5+_mole_percent: '84.77'
+          V4+_mole_percent: '14.24'
+          V3+_mole_percent: '0.99'
+        - sample: 11#
+          sample_number_as_printed: '11'
+          V5+_mole_percent: '72.79'
+          V4+_mole_percent: '20.14'
+          V3+_mole_percent: '7.07'
+        - sample: 12#
+          sample_number_as_printed: '12'
+          V5+_mole_percent: '90.61'
+          V4+_mole_percent: '9.39'
+          V3+_mole_percent: '-'
+        - sample: 13#
+          sample_number_as_printed: '13'
+          V5+_mole_percent: '81.56'
+          V4+_mole_percent: '11.35'
+          V3+_mole_percent: '7.09'
+        - sample: 14#
+          sample_number_as_printed: '14'
+          V5+_mole_percent: '71.07'
+          V4+_mole_percent: '24.97'
+          V3+_mole_percent: '3.96'
+        - sample: 15#
+          sample_number_as_printed: '15'
+          V5+_mole_percent: '66.56'
+          V4+_mole_percent: '32.57'
+          V3+_mole_percent: '0.87'
+        - sample: 16#
+          sample_number_as_printed: '16'
+          V5+_mole_percent: '64.52'
+          V4+_mole_percent: '27.17'
+          V3+_mole_percent: '8.31'
+        - sample: 17#
+          sample_number_as_printed: '17'
+          V5+_mole_percent: '81.27'
+          V4+_mole_percent: '12.82'
+          V3+_mole_percent: '5.91'
+        method_class: measured_reduced
+        raw_inputs:
+          state: not_printed
+          locator:
+            source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+            pdf_page_index: 3
+            page: 4
+            note: XPS V2p fitting method; raw spectral values are not tabulated.
+        T_C_as_printed: 1500 C
+        pO2_as_printed: 10^-3 atm
+    - observation_id: liu_2024_table5_derived_glass_compositions_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 7
+        page: 8
+        table: '5'
+        note: Table 5; every displayed row and cell retained.
+      units: printed values and units retained in rows_as_printed
+      values:
+        typed_quantity_as_printed: actual component contents and O/V of glass phase
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 5 synthesizes Table 3 EDS and Table 4 XPS valence data. The Table
+          4 input has no typed token or registered table asset; derivation pending a corpus table asset
+          (controller, t-1382). Inputs and displayed results are retained in .agent-scratch/f46-tables/liu-2024-cao-al2o3-vox-phase/.
+        rows_as_printed:
+        - sample: 1#
+          sample_number_as_printed: '1'
+          CaO_mass_percent: '46.79'
+          Al2O3_mass_percent: '-'
+          V2O5_mass_percent: '42.43'
+          VO2_mass_percent: '8.94'
+          V2O3_mass_percent: '1.84'
+          O_over_V: '2.37'
+        - sample: 2#
+          sample_number_as_printed: '2'
+          CaO_mass_percent: '-'
+          Al2O3_mass_percent: '6.57'
+          V2O5_mass_percent: '73.67'
+          VO2_mass_percent: '16.04'
+          V2O3_mass_percent: '3.72'
+          O_over_V: '2.32'
+        - sample: 3#
+          sample_number_as_printed: '3'
+          CaO_mass_percent: '12.41'
+          Al2O3_mass_percent: '8.78'
+          V2O5_mass_percent: '57.14'
+          VO2_mass_percent: '17.13'
+          V2O3_mass_percent: '4.54'
+          O_over_V: '2.37'
+        - sample: 4#
+          sample_number_as_printed: '4'
+          CaO_mass_percent: '53.80'
+          Al2O3_mass_percent: '24.54'
+          V2O5_mass_percent: '18.56'
+          VO2_mass_percent: '1.38'
+          V2O3_mass_percent: '1.72'
+          O_over_V: '2.38'
+        - sample: 5#
+          sample_number_as_printed: '5'
+          CaO_mass_percent: '51.24'
+          Al2O3_mass_percent: '40.99'
+          V2O5_mass_percent: '6.13'
+          VO2_mass_percent: '1.33'
+          V2O3_mass_percent: '0.31'
+          O_over_V: '2.42'
+        - sample: 6#
+          sample_number_as_printed: '6'
+          CaO_mass_percent: '39.08'
+          Al2O3_mass_percent: '25.70'
+          V2O5_mass_percent: '27.77'
+          VO2_mass_percent: '6.05'
+          V2O3_mass_percent: '1.40'
+          O_over_V: '2.33'
+        - sample: 7#
+          sample_number_as_printed: '7'
+          CaO_mass_percent: '32.45'
+          Al2O3_mass_percent: '24.48'
+          V2O5_mass_percent: '34.36'
+          VO2_mass_percent: '7.93'
+          V2O3_mass_percent: '0.78'
+          O_over_V: '2.45'
+        - sample: 8#
+          sample_number_as_printed: '8'
+          CaO_mass_percent: '15.21'
+          Al2O3_mass_percent: '-'
+          V2O5_mass_percent: '66.86'
+          VO2_mass_percent: '14.55'
+          V2O3_mass_percent: '3.38'
+          O_over_V: '2.37'
+        - sample: 9#
+          sample_number_as_printed: '9'
+          CaO_mass_percent: '51.26'
+          Al2O3_mass_percent: '-'
+          V2O5_mass_percent: '41.91'
+          VO2_mass_percent: '6.42'
+          V2O3_mass_percent: '0.40'
+          O_over_V: '2.34'
+        - sample: 10#
+          sample_number_as_printed: '10'
+          CaO_mass_percent: '7.84'
+          Al2O3_mass_percent: '6.14'
+          V2O5_mass_percent: '67.83'
+          VO2_mass_percent: '14.77'
+          V2O3_mass_percent: '3.43'
+          O_over_V: '2.43'
+        - sample: 11#
+          sample_number_as_printed: '11'
+          CaO_mass_percent: '-'
+          Al2O3_mass_percent: '29.70'
+          V2O5_mass_percent: '52.76'
+          VO2_mass_percent: '13.31'
+          V2O3_mass_percent: '4.22'
+          O_over_V: '2.28'
+        - sample: 12#
+          sample_number_as_printed: '12'
+          CaO_mass_percent: '43.20'
+          Al2O3_mass_percent: '43.79'
+          V2O5_mass_percent: '11.88'
+          VO2_mass_percent: '1.12'
+          V2O3_mass_percent: '-'
+          O_over_V: '2.38'
+        - sample: 13#
+          sample_number_as_printed: '13'
+          CaO_mass_percent: '33.49'
+          Al2O3_mass_percent: '26.97'
+          V2O5_mass_percent: '32.99'
+          VO2_mass_percent: '4.19'
+          V2O3_mass_percent: '2.36'
+          O_over_V: '2.36'
+        - sample: 14#
+          sample_number_as_printed: '14'
+          CaO_mass_percent: '29.12'
+          Al2O3_mass_percent: '12.34'
+          V2O5_mass_percent: '42.84'
+          VO2_mass_percent: '13.73'
+          V2O3_mass_percent: '1.97'
+          O_over_V: '2.36'
+        - sample: 15#
+          sample_number_as_printed: '15'
+          CaO_mass_percent: '16.62'
+          Al2O3_mass_percent: '2.89'
+          V2O5_mass_percent: '71.24'
+          VO2_mass_percent: '8.48'
+          V2O3_mass_percent: '0.77'
+          O_over_V: '2.36'
+        - sample: 16#
+          sample_number_as_printed: '16'
+          CaO_mass_percent: '23.34'
+          Al2O3_mass_percent: '7.23'
+          V2O5_mass_percent: '46.59'
+          VO2_mass_percent: '17.89'
+          V2O3_mass_percent: '4.95'
+          O_over_V: '2.36'
+        - sample: 17#
+          sample_number_as_printed: '17'
+          CaO_mass_percent: '40.08'
+          Al2O3_mass_percent: '10.82'
+          V2O5_mass_percent: '40.79'
+          VO2_mass_percent: '5.87'
+          V2O3_mass_percent: '2.44'
+          O_over_V: '2.36'
+        - sample: 18#
+          sample_number_as_printed: '18'
+          CaO_mass_percent: '53.40'
+          Al2O3_mass_percent: '14.11'
+          V2O5_mass_percent: '25.62'
+          VO2_mass_percent: '5.58'
+          V2O3_mass_percent: '1.29'
+          O_over_V: '2.36'
+        - sample: X̄
+          sample_number_as_printed: null
+          CaO_mass_percent: ''
+          Al2O3_mass_percent: ''
+          V2O5_mass_percent: ''
+          VO2_mass_percent: ''
+          V2O3_mass_percent: ''
+          O_over_V: '2.367'
+        method_class: measured_reduced
+        T_C_as_printed: 1500 C
+        pO2_as_printed: 10^-3 atm
+    - observation_id: liu_2024_text_v2_plus_xps_estimate_context
+      type: table_context
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 6
+        page: 7
+        note: Text immediately preceding Figure 4; V2+ peak fitting in sample 1.
+      units: mole percent as printed
+      values:
+        typed_quantity_as_printed: relative V2+ content in sample 1 glass
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: The approximately 0.73% value is a fitted share of the vanadium XPS
+          signal, not a phase component amount; it is below the reported XPS detection accuracy and authors
+          disregard it.
+        method_class: measured_reduced
+        raw_inputs:
+          state: not_printed
+          locator:
+            source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+            pdf_page_index: 3
+            page: 4
+            note: XPS V2p fitting method; raw spectral values are not tabulated.
+        value_as_printed: about 0.73%
+        approximate: true
