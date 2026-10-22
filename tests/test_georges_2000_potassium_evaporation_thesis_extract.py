@@ -65,6 +65,42 @@ def _assert_annex_iii_grid(document: dict, expected: dict[str, dict[str, str]]) 
     assert all(set(row) == set(COMPONENTS) for row in actual.values())
 
 
+def _assert_no_chapter_reprints_in_annexe_ii(document: dict) -> None:
+    reprinted_cells = []
+    annex_cells = []
+    for formula, container in document["species"].items():
+        for observation in container.get("observations", []):
+            for point in observation["values"].get("points", []):
+                table = point.get("locator", {}).get("table")
+                sample_id = point.get("sample_id", "")
+                if table in {"III.3", "III.4", "III.6", "III.7"}:
+                    row = int(sample_id.rsplit("r", 1)[-1])
+                    is_reprint = (
+                        table == "III.3" and row == 2
+                        or table == "III.4" and 2 <= row <= 4
+                        or table == "III.6" and 2 <= row <= 10
+                        or table == "III.7" and 2 <= row <= 22
+                    )
+                    if is_reprint:
+                        reprinted_cells.append((formula, point))
+                elif table == "Annexe II":
+                    annex_cells.append((formula, point))
+
+    assert len(reprinted_cells) == 136
+    duplicates = []
+    for formula, chapter_point in reprinted_cells:
+        matches = [
+            point
+            for annex_formula, point in annex_cells
+            if annex_formula == formula
+            and point.get(f"{formula}_wt_pct") == chapter_point.get(f"{formula}_wt_pct")
+            and point.get("log_fO2", {}).get("value") == chapter_point.get("log_fO2", {}).get("value")
+            and abs(Decimal(point["duration_min"]) - Decimal(chapter_point["duration_min"])) <= Decimal("0.05")
+        ]
+        duplicates.extend((formula, chapter_point["sample_id"], point["sample_id"]) for point in matches)
+    assert duplicates == []
+
+
 def _expected_measurements(document: dict) -> Counter:
     expected = Counter()
     for container_formula, container in document["species"].items():
@@ -97,10 +133,10 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
     assert not result.validation.hard_issues
 
     observations = [row for row in result.observations.values() if row.source_id == SID]
-    assert len(observations) == 1226
+    assert len(observations) == 1090
     counts = Counter(row.identity.quantity.value for row in observations)
     assert counts == {
-        Quantity.RESIDUE_COMPONENT_COMPOSITION: 616,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION: 480,
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION: 602,
         Quantity.P_PARTIAL: 8,
     }
@@ -131,6 +167,7 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
     assert pressure_rows[0].value.point == Decimal("99.602475")
     assert all(row.identity.species.formula == "K" for row in pressure_rows)
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
+    _assert_no_chapter_reprints_in_annexe_ii(document)
 
     figures = [
         row
@@ -186,3 +223,23 @@ def test_annex_iii_table_grid_is_render_pinned_and_both_mutations_fail() -> None
     }.items():
         page_text = pdftotext_page_text(pdf, page_number)
         assert all(label in page_text for label in expected_labels), page_number
+
+
+def test_restoring_a_georges_chapter_reprint_fails() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_no_chapter_reprints_in_annexe_ii(document)
+
+    restored = deepcopy(document)
+    chapter_point = next(
+        point
+        for point in restored["species"]["MgO"]["observations"][0]["values"]["points"]
+        if point.get("sample_id") == "georges-2000-iii-3-r002"
+    )
+    reprint = deepcopy(chapter_point)
+    reprint["sample_id"] = "georges-2000-annex-ii-CS-CMAS9-57.1-CMAS1-r035"
+    reprint["run_id"] = "CS-CMAS9"
+    reprint["locator"] = deepcopy(reprint["locator"])
+    reprint["locator"]["table"] = "Annexe II"
+    restored["species"]["MgO"]["observations"][0]["values"]["points"].append(reprint)
+    with pytest.raises(AssertionError):
+        _assert_no_chapter_reprints_in_annexe_ii(restored)

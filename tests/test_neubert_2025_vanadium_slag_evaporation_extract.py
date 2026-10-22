@@ -11,7 +11,6 @@ from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import (
     REPO_ROOT,
     convert_pressure_to_pa,
-    wt_pct_to_mole_fraction,
 )
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
@@ -86,24 +85,40 @@ V3 33.66 29.89 8.14 0.08 0.51 6.11 0.29 0.20 1.12 10.00 10.00
 def _table3_grid(document: dict) -> tuple[tuple[str, ...], ...]:
     grid: dict[str, dict[str, str]] = {}
     for container_formula, container in document["species"].items():
-        for observation in container.get("observations", []):
+        for observation in container.get("observations") or []:
             values = observation["values"]
-            if values["quantity"] != Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value:
+            if values["quantity"] != Quantity.RESIDUE_COMPONENT_COMPOSITION.value:
                 continue
-            assert values["formula"] == container_formula
-            run_id = values["sample_id"]
-            row = grid.setdefault(
-                run_id,
-                {
-                    "run_id": run_id,
-                    "composition_id": values["composition_id"],
-                    "duration_min": values["point_conditions"]["duration_min"]["state"]["value"],
-                    "pressure_kPa": values["pressure_kPa_as_published"],
-                    "oxygen_flow_cm3_min": values["point_conditions"]["flow_rate_cm3_min"]["state"]["value"],
-                },
-            )
-            assert row["composition_id"] == values["composition_id"]
-            row[container_formula] = values["component_amount"]
+            assert values["analyte"] == container_formula
+            for point in values["points"]:
+                run_id = point["sample_id"]
+                conditions = point["point_conditions"]
+                row = grid.setdefault(
+                    run_id,
+                    {
+                        "run_id": run_id,
+                        "composition_id": point["composition_id"],
+                        "duration_min": point["duration_min"],
+                        "pressure_kPa": str(int(conditions["total_pressure_Pa"]["state"]["value"]) // 1000),
+                        "oxygen_flow_cm3_min": conditions["flow_rate_cm3_min"]["state"]["value"],
+                    },
+                )
+                row[container_formula] = point[f"{container_formula}_wt_pct"]
+        for context in container.get("context") or []:
+            if context["type"] != "context_no_token" or context["values"].get("quantity") != "post-run slag oxide composition":
+                continue
+            for point in context["values"]["rows"]:
+                row = grid.setdefault(
+                    point["sample_id"],
+                    {
+                        "run_id": point["sample_id"],
+                        "composition_id": point["composition_id"],
+                        "duration_min": point["duration_min"],
+                        "pressure_kPa": point["pressure_kPa_as_published"],
+                        "oxygen_flow_cm3_min": point["flow_rate_cm3_min"],
+                    },
+                )
+                row[container_formula] = point[f"{container_formula}_wt_pct_as_published"]
     return tuple(
         tuple(
             grid[run][key]
@@ -144,66 +159,85 @@ def test_neubert_phase_compositions_migrate_with_species_and_printed_conditions(
     assert not result.validation.hard_issues, result.validation.hard_issues
 
     source_rows = [row for row in result.observations.values() if row.source_id == SID]
-    assert len(source_rows) == 444
-    assert all(row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION for row in source_rows)
+    assert len(source_rows) == 148
+    assert all(row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for row in source_rows)
     assert all(row.value.kind is ValueKind.POINT for row in source_rows)
 
     expected = Counter()
     raw_by_id = {}
     for formula, container in document["species"].items():
-        for raw in container.get("observations", []):
+        for raw in container.get("observations") or []:
             values = raw["values"]
-            expected[(formula, Decimal(values["component_amount"]))] += 1
+            for point in values["points"]:
+                expected[(formula, Decimal(point[f"{formula}_wt_pct"]))] += 1
             raw_by_id[raw["observation_id"]] = raw
     migrated = Counter((row.identity.species.formula, row.value.point) for row in source_rows)
     assert migrated == expected
 
     experiments_by_sample: dict[str, set[str]] = defaultdict(set)
     for observation in source_rows:
-        raw = raw_by_id[observation.observation_id.split("::", 1)[-1]]
+        source_observation_id = next(
+            key
+            for key in raw_by_id
+            if observation.observation_id.split("::", 1)[-1].startswith(f"{key}::")
+        )
+        raw = raw_by_id[source_observation_id]
         values = raw["values"]
         conditions = observation.point_conditions or {}
-        assert observation.identity.species.formula == values["formula"]
+        formula = values["analyte"]
+        assert observation.identity.species.formula == formula
         assert observation.identity.species.phase.value == "l"
         assert observation.identity.temperature_K.is_value
         assert observation.identity.temperature_K.value == Decimal("1873")
-        assert observation.identity.phase_role.is_value
-        assert observation.identity.phase_role.value.value == "slag"
         assert observation.identity.subtype.is_value
-        assert observation.identity.subtype.value == "wt_percent"
-        assert observation.identity.composition.is_value
+        assert observation.identity.subtype.value == "oxide_wt_percent"
         assert values["composition_wt_pct"]["V2O5"] == "10.00"
-        expected_starting_composition = next(
-            row for row in TABLE1_GRID if row[0] == values["composition_id"]
+        point = values["points"][0]
+        expected_starting_composition = next(row for row in TABLE1_GRID if row[0] == point["composition_id"])
+        assert {key: values["composition_wt_pct"][key] for key in TABLE1_COMPONENTS} == dict(
+            zip(TABLE1_COMPONENTS, expected_starting_composition[1:], strict=True)
         )
-        assert values["composition_wt_pct"] == dict(zip(TABLE1_COMPONENTS, expected_starting_composition[1:], strict=True))
-        assert observation.identity.composition.value == wt_pct_to_mole_fraction(
-            {formula: Decimal(amount) for formula, amount in values["composition_wt_pct"].items()}
-        )
-        assert "V2O5" in observation.identity.composition.value.as_map()
         assert observation.identity.total_pressure_Pa.is_value
-        expected_pressure, relation = convert_pressure_to_pa(values["pressure_kPa_as_published"], "kPa")
+        total_pressure = point["point_conditions"]["total_pressure_Pa"]["state"]["value"]
+        expected_pressure = Decimal(total_pressure)
+        converted_pressure, relation = convert_pressure_to_pa(str(int(total_pressure) // 1000), "kPa")
+        assert expected_pressure == converted_pressure
         assert relation == "kPa_to_Pa"
         assert observation.identity.total_pressure_Pa.value == expected_pressure
-        assert observation.value.point == Decimal(values["component_amount"])
+        assert observation.value.point == Decimal(point[f"{formula}_wt_pct"])
         assert not any(notice.kind.value == "source_value_outside_physical_range" for notice in observation.notices)
 
-        for key in ("temperature_K", "duration_min", "total_pressure_Pa", "flow_rate_cm3_min", "atmosphere", "pO2_Pa"):
+        for key in ("temperature_K", "duration_min", "total_pressure_Pa", "flow_rate_cm3_min"):
             assert key in conditions, (observation.observation_id, key)
             assert conditions[key].state.is_value, (observation.observation_id, key)
             assert conditions[key].locator is not None, (observation.observation_id, key)
         assert conditions["temperature_K"].state.value == Decimal("1873")
-        assert conditions["duration_min"].state.value == Decimal(values["point_conditions"]["duration_min"]["state"]["value"])
+        assert conditions["starting_composition"].state.is_value
+        assert conditions["starting_composition"].locator is not None
+        assert {
+            formula: Decimal(amount)
+            for formula, amount in conditions["starting_composition"].state.value.items()
+        } == {
+            formula: Decimal(amount)
+            for formula, amount in values["composition_wt_pct"].items()
+            if formula in TABLE1_COMPONENTS
+        }
+        assert conditions["duration_min"].state.value == Decimal(point["duration_min"])
         assert conditions["total_pressure_Pa"].state.value == expected_pressure
-        assert conditions["flow_rate_cm3_min"].state.value == Decimal(values["point_conditions"]["flow_rate_cm3_min"]["state"]["value"])
-        assert conditions["atmosphere"].state.value == "argon"
-        oxygen = conditions["pO2_Pa"].state.value
-        assert oxygen.kind is ValueKind.INTERVAL
-        assert oxygen.interval_low == Decimal("0.0101325")
-        assert oxygen.interval_high == Decimal("0.101325")
+        assert conditions["flow_rate_cm3_min"].state.value == Decimal(point["point_conditions"]["flow_rate_cm3_min"]["state"]["value"])
+        if conditions["flow_rate_cm3_min"].state.value == 0:
+            assert conditions["atmosphere"].state.value == "argon"
+            oxygen = conditions["pO2_Pa"].state.value
+            assert oxygen.kind is ValueKind.INTERVAL
+            assert oxygen.interval_low == Decimal("0.0101325")
+            assert oxygen.interval_high == Decimal("0.101325")
+        else:
+            assert "pO2_Pa" not in conditions
+            if "atmosphere" in conditions:
+                assert not conditions["atmosphere"].state.is_value
         assert "fO2_log" not in conditions
 
-        experiments_by_sample[values["sample_id"]].add(observation.experiment_id)
+        experiments_by_sample[point["sample_id"]].add(observation.experiment_id)
     assert len(experiments_by_sample) == 37
     assert all(len(ids) == 1 for ids in experiments_by_sample.values())
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
@@ -236,7 +270,7 @@ def test_neubert_full_tables_are_render_pinned_and_both_grid_mutations_fail() ->
         for item in changed_extract["species"]["CaO"]["observations"]
         if item["observation_id"] == "neubert_2025_table_3_run_01_cao_slag_composition"
     )
-    row["values"]["component_amount"] = "999"
+    row["values"]["points"][0]["CaO_wt_pct"] = "999"
     with pytest.raises(AssertionError):
         _assert_table3_grid(changed_extract, TABLE3_GRID)
 
