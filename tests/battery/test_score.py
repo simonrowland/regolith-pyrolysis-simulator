@@ -2513,6 +2513,93 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
         assert liquid["name"] == "liquid_janaf"
 
 
+_GAS_MAP_PARTIAL_PA = Decimal("1234.5")
+
+
+def test_condensed_partial_pressure_is_answered_from_the_gas_map(monkeypatch) -> None:
+    """A condensed P_PARTIAL identity currently reads gas_partial_pressures_Pa.
+
+    Captured from predict_with_engine with a fake equilibrate_cell. Gas and
+    an undeclared species phase take the same number from that map.
+    """
+
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.55")), ("Na2O", Decimal("0.45"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    base = F.activity_identity(
+        formula="Na2O",
+        component_basis="Na2O",
+        composition=composition,
+    )
+    calls = {"n": 0}
+
+    def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
+        calls["n"] += 1
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.VAPOROCK.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={"H2O": 1234.5},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
+    handle = EngineHandle(
+        name=Engine.VAPOROCK.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    def predict(species: Species):
+        identity = replace(base, quantity=Quantity.P_PARTIAL, species=species)
+        observation = F.observation(
+            f"partial-{species.formula}-{calls['n']}",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            source_id="partial-pin",
+        )
+        return predict_with_engine(
+            Engine.VAPOROCK,
+            observation,
+            handles={Engine.VAPOROCK.value: handle},
+            isolated=False,
+        )
+
+    crystal = predict(Species("H2O", Phase.CR, polymorph=State.of(Polymorph.CRYSTALLINE)))
+    assert crystal.refusal_reason is None
+    assert crystal.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 1
+    gas = predict(Species("H2O", Phase.G))
+    assert gas.refusal_reason is None
+    assert gas.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 2
+    unknown = predict(Species("H2O", State.unknown("phase not printed")))
+    assert unknown.refusal_reason is None
+    assert unknown.value == _GAS_MAP_PARTIAL_PA
+    assert calls["n"] == 3
+
+
 def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
