@@ -163,6 +163,46 @@ def test_sio_wall_sweep_pressure_request_pins_runner_mode_intent(
         requested_pO2
     )
 
+
+@pytest.mark.parametrize(
+    ("requested_pO2", "existing_o2", "expected_o2"),
+    [
+        (0.4, 0.8, 0.8),
+        (0.8, 0.8, 0.8),
+        (1.2, 0.8, 1.2),
+        (0.0, 0.8, 0.8),
+    ],
+)
+def test_sio_wall_sweep_pins_complete_gas_composition(
+    requested_pO2, existing_o2, expected_o2
+):
+    from simulator.state import Atmosphere
+
+    initial_composition = {"O2": existing_o2, "Ar": 0.7, "SiO": 0.2}
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(
+            temperature_C=1450.0,
+            pO2_mbar=0.0,
+            p_total_mbar=0.8,
+            atmosphere=Atmosphere.PN2_SWEEP,
+        ),
+        overhead=SimpleNamespace(composition=dict(initial_composition)),
+        _condensation_model=None,
+        _configure_overhead_headspace=lambda _campaign: None,
+        _current_melt_redox_fO2_log=lambda: -8.0,
+        _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
+    )
+
+    _apply_sio_wall_sweep_controls(sim, pO2_mbar=requested_pO2)
+
+    assert sim.melt.pO2_mbar == pytest.approx(requested_pO2)
+    assert sim.overhead.composition == {
+        "O2": expected_o2,
+        "Ar": 0.7,
+        "SiO": 0.2,
+    }
+
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
 # Was {lunar: 3.7303230676, mars: 3.82533227031} pre-refit.
