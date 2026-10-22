@@ -1658,10 +1658,15 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
         experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    # d-180 supplies numeric intrinsic fO2 for this open TMS row. It now
-    # reaches OpenIMCC, whose terminal refusal is its unsupported K2O output.
-    assert moved_prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert moved_prediction.refusal_detail["reason"] == "outside_supported_species"
+    # d-180 supplies numeric intrinsic fO2 for this open TMS row. It reaches
+    # OpenIMCC. The green pin and the venv pack both report single-cation
+    # KO0.5, so the closed-formula match refuses K2O instead of treating an
+    # engine-side species refusal as the terminal result.
+    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert moved_prediction.refusal_detail["reason"] == (
+        "species_unmatched_in_engine_output"
+    )
+    assert moved_prediction.refusal_detail["formula"] == "K2O"
     assert any(
         notice.reason.startswith("fo2_tier=4; route=intrinsic_melt_fO2")
         and notice.authority is not None
