@@ -163,7 +163,9 @@ def test_multiple_measured_oxygen_conditions_are_not_averaged(source_context, mo
         evidence=replace(original.evidence, class_=State.of(EvidenceClass.MEASURED_DIRECT)),
         identity=replace(original.identity, reaction=State.unknown("direct pressure")),
     )
-    other = replace(measured, observation_id="other-printed-oxygen", identity=replace(measured.identity, species=Species("O2", Phase.G)))
+    # Two measured atomic-O rows stay ambiguous. This copy used to be
+    # restamped to O2; that pair is now the co-measured condition below.
+    other = replace(measured, observation_id="other-printed-oxygen")
     rows = (row, measured, other)
     assert _resolve(source_context, row, rows).reason is FallbackReason.AMBIGUOUS
     notice = _fallback_notice(source_context, monkeypatch, row, rows)
@@ -201,16 +203,12 @@ def test_typed_source_inconsistency_prevents_conditioning(source_context, monkey
 
 
 def test_printed_command_is_preserved(source_context, monkeypatch):
-    from simulator.battery import score
-
+    # The selector now runs for a printed fO2 as well, so a condition input
+    # is refused either way (d-216 fix round 1). This SiO row is not an
+    # input, and the printed command is still what the engine receives.
     row = _row(source_context, "kems-053-stolyarova-1991")
     row = replace(row, identity=replace(row.identity, fO2_Pa=State.of(Decimal("1e-5"))))
     requests, handles = _capture_engine(monkeypatch, row)
-
-    def must_not_resolve(*args, **kwargs):
-        raise AssertionError("a printed oxygen command reached source-condition selection")
-
-    monkeypatch.setattr(score, "resolve_source_oxygen", must_not_resolve)
     compile_residual(
         row, Engine.OPENIMCC, context=source_context, handles=handles,
         point_observations=tuple(r for r in source_context.observations.values() if r.experiment_id == row.experiment_id),
@@ -307,6 +305,288 @@ def test_printed_point_oxygen_keeps_unmodelled_reactive_cell_notice(source_conte
     assert any(notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED for notice in prediction.notices)
 
 
+# Shornikov's printed pair at 1933 K: O = 2.65e-9 atm, O2 = 4.59e-11 atm.
+_ATM_PA = Decimal("101325")
+_SHORNIKOV_O_PA = Decimal("2.65e-9") * _ATM_PA
+_SHORNIKOV_O2_PA = Decimal("4.59e-11") * _ATM_PA
+
+
+def _melt_composition():
+    from simulator.battery.enums import AmountBasis
+    from simulator.battery.records import Composition
+
+    return State.of(Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.6")), ("SiO2", Decimal("0.4"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    ))
+
+
+def _partial_pressure(observation_id, formula, value_pa, *, evidence=EvidenceClass.MEASURED_DIRECT):
+    from simulator.battery.identity import Identity
+    from tests.battery.factories import observation
+
+    row = observation(
+        observation_id,
+        "exp-comeasured",
+        Identity(
+            quantity=Quantity.P_PARTIAL,
+            species=Species(formula, Phase.G),
+            temperature_K=State.of(Decimal("1933")),
+            composition=_melt_composition(),
+        ),
+        value_pa,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-comeasured",
+    )
+    if evidence is not EvidenceClass.MEASURED_DIRECT:
+        row = replace(row, evidence=replace(row.evidence, class_=State.of(evidence)))
+    return row
+
+
+def _pair_rows(o_uncertainty=None, o2_uncertainty=None):
+    sample = _partial_pressure("sample-sio", "SiO", Decimal("1"))
+    # O is measured_reduced with no derived_from: the factory would invent
+    # a parent, which fails measured eligibility.
+    atomic = _partial_pressure(
+        "printed-o", "O", _SHORNIKOV_O_PA, evidence=EvidenceClass.MEASURED_REDUCED,
+    )
+    molecular = _partial_pressure("printed-o2", "O2", _SHORNIKOV_O2_PA)
+    if o_uncertainty is not None:
+        atomic = replace(atomic, uncertainty=o_uncertainty)
+    if o2_uncertainty is not None:
+        molecular = replace(molecular, uncertainty=o2_uncertainty)
+    return sample, (sample, atomic, molecular)
+
+
+def _selected_pair(o_uncertainty=None, o2_uncertainty=None):
+    sample, rows = _pair_rows(o_uncertainty, o2_uncertainty)
+    return resolve_source_oxygen(sample, rows, None)
+
+
+def _printed_uncertainty(verbatim, value=None, basis=None):
+    from simulator.battery.enums import UncertaintyKind
+    from simulator.battery.records import Uncertainty
+
+    return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim, value=value, basis=basis)
+
+
+def _pressure_percent_verbatim(percent):
+    return _printed_uncertainty({
+        "kind": "printed",
+        "verbatim": (
+            "Table 1 pressures have an error no greater than "
+            f"{percent}%; no point-specific uncertainty is printed."
+        ),
+    })
+
+
+def _structured_percent(percent):
+    # The 2020 extract shape: the percent lives in the verbatim mapping,
+    # and the prose does not say "pressure".
+    return _printed_uncertainty({
+        "relative_error_percent": {
+            "bound_operator": "<",
+            "bound_value": Decimal(percent),
+            "units": "%",
+        },
+        "verbatim": f"error less than {percent}%",
+    })
+
+
+def _consistency_notice(selected):
+    return next(
+        (
+            notice for notice in selected.observation.notices
+            if notice.origin == "co-measured oxygen consistency"
+        ),
+        None,
+    )
+
+
+def _independent_shornikov_1933_dex():
+    """Shornikov's 1933 K pair from the JANAF table, not the production helper.
+
+    JANAF O-001 is 1/2 O2 = O, so pO/(1 bar) = K_O * sqrt(pO2/(1 bar)) and
+    K_O = exp(-ΔfG/(R T)) with ΔfG converted from kJ/mol to J/mol. Gibbs at
+    1933 K is the linear interpolation of the bracketing tabulated points.
+    """
+    import math
+
+    from simulator.physical_constants import GAS_CONSTANT
+    from simulator.reference_data.janaf import load_table_document
+
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/janaf/tables/O-001.yaml"
+    )
+    document = load_table_document(path)
+    points = []
+    for row in document["table"]["values"]:
+        temperature = row.get("temperature") if isinstance(row, dict) else None
+        gibbs = row.get("formation_gibbs_energy") if isinstance(row, dict) else None
+        t_value = temperature.get("value") if isinstance(temperature, dict) else None
+        g_value = gibbs.get("value") if isinstance(gibbs, dict) else None
+        if t_value is None or g_value is None:
+            continue
+        points.append((Decimal(str(t_value)), Decimal(str(g_value))))
+    points.sort()
+    temperature = Decimal("1933")
+    left, right = next(
+        (earlier, later)
+        for earlier, later in zip(points, points[1:])
+        if earlier[0] <= temperature <= later[0]
+    )
+    span = right[0] - left[0]
+    gibbs = left[1] + (right[1] - left[1]) * (temperature - left[0]) / span
+    constant = math.exp(-float(gibbs) * 1000.0 / (GAS_CONSTANT * float(temperature)))
+    # Decimal square, not the production float expression: q = (pO_bar / K_O)^2.
+    o_bar = _SHORNIKOV_O_PA / Decimal(100000)
+    implied_pa = (o_bar / Decimal(str(constant))) ** 2 * Decimal(100000)
+    dex = (_SHORNIKOV_O2_PA / implied_pa).ln() / Decimal(10).ln()
+    gap = abs(_SHORNIKOV_O2_PA / implied_pa - 1)
+    return dex, gap
+
+
+def test_comeasured_pair_selects_printed_o2():
+    selected = _selected_pair()
+    assert isinstance(selected, SourceOxygenCondition)
+    assert selected.observation.identity.species.formula == "O2"
+    assert selected.observation.value.point == _SHORNIKOV_O2_PA
+    relation = selected.observation.derivation.relation
+    assert "printed pO2 in Pa (recorded source-unit conversion)" in relation
+    assert "cell-metal activity" not in relation
+    assert "printed-o" in selected.observation.derivation.inputs
+    assert selected.observation.derivation.inputs == selected.observation.derived_from
+
+
+def test_comeasured_pair_records_o_input_and_independent_dex():
+    selected = _selected_pair()
+    assert isinstance(selected, SourceOxygenCondition)
+    derivation = selected.observation.derivation
+    assert "printed-o" in derivation.inputs
+    assert "printed-o2" in derivation.inputs
+    parameters = dict(derivation.parameters)
+    for name in ("pO2_from_O_Pa", "consistency_dex", "K_O", "JANAF_O_001_delta_fG_kJ_mol"):
+        assert parameters[name].locator.source_path.endswith("/O-001.yaml")
+        assert parameters[name].locator.record
+    dex = parameters["consistency_dex"].state.value
+    independent, gap = _independent_shornikov_1933_dex()
+    assert abs(dex - independent) < Decimal("1e-8")
+    assert independent < 0
+    assert abs(independent - Decimal("-0.0016")) < Decimal("0.0002")
+    assert Decimal("0.003") < gap < Decimal("0.004")
+
+
+@pytest.mark.parametrize(
+    ("o_uncertainty", "o2_uncertainty"),
+    (
+        (None, _pressure_percent_verbatim("0.0001")),
+        (None, _printed_uncertainty("stated relative pressure uncertainty", Decimal("1e-8"), "relative")),
+        (None, _structured_percent("0.0001")),
+    ),
+    ids=("verbatim-0.0001-percent", "relative-1e-8", "structured-0.0001-percent"),
+)
+def test_comeasured_consistency_notice_fires(o_uncertainty, o2_uncertainty):
+    from simulator.battery.enums import NoticeKind, UncertaintyKind
+    from simulator.battery.records import SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
+
+    selected = _selected_pair(o_uncertainty, o2_uncertainty)
+    assert isinstance(selected, SourceOxygenCondition)
+    notice = _consistency_notice(selected)
+    assert notice is not None
+    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+    assert notice.reason.startswith("co_measured_o_o2_consistency:")
+    assert not notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+    if o2_uncertainty is not None:
+        assert selected.observation.uncertainty == o2_uncertainty
+        assert selected.observation.uncertainty.kind is not UncertaintyKind.NONE
+
+
+@pytest.mark.parametrize(
+    ("o_uncertainty", "o2_uncertainty"),
+    (
+        (None, None),
+        (_pressure_percent_verbatim("8"), _pressure_percent_verbatim("8")),
+        (
+            None,
+            _printed_uncertainty(
+                "Table pressures have an error no greater than 0.0001%",
+                Decimal("0.5"),
+                "relative",
+            ),
+        ),
+        (_printed_uncertainty("stated relative pressure uncertainty", Decimal(1) - Decimal(10) ** Decimal("-0.001"), "relative"), None),
+        (None, _structured_percent("10")),
+    ),
+    ids=(
+        "none",
+        "verbatim-8-percent",
+        "relative-0.5-beats-tiny-verbatim",
+        "atomic-squared-envelope",
+        "structured-10-percent",
+    ),
+)
+def test_comeasured_consistency_notice_does_not_fire(o_uncertainty, o2_uncertainty):
+    selected = _selected_pair(o_uncertainty, o2_uncertainty)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert _consistency_notice(selected) is None
+    names = [name for name, _located in selected.observation.derivation.parameters]
+    assert "consistency_dex" in names
+    assert "pO2_from_O_Pa" in names
+
+
+@pytest.mark.parametrize(
+    "formulas",
+    (("O", "O"), ("O2", "O2"), ("O", "O2", "O2")),
+    ids=("two-o", "two-o2", "three"),
+)
+def test_other_oxygen_multiplicities_stay_ambiguous(formulas):
+    sample = _partial_pressure("sample-sio", "SiO", Decimal("1"))
+    rows = [sample]
+    for index, formula in enumerate(formulas):
+        rows.append(_partial_pressure(f"oxygen-{index}", formula, Decimal("1e-6") * (index + 1)))
+    selected = resolve_source_oxygen(sample, rows, None)
+    assert isinstance(selected, SourceOxygenFallback)
+    assert selected.reason is FallbackReason.AMBIGUOUS
+
+
+@pytest.mark.parametrize(
+    "case",
+    ("rejected-o", "rejected-o2", "tabulated-o", "derived-o2", "unlocated-o"),
+)
+def test_ineligible_oxygen_partner_is_not_the_co_measured_condition(monkeypatch, case):
+    from simulator.battery.enums import AdmissionStatus
+
+    sample = _partial_pressure("sample-sio", "SiO", Decimal("1"))
+    atomic = _partial_pressure("printed-o", "O", _SHORNIKOV_O_PA)
+    molecular = _partial_pressure("printed-o2", "O2", _SHORNIKOV_O2_PA)
+    if case == "rejected-o":
+        atomic = replace(atomic, admission=replace(atomic.admission, status=AdmissionStatus.REJECTED))
+    elif case == "rejected-o2":
+        molecular = replace(molecular, admission=replace(molecular.admission, status=AdmissionStatus.REJECTED))
+    elif case == "tabulated-o":
+        atomic = replace(
+            atomic,
+            evidence=replace(atomic.evidence, class_=State.of(EvidenceClass.MEASURED_TABULATED)),
+        )
+    elif case == "derived-o2":
+        molecular = replace(molecular, derived_from=("printed-o",))
+    elif case == "unlocated-o":
+        atomic = replace(atomic, locator=None)
+    else:
+        raise AssertionError(case)
+
+    def fail_janaf(*_args, **_kwargs):
+        raise AssertionError("an ineligible partner must not evaluate JANAF K_O")
+
+    monkeypatch.setattr("simulator.battery.generators.janaf._fusion_table_points", fail_janaf)
+    selected = resolve_source_oxygen(sample, (sample, atomic, molecular), None)
+    assert isinstance(selected, SourceOxygenFallback)
+    assert selected.reason is FallbackReason.AMBIGUOUS
+
+
 @pytest.mark.parametrize(
     ("pressure_atm", "expected_pa"),
     (
@@ -358,3 +638,105 @@ def test_atomic_oxygen_conversion_is_bit_identical(pressure_atm, expected_pa):
     assert selected.observation.value.point == Decimal(expected_pa)
     assert selected.observation.identity.species.formula == "O2"
     assert "pO2_Pa=100000*(pO_Pa/100000/K_O)^2" in selected.observation.derivation.relation
+
+
+def test_printed_fo2_condition_input_is_not_scored(source_context):
+    row = _row(source_context, "shornikov-1994-mullite-kems", "MoO2")
+    stamped = replace(row, identity=replace(row.identity, fO2_Pa=State.of(Decimal("1e-5"))))
+    residual, candidate = compile_residual(
+        stamped, Engine.OPENIMCC, context=source_context,
+        point_observations=tuple(
+            r for r in source_context.observations.values()
+            if r.experiment_id == row.experiment_id
+        ),
+    )
+    assert residual.numeric is None and candidate is None
+    assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
+    assert residual.refusal.detail["derivation"]["inputs"]
+
+
+def test_own_printed_oxygen_value_is_not_scored_against_itself(source_context):
+    """Tabulated O2 whose own pressure is the printed fO2, float residue included.
+
+    measured_tabulated is not a selector candidate, so this is not the
+    used-set path. A sample gas carrying the same stamp is still scored;
+    test_printed_command_is_preserved is that row.
+    """
+    from simulator.battery.records import Located, Value
+    from simulator.battery.score import _has_printed_fo2
+
+    sio = _row(source_context, "kems-053-stolyarova-1991")
+    exact = Decimal("0.00125643")
+    widened = exact + Decimal("1E-19")
+    own = replace(
+        sio,
+        observation_id="tabulated-o2-own-value",
+        identity=replace(
+            sio.identity,
+            species=Species("O2", Phase.G),
+            fO2_Pa=State.of(widened),
+        ),
+        value=Value.point_of(exact),
+        evidence=replace(sio.evidence, class_=State.of(EvidenceClass.MEASURED_TABULATED)),
+        point_conditions={
+            **(sio.point_conditions or {}),
+            "fO2_Pa": Located(State.of(Value.point_of(widened)), locator=sio.locator),
+        },
+        notices=(),
+        derived_from=None,
+    )
+    assert _has_printed_fo2(own, own.identity)
+    point_rows = tuple(
+        r for r in source_context.observations.values()
+        if r.experiment_id == sio.experiment_id
+    )
+    residual, candidate = compile_residual(
+        own, Engine.OPENIMCC, context=source_context, point_observations=point_rows,
+    )
+    assert residual.numeric is None and candidate is None
+    assert residual.refusal.detail["reason"] == "used_as_scoring_condition"
+    assert residual.refusal.detail["match"] == "own_value_is_condition"
+    assert own.observation_id not in set(residual.refusal.detail.get("derived_from") or ())
+
+
+def test_comeasured_consistency_notice_reaches_scored_residual(source_context, monkeypatch):
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.records import Notice
+
+    row = _row(source_context, "kems-053-stolyarova-1991")
+    _sample, pair = _pair_rows(o2_uncertainty=_pressure_percent_verbatim("0.0001"))
+    unrelated = Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="not the consistency check",
+        origin="unrelated-o2-source-notice",
+    )
+    oxygen = []
+    for item in pair:
+        if item.identity.species.formula not in {"O", "O2"}:
+            continue
+        item = replace(
+            item,
+            experiment_id=row.experiment_id,
+            source_id=row.source_id,
+            identity=replace(
+                row.identity,
+                species=Species(item.identity.species.formula, Phase.G),
+                reaction=State.unknown("printed pressure"),
+            ),
+        )
+        if item.identity.species.formula == "O2":
+            item = replace(item, notices=(unrelated,))
+        oxygen.append(item)
+    requests, handles = _capture_engine(monkeypatch, row)
+    residual, _candidate = compile_residual(
+        row, Engine.OPENIMCC, context=source_context, handles=handles,
+        point_observations=(row, *oxygen),
+    )
+    assert len(requests) == 1
+    assert requests[0].mode == battery.PO2_COMMANDED
+    assert any(notice.origin == "co-measured oxygen consistency" for notice in residual.notices)
+    assert not any(notice.origin == "unrelated-o2-source-notice" for notice in residual.notices)
+    assert any(
+        notice.reason.startswith("co_measured_o_o2_consistency:") for notice in residual.notices
+    )

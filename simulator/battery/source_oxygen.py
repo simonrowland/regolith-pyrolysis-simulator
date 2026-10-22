@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import math
+import re
 from dataclasses import dataclass, replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Iterable, Mapping
 
@@ -15,6 +17,7 @@ from simulator.battery.waypoints import identity_composition_waypoint
 from simulator.physical_constants import GAS_CONSTANT
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
+CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
 
 
 def oxygen_pressure_point(row: Observation) -> Located | None:
@@ -147,6 +150,71 @@ def _lineage(row: Observation, rows: Mapping[str, Observation], seen: frozenset[
     return species - {"O", "O2"}, used
 
 
+def _comeasured_oxygen_pair(
+    measured: list[tuple[Observation, set[str]]],
+) -> tuple[Observation, set[str], Observation, set[str]] | None:
+    """One admitted measured O and one admitted measured O2, or nothing.
+
+    ``measured`` is already the eligible measured_direct / measured_reduced
+    set. Any other count or formula mix is not this condition.
+    """
+    if len(measured) != 2:
+        return None
+    by_formula: dict[str, tuple[Observation, set[str]]] = {}
+    for row, used in measured:
+        formula = row.identity.species.formula
+        if formula in by_formula:
+            return None
+        by_formula[formula] = (row, used)
+    if set(by_formula) != {"O", "O2"}:
+        return None
+    o_row, o_used = by_formula["O"]
+    o2_row, o2_used = by_formula["O2"]
+    return o_row, o_used, o2_row, o2_used
+
+
+def _positive_oxygen_pressure(row: Observation) -> bool:
+    """A printed O or O2 pressure. Locator and evidence are eligibility, not this."""
+    return (
+        row.identity.species.formula in {"O", "O2"}
+        and row.value.kind is ValueKind.POINT
+        and row.value.point is not None
+        and row.value.point.is_finite()
+        and row.value.point > 0
+    )
+
+
+def _printed_partner_is_ineligible(
+    point: Mapping[str, Observation],
+    measured: list[tuple[Observation, set[str]]],
+    cell_oxygen: list[tuple[Observation, set[str]]],
+) -> bool:
+    """Both formulas are printed and exactly one side is measured-eligible.
+
+    Counted before the eligibility filter. Dropping a rejected or untyped
+    partner and keeping the survivor is the ambiguity this condition forbids.
+    A measured O2 still precedes a cell-route O, as at base: every printed O
+    in that case is the cell row. Downstream O2 is not this case either,
+    because neither side is measured-eligible and the cell branch still runs.
+    """
+    printed: dict[str, list[Observation]] = {"O": [], "O2": []}
+    for row in point.values():
+        if _positive_oxygen_pressure(row):
+            printed[row.identity.species.formula].append(row)
+    if not printed["O"] or not printed["O2"]:
+        return False
+    eligible: dict[str, set[str]] = {"O": set(), "O2": set()}
+    for row, _used in measured:
+        eligible[row.identity.species.formula].add(row.observation_id)
+    if bool(eligible["O"]) == bool(eligible["O2"]):
+        return False
+    if eligible["O2"] and not eligible["O"]:
+        cell_ids = {row.observation_id for row, _used in cell_oxygen}
+        if cell_ids and all(row.observation_id in cell_ids for row in printed["O"]):
+            return False
+    return True
+
+
 def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locator]:
     from simulator.battery.generators.janaf import (
         _fusion_table_points,
@@ -187,6 +255,218 @@ def _atomic_oxygen_equilibrium_parameters(
         ("K_O", Located(State.of(Decimal(str(constant))), locator=janaf)),
     )
 
+
+_RELATIVE_BASES = {"relative", "fraction"}
+_PERCENT_BASES = {"percent", "%", "percentage"}
+_DEX_BASES = {"dex"}
+_PERCENT_UNIT_NAMES = {"%", "percent", "percentage"}
+_PERCENT_IN_PROSE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:%|percent)", re.IGNORECASE)
+# Plural: Shornikov 2018 states "Table 1 pressures have an error no greater than 8%".
+_PRESSURE_WORD = re.compile(r"\b(?:k\s+)?pressures?\b|\bp[_\s]?k\b", re.IGNORECASE)
+
+
+def _finite_decimal(raw: object) -> Decimal | None:
+    if isinstance(raw, bool) or isinstance(raw, (Mapping, list, tuple)):
+        return None
+    try:
+        value = raw if isinstance(raw, Decimal) else Decimal(str(raw))
+    except (InvalidOperation, ValueError, TypeError):
+        return None
+    return value if value.is_finite() else None
+
+
+def _relative_dex(epsilon: Decimal) -> Decimal | None:
+    """Dex half-envelope of a relative pressure width ε = δp/p.
+
+    The downward side is wider, so the bound is -log10(1-ε) for
+    0 <= ε < 1. ε = 0 is a stated exact value. ε >= 1 reaches a
+    non-positive pressure and is not a finite dex bound.
+    """
+    if not epsilon.is_finite() or epsilon < 0:
+        return None
+    if epsilon == 0:
+        return Decimal(0)
+    if epsilon >= 1:
+        return None
+    return -((Decimal(1) - epsilon).ln() / Decimal(10).ln())
+
+
+def _width_magnitude(value: Decimal | tuple[Decimal, Decimal]) -> Decimal:
+    if isinstance(value, tuple):
+        return max(abs(value[0]), abs(value[1]))
+    return abs(value)
+
+
+def _pressure_range_dex(
+    pressure_pa: Decimal,
+    bounds: tuple[Decimal, Decimal],
+    basis: str,
+) -> Decimal | None:
+    from simulator.battery.migrate import convert_pressure_to_pa
+
+    low, _low_why = convert_pressure_to_pa(bounds[0], basis)
+    high, _high_why = convert_pressure_to_pa(bounds[1], basis)
+    if low is None or high is None or pressure_pa <= 0 or low <= 0 or high <= 0:
+        return None
+    low_dex = abs((pressure_pa / low).ln() / Decimal(10).ln())
+    high_dex = abs((high / pressure_pa).ln() / Decimal(10).ln())
+    return max(low_dex, high_dex)
+
+
+def _dex_from_stated_value(
+    value: Decimal | tuple[Decimal, Decimal],
+    basis: str,
+    pressure_pa: Decimal,
+) -> Decimal | None:
+    key = basis.strip().casefold()
+    if key in _DEX_BASES:
+        width = _width_magnitude(value)
+        return width if width.is_finite() and width >= 0 else None
+    if key in _RELATIVE_BASES:
+        return _relative_dex(_width_magnitude(value))
+    if key in _PERCENT_BASES:
+        return _relative_dex(_width_magnitude(value) / Decimal(100))
+    if isinstance(value, tuple):
+        return _pressure_range_dex(pressure_pa, value, basis)
+    from simulator.battery.migrate import convert_pressure_to_pa
+
+    converted, _why = convert_pressure_to_pa(value, basis)
+    if converted is None or pressure_pa <= 0:
+        return None
+    return _relative_dex(abs(converted) / pressure_pa)
+
+
+def _percent_magnitudes(node: object, found: list[Decimal]) -> None:
+    """Collect one magnitude per mapping that itself carries units=% and a number."""
+    if isinstance(node, Mapping):
+        units = None
+        number = None
+        for key, raw in node.items():
+            name = str(key).casefold()
+            if name in {"unit", "units", "basis_unit"} and isinstance(raw, str):
+                if raw.strip().casefold() in _PERCENT_UNIT_NAMES:
+                    units = raw
+            if name in {"bound_value", "value"}:
+                parsed = _finite_decimal(raw)
+                if parsed is not None:
+                    number = abs(parsed)
+        if units is not None and number is not None:
+            found.append(number)
+        for raw in node.values():
+            if isinstance(raw, (Mapping, list, tuple)):
+                _percent_magnitudes(raw, found)
+    elif isinstance(node, (list, tuple)):
+        for raw in node:
+            _percent_magnitudes(raw, found)
+
+
+def _verbatim_text(verbatim: object) -> str | None:
+    if verbatim is None:
+        return None
+    if isinstance(verbatim, str):
+        return verbatim
+    try:
+        return json.dumps(verbatim, sort_keys=True, default=str)
+    except (TypeError, ValueError):
+        return str(verbatim)
+
+
+def _dex_from_verbatim(verbatim: object) -> Decimal | None:
+    found: list[Decimal] = []
+    _percent_magnitudes(verbatim, found)
+    if len(found) == 1:
+        return _relative_dex(found[0] / Decimal(100))
+    text = _verbatim_text(verbatim)
+    if not text:
+        return None
+    for match in _PERCENT_IN_PROSE.finditer(text):
+        start = max(0, match.start() - 80)
+        window = text[start : min(len(text), match.end() + 80)]
+        if _PRESSURE_WORD.search(window) is None:
+            continue
+        return _relative_dex(Decimal(match.group(1)) / Decimal(100))
+    return None
+
+
+def _stated_pressure_dex(uncertainty: Uncertainty, pressure_pa: Decimal) -> Decimal | None:
+    """Usable stated dex envelope, or None when the source stated nothing usable.
+
+    A typed value and basis win over verbatim. ``uncertainty_for`` often
+    stores the extract mapping as PRINTED verbatim with value left empty;
+    that payload is still the typed verbatim field.
+    """
+    if uncertainty.kind is UncertaintyKind.NONE:
+        return None
+    if uncertainty.kind not in {UncertaintyKind.PRINTED, UncertaintyKind.DERIVED}:
+        return None
+    if uncertainty.value is not None:
+        if not uncertainty.basis:
+            return None
+        return _dex_from_stated_value(uncertainty.value, uncertainty.basis, pressure_pa)
+    return _dex_from_verbatim(uncertainty.verbatim)
+
+
+def _combined_stated_consistency_dex(
+    atomic: Observation, molecular: Observation
+) -> Decimal | None:
+    """Combined stated uncertainty of log10(pO2_printed / pO2_from_O), in dex.
+
+    Premise. JANAF O-001 is 1/2 O2 = O, so at fixed T the K_O-implied
+    pO2 is proportional to pO squared. K_O is the compilation constant,
+    not a stated source uncertainty, and is left out of the envelope.
+    The two printed pressures are independent readings, so their
+    envelopes can line up: the combined bound is the sum, not the
+    root-sum-square.
+
+    Algebra. consistency_dex = log10(pO2) - 2 log10(pO) - constant(T).
+    A relative width ε moves log10(p) by at most -log10(1-ε) when
+    0 < ε < 1. The atomic pressure is squared, so its dex envelope is
+    doubled. Combined dex = u(pO2) + 2 u(pO). A side with no usable
+    stated width contributes nothing. It is not treated as zero, and
+    it does not invent a threshold. If neither side yields a finite
+    envelope, there is no combined bound.
+
+    Unit check. ε = δp/p is dimensionless. -log10(1-ε) is dex. The
+    factor 2 is dex because log10(p^2) = 2 log10(p). The sum is dex.
+    consistency_dex is log10(Pa/Pa) = dex.
+
+    Sanity. Shornikov at 1933 K, O = 2.65e-9 atm and O2 = 4.59e-11 atm,
+    gives |consistency_dex| about 0.0016. A stated ±8% on both sides is
+    u = -log10(0.92) ≈ 0.03621 dex, combined ≈ 0.1086 dex, and the
+    0.0016 dex gap does not exceed it. A stated relative width of 1e-8
+    on either side is about 4e-9 dex, and the same gap does exceed it.
+    """
+    atomic_dex = _stated_pressure_dex(atomic.uncertainty, atomic.value.point)
+    molecular_dex = _stated_pressure_dex(molecular.uncertainty, molecular.value.point)
+    if atomic_dex is None and molecular_dex is None:
+        return None
+    combined = Decimal(0)
+    if molecular_dex is not None:
+        combined += molecular_dex
+    if atomic_dex is not None:
+        combined += Decimal(2) * atomic_dex
+    return combined
+
+
+def _co_measured_consistency_notice(
+    atomic: Observation, molecular: Observation, consistency_dex: Decimal
+) -> Notice | None:
+    combined = _combined_stated_consistency_dex(atomic, molecular)
+    if combined is None or abs(consistency_dex) <= combined:
+        return None
+    # SOURCE_DISAGREEMENT without the source_internally_inconsistent
+    # prefix: the pair is still one condition. The prefix would block
+    # selection and open a flagged stratum. No other NoticeKind is a
+    # stated-width disagreement between two printed pressures.
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            "co_measured_o_o2_consistency: "
+            f"|consistency_dex|={abs(consistency_dex)} exceeds combined stated uncertainty {combined} dex"
+        ),
+        origin=CO_MEASURED_CONSISTENCY_ORIGIN,
+    )
 
 
 def resolve_source_oxygen(
@@ -263,7 +543,13 @@ def resolve_source_oxygen(
         ):
             measured.append((row, used))
     candidates = measured or cell_oxygen
-    if len(candidates) != 1:
+    comeasured = _comeasured_oxygen_pair(measured)
+    if comeasured is not None:
+        o_row, o_used, o2_row, o2_used = comeasured
+        source, used = o2_row, o_used | o2_used
+    elif _printed_partner_is_ineligible(point, measured, cell_oxygen):
+        return SourceOxygenFallback(SourceOxygenFallbackReason.AMBIGUOUS)
+    elif len(candidates) != 1:
         # Report the gate that prevented selection. Mixed untyped/sample
         # failures are untyped, not "all sample-derived"; ambiguity means
         # multiple independently eligible candidates, not raw column count.
@@ -276,7 +562,8 @@ def resolve_source_oxygen(
         else:
             reason = SourceOxygenFallbackReason.NO_PRINTED_CONDITION
         return SourceOxygenFallback(reason)
-    source, used = candidates[0]
+    else:
+        source, used = candidates[0]
     assumption = "" if measured else "; cell-metal activity as assumed by the source"
     # A printed O2 reduction downstream of the selected atomic-O observation
     # is the same condition, not a second independent oxygen estimate.
@@ -297,8 +584,28 @@ def resolve_source_oxygen(
         if molecular:
             used = used | {molecular[0].observation_id}
             source = molecular[0]
-    params = [("source_pressure_Pa", Located(State.of(source.value.point), locator=source.locator))]
-    if source.identity.species.formula == "O":
+    params: list[tuple[str, Located]] = [
+        ("source_pressure_Pa", Located(State.of(source.value.point), locator=source.locator))
+    ]
+    consistency = None
+    if comeasured is not None:
+        pressure = source.value.point
+        arithmetic = "printed pO2 in Pa (recorded source-unit conversion)"
+        temperature = reference.identity.temperature_K.value
+        gibbs, constant, janaf = _janaf_atomic_oxygen(temperature)
+        from_o = _po2_pa_from_atomic_oxygen(o_row.value.point, constant)
+        consistency_dex = (pressure / from_o).ln() / Decimal(10).ln()
+        params.extend(
+            _atomic_oxygen_equilibrium_parameters(
+                temperature, o_row.locator, gibbs, constant, janaf
+            )
+        )
+        params.extend((
+            ("pO2_from_O_Pa", Located(State.of(from_o), locator=janaf)),
+            ("consistency_dex", Located(State.of(consistency_dex), locator=janaf)),
+        ))
+        consistency = _co_measured_consistency_notice(o_row, source, consistency_dex)
+    elif source.identity.species.formula == "O":
         temperature = reference.identity.temperature_K.value
         gibbs, constant, janaf = _janaf_atomic_oxygen(temperature)
         pressure = _po2_pa_from_atomic_oxygen(source.value.point, constant)
@@ -330,6 +637,7 @@ def resolve_source_oxygen(
             source.evidence, class_=State.of(EvidenceClass.MODEL_DERIVED),
             model="source oxygen conditioning reduction (d-216)",
         ),
+        notices=(*source.notices, consistency) if consistency is not None else source.notices,
         derived_from=tuple(sorted(used)), derivation=derivation,
     )
     return SourceOxygenCondition(condition, frozenset(used))

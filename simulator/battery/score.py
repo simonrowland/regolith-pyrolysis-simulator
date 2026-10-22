@@ -76,6 +76,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.source_oxygen import (
+    CO_MEASURED_CONSISTENCY_ORIGIN,
     SourceOxygenCondition,
     linked_source_pressure,
     oxygen_pressure_point,
@@ -6580,6 +6581,55 @@ def _none_uncertainty() -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.NONE)
 
 
+def _same_printed_pressure(left: Decimal, right: Decimal) -> bool:
+    """One printed number stored twice, not a physical agreement band.
+
+    Shornikov 2020 Table 3 writes the O2 pressure on the row and again as
+    oxygen_partial_pressure. Binary float residue is about 1e-16 relative.
+    1e-12 separates that residue from a different gas at the same point
+    (atomic O is about 37 times the O2 stamp).
+    """
+    if (
+        not left.is_finite() or not right.is_finite()
+        or left <= 0 or right <= 0
+    ):
+        return False
+    return abs(left - right) / max(abs(left), abs(right)) <= Decimal("1e-12")
+
+
+def _scoring_condition_pressure_pa(
+    reference: Observation, oxygen: SourceOxygenCondition | object
+) -> Decimal | None:
+    """pO2 this row would be scored at. Printed fO2 wins over the selector."""
+    if _has_printed_fo2(reference, reference.identity):
+        fo2 = reference.identity.fO2_Pa
+        if (
+            fo2 is not None and fo2.is_value
+            and isinstance(fo2.value, Decimal) and fo2.value > 0
+        ):
+            return fo2.value
+        return printed_source_pressure(reference)
+    if isinstance(oxygen, SourceOxygenCondition):
+        value = oxygen.observation.value
+        point = value.point if value.kind is ValueKind.POINT else None
+        if isinstance(point, Decimal) and point.is_finite() and point > 0:
+            return point
+    return None
+
+
+def _own_value_is_scoring_condition(
+    reference: Observation, oxygen: SourceOxygenCondition | object
+) -> bool:
+    """The row's own partial pressure is the oxygen condition, float residue included."""
+    value = reference.value
+    if value.kind is not ValueKind.POINT or not isinstance(value.point, Decimal):
+        return False
+    condition = _scoring_condition_pressure_pa(reference, oxygen)
+    if condition is None:
+        return False
+    return _same_printed_pressure(value.point, condition)
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -6870,41 +6920,67 @@ def compile_residual(
         if (
             predictor is predict_with_engine
             and _knudsen_vapour_equilibrium(quantity, experiment)
-            and not _has_printed_fo2(reference, reference.identity)
         ):
+            # The used-set check applies whether fO2 is printed on the
+            # identity or supplied by the selector. A printed command is
+            # not overwritten; it still cannot score one of its own inputs,
+            # or the row whose value is that command.
             recorded = _bench_for_score(experiment, context.benches)
             oxygen = resolve_source_oxygen(
                 reference,
                 point_observations if point_observations is not None else context.observations.values(),
                 recorded,
             )
-            if isinstance(oxygen, SourceOxygenCondition):
-                if reference.observation_id in oxygen.used_observations:
-                    return _refused(
-                        RefusalReason.UNSUPPORTED,
-                        {
-                            "reason": "used_as_scoring_condition",
-                            "derivation": to_plain(oxygen.observation.derivation),
-                            "derived_from": list(oxygen.observation.derived_from or ()),
-                        },
-                        execution=Execution(state=ExecutionState.NOT_PROBED),
-                    )
-                reference = replace(
-                    reference,
-                    point_conditions={
-                        **(reference.point_conditions or {}),
-                        "fO2_Pa": Located(
-                            State.of(oxygen.observation.value),
-                            locator=oxygen.observation.locator,
-                            inference=oxygen.observation.derivation,
-                        ),
+            printed_fo2 = _has_printed_fo2(reference, reference.identity)
+            if (
+                isinstance(oxygen, SourceOxygenCondition)
+                and reference.observation_id in oxygen.used_observations
+            ):
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    {
+                        "reason": "used_as_scoring_condition",
+                        "derivation": to_plain(oxygen.observation.derivation),
+                        "derived_from": list(oxygen.observation.derived_from or ()),
                     },
-                    provenance={
-                        **(reference.provenance or {}),
-                        "source_oxygen_condition": to_plain(oxygen.observation),
-                    },
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
                 )
-            else:
+            if _own_value_is_scoring_condition(reference, oxygen):
+                detail: dict[str, object] = {
+                    "reason": "used_as_scoring_condition",
+                    "match": "own_value_is_condition",
+                }
+                if isinstance(oxygen, SourceOxygenCondition):
+                    detail["derivation"] = to_plain(oxygen.observation.derivation)
+                    detail["derived_from"] = list(oxygen.observation.derived_from or ())
+                return _refused(
+                    RefusalReason.UNSUPPORTED,
+                    detail,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                )
+            if isinstance(oxygen, SourceOxygenCondition):
+                if not printed_fo2:
+                    consistency = tuple(
+                        notice for notice in oxygen.observation.notices
+                        if notice.origin == CO_MEASURED_CONSISTENCY_ORIGIN
+                    )
+                    notices = union_notices(notices, consistency)
+                    reference = replace(
+                        reference,
+                        point_conditions={
+                            **(reference.point_conditions or {}),
+                            "fO2_Pa": Located(
+                                State.of(oxygen.observation.value),
+                                locator=oxygen.observation.locator,
+                                inference=oxygen.observation.derivation,
+                            ),
+                        },
+                        provenance={
+                            **(reference.provenance or {}),
+                            "source_oxygen_condition": to_plain(oxygen.observation),
+                        },
+                    )
+            elif not printed_fo2:
                 reference = replace(
                     reference,
                     provenance={
