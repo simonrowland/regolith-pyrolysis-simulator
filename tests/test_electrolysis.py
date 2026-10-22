@@ -13,7 +13,9 @@ from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     ElectrolysisModel,
     MRECurrentPartitionRefusal,
+    MREElectrolysisInvalidInput,
     MREElectrolysisRefusal,
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     mre_selectivity_weight,
@@ -105,7 +107,12 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
 
 
 @pytest.mark.parametrize(
-    "refusal_reason", [MRE_RAW_MARGIN_REFUSAL, "invalid_electrolysis_control"]
+    "refusal_reason",
+    [
+        MRE_RAW_MARGIN_REFUSAL,
+        "invalid_electrolysis_control",
+        MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
+    ],
 )
 def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
     monkeypatch: pytest.MonkeyPatch,
@@ -321,6 +328,21 @@ def test_step_hour_zero_current_and_voltage_remain_idle():
     assert zero_i["energy_kWh"] == 0.0
     assert zero_v["oxides_reduced_kg"] == {}
     assert zero_v["energy_kWh"] == 0.0
+
+
+def test_step_hour_refuses_nonfinite_faraday_extent():
+    with pytest.raises(MREElectrolysisInvalidInput) as refusal:
+        _legacy_model().step_hour(
+            MeltState(composition_kg={"FeO": 1.0}),
+            voltage_V=5.0,
+            current_A=1e308,
+            T_C=1600.0,
+        )
+
+    assert isinstance(refusal.value, MREElectrolysisRefusal)
+    assert isinstance(refusal.value, ValueError)
+    assert refusal.value.reason == MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL
+    assert "current_A" in refusal.value.diagnostic["invalid_controls"]
 
 
 @pytest.mark.parametrize(
