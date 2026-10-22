@@ -16,7 +16,10 @@ from simulator.chemistry.kernel.capabilities import (
 )
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.environment import (
+    ideal_gas_partial_pressures_bar,
+    overhead_gas_temperature_K,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -80,12 +83,9 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
         control_audit = diagnostic_control_audit(request, include_fO2=False)
         controls = unpack_controls(request)
         volume_m3 = max(0.0, float(controls.get("headspace_volume_m3") or 0.0))
-        temperature_K = max(
-            0.0,
-            float(
-                controls.get("headspace_temperature_K")
-                or request.temperature_C + CELSIUS_TO_KELVIN_OFFSET
-            ),
+        temperature_K = overhead_gas_temperature_K(
+            controls.get("headspace_temperature_K"),
+            request.temperature_C,
         )
         holdup_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
@@ -142,16 +142,9 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
         volume_m3: float,
         temperature_K: float,
     ) -> dict[str, float]:
-        if volume_m3 <= 0.0 or temperature_K <= 0.0:
-            return {}
-        from simulator.state import GAS_CONSTANT
-
-        scale = GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
-        return {
-            str(species): max(0.0, float(mol)) * scale
-            for species, mol in dict(holdup_mol or {}).items()
-            if max(0.0, float(mol)) > 0.0
-        }
+        return ideal_gas_partial_pressures_bar(
+            holdup_mol, volume_m3, temperature_K
+        )
 
     @classmethod
     def oxide_activities_from_controls(
