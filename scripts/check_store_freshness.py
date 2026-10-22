@@ -75,6 +75,7 @@ CODE_INPUTS = (
 #     changes, and does not import binary_pot_battery.py. A full regen at the line's merge with green
 #     2e651d553 (11711159b, studio-2) was a fixed point: no store file changed.
 #     This acknowledges STORE outputs only; the scoring moves (d-242) are
+#     covered by the commits' tests.
 #   f53dcec23, 826f5848e, bff436549, 25796706a, 8adec237c, 9196346ee: the
 #     VapoRock gas-basis line (d-236). They change the VapoRock gas-thermo
 #     predictor in compilation_tier.py, which answers at score time, and add
@@ -85,6 +86,7 @@ CODE_INPUTS = (
 #     functions. A full regen at the line's merge with green 2c7bcb1cc
 #     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
 #     acknowledges STORE outputs only; the predictor's value moves (d-236) are
+#     covered by the commits' tests.
 #   e7dfdd4fe, 8a53c7629, fa97603c0, 085e5cbae, ff8650f45, b99e4c167, 2ad98d246,
 #     42d10d20d, d5aaf3e40, 081f50759, 4b5ec3f56: the Markova Knudsen residue line
 #     (t-1418, d-241) and its below-threshold omission provenance (t-1439). They
