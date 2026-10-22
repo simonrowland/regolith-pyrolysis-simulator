@@ -1054,6 +1054,106 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     return numeric
 
 
+def _omission_proof(record: object) -> tuple[float, float] | None:
+    """Return threshold and computed pressure when the record is a real proof."""
+
+    if not isinstance(record, Mapping):
+        return None
+    try:
+        threshold_pa = float(record.get("reporting_threshold_Pa"))
+        computed_pa = float(record.get("computed_pressure_Pa"))
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(threshold_pa)
+        or not math.isfinite(computed_pa)
+        or computed_pa < 0.0
+        or computed_pa > threshold_pa
+    ):
+        return None
+    return threshold_pa, computed_pa
+
+
+def _translate_recorded_pressure_omissions(
+    pressures: dict[str, float],
+    response: object,
+    required: set[str],
+    notices: list[Any],
+    records_out: dict[str, dict[str, Any]],
+    noticed: set[str],
+) -> None:
+    """Turn only provider-recorded below-threshold omissions into zero pressure.
+
+    Any other absent key stays absent, so the caller still refuses it as missing.
+    """
+
+    diagnostic = getattr(response, "diagnostics", None)
+    if not isinstance(diagnostic, Mapping):
+        return
+    vapor = diagnostic.get("vapor_pressure_diagnostic")
+    if not isinstance(vapor, Mapping):
+        return
+    omissions = vapor.get("below_reporting_threshold_omissions")
+    if not isinstance(omissions, Mapping) or not omissions:
+        return
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _gas_formula_for_oxygen_balance,
+    )
+
+    for key, record in omissions.items():
+        proof = _omission_proof(record)
+        if proof is None or not isinstance(record, Mapping):
+            continue
+        if str(record.get("species")) != str(key):
+            continue
+        try:
+            formula = _gas_formula_for_oxygen_balance(key)
+        except _OxygenBalanceRefusal:
+            continue
+        if formula not in required or formula in pressures:
+            continue
+        threshold_pa, computed_pa = proof
+        pressures[formula] = 0.0
+        records_out[formula] = {
+            "species": str(key),
+            "reporting_threshold_Pa": threshold_pa,
+            "computed_pressure_Pa": computed_pa,
+            "field": record.get("field"),
+            "pressure_rail": record.get("pressure_rail"),
+            "provenance": (
+                "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+            ),
+        }
+        if formula in noticed:
+            continue
+        noticed.add(formula)
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    f"{formula} pressure omitted below reporting threshold "
+                    f"{threshold_pa!r} Pa; computed_pressure_Pa={computed_pa!r}; "
+                    f"field={record.get('field')!r}; "
+                    f"pressure_rail={record.get('pressure_rail')!r}; "
+                    "provenance=BuiltinVaporPressureProvider."
+                    "below_reporting_threshold_omissions"
+                ),
+                origin="Knudsen residue pressure adapter",
+            )
+        )
+
+
+def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -> None:
+    for callback in callbacks.values():
+        for notice in getattr(callback, "below_threshold_omission_notices", ()):
+            if notice not in notices:
+                notices.append(notice)
+
+
 def _make_residue_pressure_model(
     engine: str,
     gas_channels: Sequence[tuple[str, Sequence[Any]]],
@@ -1163,6 +1263,9 @@ def _make_residue_pressure_model(
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
+        omission_notices: list[Any] = []
+        omission_records: dict[str, dict[str, Any]] = {}
+        noticed_omissions: set[str] = set()
 
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
@@ -1204,6 +1307,14 @@ def _make_residue_pressure_model(
                     ) * PA_PER_BAR
                 except (OffgasFO2Unavailable, NasaCeaError, OSError) as exc:
                     raise ResidueInventoryRefusal("residue_oxygen_pressure_unavailable", str(exc)) from exc
+            _translate_recorded_pressure_omissions(
+                pressures,
+                response,
+                required,
+                omission_notices,
+                omission_records,
+                noticed_omissions,
+            )
             missing = [
                 str(species)
                 for species, _reaction in gas_channels
@@ -1218,6 +1329,8 @@ def _make_residue_pressure_model(
                 for species, _reaction in gas_channels
             }
 
+        pressure_model.below_threshold_omission_notices = omission_notices
+        pressure_model.below_threshold_omission_records = omission_records
         return pressure_model
 
     raise ResidueInventoryRefusal(
@@ -1400,6 +1513,7 @@ def predict_knudsen_residue_composition(
         "measured_mass_loss_fraction": target, "temperature_path": path,
         "oxygen_sources": oxygen_sources,
     }
+    pressure_callbacks: dict[float, Callable[..., Mapping[str, float]]] = {}
     try:
         try:
             from openimcc import load_gas_datapack
@@ -1415,7 +1529,6 @@ def predict_knudsen_residue_composition(
                         "near-saturated molecular effusion; common orifice factor cancels")
                          for s, (parent, _, _) in gas_channels)
         flags, metadata = set(), {}
-        pressure_callbacks = {}
 
         def pressure_model(inventory, logp, temperature_K):
             if temperature_K not in pressure_callbacks:
@@ -1440,6 +1553,7 @@ def predict_knudsen_residue_composition(
                           "difference_from_step_hold_wt_pct": {k: linear_composition[k] - v for k, v in composition.items()}}
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
+        _append_omission_notices(notices, pressure_callbacks)
         return {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
@@ -1450,6 +1564,7 @@ def predict_knudsen_residue_composition(
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        _append_omission_notices(notices, pressure_callbacks)
         exc.provenance = provenance
         exc.notices = tuple(notices)
         raise
@@ -2211,6 +2326,10 @@ def _predict_hashimoto_residue_cohort(
                 pO2_ranges[geometry] = (
                     [min(pO2_steps), max(pO2_steps)] if pO2_steps else None
                 )
+            for notice in getattr(pressure_model, "below_threshold_omission_notices", ()):
+                row = {"reason": notice.reason, "kind": str(notice.kind.value)}
+                if row not in refinement_notices:
+                    refinement_notices.append(row)
             band = {
                 oxide: (
                     min(values[oxide] for values in geometry_predictions.values()),

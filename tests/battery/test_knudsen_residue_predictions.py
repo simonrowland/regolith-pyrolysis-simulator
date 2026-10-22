@@ -371,7 +371,7 @@ def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point,
     assert any("SC-360" in n.reason for n in residual.notices)
 
 
-def _real_analytical_cmas_pressure(temperature_K, inventory=None):
+def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels=()):
     openimcc = pytest.importorskip("openimcc")
     from simulator.battery.residue import _make_residue_pressure_model
     from simulator.diagnostic_helpers import binary_pot_battery as battery
@@ -380,6 +380,7 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None):
         inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
     channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
     assert not omissions
+    channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,
         engine_metadata={}, engine_flags=set(), missing_channels_reason="residue_pressure_channels_missing",
@@ -524,7 +525,8 @@ def test_parentless_oxygen_pressure_is_required_and_validated(oxygen_parent, oxy
     (1748.15, 0.0146, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, 0.0117, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
-def test_real_markova_first_interval_preserves_unproven_missing_channel(temperature_K, extent, wt):
+def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusal(temperature_K, extent, wt):
+    """Al is no longer a missing channel. The iron pressure-law refusal remains."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
@@ -534,8 +536,16 @@ def test_real_markova_first_interval_preserves_unproven_missing_channel(temperat
     with pytest.raises(ResidueInventoryRefusal) as root:
         _residue_oxygen_balance(_channel_terms(channels), inventory,
                                 lambda p: pressure(inventory, p), temperature_K)
-    assert root.value.reason == "residue_pressure_channels_missing"
-    assert root.value.detail == "Al"
+    assert root.value.reason == "residue_pressure_law_exponent_mismatch"
+    assert root.value.detail.startswith(
+        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
+    )
+    al_notices = [
+        notice for notice in pressure.below_threshold_omission_notices
+        if notice.reason.startswith("Al ")
+    ]
+    assert len(al_notices) == 1
+    assert "below_reporting_threshold_omissions" in al_notices[0].reason
     with pytest.raises(ResidueInventoryRefusal) as result:
         integrate_knudsen_residue_inventory(
             inventory, channels, lambda n, p, t: pressure(n, p),
@@ -550,21 +560,74 @@ def test_real_markova_first_interval_preserves_unproven_missing_channel(temperat
     (1748.15, {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}),
     (1749.15, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
-def test_markova_bracket_top_callback_refuses_unproven_missing_al(temperature_K, wt):
-    """Today's real callback at log10 pO2 = 0 cannot tell omitted Al from a missing channel."""
+def test_markova_bracket_top_callback_zeroes_recorded_al_omission(temperature_K, wt):
+    """A recorded below-threshold Al pressure is zero, and the notice cites that proof."""
     from simulator.accounting.formulas import parse_formula
+    from simulator.battery.enums import NoticeKind
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
     inventory, _channels, pressure = _real_analytical_cmas_pressure(temperature_K, inventory)
+    predicted = pressure(inventory, 0.0)
+    response = battery._internal_analytical_vapor_pressure_adapter(
+        core=battery._new_internal_analytical_core(),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=0.0,
+        composition_kg=None,
+        composition_mol=inventory,
+        fO2_log=0.0,
+        po2_request=battery.Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0),
+        include_diagnostic_shadows=False,
+    )
+    omissions = response.diagnostics["vapor_pressure_diagnostic"]["below_reporting_threshold_omissions"]
+    record = omissions["Al"]
+    assert "Al" not in response.vapor_pressures_Pa
+    assert record["species"] == "Al"
+    assert record["computed_pressure_Pa"] <= record["reporting_threshold_Pa"]
+    assert predicted["Al"] == 0.0
+    translated = pressure.below_threshold_omission_records["Al"]
+    assert translated["computed_pressure_Pa"] == record["computed_pressure_Pa"]
+    assert translated["reporting_threshold_Pa"] == record["reporting_threshold_Pa"]
+    assert translated["field"] == record["field"]
+    assert translated["pressure_rail"] == record["pressure_rail"]
+    assert translated["provenance"] == (
+        "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+    )
+    notices = [
+        notice for notice in pressure.below_threshold_omission_notices
+        if notice.reason.startswith("Al ")
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice.kind is NoticeKind.INPUT_OMITTED
+    assert f"{record['reporting_threshold_Pa']!r}" in notice.reason
+    assert f"{record['computed_pressure_Pa']!r}" in notice.reason
+    assert record["field"] in notice.reason
+    assert record["pressure_rail"] in notice.reason
+    assert "BuiltinVaporPressureProvider.below_reporting_threshold_omissions" in notice.reason
+
+
+def test_real_callback_refuses_channel_the_provider_did_not_omit():
+    """A required key with no omission record is still a missing channel."""
+    from simulator.accounting.formulas import parse_formula
+    wt = {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95}
+    inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
+    inventory, _channels, pressure = _real_analytical_cmas_pressure(
+        1748.15, inventory, extra_channels=(("Zr", (None, 1, 0)),),
+    )
     with pytest.raises(ResidueInventoryRefusal) as exc:
         pressure(inventory, 0.0)
     assert exc.value.reason == "residue_pressure_channels_missing"
-    assert exc.value.detail == "Al"
+    assert exc.value.detail == "Zr"
+    assert "Zr" not in pressure.below_threshold_omission_records
+    assert "Al" in pressure.below_threshold_omission_records
 
 
 def test_analytical_callback_at_2000k_returns_finite_al():
-    """Passing real callback: Al is reported, so the channel is not a refusal."""
+    """Passing real callback: Al is reported, so there is no omission record."""
     inventory, _channels, pressure = _real_analytical_cmas_pressure(2000)
     predicted = pressure(inventory, -10)
     assert "Al" in predicted
     assert math.isfinite(predicted["Al"])
     assert predicted["Al"] > 0.0
+    assert pressure.below_threshold_omission_records == {}
+    assert pressure.below_threshold_omission_notices == []
