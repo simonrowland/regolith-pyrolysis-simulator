@@ -367,6 +367,9 @@ VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG = (
 VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+# A computed partial pressure at or below this floor is left out of
+# vapor_pressures_Pa. The omission record is the proof; absence alone is not.
+VAPOR_PRESSURE_REPORTING_THRESHOLD_PA = 1e-15
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
     {
         "builtin_authoritative",
@@ -378,6 +381,46 @@ _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
 
 def _fit_target(row: Mapping[str, Any] | None) -> str:
     return str((row or {}).get("fit_target", "") or "").strip()
+
+
+def _publishes_vapor_pressure(
+    pressure_Pa: float, *, retain_subthreshold: bool
+) -> bool:
+    """True when this computed pressure is copied onto vapor_pressures_Pa."""
+
+    return pressure_Pa > 0.0 and (
+        retain_subthreshold
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    )
+
+
+def _record_reporting_threshold_omission(
+    omissions: dict[str, dict[str, Any]],
+    species: str,
+    pressure_Pa: float,
+    *,
+    field: str,
+    pressure_rail: str,
+) -> None:
+    """Record a species evaluated on this call and found at or below the floor.
+
+    Negative pressure fails the positivity gate and is not this record.
+    A species skipped before a pressure exists gets no record.
+    """
+
+    if (
+        not math.isfinite(pressure_Pa)
+        or pressure_Pa < 0.0
+        or pressure_Pa > VAPOR_PRESSURE_REPORTING_THRESHOLD_PA
+    ):
+        return
+    omissions[str(species)] = {
+        "species": str(species),
+        "reporting_threshold_Pa": VAPOR_PRESSURE_REPORTING_THRESHOLD_PA,
+        "computed_pressure_Pa": float(pressure_Pa),
+        "field": field,
+        "pressure_rail": pressure_rail,
+    }
 
 
 def _gas_rail_standard_reaction_block(
@@ -2696,7 +2739,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 intent=ChemistryIntent.VAPOR_PRESSURE,
                 status="ok",
                 control_audit=control_audit,
-                diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
+                diagnostic={
+                    "vapor_pressures_Pa": {},
+                    "activities": {},
+                    # Below 400 K nothing is evaluated, so the omission map is empty.
+                    "below_reporting_threshold_omissions": {},
+                },
             )
 
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
@@ -2801,6 +2849,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
+        below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
         activities: dict[str, float] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
@@ -3087,10 +3136,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         f"{T_K:.2f} K (regular-solution continuation "
                         "UNCERTIFIED)"
                     )
-                if P_eq_Pa > 0.0 and (
-                    retain_analytical_channel
-                    or P_eq_Pa > 1e-15
-                    or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=(
+                        retain_analytical_channel
+                        or retain_high_t_openimcc_carriers
+                    ),
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
@@ -3137,6 +3188,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         vapor_pressure_provenance[species][
                             "gamma_domain_authority"
                         ] = gamma_auth
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
+                    )
                 continue
 
             # Al/Ti/Cr/Mn: liquid-oxide standard reaction for oxide-coupled P
@@ -3222,8 +3281,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3256,6 +3316,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     }
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
+                    )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_liquid_oxide_standard_reaction",
+                        pressure_rail="liquid_oxide_standard_reaction",
                     )
                 continue
 
@@ -3367,8 +3435,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
                 )
-                if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                if _publishes_vapor_pressure(
+                    P_eq_Pa,
+                    retain_subthreshold=retain_high_t_openimcc_carriers,
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3418,6 +3487,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         )
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()
+                    )
+                else:
+                    _record_reporting_threshold_omission(
+                        below_reporting_threshold_omissions,
+                        species,
+                        P_eq_Pa,
+                        field="P_eq_gas_rail_standard_reaction",
+                        pressure_rail="gas_rail_liquid_oxide_standard_reaction",
                     )
                 continue
 
@@ -3592,8 +3669,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
-            if P_eq_Pa > 0.0 and (
-                P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=retain_high_t_openimcc_carriers,
             ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
@@ -3704,6 +3782,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         self._pseudo_vapor_pressure_warning_seen,
                         stacklevel=2,
                     )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    species,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail=pressure_rail,
+                )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
@@ -4014,10 +4100,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             retain_analytical_channel = compiled_evaluator is not None or bool(
                 data.get("retain_analytical_pressure_channel", False)
             )
-            if P_eq_Pa > 0.0 and (
-                retain_analytical_channel
-                or P_eq_Pa > 1e-15
-                or retain_high_t_openimcc_carriers
+            if _publishes_vapor_pressure(
+                P_eq_Pa,
+                retain_subthreshold=(
+                    retain_analytical_channel
+                    or retain_high_t_openimcc_carriers
+                ),
             ):
                 vapor_pressures[name] = P_eq_Pa
                 # Above-band predictions remain diagnostic-limited, including
@@ -4097,6 +4185,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     self._pseudo_vapor_pressure_warning_seen,
                     stacklevel=2,
                 )
+            else:
+                _record_reporting_threshold_omission(
+                    below_reporting_threshold_omissions,
+                    name,
+                    P_eq_Pa,
+                    field="P_eq_Pa",
+                    pressure_rail="oxide_vapor",
+                )
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
@@ -4154,6 +4250,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
+            "below_reporting_threshold_omissions": (
+                below_reporting_threshold_omissions
+            ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
             "activities_standard_state": {

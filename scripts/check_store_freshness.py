@@ -85,6 +85,18 @@ CODE_INPUTS = (
 #     functions. A full regen at the line's merge with green 2c7bcb1cc
 #     (c69d8aa09, studio-2) was a fixed point: no store file changed. This
 #     acknowledges STORE outputs only; the predictor's value moves (d-236) are
+#   e7dfdd4fe, 8a53c7629, fa97603c0, 085e5cbae, ff8650f45, b99e4c167, 2ad98d246,
+#     42d10d20d, d5aaf3e40, 081f50759, 4b5ec3f56: the Markova Knudsen residue line
+#     (t-1418, d-241) and its below-threshold omission provenance (t-1439). They
+#     change the residue predictors in simulator/battery/residue.py, the
+#     residue scoring hooks in score.py, the source-oxygen condition helper in
+#     source_oxygen.py, the omission record in engines/builtin/vapor_pressure.py,
+#     and an identity helper in identity.py. Migration imports identity.py and
+#     score.py (parse_species_formula), so the receipt is the regen, not the
+#     import graph: a full regen at the line's merge with train/b150r
+#     (d5bcc7d8c, studio-2) was a fixed point: no store file changed. 081f50759
+#     and 4b5ec3f56 touch only residue.py and score.py scoring code after that
+#     merge. This acknowledges STORE outputs only; the scoring changes are
 #     covered by the commits' tests.
 #   037f97ff6, 5d46c88e1: d-216, source-oxygen scoring. They score Knudsen
 #     vapour rows at typed source oxygen conditions and keep typed reasons for
@@ -223,6 +235,7 @@ CODE_INPUTS = (
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "19f472447", "67678d3d4", "0c5b7486a",
     "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
+    "e7dfdd4fe", "8a53c7629", "fa97603c0", "085e5cbae", "ff8650f45", "b99e4c167", "2ad98d246", "42d10d20d", "d5aaf3e40", "081f50759", "4b5ec3f56",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",

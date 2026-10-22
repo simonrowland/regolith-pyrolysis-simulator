@@ -121,6 +121,30 @@ def _point_key(row: Observation) -> tuple | None:
     return row.experiment_id, identity.temperature_K.value, tuple(sorted(composition.value.items()))
 
 
+def _printed_source_oxygen_at_point(
+    reference: Observation, observations: Iterable[Observation],
+) -> tuple[Decimal, tuple[str, ...]] | SourceOxygenFallback | None:
+    """One printed oxygen command at a physical point, independent of target column."""
+    key = _point_key(reference)
+    candidates = {}
+    for row in (reference, *observations):
+        if (
+            row.source_id != reference.source_id or row.engine is not None
+            or row.admission.status is not AdmissionStatus.ADMITTED
+            or (row.observation_id != reference.observation_id and (key is None or _point_key(row) != key))
+        ):
+            continue
+        pressure = printed_source_pressure(row)
+        if pressure is not None:
+            candidates[row.observation_id] = pressure
+    if not candidates:
+        return None
+    pressures = set(candidates.values())
+    if len(pressures) != 1:
+        return SourceOxygenFallback(SourceOxygenFallbackReason.AMBIGUOUS)
+    return pressures.pop(), tuple(sorted(candidates))
+
+
 def _lineage(row: Observation, rows: Mapping[str, Observation], seen: frozenset[str] = frozenset()) -> tuple[set[str], set[str]] | None:
     if row.observation_id in seen:
         return None

@@ -77,6 +77,7 @@ from simulator.battery.identity import (
     _AXIS_NAMES,
     identity_equal,
     _same_row_redox_identity_equal,
+    _same_row_knudsen_residue_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
@@ -6318,6 +6319,37 @@ def _predict_mass_loss_with_residue(
         predict_mass_loss_fraction,
     )
 
+    def omission_notices(payload: object) -> tuple[Notice, ...]:
+        if not isinstance(payload, str) or not payload:
+            return ()
+        parsed = json.loads(payload)
+        if not isinstance(parsed, Mapping):
+            return ()
+        rows = parsed.get("notices")
+        if not isinstance(rows, list):
+            return ()
+        built: list[Notice] = []
+        for item in rows:
+            if not isinstance(item, Mapping):
+                continue
+            if item.get("kind") != NoticeKind.INPUT_OMITTED.value:
+                continue
+            reason = item.get("reason")
+            origin = item.get("origin")
+            if not isinstance(reason, str) or not reason:
+                continue
+            if not isinstance(origin, str) or not origin:
+                continue
+            built.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+                    reason=reason,
+                    origin=origin,
+                )
+            )
+        return tuple(built)
+
     source_path = (
         REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
     )
@@ -6363,6 +6395,9 @@ def _predict_mass_loss_with_residue(
             detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -6371,9 +6406,18 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=refusal,
             refusal_detail=detail,
+            notices=omission_notices(payload),
             identity=identity,
         )
     except ResidueEngineNonconvergence as exc:
+        detail = {
+            "reason": exc.reason,
+            "engine": engine.value,
+            "detail": exc.detail,
+        }
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -6381,11 +6425,8 @@ def _predict_mass_loss_with_residue(
             coefficient_sources=sources,
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
-            refusal_detail={
-                "reason": exc.reason,
-                "engine": engine.value,
-                "detail": exc.detail,
-            },
+            refusal_detail=detail,
+            notices=omission_notices(payload),
             identity=identity,
         )
 
@@ -6402,7 +6443,7 @@ def _predict_mass_loss_with_residue(
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
-    )
+    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
@@ -8055,6 +8096,48 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
+def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+    """Translate the residue owner's extent result to the scoring contract."""
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        predict_knudsen_residue_composition,
+    )
+
+    experiment = context.experiments.get(reference.experiment_id)
+    try:
+        cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
+        if cache is not None and cache_key in cache:
+            result = cache[cache_key]
+        else:
+            result = predict_knudsen_residue_composition(
+                engine.value, reference, experiment, context.observations.values(),
+                _bench_for_score(experiment, context.benches) if experiment is not None else None,
+            )
+            if cache is not None:
+                cache[cache_key] = result
+        provenance = {k: v for k, v in result.items() if k != "notices"}
+        value = result["composition_wt_pct"].get(reference.identity.species.formula)
+        if value is None:
+            raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
+            value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            notices=result["notices"], identity=reference.identity,
+            refusal_detail=provenance,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
+            refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
+            notices=getattr(exc, "notices", ()), identity=reference.identity,
+        )
+
+
 def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -8734,6 +8817,13 @@ def compile_residual(
             exclusions=("reference_state_conversion_inputs_present",),
         )
 
+    if (
+        prediction is None and predict in (None, predict_with_engine)
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ):
+        prediction = _knudsen_residue_prediction(context, reference, engine)
     if prediction is None:
         predictor = predict or predict_with_engine
         if (
@@ -8993,6 +9083,12 @@ def compile_residual(
         )
 
     candidate = candidate_observation(reference, prediction)
+    knudsen_extent = (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and prediction.execution.call_evidence == f"{engine.value}:knudsen_residue_extent"
+    )
     compared_reference = reference.identity
     compared_candidate = candidate.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
@@ -9003,7 +9099,9 @@ def compile_residual(
             compared_candidate, reference, prediction
         )
     equal = (
-        _same_row_redox_identity_equal(compared_reference, compared_candidate)
+        _same_row_knudsen_residue_identity_equal(compared_reference, compared_candidate)
+        if knudsen_extent
+        else _same_row_redox_identity_equal(compared_reference, compared_candidate)
         if quantity is Quantity.FE3_FE2_RATIO
         else _score_identity_equal(compared_reference, compared_candidate)
     )
@@ -9169,6 +9267,9 @@ def compile_residual(
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
+    if knudsen_extent:
+        # Carry the identity owner's validated comparison into eligibility.
+        conjuncts = replace(conjuncts, identity_equal=equal.kind is IdentityEqualKind.EQUAL)
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
@@ -9595,6 +9696,16 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                            )
+                        if (
+                            predict is None
+                            and isinstance(point.identity, Identity)
+                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and experiment is not None and experiment.method.is_value
+                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                        ):
+                            prediction = _knudsen_residue_prediction(
+                                context, point, engine, residue_prediction_cache,
                             )
                         residual, candidate = compile_residual(
                             point,
