@@ -72,6 +72,7 @@ from simulator.battery.identity import (
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
     _same_row_redox_identity_equal,
+    _same_row_knudsen_residue_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
@@ -6430,6 +6431,47 @@ def _hashimoto_residue_prediction(
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
+def _knudsen_residue_prediction(context, reference, engine, cache=None) -> EnginePrediction:
+    """Translate the residue owner's extent result to the scoring contract."""
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        predict_knudsen_residue_composition,
+    )
+
+    experiment = context.experiments.get(reference.experiment_id)
+    try:
+        cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
+        if cache is not None and cache_key in cache:
+            result = cache[cache_key]
+        else:
+            result = predict_knudsen_residue_composition(
+                engine.value, reference, experiment, context.observations.values(),
+                _bench_for_score(experiment, context.benches) if experiment is not None else None,
+            )
+            if cache is not None:
+                cache[cache_key] = result
+        provenance = {k: v for k, v in result.items() if k != "notices"}
+        value = result["composition_wt_pct"].get(reference.identity.species.formula)
+        if value is None:
+            raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
+            value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            notices=result["notices"], identity=reference.identity,
+            refusal_detail=provenance,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
+            refusal_detail={"reason": exc.reason, "detail": exc.detail}, identity=reference.identity,
+        )
+
+
 def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -7027,6 +7069,13 @@ def compile_residual(
             exclusions=("reference_state_conversion_inputs_present",),
         )
 
+    if (
+        prediction is None and predict in (None, predict_with_engine)
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ):
+        prediction = _knudsen_residue_prediction(context, reference, engine)
     if prediction is None:
         predictor = predict or predict_with_engine
         if (
@@ -7259,6 +7308,12 @@ def compile_residual(
         )
 
     candidate = candidate_observation(reference, prediction)
+    knudsen_extent = (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and experiment is not None and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and prediction.execution.call_evidence == f"{engine.value}:knudsen_residue_extent"
+    )
     compared_reference = reference.identity
     compared_candidate = candidate.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
@@ -7269,7 +7324,9 @@ def compile_residual(
             compared_candidate, reference, prediction
         )
     equal = (
-        _same_row_redox_identity_equal(compared_reference, compared_candidate)
+        _same_row_knudsen_residue_identity_equal(compared_reference, compared_candidate)
+        if knudsen_extent
+        else _same_row_redox_identity_equal(compared_reference, compared_candidate)
         if quantity is Quantity.FE3_FE2_RATIO
         else _score_identity_equal(compared_reference, compared_candidate)
     )
@@ -7435,6 +7492,9 @@ def compile_residual(
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
+    if knudsen_extent:
+        # Carry the identity owner's validated comparison into eligibility.
+        conjuncts = replace(conjuncts, identity_equal=equal.kind is IdentityEqualKind.EQUAL)
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
@@ -7861,6 +7921,16 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                            )
+                        if (
+                            predict is None
+                            and isinstance(point.identity, Identity)
+                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and experiment is not None and experiment.method.is_value
+                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                        ):
+                            prediction = _knudsen_residue_prediction(
+                                context, point, engine, residue_prediction_cache,
                             )
                         residual, candidate = compile_residual(
                             point,
