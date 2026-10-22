@@ -2625,7 +2625,12 @@ def test_runner_failure_preserves_primary_when_yield_disposition_raises(
     )
 
 
-def test_runner_failure_records_unavailable_engine_lookup(monkeypatch):
+def test_runner_failure_records_unavailable_engine_lookup():
+    class RaisingRegistryKernel:
+        @property
+        def registry(self):
+            raise AttributeError("engine registry unavailable")
+
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
@@ -2638,18 +2643,16 @@ def test_runner_failure_records_unavailable_engine_lookup(monkeypatch):
         envelope_detail_unavailable="",
         per_hour=(),
         shadow_trace=(),
-        simulator=SimpleNamespace(atom_ledger=AtomLedger()),
+        simulator=SimpleNamespace(
+            atom_ledger=AtomLedger(),
+            _chem_kernel=RaisingRegistryKernel(),
+        ),
         refusal_diagnostic={},
         backend_status="unavailable",
         backend_authoritative=False,
         reduced_real_cache={},
         campaigns_elapsed=0.0,
     )
-
-    def raise_engine_lookup(*_args, **_kwargs):
-        raise LookupError("engine registry unavailable")
-
-    monkeypatch.setattr(run, "_engines_used", raise_engine_lookup)
 
     payload = run._minimal_failure_output(execution)
 
@@ -2659,8 +2662,29 @@ def test_runner_failure_records_unavailable_engine_lookup(monkeypatch):
     assert payload["run_metadata"]["engines_used"] == {
         "status": "unavailable",
         "section": "run_metadata.engines_used",
-        "exception_type": "LookupError",
+        "exception_type": "AttributeError",
         "reason": "engine registry unavailable",
+    }
+
+
+def test_engines_used_treats_kernel_without_registry_as_empty() -> None:
+    class KernelWithoutRegistry:
+        pass
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    engines_used = run._engines_used(
+        SimpleNamespace(_chem_kernel=KernelWithoutRegistry())
+    )
+
+    assert engines_used == {
+        "active": {},
+        "requested": {},
+        "registry": {},
     }
 
 

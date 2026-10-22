@@ -1858,11 +1858,12 @@ class PyrolysisRun:
         kernel = getattr(sim, "_chem_kernel", None)
         if kernel is None:
             return {"active": {}, "requested": echoed, "registry": {}}
-        try:
-            registry = kernel.registry
-        except AttributeError:
+        if "registry" not in dir(type(kernel)):
+            # Production ChemistryKernel declares this property; simple
+            # kernel shims without the capability API retain an empty summary.
             capability = {}
         else:
+            registry = kernel.registry
             capability = registry.capability_summary()
         internal_intents = {"backend_equilibrium"}
         if not getattr(sim, "_c7_product_report", None):
