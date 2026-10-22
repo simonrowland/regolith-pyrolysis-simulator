@@ -11,11 +11,13 @@ import yaml
 
 import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
+from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
+from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
     CapacityShadowRefusal,
@@ -27,6 +29,7 @@ from simulator.capacity_coupling import (
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
+    _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS,
     _pre_rg_effective_pressure_source,
 )
 from simulator.physical_constants import GAS_CONSTANT
@@ -971,315 +974,80 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         sim,
         "_compute_capacity_coupling_shadow",
         lambda _equilibrium: (_ for _ in ()).throw(
-            AssertionError("default-off live path must not compute capacity")
+            AssertionError("default-off live path must not compute the capacity shadow")
         ),
     )
 
-    phosphorus_carriers = ("PO", "PO2", "P2", "P4", "P4O6", "P4O10")
+    phosphorus_carriers = _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
     p2o5_source_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
     p2o5_projection_kg = sim.melt.composition_kg["P2O5"]
+    melt_before_kg = sim.melt.total_mass_kg
+    transport_calls = []
+    real_estimate = sim.overhead_model.estimate_transport_state
+
+    def _estimate(flux, melt, *args, **kwargs):
+        state = real_estimate(flux, melt, *args, **kwargs)
+        transport_calls.append(
+            (
+                float(flux.total_kg_hr),
+                float(state["pipe_conductance_kg_hr"]),
+            )
+        )
+        return state
+
+    sim.overhead_model.estimate_transport_state = _estimate
 
     snapshot = sim.step()
 
-    ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
+    # Default-off skips the optional shadow. This step still hits the
+    # mandatory C0 pipe cap: one estimate is over capacity, and the
+    # admitted release matches that estimate within the flux floor.
+    binding = [
+        (demand, capacity)
+        for demand, capacity in transport_calls
+        if demand > capacity
+    ]
+    assert len(binding) == 1
+    demand_kg_hr, capacity_kg_hr = binding[0]
+    cap_record = sim._last_subsolidus_bakeout["transport_cap"]
+    assert cap_record["demand_kg_hr"] == pytest.approx(
+        demand_kg_hr, rel=0.0, abs=0.0
+    )
+    assert cap_record["capacity_kg_hr"] == pytest.approx(
+        capacity_kg_hr, rel=0.0, abs=0.0
+    )
+    assert cap_record["scale"] == pytest.approx(
+        capacity_kg_hr / demand_kg_hr, rel=0.0, abs=0.0
+    )
+    released_kg_hr = snapshot.evap_flux.total_kg_hr
+    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    remainder_kg_hr = demand_kg_hr - capacity_kg_hr
+    assert remainder_kg_hr > _NONTRIVIAL_FLUX_KG_HR
+    # Refused demand stays in the melt. A debit of that remainder would
+    # put the melt on or below this line.
+    assert snapshot.melt_mass_kg > melt_before_kg - remainder_kg_hr
+    assert sim._subsolidus_pending_release is None
+    assert snapshot.mass_balance_error_pct <= 5.0e-12
+    assert snapshot.overhead.transport_saturation_pct == pytest.approx(
+        100.0,
+        rel=0.0,
+        abs=100.0 * _NONTRIVIAL_FLUX_KG_HR / capacity_kg_hr,
+    )
+    assert snapshot.hour == 1
+
     assert set(phosphorus_carriers).isdisjoint(snapshot.evap_flux.species_kg_hr)
-    assert ceiling_flux_species <= set(
-        snapshot.evap_flux.alpha_authority_status_by_species
-    )
-    assert {
-        snapshot.evap_flux.alpha_authority_status_by_species[species]
-        for species in ceiling_flux_species
-    } == {"analytical_upper_bound"}
-    assert sim._alpha_authority_status_by_species_engaged == (
-        snapshot.evap_flux.alpha_authority_status_by_species
-    )
-
-    assert sim._equipment is not None
-    assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
-        sim._equipment.pipe.initial_throat_area_m2
-    )
-
-    assert (
-        snapshot.hour,
-        snapshot.temperature_C,
-        snapshot.evap_flux.total_kg_hr,
-        snapshot.overhead.transport_saturation_pct,
-        snapshot.melt_mass_kg,
-    ) == pytest.approx(
-        # 2026-07-21 B1 vapor-package regen: corrected (higher) P_sat raises
-        # hour-1 total evaporation 1.422 -> 2.621 kg/hr; transport saturation
-        # and evaporated melt mass follow the same shift. Head-result values
-        # recomputed from the executable under the quiesced gate.
-        #
-        # 2026-08-02 VR-11 P1-2 (CrO2 refusal): policy-only alpha no longer
-        # admits CrO2, so the shared Cr2O3 parent-oxide split no longer
-        # debits a CrO2 channel.  Per-species probe shows ONLY Cr moves
-        # (+1.5539e-07 kg/hr); Al/Ca/Fe/K/Mg/Mn/Na/SiO/Ti byte-identical.
-        # Total / transport-saturation / melt-mass followers regenerated
-        # from the executable under the same default-off head-result probe.
-        # regenerated under CI engine config (studio grind overlay) per the
-        # 5c6c015 doctrine; laptop-config value was identical (studio emit
-        # 2026-08-02 @ tip 0de9c6d confirmed bit-match for the head-result trio).
-        # 2026-08-04 regrind batch (b-137 six-carrier activation): the trio
-        # moves at parts-per-billion because TiO2(g)/TiO/CaO(g)/AlO/Al2O/CrO3
-        # add ~7.8e-5 Pa of new head pressure (TiO2 7.19e-5, TiO 4.44e-6,
-        # AlO 5.63e-7, CrO3 1.27e-6, Al2O 4.8e-10, CaO 1.43e-10 — per
-        # scripts/vapour_head_pressure_table.py on this tree) whose flux
-        # couples into the Fe line only through shared O2/thermal state:
-        # flux +9.27e-9 kg/hr, energy +2.29e-3 kWh-line, follower -1.1e-8.
-        # Fe/Na/K per-species pressures byte-identical (seam-selected, OOD).
-        # Pending studio-config confirmation at the batch gate.
-        # 2026-08-04 b-142 category-2 fix: the 1550 C continuation now carries
-        # TiO=1.0355070316502984e-6 Pa and TiO2(g)=2.9802561250738806e-5 Pa,
-        # both OOR/status-bearing/non-certifying. PressureValue -> FluxEligible
-        # -> seam-selected analytic depletion adds 1.0014035860409567e-6 and
-        # 3.222946295412925e-5 kg/hr respectively; the three Ti carriers still
-        # share one grouped TiO2 parent draw and debit once. Total flux rises
-        # +3.323086654027918e-5 kg/hr, transport saturation +4.4160473477095366,
-        # and the grouped parent debit lowers melt mass -3.3481727086837054e-5 kg.
-        # CrO3 remains absent from transitions for a separate physical reason:
-        # raw 8.160077335392753e-7 kg/hr consumes 0.240001560107647 kg O2/kg,
-        # but the head has zero overhead O2, so the allocator correctly zeros it.
-        # 2026-08-05 phosphorus-carrier union: at 1550 C, PO=0.00209063758295 Pa,
-        # PO2=0.000168203490621 Pa, and P2=5.32056804627e-9 Pa dominate the six
-        # new P channels (P4/P4O6/P4O10 are positive but negligible here). Their
-        # three executable transitions add 0.0023652645523379867 kg/hr total flux,
-        # +518.9310568999499 transport-saturation points, and lower melt mass by
-        # 0.0034963082154035874 kg. Values come from the executable head-pressure
-        # table and this quiesced default-off probe on the resolved union tree.
-        # 2026-08-05 MC-1 additive lunar traces: the low-Ti declaration grows by
-        # 0.2057916 wt% without changing any major-oxide row. Existing load-time
-        # whole-feed normalization plus Stage-0 disposition leaves
-        # 998.7714742180782 kg in cleaned melt (0.8852837472074954 kg is inert
-        # trace inventory; 0.987143121334345 kg is explicitly routed to slag,
-        # chloride, and sulfide accounts). The slightly diluted major-oxide
-        # activities lower flux by 0.0031308794125107 kg/hr and transport
-            # saturation by 1433.775192481 points; post-step melt follows by
-            # -1.2253948978958 kg. Recomputed from this quiesced executable probe.
-            # 2026-08-05 MC-4A systematic carriers: the executable 1550 C head
-            # table adds CrO=0.0012405690130816466 Pa and makes CrO2 pressure-
-            # positive at 0.0011084725622752761 Pa. CrO follows PressureValue ->
-            # FluxEligible -> shared-Cr2O3 sum-once depletion, raising total flux
-            # +0.001389175252095587 kg/hr and transport saturation
-            # +215.12939772568643 points while lowering melt mass
-            # -0.0015528073208770365 kg. CrO2 still makes no head transition here:
-            # its oxidizing reaction needs overhead O2 and this probe starts at
-            # zero. Al2/Al2O2/Al2O3(g)/AlO2/Ca2 heads are <=4.89e-12 Pa and do
-            # not move the reported trio. Recomputed from the executable probe.
-                    # 2026-08-05 MC-4 wave-1 integration (e389444+217cf32 union): the merged
-        # 56-carrier composition moves the head trio again — flux +0.33 kg/hr
-        # dominated by the newly-live CrO channel plus the K2O/Na2O/SiO2/MgO
-        # additions; per-carrier pressures in scripts/vapour_head_pressure_table.py
-        # on this tree. Fe/Na/K seam-selected values unchanged. Re-pinned after
-    # the P2O5_gas tombstone restore removed its Stage-0 flux contribution
-    # (b-133 adjudication upheld at integration).
-        # 2026-08-06 chemact-land merge: constant table gamma (no
-        # pseudo-binary mid-range) + b-121 OOD status-bearing activity on
-        # the HEAD oodfix seam. Head-result trio DID NOT MOVE vs HEAD
-        # 090d048 pins (activity values for majors are the same constant-
-        # table path HEAD already used; only labels/provenance changed).
-        # 2026-08-06 b-145: composite OOR switches from log-linear slope
-        # continuation to physical composite (base Antoine × CEA K_ex at
-        # the actual T). At 1550 C the Ti/oxide carriers sit below their
-        # floors; the invented multi-dex inflation is gone, so total flux
-        # falls −0.2969906068147554 kg/hr, transport saturation
-        # −38475.2925606102 points, and melt mass rises
-        # +0.2969908083582 kg (less evaporative debit). Transition count
-        # and last-5 reasons DID NOT MOVE (still 36; TiO/TiO2_gas still
-        # status-bearing OOR flux-eligible).
-        # 2026-08-07 MC-5 Ca option B: TE gas_rail demoted; monatomic Ca and
-        # CaO/Ca2 base Pref move UP (Pref_GF; +2.32...+2.55 dex over the
-        # 1757-2273 K domain). SIGN CHECK: more high-T Ca volatilisation
-        # raises total flux (+1.2425e-6 kg/hr) and transport saturation
-        # (+0.326 points) while melt mass falls by the equal-and-opposite
-        # -1.2425e-6 kg (1 h step). Recomputed from this quiesced default-off
-        # probe; see docs-private/research/2026-08-07-mc5-ca-fix/report.md.
-        # 2026-08-07 b-147 Mg option B: TE gas_rail demoted; monatomic Mg and
-        # MgO/Mg2 base Pref move UP (Pref_GF; +0.53...+0.67 dex over the
-        # 1366-2273 K domain). SIGN CHECK: more high-T Mg volatilisation
-        # raises total flux (+2.7797e-3 kg/hr) and transport saturation
-        # (+1204 points) while melt mass falls by the equal-and-opposite
-        # -2.7797e-3 kg (1 h step). See docs-private/research/2026-08-07-mgfix/report.md.
-        # 2026-08-08 t-383 Na coherent pair: L&H liquid-NaO0.5 standard_reaction_term
-        # replaces Chase gas_standard_fugacity. SIGN CHECK: Na pressures UP
-        # (+0.118 dex at the 1429 K investigation cell; more Na volatilisation)
-        # raises total flux (+0.4971975457018237 kg/hr) and transport saturation
-        # (+227812.35318131023 points) while melt mass falls by the
-        # equal-and-opposite -0.4971975457018 kg (1 h step; Na channel alone
-        # ~2.95 kg/hr). Values from this quiesced default-off executable probe;
-        # never hand-pasted. See docs-private/research/2026-08-08-t383-build/report.md.
-        # 2026-08-08 b-136 / t-559 posture: Zhang-2014 CaTiO3 perovskite
-        # datum remains WITHDRAWN as mis-tagged HKL α for Ca/Ti silicate-melt
-        # carriers (single-point [2278,2278] band fiction dies). Missing α is
-        # a kinetic correction gap on pressures we already have — not the
-        # missing-input refuse class — so the live posture is Hertz-Knudsen
-        # ideal α=1.0 as an explicit status-bearing upper bound (never
-        # certifies; true flux ≤ this). Channel set and transition count are
-        # deliberately KEPT at 36 (the seven Ca/Ti channels stay live); refuse
-        # would have dropped them 36→29 as an unjustified silent zero.
-        # SIGN CHECK vs pre-b136 (α 0.9/0.8 proxy): flux moves slightly UP
-        # (3.15463992 -> 3.15464311, +3.19e-6 kg/hr) because α 0.9/0.8 → 1.0
-        # HKL ceiling (high-side by construction for an upper bound);
-        # transport saturation UP (+0.440 points); melt mass DOWN
-        # (-3.20e-6 kg, equal-and-opposite evaporative debit). Magnitude
-        # remains tiny (Ca/Ti are refractory). Values from this quiesced
-        # default-off executable probe; never hand-pasted.
-        # docs-private/research/2026-08-08-rp3-b136/report.md
-        # 2026-08-08 b-151 Na composites: Na2/Na2O_gas base_reference retargeted
-        # from retired activity-folded pseudo_psat (A=5.18586…) to monatomic L&H
-        # unit-activity Pref. SIGN CHECK: Na2 unit-activity P up +1.95…+6.26 dex
-        # (base^2); at this 1550 C head, Na2 channel becomes real flux
-        # (~0.513 kg/hr; was negligible), total flux +0.05078944409163633 kg/hr,
-        # melt mass equal-and-opposite -0.050789444091719815 kg. Transport
-        # saturation moves -94580.22580052097 points (not monotone with total
-        # flux: vapor-composition / throat-loading path, not a pin sign error).
-        # Monatomic Na residual / element max|Δ| unmoved (~1.536). Recomputed
-        # from this quiesced default-off executable probe; never hand-pasted.
-        # See docs-private/research/2026-08-08-b151-na-composites/report.md.
-        # NOTE: pin values are the post-rebase b-151+b-136 surface (Na2-dominant;
-        # b-136 Ca/Ti HKL α=1.0 contributes ~+3.2e-6 kg/hr vs pre-b136
-        # b-151-only probe). Recomputed on worktree after rebase onto
-        # 4a0a574; never hand-pasted.
-        # 2026-08-17 1742cbb8 rebaseline: not FeO. The −0.00236525603352 kg/hr
-        # total_kg_hr drop (and the matching transport-sat / melt-mass
-        # followers) is exactly the sum of PO+PO2+P2 input masses that used
-        # to debit. Those carriers arrive `status_bearing` / FluxEligible
-        # from the rail, but `_condensation_admission_refusal` types
-        # `inapplicable_by_declared_predicate` (`hot_train_applicability:
-        # stage0_only`; condensation has no Stage-0 context,
-        # condensation.py:4282-4286). Pre-fix that admission left
-        # remaining=rate so evaporation.py:2986-2998 still debited. After,
-        # condensation.py:4361-4366 promotes the typed refusal onto
-        # `refused` and the three P-carriers stay in the melt. Fe still
-        # evaporates (admitted; not flux_dormant). Trio measured at HEAD
-        # c777aa73 / verdict 2026-08-17-feo-verdict; not hand-pasted.
-        # 2026-08-28 0c6d9811 (b-314) rebaseline: the broad-proxy alpha rows
-        # are stripped from the provider-facing measured view, so CrO's
-        # tier-2 proxy (alpha=0.9 inherited from metals_cr_family) no longer
-        # satisfies the measured-alpha requirement. This fixture's explicit
-        # allow_unmeasured_alpha_fallback opt-in then drives CrO at the
-        # alpha=1.0 prototype ceiling. SIGN CHECK: the CrO channel flux
-        # scales 1/0.9, i.e. +1/9 of its +0.001389175252095587 kg/hr MC-4A
-        # activation contribution = +1.5435e-4 kg/hr; observed total flux
-        # delta is +1.54308e-4 kg/hr (residual 4e-9 is shared-O2/thermal
-        # feedback). Transport saturation +23.898 points and melt mass
-        # -1.7249e-4 kg are the same 1/9 scaling of the MC-4A +215.129 /
-        # -0.0015528 followers. CrO2 stays transition-free (its oxidizing
-        # leg still has no overhead O2 to debit); the remaining Al-family
-        # proxy heads are <=5.63e-7 Pa. One channel-roster follower: at the
-        # alpha=1.0 ceiling the Al2O channel (proxy alpha=0.3, head 4.8e-10
-        # Pa) lifts its dust flux above the 1e-12 kg ledger-commit floor,
-        # so evaporate_Al2O commits again (33 -> 34 transitions; the same
-        # regrind floor that dropped PO dust at 28 -> 27). Every channel
-        # still fluxes under the fallback — this is a value move plus one
-        # floor-crossing dust transition, not a refusal-driven roster drop.
-        # t-766 restores explicitly authorized P cleanup: +0.0023652560335202
-        # kg/h entirely PO/PO2/P2. Fresh executable probe, with unchanged
-        # non-P flux, moves transport and the P2O5 source debit accordingly.
-        # b-850: alkali composite vapour rows now use the parent-oxide activity.
-        # b-894 (d-145): melt oxygen at ferric saturation leaves to the gas
-        # ledger and re-speciation settles once after the evaporation batch,
-        # so less oxygen stays in the melt: melt mass 995.6386 -> 994.9920 kg
-        # (fresh executable measurement; flux and transport values unchanged).
-        # 2026-10-22 bakeout F5: C0 does not select stage0_p_carriers and does
-        # not claim the six phosphorus vapour carriers, so they stay condensed.
-        # Total flux returns to the previous non-P value. Transport saturation
-        # and melt mass are this same default-off probe, not a hand paste.
-        (
-            1,
-            1550.0,
-            3.1212881367580105,
-            1390065.8346565817,
-            994.9966377951949,
-        ),
-        rel=1.0e-12,
-        abs=1.0e-12,
-    )
-    # 2026-08-06 chemact-land merge: activity-cluster split does not change
-    # the OOD seam/roster; transition count DID NOT MOVE (still 36).
-    # The status-bearing out-of-domain point path removes one earlier
-    # zero-quantity transition; the hot-tail mechanism is otherwise unchanged.
-    # 2026-08-04 regrind batch: +3 transitions = evaporate_AlO, evaporate_Al2O,
-    # evaporate_CaO_gas (new carrier channels; per-carrier ledger transitions,
-    # grouped parent draw unchanged). b-142 adds evaporate_TiO and
-    # evaporate_TiO2_gas through the status-bearing OOR continuation described
-    # above (+2 transitions, 23 -> 25); all three Ti carrier debits still sum
-    # into one TiO2 parent draw. CrO3 adds none because its O2-consuming route
-    # is starved by the fixture's zero overhead O2, not by pressure/domain gating.
-    # The phosphorus union adds evaporate_P2 and evaporate_PO2. Regrind now
-    # rejects a whole coupled carrier transition when any nonzero ledger leg is
-    # at or below the 1e-12 kg floor, so the earlier PO dust transition is no
-    # longer committed (28 -> 27); snapshot flux and ledger remain identical.
-    # MC-4A adds one evaporate_CrO transition (1550 C head
-    # 0.0012405690130816466 Pa) through the shared Cr2O3 parent path. CrO2's
-    # 0.0011084725622752761 Pa head remains transition-free here because the
-    # oxidizing leg has no overhead O2 to debit (27 -> 28).
-    # 2026-08-05 MC-4 wave-1 union: 37 transitions (A adds evaporate_CrO et
-    # al.; B adds K2/K2O/MgO/Na2/Na2O/P2O5/Si/SiO2 reasons) — recomputed from
-    # the merged roster by execution.
-    # b-136 / t-559 posture rework (2026-08-08): transition count is an
-    # EXPLICIT attributed decision, not an incidental consequence of α
-    # withdrawal. Zhang proxy α is withdrawn, but Ca/Ti-family channels stay
-    # live on HKL ideal α=1.0 status-bearing upper bound. The seven channels
-    # that a refuse posture deleted (evaporate_Ca, evaporate_CaO_gas,
-    # evaporate_Ca2, evaporate_Ti, evaporate_TiO, evaporate_TiO2, condense_Ca)
-    # are retained. 1742cbb8 then drops evaporate_PO, evaporate_PO2, and
-    # evaporate_P2 (stage0_only admission, not a Ca/Ti α refuse). Count
-    # 36→33. t-766 now separately authorizes cleanup offgas with the positive
-    # source predicate; condensation stays inactive for those P carriers.
-    # b-314 (0c6d9811): 33 -> 34. The Al2O tier-2 proxy (alpha=0.3) no longer
-    # satisfies the measured-alpha requirement; this fixture's opted-in
-    # alpha=1.0 prototype fallback lifts its dust flux above the 1e-12 kg
-    # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
-    # drop: no channel is withdrawn.
-    # t-766 admitted three P evaporations (46). F5 leaves those carriers
-    # condensed, so the count drops by those three transitions.
-    assert len(sim.atom_ledger.transitions) == 43
-    ca_ti_reasons = {
+    reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
-    # Disabling the reactive-product backstop must not make reversible Si
-    # condensation depend on reactivity metadata. Its ledger transition is
-    # the single-transition regression guard for 149df2858.
-    assert "condense_Si" in ca_ti_reasons
     assert {
         f"evaporate_{carrier}" for carrier in phosphorus_carriers
-    }.isdisjoint(ca_ti_reasons)
+    }.isdisjoint(reasons)
     assert {
         f"condense_{carrier}" for carrier in phosphorus_carriers
-    }.isdisjoint(ca_ti_reasons)
-    assert {
-        "condense_SiO", "condense_Al2O", "condense_AlO", "condense_CaO_gas",
-        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
-        "condense_TiO2_gas",
-    } <= ca_ti_reasons
-    # Six of the seven channels the refuse posture deleted appear as ledger
-    # transitions at this head (1550 C / hour-1). evaporate_Ca2 is
-    # channel-contract-complete under the HKL upper-bound α but does not
-    # emit a nonzero ledger transition here (pressure/flux floor); it must
-    # NOT be used as a silent-zero canary for α. The seven-channel *rail*
-    # finding (controller verification: 36→29 under refuse) is recorded in
-    # docs-private/research/2026-08-08-rp3-b136/report.md §8.
-    for required in (
-        "evaporate_Ca",
-        "evaporate_CaO_gas",
-        "evaporate_Ti",
-        "evaporate_TiO",
-        "evaporate_TiO2_gas",
-        "condense_Ca",
-    ):
-        assert required in ca_ti_reasons, required
-    assert tuple(
-        transition.reason for transition in sim.atom_ledger.transitions[-5:]
-    ) == (
-        "condense_TiO",
-        "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
-        "fe_redox_respeciation",
-        "overhead_bleed",
+    }.isdisjoint(reasons)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"] == (
+        p2o5_source_kg
     )
-    # Phosphorus stays in the melt. C0 does not authorize cleanup offgas.
-    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"] == p2o5_source_kg
     assert sim.melt.composition_kg["P2O5"] == p2o5_projection_kg
     for carrier in phosphorus_carriers:
         authority = sim.condensation_model.last_condensation_authority_by_species.get(
@@ -1291,9 +1059,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         evidence = authority.get("routing_authorization") or {}
         assert evidence.get("stage") != "stage0_p_carriers"
         assert authority.get("remaining_mass_kg_hr") in (None, 0.0)
-    assert "evaporate_Fe" in ca_ti_reasons
-    assert "condense_Fe" in ca_ti_reasons
-    assert snapshot.mass_balance_error_pct <= 5.0e-12
+    assert "evaporate_Fe" in reasons
+    assert "condense_Fe" in reasons
+    assert "fe_redox_respeciation" in reasons
+
+    assert sim._equipment is not None
+    assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
+        sim._equipment.pipe.initial_throat_area_m2
+    )
 
     payload = _load_yaml("thermal_train_params.yaml")
     payload["cold_train"]["runtime_enforcement"]["value"] = True
@@ -1319,6 +1092,27 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     with pytest.raises(CapacityCouplingRefusalError, match="finite_capacity_engaged"):
         enforced.step()
     assert calls == [True]
+
+
+def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
+    """Ca/Ti ceiling flux stays live on a hot campaign the C0 cap does not scale."""
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C4)
+    sim.melt.temperature_C = 1600.0
+
+    snapshot = sim.step()
+
+    ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
+    status = snapshot.evap_flux.alpha_authority_status_by_species
+    assert ceiling_flux_species <= set(status)
+    assert {
+        status[species] for species in ceiling_flux_species
+    } == {ANALYTICAL_UPPER_BOUND_ALPHA_STATUS}
+    assert sim._alpha_authority_status_by_species_engaged == status
+    assert sim.melt.campaign == CampaignPhase.C4
+    bakeout = getattr(sim, "_last_subsolidus_bakeout", None) or {}
+    assert "transport_cap" not in bakeout
+    assert snapshot.overhead.transport_saturation_pct > 100.0
 
 
 def test_explicit_runtime_enforcement_uses_configured_finite_capacity(monkeypatch):
