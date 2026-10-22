@@ -970,8 +970,7 @@ def integrate_knudsen_residue_inventory(
             rates = {}
             for term in terms:
                 species = term.source.species
-                parent = term.source.parent_oxide
-                if parent is not None and current.get(parent, 0.0) <= 0.0:
+                if not term.is_active(current):
                     rates[species] = 0.0
                     continue
                 if species not in pressures:
