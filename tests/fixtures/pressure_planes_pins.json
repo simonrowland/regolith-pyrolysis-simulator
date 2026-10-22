@@ -1,0 +1,779 @@
+{
+  "0.01": {
+    "final_gas_atoms_mol": {
+      "Al": "0x1.d923473180000p-47",
+      "Ar": "0x1.87cac4d5953f8p-11",
+      "Ca": "0x1.5b6ce8216e0cap-40",
+      "Fe": "0x1.ffe6908220000p-16",
+      "K": "0x1.0b4c99206a9ecp-18",
+      "Mg": "0x1.1f8f6a68072d0p-22",
+      "Na": "0x1.223a8262627d1p-12",
+      "O": "0x1.293a81dda10efp-8",
+      "Si": "0x1.4b0ff6de08000p-32",
+      "Ti": "0x1.147b093e32c00p-44"
+    },
+    "gas_deltas_mol": [
+      {
+        "credits": [
+          {
+            "O2": "0x1.b4f9ba9b3bf21p+6"
+          }
+        ],
+        "debits": [],
+        "name": "native_fe_saturation_split"
+      },
+      {
+        "credits": [
+          {
+            "Fe": "0x1.989c03f2721dap+0"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Fe"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Fe": "0x1.028e78e80f0d8p-3"
+          }
+        ],
+        "name": "condense_Fe"
+      },
+      {
+        "credits": [
+          {
+            "O2": "0x1.b7c6a87cf3ca9p-15",
+            "SiO": "0x1.b7c6a87cf3ca8p-14"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_SiO"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "SiO": "0x1.a4f9b98e15734p-14"
+          }
+        ],
+        "name": "condense_SiO"
+      },
+      {
+        "credits": [
+          {
+            "Mg": "0x1.1cd30e3b2af52p-6"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Mg"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Mg": "0x1.261ec939013e5p-8"
+          }
+        ],
+        "name": "condense_Mg"
+      },
+      {
+        "credits": [
+          {
+            "Na": "0x1.228aac6c11fbep+5"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Na": "0x1.6fc277f67c4a2p+4"
+          }
+        ],
+        "name": "condense_Na"
+      },
+      {
+        "credits": [
+          {
+            "K": "0x1.c3097f1e41adfp-2"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "K": "0x1.fd198e0e6c8ebp-3"
+          }
+        ],
+        "name": "condense_K"
+      },
+      {
+        "credits": [
+          {
+            "Al": "0x1.cd404406b6e04p-27"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Al"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Al": "0x1.b78387e0804bap-27"
+          }
+        ],
+        "name": "condense_Al"
+      },
+      {
+        "credits": [
+          {
+            "Ca": "0x1.1fe21c3f4953ep-21"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Ca"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Ca": "0x1.ffebaf9ea7a3fp-22"
+          }
+        ],
+        "name": "condense_Ca"
+      },
+      {
+        "credits": [
+          {
+            "CaO_gas": "0x1.d37a0bbcae2d2p-30"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_CaO_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "CaO_gas": "0x1.d341ab0ea6ed7p-30"
+          }
+        ],
+        "name": "condense_CaO_gas"
+      },
+      {
+        "credits": [
+          {
+            "K2": "0x1.1ae07e7ad08f8p-24"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K2"
+      },
+      {
+        "credits": [
+          {
+            "K2O_gas": "0x1.bb0c2ba10630fp-32"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K2O_gas"
+      },
+      {
+        "credits": [
+          {
+            "MgO_gas": "0x1.246a538026a7ap-16"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_MgO_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "MgO_gas": "0x1.97b561e005ba4p-17"
+          }
+        ],
+        "name": "condense_MgO_gas"
+      },
+      {
+        "credits": [
+          {
+            "Na2": "0x1.2fd494951aa2ep-11"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na2"
+      },
+      {
+        "credits": [
+          {
+            "Na2O_gas": "0x1.30581f9fc13afp-21"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na2O_gas"
+      },
+      {
+        "credits": [
+          {
+            "SiO2_gas": "0x1.50b05748849f6p-11"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_SiO2_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "SiO2_gas": "0x1.4b6f16c87bf94p-11"
+          }
+        ],
+        "name": "condense_SiO2_gas"
+      },
+      {
+        "credits": [
+          {
+            "O2": "0x1.fae57eadf4e9cp-25",
+            "TiO": "0x1.fae57eadf4e89p-24"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_TiO"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "TiO": "0x1.fa9a580a5615fp-24"
+          }
+        ],
+        "name": "condense_TiO"
+      },
+      {
+        "credits": [
+          {
+            "TiO2_gas": "0x1.c3d383665d894p-19"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_TiO2_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "TiO2_gas": "0x1.c3703e588f3b8p-19"
+          }
+        ],
+        "name": "condense_TiO2_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Al": "0x1.5bc9e94022188p-31",
+            "Ar": "0x1.08fdeb1140000p-12",
+            "Ca": "0x1.fec19027ed6c2p-25",
+            "CaO_gas": "0x1.c3030aa98166dp-41",
+            "Fe": "0x1.784834eedfb9dp+0",
+            "K": "0x1.88f75994fcbf3p-3",
+            "K2": "0x1.1adefda834475p-24",
+            "K2O_gas": "0x1.bb09d0e975660p-32",
+            "Mg": "0x1.a69478f73d9a8p-7",
+            "MgO_gas": "0x1.623ca85793b73p-18",
+            "Na": "0x1.aaa37d5b38716p+3",
+            "Na2": "0x1.2fd2f7413fb72p-11",
+            "Na2O_gas": "0x1.30568198f3263p-21",
+            "O2": "0x1.b4f775e868b07p+6",
+            "SiO": "0x1.2ccd55b68090cp-18",
+            "SiO2_gas": "0x1.504e567dee3d9p-17",
+            "TiO": "0x1.2c98f58b265d5p-34",
+            "TiO2_gas": "0x1.8d121b0aa5a4bp-29"
+          }
+        ],
+        "name": "overhead_bleed"
+      }
+    ],
+    "initial": {
+      "gas_atoms_mol": {
+        "Ar": "0x1.0624dd2f1a9fcp-10"
+      },
+      "volume_m3": "0x1.61ac42829b50cp-4"
+    },
+    "postcapture_mbar": {
+      "Al": "0x1.a0b2f30e58993p-36",
+      "Ar": "0x1.590e83feaf42dp+0",
+      "Ca": "0x1.31fa6f02212a6p-29",
+      "CaO_gas": "0x1.0e2ff4fa7fe66p-45",
+      "Fe": "0x1.c2d68677d6778p-5",
+      "K": "0x1.d6d3f22b6b0a7p-8",
+      "K2": "0x1.52eb2ebd0cf70p-29",
+      "K2O_gas": "0x1.09691f110e3dfp-36",
+      "Mg": "0x1.fa4f2e21e49e9p-12",
+      "MgO_gas": "0x1.a86cc5ad5b2f1p-23",
+      "Na": "0x1.ff2c110ac78e0p-2",
+      "Na2": "0x1.6c05f792c5435p-16",
+      "Na2O_gas": "0x1.6ca39218cd372p-26",
+      "O2": "0x1.05c5f4709c4c7p+2",
+      "SiO": "0x1.68670ccf3fa81p-23",
+      "SiO2_gas": "0x1.92f0ef0bddf54p-22",
+      "TiO": "0x1.68284bed24b32p-39",
+      "TiO2_gas": "0x1.dbbee581af72dp-34"
+    },
+    "source_kg_hr": {
+      "Al": "0x1.8e3f976f90a0ep-32",
+      "Ca": "0x1.7135881ec4757p-26",
+      "CaO_gas": "0x1.a36f622d531b1p-34",
+      "K": "0x1.1a2812f096548p-6",
+      "K2": "0x1.61eb93f212712p-28",
+      "K2O_gas": "0x1.4ddd72b2f009fp-35",
+      "Mg": "0x1.bb0cd3c816d49p-12",
+      "MgO_gas": "0x1.7922e119cd8d2p-21",
+      "Na": "0x1.ab7cb4f08209ap-1",
+      "Na2": "0x1.bf0a161559d0cp-16",
+      "Na2O_gas": "0x1.2dce12a5bac4ep-25",
+      "SiO": "0x1.3631809f918fep-18",
+      "SiO2_gas": "0x1.43ab1c5986a75p-15",
+      "TiO": "0x1.02fcd322b8d69p-27",
+      "TiO2_gas": "0x1.20ae499f31029p-22"
+    },
+    "source_plane_mbar": {
+      "Al": "0x1.3037c3c25597bp-30",
+      "Ar": "0x1.7be682fcd758ap+1",
+      "Ca": "0x1.7bbf1591fa3a4p-25",
+      "CaO_gas": "0x1.3452f0fcb218ep-33",
+      "K": "0x1.297b32010536cp-5",
+      "K2": "0x1.7524817ef922dp-28",
+      "K2O_gas": "0x1.243633a7444b4p-35",
+      "Mg": "0x1.77b62860c5a14p-10",
+      "MgO_gas": "0x1.81b986040a244p-20",
+      "Na": "0x1.7f40d075957fcp+1",
+      "Na2": "0x1.90c843ee75f19p-15",
+      "Na2O_gas": "0x1.9175c8a2e6987p-25",
+      "O2": "0x1.226166e27f46ep-18",
+      "SiO": "0x1.220dd2327c8d0p-17",
+      "SiO2_gas": "0x1.bc2035445255dp-15",
+      "TiO": "0x1.4e52c00ae7561p-27",
+      "TiO2_gas": "0x1.2a006f71e5176p-22"
+    },
+    "upstream_mbar": {
+      "Al": "0x1.a0b2f30e58993p-36",
+      "Ar": "0x1.590e83feaf42dp+0",
+      "Ca": "0x1.31fa6f02212a6p-29",
+      "CaO_gas": "0x1.0e2ff4fa7fe66p-45",
+      "Fe": "0x1.c2d68677d6778p-5",
+      "K": "0x1.d6d3f22b6b0a7p-8",
+      "K2": "0x1.52eb2ebd0cf70p-29",
+      "K2O_gas": "0x1.09691f110e3dfp-36",
+      "Mg": "0x1.fa4f2e21e49e9p-12",
+      "MgO_gas": "0x1.a86cc5ad5b2f1p-23",
+      "Na": "0x1.ff2c110ac78e0p-2",
+      "Na2": "0x1.6c05f792c5435p-16",
+      "Na2O_gas": "0x1.6ca39218cd372p-26",
+      "O2": "0x1.05c5f4709c4c7p+2",
+      "SiO": "0x1.68670ccf3fa81p-23",
+      "SiO2_gas": "0x1.92f0ef0bddf54p-22",
+      "TiO": "0x1.68284bed24b32p-39",
+      "TiO2_gas": "0x1.dbbee581af72dp-34"
+    }
+  },
+  "0.1": {
+    "final_gas_atoms_mol": {
+      "Al": "0x1.3925dcb220000p-48",
+      "Ar": "0x1.4422dc474d4fep-9",
+      "Ca": "0x1.cbe3b21f984bcp-42",
+      "Fe": "0x1.52cd9fa620000p-17",
+      "K": "0x1.61d36914725b6p-20",
+      "Mg": "0x1.7ca53c9f2d900p-24",
+      "Na": "0x1.802d73df9961bp-14",
+      "O": "0x1.8971929a5998fp-10",
+      "Si": "0x1.10afd78250000p-33",
+      "Ti": "0x1.6dfab37dc0000p-46"
+    },
+    "gas_deltas_mol": [
+      {
+        "credits": [
+          {
+            "O2": "0x1.b4f9ba9b3bf21p+6"
+          }
+        ],
+        "debits": [],
+        "name": "native_fe_saturation_split"
+      },
+      {
+        "credits": [
+          {
+            "Fe": "0x1.989c03f2721dap+0"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Fe"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Fe": "0x1.028e78e80f0d8p-3"
+          }
+        ],
+        "name": "condense_Fe"
+      },
+      {
+        "credits": [
+          {
+            "O2": "0x1.89dcc8736db96p-14",
+            "SiO": "0x1.89dcc8736db96p-13"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_SiO"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "SiO": "0x1.7906549663875p-13"
+          }
+        ],
+        "name": "condense_SiO"
+      },
+      {
+        "credits": [
+          {
+            "Mg": "0x1.1cd30e3b2af52p-6"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Mg"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Mg": "0x1.261ec939013e5p-8"
+          }
+        ],
+        "name": "condense_Mg"
+      },
+      {
+        "credits": [
+          {
+            "Na": "0x1.228aac6c11fbep+5"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Na": "0x1.6fc277f67c4a2p+4"
+          }
+        ],
+        "name": "condense_Na"
+      },
+      {
+        "credits": [
+          {
+            "K": "0x1.c3097f1e41adfp-2"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "K": "0x1.fd198e0e6c8ebp-3"
+          }
+        ],
+        "name": "condense_K"
+      },
+      {
+        "credits": [
+          {
+            "Al": "0x1.cd404406b6e04p-27"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Al"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Al": "0x1.b78387e0804bap-27"
+          }
+        ],
+        "name": "condense_Al"
+      },
+      {
+        "credits": [
+          {
+            "Ca": "0x1.1fe21c3f4953ep-21"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Ca"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "Ca": "0x1.ffebaf9ea7a3fp-22"
+          }
+        ],
+        "name": "condense_Ca"
+      },
+      {
+        "credits": [
+          {
+            "CaO_gas": "0x1.d37a0bbcae2d2p-30"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_CaO_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "CaO_gas": "0x1.d341ab0ea6ed7p-30"
+          }
+        ],
+        "name": "condense_CaO_gas"
+      },
+      {
+        "credits": [
+          {
+            "K2": "0x1.1ae07e7ad08f8p-24"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K2"
+      },
+      {
+        "credits": [
+          {
+            "K2O_gas": "0x1.bb0c2ba10630fp-32"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_K2O_gas"
+      },
+      {
+        "credits": [
+          {
+            "MgO_gas": "0x1.246a538026a7ap-16"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_MgO_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "MgO_gas": "0x1.97b561e005ba4p-17"
+          }
+        ],
+        "name": "condense_MgO_gas"
+      },
+      {
+        "credits": [
+          {
+            "Na2": "0x1.2fd494951aa2ep-11"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na2"
+      },
+      {
+        "credits": [
+          {
+            "Na2O_gas": "0x1.30581f9fc13afp-21"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_Na2O_gas"
+      },
+      {
+        "credits": [
+          {
+            "SiO2_gas": "0x1.50b05728041acp-11"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_SiO2_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "SiO2_gas": "0x1.4b6f16a87d518p-11"
+          }
+        ],
+        "name": "condense_SiO2_gas"
+      },
+      {
+        "credits": [
+          {
+            "O2": "0x1.fae57eadf4e9cp-25",
+            "TiO": "0x1.fae57eadf4e89p-24"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_TiO"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "TiO": "0x1.fa9a580a5615fp-24"
+          }
+        ],
+        "name": "condense_TiO"
+      },
+      {
+        "credits": [
+          {
+            "TiO2_gas": "0x1.c3d383665d894p-19"
+          }
+        ],
+        "debits": [],
+        "name": "evaporate_TiO2_gas"
+      },
+      {
+        "credits": [],
+        "debits": [
+          {
+            "TiO2_gas": "0x1.c3703e588f3b8p-19"
+          }
+        ],
+        "name": "condense_TiO2_gas"
+      },
+      {
+        "credits": [
+          {
+            "Ar": "0x1.8220db5f80000p-10"
+          }
+        ],
+        "debits": [
+          {
+            "Al": "0x1.5bcb25d07af0fp-31",
+            "Ca": "0x1.fec3610e4a1a3p-25",
+            "CaO_gas": "0x1.c304a52e815a2p-41",
+            "Fe": "0x1.78498b6ea068ep+0",
+            "K": "0x1.88f8bf446a450p-3",
+            "K2": "0x1.1adfff21b23bap-24",
+            "K2O_gas": "0x1.bb0b642c7f0f0p-32",
+            "Mg": "0x1.a695f99b263e9p-7",
+            "MgO_gas": "0x1.623deac676f3cp-18",
+            "Na": "0x1.aaa501b0dcbd4p+3",
+            "Na2": "0x1.2fd40bcd21d90p-11",
+            "Na2O_gas": "0x1.3057969c904ddp-21",
+            "O2": "0x1.b4f90e8436f79p+6",
+            "SiO": "0x1.0d66c48855b44p-17",
+            "SiO2_gas": "0x1.504f887a283a7p-17",
+            "TiO": "0x1.2c9a07272fb20p-34",
+            "TiO2_gas": "0x1.8d1384767e179p-29"
+          }
+        ],
+        "name": "overhead_bleed"
+      }
+    ],
+    "initial": {
+      "gas_atoms_mol": {
+        "Ar": "0x1.0624dd2f1a9fcp-10"
+      },
+      "volume_m3": "0x1.61ac42829b50cp-4"
+    },
+    "postcapture_mbar": {
+      "Al": "0x1.13cb2f842d541p-37",
+      "Ar": "0x1.1d78a1db776e4p+2",
+      "Ca": "0x1.950689f157bd9p-31",
+      "CaO_gas": "0x1.65a61af92c601p-47",
+      "Fe": "0x1.2a63811395d49p-6",
+      "K": "0x1.379e7ca34de20p-9",
+      "K2": "0x1.c0a106f42538cp-31",
+      "K2O_gas": "0x1.5f536dcacd850p-38",
+      "Mg": "0x1.4f1a41c911de8p-13",
+      "MgO_gas": "0x1.18e836e63f9dap-24",
+      "Na": "0x1.525230787a07fp-3",
+      "Na2": "0x1.e1dc34d959b26p-18",
+      "Na2O_gas": "0x1.e2acd3d288c39p-28",
+      "O2": "0x1.5a82def8a9881p+0",
+      "SiO": "0x1.ab42ae488454cp-24",
+      "SiO2_gas": "0x1.0ab0207abd1bep-23",
+      "TiO": "0x1.dcbe2c1d5e67fp-41",
+      "TiO2_gas": "0x1.3adfba3243f07p-35"
+    },
+    "source_kg_hr": {
+      "Al": "0x1.8e3f976f90a0ep-32",
+      "Ca": "0x1.7135881ec4757p-26",
+      "CaO_gas": "0x1.a36f622d531b1p-34",
+      "K": "0x1.1a2812f096548p-6",
+      "K2": "0x1.61eb93f212712p-28",
+      "K2O_gas": "0x1.4ddd72b2f009fp-35",
+      "Mg": "0x1.bb0cd3c816d49p-12",
+      "MgO_gas": "0x1.7922e119cd8d2p-21",
+      "Na": "0x1.ab7cb4f08209ap-1",
+      "Na2": "0x1.bf0a161559d0cp-16",
+      "Na2O_gas": "0x1.2dce12a5bac4ep-25",
+      "SiO": "0x1.15cefa24d1d34p-17",
+      "SiO2_gas": "0x1.43ab1c3a47e81p-15",
+      "TiO": "0x1.02fcd322b8d69p-27",
+      "TiO2_gas": "0x1.20ae499f31029p-22"
+    },
+    "source_plane_mbar": {
+      "Al": "0x1.be65d2dc5dbccp-33",
+      "Ar": "0x1.5c683f3d39690p+2",
+      "Ca": "0x1.169cded7774f5p-27",
+      "CaO_gas": "0x1.c46c47d565d9cp-36",
+      "K": "0x1.b483417a4b91cp-8",
+      "K2": "0x1.11c48668b2d13p-30",
+      "K2O_gas": "0x1.acc7cb29a646cp-38",
+      "Mg": "0x1.13a70823bf5c1p-12",
+      "MgO_gas": "0x1.1affb98e622eap-22",
+      "Na": "0x1.192f849e44f71p-1",
+      "Na2": "0x1.260be047d7908p-17",
+      "Na2O_gas": "0x1.268b2ee9972fap-27",
+      "O2": "0x1.7d6b32af141a4p-20",
+      "SiO": "0x1.7d2de056aa2ddp-19",
+      "SiO2_gas": "0x1.45d8c2568ecc2p-17",
+      "TiO": "0x1.ea92c34f63a56p-30",
+      "TiO2_gas": "0x1.b546c461e1476p-25"
+    },
+    "upstream_mbar": {
+      "Al": "0x1.13cb2f842d541p-37",
+      "Ar": "0x1.1d78a1db776e4p+2",
+      "Ca": "0x1.950689f157bd9p-31",
+      "CaO_gas": "0x1.65a61af92c601p-47",
+      "Fe": "0x1.2a63811395d49p-6",
+      "K": "0x1.379e7ca34de20p-9",
+      "K2": "0x1.c0a106f42538cp-31",
+      "K2O_gas": "0x1.5f536dcacd850p-38",
+      "Mg": "0x1.4f1a41c911de8p-13",
+      "MgO_gas": "0x1.18e836e63f9dap-24",
+      "Na": "0x1.525230787a07fp-3",
+      "Na2": "0x1.e1dc34d959b26p-18",
+      "Na2O_gas": "0x1.e2acd3d288c39p-28",
+      "O2": "0x1.5a82def8a9881p+0",
+      "SiO": "0x1.ab42ae488454cp-24",
+      "SiO2_gas": "0x1.0ab0207abd1bep-23",
+      "TiO": "0x1.dcbe2c1d5e67fp-41",
+      "TiO2_gas": "0x1.3adfba3243f07p-35"
+    }
+  }
+}
