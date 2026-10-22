@@ -3289,7 +3289,7 @@ def _source_band_catalog(
         quantity = quantity_token(identity)
         if center is None or quantity is None:
             continue
-        operation = _residual_metric_operation(quantity, identity)
+        operation = metric_operation_for_identity(identity)
         if operation is None:
             continue
         deviations = [compute_metric(operation, value, center) for value in source_values]
