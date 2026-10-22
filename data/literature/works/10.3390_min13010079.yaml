@@ -376,8 +376,8 @@ experiments:
 - experiment_id: 10.3390/min13010079::sublimation-kinetics-2023-minerals
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: engine_evaluation
   sample: {}
   conditions:
     temperature_K:
@@ -402,9 +402,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.3390/min13010079
   locator:
-    published_page: 3
-    pdf_page_index: 3
-    section: '2.2'
+    published_page: 7
+    pdf_page_index: 7
+    figure: '4'
 benches:
 - id: 10.3390/min13010079::bench::bet-analyser
   work_id: 10.3390/min13010079
@@ -465,3 +465,27 @@ benches:
       pdf_page_index: 2
       section: 2.1 Lunar Simulant Sintering
   other_facts: []
+context:
+- observation_id: shaw_2023_lms1_quoted_spec_density
+  type: characterization
+  locator:
+    published_page: 3
+    pdf_page_index: 3
+    section: '2.2'
+  quote: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications [10].
+  phase: condensed_solid
+  standard_state: density adopted from LMS-1 specifications, not measured here
+  regime: quoted_literature
+  units: g/cm3 as printed
+  values:
+    quantity: density
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    density_g_cm3: '3.03'
+    value_as_published: 3.03 g/cm3
+    attribution: LMS-1 simulant specifications (Isachenkov et al. 2022 Icarus 376:114873, their ref. [10]); quoted, not measured
+      in Shaw et al. (2023)
+  context_id: sublimation-kinetics-2023-minerals::context::shaw_2023_lms1_quoted_spec_density
+  work_id: 10.3390/min13010079
+  source_id: sublimation-kinetics-2023-minerals
+  species: LMS-1
