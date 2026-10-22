@@ -2742,6 +2742,7 @@ def test_vaporock_gas_outside_shomate_uses_janaf_table() -> None:
     pytest.importorskip("vaporock.equil")
 
     from simulator.battery.compilation_tier import _JANAF_TABLE_NOTICE
+    from simulator.battery.records import Locator
 
     columns = {
         Quantity.CP: "heat_capacity",
@@ -2751,15 +2752,17 @@ def test_vaporock_gas_outside_shomate_uses_janaf_table() -> None:
     for formula, temperature, table_id in _OUTSIDE_SHOMATE_TABLE_CASES:
         for quantity, column in columns.items():
             printed = _printed_janaf_node(table_id, temperature, column)
-            attempt = predict_thermo_attempt(
-                Engine.VAPOROCK,
+            observation = replace(
                 F.observation(
                     f"table-{formula}-{quantity.value}-{temperature}",
                     "exp-1",
                     _gas_thermo(formula, quantity, temperature),
                     printed,
+                    source_id="nist-janaf-4th",
                 ),
+                locator=Locator(table=table_id, record=table_id),
             )
+            attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
             assert attempt.refusal_reason is None
             assert attempt.value == printed
             assert attempt.authority is Authority.BRIDGE
@@ -2815,6 +2818,7 @@ def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) ->
     from simulator.battery.compilation_tier import _vaporock_tabulated_gas_attempt
     from simulator.battery.generators import janaf as janaf_module
     from simulator.battery.generators.janaf import JANAFTabulatedGas
+    from simulator.battery.records import Locator
 
     def nonpositive(_formula: str, _temperature: Decimal) -> JANAFTabulatedGas:
         return JANAFTabulatedGas(
@@ -2829,10 +2833,21 @@ def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) ->
 
     monkeypatch.setattr(janaf_module, "janaf_tabulated_gas_thermo", nonpositive)
     for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+        observation = replace(
+            F.observation(
+                f"chromium-nonpositive-{quantity.value}",
+                "exp-1",
+                _gas_thermo("Cr", quantity, Decimal("500")),
+                Decimal("0"),
+                source_id="nist-janaf-4th",
+            ),
+            locator=Locator(table="Cr-005", record="Cr-005"),
+        )
         attempt = _vaporock_tabulated_gas_attempt(
             "Cr",
             quantity,
             Decimal("500"),
+            observation=observation,
             origin="chromium-nonpositive",
             species_name="Cr(g)",
             call_evidence="test",
@@ -2843,6 +2858,125 @@ def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) ->
             attempt.refusal_detail["reason"]
             == "vaporock-gas-thermo-not-admissible"
         )
+
+
+def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
+    """A gas table answers only the observation's own reference basis.
+
+    Mg-001 at 1366.104 K is the reference-state gas: published H−H298 is
+    169.298, which includes vaporization. Mg-005 at that node is 22.198.
+    The Robie magnesium reference-state entropy at 298.15 K is the crystal
+    (32.67704 J/(mol·K)). B1452 magnesium at 1361 K is still that condensed
+    zero, even where S is close to the gas table. All three refuse.
+    B1259 and B1452 oxygen are the ideal gas at 298.15 K, so those rows
+    return the printed O-029 node. A same-table gas row is covered by the
+    printed-node test.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from simulator.battery.records import Locator
+
+    magnesium = replace(
+        F.observation(
+            "mg-001-enthalpy-at-boiling",
+            "exp-1",
+            _gas_thermo("Mg", Quantity.H_MINUS_H298, Decimal("1366.104")),
+            Decimal("169.298"),
+            source_id="nist-janaf-4th",
+        ),
+        locator=Locator(table="Mg-001", record="Mg-001"),
+    )
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, magnesium)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert attempt.refusal_detail["observation_table"] == "Mg-001"
+    assert attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert attempt.refusal_detail["gas_phase"] == Phase.G.value
+
+    robie = replace(
+        F.observation(
+            "robie-magnesium-reference-entropy",
+            "exp-1",
+            _gas_thermo("Mg", Quantity.S, Decimal("298.15")),
+            Decimal("32.67704"),
+            source_id="robie-waldbaum-1968-usgs-b1259",
+        ),
+        locator=Locator(
+            table="b1259-ht-0027-magnesium-reference-state",
+            record="b1259-ht-0027-magnesium-reference-state",
+        ),
+    )
+    robie_attempt = predict_thermo_attempt(Engine.VAPOROCK, robie)
+    assert robie_attempt.value is None
+    assert robie_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        robie_attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    )
+    assert robie_attempt.refusal_detail["gas_table"] == "Mg-005"
+    assert (
+        robie_attempt.refusal_detail["observation_table"]
+        == "b1259-ht-0027-magnesium-reference-state"
+    )
+
+    near_boiling = replace(
+        F.observation(
+            "b1452-magnesium-near-boiling-entropy",
+            "exp-1",
+            _gas_thermo("Mg", Quantity.S, Decimal("1361")),
+            Decimal("180.2"),
+            source_id="robie-hemingway-fisher-1978-usgs-b1452",
+        ),
+        locator=Locator(table="b1452-magnesium", record="b1452-magnesium"),
+    )
+    near_boiling_attempt = predict_thermo_attempt(Engine.VAPOROCK, near_boiling)
+    assert near_boiling_attempt.value is None
+    assert near_boiling_attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert (
+        near_boiling_attempt.refusal_detail["reason"]
+        == "tabulated_table_basis_mismatch"
+    )
+    assert near_boiling_attempt.refusal_detail["gas_table"] == "Mg-005"
+
+    oxygen_printed = _printed_janaf_node(
+        "O-029", Decimal("500"), "enthalpy_increment"
+    )
+    oxygen = replace(
+        F.observation(
+            "b1259-oxygen-enthalpy",
+            "exp-1",
+            _gas_thermo("O2", Quantity.H_MINUS_H298, Decimal("500")),
+            oxygen_printed,
+            source_id="robie-waldbaum-1968-usgs-b1259",
+        ),
+        locator=Locator(
+            table="b1259-ht-0034-oxygen-reference-state",
+            record="b1259-ht-0034-oxygen-reference-state",
+        ),
+    )
+    oxygen_attempt = predict_thermo_attempt(Engine.VAPOROCK, oxygen)
+    assert oxygen_attempt.refusal_reason is None
+    assert oxygen_attempt.value == oxygen_printed
+    assert oxygen_attempt.authority is Authority.BRIDGE
+
+    oxygen_entropy = _printed_janaf_node("O-029", Decimal("298.15"), "entropy")
+    b1452_oxygen = replace(
+        F.observation(
+            "b1452-oxygen-entropy",
+            "exp-1",
+            _gas_thermo("O2", Quantity.S, Decimal("298.15")),
+            oxygen_entropy,
+            source_id="robie-hemingway-fisher-1978-usgs-b1452",
+        ),
+        locator=Locator(table="b1452-oxygen", record="b1452-oxygen"),
+    )
+    b1452_attempt = predict_thermo_attempt(Engine.VAPOROCK, b1452_oxygen)
+    assert b1452_attempt.refusal_reason is None
+    assert b1452_attempt.value == oxygen_entropy
+    assert b1452_attempt.authority is Authority.BRIDGE
 
 
 def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(

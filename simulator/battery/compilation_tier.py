@@ -1072,11 +1072,52 @@ def _refuse_inadmissible_vaporock_gas(
     )
 
 
+def _locator_table_id(observation: Observation) -> str:
+    locator = observation.locator
+    if locator is None:
+        return ""
+    table = locator.table or locator.record
+    return "" if table is None else str(table).strip()
+
+
+def _tabulated_gas_basis_matches(
+    observation: Observation, formula: str, table_id: str
+) -> bool:
+    """The gas table is this observation's own species, phase, and reference basis.
+
+    A JANAF row matches only its own table id. Mg-001 above the boiling
+    point is the gas on the condensed 298.15 K zero; Mg-005 is the ideal-gas
+    zero. A non-JANAF row matches only when that compilation's elemental
+    reference owner says the 298.15 K reference is this ideal gas. A
+    reference-state table that is crystal at 298.15 K does not, including
+    temperatures where the stable phase has become gas.
+    """
+
+    if _is_janaf_compilation_observation(observation, None):
+        return _locator_table_id(observation) == table_id
+    source_id = observation.source_id or ""
+    from simulator.battery.generators.usgs_b1259 import (
+        SOURCE_ID as b1259_source,
+        reference_enthalpy_zero_is_ideal_gas as b1259_ideal_gas,
+    )
+    from simulator.battery.generators.usgs_b1452 import (
+        SOURCE_ID as b1452_source,
+        reference_enthalpy_zero_is_ideal_gas as b1452_ideal_gas,
+    )
+
+    if source_id == b1259_source:
+        return b1259_ideal_gas(formula)
+    if source_id == b1452_source:
+        return b1452_ideal_gas(formula)
+    return False
+
+
 def _vaporock_tabulated_gas_attempt(
     formula: str,
     quantity: Quantity,
     temperature_K: Decimal,
     *,
+    observation: Observation,
     origin: str,
     species_name: str,
     call_evidence: str,
@@ -1140,6 +1181,29 @@ def _vaporock_tabulated_gas_attempt(
             call_evidence=call_evidence,
         )
 
+    if not _tabulated_gas_basis_matches(observation, table_formula, sample.table_id):
+        # The table read is a different reference basis. Do not return its
+        # number: Mg-001 at 1366.104 K publishes H−H298 169.298, which
+        # includes vaporization, while Mg-005 publishes 22.198.
+        declared = None
+        if isinstance(observation.identity, Identity):
+            declared = phase_token(observation.identity.species)
+        return _refuse(
+            RefusalReason.IDENTITY_MISMATCH,
+            "tabulated_table_basis_mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": Engine.VAPOROCK.value,
+                "species": species_name,
+                "observation_table": _locator_table_id(observation),
+                "observation_phase": None if declared is None else declared.value,
+                "gas_table": sample.table_id,
+                "gas_phase": Phase.G.value,
+            },
+            call_evidence=call_evidence,
+        )
+
     heat_capacity = sample.heat_capacity
     entropy = sample.entropy
     enthalpy = sample.enthalpy_increment
@@ -1179,6 +1243,7 @@ def _vaporock_tabulated_gas_attempt(
 
 
 def _vaporock_gas_attempt(
+    observation: Observation,
     identity: Identity,
     quantity: Quantity,
     temperature_K: Decimal,
@@ -1293,6 +1358,7 @@ def _vaporock_gas_attempt(
             formula,
             quantity,
             temperature_K,
+            observation=observation,
             origin=origin,
             species_name=species_name,
             call_evidence=call_evidence,
@@ -1653,7 +1719,9 @@ def predict_thermo_attempt(
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
     if engine is Engine.VAPOROCK:
-        return _vaporock_gas_attempt(identity, quantity, temperature_K, origin=origin)
+        return _vaporock_gas_attempt(
+            observation, identity, quantity, temperature_K, origin=origin
+        )
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
             engine,
