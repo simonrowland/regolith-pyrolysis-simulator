@@ -1,0 +1,35 @@
+source_id: day-2020-trinitite-volatility
+table: S-1
+locator:
+  source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  page: 11
+  pdf_page_index: 10
+  published_page: SI-4
+  table: S-1
+  note: Table S-1; all 13 printed rows and 16 columns reconciled to pdftotext-layout and checked against the 600
+    dpi page render.
+table_tool: 'not run: no MinerU table block was present; born-digital pdftotext-layout table transcribed manually.'
+transcription_method: pdftotext-layout primary read; every cell and row/column assignment checked against 600 dpi
+  PDF page 11 render.
+printed_row_count: 13
+printed_column_count: 16
+rows_emitted: 13
+typed_columns:
+  d65Cu: isotope_delta, measured_direct
+  plusminus_2sigma: Cu isotope uncertainty, retained as ±2σ
+  d66Zn: isotope_delta, quoted_attributed to Day et al. (2017)
+  d41K: isotope_delta, quoted_attributed to Chen et al. (2019)
+context_columns:
+- Mass (g)
+- Cu (ug/g)
+- Fraction
+- Blank%
+- sum_Cu (ug/g)
+- sum_d65Cu
+- Cu (ICP) (ug/g)
+- Zn (ug/g)
+- K2O (wt%)
+notes:
+- The leaching residue is not an evaporation residue; residue_component_composition.residue_ppm does not apply.
+- Whole-sample bulk analyses are multiphase context.
+- Blank table cells are preserved as null in the transcription CSV and are not treated as ditto values.

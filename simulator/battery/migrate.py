@@ -3095,6 +3095,7 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
             "Cr2O3",
             "MnO",
             "P2O5",
+            "V2O5",
             "NiO",
             "CoO",
         )

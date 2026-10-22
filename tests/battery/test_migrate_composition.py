@@ -89,6 +89,22 @@ def test_wt_percent_conversion_handles_swept_species_and_feot_alias() -> None:
     assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
 
 
+def test_wt_percent_conversion_handles_vanadium_pentoxide() -> None:
+    wt = {"MgO": Decimal("40"), "V2O5": Decimal("60")}
+
+    converted = wt_pct_to_mole_fraction(wt)
+    components = dict(converted.components)
+    oxygen_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["O"]))
+    mg_molar_mass = Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["Mg"])) + oxygen_mass
+    v2o5_molar_mass = 2 * Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL["V"])) + 5 * oxygen_mass
+    mg_moles = wt["MgO"] / mg_molar_mass
+    v2o5_moles = wt["V2O5"] / v2o5_molar_mass
+
+    assert set(components) == {"MgO", "V2O5"}
+    assert components["V2O5"] == v2o5_moles / (mg_moles + v2o5_moles)
+    assert oxide_molar_mass("V2O5") == v2o5_molar_mass
+
+
 @pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))
 def test_wt_percent_conversion_refuses_ambiguous_feot_and_iron_oxide(
     iron_oxide: str,
