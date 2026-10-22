@@ -205,6 +205,9 @@ CODE_INPUTS = (
 #     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
+#   2458a9f46: decision band for phase rows uses metric_operation_for_identity;
+#     no store output change (decision bands are not store data; ror-bandfix:
+#     same output on green).
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
@@ -225,6 +228,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "f74ef7a6f",
     "d6ccae4b4",
     "7e0508bb5", "b37e28bac", "297df02b9",
+    "2458a9f46",
 })
 
 
