@@ -28,14 +28,14 @@ species:
     observations:
     - observation_id: gerasimov_2005_augite_condensate_composition
       type: composition_series
-      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Augite condensate'}
-      phase: solid
-      regime: laser-pulse vaporization and condensation
+      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Augite condensate', note: 'Condensate values are from the Augite condensate column; identity composition is from the Augite starting sample column.'}
       units: wt% oxide as printed
       values:
         quantity: condensate_composition
         method_class: measured_direct
         analytical_method: X-ray photoelectron spectroscopy of precipitated condensate films
+        total_pressure_atm: 1
+        total_pressure_locator: {page: 3, published_page: 353, section: Experimental procedures, note: 'Atmosphere of helium kept at pressure of 1 atm.'}
         sample_id: augite
         starting_analyses_count: 18
         composition_wt_pct: {SiO2: 49.29, TiO2: 1.13, Al2O3: 9.98, FeO: 8.22, MgO: 13.09, CaO: 15.46, MnO: 0.07, Na2O: 2.75}
@@ -48,27 +48,24 @@ species:
         SiO_evolution_row: SiO2
       point_conditions:
         temperature_K:
-          state: {tag: unknown, reason: only a global 3000–5000 K range is stated; no per-row temperature}
-          locator: {page: 1, published_page: 351, section: Abstract}
+          state: {tag: unknown, reason: vaporization temperature estimated as 4000–5000 K; no per-row temperature is stated}
+          locator: {page: 3, published_page: 353, section: Experimental procedures}
         fO2_Pa:
           state: {tag: unknown, reason: oxygen fugacity is not stated for the Table 1 experiment}
           locator: {page: 4, published_page: 354, table: '1'}
-        total_pressure_Pa:
-          state: {tag: unknown, reason: pressure is not stated for the Table 1 rows}
-          locator: {page: 4, published_page: 354, table: '1'}
         composition:
           state: {tag: value, value: {amount_basis: mass_percent, components: [[SiO2, 49.29], [TiO2, 1.13], [Al2O3, 9.98], [FeO, 8.22], [MgO, 13.09], [CaO, 15.46], [MnO, 0.07], [Na2O, 2.75]]}}
-          locator: {page: 4, published_page: 354, table: '1', row: 'Augite starting sample'}
+          locator: {page: 4, published_page: 354, table: '1', row: 'Augite starting sample', column: 'Augite starting sample', note: 'Composition values come from the Augite starting sample column.'}
     - observation_id: gerasimov_2005_obsidian_condensate_composition
       type: composition_series
-      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Obsidian condensate'}
-      phase: solid
-      regime: laser-pulse vaporization and condensation
+      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Obsidian condensate', note: 'Condensate values are from the Obsidian condensate column; identity composition is from the Obsidian starting sample column.'}
       units: wt% oxide as printed
       values:
         quantity: condensate_composition
         method_class: measured_direct
         analytical_method: X-ray photoelectron spectroscopy of precipitated condensate films
+        total_pressure_atm: 1
+        total_pressure_locator: {page: 3, published_page: 353, section: Experimental procedures, note: 'Atmosphere of helium kept at pressure of 1 atm.'}
         sample_id: obsidian
         starting_analyses_count: 10
         composition_wt_pct: {SiO2: 57.90, TiO2: 1.32, Al2O3: 15.02, FeO: 9.31, MgO: 5.11, CaO: 7.37, Na2O: 2.99, K2O: 0.53}
@@ -80,17 +77,14 @@ species:
         SiO_evolution_row: SiO2
       point_conditions:
         temperature_K:
-          state: {tag: unknown, reason: only a global 3000–5000 K range is stated; no per-row temperature}
-          locator: {page: 1, published_page: 351, section: Abstract}
+          state: {tag: unknown, reason: vaporization temperature estimated as 4000–5000 K; no per-row temperature is stated}
+          locator: {page: 3, published_page: 353, section: Experimental procedures}
         fO2_Pa:
           state: {tag: unknown, reason: oxygen fugacity is not stated for the Table 1 experiment}
           locator: {page: 4, published_page: 354, table: '1'}
-        total_pressure_Pa:
-          state: {tag: unknown, reason: pressure is not stated for the Table 1 rows}
-          locator: {page: 4, published_page: 354, table: '1'}
         composition:
           state: {tag: value, value: {amount_basis: mass_percent, components: [[SiO2, 57.90], [TiO2, 1.32], [Al2O3, 15.02], [FeO, 9.31], [MgO, 5.11], [CaO, 7.37], [Na2O, 2.99], [K2O, 0.53]]}}
-          locator: {page: 4, published_page: 354, table: '1', row: 'Obsidian starting sample'}
+          locator: {page: 4, published_page: 354, table: '1', row: 'Obsidian starting sample', column: 'Obsidian starting sample', note: 'Composition values come from the Obsidian starting sample column.'}
     context:
     - observation_id: gerasimov_2005_global_temperature_range
       type: laboratory_conditions
@@ -101,3 +95,22 @@ species:
         method_class: reported_context
         T_range_as_published: 3000–5000 K
         note: Abstract-level impact-vaporization range, recorded once and not assigned to Table 1 observations.
+    - observation_id: gerasimov_2005_vaporization_temperature_estimate
+      type: laboratory_conditions
+      locator: {page: 3, published_page: 353, section: Experimental procedures}
+      units: K as printed
+      values:
+        quantity: laser_pulse_vaporization_temperature_estimate
+        method_class: reported_context
+        T_range_as_published: 4000–5000 K
+        note: The temperature of vaporization was estimated as 4000–5000 K.
+    - observation_id: gerasimov_2005_helium_atmosphere_pressure
+      type: laboratory_conditions
+      locator: {page: 3, published_page: 353, section: Experimental procedures}
+      units: atm as printed
+      values:
+        quantity: laser_experiment_atmosphere
+        method_class: reported_context
+        atmosphere_as_printed: helium
+        total_pressure_atm: 1
+        note: Atmosphere of helium kept at pressure of 1 atm.
