@@ -10,6 +10,7 @@ import yaml
 from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 from simulator.campaigns import (
     CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON,
+    C0_EXIT_MODE,
     CampaignC4EndpointRefusal,
     CampaignEndpointRefusal,
     CampaignHoldAcquisitionRefusal,
@@ -264,6 +265,38 @@ def test_c0_first_melt_backstop_beats_the_maximum_hold():
     manager.c0_first_melt_backstop = True
     assert manager.check_endpoint(
         _melt(CampaignPhase.C0, 25, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
+
+
+def test_c0_operator_max_hours_stays_an_incomplete_hold():
+    assert C0_EXIT_MODE == "backstop"
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C0"] = {"max_hours": 1.0}
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 0, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit == {
+        "outcome": "incomplete",
+        "backstop": "maximum_hold",
+        "kinetics": STAGE0_RELEASE_KINETICS,
+    }
+
+
+def test_c0_first_melt_beats_an_operator_max_hours_override():
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C0"] = {"max_hours": 1.0}
+    manager.c0_first_melt_backstop = True
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 0, temperature_C=20.0),
         _flux(),
         CondensationTrain(),
         BatchRecord(),

@@ -233,6 +233,13 @@ class _CampaignOverrideStore(dict):
             self[str(key)] = value
 
 
+# Owner ruling pending. "backstop" is the selected C0 exit: incomplete
+# first-melt or maximum-hold only. "temperature_hold" restores the
+# pre-phase-2 temperature plus minimum-hold prediction and must stay
+# unselected until measured release curves exist (t-1417).
+C0_EXIT_MODE = "backstop"
+
+
 class CampaignManager:
     """
     Manages campaign sequencing and endpoint detection.
@@ -2173,7 +2180,8 @@ class CampaignManager:
         Runtime completion on the paths in this function (not IR peak
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
-        - C0: incomplete maximum-hold or first-melt backstop only
+        - C0: C0_EXIT_MODE. Selected backstop is incomplete maximum-hold
+          or first melt. temperature_hold is unselected.
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -2201,9 +2209,14 @@ class CampaignManager:
 
         # Check user-specified max_hours override first. C6 handles this as a
         # hold-acquisition refusal below so the wall clock cannot claim a
-        # successful reaction without provider dispatch.
+        # successful reaction without provider dispatch. C0 records the same
+        # stop inside its own branch so the incomplete outcome is not skipped.
         ovr = self._campaign_overrides(campaign)
-        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
+        if campaign not in (
+            CampaignPhase.C4,
+            CampaignPhase.C6,
+            CampaignPhase.C0,
+        ) and 'max_hours' in ovr:
             raw_max_hours = ovr['max_hours']
             if not is_declared_real_scalar(
                 raw_max_hours,
@@ -2215,11 +2228,43 @@ class CampaignManager:
                 return True
 
         if campaign == CampaignPhase.C0:
-            # No measured release curve is loaded (t-1417). Temperature
-            # and the minimum hold cannot complete this campaign.
+            # No measured release curve is loaded (t-1417). The selected
+            # mode cannot complete this campaign on temperature alone.
             from simulator.accounting.stage0_inventory import (
                 STAGE0_RELEASE_KINETICS,
             )
+
+            if C0_EXIT_MODE == "temperature_hold":
+                soft = self._configured_endpoint(campaign, 'soft_endpoint')
+                min_temperature_C = self._endpoint_float(
+                    campaign, soft, 'temperature_min_C')
+                min_hold_hr = self._float(
+                    ovr.get('min_hold_hr'),
+                    self._endpoint_float(campaign, soft, 'min_hold_hr'),
+                )
+                max_hold_hr = self._max_hold_hr(campaign)
+                if (
+                    melt.temperature_C >= min_temperature_C
+                    and melt.campaign_hour >= min_hold_hr
+                ):
+                    self.last_c0_exit = {
+                        "outcome": "incomplete",
+                        "backstop": "temperature_hold",
+                        "kinetics": STAGE0_RELEASE_KINETICS,
+                        "release_curves": "uncertified",
+                        "ticket": "t-1417",
+                    }
+                    return True
+                if completed_campaign_hour >= max_hold_hr:
+                    self.last_c0_exit = {
+                        "outcome": "incomplete",
+                        "backstop": "maximum_hold",
+                        "kinetics": STAGE0_RELEASE_KINETICS,
+                    }
+                    return True
+                return False
+            if C0_EXIT_MODE != "backstop":
+                raise ValueError(f"unknown C0_EXIT_MODE {C0_EXIT_MODE!r}")
 
             max_hold_hr = self._max_hold_hr(campaign)
             if self.c0_first_melt_backstop:
