@@ -231,8 +231,10 @@ def test_completed_run_preserves_success_when_product_classification_raises(
 
     assert payload["status"] == "ok"
     assert payload["product_classification"] == {
-        "classification": {},
-        "markdown": "",
+        "status": "unavailable",
+        "section": "product_classification",
+        "exception_type": "RuntimeError",
+        "reason": "injected product-classification failure",
     }
 
 
