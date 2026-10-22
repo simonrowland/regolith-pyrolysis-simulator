@@ -3423,8 +3423,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.pumping_cost import process_pressure_state
         from simulator.campaigns import CampaignPressureSetpointRefusal
 
+        transport_notices = self._process_pressure_diagnostic.get("transport_notices", ())
         if self.melt.ambient_pressure_mbar == 0.0 and self.melt.sweep_mol_per_s is None:
-            self._process_pressure_diagnostic = {}
+            self._process_pressure_diagnostic = ({"transport_notices": list(transport_notices)}
+                                                 if transport_notices else {})
             return
         pumping = self._overhead_headspace_config.get('pumping', {}) or {}
         holdup = self.atom_ledger.mol_by_account('process.overhead_gas')
@@ -3462,6 +3464,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pumping=pumping,
         )
         diagnostic['pumping'] = dict(pumping)
+        if transport_notices:
+            diagnostic["transport_notices"] = list(transport_notices)
         self._process_pressure_diagnostic = diagnostic
         if (duct_capacity_shortfall is not None and actual_pressure_pa is not None
                 and diagnostic.get('pump_feasible', True) is True
@@ -4028,10 +4032,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.overhead import _mean_molar_mass_kg_mol
         from simulator.transport_regime import (
             gas_dynamic_viscosity_Pa_s, pipe_pressure_capacity_fraction,
+            pipe_conductance_authority_notice,
         )
 
         temperature_K = float(self.melt.temperature_C) + 273.15
-        fraction = pipe_pressure_capacity_fraction(
+        pipe_args = (
             self.overhead_model.pipe_diameter_m, self.overhead_model.pipe_length_m,
             _mean_molar_mass_kg_mol(
                 species_kg_for_M_avg,
@@ -4039,9 +4044,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 fallback_engagement_recorder=self.overhead_model._record_pipe_m_avg_fallback_engagement,
             ),
             gas_dynamic_viscosity_Pa_s(temperature_K), temperature_K,
-            float(p_upstream_bar) * 1.0e5, float(p_downstream_bar) * 1.0e5,
         )
-        self.overhead_model.last_pipe_conductance_authority_notice = None
+        pressures = (float(p_upstream_bar) * 1.0e5, float(p_downstream_bar) * 1.0e5)
+        fraction = pipe_pressure_capacity_fraction(*pipe_args, *pressures)
+        self.overhead_model.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
+            pipe_args[0], pipe_args[2], pipe_args[3], pipe_args[4], *pressures,
+        )
         return value * fraction
 
     def _headspace_bleed_conductance_kg_s_per_bar(self) -> float:
@@ -4330,6 +4338,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.overhead import continuous_sweep_balance, OverheadConfigurationError
         from simulator.campaigns import CampaignPressureSetpointRefusal
 
+        notices = set()
+
         def outlet_capacity(inventory, pressure_bar):
             masses = self._overhead_holdup_species_kg(inventory)
             total_mol = sum(inventory.values())
@@ -4338,10 +4348,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 species_kg_for_M_avg=masses, p_upstream_bar=pressure_bar,
                 p_downstream_bar=self._headspace_downstream_pressure_bar(),
             )
+            notice = self.overhead_model.last_pipe_conductance_authority_notice
+            if notice:
+                notices.add(notice)
             return capacity / mean_mass if mean_mass else 0.0
 
         try:
-            return continuous_sweep_balance(
+            plan = continuous_sweep_balance(
                 initial, generated, carrier=self._resolve_condensation_carrier_gas(),
                 sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=dt_s,
                 pressure_bar=self.melt.p_total_mbar / 1000.0,
@@ -4350,6 +4363,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 generated_external_o2_mol=generated_external_o2_mol,
                 outlet_capacity_mol_per_s=outlet_capacity,
             )
+            plan["notices"] = sorted(notices)
+            return plan
         except OverheadConfigurationError as exc:
             raise CampaignPressureSetpointRefusal({
                 'status': 'missing_input', 'reason': 'missing_input', 'detail': str(exc),
@@ -4362,6 +4377,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         holdup = self._overhead_holdup_mol()
         temperature = self._headspace_temperature_K()
         volume = self._headspace_volume_m3()
+        plan = None
         step = getattr(self, '_sweep_transport_step', None)
         if step is not None:
             initial, generated, _, _ = sweep_source_split(
@@ -4390,6 +4406,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'requested_pressure_pa': self.melt.p_total_mbar * 100.0,
                 'achieved_pressure_pa': pressure * 1e5,
             }) from exc
+        from simulator.transport_regime import MOLECULAR_MIXTURE_ROUTING_APPROXIMATION
+
+        transport_notices = list(plan["notices"]) if plan is not None else []
+        notice = self.overhead_model.last_pipe_conductance_authority_notice
+        if notice:
+            transport_notices.append(notice)
+        for notice in dict.fromkeys(transport_notices):
+            code = (MOLECULAR_MIXTURE_ROUTING_APPROXIMATION
+                    if notice.startswith(MOLECULAR_MIXTURE_ROUTING_APPROXIMATION)
+                    else "pipe_conductance_interpolated")
+            boundary["notices"].append({"code": code, "temperature_K": temperature, "reason": notice})
         self._headspace_co2_dissociation_diagnostic = {
             'p_O2_bar': boundary['partials_bar'].get('O2', 0.0), 'notices': boundary['notices'],
         } if boundary['notices'] else {}
@@ -6973,6 +7000,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         sweep_pressure_bar=None,
         sweep_capacity_shortfall=None,
         sweep_capacity_integrated=False,
+        transport_notices=(),
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -7079,10 +7107,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         .cavern_capacity_kg
                     ),
                 })
+        notices = set(transport_notices)
+        if capacity_result is not None:
+            notices.update(getattr(capacity_result, "notices", ()))
+        notice = self.overhead_model.last_pipe_conductance_authority_notice
+        if notice:
+            notices.add(notice)
+        if notices:
+            controls["transport_notices"] = sorted(notices)
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
         )
+        if controls.get("transport_notices"):
+            self._process_pressure_diagnostic["transport_notices"] = list(controls["transport_notices"])
+        else:
+            self._process_pressure_diagnostic.pop("transport_notices", None)
         if sweep_outflow_species_mol is not None and result.status != 'ok':
             from simulator.campaigns import CampaignPressureSetpointRefusal
             failure = dict(result.diagnostic or {})
@@ -14481,6 +14521,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sweep_pressure_bar=sweep_plan['pressure_bar'] if sweep_plan else None,
                 sweep_capacity_shortfall=sweep_plan['capacity_shortfall'] if sweep_plan else None,
                 sweep_capacity_integrated=sweep_plan is not None,
+                transport_notices=sweep_plan.get("notices", ()) if sweep_plan else (),
             )
             self._sweep_transport_step = None
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
@@ -15158,15 +15199,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         normalises into a JSON-serialisable shape so the snapshot
         round-trips cleanly through ``runner.py`` output.
         """
+        transport_notices = tuple(self._process_pressure_diagnostic.get("transport_notices", ()))
+        notice = getattr(self._overhead_model, "last_pipe_conductance_authority_notice", None)
+        if notice:
+            transport_notices = tuple(dict.fromkeys(transport_notices + (notice,)))
         marker = getattr(self, '_pending_knudsen_zero_overhead_flow_marker', None)
         if isinstance(marker, Mapping):
-            return dict(marker)
+            summary = dict(marker)
+            if transport_notices:
+                summary["warnings"] = tuple(dict.fromkeys(tuple(summary.get("warnings", ())) + transport_notices))
+            return summary
         model = self._condensation_model
         if model is None:
-            return {}
+            return {"warnings": transport_notices} if transport_notices else {}
         diag = dict(getattr(model, 'last_knudsen_regime_diagnostic', {}) or {})
         if not diag:
-            return {}
+            return {"warnings": transport_notices} if transport_notices else {}
         # Project the diagnostic into the documented summary shape.
         summary: Dict[str, Any] = {}
         if 'status' in diag:
@@ -15201,6 +15249,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if notice:
             summary['warnings'] += (notice,)
+        summary['warnings'] = tuple(dict.fromkeys(summary['warnings'] + tuple(
+            self._process_pressure_diagnostic.get("transport_notices", ()))))
         return summary
 
     @staticmethod

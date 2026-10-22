@@ -7,10 +7,14 @@ from dataclasses import dataclass
 from typing import Any
 
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.transport_regime import gas_dynamic_viscosity_Pa_s, pipe_downstream_pressure_pa_for_flow_fraction
+from simulator.transport_regime import (
+    gas_dynamic_viscosity_Pa_s,
+    pipe_downstream_pressure_pa_for_flow_fraction,
+)
 
 OXYGEN_SPECIES = "O2"
 _COLD_TRAIN_RATING_REFERENCE_NAMES = frozenset({"p_ref_Pa", "T_ref_K"})
+
 
 def _finite_nonnegative(value: Any, name: str) -> float:
     if isinstance(value, bool):
@@ -204,7 +208,7 @@ def external_oxygen_outlet_mol(*, bled_o2_mol: float, overhead_o2_mol: float,
     """Use a transport-derived outlet, or the legacy uniform batch split."""
     if integrated_external_o2_mol is not None:
         return integrated_external_o2_mol
-    external_holdup = min(max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol))
+    external_holdup = external_oxygen_holdup_mol(overhead_o2_mol=overhead_o2_mol, external_o2_holdup_mol=external_o2_holdup_mol)
     return (min(bled_o2_mol, bled_o2_mol * external_holdup / overhead_o2_mol)
             if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0 else 0.0)
 
@@ -232,9 +236,7 @@ def partition_melt_oxygen(
     # (kg/(hr Pa))*Pa*hr/(kg/mol) both reduce to mol. Sanity anchors: with no
     # external holdup and ample capacity, all bled O2 is admitted; with zero
     # admission and closed relief, all melt-origin bled O2 remains held.
-    external_holdup = min(
-        max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol)
-    )
+    external_holdup = external_oxygen_holdup_mol(overhead_o2_mol=overhead_o2_mol, external_o2_holdup_mol=external_o2_holdup_mol)
     external = external_oxygen_outlet_mol(
         bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
         external_o2_holdup_mol=external_holdup,
@@ -417,3 +419,75 @@ def invalid_destructive_control(controls: dict) -> str | None:
         if cavern_capacity_kg <= 0.0:
             return "cavern_capacity_kg must be a finite positive number"
     return None
+
+
+def removal_partition(
+    holdup_mol: Mapping[str, float],
+    candidate_bled_mol: Mapping[str, float],
+    molar_mass_kg_mol: Mapping[str, float],
+    controls: Mapping,
+    *,
+    cistern_fill_mol: float = 0.0,
+    integrated_external_o2_mol: float | None = None,
+) -> tuple[dict[str, float], OxygenShadowPartition]:
+    """Apply oxygen admission/relief to an already resolved ordinary outlet."""
+    bled_o2 = candidate_bled_mol.get(OXYGEN_SPECIES, 0.0)
+    overhead_o2 = holdup_mol.get(OXYGEN_SPECIES, 0.0)
+    external_holdup = external_oxygen_holdup_mol(overhead_o2_mol=overhead_o2,
+        external_o2_holdup_mol=float(controls.get("external_o2_in_overhead_mol", 0.0)))
+    oxygen_mass = molar_mass_kg_mol.get(OXYGEN_SPECIES, 0.0)
+    capacity = controls.get("cold_train_capacity")
+    if isinstance(capacity, FiniteCapacity) and overhead_o2 > 0.0 and oxygen_mass > 0.0:
+        oxygen = partition_melt_oxygen(
+            bled_o2_mol=bled_o2, overhead_o2_mol=overhead_o2,
+            external_o2_holdup_mol=external_holdup,
+            integrated_external_o2_mol=integrated_external_o2_mol,
+            capacity=capacity, dt_hr=float(controls.get("dt_hr", 1.0)),
+            p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
+            k_relief_kg_hr_Pa=float(controls.get("k_relief_kg_hr_Pa", 0.0)),
+            p_open_Pa=float(controls.get("p_open_Pa", 0.0)),
+            molar_mass_kg_mol=oxygen_mass,
+            accumulator_enabled=controls.get("accumulator_enabled") is True,
+            cistern_fill_kg=cistern_fill_mol * oxygen_mass,
+            cavern_capacity_kg=float(controls.get("cavern_capacity_kg", 0.0)),
+        )
+    else:
+        external = external_oxygen_outlet_mol(
+            bled_o2_mol=bled_o2, overhead_o2_mol=overhead_o2,
+            external_o2_holdup_mol=external_holdup,
+            integrated_external_o2_mol=integrated_external_o2_mol,
+        )
+        oxygen = OxygenShadowPartition(external, max(0.0, bled_o2 - external), 0.0, 0.0, 0.0)
+    debited = dict(candidate_bled_mol)
+    if oxygen.debited_mol > 0.0:
+        debited[OXYGEN_SPECIES] = oxygen.debited_mol
+    else:
+        debited.pop(OXYGEN_SPECIES, None)
+    return debited, oxygen
+
+
+def bounded_sweep_outlet_mol(holdup_mol, requested_outlet_mol):
+    """Resolve the accepted outlet against available inventory at binary64 precision."""
+    return {s: min(n, holdup_mol.get(s, 0.0))
+            for s, n in requested_outlet_mol.items() if n > 0.0}
+
+
+def net_sweep_transfer_mol(holdup_mol, inlet_mol, removed_mol):
+    """Net inlet/outlet once, matching the ledger transfer evaluation order."""
+    debits = {s: n - inlet_mol.get(s, 0.0)
+              for s, n in removed_mol.items() if n > inlet_mol.get(s, 0.0)}
+    credits = {s: n - removed_mol.get(s, 0.0)
+               for s, n in inlet_mol.items() if n > removed_mol.get(s, 0.0)}
+    # Premise: one net chamber lot per species. n_final=n_old-debit+credit,
+    # in mol. For inlet==outlet both lots vanish and old inventory survives;
+    # subtracting after adding the whole inlet would lose small retained loads.
+    final = dict(holdup_mol)
+    for species, mol in debits.items():
+        final[species] = final.get(species, 0.0) - mol
+    for species, mol in credits.items():
+        final[species] = final.get(species, 0.0) + mol
+    return debits, credits, final
+
+
+def external_oxygen_holdup_mol(*, overhead_o2_mol, external_o2_holdup_mol):
+    return min(max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol))

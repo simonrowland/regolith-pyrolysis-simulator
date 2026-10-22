@@ -15,7 +15,7 @@ from simulator.environment import capacity_partial_pressures_pa
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from simulator.transport_regime import (
     gas_dynamic_viscosity_Pa_s, pipe_mass_flow_kg_s,
-    pipe_pressure_capacity_fraction,
+    pipe_pressure_capacity_fraction, pipe_conductance_authority_notice,
 )
 
 
@@ -46,6 +46,7 @@ class CapacityShadowResult:
     max_delta_history_Pa: tuple[float, ...]
     mass_closure_error_pct: float
     authoritative: bool = False
+    notices: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         for name in (
@@ -198,6 +199,7 @@ def solve_capacity_shadow(
         {species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
          for species in species_order}, volume_m3, temperature_K,
     )
+    notices = set()
     delta_history: list[float] = []
     final_bled: dict[str, float] = {}
     final_offgas: dict[str, float] = {}
@@ -301,6 +303,13 @@ def solve_capacity_shadow(
                 *pipe_args, total_pressure_Pa, downstream_pressure_Pa,
             ) if total_mol > 0.0 else 0.0
         )
+        if total_mol > 0.0 and bleed_conductance_kg_s != 0.0:
+            notice = pipe_conductance_authority_notice(
+                pipe_diameter_m, gas_mass, pipe_args[3], pipe_temperature_K,
+                total_pressure_Pa, downstream_pressure_Pa,
+            )
+            if notice:
+                notices.add(notice)
         bleed_controls["bleed_conductance_kg_s"] = executable_capacity
         if controlled_flow:
             positive_source_kg_hr = sum(
@@ -446,6 +455,7 @@ def solve_capacity_shadow(
         )
     return CapacityShadowResult(
         capacity=capacity,
+        notices=tuple(sorted(notices)),
         partial_pressures_Pa=partials,
         evaporation_flux_kg_hr=final_flux,
         bled_species_mol=final_bled,

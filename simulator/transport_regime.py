@@ -161,6 +161,9 @@ def _pipe_knudsen_parameter(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
             * math.sqrt(M_avg / (2.0 * math.pi * PIPE_GAS_CONSTANT_J_MOL_K * T_K)))
 
 
+MOLECULAR_MIXTURE_ROUTING_APPROXIMATION = "molecular_mixture_routing_approximation"
+
+
 def pipe_conductance_authority_notice(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa):
     """Classify the actual pipe calculation, not a condensation wall segment.
 
@@ -170,6 +173,14 @@ def pipe_conductance_authority_notice(d, M_avg, eta, T_K, p_upstream_Pa, p_downs
     """
     x = _pipe_knudsen_parameter(d, M_avg, eta, T_K, p_upstream_Pa, p_downstream_Pa)
     knudsen_number = 0.5 / x if x > 0.0 else math.inf
+    if ((p_upstream_Pa > 0.0 or p_downstream_Pa > 0.0)
+            and mean_mixture_bulk_fraction_routing_is_approximation(knudsen_number)):
+        return (
+            f"{MOLECULAR_MIXTURE_ROUTING_APPROXIMATION}: mean-mixture total capacity "
+            "with nonfractionating bulk-fraction species removal; oxygen attainability "
+            "and outlet composition are not species-certified; opposed partial-pressure "
+            "exchange at equal total pressures is unresolved."
+        )
     if (p_upstream_Pa > p_downstream_Pa
             and classify_knudsen_regime(knudsen_number) is KnudsenRegime.TRANSITIONAL):
         return (
