@@ -4255,7 +4255,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         head_o2_mol: Optional[float] = None,
     ) -> float:
         if self.melt.sweep_mol_per_s is not None:
-            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
+            return self._sweep_boundary_pO2_bar()
         if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
             'PN2_SWEEP',
             'ARGON_FLOW',
@@ -14277,7 +14277,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._admit_process_pressure()
         if self.melt.sweep_mol_per_s is not None and (
             not self._overhead_headspace_enabled()
-            or self.melt.atmosphere.name not in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}
+            or self.melt.atmosphere.name not in {
+                'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE',
+                'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE',
+            }
             or self._resolve_condensation_carrier_gas() == 'O2'
         ):
             from simulator.campaigns import CampaignPressureSetpointRefusal

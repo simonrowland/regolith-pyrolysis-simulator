@@ -29,6 +29,7 @@ from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
     interpolate_schedule_points,
+    imposed_carrier_flow_mol_per_s,
     normalize_lab_schedule,
     pO2_enforcement_row,
     pO2_setpoint_mbar_from_schedule,
@@ -1407,6 +1408,11 @@ class CampaignManager:
         # owns A_melt (~charge mass^(2/3)); zero intensity gives zero flow.
         melt.sweep_mol_per_s = (None if flow_per_area is None else
                                 flow_per_area * melt.melt_surface_area_m2)
+        schedule = self._lab_schedule(active)
+        if schedule is not None:
+            imposed_flow = imposed_carrier_flow_mol_per_s(schedule)
+            if imposed_flow is not None:
+                melt.sweep_mol_per_s = imposed_flow
         return stage
 
     def apply_c2a_staged_gas_controls(

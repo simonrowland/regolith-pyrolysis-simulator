@@ -187,6 +187,14 @@ class EquilibriumMixin:
         self._headspace_co2_dissociation_diagnostic = diagnostic
         return float(diagnostic['p_O2_bar'])
 
+    def _sweep_boundary_pO2_bar(self) -> float:
+        physical = self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
+        if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+            physical = max(physical, self.melt.pO2_mbar / 1000.0)
+            if self.melt.body != 'mars':
+                physical = max(physical, self._oxygen_numerical_floor_bar())
+        return physical
+
     def _commanded_pO2_bar(self) -> float:
         """
         Commanded oxygen partial pressure (bar) for this hour.
@@ -216,7 +224,7 @@ class EquilibriumMixin:
         headspace pO₂ instead of a synthetic vacuum-floor setpoint.
         """
         if self.melt.sweep_mol_per_s is not None:
-            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
+            return self._sweep_boundary_pO2_bar()
         enabled = getattr(self, '_overhead_headspace_enabled', lambda: False)()
         if enabled:
             diagnostic = getattr(
@@ -258,7 +266,7 @@ class EquilibriumMixin:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
 
         if self.melt.sweep_mol_per_s is not None:
-            return self._physical_sweep_boundary()['partials_bar'].get('O2', 0.0)
+            return self._sweep_boundary_pO2_bar()
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         if reservoir is not None:
             pO2_bar = float(

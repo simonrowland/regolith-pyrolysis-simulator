@@ -235,6 +235,12 @@ class OverheadConfigurationError(ValueError):
     """Invalid overhead configuration input."""
 
 
+def _continuous_sweep_source_mol(generated, *, carrier, flow, duration):
+    dose = dict(generated)
+    dose[carrier] = dose.get(carrier, 0.0) + flow * duration
+    return dose
+
+
 def continuous_sweep_balance(
     initial_species_mol: Mapping[str, float],
     generated_species_mol: Mapping[str, float],
@@ -270,8 +276,8 @@ def continuous_sweep_balance(
     inlet = {carrier: startup + flow * duration}
     prepared = {s: n * min(1.0, target / initial_total) for s, n in initial.items()} if initial_total else {}
     prepared[carrier] = prepared.get(carrier, 0.0) + startup
-    dose = dict(generated)
-    dose[carrier] = dose.get(carrier, 0.0) + flow * duration
+    dose = _continuous_sweep_source_mol(
+        generated, carrier=carrier, flow=flow, duration=duration)
     total_dose = sum(dose.values())
     turnover = total_dose / target
     replaced = -math.expm1(-turnover)

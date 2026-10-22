@@ -15,6 +15,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.physical_constants import GAS_CONSTANT, STANDARD_ATMOSPHERE_PA
 
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
@@ -36,6 +37,23 @@ LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
 
 class LabScheduleValidationError(ValueError):
     """Raised when a declared lab schedule cannot be honored at runtime."""
+
+
+def imposed_carrier_flow_mol_per_s(schedule: Mapping[str, Any]) -> float | None:
+    """Translate a reported carrier feed; an unreported flow stays absent."""
+    flow = schedule['gas_boundary']['imposed_flow']
+    if flow.get('reported_status') == 'not_reported':
+        return None
+    value = _required_finite_non_negative(flow['value'], 'imposed_flow')
+    unit = flow['unit']
+    if unit == 'mol_per_s':
+        return value
+    if unit == 'NL_min':
+        # Normal litres are at 273.15 K and 101325 Pa. From n=PV/RT,
+        # F=Q_N*(1e-3 m3/L)/(60 s/min)*P_N/(R*T_N), in mol/s.
+        # Zero declared volume flow gives zero molar flow, not missing input.
+        return value * 1e-3 / 60.0 * STANDARD_ATMOSPHERE_PA / (GAS_CONSTANT * 273.15)
+    raise LabScheduleValidationError(f'unsupported_imposed_flow_unit: {unit}')
 
 
 def normalize_lab_schedule(
