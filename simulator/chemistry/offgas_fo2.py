@@ -101,6 +101,7 @@ from simulator.vapour_rail.nasa_cea import (
     NasaCeaPolynomial,
     reaction_equilibrium_constant,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 #: Species whose CEA records this module needs. Both couples plus O2.
@@ -289,7 +290,7 @@ def _load_cea_polynomials_from_text(
             citation=values.get("citation"),
             source_ref_code=values.get("source_ref_code"),
             reference_pressure_Pa=float(
-                values.get("reference_pressure_Pa", 100_000.0)
+                values.get("reference_pressure_Pa", PA_PER_BAR)
             ),
         )
     return tuple(polynomials.items())
@@ -331,7 +332,7 @@ def _oxygen_atom_partial_pressure_bar(
         raise OffgasFO2Unavailable(
             "NASA CEA O and O2 records use different reference pressures"
         )
-    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / 100_000.0
+    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / PA_PER_BAR
     equilibrium_constant = reaction_equilibrium_constant(
         (
             (2.0, oxygen.evaluate(temperature_K)),
