@@ -4026,7 +4026,7 @@ def test_magemin_lunar_unset_tio2_entropy_matches_janaf_o045() -> None:
         _close_cached_backend(Engine.MAGEMIN)
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
-    assert attempt.value == pytest.approx(expected, rel=0.02)
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
 
 
 def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
@@ -4058,7 +4058,7 @@ def test_thermoengine_lunar_rutile_entropy_matches_janaf_o043() -> None:
         _close_cached_backend(Engine.THERMOENGINE)
     assert attempt.refusal_reason is None
     assert attempt.unit == "J_per_declared_mol_basis_per_K"
-    assert attempt.value == pytest.approx(expected, rel=0.02)
+    assert float(attempt.value) == pytest.approx(float(expected), rel=0.02)
 
 
 def test_ambiguous_pure_phase_cases_stay_refused() -> None:
