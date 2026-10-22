@@ -23,7 +23,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import load_yaml, write_outputs
+from simulator.battery.migrate import Migrator, load_yaml, write_outputs
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,

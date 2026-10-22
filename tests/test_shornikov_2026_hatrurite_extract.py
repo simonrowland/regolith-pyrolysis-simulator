@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import REPO_ROOT, convert_pressure_to_pa
+from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
 from simulator.battery.enums import EvidenceClass, IdentityEqualKind, Quantity
 from simulator.battery.identity import identity_equal
 from tests.battery.factories import migrate_one_extract
