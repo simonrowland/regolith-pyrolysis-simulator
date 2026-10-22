@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite name="pytest" tests="6" failures="3" errors="1" skipped="1">
+  <testcase classname="a.A" name="test_ok" time="0.01"/>
+  <testcase classname="a.A" name="test_fail" time="0.02">
+    <failure message="assert 1 == 2">assert 1 == 2</failure>
+  </testcase>
+  <testcase classname="a.A" name="test_skip" time="0.00">
+    <skipped message="later"/>
+  </testcase>
+  <testcase classname="a.A" name="test_flaky" time="0.03">
+    <failure message="Obtained: 1.000000">Obtained: 1.000000
+at /Users/example/ci-jobs/run-9/pytest-3 0x1a2b 1.25s popen-gw1 gw0</failure>
+  </testcase>
+  <testcase classname="a.B" name="test_err" time="0.04">
+    <error message="boom">boom</error>
+  </testcase>
+  <testcase classname="a.A" name="test_volatile" time="0.05">
+    <failure message="stable">stable
+/Users/example/ci-jobs/run-9/pytest-3 0x1a2b 1.25s popen-gw1 gw0</failure>
+  </testcase>
+</testsuite>
