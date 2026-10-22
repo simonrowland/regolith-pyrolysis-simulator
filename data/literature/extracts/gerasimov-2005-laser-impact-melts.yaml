@@ -1,0 +1,103 @@
+schema_version: literature_extract.v1
+source_id: gerasimov-2005-laser-impact-melts
+source:
+  citation: 'Gerasimov, M.V., Yakovlev, O.I., Dikov, Yu.P., and Wlotzka, F. (2005), "Evaporative differentiation of impact-produced melts: Laser-simulation experiments and comparison with impact glasses from the Logoisk crater", in Kenkmann, T., Hörz, F., and Deutsch, A. (eds.), Large Meteorite Impacts III, Geological Society of America Special Paper 384, pp. 351–366.'
+  doi: 10.1130/0-8137-2384-1.351
+  year: 2005
+extraction:
+  method: Born-digital pdftotext-layout transcription of Table 1; page 4 rendered to confirm table column assignments and all printed numeric cells. MinerU input covers only page 8 and contains no tables.
+  date: '2026-10-22'
+  worker: wave51-F57
+  provenance_path: corpus/raw/gerasimov-2005-laser-impact-melts/gerasimov-2005-laser-impact-melts.pdf
+review_status: draft
+fidelity_samples:
+- species: silicate_melt
+  observable: composition_series
+  observation_id: gerasimov_2005_augite_condensate_composition
+  field: condensate_wt_percent
+  value: {SiO2: 54.69, TiO2: 0.74, Al2O3: 7.57, FeO: 8.11, MgO: 12.06, CaO: 12.33, Na2O: 4.51}
+  locator: {page: 4, published_page: 354, table: '1', column: 'Augite condensate'}
+- species: silicate_melt
+  observable: composition_series
+  observation_id: gerasimov_2005_obsidian_condensate_composition
+  field: condensate_wt_percent
+  value: {SiO2: 62.16, TiO2: 1.13, Al2O3: 12.56, FeO: 5.27, MgO: 6.58, CaO: 4.23, Na2O: 7.25, K2O: 1.08}
+  locator: {page: 4, published_page: 354, table: '1', column: 'Obsidian condensate'}
+species:
+  silicate_melt:
+    observations:
+    - observation_id: gerasimov_2005_augite_condensate_composition
+      type: composition_series
+      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Augite condensate'}
+      phase: solid
+      regime: laser-pulse vaporization and condensation
+      units: wt% oxide as printed
+      values:
+        quantity: condensate_composition
+        method_class: measured_direct
+        analytical_method: X-ray photoelectron spectroscopy of precipitated condensate films
+        sample_id: augite
+        starting_analyses_count: 18
+        composition_wt_pct: {SiO2: 49.29, TiO2: 1.13, Al2O3: 9.98, FeO: 8.22, MgO: 13.09, CaO: 15.46, MnO: 0.07, Na2O: 2.75}
+        starting_oxide_sigma_wt_percent: {SiO2: 0.10, TiO2: 0.03, Al2O3: 0.09, FeO: 0.10, MgO: 0.08, CaO: 0.11, MnO: 0.02, Na2O: 0.14}
+        condensate_wt_percent: {SiO2: 54.69, TiO2: 0.74, Al2O3: 7.57, FeO: 8.11, MgO: 12.06, CaO: 12.33, Na2O: 4.51}
+        condensate_sigma_wt_percent: {SiO2: 0.90, TiO2: 0.08, Al2O3: 0.48, FeO: 0.36, MgO: 0.69, CaO: 1.28, Na2O: 0.28}
+        censored_condensate_wt_percent: {MnO: '<0.10'}
+        table_row_count: 9
+        alkali_shuttle_rows: [Na2O]
+        SiO_evolution_row: SiO2
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: only a global 3000–5000 K range is stated; no per-row temperature}
+          locator: {page: 1, published_page: 351, section: Abstract}
+        fO2_Pa:
+          state: {tag: unknown, reason: oxygen fugacity is not stated for the Table 1 experiment}
+          locator: {page: 4, published_page: 354, table: '1'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: pressure is not stated for the Table 1 rows}
+          locator: {page: 4, published_page: 354, table: '1'}
+        composition:
+          state: {tag: value, value: {amount_basis: mass_percent, components: [[SiO2, 49.29], [TiO2, 1.13], [Al2O3, 9.98], [FeO, 8.22], [MgO, 13.09], [CaO, 15.46], [MnO, 0.07], [Na2O, 2.75]]}}
+          locator: {page: 4, published_page: 354, table: '1', row: 'Augite starting sample'}
+    - observation_id: gerasimov_2005_obsidian_condensate_composition
+      type: composition_series
+      locator: {page: 4, published_page: 354, table: '1', row: Oxides, column: 'Obsidian condensate'}
+      phase: solid
+      regime: laser-pulse vaporization and condensation
+      units: wt% oxide as printed
+      values:
+        quantity: condensate_composition
+        method_class: measured_direct
+        analytical_method: X-ray photoelectron spectroscopy of precipitated condensate films
+        sample_id: obsidian
+        starting_analyses_count: 10
+        composition_wt_pct: {SiO2: 57.90, TiO2: 1.32, Al2O3: 15.02, FeO: 9.31, MgO: 5.11, CaO: 7.37, Na2O: 2.99, K2O: 0.53}
+        starting_oxide_sigma_wt_percent: {SiO2: 0.19, TiO2: 0.09, Al2O3: 0.15, FeO: 0.18, MgO: 0.10, CaO: 0.10, Na2O: 0.09, K2O: 0.04}
+        condensate_wt_percent: {SiO2: 62.16, TiO2: 1.13, Al2O3: 12.56, FeO: 5.27, MgO: 6.58, CaO: 4.23, Na2O: 7.25, K2O: 1.08}
+        condensate_sigma_wt_percent: {SiO2: 0.86, TiO2: 0.55, Al2O3: 0.64, FeO: 0.66, MgO: 1.39, CaO: 0.85, Na2O: 0.83, K2O: 0.36}
+        table_row_count: 9
+        alkali_shuttle_rows: [Na2O, K2O]
+        SiO_evolution_row: SiO2
+      point_conditions:
+        temperature_K:
+          state: {tag: unknown, reason: only a global 3000–5000 K range is stated; no per-row temperature}
+          locator: {page: 1, published_page: 351, section: Abstract}
+        fO2_Pa:
+          state: {tag: unknown, reason: oxygen fugacity is not stated for the Table 1 experiment}
+          locator: {page: 4, published_page: 354, table: '1'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: pressure is not stated for the Table 1 rows}
+          locator: {page: 4, published_page: 354, table: '1'}
+        composition:
+          state: {tag: value, value: {amount_basis: mass_percent, components: [[SiO2, 57.90], [TiO2, 1.32], [Al2O3, 15.02], [FeO, 9.31], [MgO, 5.11], [CaO, 7.37], [Na2O, 2.99], [K2O, 0.53]]}}
+          locator: {page: 4, published_page: 354, table: '1', row: 'Obsidian starting sample'}
+    context:
+    - observation_id: gerasimov_2005_global_temperature_range
+      type: laboratory_conditions
+      locator: {page: 1, published_page: 351, section: Abstract}
+      units: K as printed
+      values:
+        quantity: global_impact_vaporization_temperature_range
+        method_class: reported_context
+        T_range_as_published: 3000–5000 K
+        note: Abstract-level impact-vaporization range, recorded once and not assigned to Table 1 observations.
