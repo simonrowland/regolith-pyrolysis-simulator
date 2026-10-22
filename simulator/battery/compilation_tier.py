@@ -1112,7 +1112,8 @@ def _tabulated_gas_basis_matches(
     zero. A non-JANAF row matches only when that compilation's elemental
     reference owner says the 298.15 K reference is this ideal gas. A
     reference-state table that is crystal at 298.15 K does not, including
-    temperatures where the stable phase has become gas.
+    temperatures where the stable phase has become gas. H−H298 is the
+    only quantity that calls this. Cp and S do not.
     """
 
     if _is_janaf_compilation_observation(observation, None):
@@ -1156,21 +1157,24 @@ def _vaporock_gas_basis_refusal(
 ) -> ThermoAttempt | None:
     """One basis gate for the in-band row and the tabulated read.
 
-    Species, phase, and reference basis first. Standard pressure is part
-    of the basis for entropy only. Ideal gas: H and Cp have no pressure
-    term; S has −R ln(p/p°). This path compares the declared pressure to
-    JANAF's 0.1 MPa and does not convert the value. None means the
-    observation may be answered from this gas table.
+    Species, neutral charge, declared gas phase, and mol-species basis
+    are the caller's checks, before this function and before either
+    branch. The axes that remain depend on the quantity. None means
+    this quantity may be answered from the gas table. A pressure
+    mismatch refuses with both pressures and does not convert the value.
     """
 
     from simulator.battery.generators.janaf import (
         STANDARD_PRESSURE_PA as janaf_standard_pressure,
     )
 
+    # Cp = (dH/dT)p is independent of the H origin.
+    # S is the absolute third-law entropy with −R ln(p/p°).
+    # H−H298 carries the 298.15 K zero.
     pressure_extra: dict[str, object] = {}
-    if _tabulated_gas_basis_matches(observation, formula, table_id):
-        if quantity is not Quantity.S:
-            return None
+    if quantity is Quantity.CP:
+        return None
+    if quantity is Quantity.S:
         declared_pressure = _declared_standard_pressure_Pa(observation)
         if declared_pressure == janaf_standard_pressure:
             return None
@@ -1182,6 +1186,8 @@ def _vaporock_gas_basis_refusal(
             ),
             "gas_pressure_Pa": _decimal_token(janaf_standard_pressure),
         }
+    elif _tabulated_gas_basis_matches(observation, formula, table_id):
+        return None
     declared = None
     if isinstance(observation.identity, Identity):
         declared = phase_token(observation.identity.species)
@@ -1308,11 +1314,12 @@ def _vaporock_tabulated_gas_attempt(
     JANAF fusion read in this module. The table document has no separate
     authority field. This is not an extrapolated Shomate continuation.
     The gas may be a phase-g table or a reference-phase gas already marked
-    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). The species, phase,
-    reference-basis, and entropy-pressure gate is
-    `_vaporock_gas_basis_refusal`, already applied by the caller.
-    `_vaporock_gas_thermo_admissible` is the same numeric gate as a
-    verified in-band row.
+    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). The caller already applied
+    `_vaporock_gas_basis_refusal`: Cp uses neither the enthalpy zero nor
+    standard pressure, S uses standard pressure and not the enthalpy zero,
+    and H−H298 uses the enthalpy zero. This function does not apply that
+    gate again. `_vaporock_gas_thermo_admissible` is the same numeric gate
+    as a verified in-band row.
     """
 
     from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
@@ -1514,8 +1521,9 @@ def _vaporock_gas_attempt(
         for row in table_rows
         if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
     )
-    # Containing-row selection is not an answer. The basis gate runs before
-    # either branch returns a number. Do not continue a Shomate row: Cr(g)
+    # Containing-row selection is not an answer. One basis gate runs before
+    # either branch returns a number, and its axes depend on the quantity.
+    # Do not continue a Shomate row: Cr(g)
     # at 500 K on that polynomial is about −49 J/(mol·K); the gas table's
     # own 500 K node is 20.786.
     from simulator.battery.generators.janaf import _janaf_gas_table_ids
