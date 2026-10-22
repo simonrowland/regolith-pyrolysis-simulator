@@ -1001,6 +1001,53 @@ def _feedstock_surface_pressure_mbar(feedstock: Mapping[str, Any]) -> float:
     )
 
 
+_STAGE0_CLEANUP_CAMPAIGNS = frozenset({
+    CampaignPhase.C0,
+    CampaignPhase.C0B,
+})
+
+
+def p2o5_survived_stage0_cleanup_record(
+    previous: Any,
+    entered: Any,
+    composition_kg: Mapping[str, float] | None,
+) -> dict[str, Any] | None:
+    """P2O5 mass on the melt as a run leaves C0/C0B for the main sequence.
+
+    C0 to C0B is still Stage 0 and returns None. A run that never entered
+    C0/C0B returns None. Zero mass is still a record.
+    """
+
+    if previous not in _STAGE0_CLEANUP_CAMPAIGNS:
+        return None
+    if entered in _STAGE0_CLEANUP_CAMPAIGNS:
+        return None
+    mass_kg = float((composition_kg or {}).get("P2O5", 0.0) or 0.0)
+    return {
+        "code": "P survived Stage-0 cleanup",
+        "p2o5_mass_kg": mass_kg,
+        "left_campaign": str(getattr(previous, "name", previous)),
+        "entered_campaign": str(getattr(entered, "name", entered)),
+    }
+
+
+def note_p2o5_survived_stage0_cleanup(
+    host: Any,
+    previous: Any,
+    entered: Any,
+    composition_kg: Mapping[str, float] | None,
+) -> None:
+    """Record the Stage-0 survival diagnostic once per run."""
+
+    if getattr(host, "_p2o5_survived_stage0_cleanup", None) is not None:
+        return
+    record = p2o5_survived_stage0_cleanup_record(
+        previous, entered, composition_kg
+    )
+    if record is not None:
+        host._p2o5_survived_stage0_cleanup = record
+
+
 def read_high_t_melt_activity_fallback_notice(
     sim: Any,
 ) -> dict[str, Any] | None:
@@ -1608,6 +1655,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
+        self._p2o5_survived_stage0_cleanup = None
         self._last_vapour_batch = None
         self._last_vapour_batch_report = None
         self._last_vapour_batch_flux_overlay = {}
@@ -12836,8 +12884,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _normalized_component_key(component: str) -> str:
         return component.strip().lower().replace('-', '_').replace(' ', '_')
 
+    def p2o5_survived_stage0_cleanup(self) -> dict[str, Any] | None:
+        """P2O5 mass that entered the main sequence after C0/C0B, if recorded."""
+
+        record = getattr(self, "_p2o5_survived_stage0_cleanup", None)
+        if not isinstance(record, Mapping):
+            return None
+        return dict(record)
+
     def start_campaign(self, campaign: CampaignPhase):
         """Begin a campaign phase.  Sets atmosphere, temp targets, etc."""
+        note_p2o5_survived_stage0_cleanup(
+            self,
+            self.melt.campaign,
+            campaign,
+            self.melt.composition_kg,
+        )
         overhead_headspace_config = self._resolve_overhead_headspace_config(
             campaign
         )

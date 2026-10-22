@@ -971,6 +971,34 @@ def _same_composition_temperature_bridge(
     }
 
 
+def _remember_p2o5_extension(
+    base: dict[str, Any],
+    source: Mapping[str, Any] | None,
+) -> None:
+    """Copy a plain P2O5 extension record onto the high-T authority once."""
+
+    if not isinstance(source, Mapping) or "p2o5_extension" in base:
+        return
+    extension = source.get("p2o5_extension")
+    if not isinstance(extension, Mapping):
+        return
+    notices = [
+        dict(notice)
+        for notice in extension.get("notices") or []
+        if isinstance(notice, Mapping)
+    ]
+    copied = dict(extension)
+    copied["notices"] = notices
+    omitted = copied.get("omitted_components")
+    if isinstance(omitted, Mapping):
+        copied["omitted_components"] = dict(omitted)
+    band = copied.get("band_log10_activity")
+    if isinstance(band, (list, tuple)):
+        copied["band_log10_activity"] = list(band)
+    base["p2o5_extension"] = copied
+    base["notices"].extend(notices)
+
+
 def _build_high_t_melt_activity_authority(
     *,
     composition_mol: Mapping[str, float],
@@ -1080,6 +1108,7 @@ def _build_high_t_melt_activity_authority(
                 dict(tier) for tier in _PROJECTED_COMPOSITION_WARNING_TIERS
                 if projection_notice["omitted_total_wt_pct"] > tier["above_omitted_wt_pct"]
             ]
+            _remember_p2o5_extension(base, policy_refusal.diagnostics)
             base["projected_composition_solve"] = projection_notice
             base["notices"].append(projection_notice)
             cleaned = evaluate_cleaned_melt(
@@ -1106,6 +1135,10 @@ def _build_high_t_melt_activity_authority(
             "authority": "extrapolated",
             "message": str(exc),
         }
+        _remember_p2o5_extension(
+            base,
+            diagnostics if isinstance(diagnostics, Mapping) else None,
+        )
         if isinstance(diagnostics, Mapping):
             for residual_key in ("residual_inf", "residual_l2"):
                 if residual_key not in diagnostics:
@@ -1334,6 +1367,13 @@ def _build_high_t_melt_activity_authority(
             bridge.parent_oxide_x_star_ratios,
         )
     )
+    policy_for_authority = dict(cleaned.policy)
+    _remember_p2o5_extension(base, policy_for_authority)
+    if (
+        "p2o5_extension" in base
+        and "p2o5_extension" not in policy_for_authority
+    ):
+        policy_for_authority["p2o5_extension"] = dict(base["p2o5_extension"])
     base["notices"].extend(typed_openimcc_notices)
     base.update(
         {
@@ -1341,7 +1381,7 @@ def _build_high_t_melt_activity_authority(
             "openimcc_activities_by_oxide": dict(
                 cleaned.single_cation_activities
             ),
-            "composition_policy": dict(cleaned.policy),
+            "composition_policy": policy_for_authority,
             "composition_projection_classification": dict(
                 cleaned.policy.get("composition_projection_classification", {})
             ),
@@ -4054,6 +4094,48 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if key in authority_fields
             }
 
+        p2o5_vapour = None
+        p2o5_extension = None
+        if isinstance(high_t_activity_authority, Mapping):
+            p2o5_extension = high_t_activity_authority.get("p2o5_extension")
+            if not isinstance(p2o5_extension, Mapping):
+                composition_policy = high_t_activity_authority.get(
+                    "composition_policy"
+                ) or {}
+                if isinstance(composition_policy, Mapping):
+                    p2o5_extension = composition_policy.get("p2o5_extension")
+        if isinstance(p2o5_extension, Mapping):
+            from simulator.melt_backend.openimcc_bridge import (
+                p2o5_vapour_pressures_pa,
+            )
+
+            p2o5_vapour = p2o5_vapour_pressures_pa(
+                p2o5_extension,
+                temperature_K=T_K,
+                fo2_bar=melt_dissociation_pO2_bar,
+                process_phase=controls.get("process_phase"),
+            )
+            for notice in p2o5_vapour.get("notices") or []:
+                if not isinstance(notice, Mapping):
+                    continue
+                warnings.append(
+                    f"{notice.get('code', 'openimcc_p2o5_gas')}: "
+                    f"{notice.get('message', '')}"
+                )
+                if isinstance(high_t_activity_authority, dict):
+                    high_t_activity_authority.setdefault("notices", []).append(
+                        dict(notice)
+                    )
+            if (
+                p2o5_vapour.get("inject")
+                and controls.get("process_phase") != "stage0"
+            ):
+                for species, pressure_pa in p2o5_vapour[
+                    "flux_pressures_Pa"
+                ].items():
+                    vapor_pressures[str(species)] = float(pressure_pa)
+                    vapor_pressure_sources[str(species)] = "openimcc_p2o5_gas"
+
         _attach_high_t_activity_provenance(
             authority=high_t_activity_authority,
             metals_data=metals_data,
@@ -4155,6 +4237,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             diagnostic["high_t_melt_activity"] = dict(
                 high_t_activity_authority
             )
+        if p2o5_vapour is not None:
+            diagnostic["openimcc_p2o5_gas"] = p2o5_vapour
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
 

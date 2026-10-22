@@ -3455,16 +3455,18 @@ class EvaporationMixin:
             # Stage-0 phosphorus is a narrow marker consumed only by stage0-only
             # rules sourced from P2O5; flipping the whole phase to stage0 changes
             # unrelated Na/Fe/channel eligibility.
-            request_stage = (
-                'c0b_p_cleanup'
-                if campaign_name == 'C0B'
-                else (
-                    'stage0_p_carriers'
-                    if campaign_name == 'C0'
-                    else 'evaporation'
-                )
-            )
+            from simulator.vapour_rail.request import request_stage_for_campaign
+
+            p2o5_gas = vapor_pressure_diagnostic.get("openimcc_p2o5_gas") or {}
+            p2o5_flux_species = ()
+            if isinstance(p2o5_gas, Mapping) and p2o5_gas.get("inject"):
+                p2o5_flux_species = tuple(p2o5_gas.get("flux_species") or ())
             effective_pressure_species_ids = effective_pressure_source.species_ids
+            request_stage = request_stage_for_campaign(
+                campaign_name,
+                p_extension_flux_species=p2o5_flux_species,
+                effective_pressure_species_ids=effective_pressure_species_ids,
+            )
             if campaign_name == 'C0B':
                 effective_pressure_species_ids = frozenset(
                     species_id

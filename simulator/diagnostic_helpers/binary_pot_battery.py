@@ -2368,6 +2368,53 @@ class _OpenImccBatteryBackend:
                     "reason": str(notice),
                 }
             )
+        p2o5_extension = self._bridge.assess_p2o5_extension(
+            self._bridge.composition_moles_for_p2o5(
+                composition_mol, composition_kg
+            ),
+            temperature_K,
+        )
+        for notice in p2o5_extension.get("notices") or []:
+            notices.append(
+                {
+                    "kind": "openimcc_p2o5",
+                    "authority": None,
+                    "code": notice.get("code"),
+                    "reason": notice.get("message") or notice.get("code"),
+                    "notice": dict(notice),
+                }
+            )
+
+        def _evaluate_gas_with_p2o5(
+            evaluate_gas: Any,
+            activities: Mapping[str, float],
+            fo2: float,
+            parent_oxides: tuple[str, ...] | list[str],
+            **kwargs: Any,
+        ) -> Any:
+            gas_result, gas_notices = (
+                self._bridge.evaluate_openimcc_gas_with_p2o5(
+                    evaluate_gas,
+                    activities,
+                    temperature_K,
+                    fo2,
+                    self._gas,
+                    parent_oxides,
+                    p2o5_extension,
+                    **kwargs,
+                )
+            )
+            for gas_notice in gas_notices:
+                notices.append(
+                    {
+                        "kind": "openimcc_p2o5_gas",
+                        "authority": None,
+                        "code": gas_notice.get("code"),
+                        "reason": gas_notice.get("message") or gas_notice.get("code"),
+                        "notice": dict(gas_notice),
+                    }
+                )
+            return gas_result
 
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
@@ -2393,12 +2440,34 @@ class _OpenImccBatteryBackend:
                     evaluate_gas_oxygen_balance,
                 )
 
-                po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                    result.parent_oxide_activities,
-                    temperature_K,
-                    self._gas,
-                    parent_oxides=result.parent_oxides,
+                balance_result, balance_notices = (
+                    self._bridge.call_with_p2o5_parents(
+                        lambda activities, oxides: evaluate_gas_oxygen_balance(
+                            activities,
+                            temperature_K,
+                            self._gas,
+                            parent_oxides=oxides,
+                        ),
+                        result.parent_oxide_activities,
+                        result.parent_oxides,
+                        p2o5_extension,
+                    )
                 )
+                po2_bar, gas_result, balance = balance_result
+                for gas_notice in (
+                    balance_notices or self._bridge.p_gas_notices(gas_result)
+                ):
+                    notices.append(
+                        {
+                            "kind": "openimcc_p2o5_gas",
+                            "authority": None,
+                            "code": gas_notice.get("code"),
+                            "reason": (
+                                gas_notice.get("message") or gas_notice.get("code")
+                            ),
+                            "notice": dict(gas_notice),
+                        }
+                    )
                 cell_fraction = 0.0
                 cell_info = {
                     "cell_material": None,
@@ -2443,12 +2512,11 @@ class _OpenImccBatteryBackend:
                         )
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
-                    return evaluate_gas(
+                    return _evaluate_gas_with_p2o5(
+                        evaluate_gas,
                         result.parent_oxide_activities,
-                        temperature_K,
                         pO2_bar,
-                        self._gas,
-                        parent_oxides=result.parent_oxides,
+                        result.parent_oxides,
                         allow_extrapolation=True,
                     )
 
@@ -2463,12 +2531,11 @@ class _OpenImccBatteryBackend:
                         ),
                     )
                 )
-                gas_result = evaluate_gas(
+                gas_result = _evaluate_gas_with_p2o5(
+                    evaluate_gas,
                     result.parent_oxide_activities,
-                    temperature_K,
                     po2_bar,
-                    self._gas,
-                    parent_oxides=result.parent_oxides,
+                    result.parent_oxides,
                     allow_extrapolation=True,
                 )
                 gas_pressures = dict(gas_result)
@@ -2544,12 +2611,11 @@ class _OpenImccBatteryBackend:
                 from openimcc import evaluate_gas
 
                 fo2_bar = 10.0 ** float(fO2_log)
-                gas_result = evaluate_gas(
+                gas_result = _evaluate_gas_with_p2o5(
+                    evaluate_gas,
                     result.parent_oxide_activities,
-                    temperature_K,
                     fo2_bar,
-                    self._gas,
-                    parent_oxides=result.parent_oxides,
+                    result.parent_oxides,
                     allow_extrapolation=True,
                 )
                 _channels, omission_notices = (

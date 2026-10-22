@@ -446,7 +446,13 @@ def test_predicate_readers_cannot_diverge() -> None:
         "",
         "hot_train",
     )
-    stages = (None, "stage0", "c0b_p_cleanup", "stage0_p_carriers")
+    stages = (
+        None,
+        "stage0",
+        "c0b_p_cleanup",
+        "stage0_p_carriers",
+        "main_sequence_p_extension",
+    )
     phases = (None, "stage0")
     for token, stage, phase in product(tokens, stages, phases):
         state = SimpleNamespace(stage=stage, process_phase=phase)
@@ -472,7 +478,11 @@ def test_predicate_readers_cannot_diverge() -> None:
         if (
             token == "stage0_only"
             and not shared[0]
-            and stage in {"stage0_p_carriers", "c0b_p_cleanup"}
+            and stage in {
+                "stage0_p_carriers",
+                "c0b_p_cleanup",
+                "main_sequence_p_extension",
+            }
         ):
             assert p_actual == (True, "")
         else:

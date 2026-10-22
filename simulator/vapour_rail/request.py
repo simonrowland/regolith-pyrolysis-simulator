@@ -890,6 +890,41 @@ def assert_request_coverage(
         )
 
 
+# Main-sequence wake for the existing stage0_only P2O5 carriers once the
+# openimcc extension has supplied their pressures. Not a new flux channel.
+MAIN_SEQUENCE_P_EXTENSION_STAGE = "main_sequence_p_extension"
+_P2O5_STAGE0_WAKE_STAGES = frozenset({
+    "stage0_p_carriers",
+    "c0b_p_cleanup",
+    MAIN_SEQUENCE_P_EXTENSION_STAGE,
+})
+
+
+def request_stage_for_campaign(
+    campaign_name: str,
+    *,
+    p_extension_flux_species: tuple[str, ...] | list[str] = (),
+    effective_pressure_species_ids: frozenset[str] | set[str] = frozenset(),
+) -> str:
+    """Stage token for one evaporation request.
+
+    C0 and C0B keep their existing tokens. The main sequence wakes the
+    P2O5 carriers only when every injected flux species is already in the
+    effective pressure source, so a partial injection cannot empty the flux map.
+    """
+
+    if campaign_name == "C0B":
+        return "c0b_p_cleanup"
+    if campaign_name == "C0":
+        return "stage0_p_carriers"
+    flux_species = tuple(p_extension_flux_species)
+    if flux_species and all(
+        species in effective_pressure_species_ids for species in flux_species
+    ):
+        return MAIN_SEQUENCE_P_EXTENSION_STAGE
+    return "evaporation"
+
+
 def applicability_verdict(
     predicate: str,
     *,
@@ -947,7 +982,7 @@ def _predicate_active(
     if (
         not active
         and predicate == "stage0_only"
-        and stage in {"stage0_p_carriers", "c0b_p_cleanup"}
+        and stage in _P2O5_STAGE0_WAKE_STAGES
         and "P2O5" in rule.parent_species_ids
     ):
         return True, ""

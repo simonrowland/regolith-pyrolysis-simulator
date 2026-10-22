@@ -181,6 +181,16 @@ OPENIMCC_PARENT_OXIDES = (
 )
 _OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
 _OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
+# Oxides openimcc.p2o5.evaluate_p2o5_activity accepts. Anything else is
+# omitted from that call and named on a notice; it is not folded in.
+_P2O5_ACTIVITY_COMPONENTS = frozenset({
+    "SiO2", "CaO", "MgO", "FeO", "FeOeq", "TiO2",
+    "Al2O3", "Na2O", "K2O", "P2O5", "MnO", "Fe2O3",
+})
+# Existing vapour-rail channels. Elemental P stays diagnostic-only.
+P2O5_FLUX_SPECIES = ("P2", "P4", "PO", "PO2", "P4O6", "P4O10")
+P2O5_DIAGNOSTIC_GAS_SPECIES = ("P", "P2", "P4", "PO", "PO2", "P4O6", "P4O10")
+_PA_PER_BAR = 100_000.0
 
 # Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
 # policy diagnostic only; the actual projection folds moles directly.
@@ -569,12 +579,462 @@ def _composition_wt_pct_from_moles(
     }
 
 
+def p2o5_extension_callable() -> Any | None:
+    """Return openimcc.evaluate_p2o5_activity, or None when this pin lacks it."""
+
+    package = _openimcc
+    if package is None:
+        return None
+    function = getattr(package, "evaluate_p2o5_activity", None)
+    return function if callable(function) else None
+
+
+def _p2o5_moles(composition: Mapping[str, float]) -> float:
+    raw = composition.get("P2O5", 0.0)
+    if isinstance(raw, bool) or not isinstance(raw, numbers.Real):
+        return 0.0
+    try:
+        moles = float(raw)
+    except (OverflowError, TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(moles) or moles <= 0.0:
+        return 0.0
+    return moles
+
+
+def assess_p2o5_extension(
+    composition_mol: Mapping[str, float],
+    temperature_K: float | None = None,
+    *,
+    enabled: bool = True,
+) -> dict[str, Any]:
+    """Plain record for the opt-in dilute P2O5 activity.
+
+    A missing callable, a missing temperature, or a refused activity call
+    leaves P2O5 in the 1 wt% count. Only a successful call sets
+    ``excluded_from_projection_count``. Fe2O3 is passed through unfolded;
+    openimcc folds it and emits the Fe(III) notice.
+    """
+
+    canonical = _canonical_composition(composition_mol)
+    p2o5_moles = _p2o5_moles(canonical)
+    record: dict[str, Any] = {
+        "enabled": bool(enabled),
+        "available": p2o5_extension_callable() is not None,
+        "evaluated": False,
+        "excluded_from_projection_count": False,
+        "activity": None,
+        "log10_activity": None,
+        "gamma": None,
+        "x_p2o5": None,
+        "band_log10_activity": None,
+        "notices": [],
+        "omitted_components": {},
+        "p2o5_moles": p2o5_moles,
+    }
+    if not enabled or p2o5_moles <= 0.0:
+        return record
+    function = p2o5_extension_callable()
+    if function is None:
+        record["notices"] = [{
+            "code": "openimcc_p2o5_extension_unavailable",
+            "message": (
+                "installed openimcc has no evaluate_p2o5_activity; "
+                "P2O5 stays in the 1 wt% unsupported-projection count"
+            ),
+        }]
+        return record
+    temperature: float | None
+    if isinstance(temperature_K, bool) or not isinstance(temperature_K, numbers.Real):
+        temperature = None
+    else:
+        try:
+            temperature = float(temperature_K)
+        except (OverflowError, TypeError, ValueError):
+            temperature = None
+    if (
+        temperature is None
+        or not math.isfinite(temperature)
+        or temperature <= 0.0
+    ):
+        record["notices"] = [{
+            "code": "openimcc_p2o5_extension_temperature_missing",
+            "message": (
+                "P2O5 activity was not evaluated because temperature_K "
+                "is missing or not finite and positive; P2O5 stays in "
+                "the 1 wt% unsupported-projection count"
+            ),
+        }]
+        return record
+    accepted: dict[str, float] = {}
+    omitted: dict[str, float] = {}
+    for name, amount in canonical.items():
+        if isinstance(amount, bool) or not isinstance(amount, numbers.Real):
+            continue
+        try:
+            moles = float(amount)
+        except (OverflowError, TypeError, ValueError):
+            continue
+        if not math.isfinite(moles) or moles <= 0.0:
+            continue
+        if name in _P2O5_ACTIVITY_COMPONENTS:
+            accepted[name] = moles
+        else:
+            omitted[name] = moles
+    record["omitted_components"] = omitted
+    notices: list[dict[str, Any]] = []
+    if omitted:
+        notices.append({
+            "code": "p2o5_activity_basis_omitted_components",
+            "components": dict(omitted),
+            "message": (
+                "P2O5 activity omitted components the dilute regression "
+                "does not accept; phosphorus is still modelled on the "
+                "accepted oxide basis"
+            ),
+        })
+    try:
+        result = function(accepted, temperature)
+    except Exception as exc:
+        notices.append({
+            "code": "openimcc_p2o5_extension_refused",
+            "message": (
+                "evaluate_p2o5_activity refused the composition "
+                f"({type(exc).__name__}: {exc}); P2O5 stays in the "
+                "1 wt% unsupported-projection count"
+            ),
+        })
+        record["notices"] = notices
+        return record
+    record["evaluated"] = True
+    record["excluded_from_projection_count"] = True
+    record["activity"] = float(result.activity)
+    record["log10_activity"] = float(result.log10_activity)
+    record["gamma"] = float(result.gamma)
+    record["x_p2o5"] = float(result.x_p2o5)
+    band = getattr(result, "band_log10_activity", None)
+    if band is not None:
+        record["band_log10_activity"] = [float(band[0]), float(band[1])]
+    notice = getattr(result, "notice", None)
+    if notice is not None:
+        limitations = list(getattr(notice, "limitations", ()) or ())
+        notices.append({
+            "code": str(getattr(notice, "code", "imcc_p2o5_activity_domain_notice")),
+            "regression": str(getattr(notice, "regression", "")),
+            "violated_axes": list(getattr(notice, "violated_axes", ()) or ()),
+            "band_width_dex": float(getattr(notice, "band_width_dex", 0.0) or 0.0),
+            "limitations": limitations,
+            # The existing warning formatter prints code plus message.
+            # Limitations are the metallic-Fe and Fe(III) flags.
+            "message": " ".join(str(item) for item in limitations),
+        })
+    for extra in getattr(result, "additional_notices", ()) or ():
+        notices.append({
+            "code": str(getattr(extra, "code", "")),
+            "message": str(getattr(extra, "message", "")),
+        })
+    record["notices"] = notices
+    return record
+
+
+def _extension_visible(extension: Mapping[str, Any]) -> bool:
+    return bool(extension.get("enabled")) and float(extension.get("p2o5_moles") or 0.0) > 0.0
+
+
+def parent_maps_with_p2o5(
+    activities: Mapping[str, float],
+    parent_oxides: tuple[str, ...] | list[str],
+    extension: Mapping[str, Any] | None,
+) -> tuple[dict[str, float], tuple[str, ...], bool]:
+    """Attach a(P2O5) when the extension evaluated. Other parents stay put."""
+
+    updated = {str(name): float(value) for name, value in activities.items()}
+    oxides = tuple(str(name) for name in parent_oxides)
+    if not isinstance(extension, Mapping) or not extension.get("evaluated"):
+        return updated, oxides, False
+    try:
+        activity = float(extension.get("activity"))
+    except (TypeError, ValueError):
+        return updated, oxides, False
+    if not math.isfinite(activity) or activity <= 0.0:
+        return updated, oxides, False
+    updated["P2O5"] = activity
+    if "P2O5" not in oxides:
+        oxides = oxides + ("P2O5",)
+    return updated, oxides, True
+
+
+def p_gas_notices(gas_result: Any) -> list[dict[str, Any]]:
+    """Copy openimcc P-gas notices, including the >1 bar complete-loss notice."""
+
+    notices: list[dict[str, Any]] = []
+    for notice in getattr(gas_result, "notices", ()) or ():
+        if isinstance(notice, Mapping):
+            notices.append(dict(notice))
+            continue
+        code = getattr(notice, "code", None)
+        if not code:
+            continue
+        item: dict[str, Any] = {
+            "code": str(code),
+            "message": str(getattr(notice, "message", "")),
+            "species": [str(name) for name in (getattr(notice, "species", ()) or ())],
+        }
+        total = getattr(notice, "total_pressure_bar", None)
+        if isinstance(total, numbers.Real) and not isinstance(total, bool):
+            item["total_pressure_bar"] = float(total)
+        notices.append(item)
+    return notices
+
+
+def _p2o5_gas_unavailable_notice(exc: BaseException) -> dict[str, str]:
+    return {
+        "code": "openimcc_p2o5_gas_unavailable",
+        "message": (
+            "openimcc gas evaluation refused the P2O5 parent "
+            f"({type(exc).__name__}: {exc}); phosphorus partial "
+            "pressures were not produced"
+        ),
+    }
+
+
+def call_with_p2o5_parents(
+    fn: Any,
+    activities: Mapping[str, float],
+    parent_oxides: tuple[str, ...] | list[str],
+    extension: Mapping[str, Any] | None,
+) -> tuple[Any, list[dict[str, Any]]]:
+    """Call ``fn(activities, parent_oxides)`` with a(P2O5) when evaluated.
+
+    A refusal retries without that parent and returns
+    ``openimcc_p2o5_gas_unavailable``. Callers that did not attach P2O5
+    still raise.
+    """
+
+    attached_activities, oxides, attached = parent_maps_with_p2o5(
+        activities, parent_oxides, extension
+    )
+    try:
+        return fn(attached_activities, oxides), []
+    except Exception as exc:
+        if not attached:
+            raise
+        bare_activities = {
+            name: value
+            for name, value in attached_activities.items()
+            if name != "P2O5"
+        }
+        bare_oxides = tuple(name for name in oxides if name != "P2O5")
+        return fn(bare_activities, bare_oxides), [
+            _p2o5_gas_unavailable_notice(exc)
+        ]
+
+
+def evaluate_openimcc_gas_with_p2o5(
+    evaluate_gas: Any,
+    activities: Mapping[str, float],
+    temperature_K: float,
+    fo2: float,
+    datapack: Any,
+    parent_oxides: tuple[str, ...] | list[str],
+    extension: Mapping[str, Any] | None,
+    **kwargs: Any,
+) -> tuple[Any, list[dict[str, Any]]]:
+    """Call evaluate_gas with a(P2O5) when the extension evaluated.
+
+    A gas refusal retries without the P2O5 parent so the rest of the melt
+    still solves. The 1 wt% exclusion is not changed here. Success also
+    returns the typed P-gas notices, including complete volatilisation above 1 bar.
+    """
+
+    def _call(attached_activities: Mapping[str, float], oxides: tuple[str, ...]) -> Any:
+        return evaluate_gas(
+            attached_activities,
+            temperature_K,
+            fo2,
+            datapack,
+            parent_oxides=oxides,
+            **kwargs,
+        )
+
+    result, notices = call_with_p2o5_parents(
+        _call, activities, parent_oxides, extension
+    )
+    if notices:
+        return result, notices
+    return result, p_gas_notices(result)
+
+
+def composition_moles_for_p2o5(
+    composition_mol: Mapping[str, float] | None = None,
+    composition_kg: Mapping[str, float] | None = None,
+) -> dict[str, float]:
+    """Mole inventory for the P2O5 assessment.
+
+    A non-empty ``composition_mol`` wins, matching ``evaluate()``. An empty
+    mole map falls through to kilograms. A kilogram inventory is converted
+    with ``MOLAR_MASS`` (g/mol) and 1000 g/kg. Names without a molar mass
+    are omitted; the activity call names the ones it cannot accept.
+    """
+
+    # An empty mole map is the same "not supplied" signal evaluate() uses.
+    if composition_mol:
+        canonical = _canonical_composition(composition_mol)
+        return {
+            name: float(amount)
+            for name, amount in canonical.items()
+            if isinstance(amount, numbers.Real)
+            and not isinstance(amount, bool)
+        }
+    if not composition_kg:
+        return {}
+    canonical = _canonical_composition(composition_kg)
+    moles: dict[str, float] = {}
+    for name, mass_kg in canonical.items():
+        if isinstance(mass_kg, bool) or not isinstance(mass_kg, numbers.Real):
+            continue
+        molar_g = MOLAR_MASS.get(str(name))
+        if molar_g is None:
+            continue
+        moles[str(name)] = float(mass_kg) * 1000.0 / float(molar_g)
+    return moles
+
+
+def p2o5_vapour_pressures_pa(
+    extension: Mapping[str, Any] | None,
+    *,
+    temperature_K: float,
+    fo2_bar: float,
+    process_phase: str | None,
+) -> dict[str, Any]:
+    """Partial pressures for the existing P-carrier channels.
+
+    Stage 0 is left untouched. Elemental P is returned only on
+    ``diagnostic_pressures_Pa``. Flux injection requires every existing
+    carrier. 1 bar = 1e5 Pa.
+    """
+
+    record: dict[str, Any] = {
+        "inject": False,
+        "flux_pressures_Pa": {},
+        "diagnostic_pressures_Pa": {},
+        "notices": [],
+        "flux_species": [],
+    }
+    if process_phase == "stage0":
+        return record
+    if not isinstance(extension, Mapping) or not extension.get("evaluated"):
+        return record
+    try:
+        activity = float(extension.get("activity"))
+        temperature = float(temperature_K)
+        fo2 = float(fo2_bar)
+    except (TypeError, ValueError):
+        record["notices"].append({
+            "code": "openimcc_p2o5_gas_unavailable",
+            "message": (
+                "P2O5 gas pressures were not evaluated because activity, "
+                "temperature, or melt fO2 was not numeric"
+            ),
+        })
+        return record
+    if (
+        not math.isfinite(activity)
+        or activity <= 0.0
+        or not math.isfinite(temperature)
+        or temperature <= 0.0
+        or not math.isfinite(fo2)
+        or fo2 <= 0.0
+    ):
+        record["notices"].append({
+            "code": "openimcc_p2o5_gas_unavailable",
+            "message": (
+                "P2O5 gas pressures were not evaluated because melt fO2 "
+                "or temperature was not finite and positive"
+            ),
+        })
+        return record
+    package = _openimcc
+    evaluate_gas = getattr(package, "evaluate_gas", None) if package is not None else None
+    load_gas = getattr(package, "load_gas_datapack", None) if package is not None else None
+    if not callable(evaluate_gas) or not callable(load_gas):
+        record["notices"].append({
+            "code": "openimcc_p2o5_gas_unavailable",
+            "message": "installed openimcc cannot evaluate P2O5 gas pressures",
+        })
+        return record
+    try:
+        gas_result, gas_notices = evaluate_openimcc_gas_with_p2o5(
+            evaluate_gas,
+            {"P2O5": activity},
+            temperature,
+            fo2,
+            load_gas(),
+            parent_oxides=("P2O5",),
+            extension=extension,
+            allow_extrapolation=True,
+        )
+    except Exception as exc:
+        record["notices"].append(_p2o5_gas_unavailable_notice(exc))
+        return record
+    record["notices"].extend(gas_notices)
+    if any(notice.get("code") == "openimcc_p2o5_gas_unavailable" for notice in gas_notices):
+        return record
+    diagnostic: dict[str, float] = {}
+    for species in P2O5_DIAGNOSTIC_GAS_SPECIES:
+        if species not in gas_result:
+            continue
+        try:
+            bar = float(gas_result[species])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(bar) and bar >= 0.0:
+            diagnostic[species] = bar * _PA_PER_BAR
+    record["diagnostic_pressures_Pa"] = diagnostic
+    flux: dict[str, float] = {}
+    for species in P2O5_FLUX_SPECIES:
+        pressure = diagnostic.get(species)
+        if pressure is None:
+            record["notices"].append({
+                "code": "openimcc_p2o5_gas_incomplete",
+                "message": (
+                    f"openimcc did not return a finite {species} pressure; "
+                    "phosphorus carriers were not written onto the vapour rail"
+                ),
+            })
+            record["flux_pressures_Pa"] = {}
+            record["flux_species"] = []
+            return record
+        flux[species] = pressure
+    record["flux_pressures_Pa"] = flux
+    record["flux_species"] = list(P2O5_FLUX_SPECIES)
+    record["inject"] = True
+    return record
+
+
 def _cleaned_melt_policy(
     composition_mol: Mapping[str, float],
+    *,
+    enable_p2o5_extension: bool = True,
+    temperature_K: float | None = None,
+    p2o5_extension: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, float], dict[str, Any]]:
     source_wt_pct, cleaned_composition_mol = _cleaned_melt_projection(
         composition_mol
     )
+    if p2o5_extension is None:
+        extension = assess_p2o5_extension(
+            composition_mol,
+            temperature_K,
+            enabled=enable_p2o5_extension,
+        )
+    else:
+        extension = dict(p2o5_extension)
+        extension["notices"] = [
+            dict(notice)
+            for notice in extension.get("notices") or []
+            if isinstance(notice, Mapping)
+        ]
     dropped = {
         name: value
         for name, value in source_wt_pct.items()
@@ -659,6 +1119,57 @@ def _cleaned_melt_policy(
         classification_record["openimcc_projection_crmn_relaxed"] = dict(
             relaxed_notice
         )
+    if (
+        extension.get("excluded_from_projection_count")
+        and "P2O5" in dropped
+    ):
+        gate_dropped = {
+            name: value
+            for name, value in dropped.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES and name != "P2O5"
+        }
+        gate_mol = {
+            name: value
+            for name, value in dropped_mol_per_kg.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES and name != "P2O5"
+        }
+        gate_unavailable = {
+            name: value
+            for name, value in unavailable_reasons.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES and name != "P2O5"
+        }
+        threshold_classification = classify_projected_bulk(
+            gate_dropped,
+            source_sum_wt_pct=100.0,
+            dropped_component_mol_per_kg=gate_mol,
+            dropped_component_mol_unavailable_reasons=gate_unavailable,
+        )
+        p2o5_gate_notice = {
+            "code": "openimcc_projection_p2o5_excluded",
+            "wt_pct": {"P2O5": dropped["P2O5"]},
+            "message": (
+                "P2O5 remains projected from the IMCC parent input, but "
+                "does not count toward the shared 1.0 wt% gate after the "
+                "opt-in dilute activity extension evaluated"
+            ),
+        }
+        classification_record["openimcc_projection_p2o5_excluded"] = dict(
+            p2o5_gate_notice
+        )
+        classification_record["projection_verdict"] = (
+            threshold_classification.verdict
+        )
+        classification_record["thresholded_dropped_total_wt_pct"] = (
+            threshold_classification.dropped_total_wt_pct
+        )
+        classification_record["thresholded_dropped_components"] = list(
+            threshold_classification.dropped_components
+        )
+    refusal_diagnostics: dict[str, Any] = {
+        PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
+    }
+    if _extension_visible(extension):
+        refusal_diagnostics["p2o5_extension"] = extension
     if threshold_classification.verdict == "over_threshold":
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_projection_over_threshold",
@@ -668,9 +1179,7 @@ def _cleaned_melt_policy(
                 "projected-bulk limit: "
                 f"{threshold_classification.dropped_total_wt_pct:.12g} wt%"
             ),
-            diagnostics={
-                PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
-            },
+            diagnostics=refusal_diagnostics,
         )
 
     policy = dict(classification_record)
@@ -686,6 +1195,13 @@ def _cleaned_melt_policy(
         }
     if relaxed_notice is not None:
         policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
+    p2o5_gate_notice = classification_record.get(
+        "openimcc_projection_p2o5_excluded"
+    )
+    if isinstance(p2o5_gate_notice, Mapping):
+        policy["openimcc_projection_p2o5_excluded"] = dict(p2o5_gate_notice)
+    if _extension_visible(extension):
+        policy["p2o5_extension"] = extension
     _feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(source_wt_pct)
     if fe2o3_wt_pct > 0.0:
         policy["fe2o3_fold"] = {
@@ -709,11 +1225,16 @@ def evaluate_cleaned_melt(
     temperature_K: float,
     *,
     allow_extrapolation: bool = False,
+    enable_p2o5_extension: bool = True,
 ) -> OpenImccCleanedMeltResult:
     """Apply C3's cleaned-melt policy, then call the C1 bridge."""
 
     _require_openimcc()
-    cleaned_composition_mol, policy = _cleaned_melt_policy(composition_mol)
+    cleaned_composition_mol, policy = _cleaned_melt_policy(
+        composition_mol,
+        enable_p2o5_extension=enable_p2o5_extension,
+        temperature_K=temperature_K,
+    )
     composition_wt_pct = _composition_wt_pct_from_moles(
         cleaned_composition_mol
     )

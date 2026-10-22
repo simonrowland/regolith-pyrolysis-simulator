@@ -1128,9 +1128,70 @@ def _predict_hashimoto_residue_cohort(
         oxide: mass_kg / _formula_terms(oxide)[1]
         for oxide, mass_kg in initial_oxide_mass_kg.items()
     }
-    gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
-        tuple(initial_composition_mol), gas_pack
-    )
+    channel_parents = tuple(initial_composition_mol)
+    p2o5_channel_notices: list[dict[str, Any]] = []
+    p2o5_moles = float(initial_composition_mol.get("P2O5", 0.0) or 0.0)
+    if p2o5_moles > 0.0 and openimcc_bridge.p2o5_extension_callable() is not None:
+        flux_species = set(openimcc_bridge.P2O5_FLUX_SPECIES)
+        try:
+            discovered, discovered_omissions = (
+                _openimcc_gas_channels_and_omission_notices(
+                    channel_parents + ("P2O5",), gas_pack
+                )
+            )
+        except Exception as exc:
+            p2o5_channel_notices.append(
+                openimcc_bridge._p2o5_gas_unavailable_notice(exc)
+            )
+            gas_channels, channel_omissions = (
+                _openimcc_gas_channels_and_omission_notices(
+                    channel_parents, gas_pack
+                )
+            )
+        else:
+            diagnostic_only = []
+            gas_channels = []
+            for species, reaction in discovered:
+                parent = reaction[0] if reaction else ""
+                if parent == "P2O5" and str(species) not in flux_species:
+                    diagnostic_only.append(str(species))
+                    continue
+                gas_channels.append((species, reaction))
+            p_omitted = {
+                str(name): str(reason)
+                for name, reason in dict(discovered_omissions).items()
+                if str(name) in flux_species or str(name) in {"P", "PS"}
+            }
+            channel_omissions = {
+                name: reason
+                for name, reason in dict(discovered_omissions).items()
+                if str(name) not in p_omitted
+            }
+            if diagnostic_only or p_omitted:
+                p2o5_channel_notices.append({
+                    "code": "openimcc_p2o5_gas_diagnostic_only",
+                    "species": diagnostic_only,
+                    "omitted": p_omitted,
+                    "message": (
+                        "Phosphorus gases without an existing vapour-rail "
+                        "channel stay off the Hashimoto flux"
+                    ),
+                })
+    else:
+        gas_channels, channel_omissions = (
+            _openimcc_gas_channels_and_omission_notices(
+                channel_parents, gas_pack
+            )
+        )
+        if p2o5_moles > 0.0:
+            p2o5_channel_notices.append({
+                "code": "openimcc_p2o5_extension_unavailable",
+                "message": (
+                    "installed openimcc has no evaluate_p2o5_activity; "
+                    "P2O5 is not added to the Hashimoto gas parents and "
+                    "is not dropped silently"
+                ),
+            })
     if channel_omissions:
         raise ResidueInventoryRefusal(
             "hashimoto_openimcc_channel_missing", str(channel_omissions)
@@ -1373,14 +1434,26 @@ def _predict_hashimoto_residue_cohort(
                             f"Hashimoto residue cohort OpenIMCC timeout: {exc}",
                             reason="engine_timeout:openimcc:hashimoto_residue_cohort",
                         ) from exc
-                    base_pressure_bar = evaluate_gas(
-                        state.parent_oxide_activities,
+                    extension = openimcc_bridge.assess_p2o5_extension(
+                        current_composition,
                         temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=state.parent_oxides,
-                        allow_extrapolation=True,
                     )
+                    gas_result, gas_notices = (
+                        openimcc_bridge.evaluate_openimcc_gas_with_p2o5(
+                            evaluate_gas,
+                            state.parent_oxide_activities,
+                            temperature_K,
+                            1.0,
+                            gas_pack,
+                            state.parent_oxides,
+                            extension,
+                            allow_extrapolation=True,
+                        )
+                    )
+                    for notice in list(extension.get("notices") or []) + list(gas_notices):
+                        if notice not in p2o5_channel_notices:
+                            p2o5_channel_notices.append(dict(notice))
+                    base_pressure_bar = gas_result
                     pressure_state_cache[key] = base_pressure_bar
                     melt_pack_identity.update(
                         {
@@ -1645,6 +1718,11 @@ def _predict_hashimoto_residue_cohort(
                     else {}
                 ),
                 "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
+                **(
+                    {"p2o5_extension_notices": tuple(p2o5_channel_notices)}
+                    if p2o5_channel_notices
+                    else {}
+                ),
                 "code_revision": code_revision,
                 "integration": {
                     "steps": refinement_accepted_steps_by_geometry[primary_geometry],
@@ -1967,7 +2045,10 @@ def _predict_sossi_residue_cohort(
                 if base is None:
                     try:
                         activity_composition, activity_input_policy = (
-                            openimcc_bridge._cleaned_melt_policy(composition)
+                            openimcc_bridge._cleaned_melt_policy(
+                                composition,
+                                temperature_K=temperature_K,
+                            )
                         )
                         melt_activity_input_policy.update(activity_input_policy)
                         state = _evaluate_openimcc_isolated(
@@ -2029,14 +2110,23 @@ def _predict_sossi_residue_cohort(
                                 "activity_provenance": mno_activity.provenance(),
                             },
                         )
-                    gas_result = evaluate_gas(
-                        gas_parent_oxide_activities,
-                        temperature_K,
-                        1.0,
-                        gas_pack,
-                        parent_oxides=gas_parent_oxides,
-                        allow_extrapolation=True,
+                    gas_result, gas_notices = (
+                        openimcc_bridge.evaluate_openimcc_gas_with_p2o5(
+                            evaluate_gas,
+                            gas_parent_oxide_activities,
+                            temperature_K,
+                            1.0,
+                            gas_pack,
+                            gas_parent_oxides,
+                            activity_input_policy.get("p2o5_extension"),
+                            allow_extrapolation=True,
+                        )
                     )
+                    if gas_notices:
+                        activity_input_policy["p2o5_gas_notices"] = list(gas_notices)
+                        melt_activity_input_policy["p2o5_gas_notices"] = list(
+                            gas_notices
+                        )
                     melt_pack_identity.update(
                         {
                             "model_id": str(state.pack_model_id),
