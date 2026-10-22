@@ -183,7 +183,11 @@ def alphamelts_activity_volatility_diagnostic(
         vapor_model_limits.update(computed["extrapolated_beyond_valid_range_K"])
         for notice in _antoine_skip_notices_for_omitted_species(
             computed.get("warnings", ()),
-            computed["species"],
+            {
+                species: payload.get("P_eq_Pa")
+                for species, payload in computed["species"].items()
+                if isinstance(payload, Mapping)
+            },
         ):
             if notice not in antoine_skip_notices:
                 antoine_skip_notices.append(notice)

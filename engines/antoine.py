@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping, Sequence
 
 
@@ -67,8 +68,13 @@ def _antoine_skip_notices_for_omitted_species(
             )
             if species_field is not None:
                 species = species_field[len("species="):]
-                if species in resolved_vapor_pressures:
-                    continue
+                try:
+                    pressure_Pa = float(resolved_vapor_pressures[species])
+                except (KeyError, TypeError, ValueError, OverflowError):
+                    pass
+                else:
+                    if math.isfinite(pressure_Pa) and pressure_Pa > 0.0:
+                        continue
         retained.append(notice)
     return retained
 
