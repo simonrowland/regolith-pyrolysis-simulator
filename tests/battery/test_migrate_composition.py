@@ -3,23 +3,28 @@
 from __future__ import annotations
 
 import re
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 import yaml
 
-from simulator.battery import migrate as migrate_module
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.battery import migrate as migrate_module
+from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     EvidenceClass,
     NoticeKind,
     Phase,
+    RefusalReason,
     ValueKind,
 )
+from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -36,9 +41,21 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
     wt_pct_to_mole_fraction_derivation,
 )
-from simulator.battery.records import as_decimal
-from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    Composition,
+    Located,
+    Locator,
+    as_decimal,
+)
 from tests.battery.factories import migrate_one_extract, tabulation_experiment
+from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
+    _migrate_real_extract,
+    _write_min_tree,
+)
+from tests.battery.test_schema_admission import _conditions, _located
+from tests.battery.test_waypoints import _bench
 
 
 _OBS_ROOTS = (
@@ -158,6 +175,7 @@ def test_sample_from_equipment_withholds_unsupported_numeric_component() -> None
     sample = sample_from_equipment(
         {},
         values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "locator": {"table": "1"},
             "composition_wt_pct": {
                 "SiO2": Decimal("50"),
@@ -184,6 +202,7 @@ def test_sample_without_composition_locator_keeps_unsupported_key_reason() -> No
     sample = sample_from_equipment(
         {},
         values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "composition_wt_pct": {
                 "SiO2": Decimal("50"),
                 "MgO": Decimal("40"),
@@ -219,6 +238,47 @@ def test_noncomposition_values_are_not_scanned_or_refused_as_oxides() -> None:
     assert not hasattr(migrate_module, "_is_formula_component_key")
 
 
+def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+    source = "ta-flemetakis-2024.yaml"
+    source_path = REPO_ROOT / "data/literature/extracts" / source
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "flemetakis_2024_starting_glass_composition"
+    )
+    assert source_row["values"]["composition_role"] == {
+        "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "locator": source_row["locator"],
+        "quote": source_row["quote"],
+    }
+
+    result = _migrate_real_extract(tmp_path, source)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "flemetakis_2024_starting_glass_composition"
+        )
+    )
+    point_composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_value
+    assert isinstance(point_composition.state.value, Composition)
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+
+    initial = result.experiments[observation.experiment_id].sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.locator is not None
+    assert initial.locator.section == "2.1 Starting material"
+    assert isinstance(initial.state.value, Composition)
+    assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert not migrate_module._initial_compositions_conflict(
+        initial, point_composition
+    )
+
+
 def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -241,6 +301,66 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
         "10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay"
     ]
     assert source_experiment.sample.initial_composition is None
+
+
+def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in document["species"]["K2O"]["observations"]
+        if item["observation_id"] == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    assert observation["values"]["composition_role"]["value"] == "initial_charge_only"
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
+    assert selected.initial_composition is not None
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
+    ]
+
+    actual = experiment.sample.initial_composition
+    assert actual is not None and actual.state.is_value
+    assert dict(actual.state.value.components) == dict(
+        selected.initial_composition.state.value.components
+    )
+
+
+def test_volovetskii_starting_glass_material_state_is_initial() -> None:
+    path = REPO_ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for species in document["species"].values()
+        for item in species["observations"]
+        if item["observation_id"] == "volo12_p9_initial_fe_redox"
+    )
+    assert observation["values"]["composition_material_state"] == "starting_glass"
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
+    expected = selected.initial_composition
+    assert expected is not None and not expected.state.is_value
+    assert "unsupported numeric component(s): Cl" in expected.state.reason
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    row = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith("volo12_p9_initial_fe_redox")
+    )
+    actual = migrator.result.experiments[row.experiment_id].sample.initial_composition
+
+    assert actual is not None and actual.state == expected.state
 
 
 def _plante_analytical_composition(doc: dict) -> tuple[dict[str, Decimal], object]:
@@ -392,6 +512,302 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
     _assert_plante_observations_use_analyzed_composition(migrator.result, expected)
 
 
+@pytest.mark.parametrize(
+    "experiment_id",
+    ("kms-vacuum-glass-series", "tms-n2-glass-series"),
+)
+def test_round8_plante_initial_is_independent_of_selection_prose(
+    experiment_id: str,
+) -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    _, expected = _plante_analytical_composition(doc)
+    experiment = next(
+        item for item in doc["experiments"] if item["experiment_id"] == experiment_id
+    )
+    sample_payload = experiment["sample"]
+    initial = sample_payload["initial_composition"]
+    assert initial["state"]["tag"] == "value"
+    original = _sample_from_plain(sample_payload, experiment_id=experiment_id)
+
+    inputs = initial["inference"]["inputs"]
+    selection_note = next(
+        index for index, value in enumerate(inputs) if "column selected" in value
+    )
+    inputs[selection_note] = "No nominal column selected; analytical is not a selector"
+    changed_prose = _sample_from_plain(sample_payload, experiment_id=experiment_id)
+
+    original_initial = original.initial_composition
+    changed_initial = changed_prose.initial_composition
+    assert original_initial is not None and original_initial.state.is_value
+    assert changed_initial is not None
+    assert changed_initial.state == original_initial.state
+    expected_initial = replace(
+        original_initial,
+        state=replace(original_initial.state, value=expected),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        original_initial, expected_initial
+    )
+
+
+def test_round8_existing_typed_initial_beats_printed_column_and_prose() -> None:
+    sample = _sample_from_plain(
+        {
+            "initial_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mole_fraction",
+                        "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+                    },
+                },
+                "inference": {
+                    "relation": "identity",
+                    "inputs": ["analytical column selected as the start"],
+                    "output_unit": "mole_fraction",
+                },
+            },
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "analytical": {"SiO2": "20", "MgO": "80"},
+                        "nominal": {"SiO2": "80", "MgO": "20"},
+                    },
+                }
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert to_plain(sample.initial_composition)["state"]["value"]["components"] == [
+        ["SiO2", "0.6"],
+        ["MgO", "0.4"],
+    ]
+
+
+def test_round8_multiple_printed_columns_without_typed_initial_refuse() -> None:
+    sample = _sample_from_plain(
+        {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "analytical": {"SiO2": "20", "MgO": "80"},
+                        "nominal": {"SiO2": "80", "MgO": "20"},
+                    },
+                }
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert not sample.initial_composition.state.is_value
+    assert sample.initial_composition.state.reason == (
+        "printed composition has multiple columns and no typed selection"
+    )
+
+
+def test_round9_composition_derivation_never_admits_an_untyped_map() -> None:
+    oxide_map = {"SiO2": "60", "MgO": "40"}
+    notes = (
+        None,
+        "No composition was derived",
+        "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
+    )
+    results = []
+    for note in notes:
+        values = {"composition_wt_pct": oxide_map}
+        if note is not None:
+            values["composition_derivation"] = note
+        results.append(_composition_located_from_values(values, None))
+
+    assert results == [None, None, None]
+
+
+def test_round9_initial_charge_role_admits_map_and_keeps_note_as_provenance() -> None:
+    note = "No composition was derived"
+    result = _composition_located_from_values(
+        {
+            "composition_role": {
+                "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "locator": {"table": "1"},
+                "quote": "Starting glass, wt%",
+            },
+            "composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+            "composition_derivation": note,
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.state.value.components == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    ).components
+    assert result.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert result.inference is not None
+    assert result.inference.relation == "wt_pct_to_mole_fraction"
+    assert note in result.inference.inputs
+
+
+def test_round10_datum_state_role_admits_measured_composition_without_proxy() -> None:
+    result = _composition_located_from_values(
+        {
+            "composition_role": {
+                "value": "datum_state",
+                "locator": {"table": "2"},
+                "quote": "1302 | 43.94 | 6.91E-7",
+            },
+            "composition_wt_pct": {"K2O": "43.94", "SiO2": "56.06"},
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.state.value.components == wt_pct_to_mole_fraction(
+        {"K2O": Decimal("43.94"), "SiO2": Decimal("56.06")}
+    ).components
+    assert result.state.value.proxy_flag is None
+
+
+@pytest.mark.parametrize(
+    ("oxide_map", "relation"),
+    (
+        (
+            {"K2O": "43.94", "SiO2": "56.06"},
+            "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+        ),
+        ({"K2O": "43.94", "SiO2": "56.05"}, "wt_pct_to_mole_fraction"),
+        (
+            {"K2O": "43.94", "SiO2": "56.06", "MgO": "0"},
+            "wt_pct_to_mole_fraction",
+        ),
+    ),
+)
+def test_datum_state_binary_complement_relation_uses_decimal_structure(
+    oxide_map, relation
+) -> None:
+    result = _composition_located_from_values(
+        {
+            "composition_role": "datum_state",
+            "composition_wt_pct": oxide_map,
+            "composition_derivation": (
+                "SiO2 and K2O are not complements to 100; prose is provenance only"
+            ),
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.inference is not None
+    assert result.inference.relation == relation
+
+
+def test_round10_plante_1979_table_row_keeps_datum_state_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith("plante1979_table2_s1104_r001_quoted")
+    )
+    composition = (observation.point_conditions or {}).get("composition")
+
+    assert composition is not None and composition.state.is_value
+    assert composition.state.value.proxy_flag is None
+    from simulator.battery import score as score_module
+
+    assert score_module._initial_charge_composition_notice(observation) is None
+
+
+def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
+    source = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    original_load = migrate_module.load_yaml
+    outcomes = []
+    for note in (
+        None,
+        "No composition was derived",
+        "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
+    ):
+        document = deepcopy(FIXTURE_EXTRACT)
+        row = document["species"]["Na"]["observations"][0]
+        row["values"].update(
+            {
+                "composition_from_sample_catalog": True,
+                "sample_oxide_composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+                "composition_source": "catalogue",
+            }
+        )
+        row["values"]["series"] = row["values"]["series"][:1]
+        conditions = _conditions()
+        conditions.pop("composition")
+        conditions.pop("printed_composition")
+        conditions["temperature_K"] = _located(
+            {"kind": "point", "point": "1200.0"}
+        )
+        row["values"]["series"][0]["point_conditions"] = conditions
+        if note is not None:
+            row["values"]["composition_derivation"] = note
+
+        def load_fixture(candidate):
+            return document if candidate == source else original_load(candidate)
+
+        with patch.object(
+            migrate_module,
+            "load_yaml",
+            load_fixture,
+        ):
+            migrator = migrate_one_extract(REPO_ROOT, source)
+            migrator.finalize()
+
+        observation = next(iter(migrator.result.observations.values()))
+        experiment = migrator.result.experiments[observation.experiment_id]
+        composition = (observation.point_conditions or {}).get("composition")
+        inputs = collect_consumer_inputs(experiment, _bench(), observation)
+        requests = engine_point_requests(inputs)
+        outcomes.append(
+            (
+                None
+                if composition is None or not composition.state.is_value
+                else tuple(sorted(composition.state.value.components)),
+                tuple(
+                    (request.readiness.status.value, request.payload is not None)
+                    for request in requests
+                ),
+                ()
+                if composition is None or composition.inference is None
+                else composition.inference.inputs,
+            )
+        )
+
+    expected_components = tuple(
+        sorted(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            ).components
+        )
+    )
+    expected_outcome = (expected_components, (("ready", True),) * 7)
+    assert [(components, requests) for components, requests, _ in outcomes] == [
+        expected_outcome
+    ] * 3
+    for note, (_, _, derivation_inputs) in zip(
+        (
+            None,
+            "No composition was derived",
+            "SiO2 and K2O are NOT complements to 100; this sample contains MgO",
+        ),
+        outcomes,
+        strict=True,
+    ):
+        if note is not None:
+            assert note in derivation_inputs
+
+
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -524,7 +940,7 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
     ]
 
 
-def test_merge_honors_preferred_starting_initial_over_printed_sibling() -> None:
+def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))
     raw_experiment = next(
@@ -551,7 +967,6 @@ def test_merge_honors_preferred_starting_initial_over_printed_sibling() -> None:
         incoming,
         existing.apparatus,
         existing.pressure_environment,
-        prefer_existing_initial=True,
     )
 
     assert merged.sample.initial_composition == starting
@@ -560,7 +975,6 @@ def test_merge_honors_preferred_starting_initial_over_printed_sibling() -> None:
 def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> None:
     cases = (
         ("britt-2019-asteroid-simulants", "britt_2019_tga_ega_thermal_program"),
-        ("kems-042-plante-1979", "plante1979_table2_s1123_r030_quoted"),
         ("kems-200-ueshima-1983", "ueshima_1983_femo_table2_epma"),
         (
             "kems-046-van-limpt-2007",
@@ -578,25 +992,10 @@ def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> No
             if observation.get("observation_id") == observation_id
         )
         refusal: list[str] = []
-        if observation_id == "plante1979_table2_s1123_r030_quoted":
-            assert _initial_oxide_map_from_values(
-                values,
-                refusal_reason=refusal,
-                declared_map=migrate_module._declared_wt_composition_point_map(
-                    values, None
-                ),
-            ) == {"K2O": Decimal("21.14"), "SiO2": Decimal("78.86")}
-            located = _composition_located_from_values(values, None)
-            assert located is not None and located.state.is_value
-            assert located.inference is not None
-            assert located.inference.relation == (
-                "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
-            )
-        else:
-            assert _initial_oxide_map_from_values(
-                values, refusal_reason=refusal
-            ) is None
-            assert refusal == [], observation_id
+        assert _initial_oxide_map_from_values(
+            values, refusal_reason=refusal
+        ) is None
+        assert refusal == [], observation_id
 
 
 @pytest.mark.parametrize("include_parent_map", [False, True])
@@ -708,8 +1107,9 @@ def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -
         and observation.identity.temperature_K.value == target_t
     )
     assert row.identity.composition.is_value
-    assert row.identity.composition.value == wt_pct_to_mole_fraction(
-        raw["values"]["composition_wt_pct"]
+    assert row.identity.composition.value == replace(
+        wt_pct_to_mole_fraction(raw["values"]["composition_wt_pct"]),
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
     )
     assert normalized_composition(
         migrator.result.experiments[row.experiment_id], _bench(), row
@@ -1022,9 +1422,10 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
-def test_printed_wt_percent_replaces_a_stale_pretyped_initial_composition() -> None:
+def test_printed_wt_percent_does_not_replace_a_typed_initial_composition() -> None:
     printed = {"SiO2": "50", "FeOT": "30", "SO3": "20"}
     raw = {
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
         "printed_composition": {
             "state": {"tag": "value", "value": printed},
             "locator": {"note": "Printed starting material composition"},
@@ -1037,15 +1438,12 @@ def test_printed_wt_percent_replaces_a_stale_pretyped_initial_composition() -> N
     }
 
     sample = _sample_from_plain(raw)
-    expected = wt_pct_to_mole_fraction(
-        {key: Decimal(value) for key, value in printed.items()}
-    )
-
     assert sample.initial_composition is not None
     assert sample.initial_composition.state.is_value
-    assert sample.initial_composition.inference is not None
-    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
-    assert dict(sample.initial_composition.state.value.components) == dict(expected.components)
+    assert sample.initial_composition.inference is None
+    assert dict(sample.initial_composition.state.value.components) == {
+        "SiO2": Decimal("1")
+    }
 
 
 @pytest.mark.parametrize("duplicate_name", ("SiO2", " SiO2 "))
@@ -1054,6 +1452,7 @@ def test_duplicate_mass_percent_pairs_are_refused_without_collapsing(
 ) -> None:
     sample = _sample_from_plain(
         {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "printed_composition": {
                 "locator": {"note": "Printed starting material composition"},
                 "state": {
@@ -1150,7 +1549,11 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                 for observation in rows:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
-                    assert composition.value == expected, observation.observation_id
+                        # This sweep pins composition conversion; the typed
+                        # initial-charge proxy is asserted by its owner test.
+                    assert replace(composition.value, proxy_flag=None) == expected, (
+                        observation.observation_id
+                    )
                     if "FeOT" in raw_composition:
                         assert observation.identity.quantity.is_unknown
                         assert not any(
@@ -1173,7 +1576,7 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
             assert feot_derivations == expected_count
 
 
-def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> None:
+def test_untyped_printed_composition_note_does_not_create_initial_composition() -> None:
     raw = {
         "printed_composition": {
             "locator": {
@@ -1196,10 +1599,7 @@ def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> N
 
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
-    assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_value
-    assert sample.initial_composition.inference is not None
-    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+    assert sample.initial_composition is None
 
 
 def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
@@ -1227,6 +1627,432 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     assert sample.initial_composition is not None
     assert sample.initial_composition.state.value.proxy_flag == (
         "composition_from_sample_catalog"
+    )
+
+
+def _located_initial_composition(
+    components: dict[str, Decimal | str],
+    *,
+    amount_basis: AmountBasis,
+    proxy_flag: str | None = None,
+    proxy_source: str | None = None,
+    analysis_selection_rule: str | None = None,
+):
+    payload = {
+        "basis": "test_initial_composition",
+        "amount_basis": amount_basis.value,
+        "components": [[oxide, str(amount)] for oxide, amount in components.items()],
+    }
+    if proxy_flag is not None:
+        payload["proxy_flag"] = proxy_flag
+    if proxy_source is not None:
+        payload["proxy_source"] = proxy_source
+    if analysis_selection_rule is not None:
+        payload["analysis_selection_rule"] = analysis_selection_rule
+    return migrate_module._composition_located_from_plain(payload)
+
+
+def _merge_sample_initials(existing_initial, incoming_initial):
+    experiment = tabulation_experiment("initial-authority-merge")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample, initial_composition=existing_initial
+        ),
+    )
+    merged = migrate_module._merge_experiment_lab_params(
+        experiment,
+        replace(experiment.sample, initial_composition=incoming_initial),
+        experiment.apparatus,
+        experiment.pressure_environment,
+    )
+    return merged.sample.initial_composition
+
+
+def test_equivalent_initial_inventories_keep_higher_authority_owner() -> None:
+    starting_glass = {
+        "composition_material_state": "starting_glass",
+        "composition_wt_pct": {"SiO2": 60, "MgO": 40},
+    }
+    catalogue = {
+        "composition_from_sample_catalog": True,
+        "composition_source": (
+            "Lunar Sample Compendium entry 10017. "
+            "Selection rule: first complete named whole-sample analysis."
+        ),
+        "sample_oxide_composition_wt_pct": {"SiO2": 60, "MgO": 40},
+    }
+    existing_initial = sample_from_equipment(
+        {}, values=starting_glass
+    ).initial_composition
+    incoming_initial = sample_from_equipment({}, values=catalogue).initial_composition
+    assert existing_initial is not None and incoming_initial is not None
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, incoming_initial
+    )
+    mass_percent_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=Composition(
+                basis="different_engine_label",
+                components=(("SiO2", Decimal("60")), ("MgO", Decimal("40"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            ),
+        ),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, mass_percent_initial
+    )
+    mole_inventory_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=Composition(
+                basis="molar_inventory",
+                components=tuple(
+                    (oxide, amount * Decimal("10"))
+                    for oxide, amount in existing_initial.state.value.components
+                ),
+                amount_basis=AmountBasis.MOL_INVENTORY,
+            ),
+        ),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, mole_inventory_initial
+    )
+
+    experiment = tabulation_experiment("equivalent-owner-initials")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample, initial_composition=existing_initial
+        ),
+    )
+    migrator = Migrator()
+    migrator.result.experiments[experiment.experiment_id] = experiment
+
+    merged = migrator._ensure_experiment(
+        work_id=experiment.work_id,
+        experiment_id=experiment.experiment_id,
+        locator=experiment.locator,
+        method=experiment.method,
+        equipment={},
+        values=catalogue,
+    )
+
+    initial = merged.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial == existing_initial
+    assert not any(
+        "initial_composition_conflict" in issue.detail
+        for issue in migrator.result.registry_issues
+    )
+
+    measured_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=replace(
+                existing_initial.state.value,
+                analysis_selection_rule=(
+                    "directly measured starting-material analysis"
+                ),
+            ),
+        ),
+    )
+    assert _merge_sample_initials(incoming_initial, existing_initial) == existing_initial
+    assert _merge_sample_initials(existing_initial, measured_initial) == existing_initial
+
+    initial_charge = _located_initial_composition(
+        {"SiO2": "0.5015472170832676561113000772", "MgO": "0.4984527829167323438886999228"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    )
+    assert _merge_sample_initials(incoming_initial, initial_charge) == initial_charge
+
+    generic_proxy = _located_initial_composition(
+        {"SiO2": "0.5015472170832676561113000772", "MgO": "0.4984527829167323438886999228"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag="model_proxy",
+        proxy_source="model estimate",
+    )
+    assert _merge_sample_initials(existing_initial, generic_proxy) == existing_initial
+
+    tied_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=replace(
+                existing_initial.state.value,
+                proxy_source="extra provenance without higher authority",
+            ),
+        ),
+    )
+    assert _merge_sample_initials(existing_initial, tied_initial) == existing_initial
+
+
+@pytest.mark.parametrize(
+    "prose_location",
+    ("analysis_selection_rule", "derivation_input", "locator_note"),
+)
+def test_prose_does_not_promote_equivalent_incoming_start(
+    prose_location: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    note = "NOT measured starting material; no EPMA was performed"
+    typed_start_values = {
+        "composition_material_state": "starting_glass",
+        "composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+    }
+    existing_initial = sample_from_equipment({}, values=typed_start_values).initial_composition
+    assert existing_initial is not None and existing_initial.state.is_value
+
+    experiment = tabulation_experiment(f"prose-authority-{prose_location}")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=existing_initial,
+        ),
+    )
+    migrator = Migrator()
+    migrator.result.experiments[experiment.experiment_id] = experiment
+
+    incoming_values = dict(typed_start_values)
+    real_sample_from_equipment = migrate_module.sample_from_equipment
+    selected_incoming = []
+
+    def sample_with_prose(equipment, **kwargs):
+        sample = real_sample_from_equipment(equipment, **kwargs)
+        if kwargs.get("values") is not incoming_values:
+            return sample
+        candidate = sample.initial_composition
+        assert candidate is not None and candidate.state.is_value
+        composition = replace(candidate.state.value, basis="nominal-recipe")
+        if prose_location == "analysis_selection_rule":
+            composition = replace(composition, analysis_selection_rule=note)
+        candidate = replace(
+            candidate,
+            state=replace(candidate.state, value=composition),
+        )
+        if prose_location == "derivation_input":
+            assert candidate.inference is not None
+            candidate = replace(
+                candidate,
+                inference=replace(
+                    candidate.inference,
+                    inputs=(*candidate.inference.inputs, note),
+                ),
+            )
+        elif prose_location == "locator_note":
+            candidate = replace(candidate, locator=Locator(note=note))
+        selected_incoming.append(candidate)
+        return replace(sample, initial_composition=candidate)
+
+    monkeypatch.setattr(migrate_module, "sample_from_equipment", sample_with_prose)
+    merged = migrator._ensure_experiment(
+        work_id=experiment.work_id,
+        experiment_id=experiment.experiment_id,
+        locator=None,
+        method=experiment.method,
+        equipment={},
+        values=incoming_values,
+    )
+
+    assert selected_incoming
+    assert merged.sample.initial_composition == existing_initial
+    assert not any(
+        "initial_composition_conflict" in issue.detail
+        for issue in migrator.result.registry_issues
+    )
+
+
+def test_absolute_mole_inventories_compare_amount_and_prefer_absolute() -> None:
+    fraction = _located_initial_composition(
+        {"SiO2": "0.6", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    same_absolute_inventory = _located_initial_composition(
+        {"SiO2": "0.6", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    tenfold_absolute_inventory = _located_initial_composition(
+        {"SiO2": "6", "MgO": "4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        fraction, tenfold_absolute_inventory
+    )
+    assert _merge_sample_initials(fraction, tenfold_absolute_inventory) == (
+        tenfold_absolute_inventory
+    )
+    assert migrate_module._initial_compositions_conflict(
+        same_absolute_inventory, tenfold_absolute_inventory
+    )
+
+    rounded_absolute_inventory = _located_initial_composition(
+        {"SiO2": "0.6000000000002", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        same_absolute_inventory, rounded_absolute_inventory
+    )
+
+
+def test_initial_composition_component_keys_must_match() -> None:
+    omitted_trace = _located_initial_composition(
+        {"SiO2": "1"}, amount_basis=AmountBasis.MOLE_FRACTION
+    )
+    stated_trace = _located_initial_composition(
+        {"SiO2": "1", "Na2O": "1e-13"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    stated_zero = _located_initial_composition(
+        {"SiO2": "1", "Na2O": "0"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+    assert migrate_module._initial_compositions_conflict(
+        omitted_trace, stated_trace
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        stated_zero, stated_trace
+    )
+
+
+def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    old_initial = sample_from_equipment(
+        {},
+        values={
+            "composition_from_sample_catalog": True,
+            "composition_source": "first catalogue source",
+            "sample_oxide_composition_wt_pct": {"SiO2": 60, "MgO": 40},
+        },
+    ).initial_composition
+    incoming_initial = sample_from_equipment(
+        {},
+        values={
+            "composition_from_sample_catalog": True,
+            "composition_source": "second catalogue source",
+            "sample_oxide_composition_wt_pct": {"SiO2": 55, "MgO": 45},
+        },
+    ).initial_composition
+    assert old_initial is not None and incoming_initial is not None
+    basis_conflict = replace(
+        old_initial,
+        state=replace(
+            old_initial.state,
+            value=replace(old_initial.state.value, basis="other_engine_basis"),
+        ),
+    )
+    # Engine-basis labels are metadata; the physical maps are identical.
+    assert not migrate_module._initial_compositions_conflict(
+        old_initial, basis_conflict
+    )
+
+    experiment_id = "catalogue-initial-conflict"
+    registry_printed = migrate_module._located_printed_and_initial(
+        {"SiO2": Decimal("70"), "MgO": Decimal("30")}, None
+    )[0]
+    row_printed = migrate_module._located_printed_and_initial(
+        {"SiO2": Decimal("40"), "MgO": Decimal("60")}, None
+    )[0]
+    assert registry_printed is not None and row_printed is not None
+    existing = tabulation_experiment(experiment_id)
+    existing = replace(
+        existing,
+        sample=replace(
+            existing.sample,
+            initial_composition=old_initial,
+            printed_composition=registry_printed,
+        ),
+    )
+    migrator = Migrator()
+    migrator.result.experiments[existing.experiment_id] = existing
+    migrator._registry_printed_composition_experiments.add(experiment_id)
+    current_sample = {
+        "value": replace(
+            existing.sample,
+            initial_composition=incoming_initial,
+            printed_composition=row_printed,
+        )
+    }
+    monkeypatch.setattr(
+        migrate_module,
+        "sample_from_equipment",
+        lambda *args, **kwargs: current_sample["value"],
+    )
+    merged = migrator._ensure_experiment(
+        work_id=existing.work_id,
+        experiment_id=experiment_id,
+        locator=existing.locator,
+        method=existing.method,
+        equipment={},
+    )
+
+    assert merged.sample.initial_composition is None
+    conflict = next(
+        issue
+        for issue in migrator.result.registry_issues
+        if "initial_composition_conflict" in issue.detail
+    )
+    assert conflict.path == (
+        "experiment[catalogue-initial-conflict].sample.initial_composition"
+    )
+    assert conflict.reason is RefusalReason.INVALID_SOURCE
+    assert "first catalogue source" in conflict.detail
+    assert "second catalogue source" in conflict.detail
+    assert "basis=" in conflict.detail
+    assert "amount_basis=" in conflict.detail
+    assert "proxy_flag='composition_from_sample_catalog'" in conflict.detail
+
+    current_sample["value"] = replace(
+        existing.sample,
+        initial_composition=old_initial,
+        printed_composition=row_printed,
+    )
+    later = migrator._ensure_experiment(
+        work_id=existing.work_id,
+        experiment_id=experiment_id,
+        locator=existing.locator,
+        method=existing.method,
+        equipment={},
+    )
+    assert later.sample.initial_composition is None
+    assert len(
+        [
+            issue
+            for issue in migrator.result.registry_issues
+            if "initial_composition_conflict" in issue.detail
+        ]
+    ) == 1
+
+
+def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
+    source = REPO_ROOT / "data/literature/extracts/kems-137-bischof-2023.yaml"
+    migrator = migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+
+    expected_runs = {"an-di-1-low", "an-di-2-low", "an-di-3-high"}
+    conflicts = [
+        issue
+        for issue in migrator.result.registry_issues
+        if "initial_composition_conflict" in issue.detail
+    ]
+    assert len(conflicts) == 3
+    assert {
+        run
+        for run in expected_runs
+        if any(f"::{run}]" in issue.path for issue in conflicts)
+    } == expected_runs
+    assert all(issue.reason is RefusalReason.INVALID_SOURCE for issue in conflicts)
+    assert all(
+        experiment.sample.initial_composition is None
+        for experiment_id, experiment in migrator.result.experiments.items()
+        if any(experiment_id.endswith(f"::{run}") for run in expected_runs)
     )
 
 
@@ -2033,6 +2859,7 @@ def _plante_evolving_extract() -> dict:
         },
     }
     equipment = {
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
         "cell_material": {
             "value": "platinum Knudsen cell",
             "locator": {"published_page": 267, "figure": "2"},
@@ -2127,8 +2954,16 @@ def test_registry_charge_repeated_by_row_keeps_derived_initial_composition(
             "experiment_id": "k2o-sio2-effusion-series",
             "method": "knudsen_effusion",
             "sample": {
-                "printed_composition": {
-                    "state": {"tag": "value", "value": charge},
+                "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "initial_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "printed_oxides",
+                            "amount_basis": "mass_percent",
+                            "components": [[key, value] for key, value in charge.items()],
+                        },
+                    },
                     "locator": {"table": "2", "published_page": 276},
                 }
             },
@@ -2152,6 +2987,234 @@ def test_registry_charge_repeated_by_row_keeps_derived_initial_composition(
         {key: as_decimal(value) for key, value in _PLANTE_CHARGE_WT.items()}
     )
     assert dict(initial.state.value.components) == dict(expected.components)
+
+
+def test_plante_1979_migrator_keeps_typed_k2si2o5_initial(
+    tmp_path: Path,
+) -> None:
+    """Table 2's K2Si2O5 charge stays a typed initial after migration.
+
+    The committed work snapshot can keep a stale initial after the migrator
+    stops deriving one. This runs the migrator on the extract.
+    """
+
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    experiment = result.experiments[_PLANTE_EXPERIMENT_ID]
+    printed = experiment.sample.printed_composition
+    assert printed is not None and printed.state.is_value
+    assert as_decimal(printed.state.value["K2O"]) == as_decimal(_PLANTE_CHARGE_WT["K2O"])
+    assert as_decimal(printed.state.value["SiO2"]) == as_decimal(_PLANTE_CHARGE_WT["SiO2"])
+    assert printed.locator is not None
+    assert str(printed.locator.table) == "2"
+    assert printed.locator.published_page == 276
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert initial.state.value.proxy_flag is None
+    assert initial.inference is not None
+    assert initial.inference.relation == "wt_pct_to_mole_fraction"
+    expected = wt_pct_to_mole_fraction(
+        {key: as_decimal(value) for key, value in _PLANTE_CHARGE_WT.items()}
+    )
+    assert dict(initial.state.value.components) == dict(expected.components)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id == _PLANTE_EXPERIMENT_ID
+    ]
+    assert len(rows) == 383
+    start = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith(
+            "plante1979_table2_k2o_s1104_000_1302K"
+        )
+    )
+    later = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith(
+            "plante1979_table2_k2o_s1104_027_1396K"
+        )
+    )
+    assert start.identity.composition is not None and start.identity.composition.is_value
+    assert later.identity.composition is not None and later.identity.composition.is_value
+    assert dict(start.identity.composition.value.components) != dict(
+        later.identity.composition.value.components
+    )
+
+
+# Printed starting charges typed on the extract. Mole fractions come from
+# the owner converter, not from a pasted inventory.
+_RESTORED_STARTING_WT = {
+    "10.1016/j.gca.2007.09.005::experiment::type-b-cai-like-lab-melt": {
+        "MgO": "11.48",
+        "SiO2": "46",
+        "Al2O3": "19.39",
+        "CaO": "23.12",
+    },
+    "10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass": {
+        "Na2O": "17",
+        "CaO": "12",
+        "SiO2": "71",
+    },
+    "9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series": {
+        "MgO": "12",
+        "SiO2": "46",
+        "Al2O3": "19",
+        "CaO": "23",
+    },
+}
+
+
+
+_RESTORED_STARTING_EXTRACTS = {
+    "10.1016/j.gca.2007.09.005::experiment::type-b-cai-like-lab-melt": (
+        "kems-010-richter-2007.yaml"
+    ),
+    "10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass": (
+        "kems-020-hastie-1981-nbsir.yaml"
+    ),
+    "9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series": (
+        "llnl-2021-cai-aerodynamic-levitation.yaml"
+    ),
+}
+
+# Green 4153a7c4b SiO2 mole fraction for the Table 1 analytical SNW glass,
+# printed order SiO2 then Fe2O3. Alphabetical conversion ends in 8557.
+_PLANTE_HASTIE_GREEN_SIO2 = Decimal("0.5938921582998945505736528565")
+_PLANTE_HASTIE_ROWS = (
+    "plante_hastie_1983_table1_snw_glass_composition",
+    "plante_hastie_1983_detection_limits_quoted",
+)
+_SHORNIKOV_PRESSURE_ROWS = (
+    "shornikov_2025_k_pressure_range_1450_1500k",
+    "shornikov_2025_na_pressure_range_1450_1500k",
+)
+_SHORNIKOV_EXPERIMENT = "saratov-chondrule-kems-series"
+
+
+def _observation(result, local_id: str):
+    return next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::" + local_id)
+    )
+
+
+def _extract_values(name: str, local_id: str) -> dict:
+    document = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
+        )
+    )
+    for species in document["species"].values():
+        for observation in species.get("observations") or ():
+            if observation.get("observation_id") == local_id:
+                return observation["values"]
+    raise AssertionError(local_id)
+
+
+def test_restored_starting_charges_match_printed_weights(tmp_path: Path) -> None:
+    """Richter, Hastie, and LLNL keep the printed starting charge."""
+
+    found = {}
+    for experiment_id, name in _RESTORED_STARTING_EXTRACTS.items():
+        result = _migrate_real_extract(tmp_path / name, name)
+        found[experiment_id] = result.experiments[experiment_id]
+    for experiment_id, weights in _RESTORED_STARTING_WT.items():
+        initial = found[experiment_id].sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert initial.state.value.proxy_flag is None
+        assert initial.inference is not None
+        assert initial.inference.relation == "wt_pct_to_mole_fraction"
+        expected = wt_pct_to_mole_fraction(
+            {oxide: as_decimal(weight) for oxide, weight in weights.items()}
+        )
+        assert dict(initial.state.value.components) == dict(expected.components)
+
+
+def test_plante_hastie_analytical_rows_keep_printed_order(tmp_path: Path) -> None:
+    """Table 1 analytical glass keeps printed order and green's SiO2 digit.
+
+    The sorted printed fingerprint reorders the oxides and changes SiO2's
+    last digit. These two rows are the measured composition and the
+    detection-limit quote of that same map. They are not initial_charge_only.
+    """
+
+    values = _extract_values(
+        "kems-027-plante-hastie-1983.yaml", _PLANTE_HASTIE_ROWS[0]
+    )
+    printed = values["composition_wt_pct"]
+    expected = wt_pct_to_mole_fraction(
+        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
+    )
+    assert dict(expected.components)["SiO2"] == _PLANTE_HASTIE_GREEN_SIO2
+    result = _migrate_real_extract(tmp_path, "kems-027-plante-hastie-1983.yaml")
+    for local_id in _PLANTE_HASTIE_ROWS:
+        observation = _observation(result, local_id)
+        point = observation.point_conditions or {}
+        assert list(point)[:2] == ["composition", "printed_composition"]
+        composition = point["composition"]
+        assert composition.state.is_value
+        assert composition.state.value.proxy_flag is None
+        assert [name for name, _amount in composition.state.value.components] == list(
+            printed
+        )
+        assert dict(composition.state.value.components) == dict(expected.components)
+        identity = observation.identity.composition
+        assert identity is not None and identity.is_value
+        assert dict(identity.value.components) == dict(expected.components)
+
+
+def test_shornikov_pressure_rows_use_initial_charge_only(tmp_path: Path) -> None:
+    """The 1450-1500 K pressures use the p.115 bulk charge, not the residual.
+
+    p.116 calculates the residual-melt change from those pressures. The
+    proxy stays on the pressure rows. The experiment initial is the bulk
+    charge itself and is not flagged.
+    """
+
+    values = _extract_values(
+        "shornikov-2025-saratov-alkali-evaporation.yaml",
+        _SHORNIKOV_PRESSURE_ROWS[0],
+    )
+    role = values["composition_role"]
+    assert role["value"] == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert role["locator"]["published_page"] == 115
+    assert role["quote"] == (
+        "The Saratov chondrite chondrules belong to type IIB "
+        "(according to the classification accepted in meteoritics) "
+        "and are an oxide material (wt %): SiO2 (54.44), TiO2 (0.13), "
+        "Al2O3 (3.20), FeO (13.17), MgO (24.98), CaO (2.24), "
+        "Na2O (1.44) and K2O (0.40)."
+    )
+    assert "residual melt" in role["locator"]["note"]
+    printed = values["oxides_wt_pct"]
+    expected = wt_pct_to_mole_fraction(
+        {oxide: as_decimal(weight) for oxide, weight in printed.items()}
+    )
+    result = _migrate_real_extract(
+        tmp_path, "shornikov-2025-saratov-alkali-evaporation.yaml"
+    )
+    for local_id in _SHORNIKOV_PRESSURE_ROWS:
+        observation = _observation(result, local_id)
+        for composition in (
+            observation.identity.composition,
+            (observation.point_conditions or {})["composition"].state,
+        ):
+            assert composition is not None and composition.is_value
+            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            assert dict(composition.value.components) == dict(expected.components)
+    experiment = next(
+        item
+        for item in result.experiments.values()
+        if item.experiment_id.endswith(_SHORNIKOV_EXPERIMENT)
+    )
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.proxy_flag is None
 
 
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:

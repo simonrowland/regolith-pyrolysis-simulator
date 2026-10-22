@@ -35,9 +35,9 @@ Train topology (metals train, active C2A onward):
              pressure only when that P_sat contract exists.
              The absolute total capture remains rate-cap-driven by
              ``_pressure_isolated_capture_budget_kg``.
-             Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
-             Stage 3 capture and passes SiO downstream (silica fume)
-             or holds it in the melt.
+             Stage-3 capture has no axial stirring suppression gate;
+             pO₂ and the saturation-pressure contract govern the
+             documented paths above.
     Stage 4  Alkali/Mg cyclone (350-700°C) — Na/K/Mg condensation
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
@@ -1451,9 +1451,9 @@ CAPTURE_BUDGET_REGULARIZER_NOTICE = {
 # ``MAX_STIR_FACTOR`` + ``clamp_stir_factor`` are canonical in
 # ``simulator/state.py`` (where ``MeltState.stir_factor`` lives). They
 # are imported here so the condensation Sherwood-enhancement honours the
-# same ceiling as the evaporation linear-multiplier consumer at
-# ``engines/builtin/evaporation_flux.py``. See ``MeltState.stir_factor``
-# doc for the two-consumer rationale and the codex/gstack reviewer
+# same ceiling as the evaporation diagnostic clamp at
+# ``engines/builtin/evaporation_flux.py``. See ``StirState``
+# doc for the consumer mapping and the codex/gstack reviewer
 # trail that surfaced the clamp-asymmetry P1.
 
 
@@ -1479,12 +1479,10 @@ def _stirring_enhanced_sherwood(
     0.5.3 Phase B (2-axis stirring) — which axis drives Sh:
 
     The Sherwood enhancement reads the RADIAL stirring axis as the
-    configured gas-side transport proxy. The axial axis drives a different
-    consumer (the H-K-L linear
-    multiplier in ``engines/builtin/evaporation_flux.py``) — it
-    represents vertical melt-side surface renewal, not gas-side
-    boundary-layer transport. Mixing them up would double-count the
-    same physical knob.
+    configured gas-side transport proxy. The axial axis is diagnostic-only
+    in ``engines/builtin/evaporation_flux.py`` and drives the assumed
+    metal cross-pool relaxation in ``simulator/metal_stratification.py``.
+    Mixing the axes would apply the wrong consumer input.
 
     Signature contract (post-0.5.3):
 
@@ -1507,10 +1505,9 @@ def _stirring_enhanced_sherwood(
 
     Constrained: the driving factor is clamped to ``[0.0,
     MAX_STIR_FACTOR]`` at the operator boundary, with a Sh physics
-    floor at 1.0 (laminar baseline never collapses to zero). Anything
-    beyond ``MAX_STIR_FACTOR`` breaks the gas-side boundary-layer
-    assumption AND the recipe setpoints; the clamp keeps physics
-    defensible even under a bad campaign override.
+    floor at 1.0 (laminar baseline never collapses to zero). The 10×
+    input ceiling is an unsourced engineering placeholder (b-1015), not
+    a measured gas-side boundary-layer limit.
 
     Returns: Sh in the range [``sherwood_laminar``, ~11.6] for the
     driving radial factor in [0, MAX_STIR_FACTOR].
@@ -1518,9 +1515,8 @@ def _stirring_enhanced_sherwood(
     Two-tier clamp (codex /code-review max-effort, Phase B):
 
     - ``clamp_stir_factor`` is the OPERATOR-facing clamp ``[0, 10]``.
-      It preserves the "halt evap" signal at the source for the
-      evaporation consumer at ``axial=0`` AND maps non-finite/bool/
-      etc to 0.
+      It maps non-finite/bool/etc. inputs to 0; axial=0 remains an
+      evaporation diagnostic value, not an evaporation stop command.
     - This helper applies its OWN physics floor at ``1.0`` so that
       Sherwood never drops below the BSL laminar-pipe asymptote
       ``Sh = 3.66`` regardless of operator value. Without stirring
@@ -1529,7 +1525,7 @@ def _stirring_enhanced_sherwood(
 
     Net mapping for the Sherwood path:
 
-    - factor = 0 (halt-evap signal): Sh = 3.66 (laminar baseline)
+    - factor = 0 (radial input floor): Sh = 3.66 (laminar baseline)
     - factor = 1 (no radial stir): Sh = 3.66 (matches)
     - factor = 6 (legacy C2A scalar default): Sh ≈ 9.0
     - factor = 10 (operator ceiling): Sh ≈ 11.6
@@ -1549,7 +1545,7 @@ def _stirring_enhanced_sherwood(
     else:
         operator_value = 1.0
     # Physics floor: Sherwood must not drop below the laminar
-    # asymptote. ``operator_value=0`` (halt-evap signal) maps here
+    # asymptote. ``operator_value=0`` (minimum radial input) maps here
     # to Sh = sherwood_laminar, not Sh = 0.
     sh_input = max(1.0, operator_value)
     return float(sherwood_laminar) * math.sqrt(sh_input)
@@ -2239,10 +2235,10 @@ class CondensationModel:
         ``1.0`` (no-stir laminar baseline, ``Sh = 3.66``) when unset; recipes wire
         ``melt.stir_state.radial`` through
         ``core._configure_condensation_operating_conditions``. The
-        AXIAL axis lives on ``melt.stir_state.axial`` and drives a
-        DIFFERENT consumer (the H-K-L linear multiplier in
-        ``engines/builtin/evaporation_flux.py``); it is not consumed
-        here.
+        AXIAL axis lives on ``melt.stir_state.axial`` and is
+        diagnostic-only in ``engines/builtin/evaporation_flux.py``; its
+        live numerical effect is metal cross-pool relaxation. It is not
+        consumed here.
         """
 
         # Validate the complete candidate first. A late invalid pressure,
@@ -4596,9 +4592,11 @@ class CondensationModel:
             # than the v1 additive blend. T_surface_K (stage T-band
             # sample) drives P_sat; T_gas_K (bulk gas) drives the
             # ideal-gas denominator. overhead_pressure_pa feeds the
-            # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
-            # amplifies the boundary-layer Sherwood per the operator's
-            # induction-stirring power.
+            # Chapman-Enskog D_AB(T, P) per Phase A1. The explicit
+            # radial_stir_factor sets the heuristic Sherwood proxy;
+            # a legacy scalar is radial-equivalent only when the
+            # explicit radial input is absent. No induction power or
+            # field is modeled.
             T_gas_K = max(
                 float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
                 1.0,

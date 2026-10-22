@@ -17,6 +17,31 @@ ANALYTICAL_UPPER_BOUND_ALPHA_STATUS = "analytical_upper_bound"
 ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 
 
+def _evaluate_extracted_arrhenius_alpha(
+    alpha_form: Mapping[str, Any], temperature_K: float,
+) -> tuple[float, float | None]:
+    """Evaluate an extract's Arrhenius fit and its optional energy uncertainty."""
+    if alpha_form.get("A") is not None and alpha_form.get("B_K") is not None:
+        return float(alpha_form["A"]) * math.exp(
+            -float(alpha_form["B_K"]) / temperature_K
+        ), None
+    prefactor = float(alpha_form.get("gamma_o", alpha_form.get("c0")))
+    activation = float(alpha_form["E_J_per_mol"])
+    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
+    # E [J/mol] / (R [J/(mol K)] * T [K]) is dimensionless. Thus
+    # alpha=gamma0*exp(-E/RT) is dimensionless. Linear propagation gives
+    # sigma_alpha=abs(alpha)*sigma_E/(RT), also dimensionless. Positive E
+    # makes alpha increase with T; Richter Fig. 3 gives Mg~0.13, SiO~0.12
+    # at 2073 K. Callers retain their own admission/domain/provenance checks.
+    alpha = prefactor * math.exp(-activation / (gas_constant * temperature_K))
+    sigma_E = alpha_form.get("E_uncertainty_J_per_mol")
+    sigma = (
+        abs(alpha) * float(sigma_E) / (gas_constant * temperature_K)
+        if sigma_E is not None else None
+    )
+    return alpha, sigma
+
+
 def _finite_pair(
     value: Any,
     *,
