@@ -419,7 +419,11 @@ def test_caso4_bakeout_host_is_retained_and_carbon_cleanup_does_not_credit_it(
     )
 
     ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
-    baseline_cao = mars_caso4_feedstock["composition_wt_pct"]["CaO"] / 100.0 * mass_kg
+    # Declared weights sum to 75. Load scales every positive component so
+    # the masses sum to the batch: CaO is 5/75 of 1000 kg, not 5% of it.
+    declared = mars_caso4_feedstock["composition_wt_pct"]
+    declared_total = sum(float(value) for value in declared.values())
+    baseline_cao = mass_kg * float(declared["CaO"]) / declared_total
     assert ledger_melt.get("CaO", 0.0) == pytest.approx(baseline_cao, rel=0, abs=1e-6)
 
     ledger_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
