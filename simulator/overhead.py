@@ -1203,7 +1203,12 @@ class OverheadGasModel:
             isinstance(cold_train_capacity, NoColdTrain)
             and cold_train_capacity.reason == "runtime_enforcement_disabled"
         )
-        return controlled_flow_capacity(
+        gas_temperature_K = float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        gas_molar_mass_kg_mol = _mean_molar_mass_kg_mol(
+            evap_flux.species_kg_hr,
+            species_formula_registry=self.species_formula_registry,
+        )
+        capacity = controlled_flow_capacity(
             pipe_capacity_kg_hr=pipe_capacity_kg_hr,
             equipment_capacity_kg_hr=equipment_capacity,
             evolved_flux_kg_hr=evap_flux.total_kg_hr,
@@ -1213,12 +1218,18 @@ class OverheadGasModel:
             upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
             pipe_diameter_m=self.pipe_diameter_m,
             pipe_length_m=self.pipe_length_m,
-            gas_temperature_K=float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
-            gas_molar_mass_kg_mol=_mean_molar_mass_kg_mol(
-                evap_flux.species_kg_hr,
-                species_formula_registry=self.species_formula_registry,
-            ),
+            gas_temperature_K=gas_temperature_K,
+            gas_molar_mass_kg_mol=gas_molar_mass_kg_mol,
         )
+        if self._conductance_override is not None:
+            # A configured rate still uses mean-mixture bulk-fraction removal.
+            # Classify its capacity boundary even though no pipe law was run.
+            self.last_pipe_conductance_authority_notice = pipe_conductance_authority_notice(
+                self.pipe_diameter_m, gas_molar_mass_kg_mol,
+                self._gas_dynamic_viscosity_Pa_s(gas_temperature_K), gas_temperature_K,
+                capacity.upstream_pressure_bar * 1.0e5, 0.0,
+            )
+        return capacity
 
     def _resolve_liner_temperature_value(
         self,
