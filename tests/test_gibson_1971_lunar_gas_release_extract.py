@@ -48,6 +48,12 @@ def test_gibson_1971_render_pins_and_printed_row_counts():
     ]
     assert len(residue) == 15
     assert all(row["locator"]["pdf_page_index"] == 10 for row in residue)
+    assert all(row["uncertainty"]["locator"]["page"] == 11 for row in residue)
+    for row in residue:
+        locator = row["uncertainty"]["locator"]
+        form = "Breccia" if row["values"]["sample_form"] == "breccia" else "Basalt"
+        assert locator["row"] == row["values"]["analyte"]
+        assert locator["column"] == f"{form} {row['values']['sample_number']} initial"
     assert {
         (row["values"]["analyte"], row["values"]["series"][0]["residue_ppm"])
         for row in residue
@@ -88,3 +94,24 @@ def test_gibson_1971_real_migration_preserves_values_and_run_conditions():
         assert observation.identity.total_pressure_Pa.value == Decimal(
             "0.0002666447368421052631578947368"
         )
+        pressure_condition = observation.point_conditions.get("total_pressure_Pa")
+        if pressure_condition is None:
+            pressure_condition = observation.point_conditions["pressure_torr"]
+        assert pressure_condition.locator.page == 2
+        assert pressure_condition.locator.section == "EXPERIMENT PROCEDURES"
+
+    starting_ppm_pins = {
+        "gibson_1971_10073_k_residue_ppm": Decimal("1200"),
+        "gibson_1971_10017_na_residue_ppm": Decimal("3800"),
+        "gibson_1971_12022_gd_residue_ppm": Decimal("7.90"),
+    }
+    for observation_id, expected in starting_ppm_pins.items():
+        observation = next(
+            value
+            for key, value in observations.items()
+            if observation_id in key
+        )
+        starting = observation.point_conditions["starting_component_ppm"]
+        assert starting.state.value == expected
+        assert starting.locator.page == 11
+        assert starting.locator.table == "2"

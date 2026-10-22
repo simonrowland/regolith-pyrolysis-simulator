@@ -27,91 +27,91 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Mettler recording vacuum thermoanalyzer with Finnigan quadrupole mass spectrometer}
-    locator: {page: 3, section: 'Experiment procedures'}
+    locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   cell_material_and_liner:
     state: {tag: value, value: 'previously outgassed platinum crucible, 16 mm diameter'}
-    locator: {page: 3, section: 'Experiment procedures'}
+    locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
 experiments:
 - experiment_id: lunar-sample-10086
   bench_id: mettler-vacuum-thermoanalyzer
   method: vacuum_chamber_pyrolysis
-  locator: {page: 3, section: 'Experiment procedures'}
+  locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.00024296'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['242.96 mg']}}
     printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this soil.'}}
     form: {state: {tag: value, value: 'Apollo 11 soil 10086,16'}, locator: {page: 10, table: '1'}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
-    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
     channel: {tag: unknown, reason: not_published}
-    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: 'The source specifies vacuum but no oxygen fugacity.'}}
 - experiment_id: lunar-sample-12023
   bench_id: mettler-vacuum-thermoanalyzer
   method: vacuum_chamber_pyrolysis
-  locator: {page: 3, section: 'Experiment procedures'}
+  locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.00020850'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['208.50 mg']}}
     printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this soil.'}}
     form: {state: {tag: value, value: 'Apollo 12 soil 12023,9'}, locator: {page: 10, table: '1'}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
-    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
     channel: {tag: unknown, reason: not_published}
-    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: 'The source specifies vacuum but no oxygen fugacity.'}}
 - experiment_id: lunar-sample-10073
   bench_id: mettler-vacuum-thermoanalyzer
   method: vacuum_chamber_pyrolysis
-  locator: {page: 3, section: 'Experiment procedures'}
+  locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.00020187'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['201.87 mg']}}
     printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this breccia.'}}
     form: {state: {tag: value, value: 'Apollo 11 breccia 10073,23'}, locator: {page: 10, table: '1'}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
-    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
     channel: {tag: unknown, reason: not_published}
-    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: 'The source specifies vacuum but no oxygen fugacity.'}}
 - experiment_id: lunar-sample-10017
   bench_id: mettler-vacuum-thermoanalyzer
   method: vacuum_chamber_pyrolysis
-  locator: {page: 3, section: 'Experiment procedures'}
+  locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.00040045'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['400.45 mg']}}
     printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this basalt.'}}
     form: {state: {tag: value, value: 'Apollo 11 rock 10017,57'}, locator: {page: 10, table: '1'}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
-    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
     channel: {tag: unknown, reason: not_published}
-    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: 'The source specifies vacuum but no oxygen fugacity.'}}
 - experiment_id: lunar-sample-12022
   bench_id: mettler-vacuum-thermoanalyzer
   method: vacuum_chamber_pyrolysis
-  locator: {page: 3, section: 'Experiment procedures'}
+  locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.00050065'}}, locator: {page: 10, table: '1'}, inference: {relation: mg_to_kg, inputs: ['500.65 mg']}}
     printed_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, table: '1', note: 'No bulk composition is printed for this basalt.'}}
     form: {state: {tag: value, value: 'Apollo 12 rock 12022,38'}, locator: {page: 10, table: '1'}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 3, section: 'Experiment procedures', note: '2 × 10⁻⁶ torr converted to Pa.'}}
-    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 3, section: 'Experiment procedures'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: '2 × 10⁻⁶ torr converted to Pa.'}}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}
     regime:
       regime_class: {tag: unknown, reason: not_published}
   fO2_control:
     channel: {tag: unknown, reason: not_published}
-    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 3, section: 'Experiment procedures', note: 'The source specifies vacuum but no oxygen fugacity.'}}
+    buffer: {state: {tag: unknown, reason: not_published}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES', note: 'The source specifies vacuum but no oxygen fugacity.'}}
 species:
   lunar_samples:
     observations:
@@ -130,10 +130,10 @@ species:
         points:
         - T_C: '1000'
           mass_loss_wt_pct: '0.13'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
         - T_C: '1400'
           mass_loss_wt_pct: '1.41'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
     - observation_id: gibson_1971_12023_weight_loss
       type: mass_loss
       regime: vacuum_chamber_pyrolysis
@@ -149,10 +149,10 @@ species:
         points:
         - T_C: '1000'
           mass_loss_wt_pct: '0.20'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
         - T_C: '1400'
           mass_loss_wt_pct: '2.13'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
     - observation_id: gibson_1971_10073_weight_loss
       type: mass_loss
       regime: vacuum_chamber_pyrolysis
@@ -168,10 +168,10 @@ species:
         points:
         - T_C: '1000'
           mass_loss_wt_pct: '0.15'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
         - T_C: '1400'
           mass_loss_wt_pct: '0.95'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
     - observation_id: gibson_1971_10017_weight_loss
       type: mass_loss
       regime: vacuum_chamber_pyrolysis
@@ -187,10 +187,10 @@ species:
         points:
         - T_C: '1000'
           mass_loss_wt_pct: '0.073'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
         - T_C: '1400'
           mass_loss_wt_pct: '1.02'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
     - observation_id: gibson_1971_12022_weight_loss
       type: mass_loss
       regime: vacuum_chamber_pyrolysis
@@ -206,10 +206,10 @@ species:
         points:
         - T_C: '1000'
           mass_loss_wt_pct: '0.038'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
         - T_C: '1400'
           mass_loss_wt_pct: '0.51'
-          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 3, section: 'Experimental procedures'}}}
+          point_conditions: {pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 2, section: 'EXPERIMENT PROCEDURES'}}}
   Ce:
     observations:
     - observation_id: gibson_1971_12022_ce_residue_ppm
@@ -221,6 +221,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Ce, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -244,6 +246,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Eu, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -267,6 +271,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Gd, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -291,6 +297,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: K, column: 'Breccia 10073 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -312,6 +320,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: K, column: 'Basalt 10017 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -333,6 +343,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: K, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -356,6 +368,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Li, column: 'Basalt 10017 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -377,6 +391,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Li, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -400,6 +416,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Na, column: 'Basalt 10017 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -421,6 +439,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Na, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -444,6 +464,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Nd, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -467,6 +489,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Rb, column: 'Breccia 10073 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -488,6 +512,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Rb, column: 'Basalt 10017 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -509,6 +535,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Rb, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -532,6 +560,8 @@ species:
       units: ppm
       point_conditions:
         pressure_torr: {state: {tag: value, value: '0.000002'}, locator: {page: 11, section: 'Thermal volatilization of selected elements'}}
+      uncertainty:
+        locator: {page: 11, table: '2', row: Sm, column: 'Basalt 12022 initial'}
       values:
         quantity: residue_component_composition
         method_class: measured_direct
@@ -548,4 +578,7 @@ notes:
 - Table 1 initial-melting values are contextual; the paper calls them initial melting/solidus, but they are not typed as separate transition-temperature measurements in this extract.
 - Figures 1–5 contain gas-release curves only; figure-read candidates are deferred because the curves are not tabulated numeric data.
 - Table 2 prints 27 initial element concentrations but only 15 numerical after-1400 °C residue concentrations; remaining residue cells are dashes.
+- The source states a 4 °C/min heating rate from room temperature to 1400 °C (PDF p. 3, section 'EXPERIMENT PROCEDURES'); Table 2 discussion repeats the 4 °C/min rate (PDF p. 11). No hold duration is stated for this 1971 run.
+- Fourteen of these 15 after-1400 °C values also appear in Gibson and Hubbard (1972), Table 2 (PDF p. 2005), as 1400 °C, 2 hr residues. For K in sample 12022, the 1971 value is 179.3 ppm and the 1972 value is 179 ppm. The 1971 initial Li for sample 10017 is 18.7 ppm; the 1972 table gives 18.1 ppm and attributes it to Tera et al. (1970). The extracts remain distinct; no 1972 hold is assigned to these 1971 measurements.
+- Table 1 gives 242.96 mg for sample 10086,16, while the Fig. 1 caption gives 242.94 mg (PDF p. 4). The extract follows Table 1, confirmed on PDF p. 10.
 - Distinct 1971 proceedings paper; the separate Gibson and Hubbard 1972 extract is unchanged.
