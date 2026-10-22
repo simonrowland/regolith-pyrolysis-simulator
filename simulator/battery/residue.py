@@ -2007,6 +2007,52 @@ def predict_mass_loss_fraction(
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
     corner_records = []
     inventory_capped_channels = set()
+    # The shared callback names residue composition for Knudsen and Hashimoto.
+    # This path keeps those notices and retargets only the mass-loss quantity.
+    omission_notices: list[Any] = []
+    omission_records: dict[str, list[dict[str, Any]]] = {}
+
+    def retain_omissions(pressure_model: object) -> None:
+        from simulator.battery.enums import Quantity
+
+        for notice in getattr(pressure_model, "below_threshold_omission_notices", ()) or ():
+            adapted = replace(
+                notice, affected_quantities=(Quantity.MASS_LOSS_FRACTION,)
+            )
+            if adapted not in omission_notices:
+                omission_notices.append(adapted)
+        for formula, record in (
+            getattr(pressure_model, "below_threshold_omission_records", {}) or {}
+        ).items():
+            bucket = omission_records.setdefault(str(formula), [])
+            copied = dict(record)
+            if copied not in bucket:
+                bucket.append(copied)
+
+    def omission_payload() -> str | None:
+        if not omission_notices and not omission_records:
+            return None
+        return json.dumps(
+            {
+                "notices": [
+                    {
+                        "kind": notice.kind.value,
+                        "reason": notice.reason,
+                        "origin": notice.origin,
+                    }
+                    for notice in omission_notices
+                ],
+                "records": omission_records,
+            },
+            sort_keys=True,
+        )
+
+    def attach_omissions(exc: BaseException) -> None:
+        payload = omission_payload()
+        if payload is None:
+            return
+        setattr(exc, "notices", tuple(omission_notices))
+        setattr(exc, "below_threshold_omissions", payload)
 
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
@@ -2048,124 +2094,134 @@ def predict_mass_loss_fraction(
             if not rectangle:
                 corner_records.append(corners)
 
-        result = _hashimoto_integrate_geometry(
-            inventory, channels, pressure_model, temperature_K=at_K,
-            duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
-            geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
-            initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
-            background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
-            **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
-        )
-        if result.refusal is not None:
-            raise result.refusal
-        terms = _channel_terms(channels)
-        parent_loss = {
-            term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
-            * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
-            for term in terms if term.source.parent_oxide is not None
-        }
-        return result.inventory_mol, math.fsum(parent_loss.values())
+        try:
+            result = _hashimoto_integrate_geometry(
+                inventory, channels, pressure_model, temperature_K=at_K,
+                duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
+                geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
+                initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
+                background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
+                **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
+            )
+            if result.refusal is not None:
+                raise result.refusal
+            terms = _channel_terms(channels)
+            parent_loss = {
+                term.source.species: result.evaporated_mol.get(term.source.species, 0.0)
+                * term.parent_moles_per_product * _formula_terms(term.source.parent_oxide)[1]
+                for term in terms if term.source.parent_oxide is not None
+            }
+            return result.inventory_mol, math.fsum(parent_loss.values())
+        finally:
+            retain_omissions(pressure_model)
 
     # The unknown preheat is an upper rectangle only: do not debit it as a
     # measured trajectory. All its removal, not just unsourced channels, joins B.
-    _unused_inventory, _unused_loss = run_segment(
-        initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
-        rectangle=True, unsourced_unity=True
-    )
-    inventory = initial_inventory_mol
-    joint_inventory = initial_inventory_mol
-    documented_loss_kg = 0.0
-    joint_loss_kg = 0.0
-    joint_refusal = None
-    for at_K, seconds in segments:
-        inventory, loss = run_segment(
-            inventory, at_K, seconds,
-        )
-        if joint_refusal is None:
-            try:
-                joint_inventory, joint_loss = run_segment(
-                    joint_inventory, at_K, seconds, unsourced_unity=True,
-                )
-                joint_loss_kg += joint_loss
-            except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
-                joint_refusal = {"reason": exc.reason, "detail": exc.detail}
-        documented_loss_kg += loss
-    channel_parents = {str(species): parent for species, (parent, *_rest) in gas_channels if parent}
-    inventory_bounds_by_parent = {}
-    # A divergent channel can remove at most its initial parent mass, ONCE:
-    # splitting time or sharing that parent between gases creates no matter.
-    # Cap the accumulated parent sum, including preheat, rather than shadow-
-    # debiting the point state. This leaves the original trajectories intact.
-    # Proportional attribution preserves B=sum(channels)+preheat; it is not a
-    # physical debit. Two 60 s full-parent claims become m0, never 2*m0.
-    for parent in sorted({channel_parents[species] for species in inventory_capped_channels}):
-        species = [name for name, oxide in channel_parents.items() if oxide == parent]
-        total = math.fsum(mapping.get(name, 0.0)
-                          for mapping in (bounds_by_channel, preheat_bounds_by_channel)
-                          for name in species)
-        ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
-        scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
-        inventory_bounds_by_parent[parent] = {
-            "uncapped_bound_kg": total, "ceiling_kg": ceiling,
-            "applied_bound_kg": min(total, ceiling),
-        }
-        for mapping in (bounds_by_channel, preheat_bounds_by_channel):
-            for name in species:
-                if name in mapping:
-                    mapping[name] *= scale
-    unsourced_bound_kg = math.fsum(bounds_by_channel.values())
-    preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
-    point_loss_kg = documented_loss_kg
-    uncertainty = getattr(observation, "uncertainty", None)
-    uncertainty_kg = None
-    if getattr(getattr(uncertainty, "kind", None), "value", "none") != "none":
-        value = getattr(uncertainty, "value", None)
-        basis = getattr(uncertainty, "basis", None)
-        if value is None or isinstance(value, tuple):
-            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_not_numeric")
-        if basis in {"absolute", "absolute_fraction_of_initial_mass"}:
-            uncertainty_kg = float(value) * sample_mass_kg
-        elif basis in {"relative", "fraction"}:
-            uncertainty_kg = float(value) * float(observation.value.point) * sample_mass_kg
-        else:
-            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_basis_not_stated")
-        if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
-            raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
-    evidence = {
-        "unsourced_bound_kg_by_channel": bounds_by_channel,
-        "joint_arm_loss_kg_non_gating": joint_loss_kg if joint_refusal is None else None,
-        "joint_arm_refusal_non_gating": joint_refusal,
-        "joint_arm_background_pressure_Pa": 0.0,
-        "corner_steps": len(corner_records),
-        "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
-        "pO2_corner_ranges_bar": {
-            name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
-            for name in ("pO2_low_bar", "pO2_high_bar")
-        } if corner_records else {},
-        "inventory_capped_channels": sorted(inventory_capped_channels),
-        "inventory_bound_kg_by_parent": inventory_bounds_by_parent,
-    }
     try:
-        diagnostics = _mass_loss_bound_gate(
-            unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
-            channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
-            preheat_bound_kg=preheat_bound_kg,
+        _unused_inventory, _unused_loss = run_segment(
+            initial_inventory_mol, preheat_maximum_K, preheat_duration_s,
+            rectangle=True, unsourced_unity=True,
         )
-    except ResidueInventoryRefusal as exc:
-        if exc.reason not in {"alpha_not_sourced", "preheat_bound_not_negligible"}:
-            raise
-        diagnostics = json.loads(exc.detail)
+        inventory = initial_inventory_mol
+        joint_inventory = initial_inventory_mol
+        documented_loss_kg = 0.0
+        joint_loss_kg = 0.0
+        joint_refusal = None
+        for at_K, seconds in segments:
+            inventory, loss = run_segment(
+                inventory, at_K, seconds,
+            )
+            if joint_refusal is None:
+                try:
+                    joint_inventory, joint_loss = run_segment(
+                        joint_inventory, at_K, seconds, unsourced_unity=True,
+                    )
+                    joint_loss_kg += joint_loss
+                except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+                    joint_refusal = {"reason": exc.reason, "detail": exc.detail}
+            documented_loss_kg += loss
+        channel_parents = {str(species): parent for species, (parent, *_rest) in gas_channels if parent}
+        inventory_bounds_by_parent = {}
+        # A divergent channel can remove at most its initial parent mass, ONCE:
+        # splitting time or sharing that parent between gases creates no matter.
+        # Cap the accumulated parent sum, including preheat, rather than shadow-
+        # debiting the point state. This leaves the original trajectories intact.
+        # Proportional attribution preserves B=sum(channels)+preheat; it is not a
+        # physical debit. Two 60 s full-parent claims become m0, never 2*m0.
+        for parent in sorted({channel_parents[species] for species in inventory_capped_channels}):
+            species = [name for name, oxide in channel_parents.items() if oxide == parent]
+            total = math.fsum(mapping.get(name, 0.0)
+                              for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                              for name in species)
+            ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
+            scale = min(1.0, ceiling / total) if total > 0.0 else 1.0
+            inventory_bounds_by_parent[parent] = {
+                "uncapped_bound_kg": total, "ceiling_kg": ceiling,
+                "applied_bound_kg": min(total, ceiling),
+            }
+            for mapping in (bounds_by_channel, preheat_bounds_by_channel):
+                for name in species:
+                    if name in mapping:
+                        mapping[name] *= scale
+        unsourced_bound_kg = math.fsum(bounds_by_channel.values())
+        preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
+        point_loss_kg = documented_loss_kg
+        uncertainty = getattr(observation, "uncertainty", None)
+        uncertainty_kg = None
+        if getattr(getattr(uncertainty, "kind", None), "value", "none") != "none":
+            value = getattr(uncertainty, "value", None)
+            basis = getattr(uncertainty, "basis", None)
+            if value is None or isinstance(value, tuple):
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_not_numeric")
+            if basis in {"absolute", "absolute_fraction_of_initial_mass"}:
+                uncertainty_kg = float(value) * sample_mass_kg
+            elif basis in {"relative", "fraction"}:
+                uncertainty_kg = float(value) * float(observation.value.point) * sample_mass_kg
+            else:
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_basis_not_stated")
+            if not math.isfinite(uncertainty_kg) or uncertainty_kg <= 0.0:
+                raise ResidueInventoryRefusal("bulk_mass_loss_uncertainty_invalid")
+        evidence = {
+            "unsourced_bound_kg_by_channel": bounds_by_channel,
+            "joint_arm_loss_kg_non_gating": joint_loss_kg if joint_refusal is None else None,
+            "joint_arm_refusal_non_gating": joint_refusal,
+            "joint_arm_background_pressure_Pa": 0.0,
+            "corner_steps": len(corner_records),
+            "corner_ordering_verified": all(c["pO2_low_bar"] <= c["pO2_high_bar"] for c in corner_records),
+            "pO2_corner_ranges_bar": {
+                name: [min(c[name] for c in corner_records), max(c[name] for c in corner_records)]
+                for name in ("pO2_low_bar", "pO2_high_bar")
+            } if corner_records else {},
+            "inventory_capped_channels": sorted(inventory_capped_channels),
+            "inventory_bound_kg_by_parent": inventory_bounds_by_parent,
+        }
+        try:
+            diagnostics = _mass_loss_bound_gate(
+                unsourced_bound_kg + preheat_bound_kg, point_loss_kg, uncertainty_kg,
+                channels=tuple(species for species, bound in bounds_by_channel.items() if bound > 0.0),
+                preheat_bound_kg=preheat_bound_kg,
+            )
+        except ResidueInventoryRefusal as exc:
+            if exc.reason not in {"alpha_not_sourced", "preheat_bound_not_negligible"}:
+                raise
+            diagnostics = json.loads(exc.detail)
+            diagnostics.update(evidence)
+            raise ResidueInventoryRefusal(exc.reason, json.dumps(diagnostics, sort_keys=True)) from exc
         diagnostics.update(evidence)
-        raise ResidueInventoryRefusal(exc.reason, json.dumps(diagnostics, sort_keys=True)) from exc
-    diagnostics.update(evidence)
-    flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
-    metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
-    metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
-    metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
-    return ResidueMassLossPrediction(
-        mass_loss_fraction=point_loss_kg / sample_mass_kg,
-        engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
-    )
+        flags.add("mass_loss_bound:" + json.dumps(diagnostics, sort_keys=True))
+        metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
+        metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
+        metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
+        payload = omission_payload()
+        if payload is not None:
+            metadata["below_threshold_omissions"] = payload
+        return ResidueMassLossPrediction(
+            mass_loss_fraction=point_loss_kg / sample_mass_kg,
+            engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attach_omissions(exc)
+        raise
 
 
 def _hashimoto_table_row(table: Any, key: str, temperature_K: float) -> Mapping[str, Any]:

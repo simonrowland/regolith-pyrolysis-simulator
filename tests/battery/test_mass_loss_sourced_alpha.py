@@ -728,3 +728,155 @@ def test_positive_bound_with_zero_point_loss_refuses():
     assert detail["bound_fraction"] is None
     assert detail["fraction_clause_passed"] is False
     assert _mass_loss_bound_gate(0, 0, None, channels=(), preheat_bound_kg=0)["bound_fraction"] == 0
+
+
+def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_predictions(
+    monkeypatch, fig3_source, r11_inputs,
+):
+    """A proved below-threshold channel stays on the mass-loss result and refusal."""
+    import sys
+    from types import ModuleType
+
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import NoticeKind
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    row, experiment = r11_inputs
+    temperature_K = float(score_module.temperature_of(row.identity))
+    package = ModuleType("openimcc")
+    package.load_gas_datapack = lambda: object()
+    monkeypatch.setitem(sys.modules, "openimcc", package)
+    original_yaml = score_module.load_yaml
+    monkeypatch.setattr(score_module, "load_yaml", lambda path: (
+        deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original_yaml(path)
+    ))
+    segment_temperatures = (1173.15, 1673.15, 2073.15)
+    monkeypatch.setattr(residue, "_mass_loss_thermal_segments", lambda *_args: (
+        segment_temperatures[0], 1.0e-3,
+        tuple((temperature, 60.0) for temperature in segment_temperatures[1:]),
+    ))
+    monkeypatch.setattr(binary_pot_battery, "_new_internal_analytical_core", lambda: object())
+    state = {"missing": ()}
+
+    def adapter(**kwargs):
+        logp = float(kwargs["fO2_log"])
+        computed = 1e-30 * float(kwargs["temperature_C"])
+        return SimpleNamespace(
+            vapor_pressures_Pa={"Mg": 0.001 / (10.0**logp)**0.5},
+            diagnostics={
+                "vapor_pressure_diagnostic": {
+                    "below_reporting_threshold_omissions": {
+                        "Al": {
+                            "species": "Al",
+                            "reporting_threshold_Pa": 1e-15,
+                            "computed_pressure_Pa": computed,
+                            "field": "vapor_pressure_Pa",
+                            "pressure_rail": "metal",
+                        },
+                    },
+                },
+            },
+        )
+
+    def gas_channels(*_args):
+        channels = [
+            ("Mg", ("MgO", 1.0, -0.5)),
+            ("Al", ("Al2O3", 0.5, -0.75)),
+            ("O2", (None, 0.0, 1.0)),
+        ]
+        channels.extend(state["missing"])
+        return tuple(channels), ()
+
+    monkeypatch.setattr(
+        binary_pot_battery, "_internal_analytical_vapor_pressure_adapter", adapter,
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, "_openimcc_gas_channels_and_omission_notices", gas_channels,
+    )
+
+    def assert_omission(notice, computed):
+        assert notice.kind is NoticeKind.INPUT_OMITTED
+        assert notice.affected_quantities == (Quantity.MASS_LOSS_FRACTION,)
+        assert notice.origin == "Knudsen residue pressure adapter"
+        assert notice.reason.startswith("Al ")
+        assert "1e-15" in notice.reason
+        assert f"{computed!r}" in notice.reason
+        assert "vapor_pressure_Pa" in notice.reason
+        assert "metal" in notice.reason
+        assert (
+            "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+            in notice.reason
+        )
+
+    expected_computed = {
+        1e-30 * (temperature - 273.15) for temperature in segment_temperatures
+    }
+    result = residue.predict_mass_loss_fraction(
+        "internal-analytical", experiment, temperature_K=temperature_K,
+        source_document=fig3_source, observation=row,
+    )
+    payload = json.loads(result.engine_metadata["below_threshold_omissions"])
+    recorded = {
+        record["computed_pressure_Pa"] for record in payload["records"]["Al"]
+    }
+    assert recorded == expected_computed
+    assert payload["records"]["Al"][0]["species"] == "Al"
+    assert payload["records"]["Al"][0]["reporting_threshold_Pa"] == 1e-15
+    assert payload["records"]["Al"][0]["provenance"] == (
+        "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+    )
+    produced = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment,
+    )
+    assert produced.value is not None, produced.refusal_detail
+    produced_omissions = [
+        notice for notice in produced.notices
+        if notice.kind is NoticeKind.INPUT_OMITTED
+    ]
+    assert {
+        computed for computed in expected_computed
+        for notice in produced_omissions
+        if f"{computed!r}" in notice.reason
+    } == expected_computed
+    for notice in produced_omissions:
+        matched = next(
+            computed for computed in expected_computed
+            if f"{computed!r}" in notice.reason
+        )
+        assert_omission(notice, matched)
+
+    state["missing"] = (("Zr", ("ZrO2", 1.0, -1.0)),)
+    with pytest.raises(ResidueInventoryRefusal) as failure:
+        residue.predict_mass_loss_fraction(
+            "internal-analytical", experiment, temperature_K=temperature_K,
+            source_document=fig3_source, observation=row,
+        )
+    assert failure.value.reason == "residue_pressure_channels_missing"
+    assert failure.value.detail == "Zr"
+    preheat_computed = 1e-30 * (segment_temperatures[0] - 273.15)
+    assert len(failure.value.notices) == 1
+    assert_omission(failure.value.notices[0], preheat_computed)
+    refused_payload = json.loads(failure.value.below_threshold_omissions)
+    assert refused_payload["records"]["Al"][0]["computed_pressure_Pa"] == preheat_computed
+    assert refused_payload["records"]["Al"][0]["provenance"] == (
+        "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+    )
+    refused = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment,
+    )
+    assert refused.value is None
+    assert refused.refusal_detail["reason"] == "residue_pressure_channels_missing"
+    assert refused.refusal_detail["detail"] == "Zr"
+    refused_omissions = [
+        notice for notice in refused.notices
+        if notice.kind is NoticeKind.INPUT_OMITTED
+    ]
+    assert len(refused_omissions) == 1
+    assert_omission(refused_omissions[0], preheat_computed)
+    scored_payload = json.loads(refused.refusal_detail["below_threshold_omissions"])
+    assert scored_payload["records"]["Al"][0]["species"] == "Al"
+    assert scored_payload["records"]["Al"][0]["reporting_threshold_Pa"] == 1e-15
+    assert scored_payload["records"]["Al"][0]["computed_pressure_Pa"] == preheat_computed
+    assert scored_payload["records"]["Al"][0]["provenance"] == (
+        "BuiltinVaporPressureProvider.below_reporting_threshold_omissions"
+    )

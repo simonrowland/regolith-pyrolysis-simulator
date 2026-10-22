@@ -5908,6 +5908,37 @@ def _predict_mass_loss_with_residue(
         predict_mass_loss_fraction,
     )
 
+    def omission_notices(payload: object) -> tuple[Notice, ...]:
+        if not isinstance(payload, str) or not payload:
+            return ()
+        parsed = json.loads(payload)
+        if not isinstance(parsed, Mapping):
+            return ()
+        rows = parsed.get("notices")
+        if not isinstance(rows, list):
+            return ()
+        built: list[Notice] = []
+        for item in rows:
+            if not isinstance(item, Mapping):
+                continue
+            if item.get("kind") != NoticeKind.INPUT_OMITTED.value:
+                continue
+            reason = item.get("reason")
+            origin = item.get("origin")
+            if not isinstance(reason, str) or not reason:
+                continue
+            if not isinstance(origin, str) or not origin:
+                continue
+            built.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+                    reason=reason,
+                    origin=origin,
+                )
+            )
+        return tuple(built)
+
     source_path = (
         REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
     )
@@ -5953,6 +5984,9 @@ def _predict_mass_loss_with_residue(
             detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -5961,9 +5995,18 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=refusal,
             refusal_detail=detail,
+            notices=omission_notices(payload),
             identity=identity,
         )
     except ResidueEngineNonconvergence as exc:
+        detail = {
+            "reason": exc.reason,
+            "engine": engine.value,
+            "detail": exc.detail,
+        }
+        payload = getattr(exc, "below_threshold_omissions", None)
+        if isinstance(payload, str) and payload:
+            detail["below_threshold_omissions"] = payload
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -5971,11 +6014,8 @@ def _predict_mass_loss_with_residue(
             coefficient_sources=sources,
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
-            refusal_detail={
-                "reason": exc.reason,
-                "engine": engine.value,
-                "detail": exc.detail,
-            },
+            refusal_detail=detail,
+            notices=omission_notices(payload),
             identity=identity,
         )
 
@@ -5992,7 +6032,7 @@ def _predict_mass_loss_with_residue(
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
-    )
+    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
