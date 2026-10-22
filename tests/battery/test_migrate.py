@@ -10985,6 +10985,8 @@ def _condensed_density_points_below_floor(observations) -> list[str]:
 
 
 def test_store_condensed_phase_densities_are_at_least_100_kg_per_m3() -> None:
+    from simulator.battery.identity import Identity
+
     # Silica aerogels can be about 1-100 kg/m3; porous regolith and minerals
     # are about 1000-6000 kg/m3, so a condensed regolith/mineral value below
     # 100 kg/m3 signals a unit error.
