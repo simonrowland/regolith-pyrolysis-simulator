@@ -89,6 +89,32 @@ def test_wt_percent_conversion_handles_swept_species_and_feot_alias() -> None:
     assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
 
 
+def test_wt_percent_conversion_keeps_v2o3_in_the_printed_slag_composition() -> None:
+    converted = wt_pct_to_mole_fraction(
+        {"CaO": Decimal("60"), "SiO2": Decimal("35"), "V2O3": Decimal("5")}
+    )
+    components = dict(converted.components)
+
+    assert set(components) == {"CaO", "SiO2", "V2O3"}
+    assert abs(components["CaO"] - Decimal("0.6346713")) < Decimal("0.0000001")
+    assert abs(components["SiO2"] - Decimal("0.3455404")) < Decimal("0.0000001")
+    assert abs(components["V2O3"] - Decimal("0.0197883")) < Decimal("0.0000001")
+    assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
+    assert migrate_module._is_engine_oxide_component("V2O3") is False
+
+
+def test_v2o3_phase_composition_component_row_migrates(tmp_path: Path) -> None:
+    source = "wang-2017-cao-sio2-vox-tables-s1-s32"
+    result = _migrate_real_extract(tmp_path, f"{source}.yaml")
+
+    row = result.observations[
+        f"{source}::wang_2017_s1_sample101_liquid_point_1_v2o3"
+    ]
+    assert row.identity.quantity.value.value == "equilibrium_phase_composition"
+    assert row.identity.species.formula == "V2O3"
+    assert row.value.point == Decimal("5.38")
+
+
 @pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))
 def test_wt_percent_conversion_refuses_ambiguous_feot_and_iron_oxide(
     iron_oxide: str,
