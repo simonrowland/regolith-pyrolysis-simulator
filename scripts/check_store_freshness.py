@@ -156,8 +156,9 @@ CODE_INPUTS = (
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring and diagnostic changes are covered by the commits' tests.
 #   c21acfc5d, 6ba1b9771: t-1424 public battery tools. c21acfc5d names the
-#     residual-key spellings in simulator/battery/score.py and shares one key
-#     splitter with compilation_tier.py and pins.py (same strings). 6ba1b9771
+#     residual-key spellings in simulator/battery/score.py, shares its key
+#     splitter with pins.py, and gives compilation_tier.py the shared
+#     no-headline rail token (same strings throughout). 6ba1b9771
 #     streams residual ledgers through iter_residual_payloads in score.py for
 #     scripts/battery_residuals_report.py. Migration's only import from these
 #     modules is the unchanged parse_species_formula, and neither commit
