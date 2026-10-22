@@ -1,0 +1,96 @@
+source_id: babaian-2026-fe-mg-si-reassessment
+extraction_mode: manual_600dpi_render_checked
+table_tool: unavailable_in_this_seat
+mappings:
+  - table: '1'
+    page_range: '4-8'
+    columns:
+      - Mixture
+      - T (°C)
+      - p(O2)
+      - Substrate
+      - Time (h)
+      - Preheat (°C)
+      - Phase
+      - SiO2 (mol.%, corrected)
+      - FeO (mol.%, corrected)
+      - MgO (mol.%, corrected)
+      - Old wt.% total
+    typed_as:
+      - one equilibrium_phase_composition observation per printed component in each liquid phase
+    component_species:
+      - SiO2
+      - FeO
+      - MgO
+    identity:
+      phase_role: melt
+      basis: mole_fraction
+      amount: printed mol.% value, retained in mol.% units
+      sigma: printed standard deviation, retained in mol.% units when nonzero
+      temperature: values.T_C and point_conditions.T_C with state and row locator
+      oxygen: printed 10^-4 or 10^-6 atm converted to canonical pO2_Pa and original condition retained verbatim
+      iron_saturation: retained as redox_condition_as_published; no pO2 inferred
+      assemblage: mixture, full printed assemblage, preheat and old wt.% total bound to the shared experiment
+    filing:
+      two_liquid_tie_lines: species.SiO2
+      one_solid_olivine: species.MgO
+      one_solid_monoxide: species.MgO
+      one_solid_spinel: species.FeO
+      one_solid_silica_polymorph: species.SiO2
+      multiple_coexisting_solids: species.SiO2
+    untyped_rows:
+      solid_phase_compositions: context rows with every printed component and old wt.% total; no d-223 solid phase_role exists
+      old_wt_percent_total: preserved on liquid rows and solid context rows; not mapped to printed_sum because it is the previous wt.% total
+    page_break_correction: >-
+      The PDF page 8 render shows the first pyroxene and tridymite cells continue FMS20a from page 7;
+      MinerU attached those two rows to the following FMS35 block. The extract and test grid use FMS20a.
+  - table: '2'
+    page: 11
+    columns:
+      - Mixture
+      - T (°C)
+      - Substrate
+      - Time (h)
+      - Preheat (°C)
+      - Phase
+      - SiO2/Si (mol.%, corrected)
+      - FeO/Fe (mol.%, corrected)
+      - MgO/Mg (mol.%, corrected)
+      - SnO/Sn (mol.%, corrected)
+      - Old wt.% total
+    typed_as:
+      - one equilibrium_phase_composition observation per printed component in each liquid slag
+      - one equilibrium_phase_composition observation per printed component in each liquid metal
+    identity:
+      slag_phase_role: slag
+      metal_phase_role: metal
+      basis: mole_fraction
+      amount: printed mol.% value, retained in mol.% units
+      temperature: values.T_C and point_conditions.T_C with state and row locator
+      oxygen: not printed; equilibrium with Sn-Fe alloy retained as text and no pO2 inferred
+      assemblage: shared experiment across slag, metal and solid phases
+    untyped_rows:
+      solid_phase_compositions: context rows with all four printed component columns and old wt.% total; no d-223 solid phase_role exists
+      FMSSn5_metal_Mg: blank cell retained as unreported; not converted to zero
+      old_wt_percent_total: preserved in row notes; not treated as the corrected mol.% sum
+  - table: '3'
+    page_range: '12-19'
+    typed_as: context only
+    reason: optimized thermochemical assessment parameters are model_derived, not current experimental measurements
+    candidate_quantity_tokens:
+      - cp
+      - delta_fH
+      - S
+    capture: full pdftotext-layout table rows retained verbatim with printed expressions and numbers
+  - table: '4'
+    page_range: '20-21'
+    typed_as: context only
+    reason: optimized interaction parameters are model_derived, not current experimental measurements
+    candidate_quantity_tokens:
+      - interaction_parameter
+    capture: full pdftotext-layout table rows retained verbatim with printed expressions and numbers
+  - figures: '1-24'
+    typed_as: context figure records with empty points arrays and digitisation deferred
+    note: >-
+      Captions, figure locator, panel, plotted quantity family, identity axes and provisional series are recorded.
+      Marker counts are left for the deferred figure pass; no figure values are estimated.
