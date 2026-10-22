@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 from simulator.campaigns import (
     CAMPAIGN_DEPLETION_SIGNAL_INVALID_REFUSAL_REASON,
     CampaignC4EndpointRefusal,
@@ -139,7 +140,9 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
     ),
     [
         (CampaignPhase.C0, 9, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
-        (CampaignPhase.C0, 10, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
+        # Temperature plus the minimum hold cannot complete C0 until a
+        # measured release curve is loaded. Maximum hold still ends it.
+        (CampaignPhase.C0, 10, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C0, 25, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0B, 3, 1199.9, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0B, 3, 1200.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
@@ -230,6 +233,44 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     )
 
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
+
+
+def test_c0_temperature_hold_does_not_complete_and_max_hold_is_incomplete():
+    manager = CampaignManager(_setpoints())
+    soft = manager.check_endpoint(
+        _melt(CampaignPhase.C0, 10, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    )
+    assert soft is False
+    assert manager.last_c0_exit is None
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 25, temperature_C=25.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit == {
+        "outcome": "incomplete",
+        "backstop": "maximum_hold",
+        "kinetics": STAGE0_RELEASE_KINETICS,
+    }
+
+
+def test_c0_first_melt_backstop_beats_the_maximum_hold():
+    manager = CampaignManager(_setpoints())
+    manager.c0_first_melt_backstop = True
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 25, temperature_C=940.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+    assert manager.last_c0_exit["outcome"] == "incomplete"
+    assert manager.last_c0_exit["backstop"] == "first_melt"
+    assert manager.last_c0_exit["kinetics"] == STAGE0_RELEASE_KINETICS
 
 
 def _c4_snapshot(*, temperature_C: float, mg_rate: float) -> HourSnapshot:

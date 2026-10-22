@@ -186,6 +186,8 @@ REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
 REACTION_FAMILY_CHAR_LANCE_OXIDATION = "char_lance_oxidation"
 REACTION_FAMILY_CHAR_FEO_REDUCTION = "char_feo_reduction"
 REACTION_FAMILY_ORGANIC_SOURCE_TERM = "organic_source_term"
+REACTION_FAMILY_SUBSOLIDUS_BAKEOUT = "subsolidus_bakeout"
+REACTION_FAMILY_SUBSOLIDUS_HANDOFF = "subsolidus_handoff"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_COMPLETE_OXIDATION,
     REACTION_FAMILY_SULFATE_CARBON,
@@ -201,6 +203,8 @@ VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_CHAR_LANCE_OXIDATION,
     REACTION_FAMILY_CHAR_FEO_REDUCTION,
     REACTION_FAMILY_ORGANIC_SOURCE_TERM,
+    REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+    REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
 })
 
 OXYGEN_SPECIES = "O2"
@@ -411,6 +415,17 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
             return self._dispatch_boudouard(
                 controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family in (
+            REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+            REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
+        ):
+            return self._dispatch_subsolidus_mol_transfer(
+                reaction_family,
+                controls,
+                registry,
+                resolve_species_formula,
+                control_audit,
             )
         # reaction_family == REACTION_FAMILY_PERCHLORATE
         return self._dispatch_perchlorate(
@@ -1780,6 +1795,108 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     # ------------------------------------------------------------------
     # Helpers shared with the other authoritative providers.
     # ------------------------------------------------------------------
+
+    def _dispatch_subsolidus_mol_transfer(
+        self,
+        reaction_family: str,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        """Commit caller-built mol maps for a bakeout extent or a handoff.
+
+        The bakeout module chooses the stoichiometry and the accounts.
+        This provider only checks the declared-account gate, drops
+        non-positive moles, and attaches the shared atom-balance proof.
+        """
+        debits, debit_error = self._clean_subsolidus_mol_map(
+            controls.get("mol_debits"),
+            "mol_debits",
+            control_audit,
+        )
+        if debit_error is not None:
+            return debit_error
+        credits, credit_error = self._clean_subsolidus_mol_map(
+            controls.get("mol_credits"),
+            "mol_credits",
+            control_audit,
+        )
+        if credit_error is not None:
+            return credit_error
+        assert debits is not None and credits is not None
+        if not debits and not credits:
+            return self._empty_result(
+                f"{reaction_family} skipped: no positive moles",
+                control_audit=control_audit,
+            )
+        proof = self._build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason=f"stage0_{reaction_family}",
+            atom_balance_proof=proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": reaction_family,
+                "mol_debits": debits,
+                "mol_credits": credits,
+            },
+        )
+
+    def _clean_subsolidus_mol_map(
+        self,
+        raw: Any,
+        label: str,
+        control_audit,
+    ) -> tuple[dict[str, dict[str, float]] | None, IntentResult | None]:
+        if raw is None:
+            return {}, None
+        if not isinstance(raw, Mapping):
+            return None, self._out_of_domain(
+                f"{label} must be a mapping",
+                control_audit=control_audit,
+            )
+        cleaned: dict[str, dict[str, float]] = {}
+        for account, species_map in raw.items():
+            account_name = str(account)
+            if account_name not in self.DECLARED_ACCOUNTS:
+                return None, self._out_of_domain(
+                    f"{label} account {account_name} is not declared",
+                    control_audit=control_audit,
+                )
+            if not isinstance(species_map, Mapping):
+                return None, self._out_of_domain(
+                    f"{label} entry for {account_name} must be a mapping",
+                    control_audit=control_audit,
+                )
+            bucket: dict[str, float] = {}
+            for species, mol in species_map.items():
+                if not is_declared_real_scalar(mol):
+                    return None, self._out_of_domain(
+                        f"{label} mole for {species} is missing",
+                        control_audit=control_audit,
+                    )
+                number = float(mol)
+                if not math.isfinite(number) or number < 0.0:
+                    return None, self._out_of_domain(
+                        f"{label} mole for {species} must be finite and non-negative",
+                        control_audit=control_audit,
+                    )
+                if number == 0.0:
+                    continue
+                species_name = str(species)
+                bucket[species_name] = bucket.get(species_name, 0.0) + number
+            if bucket:
+                cleaned[account_name] = bucket
+        return cleaned, None
 
     @staticmethod
     def _empty_result(reason: str, *, control_audit=None) -> IntentResult:

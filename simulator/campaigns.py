@@ -313,6 +313,8 @@ class CampaignManager:
         self.last_c2a_staged_gas_control: dict[str, object] | None = None
         self.last_c2a_staged_max_hold_adjustment: dict[str, object] | None = None
         self.last_c3_na_hold_adjustment: dict[str, object] | None = None
+        self.last_c0_exit: dict[str, object] | None = None
+        self.c0_first_melt_backstop = False
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
         self._c2a_staged_stage_start_hour: int = 0
@@ -2171,7 +2173,7 @@ class CampaignManager:
         Runtime completion on the paths in this function (not IR peak
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
-        - C0: temperature >= configured min after min hold, else max_hold
+        - C0: incomplete maximum-hold or first-melt backstop only
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -2213,19 +2215,28 @@ class CampaignManager:
                 return True
 
         if campaign == CampaignPhase.C0:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
-            min_temperature_C = self._endpoint_float(
-                campaign, soft, 'temperature_min_C')
-            min_hold_hr = self._float(
-                ovr.get('min_hold_hr'),
-                self._endpoint_float(campaign, soft, 'min_hold_hr'),
+            # No measured release curve is loaded (t-1417). Temperature
+            # and the minimum hold cannot complete this campaign.
+            from simulator.accounting.stage0_inventory import (
+                STAGE0_RELEASE_KINETICS,
             )
+
             max_hold_hr = self._max_hold_hr(campaign)
-            if (melt.temperature_C >= min_temperature_C
-                    and melt.campaign_hour >= min_hold_hr):
+            if self.c0_first_melt_backstop:
+                self.last_c0_exit = {
+                    "outcome": "incomplete",
+                    "backstop": "first_melt",
+                    "kinetics": STAGE0_RELEASE_KINETICS,
+                }
                 return True
             if completed_campaign_hour >= max_hold_hr:
+                self.last_c0_exit = {
+                    "outcome": "incomplete",
+                    "backstop": "maximum_hold",
+                    "kinetics": STAGE0_RELEASE_KINETICS,
+                }
                 return True
+            return False
 
         elif campaign == CampaignPhase.C0B:
             max_hold_hr = self._max_hold_hr(campaign)

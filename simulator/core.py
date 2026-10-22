@@ -1258,6 +1258,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
         self._target_inventory_depletion_hour: int | str | None = None
         self._stage0_bakeout_reserved_carbon_kg = 0.0
+        self._subsolidus_committed_kg_hr_by_species: Dict[str, float] = {}
+        self._subsolidus_handed_off = False
+        self._last_subsolidus_bakeout: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
         self._non_feedstock_reagent_element_kg_by_account: Dict[
@@ -1619,6 +1622,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
+        self._subsolidus_committed_kg_hr_by_species = {}
+        self._subsolidus_handed_off = False
+        self._last_subsolidus_bakeout = {}
+        self.campaign_mgr.last_c0_exit = None
+        self.campaign_mgr.c0_first_melt_backstop = False
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
         self._last_fe_redox_respeciation_diagnostic = {}
@@ -13392,6 +13400,224 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 hard_regime_diagnostic
             )
 
+    def _apply_c0_bakeout(
+        self,
+        *,
+        liquid_fraction: Any,
+        evaluator_loader=None,
+        seam_refusal_for=None,
+        headspace_mbar: Mapping[str, Any] | None = None,
+        temperature_K: float | None = None,
+    ) -> Dict[str, Any]:
+        """Price C0 subsolidus hosts and commit only an admitted extent.
+
+        S2 and SO2 are refused at the channel seam until a runtime owner
+        and a C0 temperature domain exist. A refused row does not call
+        the flux provider and does not change the ledger. First melt
+        moves the remaining hosts and CaO/MgO once; metal iron stays.
+        """
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+            REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
+        )
+        from simulator.subsolidus_bakeout import (
+            BAKEOUT_HOST_IDENTITY,
+            FOULANT_ACCOUNT,
+            OPENIMCC_UNAVAILABLE_REASON,
+            SALT_FEED_ACCOUNT,
+            SUBSOLIDUS_STEP_DURATION_HR,
+            first_melt_backstop,
+            gas_partials_Pa_from_headspace_mbar,
+            handoff_mol_maps,
+            host_inventory_row,
+            load_subsolidus_evaluator,
+            mol_maps_for_extents,
+            partition_openimcc_results,
+            production_seam_refusal,
+            reactions_at_accepted_extents,
+            redox_notice_for_feedstock,
+        )
+
+        if self.melt.campaign != CampaignPhase.C0:
+            self.campaign_mgr.c0_first_melt_backstop = False
+            diagnostic = {"skipped": "not_c0", "committed": False}
+            self._last_subsolidus_bakeout = diagnostic
+            return diagnostic
+
+        if temperature_K is None:
+            temperature_K = float(self.melt.temperature_C) + 273.15
+        feedstock_key = str(
+            getattr(self.record, "feedstock_key", "")
+            or getattr(self, "_batch_feedstock_key", "")
+            or ""
+        )
+        salt_mol = dict(self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT) or {})
+        hosts = []
+        host_remaining: Dict[str, float] = {}
+        for species_id in sorted(BAKEOUT_HOST_IDENTITY):
+            remaining = float(salt_mol.get(species_id, 0.0) or 0.0)
+            if remaining <= 0.0:
+                continue
+            hosts.append(host_inventory_row(species_id, remaining))
+            host_remaining[species_id] = remaining
+
+        rows: list[Dict[str, Any]] = []
+        provider_reactions: list[Dict[str, Any]] = []
+        pressures_Pa: Dict[str, float] = {}
+        if hosts:
+            loader = evaluator_loader or load_subsolidus_evaluator
+            evaluator = loader()
+            if evaluator is None:
+                rows = [
+                    {
+                        "host_species_id": str(host["species_id"]),
+                        "status": "unavailable",
+                        "reason": OPENIMCC_UNAVAILABLE_REASON,
+                    }
+                    for host in hosts
+                ]
+            else:
+                headspace = (
+                    self._melt_headspace_composition_mbar
+                    if headspace_mbar is None
+                    else headspace_mbar
+                )
+                results = evaluator(
+                    hosts=hosts,
+                    temperature_K=float(temperature_K),
+                    gas_partial_pressures_Pa=gas_partials_Pa_from_headspace_mbar(
+                        headspace
+                    ),
+                    condensed_phase_activities={},
+                    oxygen_fugacity_Pa=None,
+                )
+                partitioned = partition_openimcc_results(
+                    hosts,
+                    results,
+                    host_remaining_mol=host_remaining,
+                    temperature_K=float(temperature_K),
+                    seam_refusal_for=seam_refusal_for or production_seam_refusal,
+                )
+                rows = list(partitioned["rows"])
+                provider_reactions = list(partitioned["provider_reactions"])
+                pressures_Pa = dict(partitioned["vapour_batch_flux_pressures_Pa"])
+
+        provider_status = None
+        provider_reason = None
+        provider_diagnostic: Dict[str, Any] = {}
+        committed = False
+        if provider_reactions:
+            molar_mass_kg_mol: Dict[str, float] = {}
+            for reaction in provider_reactions:
+                for term in reaction.get("stoichiometry") or ():
+                    species = str(term.get("species_id") or "")
+                    if not species or species in molar_mass_kg_mol:
+                        continue
+                    molar_mass_kg_mol[species] = resolve_species_formula(
+                        species,
+                        self.species_formula_registry,
+                    ).molar_mass_kg_per_mol()
+            train = getattr(self, "_volatiles_train_spec", None)
+            throughput = getattr(train, "max_throughput_kg_hr", None)
+            if not isinstance(throughput, (int, float)) or isinstance(throughput, bool):
+                throughput = 0.0
+            headspace = (
+                self._melt_headspace_composition_mbar
+                if headspace_mbar is None
+                else headspace_mbar
+            )
+            flux_result = self._dispatch_only(
+                ChemistryIntent.EVAPORATION_FLUX,
+                control_inputs={
+                    "solid_host_bakeout": True,
+                    "vapour_batch_flux_pressures_Pa": pressures_Pa,
+                    "overhead_partials_Pa": gas_partials_Pa_from_headspace_mbar(
+                        headspace
+                    ),
+                    "molar_mass_kg_mol": molar_mass_kg_mol,
+                    "reactions": provider_reactions,
+                    "max_throughput_kg_hr": float(throughput),
+                    "dt_hr": SUBSOLIDUS_STEP_DURATION_HR,
+                },
+            )
+            provider_status = flux_result.status
+            provider_diagnostic = dict(flux_result.diagnostic or {})
+            provider_reason = provider_diagnostic.get("reason")
+            if flux_result.status == "ok":
+                selected = reactions_at_accepted_extents(
+                    provider_reactions,
+                    provider_diagnostic.get("accepted_extent_mol_by_reaction") or {},
+                )
+                debits, credits = mol_maps_for_extents(selected)
+                if debits or credits:
+                    self._dispatch_and_commit(
+                        ChemistryIntent.STAGE0_PRETREATMENT,
+                        control_inputs={
+                            "reaction_family": REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+                            "mol_debits": debits,
+                            "mol_credits": credits,
+                        },
+                        transition_source="subsolidus_bakeout",
+                    )
+                    committed = True
+
+        released_kg = {}
+        if committed:
+            released_kg = dict(
+                provider_diagnostic.get("released_kg_hr_by_species") or {}
+            )
+        self._subsolidus_committed_kg_hr_by_species = released_kg
+
+        melting = first_melt_backstop(liquid_fraction)
+        self.campaign_mgr.c0_first_melt_backstop = melting
+        handed_off = False
+        if melting and not self._subsolidus_handed_off:
+            debits, credits = handoff_mol_maps(
+                self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT),
+                self.atom_ledger.mol_by_account(FOULANT_ACCOUNT),
+            )
+            if debits or credits:
+                self._dispatch_and_commit(
+                    ChemistryIntent.STAGE0_PRETREATMENT,
+                    control_inputs={
+                        "reaction_family": REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
+                        "mol_debits": debits,
+                        "mol_credits": credits,
+                    },
+                    transition_source="subsolidus_handoff",
+                )
+            self._subsolidus_handed_off = True
+            handed_off = True
+
+        diagnostic = {
+            "temperature_K": float(temperature_K),
+            "kinetics": STAGE0_RELEASE_KINETICS,
+            "notice": redox_notice_for_feedstock(feedstock_key),
+            "reactions": rows,
+            "provider_status": provider_status,
+            "provider_reason": provider_reason,
+            "committed": committed,
+            "handoff": handed_off,
+            "released_kg_hr_by_species": released_kg,
+        }
+        if provider_status == "ok":
+            for key in (
+                "hk_demand_mol_by_species",
+                "hk_demand_mol_hr_by_species",
+                "hk_demand_peak_mol_hr_by_species",
+                "hk_demand_kg_hr_by_species",
+                "hk_demand_peak_kg_hr_by_species",
+                "pump_peak_demand_kg_hr",
+                "released_mol_by_species",
+                "release_mol_hr_by_species",
+                "accepted_extent_mol_by_reaction",
+                "pump_scale",
+            ):
+                if key in provider_diagnostic:
+                    diagnostic[key] = provider_diagnostic[key]
+        self._last_subsolidus_bakeout = diagnostic
+        return diagnostic
+
     def _update_target_inventory_diagnostic(self) -> None:
         inventory = getattr(getattr(self, "record", None), "initial_inventory", None)
         ledger = getattr(self, "atom_ledger", None)
@@ -13664,6 +13890,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif campaign_name == 'C6':
             summary['c6_refusal_diagnostic'] = dict(
                 getattr(self, '_last_c6_refusal_diagnostic', {}) or {})
+        elif campaign_name == 'C0':
+            c0_exit = getattr(self.campaign_mgr, 'last_c0_exit', None)
+            if c0_exit:
+                summary['c0_exit'] = dict(c0_exit)
         return summary
 
     def campaign_endpoint_refused(self) -> bool:
@@ -14340,6 +14570,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.species_formula_registry,
             )
         )
+        self._apply_c0_bakeout(
+            liquid_fraction=getattr(equilibrium, 'liquid_fraction', None),
+        )
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0
@@ -14637,16 +14870,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign in (CampaignPhase.C0, CampaignPhase.C0B):
             vol_train = getattr(self, '_volatiles_train_spec', None)
             if vol_train and vol_train.max_throughput_kg_hr > 0:
-                # Estimate current volatiles offgas rate from evaporation
-                # Na, K, H₂O, S, Cl species are volatiles
-                volatile_species = {'Na', 'K'}  # Main C0 volatiles
-                vol_rate = 0.0
+                # Last hour's committed Na, K, S2, SO2, and H2O. A
+                # non-positive train still skips this ramp throttle;
+                # the bakeout release path refuses that train instead.
+                from simulator.subsolidus_bakeout import (
+                    throttle_mass_rate_kg_hr,
+                )
+
+                evap_kg_hr = {}
                 if self.record.snapshots:
-                    last = self.record.snapshots[-1]
-                    vol_rate = sum(
-                        last.evap_flux.species_kg_hr.get(sp, 0.0)
-                        for sp in volatile_species
+                    evap_kg_hr = (
+                        self.record.snapshots[-1].evap_flux.species_kg_hr
+                        or {}
                     )
+                vol_rate = throttle_mass_rate_kg_hr(
+                    evap_kg_hr,
+                    getattr(self, '_subsolidus_committed_kg_hr_by_species', {}),
+                )
                 vol_sat = (vol_rate / vol_train.max_throughput_kg_hr) * 100.0
                 if not math.isfinite(vol_sat):
                     raise ValueError(

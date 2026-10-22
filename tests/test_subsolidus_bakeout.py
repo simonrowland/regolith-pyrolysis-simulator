@@ -6,15 +6,34 @@ import math
 from pathlib import Path
 
 import pytest
+import yaml
 
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting import resolve_species_formula
 from simulator.accounting.formulas import load_species_formulas
+from simulator.accounting.stage0_inventory import STAGE0_RELEASE_KINETICS
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.state import CampaignPhase
+from simulator.subsolidus_bakeout import (
+    CLEANED_MELT_ACCOUNT,
+    FOULANT_ACCOUNT,
+    METAL_ACCOUNT,
+    OPENIMCC_UNAVAILABLE_REASON,
+    OVERHEAD_GAS_ACCOUNT,
+    SALT_FEED_ACCOUNT,
+    catalog_temperature_domain,
+    first_melt_backstop,
+    mol_maps_for_extents,
+    partition_openimcc_results,
+    production_seam_refusal,
+    seam_refusal,
+    throttle_mass_rate_kg_hr,
+)
+from simulator.vapour_rail.channels import CHANNEL_REGISTRY, CHANNEL_S2
 
 _DATA = Path(__file__).resolve().parents[1] / "data"
 _REGISTRY = load_species_formulas(_DATA / "species_catalog.yaml")
@@ -511,3 +530,412 @@ def test_refused_reaction_does_not_enter_released_demand():
     assert result.status == "unavailable"
     assert result.diagnostic.get("released_mol_by_species", {}) == {}
     assert result.diagnostic.get("hk_demand_mol_by_species", {}) == {}
+
+
+def _net_element_mol(debits, credits) -> dict[str, float]:
+    net: dict[str, float] = {}
+    for sign, side in ((-1.0, debits), (1.0, credits)):
+        for species_mol in side.values():
+            for species, mol in species_mol.items():
+                atoms = resolve_species_formula(species, _REGISTRY).atom_moles(mol)
+                for element, amount in atoms.items():
+                    net[element] = net.get(element, 0.0) + sign * amount
+    return net
+
+
+def _commit(sim, family: str, debits, credits):
+    return sim._dispatch_and_commit(
+        ChemistryIntent.STAGE0_PRETREATMENT,
+        control_inputs={
+            "reaction_family": family,
+            "mol_debits": debits,
+            "mol_credits": credits,
+        },
+    )
+
+
+def _s2_fraction(sim) -> float:
+    sim._update_target_inventory_diagnostic()
+    row = next(
+        item
+        for item in sim._last_target_inventory_diagnostic["targets"]
+        if item["key"] == "S2"
+    )
+    return float(row["remaining_fraction"])
+
+
+def _arm_c0(sim, temperature_C: float = 600.0) -> None:
+    sim.melt.campaign = CampaignPhase.C0
+    sim.melt.temperature_C = temperature_C
+
+
+def test_s2_and_so2_stay_unavailable_until_a_c0_domain_has_an_owner():
+    payload = yaml.safe_load((_DATA / "species_catalog.yaml").read_text())
+    rows = payload["species"]
+    s2_domain = catalog_temperature_domain("S2", rows)
+    so2_domain = catalog_temperature_domain("SO2", rows)
+    assert s2_domain is None
+    assert so2_domain is not None
+    envelope_low, envelope_high = 348.0, 1223.0
+    assert not (
+        so2_domain[0] <= envelope_low and so2_domain[1] >= envelope_high
+    )
+    assert CHANNEL_REGISTRY[CHANNEL_S2].runtime_owner is None
+    assert production_seam_refusal("S2", 900.0) == "missing_s2_channel_owner"
+    assert production_seam_refusal("SO2", 900.0) == "so2_c0_domain_unowned"
+    owned = (300.0, 1300.0)
+    assert seam_refusal(
+        "S2", 900.0, runtime_owner="sulfur-owner", domain=owned,
+    ) is None
+    assert seam_refusal(
+        "SO2", 900.0, runtime_owner="sulfur-owner", domain=owned,
+    ) is None
+
+
+def test_throttle_mass_rate_sums_committed_volatiles_only():
+    rate = throttle_mass_rate_kg_hr(
+        {"Na": 1.5, "K": 0.25, "Fe": 9.0},
+        {"S2": 2.0, "SO2": 3.0, "H2O": 0.5, "CaO": 8.0},
+    )
+    assert rate == pytest.approx(1.5 + 0.25 + 2.0 + 3.0 + 0.5)
+
+
+def test_partial_fes_and_sulfate_extents_balance_and_close():
+    xi_fes = 0.2
+    xi_sulfate = 0.15
+    troilite_maps = mol_maps_for_extents([{
+        "extent_mol": xi_fes,
+        "stoichiometry": _troilite_reaction()["stoichiometry"],
+    }])
+    sulfate_maps = mol_maps_for_extents([{
+        "extent_mol": xi_sulfate,
+        "stoichiometry": _sulfate_reaction()["stoichiometry"],
+    }])
+    for debits, credits in (troilite_maps, sulfate_maps):
+        net = _net_element_mol(debits, credits)
+        assert net
+        for element, amount in net.items():
+            assert amount == pytest.approx(0.0, abs=1e-12), element
+
+    sim = _load({
+        "label": "hosts",
+        "composition_wt_pct": {
+            "SiO2": 84.0,
+            "FeS_troilite": 8.0,
+            "CaSO4": 8.0,
+        },
+    })
+    host_before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)
+    assert host_before["FeS_troilite"] > xi_fes
+    assert host_before["CaSO4"] > xi_sulfate
+    _commit(sim, "subsolidus_bakeout", *troilite_maps)
+    _commit(sim, "subsolidus_bakeout", *sulfate_maps)
+
+    salt = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)
+    metal = sim.atom_ledger.mol_by_account(METAL_ACCOUNT)
+    foulant = sim.atom_ledger.mol_by_account(FOULANT_ACCOUNT)
+    gas = sim.atom_ledger.mol_by_account(OVERHEAD_GAS_ACCOUNT)
+    assert salt["FeS_troilite"] == pytest.approx(host_before["FeS_troilite"] - xi_fes)
+    assert salt["CaSO4"] == pytest.approx(host_before["CaSO4"] - xi_sulfate)
+    assert metal["Fe"] == pytest.approx(xi_fes)
+    assert foulant["CaO"] == pytest.approx(xi_sulfate)
+    assert gas["S2"] == pytest.approx(0.5 * xi_fes)
+    assert gas["SO2"] == pytest.approx(xi_sulfate)
+    assert gas["O2"] == pytest.approx(0.5 * xi_sulfate)
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+    _arm_c0(sim)
+    retained = dict(salt)
+    sim._apply_c0_bakeout(liquid_fraction=None, evaluator_loader=lambda: None)
+    sim._apply_c0_bakeout(liquid_fraction=None, evaluator_loader=lambda: None)
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        retained["FeS_troilite"]
+    )
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"] == pytest.approx(
+        retained["CaSO4"]
+    )
+
+
+def test_partial_release_updates_the_target_and_a_refusal_does_not():
+    sim = _load({
+        "label": "troilite only",
+        "composition_wt_pct": {"SiO2": 90.0, "FeS_troilite": 10.0},
+    })
+    initial = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"]
+    xi = 0.25 * initial
+    debits, credits = mol_maps_for_extents([{
+        "extent_mol": xi,
+        "stoichiometry": _troilite_reaction()["stoichiometry"],
+    }])
+    _commit(sim, "subsolidus_bakeout", debits, credits)
+    assert sim.melt.hour == 0
+    assert _s2_fraction(sim) == pytest.approx((initial - xi) / initial)
+    assert sim._last_target_inventory_diagnostic["depletion_hour"] is None
+    assert sim._last_target_inventory_diagnostic["would_be_inventory_advance"] is False
+    assert sim._last_target_inventory_diagnostic["stage0_release_kinetics"] == (
+        STAGE0_RELEASE_KINETICS
+    )
+
+    def _refuse(**_kwargs):
+        return [{
+            "reaction_id": "troilite_decomposition",
+            "status": "thermochemistry_missing",
+            "driving_gas_species_id": "S2",
+            "stoichiometry": _troilite_reaction()["stoichiometry"],
+            "extent_bound_mol_rxn": None,
+            "equilibrium_gas_partial_pressures_Pa": None,
+        }]
+
+    _arm_c0(sim)
+    refused = sim._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: _refuse,
+    )
+    assert refused["committed"] is False
+    assert refused["reactions"][0]["reason"] == "thermochemistry_missing"
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        initial - xi
+    )
+    assert _s2_fraction(sim) == pytest.approx((initial - xi) / initial)
+
+    remaining = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"]
+    rest_debits, rest_credits = mol_maps_for_extents([{
+        "extent_mol": remaining,
+        "stoichiometry": _troilite_reaction()["stoichiometry"],
+    }])
+    _commit(sim, "subsolidus_bakeout", rest_debits, rest_credits)
+    sim.melt.hour = 5
+    sim._update_target_inventory_diagnostic()
+    assert sim._last_target_inventory_diagnostic["depleted"] is True
+    assert sim._last_target_inventory_diagnostic["depletion_hour"] == 5
+    assert sim._last_target_inventory_diagnostic["would_be_inventory_advance"] is False
+    assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
+
+
+def test_missing_openimcc_and_the_seam_block_release():
+    sim = _load({
+        "label": "troilite",
+        "composition_wt_pct": {"SiO2": 92.0, "FeS_troilite": 8.0},
+    })
+    _arm_c0(sim)
+    before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"]
+    missing = sim._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: None,
+    )
+    assert missing["committed"] is False
+    assert missing["reactions"][0]["reason"] == OPENIMCC_UNAVAILABLE_REASON
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        before
+    )
+
+    def _supported(**_kwargs):
+        return [{
+            "reaction_id": "troilite_decomposition",
+            "status": "supported",
+            "driving_gas_species_id": "S2",
+            "stoichiometry": _troilite_reaction()["stoichiometry"],
+            "equilibrium_gas_partial_pressures_Pa": {"S2": 12.0},
+            "extent_bound_mol_rxn": before,
+        }]
+
+    blocked = sim._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: _supported,
+    )
+    assert blocked["committed"] is False
+    assert blocked["reactions"][0]["reason"] == "missing_s2_channel_owner"
+    assert blocked["provider_status"] is None
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        before
+    )
+
+    admitted = sim._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: _supported,
+        seam_refusal_for=lambda _species, _temperature_K: None,
+    )
+    assert admitted["committed"] is False
+    assert admitted["provider_status"] == "refused"
+    assert admitted["provider_reason"] == "missing_solid_area"
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        before
+    )
+
+
+def test_disagreeing_driver_pressures_are_not_collapsed():
+    stoich = _sulfate_reaction()["stoichiometry"]
+    magnesium = [
+        {"species_id": "MgSO4", "phase": "crystalline anhydrous magnesium sulfate", "nu_mol_per_mol_rxn": -1.0},
+        {"species_id": "MgO", "phase": "crystal", "nu_mol_per_mol_rxn": 1.0},
+        {"species_id": "SO2", "phase": "gas", "nu_mol_per_mol_rxn": 1.0},
+        {"species_id": "O2", "phase": "gas", "nu_mol_per_mol_rxn": 0.5},
+    ]
+    hosts = ({"species_id": "CaSO4"}, {"species_id": "MgSO4"})
+
+    def _row(reaction_id, pressure):
+        return {
+            "reaction_id": reaction_id,
+            "status": "supported",
+            "driving_gas_species_id": "SO2",
+            "stoichiometry": stoich if reaction_id.startswith("anhydrite") else magnesium,
+            "extent_bound_mol_rxn": 1.0,
+            "equilibrium_gas_partial_pressures_Pa": {"SO2": pressure},
+        }
+
+    withheld = partition_openimcc_results(
+        hosts,
+        (_row("anhydrite_decomposition", 10.0), _row("magnesium_sulfate_decomposition", 12.0)),
+        host_remaining_mol={"CaSO4": 1.0, "MgSO4": 1.0},
+        temperature_K=900.0,
+        seam_refusal_for=lambda _species, _temperature_K: None,
+    )
+    assert withheld["provider_reactions"] == []
+    assert withheld["vapour_batch_flux_pressures_Pa"] == {}
+    assert {row["reason"] for row in withheld["rows"]} == {
+        "conflicting_driver_equilibrium_pressure",
+    }
+
+    shared = partition_openimcc_results(
+        hosts,
+        (_row("anhydrite_decomposition", 10.0), _row("magnesium_sulfate_decomposition", 10.0)),
+        host_remaining_mol={"CaSO4": 1.0, "MgSO4": 1.0},
+        temperature_K=900.0,
+        seam_refusal_for=lambda _species, _temperature_K: None,
+    )
+    assert shared["vapour_batch_flux_pressures_Pa"] == {"SO2": 10.0}
+    assert len(shared["provider_reactions"]) == 2
+
+
+def test_first_melt_hands_hosts_and_oxides_once_and_leaves_iron():
+    assert first_melt_backstop(None) is False
+    assert first_melt_backstop(0.0) is False
+    assert first_melt_backstop(True) is False
+    assert first_melt_backstop(0.2) is True
+
+    sim = _load({
+        "label": "handoff",
+        "composition_wt_pct": {
+            "SiO2": 84.0,
+            "FeS_troilite": 8.0,
+            "CaSO4": 8.0,
+        },
+    })
+    fes = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["FeS_troilite"]
+    caso4 = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"]
+    xi_fe = 0.1
+    xi_ca = 0.1
+    _commit(sim, "subsolidus_bakeout", *mol_maps_for_extents([{
+        "extent_mol": xi_fe,
+        "stoichiometry": _troilite_reaction()["stoichiometry"],
+    }]))
+    _commit(sim, "subsolidus_bakeout", *mol_maps_for_extents([{
+        "extent_mol": xi_ca,
+        "stoichiometry": _sulfate_reaction()["stoichiometry"],
+    }]))
+    sim.atom_ledger.load_external(
+        SALT_FEED_ACCOUNT,
+        {"SO3": 0.2},
+        source="unrelated salt",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external(
+        FOULANT_ACCOUNT,
+        {"SiO2": 0.3},
+        source="unrelated foulant",
+        material_origin="feedstock",
+    )
+    _arm_c0(sim)
+    fraction_before = _s2_fraction(sim)
+    first = sim._apply_c0_bakeout(
+        liquid_fraction=0.2,
+        evaluator_loader=lambda: None,
+    )
+    assert first["handoff"] is True
+    assert first["committed"] is False
+    melt = sim.atom_ledger.mol_by_account(CLEANED_MELT_ACCOUNT)
+    assert melt["FeS_troilite"] == pytest.approx(fes - xi_fe)
+    assert melt["CaSO4"] == pytest.approx(caso4 - xi_ca)
+    assert melt["CaO"] == pytest.approx(xi_ca)
+    assert melt.get("Fe", 0.0) == pytest.approx(0.0, abs=1e-15)
+    assert sim.atom_ledger.mol_by_account(METAL_ACCOUNT)["Fe"] == pytest.approx(xi_fe)
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT).get("FeS_troilite", 0.0) == pytest.approx(0.0, abs=1e-15)
+    assert sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["SO3"] > 0.0
+    assert sim.atom_ledger.mol_by_account(FOULANT_ACCOUNT).get("CaO", 0.0) == pytest.approx(0.0, abs=1e-15)
+    assert sim.atom_ledger.mol_by_account(FOULANT_ACCOUNT)["SiO2"] == pytest.approx(0.3 / _molar("SiO2"))
+    assert _s2_fraction(sim) == pytest.approx(fraction_before)
+    second = sim._apply_c0_bakeout(
+        liquid_fraction=0.2,
+        evaluator_loader=lambda: None,
+    )
+    assert second["handoff"] is False
+    assert sim.atom_ledger.mol_by_account(CLEANED_MELT_ACCOUNT)["FeS_troilite"] == pytest.approx(
+        fes - xi_fe
+    )
+
+
+def test_redox_notice_is_feedstock_key_only_and_phosphorus_stays_put():
+    ci = _sim({
+        "ci_carbonaceous_chondrite": {
+            "label": "ci",
+            "composition_wt_pct": {"SiO2": 100.0},
+        },
+    })
+    ci.load_batch("ci_carbonaceous_chondrite", mass_kg=10.0)
+    _arm_c0(ci)
+    ci_diag = ci._apply_c0_bakeout(liquid_fraction=None, evaluator_loader=lambda: None)
+    assert ci_diag["notice"] == "redox_back_oxidation_not_modelled"
+    assert ci_diag["committed"] is False
+
+    cm = _sim({
+        "cm_carbonaceous_chondrite": {
+            "label": "cm",
+            "composition_wt_pct": {"SiO2": 100.0},
+        },
+    })
+    cm.load_batch("cm_carbonaceous_chondrite", mass_kg=10.0)
+    _arm_c0(cm)
+    assert cm._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: None,
+    )["notice"] == "redox_back_oxidation_not_modelled"
+
+    ordinary = _sim({
+        "s_type_asteroid_silicate": {
+            "label": "s type",
+            "composition_wt_pct": {"SiO2": 95.0, "FeS_troilite": 5.0},
+        },
+    })
+    ordinary.load_batch("s_type_asteroid_silicate", mass_kg=10.0)
+    _arm_c0(ordinary)
+    ordinary_diag = ordinary._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: None,
+    )
+    assert ordinary_diag["notice"] is None
+
+    lunar = _load({
+        "label": "elemental sulfur",
+        "composition_wt_pct": {"SiO2": 95.0, "S": 3.0, "P2O5": 2.0},
+    })
+    assert "FeS_troilite" not in (
+        lunar.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT) or {}
+    )
+    phosphorus_before = sum(
+        float(species_kg.get("P2O5", 0.0) or 0.0)
+        for species_kg in lunar.atom_ledger.kg_by_account().values()
+    )
+    assert phosphorus_before > 0.0
+    _arm_c0(lunar)
+    lunar_diag = lunar._apply_c0_bakeout(
+        liquid_fraction=None,
+        evaluator_loader=lambda: None,
+    )
+    assert lunar_diag["notice"] is None
+    assert lunar_diag["reactions"] == []
+    phosphorus_after = sum(
+        float(species_kg.get("P2O5", 0.0) or 0.0)
+        for species_kg in lunar.atom_ledger.kg_by_account().values()
+    )
+    assert phosphorus_after == pytest.approx(phosphorus_before)
+    assert lunar.atom_ledger.mol_by_account(OVERHEAD_GAS_ACCOUNT).get("P2", 0.0) == 0.0
