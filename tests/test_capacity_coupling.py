@@ -975,12 +975,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         ),
     )
 
+    phosphorus_carriers = ("PO", "PO2", "P2", "P4", "P4O6", "P4O10")
+    p2o5_source_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"]
+    p2o5_projection_kg = sim.melt.composition_kg["P2O5"]
+
     snapshot = sim.step()
 
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
-    p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
-    # b-850: alkali composite vapour rows now use the parent-oxide activity.
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.1212881367580105, rel=1e-12, abs=1e-12)
+    assert set(phosphorus_carriers).isdisjoint(snapshot.evap_flux.species_kg_hr)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1179,12 +1181,16 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # ledger and re-speciation settles once after the evaporation batch,
         # so less oxygen stays in the melt: melt mass 995.6386 -> 994.9920 kg
         # (fresh executable measurement; flux and transport values unchanged).
+        # 2026-10-22 bakeout F5: C0 does not select stage0_p_carriers and does
+        # not claim the six phosphorus vapour carriers, so they stay condensed.
+        # Total flux returns to the previous non-P value. Transport saturation
+        # and melt mass are this same default-off probe, not a hand paste.
         (
             1,
             1550.0,
-            3.123653392791531,
-            1390584.7638444814,
-            994.9920372838491,
+            3.1212881367580105,
+            1390065.8346565817,
+            994.9966377951949,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1226,8 +1232,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # alpha=1.0 prototype fallback lifts its dust flux above the 1e-12 kg
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
-    # t-766: three admitted P evaporations and nine flagged capture transitions.
-    assert len(sim.atom_ledger.transitions) == 46
+    # t-766 admitted three P evaporations (46). F5 leaves those carriers
+    # condensed, so the count drops by those three transitions.
+    assert len(sim.atom_ledger.transitions) == 43
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1235,7 +1242,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # condensation depend on reactivity metadata. Its ledger transition is
     # the single-transition regression guard for 149df2858.
     assert "condense_Si" in ca_ti_reasons
-    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"} <= ca_ti_reasons
+    assert {
+        f"evaporate_{carrier}" for carrier in phosphorus_carriers
+    }.isdisjoint(ca_ti_reasons)
+    assert {
+        f"condense_{carrier}" for carrier in phosphorus_carriers
+    }.isdisjoint(ca_ti_reasons)
     assert {
         "condense_SiO", "condense_Al2O", "condense_AlO", "condense_CaO_gas",
         "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
@@ -1266,20 +1278,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
-    # Admitted P source evidence authorizes cleanup offgas, not condensation.
-    for p_species in ("PO", "PO2", "P2"):
-        assert f"evaporate_{p_species}" in ca_ti_reasons, p_species
-        authority = sim.condensation_model.last_condensation_authority_by_species[
-            p_species
-        ]
-        evidence = authority["routing_authorization"]
-        assert evidence["active"] is True and evidence["stage"] == "stage0_p_carriers"
-        assert authority["authoritative_for_condensation"] is False
-        assert authority["mass_disposition"] == "declared_cleanup_offgas"
-        assert authority["remaining_mass_kg_hr"] > 0.0
-        assert authority["retained_in_source_mass_kg_hr"] == 0.0
-        assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
-        assert snapshot.evap_flux.species_kg_hr[p_species] > 0.0
+    # Phosphorus stays in the melt. C0 does not authorize cleanup offgas.
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt")["P2O5"] == p2o5_source_kg
+    assert sim.melt.composition_kg["P2O5"] == p2o5_projection_kg
+    for carrier in phosphorus_carriers:
+        authority = sim.condensation_model.last_condensation_authority_by_species.get(
+            carrier
+        )
+        if authority is None:
+            continue
+        assert authority.get("mass_disposition") != "declared_cleanup_offgas"
+        evidence = authority.get("routing_authorization") or {}
+        assert evidence.get("stage") != "stage0_p_carriers"
+        assert authority.get("remaining_mass_kg_hr") in (None, 0.0)
     assert "evaporate_Fe" in ca_ti_reasons
     assert "condense_Fe" in ca_ti_reasons
     assert snapshot.mass_balance_error_pct <= 5.0e-12

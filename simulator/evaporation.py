@@ -65,6 +65,13 @@ PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
 PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
+# Stage-0 phosphorus vapour carriers. C0 must not claim them (they stay
+# condensed). C0B claims only this set. Activity-evidence annotations use
+# the same membership. Not STRUCTURALLY_ZERO_P_CARRIERS: that name is the
+# EC2 "no VP channel" classification, a different rule.
+_STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
+    'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
+})
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -3421,9 +3428,7 @@ class EvaporationMixin:
                     f'{activity_provider_id}:'
                     f'{activity_evidence_owner}[{species_id}]'
                 )
-                if species_id in {
-                    'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'
-                }:
+                if species_id in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS:
                     authority_status = provenance.get(
                         'melt_oxide_activity_authority_status'
                     )
@@ -3452,24 +3457,30 @@ class EvaporationMixin:
             campaign = getattr(self.melt, 'campaign', None)
             campaign_name = str(getattr(campaign, 'name', '') or '')
             # Keep the global request phase on the legacy hot-train contract.
-            # Stage-0 phosphorus is a narrow marker consumed only by stage0-only
-            # rules sourced from P2O5; flipping the whole phase to stage0 changes
-            # unrelated Na/Fe/channel eligibility.
+            # C0 does not select stage0_p_carriers: phosphorus stays condensed
+            # through C0. C0B still selects c0b_p_cleanup. Flipping the whole
+            # phase to stage0 would change unrelated Na/Fe eligibility.
             request_stage = (
                 'c0b_p_cleanup'
                 if campaign_name == 'C0B'
-                else (
-                    'stage0_p_carriers'
-                    if campaign_name == 'C0'
-                    else 'evaporation'
-                )
+                else 'evaporation'
             )
             effective_pressure_species_ids = effective_pressure_source.species_ids
             if campaign_name == 'C0B':
                 effective_pressure_species_ids = frozenset(
                     species_id
                     for species_id in effective_pressure_species_ids
-                    if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
+                    if species_id in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
+                )
+            elif campaign_name == 'C0':
+                # Drop the carriers from the claim. Leaving them claimed on
+                # stage evaporation fail-closes the batch: their stage0_only
+                # predicate does not wake, and the pre-RG guard refuses any
+                # claimed channel that is not flux-eligible.
+                effective_pressure_species_ids = frozenset(
+                    species_id
+                    for species_id in effective_pressure_species_ids
+                    if species_id not in _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS
                 )
             batch = builder(
                 temperature_K=float(temperature_K),
