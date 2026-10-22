@@ -11,8 +11,10 @@ from tests.battery.factories import migrate_one_extract
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "kirschen-1998-silicate-miscibility-thesis"
 ARTICLE_ID = "kirschen-decapitani-1999-liquid-miscibility"
+MISCIBILITY_ARTICLE_ID = "kirschen-1999-si-ti-al-miscibility"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
 ARTICLE_EXTRACT = ROOT / f"data/literature/extracts/{ARTICLE_ID}.yaml"
+MISCIBILITY_ARTICLE_EXTRACT = ROOT / f"data/literature/extracts/{MISCIBILITY_ARTICLE_ID}.yaml"
 
 
 def _migrated_rows():
@@ -28,7 +30,7 @@ def _migrated_rows():
         for formula, species in document["species"].items()
         for row in species.get("observations", [])
     }
-    assert len(raw_rows) == len(result.observations) == 64
+    assert len(raw_rows) == len(result.observations) == 21
     for observation_id, observation in result.observations.items():
         formula, raw = raw_rows[observation_id]
         values = raw["values"]
@@ -147,20 +149,71 @@ def test_journal_repeats_are_linked_context_and_stmc_grid_matches_render() -> No
         assert len(values["published_observation_ids"]) == 4
 
 
-def test_table_iii_footnote_sample_and_oxygen_condition_migrate() -> None:
+def test_table_iii_repeats_link_to_published_component_observations() -> None:
+    document, _ = _migrated_rows()
+    contexts = [
+        context
+        for context in document["species"]["SiO2"]["context"]
+        if context.get("type") == "duplicate_measurement_context"
+        and context.get("values", {}).get("published_source_id")
+        == MISCIBILITY_ARTICLE_ID
+    ]
+    article = yaml.safe_load(MISCIBILITY_ARTICLE_EXTRACT.read_text(encoding="utf-8"))
+    article_rows = {
+        row["observation_id"]: row
+        for row in article["species"]["SiO2"]["observations"]
+        if isinstance(row["values"].get("component_amount"), dict)
+    }
+    linked_ids = {
+        observation_id
+        for context in contexts
+        for observation_id in context["values"]["published_observation_ids"]
+    }
+    assert len(contexts) == 43
+    assert linked_ids == set(article_rows)
+
+    for context in contexts:
+        values = context["values"]
+        published = article_rows[values["published_observation_ids"][0]]["values"]
+        assert values["component_formula"] == published["formula"]
+        assert Decimal(values["component_wt_percent_as_printed"]) == Decimal(
+            published["component_amount"]["value"]
+        )
+        assert Decimal(values["one_sigma_wt_percent_as_printed"]) == Decimal(
+            published["component_amount"]["sigma"]
+        )
+        assert Decimal(values["temperature_K_as_printed"]) == Decimal(
+            published["T_K"]["value"]
+        )
+        assert values["atmosphere_as_printed"] == "pure oxygen"
+
+
+def test_table_iii_footnote_repeat_context_and_unique_ti_sample_migrate() -> None:
     document, result = _migrated_rows()
+    context = next(
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row.get("observation_id")
+        == "kirschen_1998_iii_1_sta2_2h_phase1_sio2"
+    )
+    values = context["values"]
+    assert values["sample_id_as_printed"] == "STA2-2H1"
+    assert values["run_note_as_printed"] == "1"
+    assert values["system_as_printed"] == "SiO2-TiO2-Al2O3"
+    assert values["published_source_id"] == MISCIBILITY_ARTICLE_ID
+    assert values["temperature_as_published"] == "2050±30 K"
+    assert values["atmosphere_as_printed"] == "pure oxygen"
+
     observation = result.observations[
-        f"{SOURCE_ID}::kirschen_1998_iii_1_sta2_2h_phase1_sio2"
+        f"{SOURCE_ID}::kirschen_1998_iii_1_ti_phase1_sio2"
     ]
     source_row = next(
         row
         for species in document["species"].values()
         for row in species.get("observations", [])
-        if row["observation_id"] == "kirschen_1998_iii_1_sta2_2h_phase1_sio2"
+        if row["observation_id"] == "kirschen_1998_iii_1_ti_phase1_sio2"
     )
-    assert source_row["values"]["sample_id_as_printed"] == "STA2-2H1"
-    assert source_row["values"]["run_note_as_printed"] == "1"
-    assert source_row["values"]["system_as_printed"] == "SiO2-TiO2-Al2O3"
-    assert observation.identity.temperature_K.value == Decimal("2050")
+    assert source_row["values"]["sample_id_as_printed"] == "Ti"
+    assert observation.identity.temperature_K.value == Decimal("2280")
     assert observation.point_conditions["gas_mix"].state.value == "pure oxygen"
     assert observation.point_conditions["temperature_K"].locator.page == 89

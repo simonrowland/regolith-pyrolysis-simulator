@@ -13,13 +13,13 @@ extraction:
   date: '2026-10-22'
   worker: fam40-1022
 fidelity_samples:
-- path: species.SiO2.observations[kirschen_1998_iii_1_sta2_2h_phase1_sio2].values.component_amount.value
-  value: '13.64'
+- path: species.SiO2.observations[kirschen_1998_iii_1_ti_phase1_sio2].values.component_amount.value
+  value: '0.12'
   locator:
     page: 89
     pdf_page_index: 88
     table: III-1
-    note: Table III-1, STA2-2H, phase 1, SiO2 column; unique high-temperature Al-bearing dataset.
+    note: Table III-1, Ti sample, SiO2 column; this Ti-only sample is absent from the 1999 article.
     published_page: III-74
 experiments:
 - experiment_id: kirschen_1998_ii_1_stc_2_2
@@ -400,907 +400,6 @@ species:
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-1H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '57.49'
-          sigma: '1.20'
-        printed_sum: '99.66'
-        n_measurements: '49'
-        T_K:
-          value: '2500'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2500±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-1H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.20'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_1h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-1H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '28.70'
-          sigma: '5.34'
-        printed_sum: '100.80'
-        n_measurements: '47'
-        T_K:
-          value: '2500'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2500±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-1H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '5.34'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '67.91'
-          sigma: '2.58'
-        printed_sum: '100.28'
-        n_measurements: '50'
-        T_K:
-          value: '2280'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2280±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '2.58'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_2h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-2H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '5.55'
-          sigma: '1.79'
-        printed_sum: '100.24'
-        n_measurements: '28'
-        T_K:
-          value: '2280'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2280±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-2H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-2H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.79'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_2_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_2_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 2-1H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '74.61'
-          sigma: '5.97'
-        printed_sum: '100.10'
-        n_measurements: '67'
-        T_K:
-          value: '2250'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2250±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 2-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 2-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 2-1H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '5.97'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_2_1h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_2_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 2-1H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '18.47'
-          sigma: '2.45'
-        printed_sum: '100.84'
-        n_measurements: '30'
-        T_K:
-          value: '2250'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2250±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 2-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 2-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 2-1H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '2.45'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_3_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 3-1H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '68.81'
-          sigma: '1.46'
-        printed_sum: '100.21'
-        n_measurements: '43'
-        T_K:
-          value: '2200'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2200±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 3-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 3-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 3-1H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.46'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_3_1h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 3-1H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '10.10'
-          sigma: '5.50'
-        printed_sum: '100.76'
-        n_measurements: '47'
-        T_K:
-          value: '2200'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2200±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 3-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 3-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 3-1H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '5.50'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '55.66'
-          sigma: '1.57'
-        printed_sum: '100.25'
-        n_measurements: '63'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.57'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '10.90'
-          sigma: '1.51'
-        printed_sum: '100.99'
-        n_measurements: '28'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.51'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '55.34'
-          sigma: '0.83'
-        printed_sum: '100.56'
-        n_measurements: '14'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.83'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 2, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '11.53'
-          sigma: '3.00'
-        printed_sum: '100.80'
-        n_measurements: '29'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 2, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '3.00'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta2_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA2-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '13.64'
-          sigma: '0.53'
-        printed_sum: '100.11'
-        n_measurements: '36'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA2-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA2-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA2-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.53'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-1H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '33.12'
-          sigma: '0.35'
-        printed_sum: '100.27'
-        n_measurements: '33'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-1H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-1H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-1H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.35'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '33.05'
-          sigma: '0.31'
-        printed_sum: '99.93'
-        n_measurements: '40'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.31'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta4_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA4-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '51.53'
-          sigma: '0.73'
-        printed_sum: '100.01'
-        n_measurements: '58'
-        T_K:
-          value: '1970'
-          sigma: '30'
-          units: K
-        temperature_as_published: 1970±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA4-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA4-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA4-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.73'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_sio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta5_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA5-2H, liquid row 1, SiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: SiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '59.24'
-          sigma: '0.58'
-        printed_sum: '100.88'
-        n_measurements: '10'
-        T_K:
-          value: '2230'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2230±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA5-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA5-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA5-2H, liquid row 1, SiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.58'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
     - observation_id: kirschen_1998_iii_1_ti_phase1_sio2
       type: composition_series
       units: wt_percent
@@ -1355,6 +454,1511 @@ species:
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed.
     context:
+    - observation_id: kirschen_1998_iii_1_st_1_1h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-1H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '57.49'
+        one_sigma_wt_percent_as_printed: '1.20'
+        sample_id_as_printed: ST 1-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2500±30 K
+        temperature_K_as_printed: '2500'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '99.66'
+        measurement_count_n: '49'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_1h_phase1_sio2
+        assemblage_id: III-1:ST 1-1H
+    - observation_id: kirschen_1998_iii_1_st_1_1h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-1H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '42.16'
+        one_sigma_wt_percent_as_printed: '1.20'
+        sample_id_as_printed: ST 1-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2500±30 K
+        temperature_K_as_printed: '2500'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '99.66'
+        measurement_count_n: '49'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_1h_phase1_tio2
+        assemblage_id: III-1:ST 1-1H
+    - observation_id: kirschen_1998_iii_1_st_1_1h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-1H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '28.70'
+        one_sigma_wt_percent_as_printed: '5.34'
+        sample_id_as_printed: ST 1-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2500±30 K
+        temperature_K_as_printed: '2500'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.80'
+        measurement_count_n: '47'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_1h_phase2_sio2
+        assemblage_id: III-1:ST 1-1H
+    - observation_id: kirschen_1998_iii_1_st_1_1h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-1H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '72.10'
+        one_sigma_wt_percent_as_printed: '5.23'
+        sample_id_as_printed: ST 1-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2500±30 K
+        temperature_K_as_printed: '2500'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.80'
+        measurement_count_n: '47'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_1h_phase2_tio2
+        assemblage_id: III-1:ST 1-1H
+    - observation_id: kirschen_1998_iii_1_st_1_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '67.91'
+        one_sigma_wt_percent_as_printed: '2.58'
+        sample_id_as_printed: ST 1-2H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2280±30 K
+        temperature_K_as_printed: '2280'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.28'
+        measurement_count_n: '50'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_2h_phase1_sio2
+        assemblage_id: III-1:ST 1-2H
+    - observation_id: kirschen_1998_iii_1_st_1_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '32.37'
+        one_sigma_wt_percent_as_printed: '2.28'
+        sample_id_as_printed: ST 1-2H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2280±30 K
+        temperature_K_as_printed: '2280'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.28'
+        measurement_count_n: '50'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_2h_phase1_tio2
+        assemblage_id: III-1:ST 1-2H
+    - observation_id: kirschen_1998_iii_1_st_1_2h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-2H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '5.55'
+        one_sigma_wt_percent_as_printed: '1.79'
+        sample_id_as_printed: ST 1-2H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2280±30 K
+        temperature_K_as_printed: '2280'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.24'
+        measurement_count_n: '28'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_2h_phase2_sio2
+        assemblage_id: III-1:ST 1-2H
+    - observation_id: kirschen_1998_iii_1_st_1_2h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 1-2H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '94.51'
+        one_sigma_wt_percent_as_printed: '1.72'
+        sample_id_as_printed: ST 1-2H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2280±30 K
+        temperature_K_as_printed: '2280'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.24'
+        measurement_count_n: '28'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_1_2h_phase2_tio2
+        assemblage_id: III-1:ST 1-2H
+    - observation_id: kirschen_1998_iii_1_st_2_1h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 2-1H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '74.61'
+        one_sigma_wt_percent_as_printed: '5.97'
+        sample_id_as_printed: ST 2-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2250±30 K
+        temperature_K_as_printed: '2250'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.10'
+        measurement_count_n: '67'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_2_1h_phase1_sio2
+        assemblage_id: III-1:ST 2-1H
+    - observation_id: kirschen_1998_iii_1_st_2_1h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 2-1H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '25.49'
+        one_sigma_wt_percent_as_printed: '6.21'
+        sample_id_as_printed: ST 2-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2250±30 K
+        temperature_K_as_printed: '2250'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.10'
+        measurement_count_n: '67'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_2_1h_phase1_tio2
+        assemblage_id: III-1:ST 2-1H
+    - observation_id: kirschen_1998_iii_1_st_2_1h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 2-1H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '18.47'
+        one_sigma_wt_percent_as_printed: '2.45'
+        sample_id_as_printed: ST 2-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2250±30 K
+        temperature_K_as_printed: '2250'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.84'
+        measurement_count_n: '30'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_2_1h_phase2_sio2
+        assemblage_id: III-1:ST 2-1H
+    - observation_id: kirschen_1998_iii_1_st_2_1h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 2-1H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '82.23'
+        one_sigma_wt_percent_as_printed: '3.04'
+        sample_id_as_printed: ST 2-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2250±30 K
+        temperature_K_as_printed: '2250'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.84'
+        measurement_count_n: '30'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_2_1h_phase2_tio2
+        assemblage_id: III-1:ST 2-1H
+    - observation_id: kirschen_1998_iii_1_st_3_1h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 3-1H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '68.81'
+        one_sigma_wt_percent_as_printed: '1.46'
+        sample_id_as_printed: ST 3-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2200±30 K
+        temperature_K_as_printed: '2200'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.21'
+        measurement_count_n: '43'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_3_1h_phase1_sio2
+        assemblage_id: III-1:ST 3-1H
+    - observation_id: kirschen_1998_iii_1_st_3_1h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 3-1H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '31.40'
+        one_sigma_wt_percent_as_printed: '1.49'
+        sample_id_as_printed: ST 3-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2200±30 K
+        temperature_K_as_printed: '2200'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.21'
+        measurement_count_n: '43'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_3_1h_phase1_tio2
+        assemblage_id: III-1:ST 3-1H
+    - observation_id: kirschen_1998_iii_1_st_3_1h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 3-1H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '10.10'
+        one_sigma_wt_percent_as_printed: '5.50'
+        sample_id_as_printed: ST 3-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2200±30 K
+        temperature_K_as_printed: '2200'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.76'
+        measurement_count_n: '47'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_3_1h_phase2_sio2
+        assemblage_id: III-1:ST 3-1H
+    - observation_id: kirschen_1998_iii_1_st_3_1h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run ST 3-1H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '90.62'
+        one_sigma_wt_percent_as_printed: '5.58'
+        sample_id_as_printed: ST 3-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2
+        temperature_as_published: 2200±30 K
+        temperature_K_as_printed: '2200'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.76'
+        measurement_count_n: '47'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_st_3_1h_phase2_tio2
+        assemblage_id: III-1:ST 3-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '4.22'
+        one_sigma_wt_percent_as_printed: '0.95'
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.25'
+        measurement_count_n: '63'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase1_al2o3
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '55.66'
+        one_sigma_wt_percent_as_printed: '1.57'
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.25'
+        measurement_count_n: '63'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase1_sio2
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '40.36'
+        one_sigma_wt_percent_as_printed: '1.67'
+        sample_id_as_printed: STA1-1H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.25'
+        measurement_count_n: '63'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase1_tio2
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 2, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '4.41'
+        one_sigma_wt_percent_as_printed: '0.87'
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.99'
+        measurement_count_n: '28'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase2_al2o3
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '10.90'
+        one_sigma_wt_percent_as_printed: '1.51'
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.99'
+        measurement_count_n: '28'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase2_sio2
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-1H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '85.68'
+        one_sigma_wt_percent_as_printed: '1.63'
+        sample_id_as_printed: STA1-1H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2080±30 K
+        temperature_K_as_printed: '2080'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.99'
+        measurement_count_n: '28'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_1h_phase2_tio2
+        assemblage_id: III-1:STA1-1H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '4.26'
+        one_sigma_wt_percent_as_printed: '0.64'
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.56'
+        measurement_count_n: '14'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase1_al2o3
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '55.34'
+        one_sigma_wt_percent_as_printed: '0.83'
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.56'
+        measurement_count_n: '14'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase1_sio2
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '40.96'
+        one_sigma_wt_percent_as_printed: '1.04'
+        sample_id_as_printed: STA1-2H
+        phase_order: 1
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.56'
+        measurement_count_n: '14'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase1_tio2
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 2, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '4.44'
+        one_sigma_wt_percent_as_printed: '1.05'
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.80'
+        measurement_count_n: '29'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase2_al2o3
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 2, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '11.53'
+        one_sigma_wt_percent_as_printed: '3.00'
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.80'
+        measurement_count_n: '29'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase2_sio2
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA1-2H, liquid row 2, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '84.78'
+        one_sigma_wt_percent_as_printed: '3.04'
+        sample_id_as_printed: STA1-2H
+        phase_order: 2
+        phase_assemblage_as_printed: two coexisting liquids
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.80'
+        measurement_count_n: '29'
+        run_note_as_printed: ''
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta1_2h_phase2_tio2
+        assemblage_id: III-1:STA1-2H
+    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA2-2H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '13.77'
+        one_sigma_wt_percent_as_printed: '0.39'
+        sample_id_as_printed: STA2-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.11'
+        measurement_count_n: '36'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta2_2h_phase1_al2o3
+        assemblage_id: III-1:STA2-2H
+    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA2-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '13.64'
+        one_sigma_wt_percent_as_printed: '0.53'
+        sample_id_as_printed: STA2-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.11'
+        measurement_count_n: '36'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta2_2h_phase1_sio2
+        assemblage_id: III-1:STA2-2H
+    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA2-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '72.70'
+        one_sigma_wt_percent_as_printed: '0.66'
+        sample_id_as_printed: STA2-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.11'
+        measurement_count_n: '36'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta2_2h_phase1_tio2
+        assemblage_id: III-1:STA2-2H
+    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-1H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '13.43'
+        one_sigma_wt_percent_as_printed: '0.15'
+        sample_id_as_printed: STA3-1H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.27'
+        measurement_count_n: '33'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_1h_phase1_al2o3
+        assemblage_id: III-1:STA3-1H
+    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-1H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '33.12'
+        one_sigma_wt_percent_as_printed: '0.35'
+        sample_id_as_printed: STA3-1H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.27'
+        measurement_count_n: '33'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_1h_phase1_sio2
+        assemblage_id: III-1:STA3-1H
+    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-1H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '53.71'
+        one_sigma_wt_percent_as_printed: '1.05'
+        sample_id_as_printed: STA3-1H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2070±30 K
+        temperature_K_as_printed: '2070'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.27'
+        measurement_count_n: '33'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_1h_phase1_tio2
+        assemblage_id: III-1:STA3-1H
+    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-2H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '13.17'
+        one_sigma_wt_percent_as_printed: '0.16'
+        sample_id_as_printed: STA3-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '99.93'
+        measurement_count_n: '40'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_2h_phase1_al2o3
+        assemblage_id: III-1:STA3-2H
+    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '33.05'
+        one_sigma_wt_percent_as_printed: '0.31'
+        sample_id_as_printed: STA3-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '99.93'
+        measurement_count_n: '40'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_2h_phase1_sio2
+        assemblage_id: III-1:STA3-2H
+    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA3-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '53.70'
+        one_sigma_wt_percent_as_printed: '0.59'
+        sample_id_as_printed: STA3-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2050±30 K
+        temperature_K_as_printed: '2050'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '99.93'
+        measurement_count_n: '40'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta3_2h_phase1_tio2
+        assemblage_id: III-1:STA3-2H
+    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA4-2H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '13.82'
+        one_sigma_wt_percent_as_printed: '0.17'
+        sample_id_as_printed: STA4-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 1970±30 K
+        temperature_K_as_printed: '1970'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.01'
+        measurement_count_n: '58'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta4_2h_phase1_al2o3
+        assemblage_id: III-1:STA4-2H
+    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA4-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '51.53'
+        one_sigma_wt_percent_as_printed: '0.73'
+        sample_id_as_printed: STA4-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 1970±30 K
+        temperature_K_as_printed: '1970'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.01'
+        measurement_count_n: '58'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta4_2h_phase1_sio2
+        assemblage_id: III-1:STA4-2H
+    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA4-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '34.65'
+        one_sigma_wt_percent_as_printed: '0.54'
+        sample_id_as_printed: STA4-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 1970±30 K
+        temperature_K_as_printed: '1970'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.01'
+        measurement_count_n: '58'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta4_2h_phase1_tio2
+        assemblage_id: III-1:STA4-2H
+    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_al2o3
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA5-2H, liquid row 1, Al2O3 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: Al2O3
+        component_wt_percent_as_printed: '21.83'
+        one_sigma_wt_percent_as_printed: '0.33'
+        sample_id_as_printed: STA5-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2230±30 K
+        temperature_K_as_printed: '2230'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.88'
+        measurement_count_n: '10'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta5_2h_phase1_al2o3
+        assemblage_id: III-1:STA5-2H
+    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_sio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA5-2H, liquid row 1, SiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: SiO2
+        component_wt_percent_as_printed: '59.24'
+        one_sigma_wt_percent_as_printed: '0.58'
+        sample_id_as_printed: STA5-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2230±30 K
+        temperature_K_as_printed: '2230'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.88'
+        measurement_count_n: '10'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta5_2h_phase1_sio2
+        assemblage_id: III-1:STA5-2H
+    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_tio2
+      type: duplicate_measurement_context
+      units: wt_percent; temperature K
+      locator:
+        page: 89
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run STA5-2H, liquid row 1, TiO2 column.
+        published_page: III-74
+      values:
+        method_class: measured_direct
+        reason: Table III-1 repeats a measured component value reported in Table 4 of Kirschen et al. (1999); the published
+          article owns the scored observation.
+        component_formula: TiO2
+        component_wt_percent_as_printed: '19.81'
+        one_sigma_wt_percent_as_printed: '0.44'
+        sample_id_as_printed: STA5-2H1
+        phase_order: 1
+        phase_assemblage_as_printed: one liquid
+        basis: wt_percent
+        system_as_printed: SiO2-TiO2-Al2O3
+        temperature_as_published: 2230±30 K
+        temperature_K_as_printed: '2230'
+        temperature_sigma_K_as_printed: '30'
+        atmosphere_as_printed: pure oxygen
+        printed_sum_wt_percent: '100.88'
+        measurement_count_n: '10'
+        run_note_as_printed: '1'
+        phase_as_analyzed: quenched glass by electron-probe microanalysis
+        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater than
+          300 K/s.
+        published_source_id: kirschen-1999-si-ti-al-miscibility
+        published_observation_ids:
+        - kirschen_1999_t4_sta5_2h_phase1_tio2
+        assemblage_id: III-1:STA5-2H
     - observation_id: kirschen_1998_i1_stc_2_1_phase1
       type: duplicate_measurement_context
       units: wt_percent; temperature °C; duration h
@@ -8789,907 +9393,6 @@ species:
         units: wt_percent
         confidence_level: one_sigma
         note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-1H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '42.16'
-          sigma: '1.20'
-        printed_sum: '99.66'
-        n_measurements: '49'
-        T_K:
-          value: '2500'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2500±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-1H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.20'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_1h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-1H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '72.10'
-          sigma: '5.23'
-        printed_sum: '100.80'
-        n_measurements: '47'
-        T_K:
-          value: '2500'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2500±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-1H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '5.23'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '32.37'
-          sigma: '2.28'
-        printed_sum: '100.28'
-        n_measurements: '50'
-        T_K:
-          value: '2280'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2280±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '2.28'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_1_2h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 1-2H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '94.51'
-          sigma: '1.72'
-        printed_sum: '100.24'
-        n_measurements: '28'
-        T_K:
-          value: '2280'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2280±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 1-2H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 1-2H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.72'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_2_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_2_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 2-1H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '25.49'
-          sigma: '6.21'
-        printed_sum: '100.10'
-        n_measurements: '67'
-        T_K:
-          value: '2250'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2250±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 2-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 2-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 2-1H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '6.21'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_2_1h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_2_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 2-1H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '82.23'
-          sigma: '3.04'
-        printed_sum: '100.84'
-        n_measurements: '30'
-        T_K:
-          value: '2250'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2250±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 2-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 2-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 2-1H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '3.04'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_3_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 3-1H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '31.40'
-          sigma: '1.49'
-        printed_sum: '100.21'
-        n_measurements: '43'
-        T_K:
-          value: '2200'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2200±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 3-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:ST 3-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 3-1H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.49'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_st_3_1h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_st_3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run ST 3-1H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '90.62'
-          sigma: '5.58'
-        printed_sum: '100.76'
-        n_measurements: '47'
-        T_K:
-          value: '2200'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2200±30 K
-        system_as_printed: SiO2-TiO2
-        sample_id_as_printed: ST 3-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:ST 3-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run ST 3-1H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '5.58'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '40.36'
-          sigma: '1.67'
-        printed_sum: '100.25'
-        n_measurements: '63'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.67'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '85.68'
-          sigma: '1.63'
-        printed_sum: '100.99'
-        n_measurements: '28'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.63'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '40.96'
-          sigma: '1.04'
-        printed_sum: '100.56'
-        n_measurements: '14'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.04'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 2, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '84.78'
-          sigma: '3.04'
-        printed_sum: '100.80'
-        n_measurements: '29'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 2, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '3.04'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta2_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA2-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '72.70'
-          sigma: '0.66'
-        printed_sum: '100.11'
-        n_measurements: '36'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA2-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA2-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA2-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.66'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-1H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '53.71'
-          sigma: '1.05'
-        printed_sum: '100.27'
-        n_measurements: '33'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-1H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-1H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-1H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.05'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '53.70'
-          sigma: '0.59'
-        printed_sum: '99.93'
-        n_measurements: '40'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.59'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta4_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA4-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '34.65'
-          sigma: '0.54'
-        printed_sum: '100.01'
-        n_measurements: '58'
-        T_K:
-          value: '1970'
-          sigma: '30'
-          units: K
-        temperature_as_published: 1970±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA4-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA4-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA4-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.54'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_tio2
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta5_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA5-2H, liquid row 1, TiO2 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: TiO2
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '19.81'
-          sigma: '0.44'
-        printed_sum: '100.88'
-        n_measurements: '10'
-        T_K:
-          value: '2230'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2230±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA5-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA5-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA5-2H, liquid row 1, TiO2 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.44'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
     - observation_id: kirschen_1998_iii_1_ti_phase1_tio2
       type: composition_series
       units: wt_percent
@@ -9838,483 +9541,6 @@ species:
     context: []
   Al2O3:
     observations:
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '4.22'
-          sigma: '0.95'
-        printed_sum: '100.25'
-        n_measurements: '63'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.95'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_1h_phase2_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-1H, liquid row 2, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '4.41'
-          sigma: '0.87'
-        printed_sum: '100.99'
-        n_measurements: '28'
-        T_K:
-          value: '2080'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2080±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-1H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-1H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-1H, liquid row 2, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.87'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '4.26'
-          sigma: '0.64'
-        printed_sum: '100.56'
-        n_measurements: '14'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 1
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.64'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta1_2h_phase2_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta1_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA1-2H, liquid row 2, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '4.44'
-          sigma: '1.05'
-        printed_sum: '100.80'
-        n_measurements: '29'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA1-2H
-        run_note_as_printed: ''
-        phase_order: 2
-        assemblage_id: III-1:STA1-2H
-        phase_assemblage_as_printed: two coexisting liquids
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA1-2H, liquid row 2, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '1.05'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta2_2h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta2_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA2-2H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '13.77'
-          sigma: '0.39'
-        printed_sum: '100.11'
-        n_measurements: '36'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA2-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA2-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA2-2H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.39'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_1h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_1h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-1H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '13.43'
-          sigma: '0.15'
-        printed_sum: '100.27'
-        n_measurements: '33'
-        T_K:
-          value: '2070'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2070±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-1H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-1H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-1H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.15'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta3_2h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta3_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA3-2H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '13.17'
-          sigma: '0.16'
-        printed_sum: '99.93'
-        n_measurements: '40'
-        T_K:
-          value: '2050'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2050±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA3-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA3-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA3-2H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.16'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta4_2h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta4_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA4-2H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '13.82'
-          sigma: '0.17'
-        printed_sum: '100.01'
-        n_measurements: '58'
-        T_K:
-          value: '1970'
-          sigma: '30'
-          units: K
-        temperature_as_published: 1970±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA4-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA4-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA4-2H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.17'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
-    - observation_id: kirschen_1998_iii_1_sta5_2h_phase1_al2o3
-      type: composition_series
-      units: wt_percent
-      experiment: kirschen_1998_iii_1_sta5_2h
-      regime: quench_equilibration
-      locator:
-        page: 89
-        pdf_page_index: 88
-        table: III-1
-        note: Table III-1, run STA5-2H, liquid row 1, Al2O3 column.
-        published_page: III-74
-      values:
-        quantity: equilibrium_phase_composition
-        formula: Al2O3
-        phase_label: glass
-        basis: wt_percent
-        component_amount:
-          value: '21.83'
-          sigma: '0.33'
-        printed_sum: '100.88'
-        n_measurements: '10'
-        T_K:
-          value: '2230'
-          sigma: '30'
-          units: K
-        temperature_as_published: 2230±30 K
-        system_as_printed: SiO2-TiO2-Al2O3
-        sample_id_as_printed: STA5-2H1
-        run_note_as_printed: '1'
-        phase_order: 1
-        assemblage_id: III-1:STA5-2H
-        phase_assemblage_as_printed: one liquid
-        phase_as_analyzed: quenched glass by electron-probe microanalysis
-        quench_provenance_as_printed: Laser shutoff followed by radiative cooling; reported cooling rate greater
-          than 300 K/s.
-        method_class: measured_direct
-        admission_status: admitted
-        point_conditions:
-          gas_mix:
-            state:
-              tag: value
-              value: pure oxygen
-            locator:
-              page: 89
-              pdf_page_index: 88
-              table: III-1
-              note: Table III-1, run STA5-2H, liquid row 1, Al2O3 column.
-              published_page: III-74
-      uncertainty:
-        sigma: '0.33'
-        units: wt_percent
-        confidence_level: one_sigma
-        note: Parenthetical component standard deviation as printed.
     - observation_id: kirschen_1998_iii_1_ti_phase1_al2o3
       type: composition_series
       units: wt_percent
