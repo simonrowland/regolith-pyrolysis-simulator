@@ -1804,6 +1804,17 @@ species:
         note: 1400 °C Na is diffusion-influenced (L=0.5); 1200 °C Na L=0. Bounds stay bounds.
       uncertainty:
         note: 1200 °C D and L are inequalities as printed
+    context:
+    - observation_id: zhang_2021_table1_bas1400c90m_na2o_below_detection
+      type: below_detection_cell
+      locator:
+        table: '1'
+        page: 71
+        row: Bas1400C90m
+      units: wt_percent
+      values:
+        analyte: Na2O
+        printed: b.d.l.
   K:
     observations:
     - observation_id: zhang_2021_table4_K_evaporation_coefficients
