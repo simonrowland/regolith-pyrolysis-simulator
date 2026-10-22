@@ -102,6 +102,10 @@ class Quantity(StrEnum):
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
     RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
+    EQUILIBRIUM_PHASE_COMPOSITION = "equilibrium_phase_composition"
+    DISTRIBUTION_RATIO = "distribution_ratio"
+    SULFIDE_CAPACITY = "sulfide_capacity"
+    CHLORIDE_CAPACITY = "chloride_capacity"
 
 
 class EvidenceClass(StrEnum):
@@ -152,6 +156,12 @@ class RefusalReason(StrEnum):
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
     ENGINE_DOES_NOT_REPORT_FE_REDOX = "engine_does_not_report_fe_redox"
     ENGINE_DOES_NOT_REPORT_FUSION = "engine_does_not_report_fusion"
+    ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
+        "engine_does_not_report_phase_composition"
+    )
+    ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
+    ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
+    CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
 
 
 class CellMaterial(StrEnum):
@@ -241,6 +251,20 @@ class Phase(StrEnum):
     AQ = "aq"
     GLASS = "glass"
     SUPERCOOLED_L = "supercooled_l"
+
+
+class PhaseRole(StrEnum):
+    """Printed phase role on a phase-composition row.
+
+    Thermodynamic ``Phase`` cannot separate melt, slag, metal, and matte:
+    those are often all liquid. The role is the identity axis.
+    """
+
+    MELT = "melt"
+    SLAG = "slag"
+    GLASS = "glass"
+    METAL = "metal"
+    MATTE = "matte"
 
 
 class Polymorph(StrEnum):
@@ -517,6 +541,10 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
     Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
+    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: "subtype_defined",
+    Quantity.DISTRIBUTION_RATIO: "dimensionless",
+    Quantity.SULFIDE_CAPACITY: "dimensionless",
+    Quantity.CHLORIDE_CAPACITY: "dimensionless",
 }
 
 MEASURED_EVIDENCE = frozenset(
@@ -550,6 +578,22 @@ MELT_ACTIVITY_QUANTITIES = frozenset(
         Quantity.INTERACTION_PARAMETER,
     }
 )
+# Phase compositions and printed capacities share the melt_activity rail.
+# They are not members of MELT_ACTIVITY_QUANTITIES: that set is the activity
+# profile and the activity engine branch.
+PHASE_COMPOSITION_QUANTITIES = frozenset(
+    {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.DISTRIBUTION_RATIO,
+    }
+)
+PRINTED_CAPACITY_QUANTITIES = frozenset(
+    {
+        Quantity.SULFIDE_CAPACITY,
+        Quantity.CHLORIDE_CAPACITY,
+    }
+)
+PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIES
 KINETIC_YIELD_QUANTITIES = frozenset(
     {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
