@@ -88,6 +88,36 @@ def test_capacity_shadow_retains_molecular_routing_notice():
     assert any(REASON in n for n in result.notices)
 
 
+@pytest.mark.parametrize("override", [None, 1e-20])
+def test_controlled_flow_override_keeps_f3_notice(monkeypatch, override):
+    from simulator.state import Atmosphere, EvaporationFlux
+
+    sim = _gas_train_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 1e-8
+    sim.melt.temperature_C = 1600.0
+    sim._overhead_headspace_config.update(enabled=True, conductance_kg_s=override)
+    sim._overhead_headspace_config.pop("conductance_kg_s_per_bar", None)
+    sim._headspace_volume_m3 = lambda: 0.137
+    sim._headspace_temperature_K = lambda: 1873.15
+    sim.atom_ledger.load_external_mol("process.overhead_gas", {"O2": 1e-12, "Kr": 1e-12},
+        source="F3 controlled mixture", material_origin="feedstock")
+    monkeypatch.setattr(sim, "_cold_train_capacity_policy",
+        lambda: (NoColdTrain("runtime_enforcement_disabled"), None))
+    sim.overhead_model.configure_headspace(sim._overhead_headspace_config)
+    flux = EvaporationFlux(species_kg_hr={"O2": 1e-12, "Kr": 1e-12})
+    flux.update_totals()
+    flow = sim._controlled_o2_transport_capacity(flux)
+    assert flow is not None
+    reference = transport.pipe_conductance_authority_notice(
+        sim.overhead_model.pipe_diameter_m, 0.04,
+        transport.gas_dynamic_viscosity_Pa_s(1873.15), 1873.15, 1e-6, 0.0)
+    assert REASON in reference
+    receipt = sim._dispatch_overhead_bleed(effective_transport_capacity=flow)
+    assert receipt.status == "ok"
+    assert any(REASON in n for n in receipt.diagnostic.get("notices", ()))
+
+
 
 def test_passive_pressure_admission_preserves_accepted_routing_notice():
     sim = _gas_train_sim()
