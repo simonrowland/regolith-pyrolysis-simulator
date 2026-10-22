@@ -674,8 +674,11 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
     that SiO pressure used to refuse the row by numeric coincidence. Setting
     the SiO pressure itself equal to the selected O2 condition does too.
     The row is in neither derivation. A matching number is not an input.
+    A synthetic 100000 Pa total completes the printed-command identity.
+    The synthetic equal-pressure sample has no published uncertainty.
     """
-    from simulator.battery.records import Value
+    from simulator.battery.enums import UncertaintyKind
+    from simulator.battery.records import Uncertainty, Value
 
     row = _row(source_context, "kems-053-stolyarova-1991")
     point_rows = tuple(
@@ -687,7 +690,11 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
     assert row.observation_id not in selected.used_observations
     assert row.observation_id not in selected.observation.derivation.inputs
 
-    stamped = replace(row, identity=replace(row.identity, fO2_Pa=State.of(row.value.point)))
+    stamped = replace(row, identity=replace(
+        row.identity,
+        fO2_Pa=State.of(row.value.point),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    ))
     requests, handles = _capture_engine(monkeypatch, stamped)
     residual, candidate = compile_residual(
         stamped, Engine.OPENIMCC, context=source_context, handles=handles,
@@ -699,7 +706,11 @@ def test_stolyarova_sio_pressure_equal_to_the_o2_condition_is_scored(source_cont
     assert requests[0].mode == battery.PO2_COMMANDED
     assert requests[0].po2_bar == pytest.approx(float(row.value.point) / 1e5, rel=1e-12)
 
-    equal = replace(row, value=Value.point_of(selected.observation.value.point))
+    equal = replace(
+        row,
+        value=Value.point_of(selected.observation.value.point),
+        uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+    )
     requests, handles = _capture_engine(monkeypatch, equal)
     residual, candidate = compile_residual(
         equal, Engine.OPENIMCC, context=source_context, handles=handles,
