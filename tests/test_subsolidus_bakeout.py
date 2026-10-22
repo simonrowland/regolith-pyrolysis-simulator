@@ -440,9 +440,9 @@ def test_inventory_cap_and_pump_scale_share_one_extent():
     molar = {"SO2": _molar("SO2"), "O2": _molar("O2"), "CaO": _molar("CaO")}
     unconstrained_extent = 2.0
     inventory_extent = 1.0
-    inventory_gas_kg_h = (
-        inventory_extent * molar["SO2"] + 0.5 * inventory_extent * molar["O2"]
-    )
+    gas_per_extent = molar["SO2"] + 0.5 * molar["O2"]
+    inventory_gas_kg_h = inventory_extent * gas_per_extent
+    peak_kg_h = unconstrained_extent * gas_per_extent
     throughput = 0.5 * inventory_gas_kg_h
     result = _dispatch_bakeout(
         temperature_C=temperature_K - 273.15,
@@ -463,16 +463,72 @@ def test_inventory_cap_and_pump_scale_share_one_extent():
     assert demand["O2"] == pytest.approx(0.5 * unconstrained_extent, rel=1e-9)
     assert "CaO" not in demand
     assert result.diagnostic["pump_peak_demand_kg_hr"] == pytest.approx(
-        inventory_gas_kg_h, rel=1e-9
+        peak_kg_h, rel=1e-9
     )
-    assert result.diagnostic["pump_scale"] == pytest.approx(0.5, rel=1e-12)
-    accepted = 0.5 * inventory_extent
+    assert result.diagnostic["pump_scale"] == pytest.approx(
+        throughput / peak_kg_h, rel=1e-12
+    )
+    accepted = min(inventory_extent, unconstrained_extent * throughput / peak_kg_h)
     assert released["SO2"] == pytest.approx(accepted, rel=1e-9)
     assert released["O2"] == pytest.approx(0.5 * accepted, rel=1e-9)
     assert released["SO2"] < demand["SO2"]
     assert "CaO" not in released
     assert result.diagnostic["release_mol_hr_by_species"]["O2"] == pytest.approx(
         released["O2"], rel=1e-12
+    )
+
+
+def test_step_average_fits_but_within_step_peak_exceeds_capacity():
+    """Inventory hour-average can sit under the pump while the initial rate does not."""
+    temperature_K = 1000.0
+    alpha = 0.4
+    p_eq = 20.0
+    per_m2 = _hk_driver_mol_h(
+        species="SO2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=0.0,
+        alpha=alpha,
+        area_m2=1.0,
+    )
+    area_m2 = 2.0 / per_m2
+    molar = {"SO2": _molar("SO2"), "O2": _molar("O2"), "CaO": _molar("CaO")}
+    gas_per_extent = molar["SO2"] + 0.5 * molar["O2"]
+    unconstrained_extent = 2.0
+    inventory_extent = 1.0
+    peak_kg_h = unconstrained_extent * gas_per_extent
+    inventory_average_kg_h = inventory_extent * gas_per_extent
+    throughput = 1.5 * inventory_average_kg_h
+    assert inventory_average_kg_h < throughput < peak_kg_h
+    result = _dispatch_bakeout(
+        temperature_C=temperature_K - 273.15,
+        vapour_batch_flux_pressures_Pa={"SO2": p_eq},
+        solid_host_area_m2=area_m2,
+        max_throughput_kg_hr=throughput,
+        dt_hr=1.0,
+        alpha={"SO2": alpha},
+        molar_mass_kg_mol=molar,
+        reactions=[
+            _sulfate_reaction(host_remaining_mol=1.0, extent_bound_mol_rxn=10.0)
+        ],
+    )
+    scale = throughput / peak_kg_h
+    assert result.status == "ok"
+    assert result.diagnostic["pump_peak_demand_kg_hr"] == pytest.approx(peak_kg_h)
+    assert result.diagnostic["pump_scale"] == pytest.approx(scale)
+    assert result.diagnostic["pump_scale"] < 1.0
+    accepted = min(inventory_extent, unconstrained_extent * scale)
+    assert result.diagnostic["accepted_extent_mol_by_reaction"][
+        "anhydrite_decomposition"
+    ] == pytest.approx(accepted)
+    assert result.diagnostic["inventory_capped_extent_mol_by_reaction"][
+        "anhydrite_decomposition"
+    ] == pytest.approx(inventory_extent)
+    assert result.diagnostic["released_mol_by_species"]["SO2"] == pytest.approx(
+        accepted
+    )
+    assert result.diagnostic["released_mol_by_species"]["O2"] == pytest.approx(
+        0.5 * accepted
     )
 
 

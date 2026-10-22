@@ -844,9 +844,10 @@ def _solid_host_bakeout_result(
     """Solid-host Hertz-Knudsen demand, pump cap, and accepted extents.
 
     The oxide-parent path is not used. Condensed coproducts share the
-    accepted extent but do not enter the pump aggregate. Unconstrained
-    demand is published separately from the inventory-capped peak the
-    pump compares, and from the committed release.
+    accepted extent but do not enter the pump aggregate. The pump
+    compares the simultaneous pre-inventory gas rate. Inventory then
+    limits that scaled extent. Unconstrained demand stays separate
+    from the committed release.
     """
     intent = ChemistryIntent.EVAPORATION_FLUX
     empty_flux = {"evaporation_flux_kg_hr": {}}
@@ -1053,6 +1054,30 @@ def _solid_host_bakeout_result(
         )
 
     priced.sort(key=lambda row: row["reaction_id"])
+
+    def _gas_kg_h(row: Mapping[str, Any], extent: float) -> float:
+        total = 0.0
+        for species, phase, nu in row["terms"]:
+            if phase != "gas" or nu <= 0.0:
+                continue
+            total += extent * nu * float(molar_mass[species]) / dt_hr
+        return total
+
+    # Hertz-Knudsen is constant until the host is gone, so the within-step
+    # peak is the unconstrained rate, not the inventory-limited hour average.
+    peak_kg_h = sum(_gas_kg_h(row, row["unconstrained"]) for row in priced)
+    admitted_gas = controls.get("admitted_gas_kg_hr") or {}
+    admitted_kg_h = 0.0
+    if isinstance(admitted_gas, Mapping):
+        for value in admitted_gas.values():
+            number = _solid_host_nonnegative(value)
+            if number:
+                admitted_kg_h += number
+    combined_peak_kg_h = peak_kg_h + admitted_kg_h
+    scale = 1.0
+    if combined_peak_kg_h > throughput:
+        scale = throughput / combined_peak_kg_h
+
     running = dict(host_remaining)
     inventory_capped: dict[str, float] = {}
     for row in priced:
@@ -1065,39 +1090,43 @@ def _solid_host_bakeout_result(
             0.0, host_left - capped * row["host_nu_abs"]
         )
 
-    peak_kg_h = 0.0
-    for row in priced:
-        extent = inventory_capped[row["reaction_id"]]
-        for species, phase, nu in row["terms"]:
-            if phase != "gas" or nu <= 0.0:
-                continue
-            mass = float(molar_mass[species])
-            peak_kg_h += extent * nu * mass / dt_hr
-    scale = 1.0
-    if peak_kg_h > throughput:
-        scale = throughput / peak_kg_h
-
     demand_mol: dict[str, float] = {}
     demand_mol_h: dict[str, float] = {}
     demand_kg_h: dict[str, float] = {}
+    peak_mol_h: dict[str, float] = {}
+    peak_kg_h_by_species: dict[str, float] = {}
     released_mol: dict[str, float] = {}
     release_mol_h: dict[str, float] = {}
     released_kg_h: dict[str, float] = {}
     accepted: dict[str, float] = {}
     unconstrained_by_reaction: dict[str, float] = {}
+    accepting = dict(host_remaining)
     for row in priced:
-        accepted_extent = inventory_capped[row["reaction_id"]] * scale
+        host_left = accepting.get(row["host_species"], 0.0)
+        host_cap = host_left / row["host_nu_abs"] if row["host_nu_abs"] else 0.0
+        accepted_extent = min(
+            row["unconstrained"] * scale,
+            host_cap,
+            row["extent_bound"],
+        )
+        accepted_extent = max(0.0, accepted_extent)
         accepted[row["reaction_id"]] = accepted_extent
+        accepting[row["host_species"]] = max(
+            0.0, host_left - accepted_extent * row["host_nu_abs"]
+        )
         unconstrained_by_reaction[row["reaction_id"]] = row["unconstrained"]
         for species, phase, nu in row["terms"]:
             if phase != "gas" or nu <= 0.0:
                 continue
             mass = float(molar_mass[species])
             demand = row["unconstrained"] * nu
+            peak_rate = demand / dt_hr
             released = accepted_extent * nu
             _add_amount(demand_mol, species, demand)
-            _add_amount(demand_mol_h, species, demand / dt_hr)
-            _add_amount(demand_kg_h, species, demand / dt_hr * mass)
+            _add_amount(demand_mol_h, species, peak_rate)
+            _add_amount(demand_kg_h, species, peak_rate * mass)
+            _add_amount(peak_mol_h, species, peak_rate)
+            _add_amount(peak_kg_h_by_species, species, peak_rate * mass)
             _add_amount(released_mol, species, released)
             _add_amount(release_mol_h, species, released / dt_hr)
             _add_amount(released_kg_h, species, released / dt_hr * mass)
@@ -1107,10 +1136,11 @@ def _solid_host_bakeout_result(
         None,
         hk_demand_mol_by_species=demand_mol,
         hk_demand_mol_hr_by_species=demand_mol_h,
-        hk_demand_peak_mol_hr_by_species=dict(demand_mol_h),
+        hk_demand_peak_mol_hr_by_species=peak_mol_h,
         hk_demand_kg_hr_by_species=demand_kg_h,
-        hk_demand_peak_kg_hr_by_species=dict(demand_kg_h),
-        pump_peak_demand_kg_hr=peak_kg_h,
+        hk_demand_peak_kg_hr_by_species=peak_kg_h_by_species,
+        pump_peak_demand_kg_hr=combined_peak_kg_h,
+        admitted_gas_kg_hr=admitted_kg_h,
         released_mol_by_species=released_mol,
         release_mol_hr_by_species=release_mol_h,
         released_kg_hr_by_species=released_kg_h,
