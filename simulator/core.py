@@ -13437,7 +13437,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         moves the remaining hosts and CaO/MgO once; metal iron stays.
         """
         from engines.builtin.stage0_pretreatment import (
-            REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
             REACTION_FAMILY_SUBSOLIDUS_HANDOFF,
         )
         from simulator.subsolidus_bakeout import (
@@ -13613,15 +13612,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 debits, credits = mol_maps_for_extents(selected)
                 if debits or credits:
                     if commit_release:
-                        self._dispatch_and_commit(
-                            ChemistryIntent.STAGE0_PRETREATMENT,
-                            control_inputs={
-                                "reaction_family": REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
-                                "mol_debits": debits,
-                                "mol_credits": credits,
-                            },
-                            transition_source="subsolidus_bakeout",
-                        )
+                        self._commit_subsolidus_bakeout_release(debits, credits)
                         committed = True
                     else:
                         # The step commits this after the combined-species
@@ -13689,16 +13680,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         inlet.update_totals()
         return inlet
 
-    def _commit_pending_subsolidus_release(self) -> bool:
-        pending = getattr(self, "_subsolidus_pending_release", None)
-        self._subsolidus_pending_release = None
-        if not pending:
-            return False
+    def _commit_subsolidus_bakeout_release(self, debits, credits) -> None:
+        """Commit one admitted subsolidus bakeout extent.
+
+        The immediate path and the deferred step path both use this.
+        First-melt handoff is a different family and stays separate.
+        """
         from engines.builtin.stage0_pretreatment import (
             REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
         )
 
-        debits, credits = pending
         self._dispatch_and_commit(
             ChemistryIntent.STAGE0_PRETREATMENT,
             control_inputs={
@@ -13708,6 +13699,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             },
             transition_source="subsolidus_bakeout",
         )
+
+    def _commit_pending_subsolidus_release(self) -> bool:
+        pending = getattr(self, "_subsolidus_pending_release", None)
+        self._subsolidus_pending_release = None
+        if not pending:
+            return False
+        debits, credits = pending
+        self._commit_subsolidus_bakeout_release(debits, credits)
         last = getattr(self, "_last_subsolidus_bakeout", None)
         if isinstance(last, dict):
             last["committed"] = True
