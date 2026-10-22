@@ -15729,7 +15729,8 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
             }
-        elif projected_oxide_map:
+        elif projected_oxide_map and not composition_role_refusal:
+            # A refused composition_role is queued and left unstamped (b716).
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": Located(
