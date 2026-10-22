@@ -605,7 +605,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         credits_mol: dict[str, dict[str, float]] = {}
         offgas_mol = self._kg_dict_to_mol(products_kg, registry, resolve_species_formula)
         if offgas_mol:
-            credits_mol["terminal.offgas"] = offgas_mol
+            credits_mol[OFFGAS_ACCOUNT] = offgas_mol
 
         melt_mol = self._kg_dict_to_mol(
             oxide_products_kg, registry, resolve_species_formula,
@@ -691,7 +691,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             offgas_products_kg, registry, resolve_species_formula,
         )
         if offgas_mol:
-            credits["terminal.offgas"] = offgas_mol
+            credits[OFFGAS_ACCOUNT] = offgas_mol
         melt_mol = self._kg_dict_to_mol(
             oxide_products_kg, registry, resolve_species_formula,
         )
@@ -905,7 +905,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 kg_val / formula.molar_mass_kg_per_mol()
             )
         if offgas_mol:
-            credits_mol["terminal.offgas"] = offgas_mol
+            credits_mol[OFFGAS_ACCOUNT] = offgas_mol
 
         if not credits_mol:
             return self._empty_result(
