@@ -5,6 +5,7 @@ import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -17,7 +18,12 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
-from simulator.battery.migrate import load_yaml, write_outputs
+from simulator.battery.migrate import (
+    fe3_fe2_ratio_from_ferric_fraction,
+    fe3_fe2_ratio_from_oxide_wt_pct,
+    load_yaml,
+    write_outputs,
+)
 from simulator.battery.score import (
     ScoreContext,
     comparison_candidates,
@@ -118,7 +124,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
         "input": "printed_fO2",
     }
 
-    unsupported = predict_with_engine(Engine.ALPHAMELTS, row4)
+    unsupported = predict_with_engine(Engine.MAGEMIN, row4)
     assert unsupported.value is None
     assert unsupported.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
 
@@ -546,7 +552,8 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
     for residual in residuals:
         assert residual.numeric is None
         assert residual.refusal is not None
-        if residual.key.endswith("internal-analytical"):
+        engine_name = residual.key.rsplit("::", 1)[-1]
+        if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
             assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
             assert residual.refusal.detail == {
                 "reason": "missing_input",
@@ -557,3 +564,266 @@ def test_existing_sixteen_redox_rows_are_refused_for_unprinted_composition():
                 residual.refusal.reason
                 is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
             )
+
+
+def _borisov_row4():
+    root = Path(__file__).resolve().parents[2]
+    extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    return next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith("borisov_2018_table2_row_4")
+    )
+
+
+def _without_printed_fo2(observation):
+    conditions = dict(observation.point_conditions or {})
+    conditions.pop("fO2_log", None)
+    conditions.pop("fO2_Pa", None)
+    return replace(
+        observation,
+        point_conditions=conditions,
+        identity=replace(observation.identity, fO2_Pa=None),
+    )
+
+
+def _patch_melts_cell(monkeypatch, cell_for):
+    calls = []
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            backend=object(),
+            supports_intrinsic_fo2=(name == "thermoengine"),
+        )
+
+    def _cell(handle, pot, **kwargs):
+        calls.append({"handle": handle, "pot": pot, **kwargs})
+        return cell_for(handle)
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return calls
+
+
+def _ok_cell(**fields):
+    payload = {
+        "status": "ok",
+        "refusal_reason": None,
+        "hostname": "test",
+        "exit_code": 0,
+        "exit_signal": None,
+        "model_id": None,
+        "notices": [],
+        "authority": None,
+        "certified_band": None,
+        "liquid_composition_wt_pct": {},
+        "fe_redox_split": {},
+    }
+    payload.update(fields)
+    return SimpleNamespace(**payload)
+
+
+def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
+    """9 wt% FeO and 1 wt% Fe2O3 is the recorded ThermoEngine split shape.
+
+    The battery ratio is the production oxide-weight converter. Split weights
+    win over a different liquid pair and over Fe3Fet_Liq.
+    """
+
+    row4 = _borisov_row4()
+    expected = fe3_fe2_ratio_from_oxide_wt_pct(Decimal("1.0"), Decimal("9.0"))
+    assert expected is not None
+    other_liquid = fe3_fe2_ratio_from_oxide_wt_pct(Decimal("1.0"), Decimal("100.0"))
+    other_fraction = fe3_fe2_ratio_from_ferric_fraction(Decimal("0.9"))
+    assert expected != other_liquid
+    assert expected != other_fraction
+
+    def cell_for(handle):
+        if handle.name == "thermoengine":
+            return _ok_cell(
+                fe_redox_split={
+                    "FeO_wt_pct": 9.0,
+                    "Fe2O3_wt_pct": 1.0,
+                    "Fe3Fet_Liq": 0.9,
+                },
+                liquid_composition_wt_pct={"FeO": 100.0, "Fe2O3": 1.0},
+            )
+        return _ok_cell(
+            liquid_composition_wt_pct={"SiO2": 50.0, "FeO": 9.0, "Fe2O3": 1.0},
+        )
+
+    calls = _patch_melts_cell(monkeypatch, cell_for)
+    printed = score_module._printed_fe_redox_fo2_log(row4, row4.identity)
+    assert printed is not None
+    for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
+        prediction = predict_with_engine(engine, row4, isolated=False)
+        assert prediction.value == expected
+        assert prediction.refusal_reason is None
+        assert prediction.unit == "dimensionless"
+        assert prediction.coefficient_sources == (engine.value,)
+    assert len(calls) == 2
+    for call in calls:
+        assert call["qualification"] is False
+        assert call["physical_pressure_bar"] == pytest.approx(1.01325)
+        assert call["po2"].mode == "commanded"
+        assert call["po2"].po2_bar == pytest.approx(10 ** float(printed))
+
+
+def test_melts_fe_redox_uses_ferric_fraction_only_without_weights(monkeypatch):
+    row4 = _borisov_row4()
+    calls = _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(fe_redox_split={"Fe3Fet_Liq": 0.5}),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value == fe3_fe2_ratio_from_ferric_fraction(Decimal("0.5"))
+    assert prediction.value == Decimal(1)
+    assert len(calls) == 1
+
+
+def test_melts_fe_redox_nonpositive_weights_do_not_fall_through(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            fe_redox_split={
+                "FeO_wt_pct": 0.0,
+                "Fe2O3_wt_pct": 1.0,
+                "Fe3Fet_Liq": 0.5,
+            }
+        ),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail == {
+        "reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite",
+    }
+
+
+def test_melts_fe_redox_without_a_split_stays_refused(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(monkeypatch, lambda _handle: _ok_cell())
+    prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+
+
+def test_melts_fe_redox_honours_intrinsic_fo2_and_requires_printed_otherwise(monkeypatch):
+    row4 = _without_printed_fo2(_borisov_row4())
+    calls = _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            liquid_composition_wt_pct={"FeO": 9.0, "Fe2O3": 1.0},
+        ),
+    )
+    alphamelts = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert alphamelts.value is None
+    assert alphamelts.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert alphamelts.refusal_detail == {
+        "reason": "missing_input",
+        "input": "printed_fO2",
+    }
+    assert calls == []
+
+    thermoengine = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert thermoengine.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0")
+    )
+    assert thermoengine.identity is not None
+    assert thermoengine.identity.fO2_Pa is None
+    assert len(calls) == 1
+    assert calls[0]["po2"].mode == "engine_default"
+    assert calls[0]["po2"].po2_bar is None
+    assert calls[0]["physical_pressure_bar"] == pytest.approx(1.01325)
+
+
+def test_melts_fe_redox_commissioning_notice_is_the_only_extrapolated_flag(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0},
+            authority="extrapolated",
+            certified_band={"temperature_K": [1473.15, 1903.15]},
+            notices=[
+                {
+                    "kind": "out_of_certified_band",
+                    "authority": "extrapolated",
+                    "reason": "melts above the certified band",
+                    "certified_band": {"temperature_K": [1473.15, 1903.15]},
+                }
+            ],
+        ),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, row4, isolated=False)
+    assert prediction.value is not None
+    assert prediction.authority is Authority.EXTRAPOLATED
+    extrapolated = [
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    ]
+    assert len(extrapolated) == 1
+    assert len(prediction.notices) == 1
+
+
+def test_melts_fe_redox_timeout_is_attempted_unavailable(monkeypatch):
+    row4 = _borisov_row4()
+    _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            status="refusal",
+            refusal_reason="engine_timeout",
+            engine_reason="equilibrate exceeded hard timeout",
+        ),
+    )
+    prediction = predict_with_engine(Engine.ALPHAMELTS, row4, isolated=False)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["refusal_reason"] == "engine_timeout"
+
+
+def test_engines_without_a_ferric_split_do_not_equilibrate(monkeypatch):
+    row4 = _borisov_row4()
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("fe redox must not open or equilibrate this engine")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    for engine in (Engine.MAGEMIN, Engine.VAPOROCK, Engine.OPENIMCC):
+        prediction = predict_with_engine(engine, row4)
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
+        assert prediction.coefficient_sources == (
+            "Kress and Carmichael 1991, doi:10.1007/BF00307328",
+        )
+        assert prediction.refusal_detail == {
+            "reason": "engine_does_not_report_fe_redox",
+            "engine": engine.value,
+            "detail": (
+                "no fixed-T/fO2/composition ferric output without "
+                "phase-equilibrium execution"
+            ),
+        }
+    kress = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row4)
+    assert kress.refusal_reason is None
+    assert kress.value is not None

@@ -308,6 +308,9 @@ class EquilibrateCell:
     )
     invalid_gas_partial_pressure_components: tuple[str, ...] = ()
     activities_standard_state: dict[str, Any] | None = None
+    # Copied from the equilibrium result. The scorer owns the battery ratio.
+    liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
+    fe_redox_split: dict[str, float] = field(default_factory=dict)
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -356,6 +359,8 @@ class EquilibrateCell:
             "exit_signal": self.exit_signal,
             "exit_code": self.exit_code,
             "model_id": self.model_id,
+            "liquid_composition_wt_pct": dict(self.liquid_composition_wt_pct),
+            "fe_redox_split": dict(self.fe_redox_split),
         }
 
     @classmethod
@@ -461,6 +466,10 @@ class EquilibrateCell:
                 if payload.get("model_id") is None
                 else str(payload.get("model_id"))
             ),
+            liquid_composition_wt_pct=_finite_component_map(
+                payload.get("liquid_composition_wt_pct")
+            ),
+            fe_redox_split=_finite_component_map(payload.get("fe_redox_split")),
         )
 
 
@@ -914,6 +923,20 @@ def _finite_float(value: Any) -> float | None:
     if not math.isfinite(number):
         return None
     return number
+
+
+def _finite_component_map(value: Any) -> dict[str, float]:
+    """Finite component floats. Non-numeric entries are omitted, not clamped."""
+
+    if not isinstance(value, Mapping):
+        return {}
+    copied: dict[str, float] = {}
+    for name, item in value.items():
+        number = _finite_float(item)
+        if number is None:
+            continue
+        copied[str(name)] = number
+    return copied
 
 
 def _optional_int(value: Any) -> int | None:
@@ -4151,6 +4174,12 @@ def equilibrate_cell(
             exit_signal=exit_signal,
             exit_code=exit_code,
             model_id=getattr(result, "imcc_model_id", None),
+            liquid_composition_wt_pct=_finite_component_map(
+                getattr(result, "liquid_composition_wt_pct", None)
+            ),
+            fe_redox_split=_finite_component_map(
+                getattr(result, "fe_redox_split", None)
+            ),
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
