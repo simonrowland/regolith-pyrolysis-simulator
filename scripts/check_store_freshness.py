@@ -63,12 +63,16 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
-#   19f472447, 67678d3d4, 0c5b7486a: recovery 2/4 (d-242). They change
-#     score-time code in simulator/battery/score.py only: 19f472447 moves the
-#     battery-handle cache and the Kress redox inputs to their owners (Fe-redox
-#     material and refusal records); 67678d3d4 scores MELTS Fe3+/Fe2+ from the
-#     engine's reported split; 0c5b7486a matches vapour species reported with
-#     the exact _gas suffix. A full regen at the line's merge with green
+#   19f472447, 67678d3d4, 0c5b7486a: recovery 2/4 (d-242). 19f472447 moves
+#     the battery-handle cache and the Kress redox inputs to their owners
+#     (Fe-redox material and refusal records) in simulator/battery/score.py;
+#     67678d3d4 scores MELTS Fe3+/Fe2+ from the engine's reported split
+#     (score.py) and carries the liquid composition and the Fe redox split
+#     through the battery cell payload
+#     (simulator/diagnostic_helpers/binary_pot_battery.py); 0c5b7486a matches
+#     vapour species reported with the exact _gas suffix (score.py). Migration
+#     imports only parse_species_formula from score.py, which none of them
+#     changes, and does not import binary_pot_battery.py. A full regen at the line's merge with green
 #     2e651d553 (11711159b, studio-2) was a fixed point: no store file changed.
 #     This acknowledges STORE outputs only; the scoring moves (d-242) are
 #     covered by the commits' tests.
