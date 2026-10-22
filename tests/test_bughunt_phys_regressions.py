@@ -1560,7 +1560,9 @@ def test_uncontrolled_equilibrium_po2_ignores_downstream_residual() -> None:
         overhead=SimpleNamespace(composition={"O2": 500.0}),
         _melt_headspace_composition_mbar={"O2": 2.0},
         _overhead_headspace_enabled=lambda: False,
-        _vacuum_floor_bar=lambda: 1.0e-12,
+        # This declared vacuum contributes no cover-gas oxygen.
+        _headspace_equilibrated_pO2_bar=lambda pO2: pO2,
+        _oxygen_numerical_floor_bar=lambda: 1.0e-12,
     )
     first = EquilibriumMixin._commanded_pO2_bar(sim)
     sim.overhead.composition["O2"] = 0.001
