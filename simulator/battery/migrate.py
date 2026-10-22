@@ -3134,6 +3134,41 @@ def residue_component_source_fields() -> tuple[str, ...]:
     )
 
 
+# Published ::point:N layout from when the residue field tuple was
+# residue_ppm plus these five oxides, in this order. Widening
+# residue_oxide_names() must not renumber those ids. This is not an
+# admission list: admission is residue_oxide_names(). Do not derive this
+# order from that function; its order inserts TiO2 and Fe2O3 ahead of
+# these slots, and an absent FeO still occupies slot 2.
+_HISTORICAL_RESIDUE_OXIDE_FIELDS = (
+    "SiO2_wt_pct",
+    "Al2O3_wt_pct",
+    "FeO_wt_pct",
+    "MgO_wt_pct",
+    "CaO_wt_pct",
+)
+# Old index: point_index * len(("residue_ppm",) + five oxides) + slot.
+# Oxide rows are enumerated in the five-oxide order. A residue_ppm-only
+# row uses slot 0 of the same stride.
+_HISTORICAL_RESIDUE_ORDINAL_STRIDE = 1 + len(_HISTORICAL_RESIDUE_OXIDE_FIELDS)
+
+
+def _residue_ordinal_index(point_index: int, field: str) -> int | None:
+    """Index in the published residue ::point:N scheme.
+
+    None means this field was not in that scheme. The caller gives it a
+    content-stable id so it cannot collide with a historical ordinal.
+    """
+
+    if field == "residue_ppm":
+        return point_index * _HISTORICAL_RESIDUE_ORDINAL_STRIDE
+    try:
+        slot = _HISTORICAL_RESIDUE_OXIDE_FIELDS.index(field)
+    except ValueError:
+        return None
+    return point_index * _HISTORICAL_RESIDUE_ORDINAL_STRIDE + slot
+
+
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
@@ -14746,9 +14781,7 @@ class Migrator:
                 if not isinstance(raw_item, Mapping):
                     continue
                 point_index = int(point.get("index", 0))
-                for component_index, (field, payload) in enumerate(
-                    residue_point_component_items(raw_item)
-                ):
+                for field, payload in residue_point_component_items(raw_item):
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -14773,10 +14806,14 @@ class Migrator:
                             polymorph=species.polymorph,
                             charge=species.charge,
                         )
+                    # Historical oxides keep the published ordinal. A newly
+                    # admitted oxide is not in that scheme; a content-stable
+                    # id keeps it off ::point:N.
+                    ordinal_index = _residue_ordinal_index(point_index, field)
                     self._emit_exploded_point(
                         parent_id=obs_id,
                         item={
-                            "index": point_index * len(residue_fields) + component_index,
+                            "index": 0 if ordinal_index is None else ordinal_index,
                             "item": cell_item,
                             "units": cell_units,
                         },
@@ -14806,6 +14843,7 @@ class Migrator:
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
                         ),
+                        content_stable_id=ordinal_index is None,
                     )
             return
         row_point_containers: list[tuple[str, list[Any]]] = []

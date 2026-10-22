@@ -82,6 +82,7 @@ from simulator.battery.migrate import (
     residue_component_source_fields,
     residue_oxide_names,
     residue_point_component_items,
+    _residue_ordinal_index,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -15527,6 +15528,109 @@ def test_removing_k2o_from_the_residue_allowlist_drops_the_zhang_pin(
     assert [observation.identity.species.formula for observation in pinned] == ["Na2O"]
     assert pinned[0].value.point == Decimal("0.01")
     assert all(observation.identity.species.formula != "K2O" for observation in points)
+
+
+def test_residue_ordinal_keeps_published_point_ids() -> None:
+    """Widening the oxide allowlist must not renumber ::point:N.
+
+    The published stride is residue_ppm plus SiO2, Al2O3, FeO, MgO, CaO.
+    An absent FeO still occupies slot 2. Na2O is not in that scheme.
+    """
+
+    assert _residue_ordinal_index(0, "SiO2_wt_pct") == 0
+    assert _residue_ordinal_index(0, "Al2O3_wt_pct") == 1
+    assert _residue_ordinal_index(0, "FeO_wt_pct") == 2
+    assert _residue_ordinal_index(0, "MgO_wt_pct") == 3
+    assert _residue_ordinal_index(0, "CaO_wt_pct") == 4
+    assert _residue_ordinal_index(1, "SiO2_wt_pct") == 6
+    assert _residue_ordinal_index(0, "residue_ppm") == 0
+    assert _residue_ordinal_index(1, "residue_ppm") == 6
+    assert _residue_ordinal_index(0, "Na2O_wt_pct") is None
+    assert _residue_ordinal_index(0, "K2O_wt_pct") is None
+    assert _residue_ordinal_index(3, "Fe2O3_wt_pct") is None
+
+
+# Ivanova 2018 Table 1 residue series, as published in the store before the
+# allowlist widened. No temperature on the row, so the id is ::point:N.
+# FeO is not printed; its slot stays empty (2, 8, 14, ...).
+_IVANOVA_PUBLISHED_RESIDUE_CELLS = (
+    (0, "SiO2", "33.71", "0"),
+    (1, "Al2O3", "37.72", "0"),
+    (3, "MgO", "16.02", "0"),
+    (4, "CaO", "12.56", "0"),
+    (6, "SiO2", "27.17", "5"),
+    (7, "Al2O3", "43.07", "5"),
+    (9, "MgO", "15.77", "5"),
+    (10, "CaO", "14", "5"),
+    (12, "SiO2", "23.91", "10"),
+    (13, "Al2O3", "46.07", "10"),
+    (15, "MgO", "14.46", "10"),
+    (16, "CaO", "15.56", "10"),
+    (18, "SiO2", "19.87", "15"),
+    (19, "Al2O3", "50.59", "15"),
+    (21, "MgO", "12.69", "15"),
+    (22, "CaO", "16.85", "15"),
+    (24, "SiO2", "13.95", "15"),
+    (25, "Al2O3", "57.63", "15"),
+    (27, "MgO", "11.43", "15"),
+    (28, "CaO", "16.99", "15"),
+    (30, "SiO2", "9.11", "25"),
+    (31, "Al2O3", "63.62", "25"),
+    (33, "MgO", "6.49", "25"),
+    (34, "CaO", "20.79", "25"),
+    (36, "SiO2", "0.09", "30"),
+    (37, "Al2O3", "76.88", "30"),
+    (39, "MgO", "0.01", "30"),
+    (40, "CaO", "23.02", "30"),
+    (42, "SiO2", "0.05", "45"),
+    (43, "Al2O3", "76.66", "45"),
+    (45, "MgO", "0", "45"),
+    (46, "CaO", "23.29", "45"),
+)
+
+
+def test_ivanova_residue_point_ids_survive_the_wider_allowlist(tmp_path: Path) -> None:
+    """Table 1 cells keep their published ::point:N id and printed wt%.
+
+    The series has no row temperature, so the id is the ordinal. FeO is
+    absent and still occupies its slot. A printed 0.00 stays 0; it is not
+    a missing oxide scored as zero.
+    """
+
+    result = _migrate_real_extract(
+        tmp_path, "ivanova-2018-spinel-rich-cai-evaporation.yaml"
+    )
+    parent = (
+        "ivanova-2018-spinel-rich-cai-evaporation"
+        "::ivanova_2018_table1_residue_composition"
+    )
+    cells = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(parent + "::")
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.value.kind is ValueKind.POINT
+    ]
+    got = {
+        (
+            int(observation.observation_id.rsplit(":", 1)[-1]),
+            observation.identity.species.formula,
+            observation.value.point,
+            observation.point_conditions["time_min"].state.value,
+        )
+        for observation in cells
+    }
+    expected = {
+        (index, formula, Decimal(amount), Decimal(minutes))
+        for index, formula, amount, minutes in _IVANOVA_PUBLISHED_RESIDUE_CELLS
+    }
+    assert got == expected
+    assert all("::point:" in observation.observation_id for observation in cells)
+    assert all(
+        observation.identity.species.formula != "FeO" for observation in cells
+    )
 
 
 def test_residue_migration_keeps_feo_and_fe2o3_distinct(tmp_path: Path) -> None:
