@@ -460,6 +460,141 @@ def test_sibling_endmember_nan_does_not_poison_requested_endmember():
     ]
 
 
+def test_unrequested_pure_phase_nan_is_recorded():
+    """nan/inf on a pure-phase row are tokens, not a skipped line."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "  cor:  -2034.776231  +0.999740\n"
+        "    q:  nan  +1.000000\n"
+        "  trd:  -981.191364  nan\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["cor"], stdout, notes
+    )
+    assert got == pytest.approx(-2034.776231)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase q, field gbase, raw token 'nan'",
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase trd, field factor, raw token 'nan'",
+    ]
+
+
+def test_requested_pure_phase_nan_refuses_with_typed_reason():
+    """A nan on the requested pure phase is the gbase refusal, not a miss."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    gbase_nan = "  cor:  nan  +0.999740\n"
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["cor"], gbase_nan)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for cor is not finite: 'nan'; "
+        "refusing engine output"
+    )
+    factor_nan = "  cor:  -2034.776231  nan\n"
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["cor"], factor_nan)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for cor factor is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_unscoped_pure_phase_nan_still_refuses():
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _parse_magemin_gbase_tables("    q:  nan  +1.000000\n")
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for q is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_short_solution_row_records_unrequested_nan_and_keeps_requested():
+    """A short row is read. Unrequested nan is a note; fo's own token stands."""
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  nan  -2728.75017\n"
+    )
+    notes: list[str] = []
+    got = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["fo"], stdout, notes
+    )
+    assert got == pytest.approx(-2728.75017)
+    assert notes == [
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase ol, field fa, raw token 'nan'",
+    ]
+
+
+def test_short_solution_row_requested_nan_refuses():
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  nan\n"
+    )
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _magemin_endmember_gbase_kJ(_MAGEMIN_PURE_PHASES["fo"], stdout)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for ol:fo is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_unscoped_short_solution_row_nan_still_refuses():
+    stdout = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  nan  -2728.75017\n"
+    )
+    with pytest.raises(PurePhaseAccessError) as raised:
+        _parse_magemin_gbase_tables(stdout)
+    assert str(raised.value) == (
+        "MAGEMin gbase table value for ol:fa is not finite: 'nan'; "
+        "refusing engine output"
+    )
+
+
+def test_finite_short_row_stays_dropped_and_trailing_token_stays_ignored():
+    short = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  -2728.75017\n"
+    )
+    _pp, ss = _parse_magemin_gbase_tables(short)
+    assert "ol" not in ss
+    trailing = (
+        "   ol:\n"
+        "----\n"
+        "         mont           fa           fo          cfm\n"
+        "  -2844.70237  -2182.52123  -2728.75017  -2455.63570  nan\n"
+    )
+    _pp, ss = _parse_magemin_gbase_tables(trailing)
+    assert ss["ol"]["fo"] == pytest.approx(-2728.75017)
+
+
 def test_requested_endmember_nan_refuses_with_typed_reason():
     """NaN on the requested endmember keeps the gbase refusal text."""
     from simulator.melt_backend.magemin import (

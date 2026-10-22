@@ -233,6 +233,10 @@ class NoticeKind(StrEnum):
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
+    # t-1465: a non-finite gbase token in a phase this read did not request.
+    # Advisory. The reason is the parser sentence (phase, field, raw token).
+    # It is not a flagged stratum and does not void the decision band.
+    UNREQUESTED_PHASE_NONFINITE = "unrequested_phase_nonfinite"
 
 
 class ReferenceStateConvention(StrEnum):

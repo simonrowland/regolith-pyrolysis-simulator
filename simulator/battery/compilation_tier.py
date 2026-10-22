@@ -1022,10 +1022,44 @@ def _pure_phase_attempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],
         authority=Authority.BRIDGE,
-        notices=(),
+        notices=_unrequested_phase_notices(props, second, quantity, origin),
         refusal_reason=None,
         refusal_detail={},
         call_evidence=f"pure-phase:{engine.value}:{symbol}:T={temperature_K}",
+    )
+
+
+def _unrequested_phase_notices(
+    props: object,
+    second: object | None,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Carry ignored-token diagnostics onto the attempt.
+
+    The parser owns the sentence. Stencil, status, and lambda warnings
+    stay on the property result and are not scoring notices. The enthalpy
+    anchor is a second property read; its diagnostics are included.
+    """
+
+    from simulator.melt_backend.magemin import _unrelated_gbase_nonfinite_notes
+
+    texts: list[str] = []
+    for source in (props, second):
+        if source is None:
+            continue
+        warnings = getattr(source, "warnings", ()) or ()
+        for text in _unrelated_gbase_nonfinite_notes(tuple(warnings)):
+            if text not in texts:
+                texts.append(text)
+    return tuple(
+        Notice(
+            kind=NoticeKind.UNREQUESTED_PHASE_NONFINITE,
+            affected_quantities=(quantity,),
+            reason=text,
+            origin=origin,
+        )
+        for text in texts
     )
 
 

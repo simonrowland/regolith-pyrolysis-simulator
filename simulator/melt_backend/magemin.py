@@ -108,7 +108,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
@@ -790,8 +790,14 @@ _MAGEMIN_PURE_PHASES: Mapping[str, _MAGEMinPurePhaseSpec] = {
     ),
 }
 
+# Decimal shape is the printed gbase/factor. nan/inf must reach the
+# finiteness gate; a decimal-only match dropped those pure-phase tokens
+# before any diagnostic existed. Case follows the engine's own spelling.
+_MAGEMIN_GBASE_TOKEN = r'[+-]?(?:\d+\.\d+|nan|inf)'
 _MAGEMIN_PP_GBASE_RE = re.compile(
-    r'^\s*([A-Za-z0-9_]+):\s+(-?\d+\.\d+)\s+\+?(-?\d+\.\d+)\s*$'
+    rf'^\s*([A-Za-z0-9_]+):\s+({_MAGEMIN_GBASE_TOKEN})\s+'
+    rf'\+?({_MAGEMIN_GBASE_TOKEN})\s*$',
+    re.IGNORECASE,
 )
 _MAGEMIN_SS_BLOCK_RE = re.compile(r'^\s*([a-z][a-z0-9]*):\s*$')
 _MAGEMIN_STATUS_RE = re.compile(
@@ -817,11 +823,25 @@ def _nonfinite_gbase_message(context: str, token: str) -> str:
     )
 
 
+_UNRELATED_GBASE_NONFINITE_PREFIX = (
+    'ignored non-finite MAGEMin gbase value in an unrequested phase: '
+)
+
+
 def _unrelated_gbase_nonfinite_note(fault: _GbaseNonFinite) -> str:
     return (
-        'ignored non-finite MAGEMin gbase value in an unrequested phase: '
+        f'{_UNRELATED_GBASE_NONFINITE_PREFIX}'
         f'phase {fault.phase}, field {fault.field}, '
         f'raw token {fault.raw_token!r}'
+    )
+
+
+def _unrelated_gbase_nonfinite_notes(warnings: Sequence[str]) -> Tuple[str, ...]:
+    """Sentences this parser recorded for a phase the read did not request."""
+    return tuple(
+        item
+        for item in warnings
+        if item.startswith(_UNRELATED_GBASE_NONFINITE_PREFIX)
     )
 
 
@@ -867,6 +887,9 @@ def _parse_magemin_gbase_tables(
     With ``nonfinite`` omitted, any non-finite token refuses the table.
     With a list, those tokens are recorded and omitted from the numeric
     maps so a later selector can refuse only the phase it asked for.
+    A short solution row is still not a complete endmember vector: its
+    finite tokens are kept only when the row also carries a non-finite
+    token that had to be read. An all-finite short row stays dropped.
     """
     pp: Dict[str, Tuple[float, float]] = {}
     ss: Dict[str, Dict[str, float]] = {}
@@ -904,9 +927,9 @@ def _parse_magemin_gbase_tables(
             host = m.group(1)
             names = lines[i + 2].split()
             raws = lines[i + 3].split()
-            # zip used to ignore trailing raw tokens and drop a short row.
-            if len(raws) < len(names):
-                continue
+            # zip ignores trailing raw tokens. A short row used to be
+            # skipped before those tokens were read, so a nan on it never
+            # reached the gate. Read the paired tokens first.
             parsed: Dict[str, float] = {}
             block_faults: List[_GbaseNonFinite] = []
             try:
@@ -924,6 +947,9 @@ def _parse_magemin_gbase_tables(
                 continue
             if nonfinite is not None:
                 nonfinite.extend(block_faults)
+            short = len(raws) < len(names)
+            if short and not block_faults:
+                continue
             ss[host] = parsed
     return pp, ss
 

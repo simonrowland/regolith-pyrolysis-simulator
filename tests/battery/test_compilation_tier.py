@@ -55,6 +55,7 @@ from simulator.battery.score import (
     compile_residual,
     comparison_candidates,
     decision_band_for,
+    flagged_strata,
     headline_rows,
     predict_with_engine,
     render_score_report,
@@ -2185,6 +2186,102 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     )
     assert refused.refusal_detail["reason"] == "pure-phase-call-required"
     assert calls == []
+
+
+def test_unrequested_phase_nan_reaches_the_scored_residual(monkeypatch) -> None:
+    """The ignored-token sentence is a scoring notice, including the anchor."""
+    from simulator.battery import compilation_tier
+
+    diagnostic = (
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase bi, field tbi, raw token 'nan'"
+    )
+    anchor_diagnostic = (
+        "ignored non-finite MAGEMin gbase value in an unrequested phase: "
+        "phase bi, field eas, raw token 'nan'"
+    )
+    stencil = (
+        "S/Cp/H are central differences of the pure-endmember gbase "
+        "(delta=10 K)"
+    )
+
+    class _Props:
+        def __init__(self, enthalpy, warnings):
+            self.formula = "MgO"
+            self.H_J_mol = enthalpy
+            self.Cp_J_K_mol = 40.0
+            self.S_J_K_mol = 30.0
+            self.absences = ()
+            self.warnings = warnings
+
+    def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        if abs(temperature_K - 298.15) < 1e-6:
+            return _Props(1000.0, (anchor_diagnostic, stencil))
+        return _Props(5000.0, (diagnostic, stencil))
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+
+    cp_identity = _pure_phase_identity()
+    cp_observation = F.observation(
+        "mgo-cp-unrequested-nan",
+        "exp-1",
+        cp_identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    cp_attempt = predict_thermo_attempt(Engine.MAGEMIN, cp_observation)
+    assert cp_attempt.value is not None
+    assert [notice.reason for notice in cp_attempt.notices] == [diagnostic]
+    assert cp_attempt.notices[0].kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+    assert flagged_strata(cp_attempt.notices) == ()
+    cp_residual, _ = compile_residual(
+        cp_observation,
+        Engine.MAGEMIN,
+        context=_context(cp_observation),
+        comparison_ids=set(),
+    )
+    assert cp_residual.refusal is None
+    assert cp_residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+        and notice.reason == diagnostic
+        for notice in cp_residual.notices
+    )
+    assert all(stencil not in notice.reason for notice in cp_residual.notices)
+
+    enthalpy_identity = replace(
+        _pure_phase_identity(Quantity.H_MINUS_H298),
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
+    enthalpy_observation = F.observation(
+        "mgo-h-unrequested-nan",
+        "exp-1",
+        enthalpy_identity,
+        Decimal("4"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    enthalpy_attempt = predict_thermo_attempt(Engine.MAGEMIN, enthalpy_observation)
+    assert enthalpy_attempt.value is not None
+    assert [notice.reason for notice in enthalpy_attempt.notices] == [
+        diagnostic,
+        anchor_diagnostic,
+    ]
+    enthalpy_residual, _ = compile_residual(
+        enthalpy_observation,
+        Engine.MAGEMIN,
+        context=_context(enthalpy_observation),
+        comparison_ids=set(),
+    )
+    assert enthalpy_residual.refusal is None
+    assert enthalpy_residual.numeric is not None
+    reasons = [
+        notice.reason
+        for notice in enthalpy_residual.notices
+        if notice.kind is NoticeKind.UNREQUESTED_PHASE_NONFINITE
+    ]
+    assert reasons == [diagnostic, anchor_diagnostic]
 
 
 def test_thermoengine_import_failure_is_typed_in_score_and_census(monkeypatch) -> None:
