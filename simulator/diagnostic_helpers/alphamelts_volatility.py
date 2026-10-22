@@ -646,8 +646,11 @@ def _oxide_vapor_pressure_Pa(
             field="P_eq_pO2",
         )
         activity_factor *= scale
-    elif species == "SiO" and pO2_bar > vacuum_floor_bar:
-        suppression = math.sqrt(vacuum_floor_bar / pO2_bar)
+    elif species == "SiO":
+        from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+        reference_bar = float(data.get("pO2_reference_bar", vacuum_floor_bar) or vacuum_floor_bar)
+        suppression = _sio_oxygen_pressure_factor(pO2_bar, reference_bar)
         P_eq_Pa = _finite_number(
             P_eq_Pa * suppression,
             species=species,
