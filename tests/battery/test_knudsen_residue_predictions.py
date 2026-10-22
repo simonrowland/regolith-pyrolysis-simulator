@@ -320,3 +320,108 @@ def test_prediction_boundary_refuses_missing_inputs(extent_point, change, reason
     with pytest.raises(ResidueInventoryRefusal) as exc:
         predict_knudsen_residue_composition("internal-analytical", reference, experiment, rows)
     assert exc.value.reason == reason
+
+
+def test_printed_oxygen_is_identical_on_shared_trajectory_prefix(extent_point):
+    reference, experiment, rows = extent_point
+    earlier = replace(reference, observation_id="earlier-residue",
+                      identity=replace(reference.identity, temperature_K=State.of(Decimal(2000))),
+                      point_conditions={"fO2_Pa": Located(State.of(Value.point_of("0.00001")), reference.locator)})
+    observations = (*rows, earlier, reference)
+    first = predict_knudsen_residue_composition("internal-analytical", earlier, experiment, observations)
+    later = predict_knudsen_residue_composition("internal-analytical", reference, experiment, observations)
+    assert first["oxygen_sources"][0] == later["oxygen_sources"][0]
+    assert later["oxygen_sources"][0]["source"] == "source_printed"
+    assert "earlier-residue" in later["oxygen_sources"][0]["used_observations"]
+
+
+def test_conflicting_printed_interval_oxygen_is_flagged(extent_point):
+    reference, experiment, rows = extent_point
+    conflict = replace(reference, observation_id="other-column",
+                       point_conditions={"fO2_Pa": Located(State.of(Value.point_of("0.0001")), reference.locator)})
+    reference = replace(reference, point_conditions={"fO2_Pa": Located(State.of(Value.point_of("0.00001")), reference.locator)})
+    result = predict_knudsen_residue_composition("internal-analytical", reference, experiment, (*rows, conflict))
+    assert result["oxygen_sources"][-1]["source"] == "d142_closure"
+    assert any("several_candidates_survive" in n.reason for n in result["notices"])
+
+
+@pytest.mark.parametrize("engine_failure", (False, True))
+def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point, monkeypatch, engine_failure):
+    import simulator.battery.residue as residue
+    from simulator.battery.residue import ResidueEngineNonconvergence
+    from simulator.battery.score import ScoreContext, _knudsen_residue_prediction, compile_residual
+    reference, experiment, rows = extent_point
+    def fail(*args):
+        if engine_failure:
+            raise ResidueEngineNonconvergence("internal-analytical", "after oxygen selection")
+        raise ResidueInventoryRefusal("residue_pressure_channels_missing", "original channel detail")
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *a, **k: fail)
+    context = ScoreContext({}, {experiment.experiment_id: experiment},
+                           {r.observation_id: r for r in (*rows, reference)})
+    prediction = _knudsen_residue_prediction(context, reference, Engine.INTERNAL_ANALYTICAL)
+    detail = prediction.refusal_detail
+    assert detail["reason"] == ("engine_nonconvergence" if engine_failure else "residue_pressure_channels_missing")
+    assert detail["measured_mass_loss_fraction"] == 0.2
+    assert detail["temperature_path"] == [(0.1, 2000), (0.2, 2100)]
+    assert all(r["source"] == "d142_closure" for r in detail["oxygen_sources"])
+    assert any("SC-360" in n.reason for n in prediction.notices)
+    residual, _ = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context, prediction=prediction)
+    assert residual.refusal is not None
+    assert any("SC-360" in n.reason for n in residual.notices)
+
+
+def test_internal_analytical_pressure_callback_covers_real_channels_and_oxygen():
+    openimcc = pytest.importorskip("openimcc")
+    from pathlib import Path
+    from simulator.battery.residue import _make_residue_pressure_model
+    from simulator.chemistry.offgas_fo2 import _oxygen_atom_partial_pressure_bar
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.physical_constants import PA_PER_BAR
+    pack = openimcc.load_gas_datapack()
+    inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
+    channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
+    assert not omissions
+    pressure_model = _make_residue_pressure_model(
+        "internal-analytical", channels, pack, temperature_K=2000, total_pressure_Pa=0,
+        engine_metadata={}, engine_flags=set(), missing_channels_reason="residue_pressure_channels_missing",
+        caller="Knudsen regression",
+    )
+    predicted = pressure_model(inventory, -10)
+    assert set(predicted) == {str(s) for s, _ in channels}
+    response = battery._internal_analytical_vapor_pressure_adapter(
+        core=battery._new_internal_analytical_core(), temperature_C=1726.85,
+        pressure_bar=0, composition_kg=None, composition_mol=inventory, fO2_log=-10,
+        po2_request=battery.Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1e-10),
+        include_diagnostic_shadows=False,
+    )
+    # Expected names come from the existing species resolver, not a test alias table.
+    for channel, value in response.vapor_pressures_Pa.items():
+        formula = battery._gas_formula_for_oxygen_balance(channel)
+        if formula in predicted:
+            assert predicted[formula] == pytest.approx(value)
+    assert predicted["O2"] == pytest.approx(1e-5)
+    assert predicted["O"] == pytest.approx(_oxygen_atom_partial_pressure_bar(
+        2000, 1e-10, extract_path=Path(__file__).resolve().parents[2] / "data/literature/extracts/nasa-cea-thermo.yaml",
+    ) * PA_PER_BAR)
+
+
+@pytest.mark.parametrize("failure_kind", ("domain", "extract"))
+def test_oxygen_projection_failure_has_typed_pressure_reason(monkeypatch, failure_kind):
+    from simulator.battery.residue import _make_residue_pressure_model
+    from simulator.chemistry import offgas_fo2
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.vapour_rail.nasa_cea import NasaCeaError
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", lambda: object())
+    monkeypatch.setattr(battery, "_internal_analytical_vapor_pressure_adapter",
+                        lambda **kwargs: SimpleNamespace(vapor_pressures_Pa={}))
+    def fail(*args, **kwargs):
+        raise (NasaCeaError("CEA domain") if failure_kind == "domain" else OSError("CEA extract"))
+    monkeypatch.setattr(offgas_fo2, "_oxygen_atom_partial_pressure_bar", fail)
+    pressure = _make_residue_pressure_model(
+        "internal-analytical", [("O", (None, 1, -0.5)), ("O2", (None, 1, -1))], None,
+        temperature_K=2000, total_pressure_Pa=0, engine_metadata={}, engine_flags=set(),
+        missing_channels_reason="residue_pressure_channels_missing", caller="oxygen failure regression",
+    )
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        pressure({"FeO": 1.0}, -10)
+    assert exc.value.reason == "residue_oxygen_pressure_unavailable"
