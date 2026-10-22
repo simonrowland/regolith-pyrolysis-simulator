@@ -167,6 +167,12 @@ CODE_INPUTS = (
 #     commit equals the tip, so no store change. This acknowledges STORE
 #     outputs only; the projection value moves (d-195) are covered by the
 #     commit's tests.
+#   7e0508bb5, b37e28bac, 297df02b9: t-1413 (d-223), printed phase
+#     compositions, distribution ratios and S/Cl capacities. They add the
+#     enums, identity axes, migrate readers and score.py paths for those rows.
+#     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
+#     studio-3) was a fixed point: no store change. This acknowledges STORE
+#     outputs only; the new rows' scoring is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -182,6 +188,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "9364d3828",
     "f74ef7a6f",
     "d6ccae4b4",
+    "7e0508bb5", "b37e28bac", "297df02b9",
 })
 
 
