@@ -271,6 +271,16 @@ def test_c0_temperature_hold_is_incomplete_and_max_hold_is_a_backstop():
     ) is False
     assert manager.last_c0_exit is None
 
+    # Baseline pin before replacing the fiat gate: the configured 940 C
+    # threshold still binds after the 10 h minimum hold.
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C0, 10, temperature_C=939.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager.last_c0_exit is None
+
     assert manager.check_endpoint(
         _melt(CampaignPhase.C0, 10, temperature_C=940.0),
         _flux(),
