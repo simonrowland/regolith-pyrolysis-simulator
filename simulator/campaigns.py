@@ -260,6 +260,23 @@ def c0_exit_record(
         raise ValueError(
             f"C0 ramp must be finite and positive; got {ramp_C_per_hr!r}"
         )
+    raw_targets = (
+        unreleased_inventory.get("targets", [])
+        if isinstance(unreleased_inventory, Mapping)
+        else []
+    )
+    unreleased_targets = []
+    if isinstance(raw_targets, (list, tuple)):
+        unreleased_targets = [
+            {
+                "key": target.get("key"),
+                "remaining_kg": target.get("remaining_kg"),
+                "remaining_fraction": target.get("remaining_fraction"),
+                "status": target.get("status"),
+            }
+            for target in raw_targets
+            if isinstance(target, Mapping)
+        ]
     return {
         "outcome": "incomplete",
         "backstop": backstop,
@@ -277,7 +294,7 @@ def c0_exit_record(
         "ramp_authority": "owner_fiat",
         "ramp_model_bounded": False,
         **dict(prediction),
-        "unreleased_inventory_at_exit": dict(unreleased_inventory or {}),
+        "unreleased_inventory_at_exit": {"targets": unreleased_targets},
         "sulfates_routed_to": "melt_or_C0b",
     }
 

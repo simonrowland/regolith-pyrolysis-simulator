@@ -292,7 +292,17 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     ) is False
     assert manager.last_c0_exit is None
 
-    inventory_diagnostic = {"targets": [{"species": "H2O", "remaining_kg": 1.0}]}
+    inventory_diagnostic = {
+        "targets": [{
+            "key": "H2O",
+            "remaining_kg": 1.0,
+            "remaining_fraction": 0.5,
+            "status": "ok",
+            "remaining_accounts": ["process.stage0_volatile_feed"],
+        }],
+        "aggregate_remaining_fraction": 0.5,
+        "stage0_release_kinetics": "diagnostic_only",
+    }
     assert manager.check_endpoint(
         _melt(CampaignPhase.C0, 7, temperature_C=900.0),
         _flux(),
@@ -304,7 +314,16 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     _assert_computed_c0_exit_notice(notice)
     assert notice["T_exit_C"] == 900.0
     assert notice["t_evac_hr"] == 8.0
-    assert notice["unreleased_inventory_at_exit"] == inventory_diagnostic
+    assert notice["unreleased_inventory_at_exit"] == {
+        "targets": [{
+            "key": "H2O",
+            "remaining_kg": 1.0,
+            "remaining_fraction": 0.5,
+            "status": "ok",
+        }],
+    }
+    assert "aggregate_remaining_fraction" not in notice["unreleased_inventory_at_exit"]
+    assert "remaining_accounts" not in notice["unreleased_inventory_at_exit"]["targets"][0]
     assert notice["sulfates_routed_to"] == "melt_or_C0b"
     sim = SimpleNamespace(campaign_mgr=manager)
     assert c0_exit_run_notice(sim) == notice
