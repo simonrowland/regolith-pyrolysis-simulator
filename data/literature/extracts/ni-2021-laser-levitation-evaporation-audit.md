@@ -1,6 +1,6 @@
 # Ni et al. (2021), Table 1 transcription audit
 
-Source machine text: `pdftotext-layout.txt`, PDF p. 41; born-digital text layer. Table row and column positions and all cells below were checked against the full-page 200 dpi render (`pdftoppm`, PDF p. 41). The render check covered every listed data cell. The MinerU directory/content-list JSON is absent from both configured corpus locations; staged converter `/private/tmp/claude-501/main-review/tools/mineru_table_draft.py` was invoked, but reported no content-list JSON. No MinerU compare output exists for this source.
+Source machine text: `pdftotext-layout.txt`, PDF p. 41; born-digital text layer. Table row and column positions and all cells below were checked against the full-page 200 dpi render (`pdftoppm`, PDF p. 41). The render check covered every listed data cell. The MinerU directory/content-list JSON is absent from both configured corpus locations; `tools/mineru_table_draft.py` (offer-21 line; run standalone) was invoked, but reported no content-list JSON. No MinerU compare output exists for this source.
 
 Printed count: 18 data rows (Et1Cu starting powder, Cu 1.15 fusion control, and 16 levitation-heated samples). The paper calls the latter 17 experiments inclusive of the control. Header plus footnote are not counted as data rows.
 
@@ -35,16 +35,22 @@ Each row lists every Table 1 data cell in source column order: sample, d0 (mm), 
 - `n.d.` (Cu 1.17, 1.18, 1.19) and `b.d.` (Cu 1.3, 1.4, 1.5, 1.8, 1.1) in δ65Cu are preserved as typed refusals. Dashes remain in the context transcription. All Cu ppm values are numeric, including italic near-detection-limit values 0.028, 0.028, 0.056, and 0.035 ppm.
 - Diameter d0/d and post-run mass M are preserved verbatim in each context row and marked typed-refused schema gaps; `tr` remains in the raw table row because there is no existing field for recorded peak-temperature duration, while `tc` is used as corrected duration. The source total ΔM is not assigned to Na2O or K2O.
 - Figures 3, 5, and 6 contain plotted trends and comparison values; they are figure-read candidates and are not extracted in this pass.
-- Printed starting composition uses `FeOt` (10.67 wt%). The existing composition migrator rejects `FeOt` as unsupported, leaving identity composition unknown. No alias to FeO was inferred. This is the pending ruling needed to bind printed composition to identity.
+- The starting composition source text spells the component `FeOt` (10.67 wt%) and is preserved verbatim in a p. 8 context row. Per the controller ruling, the normalized composition uses the existing `FeOT` token, which the migrator converts to FeO with its total-iron-reported-as-FeO derivation note and notice. No separate FeO or Fe2O3 component is included.
 - The extract retains experiment method text `levitation`, but no closed observation `MethodToken` represents aerodynamic levitation. The real migrator reports this as a method queue item for each of 48 typed observations; no incorrect vacuum/Langmuir method was substituted.
 - Quenched heated samples are glass measured after cutting laser power; the source statement is recorded as `asserted_preserved` with PDF p. 8. Starting powder/control rows have no row-specific quench statement and are marked `not_stated`.
 
 ## Migration and condition audit
 
-The isolated migration yields 48 observation records (16 mass-loss + 16 Cu-residue + 16 isotope rows), 0 hard issues, and 8 unavailable isotope values corresponding exactly to printed `n.d.`/`b.d.`. 56 migration queue entries arise from the absent closed levitation method token (48 records) and the 8 typed isotope refusals. T_C reaches identity as 2023.15 K / 2423.15 K / 2273.15 K as applicable; total pressure reaches identity as 101325 Pa. fO2 is correctly unknown because the source prints Ar and total pressure, not oxygen fugacity. Composition is unknown solely because FeOt is unsupported (schema gap, above).
+The isolated migration yields 48 observation records (16 mass-loss + 16 Cu-residue + 16 isotope rows), 0 hard issues, and 8 unavailable isotope values corresponding exactly to printed `n.d.`/`b.d.`. 56 migration queue entries arise from the absent closed levitation method token (48 records) and the 8 typed isotope refusals. T_C reaches identity as 2023.15 K / 2423.15 K / 2273.15 K as applicable. Total pressure and composition are identity axes for mass-loss and residue profiles; the isotope-delta profile does not use those axes. fO2 remains unknown for profiles that use it because the source prints Ar and total pressure, not oxygen fugacity.
+
+| Migrated row | Quantity profile | T (K) | Total pressure (Pa) | Composition | fO2 (Pa) |
+|---|---|---:|---:|---|---|
+| `ni_2021_cu_1_12_bulk_mass_loss` | mass_loss_fraction | 2023.15 | 101325 | value; FeO component from FeOT | unknown |
+| `ni_2021_cu_1_12_cu_residue` | residue_component_composition | 2023.15 | 101325 | value; FeO component from FeOT | unknown |
+| `ni_2021_cu_1_14_bulk_mass_loss` | mass_loss_fraction | 2423.15 | 101325 | value; FeO component from FeOT | unknown |
 
 ## Focused value pins
 
-`tests/test_literature_extracts.py::test_ni_2021_table1_render_pins_and_row_count` passes and pins ΔM=1.11%, CCu=517 ppm, δ65Cu=7.10‰ for Cu 1.12 and control δ65Cu=3.71‰, with the 18-row count, all checked against the PDF p. 41 render. Mutation check changed the pinned mass loss to 9.99%; the focused test failed at the 1.11% assertion, then the source was restored.
+`tests/test_literature_extracts.py::test_ni_2021_table1_render_pins_and_row_count` pins ΔM=1.11%, CCu=517 ppm, δ65Cu=7.10‰ for Cu 1.12 and control δ65Cu=3.71‰, with the 18-row count, all checked against the PDF p. 41 render. `test_ni_2021_conditions_and_starting_composition_reach_identity` proves T reaches all 48 migrated rows and pressure/composition (including FeO mapped from FeOT) reach every mass-loss and residue row. Mutation check changed the pinned mass loss to 9.99%; the focused render test failed at the 1.11% assertion, then the source was restored.
 
-`tests/test_yaml_flow_scalar_commas.py`: 17 passed. The requested full `tests/test_literature_extracts.py` run did not complete: it was stopped at 347.81 s after 149 passed, beyond the 300 s per-run ceiling. The focused Ni test passed separately.
+`tests/test_yaml_flow_scalar_commas.py`: 17 passed. The full `tests/test_literature_extracts.py` suite: 555 passed in 255.76 s with `--timeout=300 -n 0`. The extract validator reported `OK: 1 extract file(s) valid`.

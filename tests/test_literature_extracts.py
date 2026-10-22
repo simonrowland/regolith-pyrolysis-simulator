@@ -577,7 +577,11 @@ def test_ni_2021_table1_render_pins_and_row_count() -> None:
     doc = yaml.safe_load(
         (EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml").read_text()
     )
-    rows = doc["species"]["basaltic_glass"]["context"]
+    rows = [
+        row
+        for row in doc["species"]["basaltic_glass"]["context"]
+        if row["type"] == "table_row"
+    ]
     table = {
         row["values"]["table_row"]["sample"]: row["values"]["table_row"]
         for row in rows
@@ -588,6 +592,28 @@ def test_ni_2021_table1_render_pins_and_row_count() -> None:
     assert table["Cu 1.12"]["Cu_ppm"] == "517"
     assert table["Cu 1.12"]["delta65Cu_permil"] == "7.10"
     assert table["Cu 1.15"]["delta65Cu_permil"] == "3.71"
+
+
+def test_ni_2021_conditions_and_starting_composition_reach_identity() -> None:
+    path = EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+
+    assert len(observations) == 48
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    for observation in observations:
+        assert observation.identity.temperature_K.is_value
+        if observation.identity.quantity.value != "isotope_delta":
+            assert observation.identity.composition.is_value
+            assert any(
+                component == "FeO" and amount > 0
+                for component, amount in observation.identity.composition.value.components
+            )
+            assert observation.identity.total_pressure_Pa.is_value
+            assert observation.identity.total_pressure_Pa.value == 101325
+            assert observation.identity.fO2_Pa.is_unknown
 
 
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
