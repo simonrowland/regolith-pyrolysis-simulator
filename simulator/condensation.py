@@ -4592,9 +4592,11 @@ class CondensationModel:
             # than the v1 additive blend. T_surface_K (stage T-band
             # sample) drives P_sat; T_gas_K (bulk gas) drives the
             # ideal-gas denominator. overhead_pressure_pa feeds the
-            # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
-            # amplifies the boundary-layer Sherwood per the operator's
-            # induction-stirring power.
+            # Chapman-Enskog D_AB(T, P) per Phase A1. The explicit
+            # radial_stir_factor sets the heuristic Sherwood proxy;
+            # a legacy scalar is radial-equivalent only when the
+            # explicit radial input is absent. No induction power or
+            # field is modeled.
             T_gas_K = max(
                 float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
                 1.0,
