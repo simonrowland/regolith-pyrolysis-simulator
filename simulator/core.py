@@ -3693,7 +3693,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # 0.5.2 Phase B (series-resistance + stir-Sherwood): the
             # induction-stirring knob lives on the melt state, set by
             # campaign overrides (``simulator/campaigns.py:152``) and
-            # defaults to ``6.0`` for the standard 4-8× range. Pass it
+            # defaults to ``6.0`` within the unsourced engineering
+            # placeholder 4–8× range (b-1015). Pass it
             # through so the boundary-layer flux uses the enhanced
             # Sherwood rather than the laminar 3.66 asymptote. Route
             # via ``clamp_stir_factor`` for symmetry with the operator-
@@ -3704,8 +3705,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # max-effort, Phase B.
             #
             # 0.5.3 Phase B (2-axis stirring): split the single scalar
-            # ``stir_factor`` into ``stir_state.axial`` (evap H-K-L
-            # multiplier) + ``stir_state.radial`` (Sh enhancement).
+            # ``stir_factor`` into ``stir_state.axial`` (evaporation
+            # diagnostic and metal-stratification input) +
+            # ``stir_state.radial`` (gas-side Sh enhancement).
             # The legacy ``stir_factor=`` kwarg on condensation carries
             # the axial value for audit-history continuity (the legacy
             # field is preserved on ``CondensationModel`` so a
