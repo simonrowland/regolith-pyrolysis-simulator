@@ -572,6 +572,24 @@ def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
     assert "(1 sigma)" in printed_uncertainty
 
 
+def test_ni_2021_table1_render_pins_and_row_count() -> None:
+    """PDF p. 41 render pins for Table 1; the table has 18 printed rows."""
+    doc = yaml.safe_load(
+        (EXTRACTS / "ni-2021-laser-levitation-evaporation.yaml").read_text()
+    )
+    rows = doc["species"]["basaltic_glass"]["context"]
+    table = {
+        row["values"]["table_row"]["sample"]: row["values"]["table_row"]
+        for row in rows
+    }
+
+    assert len(rows) == 18
+    assert table["Cu 1.12"]["mass_loss_pct"] == "1.11"
+    assert table["Cu 1.12"]["Cu_ppm"] == "517"
+    assert table["Cu 1.12"]["delta65Cu_permil"] == "7.10"
+    assert table["Cu 1.15"]["delta65Cu_permil"] == "3.71"
+
+
 def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
     from simulator.battery.enums import Quantity
     path = EXTRACTS / "banya-watanabe-1977-feto-p2o5-solid-iron.yaml"

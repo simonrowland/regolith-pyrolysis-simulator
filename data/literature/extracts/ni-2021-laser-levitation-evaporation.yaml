@@ -1,0 +1,3641 @@
+schema_version: literature_extract.v1
+source_id: ni-2021-laser-levitation-evaporation
+source:
+  citation: 'Ni, P., Macris, C. A., Darling, E. A. & Shahar, A. (2021), “Aerodynamic levitation evaporation of basalt
+    at 1750–2150 °C: Cu isotopes”, Geochimica et Cosmochimica Acta 298:131.'
+  doi: 10.1016/j.gca.2021.02.007
+  year: 2021
+extraction:
+  method: Transcribed from the born-digital pdftotext-layout file; Table 1 row and column assignment and every stored
+    numeric cell checked against a full-page render of PDF p. 41. MinerU source directory and content-list JSON
+    are absent; the staged standalone converter reported no content-list JSON in the available input. Table body
+    p. 41 reports Cu 1.15 δ65Cu = 3.71‰, while prose reports 3.17‰; the table value is retained because the requested
+    observable is Table 1 and the p. 41 render confirms 3.71.
+  date: '2026-10-22'
+  worker: wave51-F59
+  provenance_path: data/literature/extracts/ni-2021-laser-levitation-evaporation-audit.md
+review_status: draft
+fidelity_samples:
+- species: Cu
+  observation_id: ni_2021_cu_1_12_cu_residue
+  field: element_ppm_by_mass
+  value: '517'
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.12
+    column: C_Cu
+- species: Cu
+  observation_id: ni_2021_cu_1_12_delta65cu
+  field: isotope_delta_isotope_delta
+  value: '7.10'
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.12
+    column: δ65Cu
+- species: basaltic_glass
+  observation_id: ni_2021_cu_1_12_bulk_mass_loss
+  field: mass_loss_wt_pct
+  value: '1.11'
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.12
+    column: ΔM
+benches:
+- id: laser-aerodynamic-levitation
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Aerodynamic-levitation laser furnace
+    locator: &id001
+      page: 8
+      pdf_page_index: 7
+      section: 2.1 Laser melting experiments
+  heating_method:
+    state:
+      tag: value
+      value: 400 W CO2 laser heating of a freely levitated glass sphere
+    locator: *id001
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pyrometer
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Laser melting experiments
+experiments:
+- experiment_id: table1-cu_1_12
+  method: levitation
+  locator: &id006
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.12
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: &id003
+          SiO2: '46.18'
+          TiO2: '1.63'
+          Al2O3: '18.17'
+          FeOt: '10.67'
+          MgO: '5.84'
+          CaO: '10.69'
+          Na2O: '4.45'
+          K2O: '1.90'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: &id004
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.12
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020044'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.12
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: &id002
+        page: 22
+        pdf_page_index: 21
+        section: Experimental conditions
+        note: Aerodynamic levitation in one-atmosphere 99.999% Ar flow.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '17.9'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.12
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_14
+  method: levitation
+  locator: &id007
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.14
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.14
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000019072'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.14
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.14
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_17
+  method: levitation
+  locator: &id008
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.17
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.17
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020008'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.17
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10.0'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.17
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_18
+  method: levitation
+  locator: &id009
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.18
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.18
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000019958'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.18
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18.6'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.18
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_2
+  method: levitation
+  locator: &id010
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.2
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.2
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002004'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.2
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '33.8'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.2
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_3
+  method: levitation
+  locator: &id011
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.3
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.3
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020196'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.3
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '59.1'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.3
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_4
+  method: levitation
+  locator: &id012
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.4
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.4
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002016'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.4
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '75.4'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.4
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_5
+  method: levitation
+  locator: &id013
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.5
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.5
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020154'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.5
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '84.5'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.5
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_13
+  method: levitation
+  locator: &id014
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.13
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.13
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000019558'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.13
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7.9'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.13
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_11
+  method: levitation
+  locator: &id015
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.11
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.11
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020008'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.11
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12.3'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.11
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_9
+  method: levitation
+  locator: &id016
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.9
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.9
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002022'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.9
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '16.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.9
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_19
+  method: levitation
+  locator: &id017
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.19
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.19
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000019964'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.19
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '17.5'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.19
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_10
+  method: levitation
+  locator: &id018
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.10
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.10
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002014'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.10
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '25.5'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.10
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_7
+  method: levitation
+  locator: &id019
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.7
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.7
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020082'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.7
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '34.4'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.7
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_8
+  method: levitation
+  locator: &id020
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.8
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.8
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000020046'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.8
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '62.9'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.8
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+- experiment_id: table1-cu_1_1
+  method: levitation
+  locator: &id021
+    page: 41
+    pdf_page_index: 40
+    table: '1'
+    row: Cu 1.1
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: *id003
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 2.1 Starting material
+        note: Et1Cu starting basaltic glass composition in wt%; the printed oxide total is 99.53 wt%.
+    composition_class:
+      state:
+        tag: value
+        value: Cu-bearing basaltic glass (Et1Cu)
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: quenched glass sphere
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.1
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000019902'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.1
+        column: M0 (mg)
+        note: Printed M0 converted from mg to the sample.mass_kg field.
+  bench_id: laser-aerodynamic-levitation
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '108.6'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.1
+        note: Corrected duration tc; tr is separately retained in the printed table row.
+species:
+  basaltic_glass:
+    context:
+    - observation_id: ni_2021_table1_row_et1cu
+      type: table_row
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Et1Cu
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Et1Cu
+          d0_mm: '-'
+          d_mm: '-'
+          M0_mg: '-'
+          M_mg: '-'
+          mass_loss_pct: '-'
+          tr_s: '-'
+          tc_s: '-'
+          T_C: '-'
+          Cu_ppm: '1185'
+          delta65Cu_permil: '3.46'
+          delta65Cu_2SE_permil: '0.02'
+          n: '12'
+        schema_gaps: []
+        quench_status: not_stated
+        quench_statement: no row-specific quench statement for this starting/control sample
+        quench_locator: &id005
+          page: 8
+          pdf_page_index: 7
+          section: 2.1 Laser melting experiments
+    - observation_id: ni_2021_table1_row_cu_1_15
+      type: table_row
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '1'
+        row: Cu 1.15
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.15
+          d0_mm: '2.3'
+          d_mm: '2.42'
+          M0_mg: '19.664'
+          M_mg: '-'
+          mass_loss_pct: '-'
+          tr_s: '-'
+          tc_s: '-'
+          T_C: '-'
+          Cu_ppm: '1129'
+          delta65Cu_permil: '3.71'
+          delta65Cu_2SE_permil: '0.03'
+          n: '4'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: not_stated
+        quench_statement: no row-specific quench statement for this starting/control sample
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_12
+      type: table_row
+      locator: *id006
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.12
+          d0_mm: '2.42'
+          d_mm: '2.36'
+          M0_mg: '20.044'
+          M_mg: '19.822'
+          mass_loss_pct: '1.11'
+          tr_s: '8'
+          tc_s: '17.9'
+          T_C: '1750'
+          Cu_ppm: '517'
+          delta65Cu_permil: '7.10'
+          delta65Cu_2SE_permil: '0.04'
+          n: '8'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_14
+      type: table_row
+      locator: *id007
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.14
+          d0_mm: '2.38'
+          d_mm: '2.32'
+          M0_mg: '19.072'
+          M_mg: '18.486'
+          mass_loss_pct: '3.07'
+          tr_s: '4'
+          tc_s: '6.7'
+          T_C: '2150'
+          Cu_ppm: '50'
+          delta65Cu_permil: '16.14'
+          delta65Cu_2SE_permil: '0.06'
+          n: '8'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_17
+      type: table_row
+      locator: *id008
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.17
+          d0_mm: '2.34'
+          d_mm: '2.31'
+          M0_mg: '20.008'
+          M_mg: '19.270'
+          mass_loss_pct: '3.69'
+          tr_s: '8'
+          tc_s: '10.0'
+          T_C: '2150'
+          Cu_ppm: '34'
+          delta65Cu_permil: n.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_18
+      type: table_row
+      locator: *id009
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.18
+          d0_mm: '2.31'
+          d_mm: '2.39'
+          M0_mg: '19.958'
+          M_mg: '18.632'
+          mass_loss_pct: '6.64'
+          tr_s: '16'
+          tc_s: '18.6'
+          T_C: '2150'
+          Cu_ppm: '35'
+          delta65Cu_permil: n.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_2
+      type: table_row
+      locator: *id010
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.2
+          d0_mm: '2.43'
+          d_mm: '2.36'
+          M0_mg: '20.040'
+          M_mg: '19.180'
+          mass_loss_pct: '4.29'
+          tr_s: '30'
+          tc_s: '33.8'
+          T_C: '2150'
+          Cu_ppm: '2.7'
+          delta65Cu_permil: '21.57'
+          delta65Cu_2SE_permil: '0.19'
+          n: '6'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_3
+      type: table_row
+      locator: *id011
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.3
+          d0_mm: '2.43'
+          d_mm: '2.19'
+          M0_mg: '20.196'
+          M_mg: '18.632'
+          mass_loss_pct: '7.74'
+          tr_s: '60'
+          tc_s: '59.1'
+          T_C: '2150'
+          Cu_ppm: '0.028'
+          delta65Cu_permil: b.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_4
+      type: table_row
+      locator: *id012
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.4
+          d0_mm: '2.44'
+          d_mm: '2.33'
+          M0_mg: '20.160'
+          M_mg: '17.724'
+          mass_loss_pct: '12.08'
+          tr_s: '90'
+          tc_s: '75.4'
+          T_C: '2150'
+          Cu_ppm: '0.028'
+          delta65Cu_permil: b.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_5
+      type: table_row
+      locator: *id013
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.5
+          d0_mm: '2.44'
+          d_mm: '2.33'
+          M0_mg: '20.154'
+          M_mg: '17.986'
+          mass_loss_pct: '10.76'
+          tr_s: '120'
+          tc_s: '84.5'
+          T_C: '2150'
+          Cu_ppm: '0.31'
+          delta65Cu_permil: b.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_13
+      type: table_row
+      locator: *id014
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.13
+          d0_mm: '2.41'
+          d_mm: '2.41'
+          M0_mg: '19.558'
+          M_mg: '19.306'
+          mass_loss_pct: '1.29'
+          tr_s: '4'
+          tc_s: '7.9'
+          T_C: '2000'
+          Cu_ppm: '323'
+          delta65Cu_permil: '9.59'
+          delta65Cu_2SE_permil: '0.11'
+          n: '8'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_11
+      type: table_row
+      locator: *id015
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.11
+          d0_mm: '2.43'
+          d_mm: '2.41'
+          M0_mg: '20.008'
+          M_mg: '19.590'
+          mass_loss_pct: '2.09'
+          tr_s: '8'
+          tc_s: '12.3'
+          T_C: '2000'
+          Cu_ppm: '126'
+          delta65Cu_permil: '13.66'
+          delta65Cu_2SE_permil: '0.06'
+          n: '8'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_9
+      type: table_row
+      locator: *id016
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.9
+          d0_mm: '2.44'
+          d_mm: '2.30'
+          M0_mg: '20.220'
+          M_mg: '19.720'
+          mass_loss_pct: '2.47'
+          tr_s: '16'
+          tc_s: '16.7'
+          T_C: '2000'
+          Cu_ppm: '73'
+          delta65Cu_permil: '13.91'
+          delta65Cu_2SE_permil: '0.05'
+          n: '8'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_19
+      type: table_row
+      locator: *id017
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.19
+          d0_mm: '2.31'
+          d_mm: '2.39'
+          M0_mg: '19.964'
+          M_mg: '19.296'
+          mass_loss_pct: '3.35'
+          tr_s: '16'
+          tc_s: '17.5'
+          T_C: '2000'
+          Cu_ppm: '42'
+          delta65Cu_permil: n.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_10
+      type: table_row
+      locator: *id018
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.10
+          d0_mm: '2.42'
+          d_mm: '2.42'
+          M0_mg: '20.140'
+          M_mg: '19.388'
+          mass_loss_pct: '3.73'
+          tr_s: '16'
+          tc_s: '25.5'
+          T_C: '2000'
+          Cu_ppm: '18'
+          delta65Cu_permil: '21.07'
+          delta65Cu_2SE_permil: '0.03'
+          n: '6'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_7
+      type: table_row
+      locator: *id019
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.7
+          d0_mm: '2.41'
+          d_mm: '2.30'
+          M0_mg: '20.082'
+          M_mg: '19.572'
+          mass_loss_pct: '2.54'
+          tr_s: '30'
+          tc_s: '34.4'
+          T_C: '2000'
+          Cu_ppm: '12'
+          delta65Cu_permil: '20.25'
+          delta65Cu_2SE_permil: '0.06'
+          n: '6'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_8
+      type: table_row
+      locator: *id020
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.8
+          d0_mm: '2.42'
+          d_mm: '2.33'
+          M0_mg: '20.046'
+          M_mg: '18.822'
+          mass_loss_pct: '6.11'
+          tr_s: '60'
+          tc_s: '62.9'
+          T_C: '2000'
+          Cu_ppm: '0.056'
+          delta65Cu_permil: b.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    - observation_id: ni_2021_table1_row_cu_1_1
+      type: table_row
+      locator: *id021
+      units: as printed in Table 1
+      values:
+        quantity: table_1_row_as_printed
+        method_class: source_table_transcription
+        table_row:
+          sample: Cu 1.1
+          d0_mm: '2.41'
+          d_mm: '2.42'
+          M0_mg: '19.902'
+          M_mg: '17.900'
+          mass_loss_pct: '10.06'
+          tr_s: '120'
+          tc_s: '108.6'
+          T_C: '2000'
+          Cu_ppm: '0.035'
+          delta65Cu_permil: b.d.
+          delta65Cu_2SE_permil: '-'
+          n: '-'
+        schema_gaps:
+        - d0_mm
+        - d_mm
+        - M_mg
+        - tr_s
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+    observations:
+    - observation_id: ni_2021_cu_1_12_bulk_mass_loss
+      experiment: table1-cu_1_12
+      type: mass_loss
+      locator: *id006
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id022
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '1.11'
+        T_C: '1750'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_12
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_14_bulk_mass_loss
+      experiment: table1-cu_1_14
+      type: mass_loss
+      locator: *id007
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id023
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '3.07'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_14
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_17_bulk_mass_loss
+      experiment: table1-cu_1_17
+      type: mass_loss
+      locator: *id008
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id024
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '3.69'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_17
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_18_bulk_mass_loss
+      experiment: table1-cu_1_18
+      type: mass_loss
+      locator: *id009
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id025
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '6.64'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_18
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_2_bulk_mass_loss
+      experiment: table1-cu_1_2
+      type: mass_loss
+      locator: *id010
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id026
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '4.29'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_2
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_3_bulk_mass_loss
+      experiment: table1-cu_1_3
+      type: mass_loss
+      locator: *id011
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id027
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '7.74'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_3
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_4_bulk_mass_loss
+      experiment: table1-cu_1_4
+      type: mass_loss
+      locator: *id012
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id028
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '12.08'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_4
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_5_bulk_mass_loss
+      experiment: table1-cu_1_5
+      type: mass_loss
+      locator: *id013
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id029
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '10.76'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_5
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_13_bulk_mass_loss
+      experiment: table1-cu_1_13
+      type: mass_loss
+      locator: *id014
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id030
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '1.29'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_13
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_11_bulk_mass_loss
+      experiment: table1-cu_1_11
+      type: mass_loss
+      locator: *id015
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id031
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '2.09'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_11
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_9_bulk_mass_loss
+      experiment: table1-cu_1_9
+      type: mass_loss
+      locator: *id016
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id032
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '2.47'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_9
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_19_bulk_mass_loss
+      experiment: table1-cu_1_19
+      type: mass_loss
+      locator: *id017
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id033
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '3.35'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_19
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_10_bulk_mass_loss
+      experiment: table1-cu_1_10
+      type: mass_loss
+      locator: *id018
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id034
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '3.73'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_10
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_7_bulk_mass_loss
+      experiment: table1-cu_1_7
+      type: mass_loss
+      locator: *id019
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id035
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '2.54'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_7
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_8_bulk_mass_loss
+      experiment: table1-cu_1_8
+      type: mass_loss
+      locator: *id020
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id036
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '6.11'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_8
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+    - observation_id: ni_2021_cu_1_1_bulk_mass_loss
+      experiment: table1-cu_1_1
+      type: mass_loss
+      locator: *id021
+      phase: glass
+      units: wt% as printed
+      point_conditions: &id037
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_fraction
+              components:
+              - - SiO2
+                - '46.18'
+              - - TiO2
+                - '1.63'
+              - - Al2O3
+                - '18.17'
+              - - FeOt
+                - '10.67'
+              - - MgO
+                - '5.84'
+              - - CaO
+                - '10.69'
+              - - Na2O
+                - '4.45'
+              - - K2O
+                - '1.90'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: *id002
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_wt_pct: '10.06'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_1
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        note: Total mass loss; authors suggest Na2O and K2O evaporation but do not assign the loss to either species.
+      uncertainty:
+        note: No uncertainty for ΔM is stated.
+  Cu:
+    observations:
+    - observation_id: ni_2021_cu_1_12_cu_residue
+      experiment: table1-cu_1_12
+      type: concentration_series
+      locator: *id006
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '517'
+        residue_ppm: '517'
+        T_C: '1750'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_12
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id022
+    - observation_id: ni_2021_cu_1_12_delta65cu
+      experiment: table1-cu_1_12
+      type: concentration_series
+      locator: *id006
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '7.10'
+        reference_standard: AE633
+        T_C: '1750'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_12
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id022
+      uncertainty:
+        two_se: '0.04'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.12
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_14_cu_residue
+      experiment: table1-cu_1_14
+      type: concentration_series
+      locator: *id007
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '50'
+        residue_ppm: '50'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_14
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id023
+    - observation_id: ni_2021_cu_1_14_delta65cu
+      experiment: table1-cu_1_14
+      type: concentration_series
+      locator: *id007
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '16.14'
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_14
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id023
+      uncertainty:
+        two_se: '0.06'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.14
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_17_cu_residue
+      experiment: table1-cu_1_17
+      type: concentration_series
+      locator: *id008
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '34'
+        residue_ppm: '34'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_17
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id024
+    - observation_id: ni_2021_cu_1_17_delta65cu
+      experiment: table1-cu_1_17
+      type: concentration_series
+      locator: *id008
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_17
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: n.d.'
+      point_conditions: *id024
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id008
+    - observation_id: ni_2021_cu_1_18_cu_residue
+      experiment: table1-cu_1_18
+      type: concentration_series
+      locator: *id009
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '35'
+        residue_ppm: '35'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_18
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id025
+    - observation_id: ni_2021_cu_1_18_delta65cu
+      experiment: table1-cu_1_18
+      type: concentration_series
+      locator: *id009
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_18
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: n.d.'
+      point_conditions: *id025
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id009
+    - observation_id: ni_2021_cu_1_2_cu_residue
+      experiment: table1-cu_1_2
+      type: concentration_series
+      locator: *id010
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '2.7'
+        residue_ppm: '2.7'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_2
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id026
+    - observation_id: ni_2021_cu_1_2_delta65cu
+      experiment: table1-cu_1_2
+      type: concentration_series
+      locator: *id010
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '21.57'
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_2
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id026
+      uncertainty:
+        two_se: '0.19'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.2
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_3_cu_residue
+      experiment: table1-cu_1_3
+      type: concentration_series
+      locator: *id011
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '0.028'
+        residue_ppm: '0.028'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_3
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id027
+    - observation_id: ni_2021_cu_1_3_delta65cu
+      experiment: table1-cu_1_3
+      type: concentration_series
+      locator: *id011
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_3
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: b.d.'
+      point_conditions: *id027
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id011
+    - observation_id: ni_2021_cu_1_4_cu_residue
+      experiment: table1-cu_1_4
+      type: concentration_series
+      locator: *id012
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '0.028'
+        residue_ppm: '0.028'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_4
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id028
+    - observation_id: ni_2021_cu_1_4_delta65cu
+      experiment: table1-cu_1_4
+      type: concentration_series
+      locator: *id012
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_4
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: b.d.'
+      point_conditions: *id028
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id012
+    - observation_id: ni_2021_cu_1_5_cu_residue
+      experiment: table1-cu_1_5
+      type: concentration_series
+      locator: *id013
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '0.31'
+        residue_ppm: '0.31'
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_5
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id029
+    - observation_id: ni_2021_cu_1_5_delta65cu
+      experiment: table1-cu_1_5
+      type: concentration_series
+      locator: *id013
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2150'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_5
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: b.d.'
+      point_conditions: *id029
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id013
+    - observation_id: ni_2021_cu_1_13_cu_residue
+      experiment: table1-cu_1_13
+      type: concentration_series
+      locator: *id014
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '323'
+        residue_ppm: '323'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_13
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id030
+    - observation_id: ni_2021_cu_1_13_delta65cu
+      experiment: table1-cu_1_13
+      type: concentration_series
+      locator: *id014
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '9.59'
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_13
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id030
+      uncertainty:
+        two_se: '0.11'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.13
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_11_cu_residue
+      experiment: table1-cu_1_11
+      type: concentration_series
+      locator: *id015
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '126'
+        residue_ppm: '126'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_11
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id031
+    - observation_id: ni_2021_cu_1_11_delta65cu
+      experiment: table1-cu_1_11
+      type: concentration_series
+      locator: *id015
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '13.66'
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_11
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id031
+      uncertainty:
+        two_se: '0.06'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.11
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_9_cu_residue
+      experiment: table1-cu_1_9
+      type: concentration_series
+      locator: *id016
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '73'
+        residue_ppm: '73'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_9
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id032
+    - observation_id: ni_2021_cu_1_9_delta65cu
+      experiment: table1-cu_1_9
+      type: concentration_series
+      locator: *id016
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '13.91'
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_9
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id032
+      uncertainty:
+        two_se: '0.05'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.9
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_19_cu_residue
+      experiment: table1-cu_1_19
+      type: concentration_series
+      locator: *id017
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '42'
+        residue_ppm: '42'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_19
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id033
+    - observation_id: ni_2021_cu_1_19_delta65cu
+      experiment: table1-cu_1_19
+      type: concentration_series
+      locator: *id017
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_19
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: n.d.'
+      point_conditions: *id033
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id017
+    - observation_id: ni_2021_cu_1_10_cu_residue
+      experiment: table1-cu_1_10
+      type: concentration_series
+      locator: *id018
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '18'
+        residue_ppm: '18'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_10
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id034
+    - observation_id: ni_2021_cu_1_10_delta65cu
+      experiment: table1-cu_1_10
+      type: concentration_series
+      locator: *id018
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '21.07'
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_10
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id034
+      uncertainty:
+        two_se: '0.03'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.10
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_7_cu_residue
+      experiment: table1-cu_1_7
+      type: concentration_series
+      locator: *id019
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '12'
+        residue_ppm: '12'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_7
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id035
+    - observation_id: ni_2021_cu_1_7_delta65cu
+      experiment: table1-cu_1_7
+      type: concentration_series
+      locator: *id019
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: '20.25'
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_7
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id035
+      uncertainty:
+        two_se: '0.06'
+        units: ‰
+        confidence_level: not_stated
+        note: Table 1 reports 2 s.e.; confidence level is not stated.
+        locator:
+          page: 41
+          pdf_page_index: 40
+          table: '1'
+          row: Cu 1.7
+          column: 2 s.e.
+    - observation_id: ni_2021_cu_1_8_cu_residue
+      experiment: table1-cu_1_8
+      type: concentration_series
+      locator: *id020
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '0.056'
+        residue_ppm: '0.056'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_8
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id036
+    - observation_id: ni_2021_cu_1_8_delta65cu
+      experiment: table1-cu_1_8
+      type: concentration_series
+      locator: *id020
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_8
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: b.d.'
+      point_conditions: *id036
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id020
+    - observation_id: ni_2021_cu_1_1_cu_residue
+      experiment: table1-cu_1_1
+      type: concentration_series
+      locator: *id021
+      phase: glass
+      units: ppm by mass as printed
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        analyte: Cu
+        element_ppm_by_mass: '0.035'
+        residue_ppm: '0.035'
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_1
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+      point_conditions: *id037
+    - observation_id: ni_2021_cu_1_1_delta65cu
+      experiment: table1-cu_1_1
+      type: concentration_series
+      locator: *id021
+      phase: glass
+      units: ‰ as printed
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        system_class: silicate_melt
+        isotope_ratio: 65Cu/63Cu
+        isotope_delta_isotope_delta: null
+        reference_standard: AE633
+        T_C: '2000'
+        total_pressure_Pa: '101325'
+        composition_wt_pct: *id003
+        table_row_context_id: ni_2021_table1_row_cu_1_1
+        quench_status: asserted_preserved
+        quench_statement: quenched to glass by cutting power to the laser
+        quench_locator: *id005
+        admission_status: rejected
+        status: typed_refusal
+        refusal_reason: 'isotope result not numeric: b.d.'
+      point_conditions: *id037
+      uncertainty:
+        note: No numeric isotope result or uncertainty is reported for this row.
+        locator: *id021
