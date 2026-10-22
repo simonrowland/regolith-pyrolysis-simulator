@@ -1,21 +1,19 @@
 """Source-grounded context pins for Farmer and O'Neill (2023)."""
 
 from copy import deepcopy
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/farmer-oneill-2023-mgo-zno-miscibility.yaml"
-CORPUS = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS = regolith_corpus_root()
 SOURCE_TEXT = CORPUS / "text/farmer-oneill-2023-mgo-zno-miscibility/pdftotext-layout.txt"
 
 pytestmark = pytest.mark.skipif(

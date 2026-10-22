@@ -137,6 +137,153 @@ species:
         attribution: Bosenick et al. (1996)
       uncertainty:
         reported_status: not_reported
+    - observation_id: dachs_geiger_2006_pyrope_entropy_ppms_py1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 265.94
+        T_K: 298.15
+        sigma: 0.23
+      uncertainty:
+        reported_status: printed
+        value: 0.23
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_pyrope_entropy_ppms_py2
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 265.81
+        T_K: 298.15
+        sigma: 0.22
+      uncertainty:
+        reported_status: printed
+        value: 0.22
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_pyrope_entropy_ppms_py3
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 264.20
+        T_K: 298.15
+        sigma: 0.23
+      uncertainty:
+        reported_status: printed
+        value: 0.23
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_pyrope_entropy_ppms_py4
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 265.01
+        T_K: 298.15
+        sigma: 0.24
+      uncertainty:
+        reported_status: printed
+        value: 0.24
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_pyrope_entropy_hw80
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 266.27
+        T_K: 298.15
+        attribution: Haselton and Westrum (1980)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_pyrope_entropy_b88
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 266.36
+        T_K: 298.15
+        attribution: Berman (1988)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_pyrope_entropy_hp98
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 266.3
+        T_K: 298.15
+        attribution: Holland and Powell (1998)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_pyrope_entropy_g97
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 274.45
+        T_K: 298.15
+        sigma: 0.27
+        attribution: Geiger et al. (1997)
+      uncertainty:
+        reported_status: printed
+        value: 0.27
+        units: J/mol/K
     context:
     - observation_id: dachs_geiger_2006_intermediate_solution_entropies
       type: calorimetric_entropy_context
@@ -149,21 +296,12 @@ species:
       values:
         quantity: S and excess entropy ΔSxs
         method_class: measured_reduced and model_derived
-        table2_standard_entropies_J_mol_K:
-        - sample: Py-2
-          value: 265.81±0.22
-        - sample: Py-3
-          value: 264.20±0.23
-        - sample: Py-4
-          value: 265.01±0.24
         table2_locator:
           page: 6
           pdf_page_index: 5
           published_page: 899
           table: '2'
-        note: These pure-endmember S298 values are author-integrated from PPMS Cp. They remain context because measured_reduced
-          S requires located derivation inputs, and the corpus has no TABLE_CSV asset for the Appendix Cp inputs (controller
-          ruling).
+        note: Intermediate solid-solution and excess entropies remain context; pure-endmember values are transcribed separately.
     - observation_id: dachs_geiger_2006_table_1_printed_values_context
       type: printed_table_context
       locator:
@@ -742,6 +880,62 @@ species:
         quantity_as_printed: calorimetric entropy and excess entropy data
         method_class: measured_reduced and model_derived
         printed_rows:
+        - - 'Py'
+          - 'Py-1*'
+          - '0.000'
+          - '265.94±0.23'
+          - '0.00±0.33'
+          - ''
+          - '0±0.34'
+          - ''
+        - - 'Py90Gr10'
+          - 'Py90Gr10-1†'
+          - '0.102'
+          - '268.09±0.22'
+          - '2.81±0.31'
+          - '30.7±3.4'
+          - '2.97±0.31'
+          - '32.5±3.4'
+        - - 'Py90Gr10'
+          - 'Py90Gr10-2†'
+          - '0.102'
+          - '268.65±0.21'
+          - '3.37±0.30'
+          - '36.8±3.3'
+          - '3.53±0.31'
+          - '38.6±3.3'
+        - - 'Py90Gr10'
+          - 'Py90Gr10-3†'
+          - '0.102'
+          - '268.06±0.27'
+          - '2.78±0.35'
+          - '30.4±3.8'
+          - '2.94±0.35'
+          - '32.1±3.8'
+        - - 'Py75Gr25'
+          - 'Py75Gr25-1†'
+          - '0.264'
+          - '267.48±0.24'
+          - '3.25±0.31'
+          - '16.7±1.6'
+          - '3.67±0.31'
+          - '18.9±1.6'
+        - - 'Py60Gr40'
+          - 'Py60Gr40-1*'
+          - '0.400'
+          - '265.11±0.22'
+          - '1.76±0.29'
+          - '7.3±1.2'
+          - '2.40±0.29'
+          - '10.0±1.2'
+        - - 'Py60Gr40'
+          - 'Py60Gr40-2†'
+          - '0.414'
+          - '265.44±0.24'
+          - '2.18±0.30'
+          - '9.0±1.2'
+          - '2.85±0.31'
+          - '11.7±1.3'
         - - ' $Py_{60}Gr_{40}$ '
           - HW80*‡
           - '0.400'
@@ -940,3 +1134,112 @@ species:
         attribution: Bosenick et al. (1996)
       uncertainty:
         reported_status: not_reported
+    - observation_id: dachs_geiger_2006_grossular_entropy_ppms_gr1
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 257.86
+        T_K: 298.15
+        sigma: 0.26
+      uncertainty:
+        reported_status: printed
+        value: 0.26
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_grossular_entropy_ppms_gr2
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: author_derived
+        entropy: 259.47
+        T_K: 298.15
+        sigma: 0.25
+      uncertainty:
+        reported_status: printed
+        value: 0.25
+        units: J/mol/K
+    - observation_id: dachs_geiger_2006_grossular_entropy_hw80
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 260.12
+        T_K: 298.15
+        attribution: Haselton and Westrum (1980)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_grossular_entropy_b88
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 255.15
+        T_K: 298.15
+        attribution: Berman (1988)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_grossular_entropy_hp98
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 255
+        T_K: 298.15
+        attribution: Holland and Powell (1998)
+      uncertainty:
+        reported_status: not_reported
+    - observation_id: dachs_geiger_2006_grossular_entropy_g97
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 899
+        table: '2'
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        entropy: 257.47
+        T_K: 298.15
+        sigma: 0.24
+        attribution: Geiger et al. (1997)
+      uncertainty:
+        reported_status: printed
+        value: 0.24
+        units: J/mol/K

@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from decimal import Decimal
-import os
 from pathlib import Path
 
 import pytest
@@ -10,14 +9,13 @@ import yaml
 
 from simulator.battery.enums import Quantity
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml"
-CORPUS = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS = regolith_corpus_root()
 SOURCE_TEXT = CORPUS / "text/sugawara-akaogi-2003-ni-co-fusion/pdftotext-layout.txt"
 
 pytestmark = pytest.mark.skipif(
@@ -38,7 +36,7 @@ def _observation(document: dict, observation_id: str) -> dict:
     )
 
 
-def test_printed_table_1_values_migrate_with_species_temperature_and_locator() -> None:
+def test_only_fusion_rows_migrate_and_unidentified_rows_remain_context() -> None:
     document = _document()
     assert validate_extract_document(
         document,
@@ -50,19 +48,38 @@ def test_printed_table_1_values_migrate_with_species_temperature_and_locator() -
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     observations = migrator.result.observations
-    assert len(observations) == 75
+    assert len(observations) == 18
     assert not migrator.result.validation.hard_issues
+    assert all(
+        observation.identity.quantity.value
+        in {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}
+        for observation in observations.values()
+    )
 
-    first = observations[f"{EXTRACT.stem}::suga03_t1_co2sio4_01"]
-    last = observations[f"{EXTRACT.stem}::suga03_t1_co2sio4_13"]
-    assert first.identity.quantity.value is Quantity.H_MINUS_H298
-    assert first.identity.species.formula == "Co2SiO4"
-    assert first.value.point == Decimal("194.7")
-    assert first.identity.temperature_K.value == Decimal("1373")
-    assert first.locator.page == 3
-    assert first.point_conditions["temperature_K"].state.value == Decimal("1373")
-    assert last.value.point == Decimal("393.0")
-    assert last.identity.temperature_K.value == Decimal("1773")
+    context = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("context", [])
+    }
+    moved_heat_rows = [
+        row
+        for row in context.values()
+        if row.get("type") == "calorimetric_heat_content_context"
+    ]
+    moved_glass_rows = [
+        row
+        for row in context.values()
+        if row.get("values", {}).get("quantity") == "equilibrium_phase_composition"
+    ]
+    assert len(moved_heat_rows) == 17
+    assert len(moved_glass_rows) == 40
+    assert context["suga03_t1_co2sio4_01"]["values"]["enthalpy_increment"] == 194.7
+    assert context["suga03_nio_heat_content_context"]["values"]["reference_temperature_K"] == 298
+    nio_rows = context["suga03_nio_heat_content_context"]["values"]["rows"]
+    assert [(row["atmosphere"], row["value"], row["sigma"]) for row in nio_rows] == [
+        ("Ar", 100.6, 9.0),
+        ("Air", 87.9, 5.2),
+    ]
 
     for species_formula, species in document["species"].items():
         for row in species.get("observations", []):
@@ -80,7 +97,7 @@ def test_printed_table_1_values_migrate_with_species_temperature_and_locator() -
 
 def test_fidelity_pin_rejects_a_mutated_printed_cell() -> None:
     mutated = deepcopy(_document())
-    _observation(mutated, "suga03_t1_co2sio4_01")["values"]["enthalpy_increment"] = 194.8
+    _observation(mutated, "suga03_t4_co2sio4_2_heat_fusion")["values"]["delta_H_fus_kJ_mol-1"] = 98.0
     errors = validate_extract_document(
         mutated,
         expected_source_id=EXTRACT.stem,
@@ -88,6 +105,17 @@ def test_fidelity_pin_rejects_a_mutated_printed_cell() -> None:
         check_fidelity_match=True,
     )
     assert any("fidelity" in error.casefold() for error in errors)
+
+
+def test_moved_rows_are_absent_from_observations() -> None:
+    document = _document()
+    observation_ids = {
+        row["observation_id"]
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    assert not any(row_id.startswith(("suga03_t1_", "suga03_t2_")) for row_id in observation_ids)
+    assert not any(row_id.startswith("suga03_t3_") for row_id in observation_ids)
 
 
 def test_table_4_author_calculations_remain_numeric_context() -> None:

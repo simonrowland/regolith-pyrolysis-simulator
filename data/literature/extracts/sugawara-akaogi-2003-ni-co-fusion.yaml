@@ -14,337 +14,24 @@ extraction:
   provenance_path: text/sugawara-akaogi-2003-ni-co-fusion/pdftotext-layout.txt
 review_status: draft
 fidelity_samples:
-- path: species.Co2SiO4.observations[suga03_t1_co2sio4_01].values
+- path: species.Co2SiO4.observations[suga03_t4_co2sio4_2_heat_fusion].values
   value:
-    quantity: H_minus_H298
-    method_class: measured_direct
-    T_K: 1373
-    enthalpy_increment: 194.7
-    sigma: 15.5
-    state: Solid
-    atmosphere: Ar
-    note: N=5; capsule PtCo; XCo=0.3 wt%
+    quantity: heat_of_fusion
+    method_class: quoted_attributed
+    delta_H_fus_kJ_mol-1: 97.9
+    sigma: null
+    T_fus_K: 1688
+    source_as_printed: Hirschmann and Ghiorso (1994)
+    attribution: Hirschmann and Ghiorso (1994)
   locator:
-    page: 3
-    pdf_page_index: 2
-    published_page: 2685
-    table: '1'
-    row: suga03_t1_co2sio4_01
+    page: 6
+    pdf_page_index: 5
+    published_page: 2688
+    table: '4'
+    row: Co2SiO4 row 2
 species:
   Co2SiO4:
     observations:
-    - observation_id: suga03_t1_co2sio4_01
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_01
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1373
-        enthalpy_increment: 194.7
-        sigma: 15.5
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=0.3 wt%
-      uncertainty:
-        reported_status: printed
-        value: 15.5
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_02
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_02
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1473
-        enthalpy_increment: 223.3
-        sigma: 8.3
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=0.6 wt%
-      uncertainty:
-        reported_status: printed
-        value: 8.3
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_03
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_03
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1473
-        enthalpy_increment: 236.3
-        sigma: 10.9
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule Pt; XCo cell blank
-      uncertainty:
-        reported_status: printed
-        value: 10.9
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_04
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_04
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1573
-        enthalpy_increment: 240.3
-        sigma: 6.2
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=1.6 wt%
-      uncertainty:
-        reported_status: printed
-        value: 6.2
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_05
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_05
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1573
-        enthalpy_increment: 251.2
-        sigma: 20.4
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule Pt; XCo cell blank
-      uncertainty:
-        reported_status: printed
-        value: 20.4
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_06
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_06
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1612
-        enthalpy_increment: 241.3
-        sigma: 18.9
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=0.7 wt%
-      uncertainty:
-        reported_status: printed
-        value: 18.9
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_07
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_07
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1652
-        enthalpy_increment: 257.7
-        sigma: 13.5
-        state: Solid
-        atmosphere: Ar
-        note: N=4; capsule PtCo; XCo=2.4 wt%
-      uncertainty:
-        reported_status: printed
-        value: 13.5
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_08
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_08
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1673
-        enthalpy_increment: 278.2
-        sigma: 19.0
-        state: Solid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=2.4 wt%
-      uncertainty:
-        reported_status: printed
-        value: 19.0
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_09
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_09
-      phase: l
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1693
-        enthalpy_increment: 340.3
-        sigma: 36.0
-        state: Liquid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=2.4 wt%
-      uncertainty:
-        reported_status: printed
-        value: 36.0
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_10
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_10
-      phase: l
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1713
-        enthalpy_increment: 363.0
-        sigma: 14.6
-        state: Liquid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=3.6 wt%
-      uncertainty:
-        reported_status: printed
-        value: 14.6
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_11
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_11
-      phase: l
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1731
-        enthalpy_increment: 373.5
-        sigma: 17.2
-        state: Liquid
-        atmosphere: Ar
-        note: N=5; capsule PtCo; XCo=5.6 wt%
-      uncertainty:
-        reported_status: printed
-        value: 17.2
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_12
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_12
-      phase: l
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1754
-        enthalpy_increment: 388.1
-        sigma: 10.6
-        state: Liquid
-        atmosphere: Ar
-        note: N=6; capsule PtCo; XCo=4.8 wt%
-      uncertainty:
-        reported_status: printed
-        value: 10.6
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t1_co2sio4_13
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 2
-        page: 3
-        published_page: 2685
-        table: '1'
-        row: suga03_t1_co2sio4_13
-      phase: l
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1773
-        enthalpy_increment: 393.0
-        sigma: 18.7
-        state: Liquid
-        atmosphere: Ar
-        note: N=13; capsule PtCo; XCo=6.1 wt%
-      uncertainty:
-        reported_status: printed
-        value: 18.7
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
     - observation_id: suga03_t4_co2sio4_2_heat_fusion
       type: heat_capacity_and_heat_content_series
       locator: &id002
@@ -539,10 +226,323 @@ species:
         marker_count_per_series: not counted in this pass
         attribution: Sugawara and Akaogi (2003)
         digitisation: deferred to a figure pass
+    - observation_id: suga03_t1_co2sio4_01
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_01
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1373
+        enthalpy_increment: 194.7
+        sigma: 15.5
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.3 wt%
+      uncertainty:
+        reported_status: printed
+        value: 15.5
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_02
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_02
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1473
+        enthalpy_increment: 223.3
+        sigma: 8.3
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 8.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_03
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_03
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1473
+        enthalpy_increment: 236.3
+        sigma: 10.9
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule Pt; XCo cell blank
+      uncertainty:
+        reported_status: printed
+        value: 10.9
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_04
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_04
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1573
+        enthalpy_increment: 240.3
+        sigma: 6.2
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=1.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 6.2
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_05
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_05
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1573
+        enthalpy_increment: 251.2
+        sigma: 20.4
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule Pt; XCo cell blank
+      uncertainty:
+        reported_status: printed
+        value: 20.4
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_06
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_06
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1612
+        enthalpy_increment: 241.3
+        sigma: 18.9
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.7 wt%
+      uncertainty:
+        reported_status: printed
+        value: 18.9
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_07
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_07
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1652
+        enthalpy_increment: 257.7
+        sigma: 13.5
+        state: Solid
+        atmosphere: Ar
+        note: N=4; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 13.5
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_08
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_08
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1673
+        enthalpy_increment: 278.2
+        sigma: 19.0
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 19.0
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_09
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_09
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1693
+        enthalpy_increment: 340.3
+        sigma: 36.0
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 36.0
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_10
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_10
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1713
+        enthalpy_increment: 363.0
+        sigma: 14.6
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=3.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 14.6
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_11
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_11
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1731
+        enthalpy_increment: 373.5
+        sigma: 17.2
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=5.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 17.2
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_12
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_12
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1754
+        enthalpy_increment: 388.1
+        sigma: 10.6
+        state: Liquid
+        atmosphere: Ar
+        note: N=6; capsule PtCo; XCo=4.8 wt%
+      uncertainty:
+        reported_status: printed
+        value: 10.6
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_13
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_13
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 393.0
+        sigma: 18.7
+        state: Liquid
+        atmosphere: Ar
+        note: N=13; capsule PtCo; XCo=6.1 wt%
+      uncertainty:
+        reported_status: printed
+        value: 18.7
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
   CaAl2Si2O8:
-    observations:
+    observations: []
+    context:
     - observation_id: suga03_t2_anorthite_ar
-      type: heat_capacity_and_heat_content_series
+      type: calorimetric_heat_content_context
       locator:
         pdf_page_index: 3
         page: 4
@@ -565,11 +565,11 @@ species:
         value: 22.5
         units: kJ/mol
         value_semantics: two standard deviations of the mean
-    context: []
   CaMgSi2O6:
-    observations:
+    observations: []
+    context:
     - observation_id: suga03_t2_diopside_ar
-      type: heat_capacity_and_heat_content_series
+      type: calorimetric_heat_content_context
       locator:
         pdf_page_index: 3
         page: 4
@@ -592,57 +592,8 @@ species:
         value: 14.6
         units: kJ/mol
         value_semantics: two standard deviations of the mean
-    context: []
   Ni2SiO4:
     observations:
-    - observation_id: suga03_t2_nisio4_ar
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 3
-        page: 4
-        published_page: 2686
-        table: '2'
-        row: suga03_t2_nisio4_ar
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1773
-        enthalpy_increment: 308.8
-        sigma: 22.3
-        state: Solid
-        atmosphere: Ar
-        note: N=4; capsule Pt
-      uncertainty:
-        reported_status: printed
-        value: 22.3
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
-    - observation_id: suga03_t2_nisio4_air
-      type: heat_capacity_and_heat_content_series
-      locator:
-        pdf_page_index: 3
-        page: 4
-        published_page: 2686
-        table: '2'
-        row: suga03_t2_nisio4_air
-      phase: cr
-      units: kJ/mol
-      values:
-        quantity: H_minus_H298
-        method_class: measured_direct
-        T_K: 1773
-        enthalpy_increment: 271.8
-        sigma: 11.3
-        state: Solid
-        atmosphere: Air
-        note: N=9; capsule Pt
-      uncertainty:
-        reported_status: printed
-        value: 11.3
-        units: kJ/mol
-        value_semantics: two standard deviations of the mean
     - observation_id: suga03_t4_ni2sio4_2_heat_fusion
       type: heat_capacity_and_heat_content_series
       locator: &id005
@@ -733,307 +684,59 @@ species:
         sigma: 3.05
         source: Beattie (1993)
         note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t2_nisio4_ar
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_nisio4_ar
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 308.8
+        sigma: 22.3
+        state: Solid
+        atmosphere: Ar
+        note: N=4; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 22.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t2_nisio4_air
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_nisio4_air
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 271.8
+        sigma: 11.3
+        state: Solid
+        atmosphere: Air
+        note: N=9; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 11.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
   SiO2:
-    observations:
-    - observation_id: suga03_t3_x12.5_center_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: center
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 47.13
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 101.15
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.09
-        sigma: 0.09
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 101.15
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.09
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x12.5_adjacent_pt_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: adjacent_pt
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 46.86
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 100.66
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.44
-        sigma: 0.44
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 100.66
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.44
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x25_center_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: center
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 45.81
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 99.55
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.03
-        sigma: 0.03
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 99.55
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.03
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x25_adjacent_pt_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: adjacent_pt
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 45.65
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 100.62
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.3
-        sigma: 0.3
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 100.62
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.3
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x37.5_center_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: center
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 44.37
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 98.96
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.87
-        sigma: 0.87
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 98.96
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.87
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x37.5_adjacent_pt_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: adjacent_pt
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 44.4
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 99.43
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.97
-        sigma: 0.97
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 99.43
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.97
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x50_center_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: center
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 43.2
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 99.33
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.23
-        sigma: 0.23
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 99.33
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.23
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
-    - observation_id: suga03_t3_x50_adjacent_pt_sio2
-      type: composition_series
-      locator:
-        pdf_page_index: 4
-        page: 5
-        published_page: 2687
-        table: '3'
-        row: adjacent_pt
-      phase: glass
-      units: wt%
-      values:
-        quantity: equilibrium_phase_composition
-        component_amount: 43.22
-        phase_label: glass
-        basis: wt_percent
-        T_C: 1499.85
-        method_class: measured_direct
-        printed_sum: 99.52
-        printed_component: SiO2
-        printed_T: 1773 K
-        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.63
-        sigma: 0.63
-        point_conditions:
-          printed_sum:
-            state:
-              tag: value
-              value: 99.52
-            locator:
-              pdf_page_index: 4
-              page: 5
-              published_page: 2687
-              table: '3'
-      uncertainty:
-        reported_status: printed
-        value: 0.63
-        units: wt%
-        value_semantics: one standard deviation as stated in Table 3
+    observations: []
     context:
     - observation_id: suga03_t3_starting_composition_x12.5
-      type: bulk_charge_analysis_context
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1070,7 +773,7 @@ species:
             total: 100.66
             analyses: 3
     - observation_id: suga03_t3_starting_composition_x25
-      type: bulk_charge_analysis_context
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1107,7 +810,7 @@ species:
             total: 100.62
             analyses: 2
     - observation_id: suga03_t3_starting_composition_x37.5
-      type: bulk_charge_analysis_context
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1144,7 +847,7 @@ species:
             total: 99.43
             analyses: 3
     - observation_id: suga03_t3_starting_composition_x50
-      type: bulk_charge_analysis_context
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1243,10 +946,307 @@ species:
           H: 514.1
           sigma: 14.9
           N: 15
+    - observation_id: suga03_t3_x12.5_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 47.13
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.09
+        sigma: 0.09
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.09
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 46.86
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.44
+        sigma: 0.44
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.44
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 45.81
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.03
+        sigma: 0.03
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.03
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 45.65
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.3
+        sigma: 0.3
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.3
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 44.37
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.87
+        sigma: 0.87
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.87
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 44.4
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.97
+        sigma: 0.97
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.97
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 43.2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.23
+        sigma: 0.23
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.23
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 43.22
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.63
+        sigma: 0.63
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.63
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
   Al2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: suga03_t3_x12.5_center_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1283,7 +1283,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x12.5_adjacent_pt_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1320,7 +1320,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_center_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1357,7 +1357,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_adjacent_pt_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1394,7 +1394,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_center_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1431,7 +1431,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_adjacent_pt_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1468,7 +1468,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_center_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1505,7 +1505,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_adjacent_pt_al2o3
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1541,11 +1541,11 @@ species:
         value: 0.42
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
-    context: []
   MgO:
-    observations:
+    observations: []
+    context:
     - observation_id: suga03_t3_x12.5_center_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1582,7 +1582,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x12.5_adjacent_pt_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1619,7 +1619,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_center_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1656,7 +1656,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_adjacent_pt_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1693,7 +1693,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_center_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1730,7 +1730,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_adjacent_pt_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1767,7 +1767,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_center_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1804,7 +1804,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_adjacent_pt_mgo
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1840,11 +1840,37 @@ species:
         value: 0.19
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
-    context: []
   NiO:
-    observations:
+    observations: []
+    context:
+    - observation_id: suga03_nio_heat_content_context
+      type: heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+      units: kJ/mol, H_T-H_298; temperature in K
+      values:
+        quantity_as_printed: heat content
+        reference_temperature_K: 298
+        rows:
+        - atmosphere: Ar
+          capsule: Pt
+          phase: Solid
+          temperature_K: 1773
+          value: 100.6
+          sigma: 9.0
+          N: 5
+        - atmosphere: Air
+          capsule: Pt
+          phase: Solid
+          temperature_K: 1773
+          value: 87.9
+          sigma: 5.2
+          N: 10
     - observation_id: suga03_t3_x12.5_center_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1881,7 +1907,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x12.5_adjacent_pt_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1918,7 +1944,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_center_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1955,7 +1981,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_adjacent_pt_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -1992,7 +2018,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_center_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2029,7 +2055,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_adjacent_pt_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2066,7 +2092,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_center_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2103,7 +2129,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_adjacent_pt_nio
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2139,11 +2165,11 @@ species:
         value: 1.81
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
-    context: []
   CaO:
-    observations:
+    observations: []
+    context:
     - observation_id: suga03_t3_x12.5_center_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2180,7 +2206,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x12.5_adjacent_pt_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2217,7 +2243,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_center_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2254,7 +2280,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x25_adjacent_pt_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2291,7 +2317,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_center_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2328,7 +2354,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x37.5_adjacent_pt_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2365,7 +2391,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_center_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2402,7 +2428,7 @@ species:
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
     - observation_id: suga03_t3_x50_adjacent_pt_cao
-      type: composition_series
+      type: glass_analysis_context
       locator:
         pdf_page_index: 4
         page: 5
@@ -2438,7 +2464,6 @@ species:
         value: 0.73
         units: wt%
         value_semantics: one standard deviation as stated in Table 3
-    context: []
   Mg2SiO4:
     observations:
     - observation_id: suga03_t4_mg2sio4_1_heat_fusion

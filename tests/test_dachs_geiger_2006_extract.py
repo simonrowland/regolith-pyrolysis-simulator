@@ -42,21 +42,41 @@ def test_all_typed_endmember_values_migrate_with_temperature_and_species() -> No
         "dachs_geiger_2006_pyrope_cp_ppms_py4": ("Mg3Al2Si3O12", Quantity.CP, 322.4, 1.0),
         "dachs_geiger_2006_pyrope_cp_hw80": ("Mg3Al2Si3O12", Quantity.CP, 325.31, None),
         "dachs_geiger_2006_pyrope_cp_b96": ("Mg3Al2Si3O12", Quantity.CP, 325.5, None),
+        "dachs_geiger_2006_pyrope_entropy_hw80": ("Mg3Al2Si3O12", Quantity.S, 266.27, None),
+        "dachs_geiger_2006_pyrope_entropy_b88": ("Mg3Al2Si3O12", Quantity.S, 266.36, None),
+        "dachs_geiger_2006_pyrope_entropy_hp98": ("Mg3Al2Si3O12", Quantity.S, 266.3, None),
+        "dachs_geiger_2006_pyrope_entropy_g97": ("Mg3Al2Si3O12", Quantity.S, 274.45, 0.27),
         "dachs_geiger_2006_pyrope_entropy_ppms_py4": ("Mg3Al2Si3O12", Quantity.S, 265.01, 0.24),
         "dachs_geiger_2006_grossular_cp_ppms_gr1": ("Ca3Al2Si3O12", Quantity.CP, 325.1, 1.0),
         "dachs_geiger_2006_grossular_entropy_ppms_gr1": ("Ca3Al2Si3O12", Quantity.S, 257.86, 0.26),
         "dachs_geiger_2006_grossular_cp_ppms_gr2": ("Ca3Al2Si3O12", Quantity.CP, 326.5, 1.0),
         "dachs_geiger_2006_grossular_cp_hw80": ("Ca3Al2Si3O12", Quantity.CP, 333.17, None),
         "dachs_geiger_2006_grossular_cp_b96": ("Ca3Al2Si3O12", Quantity.CP, 331.3, None),
+        "dachs_geiger_2006_grossular_entropy_hw80": ("Ca3Al2Si3O12", Quantity.S, 260.12, None),
+        "dachs_geiger_2006_grossular_entropy_b88": ("Ca3Al2Si3O12", Quantity.S, 255.15, None),
+        "dachs_geiger_2006_grossular_entropy_hp98": ("Ca3Al2Si3O12", Quantity.S, 255, None),
+        "dachs_geiger_2006_grossular_entropy_g97": ("Ca3Al2Si3O12", Quantity.S, 257.47, 0.24),
         "dachs_geiger_2006_grossular_entropy_ppms_gr2": ("Ca3Al2Si3O12", Quantity.S, 259.47, 0.25),
     }
-    expected = {key: row for key, row in expected.items() if row[1] is Quantity.CP}
     assert len(migrator.result.observations) == len(expected)
+    document = _document()
     for observation_id, (formula, quantity, value, sigma) in expected.items():
         observation = migrator.result.observations[f"{EXTRACT.stem}::{observation_id}"]
         assert observation.identity.species.formula == formula
         assert observation.identity.quantity.value is quantity
         assert observation.identity.temperature_K.value == Decimal("298.15")
+        if quantity is Quantity.S:
+            source_row = next(
+                row
+                for species in document["species"].values()
+                for row in species.get("observations", [])
+                if row["observation_id"] == observation_id
+            )
+            assert source_row["values"]["method_class"] == (
+                "quoted_attributed"
+                if observation_id.endswith(("hw80", "b88", "hp98", "g97"))
+                else "author_derived"
+            )
         assert observation.value.point == Decimal(str(value))
         if sigma is None:
             assert observation.uncertainty.value is None
@@ -94,6 +114,5 @@ def test_fit_and_excess_entropy_tables_are_retained_as_context() -> None:
     assert any("Py_{10}Gr_{90}" in cell for row in table3 for cell in row)
     assert any("11.8 ± 0.5" in cell for row in table4 for cell in row)
     assert any("1247" in cell for row in table5 for cell in row)
-    assert any(row["value"] == "265.81±0.22" for row in table2_entropies["table2_standard_entropies_J_mol_K"])
-    assert "no TABLE_CSV asset" in table2_entropies["note"]
-    assert "rows" not in table2_entropies
+    assert "table2_standard_entropies_J_mol_K" not in table2_entropies
+    assert "pure-endmember values are transcribed separately" in table2_entropies["note"]

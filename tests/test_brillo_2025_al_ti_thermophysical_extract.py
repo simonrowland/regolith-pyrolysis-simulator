@@ -1,19 +1,19 @@
 """Source-grounded pins for the context-only Al–Ti thermophysical tables."""
 
 from copy import deepcopy
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml"
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+CORPUS = regolith_corpus_root()
 SID = "brillo-2025-al-ti-thermophysical"
 SOURCE_TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
 

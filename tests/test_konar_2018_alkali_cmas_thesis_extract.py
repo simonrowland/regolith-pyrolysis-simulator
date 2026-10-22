@@ -1,21 +1,19 @@
 """Source-grounded migration pins for Konar (2018), Tables 5.2 and A-D."""
 
 from copy import deepcopy
-import os
 from pathlib import Path
 
 import pytest
 import yaml
 
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.corpus_paths import regolith_corpus_root
 from tools.validate_literature_extracts import validate_extract_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml"
-CORPUS = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS = regolith_corpus_root()
 SOURCE_TEXT = CORPUS / "text/konar-2018-alkali-cmas-thesis/pdftotext-layout.txt"
 
 pytestmark = pytest.mark.skipif(
