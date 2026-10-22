@@ -1259,6 +1259,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_depletion_hour: int | str | None = None
         self._stage0_bakeout_reserved_carbon_kg = 0.0
         self._subsolidus_committed_kg_hr_by_species: Dict[str, float] = {}
+        self._subsolidus_joint_gas_kg_hr = 0.0
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
@@ -1623,6 +1624,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
         self._subsolidus_committed_kg_hr_by_species = {}
+        self._subsolidus_joint_gas_kg_hr = 0.0
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout = {}
         self.campaign_mgr.last_c0_exit = None
@@ -13408,6 +13410,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         seam_refusal_for=None,
         headspace_mbar: Mapping[str, Any] | None = None,
         temperature_K: float | None = None,
+        admitted_gas_kg_hr: Mapping[str, Any] | None = None,
+        solid_host_area_m2: Any = None,
+        alpha: Mapping[str, Any] | None = None,
     ) -> Dict[str, Any]:
         """Price C0 subsolidus hosts and commit only an admitted extent.
 
@@ -13438,6 +13443,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_notice_for_feedstock,
         )
 
+        self._subsolidus_joint_gas_kg_hr = 0.0
         if self.melt.campaign != CampaignPhase.C0:
             self.campaign_mgr.c0_first_melt_backstop = False
             diagnostic = {"skipped": "not_c0", "committed": False}
@@ -13526,19 +13532,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if headspace_mbar is None
                 else headspace_mbar
             )
+            flux_controls: Dict[str, Any] = {
+                "solid_host_bakeout": True,
+                "vapour_batch_flux_pressures_Pa": pressures_Pa,
+                "overhead_partials_Pa": gas_partials_Pa_from_headspace_mbar(
+                    headspace
+                ),
+                "molar_mass_kg_mol": molar_mass_kg_mol,
+                "reactions": provider_reactions,
+                "max_throughput_kg_hr": float(throughput),
+                "dt_hr": SUBSOLIDUS_STEP_DURATION_HR,
+                "admitted_gas_kg_hr": dict(admitted_gas_kg_hr or {}),
+            }
+            if solid_host_area_m2 is not None:
+                flux_controls["solid_host_area_m2"] = solid_host_area_m2
+            if alpha is not None:
+                flux_controls["alpha"] = dict(alpha)
             flux_result = self._dispatch_only(
                 ChemistryIntent.EVAPORATION_FLUX,
-                control_inputs={
-                    "solid_host_bakeout": True,
-                    "vapour_batch_flux_pressures_Pa": pressures_Pa,
-                    "overhead_partials_Pa": gas_partials_Pa_from_headspace_mbar(
-                        headspace
-                    ),
-                    "molar_mass_kg_mol": molar_mass_kg_mol,
-                    "reactions": provider_reactions,
-                    "max_throughput_kg_hr": float(throughput),
-                    "dt_hr": SUBSOLIDUS_STEP_DURATION_HR,
-                },
+                control_inputs=flux_controls,
             )
             provider_status = flux_result.status
             provider_diagnostic = dict(flux_result.diagnostic or {})
@@ -13565,6 +13577,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if committed:
             released_kg = dict(
                 provider_diagnostic.get("released_kg_hr_by_species") or {}
+            )
+            self._subsolidus_joint_gas_kg_hr = sum(
+                float(rate) for rate in released_kg.values()
             )
         self._subsolidus_committed_kg_hr_by_species = released_kg
 
@@ -14443,6 +14458,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
+        headspace_for_bakeout = None
+        if evaporation_campaign:
+            provisional_transport = self.overhead_model.estimate_transport_state(
+                evap_flux,
+                self.melt,
+                p_downstream_bar=self._headspace_downstream_pressure_bar(None),
+            )
+            headspace_for_bakeout = self.overhead_model.species_partial_pressures(
+                evap_flux,
+                float(provisional_transport["vapor_pressure_mbar"]),
+                self.species_formula_registry,
+            )
+        bakeout_diag = self._apply_c0_bakeout(
+            liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
+            headspace_mbar=headspace_for_bakeout,
+            admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
+        )
+        if bakeout_diag.get("provider_status") == "ok":
+            joint_scale = bakeout_diag.get("pump_scale")
+            if (
+                isinstance(joint_scale, (int, float))
+                and not isinstance(joint_scale, bool)
+                and math.isfinite(float(joint_scale))
+                and 0.0 <= float(joint_scale) < 1.0
+            ):
+                joint_scale = float(joint_scale)
+                evap_flux.species_kg_hr = {
+                    species: rate * joint_scale
+                    for species, rate in evap_flux.species_kg_hr.items()
+                    if rate * joint_scale > 1.0e-15
+                }
+                evap_flux.update_totals()
         overhead_flux = evap_flux
         effective_transport_capacity = (
             self._controlled_o2_transport_capacity(evap_flux)
@@ -14551,7 +14598,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # so m_dot_pipe = sum(m_dot_evolved); downstream reporting instead
             # uses y_i = m_dot_residual_i / sum(m_dot_residual). Both fluxes are
             # kg/hr, and near-total capture must not erase the upstream load.
-            transport_inlet_kg_hr=evap_flux.total_kg_hr,
+            transport_inlet_kg_hr=(
+                evap_flux.total_kg_hr
+                + float(getattr(self, "_subsolidus_joint_gas_kg_hr", 0.0) or 0.0)
+            ),
             transport_inlet_flux=evap_flux,
             effective_transport_capacity=effective_transport_capacity,
         )
@@ -14569,9 +14619,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 upstream_transport['vapor_pressure_mbar'],
                 self.species_formula_registry,
             )
-        )
-        self._apply_c0_bakeout(
-            liquid_fraction=getattr(equilibrium, 'liquid_fraction', None),
         )
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (

@@ -17,7 +17,7 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.subsolidus_bakeout import (
     CLEANED_MELT_ACCOUNT,
     FOULANT_ACCOUNT,
@@ -530,6 +530,145 @@ def test_step_average_fits_but_within_step_peak_exceeds_capacity():
     assert result.diagnostic["released_mol_by_species"]["O2"] == pytest.approx(
         0.5 * accepted
     )
+
+
+def test_ordinary_gas_and_solid_share_one_throughput():
+    """One pump scale covers the solid peak and gas already admitted this step."""
+    temperature_K = 1000.0
+    alpha = 0.4
+    p_eq = 20.0
+    per_m2 = _hk_driver_mol_h(
+        species="SO2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=0.0,
+        alpha=alpha,
+        area_m2=1.0,
+    )
+    area_m2 = 2.0 / per_m2
+    molar = {"SO2": _molar("SO2"), "O2": _molar("O2"), "CaO": _molar("CaO")}
+    gas_per_extent = molar["SO2"] + 0.5 * molar["O2"]
+    solid_peak = 2.0 * gas_per_extent
+    admitted = solid_peak
+    throughput = 1.5 * solid_peak
+    assert solid_peak < throughput < solid_peak + admitted
+    result = _dispatch_bakeout(
+        temperature_C=temperature_K - 273.15,
+        vapour_batch_flux_pressures_Pa={"SO2": p_eq},
+        solid_host_area_m2=area_m2,
+        max_throughput_kg_hr=throughput,
+        dt_hr=1.0,
+        alpha={"SO2": alpha},
+        molar_mass_kg_mol=molar,
+        admitted_gas_kg_hr={"Na": admitted},
+        reactions=[
+            _sulfate_reaction(host_remaining_mol=1.0, extent_bound_mol_rxn=10.0)
+        ],
+    )
+    combined = solid_peak + admitted
+    scale = throughput / combined
+    assert result.status == "ok"
+    assert result.diagnostic["pump_peak_demand_kg_hr"] == pytest.approx(combined)
+    assert result.diagnostic["admitted_gas_kg_hr"] == pytest.approx(admitted)
+    assert result.diagnostic["pump_scale"] == pytest.approx(scale)
+    assert result.diagnostic["pump_scale"] < 1.0
+    accepted = min(1.0, 2.0 * scale)
+    assert result.diagnostic["accepted_extent_mol_by_reaction"][
+        "anhydrite_decomposition"
+    ] == pytest.approx(accepted)
+    assert result.diagnostic["released_mol_by_species"]["O2"] == pytest.approx(
+        0.5 * accepted
+    )
+
+
+def test_joint_admission_scales_ordinary_gas_before_routing():
+    temperature_K = 1000.0
+    alpha = 0.4
+    p_eq = 20.0
+    per_m2 = _hk_driver_mol_h(
+        species="SO2",
+        temperature_K=temperature_K,
+        p_eq_Pa=p_eq,
+        p_bulk_Pa=0.0,
+        alpha=alpha,
+        area_m2=1.0,
+    )
+    area_m2 = 2.0 / per_m2
+    gas_per_extent = _molar("SO2") + 0.5 * _molar("O2")
+    solid_peak = 2.0 * gas_per_extent
+    admitted = solid_peak
+    throughput = 1.5 * solid_peak
+    scale = throughput / (solid_peak + admitted)
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
+        {"feed": {
+            "label": "joint",
+            "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+        }},
+        yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
+    )
+    sim.load_batch("feed", mass_kg=1000.0)
+    salt_before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"]
+    priced_temperature_C = temperature_K - 273.15
+    _arm_c0(sim, temperature_C=priced_temperature_C)
+    # The C0 ramp adds 50 C this hour. Restore the temperature the area was
+    # priced at after that update so the Hertz-Knudsen extent stays 2 mol/h.
+    original_update = sim._update_temperature
+
+    def _hold_priced_temperature():
+        original_update()
+        sim.melt.temperature_C = priced_temperature_C
+
+    sim._update_temperature = _hold_priced_temperature
+
+    def _evaporate(_equilibrium, overhead_partials_override_Pa=None):
+        return EvaporationFlux(
+            species_kg_hr={"Na": admitted},
+            total_kg_hr=admitted,
+        )
+
+    sim._calculate_evaporation = _evaporate
+    seen = {}
+
+    def _route(flux):
+        seen["na_kg_hr"] = flux.species_kg_hr.get("Na")
+        seen["salt_mol"] = sim.atom_ledger.mol_by_account(
+            SALT_FEED_ACCOUNT
+        ).get("CaSO4")
+        return flux
+
+    sim._route_to_condensation = _route
+    original = sim._apply_c0_bakeout
+
+    def _evaluator(**_kwargs):
+        return [{
+            "status": "supported",
+            "reaction_id": "anhydrite_decomposition",
+            "driving_gas_species_id": "SO2",
+            "extent_bound_mol_rxn": 10.0,
+            "equilibrium_gas_partial_pressures_Pa": {"SO2": p_eq},
+            "stoichiometry": _sulfate_reaction()["stoichiometry"],
+        }]
+
+    def _bakeout(**kwargs):
+        sim._volatiles_train_spec = type("Train", (), {
+            "max_throughput_kg_hr": throughput,
+        })()
+        kwargs["seam_refusal_for"] = lambda _species, _temperature_K: None
+        kwargs["evaluator_loader"] = lambda: _evaluator
+        kwargs["solid_host_area_m2"] = area_m2
+        kwargs["alpha"] = {"SO2": alpha}
+        return original(**kwargs)
+
+    sim._apply_c0_bakeout = _bakeout
+    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    sim.step()
+    assert seen["na_kg_hr"] == pytest.approx(admitted * scale)
+    assert seen["salt_mol"] == pytest.approx(salt_before - 2.0 * scale)
+    assert seen["salt_mol"] < salt_before
 
 
 def test_competing_branches_share_one_host_inventory():
