@@ -1,0 +1,110 @@
+source_id: xu-2026-excess-oxygen-magma
+source: /Users/simonrowland/Repos/regolith-corpus/raw/xu-2026-excess-oxygen-magma/xu-2026-excess-oxygen-magma.pdf
+supplement: /Users/simonrowland/Repos/regolith-sources/_incoming/xu-2026-excess-oxygen-magma/supporting/publisher-supplement.zip
+extraction_mode: manual_600dpi_render_checked
+table_tool: copied from offer-21 commit 57eef5488 into scratch; not committed
+table_tool_compare: >-
+  The born-digital PDF table draft merged mean and standard-deviation cells (for example 23.40 and 0.07 became 23.400.07),
+  so Table 1 was transcribed manually and checked cell by cell against the 600 dpi physical page 3 render. No tool emit was used.
+mappings:
+  - table: '1'
+    page: 3
+    columns:
+      - Experiment
+      - T (°C)
+      - P (GPa)
+      - Duration
+      - Redox condition
+      - EMPA element wt.% components
+      - Total (wt.%)
+      - SIMS CO2 and H2O (wt.%)
+      - EO (wt.%)
+    typed_as:
+      - one equilibrium_phase_composition observation per printed glass component per sample for EMPA values
+      - one equilibrium_phase_composition observation per printed glass component per sample for SIMS CO2 and H2O values
+    context_only:
+      - starting-material analysis, because it is not an equilibrated run-product phase
+      - Total and EO values, with printed standard deviations and the author equation
+    identity:
+      phase_role: glass
+      basis: wt_percent
+      temperature: values.T_C plus point_conditions.T_C from the Table 1 row
+      pressure: point_conditions.total_pressure_Pa and experiment.pressure_environment.total_pressure_Pa; GPa and atm converted to Pa
+      oxygen_source: printed PtO2 or No PtO2; no actual run fO2 is inferred
+      sample_binding: every component binds to the Table 1 LVP sample and row
+      quench: piston-cylinder products fell below 100°C in <7 s; cubic-press products below glass transition in <2 s; LVP-1 water-quenched
+    audit:
+      typed_scalar_observations: 273
+      row_column_assignment: every Table 1 mean and 1-sd cell checked against the 600 dpi render of physical page 3
+      locator: page 3 is the physical PDF page and pdf_page_index is 2
+  - table: '2'
+    page: 5
+    columns:
+      - Calculation
+      - T (°C)
+      - P (GPa)
+      - Si, Mg and O (wt.%)
+      - Total (wt.%)
+      - EO (wt.%)
+    disposition: context only
+    candidate_quantity_tokens:
+      - equilibrium_phase_composition
+      - excess oxygen
+    reason: Molecular-dynamics results and calculated EO are model outputs, not measurements; all printed rows and 1-sd values are retained.
+  - table: S1
+    locator: publisher workbook, sheet Table S1, cells A1:B12
+    columns:
+      - Mössbauer hyperfine parameter
+      - Fe2+ and Fe3+ doublet values
+    typed_as:
+      - Fe3+ relative area 70(3)% as measured_reduced fe3_fe2_ratio
+    context_only:
+      - Fe2+ and Fe3+ center shift, quadrupole splitting and FWHM
+      - Fe2+ relative area 30(3)%
+    raw_inputs: not printed; spectrum fit described in the Mössbauer method section
+  - table: S2
+    locator: publisher workbook, sheet Table S2, displayed cells A1:O177
+    columns:
+      - Sample
+      - Filename
+      - elemental EPMA analyses in wt.%
+      - Total
+    typed_as:
+      - one equilibrium_phase_composition observation per displayed glass component for every glass analysis
+    context_only:
+      - starting-material analyses
+      - individually identified clinopyroxene, garnet and silica-polymorph analyses because d-223 has no solid phase_role
+    identity:
+      phase_role: glass
+      basis: wt_percent
+      locator: worksheet cell coordinate for every typed component
+      sample_binding: printed LVP sample plus individual filename/spot
+    audit:
+      typed_scalar_observations: 1188
+      untyped_source_rows: 61
+      blank_cells: preserved as absent, never treated as zero or ditto
+  - table: S3
+    locator: publisher workbook, sheet Table S3, displayed cells A1:AL73
+    disposition: context only
+    candidate_quantity_tokens:
+      - concentration
+      - equilibrium_phase_composition
+      - ion_intensity
+    reason: SIMS counts, rates, ratios, uncertainties and ppm concentrations have no matching current token; ion_intensity is KEMS-specific and ppm is not wt_percent.
+    audit:
+      displayed_nonempty_cells_preserved: 763
+      cell_AL3: visible free-standing 'bad offset' string outside the A:R data grid; retained as a workbook artifact, not a measurement
+  - table: S4
+    locator: publisher workbook, sheet Table S4, displayed cells A1:U63
+    disposition: context only
+    candidate_quantity_tokens:
+      - concentration
+      - equilibrium_phase_composition
+      - ion_intensity
+    reason: SIMS counts, rates, calibration ratios and ppm concentrations have no matching current token; the SiO2 field belongs to calibration and is not a separate phase analysis.
+    audit:
+      displayed_nonempty_cells_preserved: 785
+  - figures: '1-3, S1-S8'
+    typed_as: context figure records with no numeric points
+    digitisation: deferred to a figure pass
+    marker_counts: not enumerated where captions do not provide them; no plotted values estimated
