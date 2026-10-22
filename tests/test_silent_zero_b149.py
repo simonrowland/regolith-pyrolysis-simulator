@@ -599,6 +599,53 @@ def test_internal_analytical_out_of_range_oxide_pressure_is_flagged() -> None:
     assert "valid_range_K=[1400, 2273.15]" in detail
 
 
+def test_internal_analytical_shomate_out_of_range_predicts_and_flags() -> None:
+    import math
+
+    from simulator.condensation import VAPOR_PRESSURE_DATA
+    from simulator.equilibrium import EquilibriumMixin
+    from simulator.vapour_rail.catalog import (
+        OUT_OF_RANGE_STATUS,
+        compiled_catalog_for,
+    )
+
+    catalog = compiled_catalog_for(
+        VAPOR_PRESSURE_DATA.catalog_payload,
+        emit_u0_request_rules=False,
+    )
+    evaluation = catalog.evaluator_for("MnO_gas").evaluate(
+        448.15,
+        source_activity=1.0,
+        pO2_bar=1e-12,
+    )
+
+    assert math.isfinite(evaluation.pressure_pa)
+    assert evaluation.pressure_pa > 0.0
+    assert evaluation.out_of_range is True
+    assert evaluation.status == OUT_OF_RANGE_STATUS
+
+    sim = _internal_analytical_host(
+        temperature_K=448.15,
+        composition_wt_pct={"MnO": 100.0},
+        vapor_pressures=VAPOR_PRESSURE_DATA,
+    )
+    result = EquilibriumMixin._internal_analytical_equilibrium(sim)
+
+    assert result.status == "ok"
+    note = next(
+        n
+        for n in result.diagnostics.get("silent_zero_notes") or []
+        if n.get("species") == "MnO_gas"
+        and n.get("zero_because") == ZeroBecause.OUT_OF_DOMAIN_MARKED.value
+    )
+    assert note["doctrine_category"] == CATEGORY_MARK
+    detail = note.get("detail") or ""
+    assert "reason=temperature_outside_valid_range_K" in detail
+    assert "authority_level=extrapolated" in detail
+    assert "certified_band_K=unavailable" in detail
+    assert "valid_range_K=[1519, 2273.15]" in detail
+
+
 def test_internal_analytical_full_catalog_skips_absent_non_antoine_species() -> None:
     from simulator.condensation import VAPOR_PRESSURE_DATA
     from simulator.equilibrium import EquilibriumMixin

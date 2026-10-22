@@ -1373,11 +1373,14 @@ class CompiledPressureEvaluator:
             # Unit check: K_ex and every p/P° ratio are dimensionless;
             # log10 P is log10(Pa). Sanity: at T=T_low the composite
             # reproduces the in-domain edge value when every constituent
-            # polynomial accepts T_low (no cliff). MnO_gas / CoO_gas target
-            # Shomate cover [1000, 3000] K; T below that floor raises
-            # ShomateDomainError from the polynomial module rather than a
-            # typed catalog continuation.
-            return float(self.reference_model.log10_pressure(temperature_K))
+            # polynomial accepts T_low (no cliff). If a constituent thermo
+            # polynomial has a narrower domain, continue from the evaluator
+            # edge with the existing 1/T tangent. Other catalog errors remain
+            # refusals rather than being laundered into extrapolations.
+            try:
+                return float(self.reference_model.log10_pressure(temperature_K))
+            except (NasaCeaDomainError, ShomateDomainError):
+                return self._reciprocal_T_tangent_log10(temperature_K)
 
         mode = self._physical_oor_continuation_mode()
         if mode == "direct":
