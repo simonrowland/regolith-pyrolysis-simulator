@@ -20,6 +20,7 @@ from simulator.accounting.queries import (
 )
 from simulator.wall_deposition import (
     _wall_geometry_conductance_weight,
+    wall_deposit_candidate_kg,
 )
 from simulator.condensation import (
     CondensationModel,
@@ -215,6 +216,25 @@ def test_f3_zero_length_pipe_property_names_length_m():
         _ = segment.surface_area_m2
 
 
+def test_b937_negative_whole_wall_area_refuses():
+    model = SimpleNamespace(
+        wall_temperature_C=900.0,
+        wall_surface_area_m2=-1.0,
+    )
+
+    with pytest.raises(
+        DepositionInputRefusal,
+        match="parameter=surface_area_m2",
+    ):
+        wall_deposit_candidate_kg(
+            model,
+            species="Fe",
+            rate_kg_hr=1.0,
+            T_cond_C=1250.0,
+            melt_temperature_C=1700.0,
+        )
+
+
 # ---------------------------------------------------------------------------
 # F4: +inf / sub-zero-Kelvin gas temperature must not mint a kg number
 # ---------------------------------------------------------------------------
@@ -321,6 +341,15 @@ def test_f6_omitted_group_does_not_look_like_a_clean_bakeoff():
     rendered = format_stage0_foulant_report_markdown({})
     assert "wall-deposited=0 kg" not in rendered
     assert "wall-deposited=unmeasured" in rendered
+
+
+def test_b937_missing_residual_bounds_render_as_unmeasured():
+    rendered = format_stage0_foulant_report_markdown({
+        "trapped_gasses": {"residual_interval": {}},
+    })
+
+    assert "residual_interval=0-0 kg" not in rendered
+    assert "residual_interval=unmeasured-unmeasured kg" in rendered
 
 
 # ---------------------------------------------------------------------------

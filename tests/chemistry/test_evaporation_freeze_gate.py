@@ -27,6 +27,7 @@ from simulator.chemistry.kernel import (
 from simulator.core import PoisonedHourError
 from simulator.evaporation import (
     EvaporationFluxRefusal,
+    FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
 from simulator.fe_redox import (
@@ -42,7 +43,11 @@ from simulator.melt_backend.base import (
     InternalAnalyticalBackend,
     MeltCompositionError,
 )
-from simulator.melt_backend.liquidus import LiquidusSolidusResult
+from simulator.melt_backend.liquidus import (
+    LIQUIDUS_LIQUID_EPSILON,
+    LiquidusSolidusResult,
+    MeltFractionSample,
+)
 from simulator.reduced_real_determinism import (
     GateCurveProviderOutcome,
     PT0DeterminismStore,
@@ -3165,6 +3170,7 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     assert 1 <= cache_rebuild_count <= 5
     assert gate_calls == cache_rebuild_count
     assert len(set(cache_ids)) <= cache_rebuild_count
+    assert factors == [factors[0]] * len(factors)
     assert factors == [1.0] * 10
     assert max(balance_errors) <= 5e-12
 
@@ -3488,9 +3494,16 @@ def test_shared_freeze_gate_curve_cache_uses_registered_authoritative_supplier(
         )
         sim.melt.temperature_C = 1600.0
         sim.melt.p_total_mbar = 10.0
+        # EC sampling reads equilibrate().liquid_fraction, not the finder
+        # result's liquid_fraction field. The helper's 0.8 sits below the
+        # liquid band at the declared liquidus, so the freeze gate refuses
+        # the curve. This supplier declares a liquidus, so the sample there
+        # is fully liquid.
+        equilibrium = _build_equilibrium_for_basalt()
+        equilibrium.liquid_fraction = 1.0
         backend = RegisteredAlphaBackend(
             mode='python_api',
-            equilibrium=_build_equilibrium_for_basalt(),
+            equilibrium=equilibrium,
             finder_result=LiquidusSolidusResult(
                 liquidus_T_C=liquidus,
                 solidus_T_C=1000.0,
@@ -6915,6 +6928,113 @@ def test_freeze_gate_curve_path_records_sr18_repair_notice(
         1.2,
         0.7,
     ]
+
+
+def _external_liquidus_result(raw_fraction: float) -> LiquidusSolidusResult:
+    return LiquidusSolidusResult(
+        status='ok',
+        solidus_T_C=1000.0,
+        liquidus_T_C=1300.0,
+        liquid_fraction=raw_fraction,
+        samples=(
+            MeltFractionSample(1000.0, 0.0),
+            MeltFractionSample(1150.0, 0.5),
+            MeltFractionSample(1300.0, raw_fraction),
+        ),
+        iterations=3,
+    )
+
+
+def _external_liquidus_points(raw_fraction: float) -> tuple:
+    return (
+        {'temperature_C': 1000.0, 'liquid_fraction': 0.0},
+        {'temperature_C': 1150.0, 'liquid_fraction': 0.5},
+        {'temperature_C': 1300.0, 'liquid_fraction': raw_fraction},
+    )
+
+
+def test_external_liquidus_fraction_below_epsilon_is_refused(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """An external path must not have f(liquidus) overwritten to 1."""
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    raw_fraction = 0.95
+    curve = sim._freeze_gate_curve_from_path(
+        _external_liquidus_points(raw_fraction),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1300.0,
+        source='external-engine',
+    )
+
+    assert curve is None
+    notices = sim._reduced_real_repair_notices
+    assert [notice['kind'] for notice in notices] == [
+        FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT,
+    ]
+    assert notices[0]['type'] == 'typed_notice'
+    assert notices[0]['action'] == 'refuse_curve'
+    assert notices[0]['temperature_C'] == 1300.0
+    assert notices[0]['raw_fraction'] == raw_fraction
+
+    reasons: list[str] = []
+    sim._reduced_real_repair_notices = []
+    replaced = sim._freeze_gate_curve_from_liquidus_result(
+        _external_liquidus_result(raw_fraction),
+        source='external-engine',
+        reasons=reasons,
+    )
+
+    assert replaced is None
+    assert reasons == [
+        f'external-engine {FREEZE_GATE_LIQUIDUS_FRACTION_INCONSISTENT}',
+    ]
+    assert [notice['raw_fraction'] for notice in sim._reduced_real_repair_notices] == [
+        raw_fraction,
+    ]
+
+
+def test_external_liquidus_fraction_within_epsilon_snaps_to_one(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A supplied fraction inside the finder band still snaps to 1."""
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    raw_fraction = 1.0 - LIQUIDUS_LIQUID_EPSILON
+    expected_path = ((1000.0, 0.0), (1150.0, 0.5), (1300.0, 1.0))
+    curve = sim._freeze_gate_curve_from_path(
+        _external_liquidus_points(raw_fraction),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1300.0,
+        source='external-engine',
+    )
+
+    assert curve['path'] == expected_path
+    assert getattr(sim, '_reduced_real_repair_notices', []) == []
+
+    reasons: list[str] = []
+    replaced = sim._freeze_gate_curve_from_liquidus_result(
+        _external_liquidus_result(raw_fraction),
+        source='external-engine',
+        reasons=reasons,
+    )
+
+    assert replaced['path'] == expected_path
+    assert reasons == []
 
 
 def test_failed_freeze_gate_fallback_preserves_repair_notices_without_memoizing(
