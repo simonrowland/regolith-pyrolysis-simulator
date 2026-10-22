@@ -98,103 +98,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -389,103 +299,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -680,103 +500,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -971,103 +701,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1262,103 +902,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1553,103 +1103,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1844,103 +1304,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2135,103 +1505,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2426,103 +1706,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2717,103 +1907,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3008,103 +2108,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3299,103 +2309,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3590,103 +2510,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3881,103 +2711,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4172,103 +2912,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4463,103 +3113,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4754,103 +3314,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5045,103 +3515,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5336,103 +3716,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5627,103 +3917,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5918,103 +4118,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6209,103 +4319,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6500,103 +4520,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6791,103 +4721,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7082,103 +4922,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7373,103 +5123,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7664,103 +5324,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7955,103 +5525,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -8246,103 +5726,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -8537,103 +5927,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -8828,103 +6128,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -9119,103 +6329,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -9410,103 +6530,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -9701,103 +6731,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -9992,103 +6932,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -10283,103 +7133,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -10574,103 +7334,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -10865,103 +7535,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -11156,103 +7736,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -11447,103 +7937,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -11738,103 +8138,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -12029,103 +8339,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -12320,103 +8540,13 @@ experiments:
         pdf_page_index: 52
         table: '1'
         note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements (N=8);
-          total 99.75 wt%; measured column, not calculated column.
+          total 99.75 wt%; measured column, not calculated column.; derived wt% to mole fraction for initial_composition
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.6'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.67'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '16.26'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '16.82'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 52
-              table: '1'
-              note: Measured major-element wt% of the synthetic FCMAS ferrobasalt starting mixture with 20 trace elements
-                (N=8); total 99.75 wt%; measured column, not calculated column.
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:

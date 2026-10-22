@@ -71,6 +71,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
+    IdentityEqualOutcome,
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     _AXIS_NAMES,
@@ -193,6 +194,41 @@ _ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
     _VAPOUR_EQUILIBRIUM
     | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
 )
+_SPECIES_FORMULA_INDEPENDENT_QUANTITIES = frozenset(
+    {Quantity.MASS_LOSS_FRACTION}
+)
+
+
+def _score_identity_equal(
+    left: Identity, right: Identity
+) -> IdentityEqualOutcome:
+    left_quantity = quantity_token(left)
+    right_quantity = quantity_token(right)
+    if (
+        left_quantity is Quantity.MASS_LOSS_FRACTION
+        or right_quantity is Quantity.MASS_LOSS_FRACTION
+    ):
+        if left_quantity is not right_quantity:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
+            )
+        # This bulk ratio has no species axis. The predictor validates its
+        # composition, pressure/regime, duration, mass, and area from the
+        # experiment; the scored identity coordinate is its printed T.
+        left_temperature = temperature_of(left)
+        right_temperature = temperature_of(right)
+        if left_temperature is None or right_temperature is None:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_UNKNOWN, ("temperature_K",)
+            )
+        if left_temperature != right_temperature:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_MISMATCH, ("temperature_K",)
+            )
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    return identity_equal(left, right)
+
+
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 # Engines that consume the SF04 magma companion workbook. Never score them
@@ -272,7 +308,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.LOG10_KF: MetricOperation.ABSOLUTE,
     Quantity.LOG10_K_STAR: MetricOperation.ABSOLUTE,
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: MetricOperation.ABSOLUTE,
-    Quantity.MASS_LOSS_FRACTION: MetricOperation.RELATIVE,
+    Quantity.MASS_LOSS_FRACTION: MetricOperation.ABSOLUTE,
     Quantity.MASS_LOSS_FRACTION_VS_T: MetricOperation.RELATIVE,
     Quantity.YIELD_FRACTION: MetricOperation.RELATIVE,
     Quantity.O2_YIELD: MetricOperation.RELATIVE,
@@ -2381,7 +2417,10 @@ def build_conjuncts(
         and isinstance(reference.identity, Identity)
         and isinstance(candidate.identity, Identity)
     ):
-        identity_ok = identity_equal(reference.identity, candidate.identity).kind is IdentityEqualKind.EQUAL
+        identity_ok = (
+            _score_identity_equal(reference.identity, candidate.identity).kind
+            is IdentityEqualKind.EQUAL
+        )
     cand_ok = False
     if candidate is not None:
         cev = candidate.evidence.class_
@@ -5854,6 +5893,127 @@ def _predict_phase_row(
     )
 
 
+def _predict_mass_loss_with_residue(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    experiment: Experiment | None,
+    observation: Observation,
+) -> EnginePrediction:
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence,
+        ResidueInventoryRefusal,
+        predict_mass_loss_fraction,
+    )
+
+    source_path = (
+        REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
+    )
+    source_document = load_yaml(source_path) if source_path.is_file() else {}
+    temperature = temperature_of(identity)
+    try:
+        result = predict_mass_loss_fraction(
+            engine.value,
+            experiment,
+            temperature_K=None if temperature is None else float(temperature),
+            source_document=source_document,
+            observation=observation,
+        )
+    except ResidueInventoryRefusal as exc:
+        reason = exc.reason
+        if reason in {
+            "engine_capability_unsupported", "residue_method_unsupported",
+        }:
+            refusal = RefusalReason.UNSUPPORTED
+            execution = ExecutionState.UNSUPPORTED
+        elif reason.endswith("_not_stated"):
+            refusal = RefusalReason.IDENTITY_INCOMPLETE
+            execution = ExecutionState.NOT_PROBED
+        elif reason == "openimcc_not_importable":
+            refusal = RefusalReason.OPENIMCC_NOT_IMPORTABLE
+            execution = ExecutionState.ATTEMPTED_UNAVAILABLE
+        elif reason == "initial_composition_invalid":
+            refusal = RefusalReason.METRIC_DOMAIN
+            execution = ExecutionState.NOT_PROBED
+        elif reason in {
+            "evaporation_coefficients_not_sourced", "alpha_not_sourced",
+            "area_shape_not_self_similar", "preheat_bound_not_negligible",
+        }:
+            refusal = RefusalReason.UNDERDETERMINED_APPARATUS
+            execution = ExecutionState.NOT_PROBED
+        else:
+            refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
+            execution = ExecutionState.ATTEMPTED_UNAVAILABLE
+        detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
+        if reason.endswith("_not_stated"):
+            detail["missing_input"] = exc.detail
+        elif reason in {"evaporation_coefficients_not_sourced", "alpha_not_sourced"}:
+            detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        if refusal is RefusalReason.UNSUPPORTED:
+            detail.update({"engine": engine.value, "capability": exc.detail})
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=refusal,
+            refusal_detail=detail,
+            identity=identity,
+        )
+    except ResidueEngineNonconvergence as exc:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
+            refusal_detail={
+                "reason": exc.reason,
+                "engine": engine.value,
+                "detail": exc.detail,
+            },
+            identity=identity,
+        )
+
+    notices = tuple(
+        Notice(
+            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
+                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+                or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.FALLBACK),
+            affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+            reason=flag,
+            origin=f"engine:{engine.value}",
+        )
+        for flag in result.engine_flags
+        if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
+    )
+    domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=as_decimal(str(result.mass_loss_fraction)),
+        unit="dimensionless",
+        coefficient_basis="initial_sample_mass",
+        authority=(
+            Authority.EXTRAPOLATED if domain_notices else Authority.BRIDGE
+        ),
+        notices=notices,
+        coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
+        lineage_complete=False,
+        identity=identity,
+        version=(
+            "method_class=calculated_residue_integrator; "
+            "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
+        ),
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -5905,6 +6065,15 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
+    if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
+        return _predict_mass_loss_with_residue(
+            engine,
+            identity,
+            channel,
+            sources,
+            experiment,
+            observation,
+        )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
     if quantity in PHASE_COMPOSITION_QUANTITIES or quantity in PRINTED_CAPACITY_QUANTITIES:
@@ -5927,7 +6096,10 @@ def predict_with_engine(
                 identity=identity,
             )
     formula = identity.species.formula
-    if parse_species_formula(formula) is None:
+    if (
+        quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and parse_species_formula(formula) is None
+    ):
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -8048,13 +8220,21 @@ def compile_residual(
         reason_token = "value_unknown"
         if reference.value.kind is ValueKind.UNAVAILABLE:
             reason_token = reference.value.unavailable_reason or "value_unavailable"
+        elif (
+            quantity is Quantity.MASS_LOSS_FRACTION
+            and reference.value.kind is ValueKind.INTERVAL
+        ):
+            reason_token = "observed_mass_loss_interval_not_point"
         return _refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": reason_token, "value_kind": reference.value.kind.value},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
-    if parse_species_formula(formula) is None:
+    if (
+        quantity not in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES
+        and parse_species_formula(formula) is None
+    ):
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
             {"reason": "species_formula_unparsed", "formula": formula},
@@ -8424,7 +8604,7 @@ def compile_residual(
     equal = (
         _same_row_redox_identity_equal(compared_reference, compared_candidate)
         if quantity is Quantity.FE3_FE2_RATIO
-        else identity_equal(compared_reference, compared_candidate)
+        else _score_identity_equal(compared_reference, compared_candidate)
     )
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (

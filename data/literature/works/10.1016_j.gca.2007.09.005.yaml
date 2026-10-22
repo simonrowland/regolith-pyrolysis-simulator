@@ -47,48 +47,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-11
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0001904'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-11
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -185,6 +159,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R-11
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000913'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-11
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -200,8 +189,8 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-13
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
@@ -360,48 +349,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-14
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000041'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-14
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -508,6 +471,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000058'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-14
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -523,48 +500,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-15
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000045'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-15
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -671,6 +622,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000006'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-15
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -686,48 +651,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-16
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000042'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-16
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -827,6 +766,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R-16
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000059'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-16
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -842,48 +796,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-17
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000044'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-17
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -990,6 +918,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000006'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-17
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1005,48 +947,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-18
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000399'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-18
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1150,6 +1066,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000274'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-18
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1165,48 +1095,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-2
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000263'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-2
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1310,6 +1214,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000228'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-2
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1325,48 +1243,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-3
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000238'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-3
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1470,6 +1362,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000215'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-3
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1485,48 +1391,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-4
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000222'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-4
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1630,6 +1510,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000206'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-4
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1645,48 +1539,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-6
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000209'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-6
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1793,6 +1661,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-6
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1808,48 +1690,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-7
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000301'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-7
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -1953,6 +1809,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000278'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-7
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -1968,48 +1838,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-8
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0001719'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-8
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2106,6 +1950,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R-8
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000875'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-8
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2121,48 +1980,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-9
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0001466'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R-9
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2259,6 +2092,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R-9
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000826'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R-9
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2274,48 +2122,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-1
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000242'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-1
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2419,6 +2241,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000217'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-1
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2434,48 +2270,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-10
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000254'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-10
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2579,6 +2389,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000222'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-10
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2594,48 +2418,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-11
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000287'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-11
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2739,6 +2537,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000024'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-11
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2754,48 +2566,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-12
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000319'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-12
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -2899,6 +2685,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000252'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-12
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -2914,48 +2714,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-13
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000003'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-13
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3062,6 +2836,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000052'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R2-13
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3077,48 +2865,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-14
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000034'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-14
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3225,6 +2987,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000054'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R2-14
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3240,48 +3016,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-15
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000043'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-15
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3388,6 +3138,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000059'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R2-15
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3403,48 +3167,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-16
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000178'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-16
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3548,6 +3286,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000184'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-16
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3563,48 +3315,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-17
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000028'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-17
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3711,6 +3437,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000051'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-17
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3726,48 +3466,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-18
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000025'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-18
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -3874,6 +3588,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000047'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-18
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -3889,48 +3617,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-19
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000034'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-19
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4037,6 +3739,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000054'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-19
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4052,48 +3768,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-2
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000205'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-2
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4197,6 +3887,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000197'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-2
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4212,48 +3916,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-20
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000002'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-20
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4360,6 +4038,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000042'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-20
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4375,48 +4067,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-21
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000018'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-21
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4523,6 +4189,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000039'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-21
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4538,48 +4218,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-3
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000169'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-3
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4683,6 +4337,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000179'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-3
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4698,48 +4366,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-4
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0001766'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-4
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4836,6 +4478,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R2-4
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000885'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-4
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -4851,48 +4508,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-5
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000186'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-5
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -4996,6 +4627,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000904'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-5
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5011,48 +4656,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-7
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000037'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-7
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5159,6 +4778,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000056'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R2-7
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5174,48 +4807,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-8
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000027'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-8
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5322,6 +4929,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000049'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R2-8
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5337,48 +4958,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-9
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000044'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R2-9
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5485,6 +5080,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000006'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R2-9
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5500,48 +5109,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-1
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000257'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-1
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5645,6 +5228,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000223'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-1
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5660,48 +5257,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-10
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000284'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-10
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5798,6 +5369,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R3-10
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000024'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-10
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5813,48 +5399,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-11
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000226'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-11
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -5951,6 +5511,21 @@ experiments:
     published_page: 5549
     table: '1'
     note: row=R3-11
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000209'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-11
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -5966,48 +5541,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-12
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000254'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-12
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6153,48 +5702,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-13
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000233'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-13
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6298,6 +5821,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000213'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-13
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -6313,48 +5850,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-14
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000276'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-14
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6458,6 +5969,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000235'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-14
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -6473,48 +5998,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-15
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000241'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-15
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6618,6 +6117,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000217'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-15
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -6633,48 +6146,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-18
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000248'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-18
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6778,6 +6265,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000218'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-18
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -6793,48 +6294,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-19
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000317'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-19
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -6938,6 +6413,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000251'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-19
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -6953,48 +6442,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-2
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000025'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-2
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7101,6 +6564,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000221'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-2
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7116,48 +6593,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-20
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000256'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-20
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7261,6 +6712,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000222'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-20
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7276,48 +6741,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-21
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000033'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-21
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7421,6 +6860,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000254'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-21
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7436,48 +6889,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-4
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000225'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-4
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7581,6 +7008,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000206'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-4
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7596,48 +7037,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-5
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000231'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-5
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7741,6 +7156,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000209'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-5
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7756,48 +7185,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-7
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.000022'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-7
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -7901,6 +7304,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000204'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-7
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -7916,48 +7333,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-8
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000237'
           approximate: false
       locator:
+        published_page: 5550
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-8
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -8061,6 +7452,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000212'
+            approximate: false
+        locator:
+          published_page: 5550
+          table: '1'
+          paragraph: R3-8
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
@@ -8076,48 +7481,22 @@ experiments:
 - experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-9
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample:
     mass_kg:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '0.000005'
-          interval_high: '0.0002'
+          kind: point
+          point: '0.0000356'
           approximate: false
       locator:
+        published_page: 5549
         table: '1'
-        note: Printed 5-200 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '5'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '200'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              table: '1'
-              note: Printed 5-200 mg; unit conversion only
-        output_unit: kg
+        paragraph: R3-9
+        note: Table 1 initial_weight_mg; exact mg-to-kg conversion
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
     initial_composition:
       state:
         tag: value
@@ -8221,6 +7600,20 @@ experiments:
         value: iridium wire loops
       locator:
         section: 3.1 Starting materials and experimental procedure
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000264'
+            approximate: false
+        locator:
+          published_page: 5549
+          table: '1'
+          paragraph: R3-9
+          note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
     total_duration_s:
