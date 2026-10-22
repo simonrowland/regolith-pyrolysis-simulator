@@ -26,8 +26,11 @@ Ambiguity resolutions:
   complete resolved observation/table lineage with no overlap; incomplete
   or unresolvable sources imply unknown, never independence; same work
   alone is not circular. Work/source/file aliases expand to registered
-  observation/table inputs and are not independence. Reference lineage
-  includes TABLE_CSV assets consumed through read_from. Diagnostic numeric
+  observation/table inputs and are not independence. Direct resolution
+  and alias expansion use one corpus asset registry. Reference lineage
+  includes TABLE_CSV assets consumed through read_from; any other
+  nonempty read_from that is not a registered source asset is
+  unresolvable. Diagnostic numeric
   residuals with those notices remain valid at score_eligible=False (M02).
   Live clamps are chunk 2.
 - Compilation pairs with legitimate ``not_applicable`` axes are valid
@@ -1447,6 +1450,14 @@ def _asset_ids(works: Mapping[str, Work] | None) -> set[str]:
     return ids
 
 
+def _is_registered_non_table(
+    token: str, table_ids: set[str], asset_ids: set[str] | None
+) -> bool:
+    """Registered source file that stays out of the overlap id set."""
+
+    return asset_ids is not None and token in asset_ids and token not in table_ids
+
+
 def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
     """Work owning a work id, source id, or non-table file/pdf alias."""
 
@@ -1529,13 +1540,20 @@ def _inputs_for_work(
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
     obs_by_work: Mapping[str, tuple[Observation, ...]] | None = None,
+    asset_ids: set[str] | None = None,
 ) -> Ancestry:
     membership = _experiment_membership_failure(observations, experiments)
     if membership is not None:
         return membership
     assert experiments is not None
     ids: set[str] = set()
-    asset_ids = {asset.asset_id for asset in work.source_files.files}
+    # The corpus registry, when the caller has one. A single-work caller
+    # still has only that work's files. Unknown strings are not assets.
+    registered = (
+        asset_ids
+        if asset_ids is not None
+        else {asset.asset_id for asset in work.source_files.files}
+    )
     for asset in work.source_files.files:
         if asset.role is AssetRole.TABLE_CSV:
             ids.add(asset.asset_id)
@@ -1554,7 +1572,7 @@ def _inputs_for_work(
             obs.observation_id,
             observations,
             table_ids,
-            asset_ids=asset_ids,
+            asset_ids=registered,
         )
         if not nested.complete:
             return nested
@@ -1587,9 +1605,15 @@ def _index_work_inputs(
             }
         obs_by_work.setdefault(experiment.work_id, []).append(obs)
     grouped = {work_id: tuple(rows) for work_id, rows in obs_by_work.items()}
+    registered = _asset_ids(works)
     return {
         work.work_id: _inputs_for_work(
-            work, observations, experiments, table_ids, grouped
+            work,
+            observations,
+            experiments,
+            table_ids,
+            grouped,
+            registered,
         )
         for work in works.values()
     }
@@ -1624,13 +1648,16 @@ def _inputs_registered_under_work(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
+    asset_ids: set[str] | None = None,
 ) -> Ancestry:
     bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
     if bound is not None and bound[0] == frozenset(table_ids):
         found_map = bound[1]
         if work.work_id in found_map:
             return found_map[work.work_id]
-    return _inputs_for_work(work, observations, experiments, table_ids)
+    return _inputs_for_work(
+        work, observations, experiments, table_ids, asset_ids=asset_ids
+    )
 
 
 def _observation_lineage(
@@ -1647,8 +1674,9 @@ def _observation_lineage(
     A shared ancestor is returned from the cache. An id still on the
     active stack is a cycle. A derivation input that is neither an
     observation, a table, nor a registered source asset is unresolvable
-    and is not dropped. A registered non-table asset stays out of the
-    id set: it is a source file, not an observation or table ancestor.
+    and is not dropped. read_from is a work asset, not an observation
+    edge: a table is an ancestor, a registered non-table asset stays
+    out of the id set, and any other nonempty value is unresolvable.
     """
 
     if _cache is None:
@@ -1675,48 +1703,57 @@ def _observation_lineage(
         result = Ancestry.incomplete(AncestryFailure.PRINTED_UNRESOLVED)
     else:
         ids: set[str] = {observation_id}
-        if obs.read_from and obs.read_from in table_ids:
-            ids.add(obs.read_from)
-        result = Ancestry.of(ids)
-        for parent in obs.derived_from or ():
-            nested = _observation_lineage(
-                parent,
-                observations,
-                table_ids,
-                asset_ids=asset_ids,
-                _cache=_cache,
-                _stack=_stack,
-            )
-            if not nested.complete:
-                result = nested
-                break
-            assert nested.ids is not None and result.ids is not None
-            ids |= set(nested.ids)
-            result = Ancestry.of(ids)
+        unresolved_read_from = False
+        if obs.read_from:
+            if obs.read_from in table_ids:
+                ids.add(obs.read_from)
+            elif _is_registered_non_table(obs.read_from, table_ids, asset_ids):
+                pass
+            else:
+                unresolved_read_from = True
+        if unresolved_read_from:
+            result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
         else:
-            if obs.derivation is not None:
-                for inp in obs.derivation.inputs:
-                    if inp not in observations and inp not in table_ids:
-                        if asset_ids is not None and inp in asset_ids:
-                            continue
-                        result = Ancestry.incomplete(
-                            AncestryFailure.UNRESOLVABLE_INPUT
+            result = Ancestry.of(ids)
+            for parent in obs.derived_from or ():
+                nested = _observation_lineage(
+                    parent,
+                    observations,
+                    table_ids,
+                    asset_ids=asset_ids,
+                    _cache=_cache,
+                    _stack=_stack,
+                )
+                if not nested.complete:
+                    result = nested
+                    break
+                assert nested.ids is not None and result.ids is not None
+                ids |= set(nested.ids)
+                result = Ancestry.of(ids)
+            else:
+                if obs.derivation is not None:
+                    for inp in obs.derivation.inputs:
+                        if inp not in observations and inp not in table_ids:
+                            if _is_registered_non_table(inp, table_ids, asset_ids):
+                                continue
+                            result = Ancestry.incomplete(
+                                AncestryFailure.UNRESOLVABLE_INPUT
+                            )
+                            break
+                        nested = _observation_lineage(
+                            inp,
+                            observations,
+                            table_ids,
+                            asset_ids=asset_ids,
+                            _cache=_cache,
+                            _stack=_stack,
                         )
-                        break
-                    nested = _observation_lineage(
-                        inp,
-                        observations,
-                        table_ids,
-                        asset_ids=asset_ids,
-                        _cache=_cache,
-                        _stack=_stack,
-                    )
-                    if not nested.complete:
-                        result = nested
-                        break
-                    assert nested.ids is not None and result.ids is not None
-                    ids |= set(nested.ids)
-                    result = Ancestry.of(ids)
+                        if not nested.complete:
+                            result = nested
+                            break
+                        assert nested.ids is not None and result.ids is not None
+                        ids |= set(nested.ids)
+                        result = Ancestry.of(ids)
     _stack.remove(observation_id)
     _cache[observation_id] = result
     return result
@@ -1752,7 +1789,7 @@ def _resolve_coefficient_sources(
             if work is None:
                 return Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
             nested = _inputs_registered_under_work(
-                work, observations, experiments, table_ids
+                work, observations, experiments, table_ids, asset_ids
             )
         if not nested.complete:
             return nested

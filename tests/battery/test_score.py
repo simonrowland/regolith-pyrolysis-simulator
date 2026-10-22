@@ -6363,6 +6363,7 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
     from simulator.battery.score import lineage_complete_for
     from simulator.battery.validate import (
         AncestryFailure,
+        _asset_ids,
         _inputs_for_work,
         _inputs_registered_under_work,
         _observation_lineage,
@@ -6389,23 +6390,32 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
     experiment = F.tabulation_experiment(
         experiment_id="lineage-exp", work_id=work.work_id
     )
-    sibling = F.observation(
-        "sibling-a",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="lineage-source",
+    sibling = replace(
+        F.observation(
+            "sibling-a",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="lineage-source",
+        ),
+        read_from="lineage-pdf",
     )
-    printed = _printed_unresolved_observation(
-        "row-b",
-        experiment.experiment_id,
-        derived_from=(sibling.observation_id,),
+    printed = replace(
+        _printed_unresolved_observation(
+            "row-b",
+            experiment.experiment_id,
+            derived_from=(sibling.observation_id,),
+        ),
+        read_from="lineage-pdf",
     )
-    printed_alone = _printed_unresolved_observation(
-        "row-b-alone",
-        experiment.experiment_id,
-        derived_from=(),
+    printed_alone = replace(
+        _printed_unresolved_observation(
+            "row-b-alone",
+            experiment.experiment_id,
+            derived_from=(),
+        ),
+        read_from="lineage-pdf",
     )
     ref_work = replace(F.work("ref-work"), source_ids=("ref-work",))
     ref_experiment = F.tabulation_experiment(
@@ -6498,11 +6508,17 @@ def test_printed_unresolved_work_alias_stays_incomplete() -> None:
                 assert_incomplete(alias)
         if _name == "sibling-and-table":
             assert _observation_lineage(
-                sibling.observation_id, observations, table_ids
+                sibling.observation_id,
+                observations,
+                table_ids,
+                asset_ids=_asset_ids(works),
             ).complete
             assert (
                 _observation_lineage(
-                    printed.observation_id, observations, table_ids
+                    printed.observation_id,
+                    observations,
+                    table_ids,
+                    asset_ids=_asset_ids(works),
                 ).failure
                 is AncestryFailure.PRINTED_UNRESOLVED
             )
@@ -6633,6 +6649,7 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     from simulator.battery.enums import RawInputStatus
     from simulator.battery.score import lineage_complete_for
     from simulator.battery.validate import (
+        _asset_ids,
         _inputs_registered_under_work,
         _observation_lineage,
         _table_ids,
@@ -6657,13 +6674,16 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     experiment = F.tabulation_experiment(
         experiment_id="pin-exp", work_id=work.work_id
     )
-    parent = F.observation(
-        "pin-parent",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="pin-source",
+    parent = replace(
+        F.observation(
+            "pin-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="pin-source",
+        ),
+        read_from="pin-pdf",
     )
     left = F.observation(
         "pin-left",
@@ -6680,6 +6700,7 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
             output_unit="dimensionless",
         ),
     )
+    left = replace(left, read_from="pin-pdf")
     right = replace(left, observation_id="pin-right")
     unprinted = F.observation(
         "pin-unprinted",
@@ -6700,6 +6721,7 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
             ),
         ),
     )
+    unprinted = replace(unprinted, read_from="pin-pdf")
     table_reader = replace(parent, observation_id="pin-reader", read_from="pin-table")
     ref_work = replace(F.work("pin-ref-work"), source_ids=("pin-ref-work",))
     ref_experiment = F.tabulation_experiment(
@@ -6723,9 +6745,12 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
     }
     works = {work.work_id: work, ref_work.work_id: ref_work}
     table_ids = _table_ids(works)
+    corpus_assets = _asset_ids(works)
 
     def ids_of(row_id: str) -> set[str]:
-        result = _observation_lineage(row_id, observations, table_ids)
+        result = _observation_lineage(
+            row_id, observations, table_ids, asset_ids=corpus_assets
+        )
         assert result.complete and result.ids is not None
         return set(result.ids)
 
@@ -6905,51 +6930,65 @@ def test_unresolvable_derivation_input_is_incomplete() -> None:
     work, experiment, reference_work, reference_experiment, reference = _alias_fixture(
         "missing-input"
     )
-    parent = F.observation(
-        "missing-input-parent",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="missing-input-source",
-    )
-    child = F.observation(
-        "missing-input-child",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_REDUCED,
-        source_id="missing-input-source",
-        derived_from=(parent.observation_id,),
-        derivation=Derivation(
-            relation="qualified pointer",
-            inputs=(parent.observation_id, "other::missing"),
-            parameters=(),
-            output_unit="dimensionless",
+    parent = replace(
+        F.observation(
+            "missing-input-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="missing-input-source",
         ),
+        read_from="missing-input-pdf",
+    )
+    child = replace(
+        F.observation(
+            "missing-input-child",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="missing-input-source",
+            derived_from=(parent.observation_id,),
+            derivation=Derivation(
+                relation="qualified pointer",
+                inputs=(parent.observation_id, "other::missing"),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="missing-input-pdf",
     )
     observations = {parent.observation_id: parent, child.observation_id: child}
     table_ids = _table_ids({work.work_id: work})
-    assert _observation_lineage(parent.observation_id, observations, table_ids).complete
+    own_assets = {asset.asset_id for asset in work.source_files.files}
+    assert _observation_lineage(
+        parent.observation_id, observations, table_ids, asset_ids=own_assets
+    ).complete
     assert (
-        _observation_lineage(child.observation_id, observations, table_ids).failure
+        _observation_lineage(
+            child.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
         is AncestryFailure.UNRESOLVABLE_INPUT
     )
     pdf_id = "missing-input-pdf"
-    registered = F.observation(
-        "missing-input-registered-pdf",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="missing-input-source",
-        derived_from=(),
-        derivation=Derivation(
-            relation="read from the source pdf",
-            inputs=(pdf_id,),
-            parameters=(),
-            output_unit="dimensionless",
+    registered = replace(
+        F.observation(
+            "missing-input-registered-pdf",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="missing-input-source",
+            derived_from=(),
+            derivation=Derivation(
+                relation="read from the source pdf",
+                inputs=(pdf_id,),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
         ),
+        read_from=pdf_id,
     )
     asset_ids = {asset.asset_id for asset in work.source_files.files}
     registered_ids = {registered.observation_id: registered}
@@ -7003,6 +7042,7 @@ def test_cyclic_ancestry_is_incomplete() -> None:
     from simulator.battery.validate import AncestryFailure, _observation_lineage, _table_ids
 
     work, experiment, *_rest = _alias_fixture("cycle")
+    own_assets = {asset.asset_id for asset in work.source_files.files}
     left = replace(
         F.observation(
             "cycle-left",
@@ -7013,32 +7053,40 @@ def test_cyclic_ancestry_is_incomplete() -> None:
             source_id="cycle-source",
         ),
         derived_from=("cycle-right",),
+        read_from="cycle-pdf",
     )
     right = replace(left, observation_id="cycle-right", derived_from=("cycle-left",))
     observations = {left.observation_id: left, right.observation_id: right}
     table_ids = _table_ids({work.work_id: work})
     assert (
-        _observation_lineage(left.observation_id, observations, table_ids).failure
+        _observation_lineage(
+            left.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
         is AncestryFailure.CYCLE
     )
     assert (
-        _observation_lineage(right.observation_id, observations, table_ids).failure
+        _observation_lineage(
+            right.observation_id, observations, table_ids, asset_ids=own_assets
+        ).failure
         is AncestryFailure.CYCLE
     )
-    input_left = F.observation(
-        "input-cycle-left",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_REDUCED,
-        source_id="cycle-source",
-        derived_from=(),
-        derivation=Derivation(
-            relation="input cycle",
-            inputs=("input-cycle-right",),
-            parameters=(),
-            output_unit="dimensionless",
+    input_left = replace(
+        F.observation(
+            "input-cycle-left",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="cycle-source",
+            derived_from=(),
+            derivation=Derivation(
+                relation="input cycle",
+                inputs=("input-cycle-right",),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
         ),
+        read_from="cycle-pdf",
     )
     input_right = replace(
         input_left,
@@ -7051,7 +7099,10 @@ def test_cyclic_ancestry_is_incomplete() -> None:
     }
     assert (
         _observation_lineage(
-            input_left.observation_id, input_observations, table_ids
+            input_left.observation_id,
+            input_observations,
+            table_ids,
+            asset_ids=own_assets,
         ).failure
         is AncestryFailure.CYCLE
     )
@@ -7062,13 +7113,16 @@ def test_cyclic_ancestry_is_incomplete() -> None:
         (left.observation_id, work.work_id, "cycle-source", "cycle-pdf"),
         AncestryFailure.CYCLE,
     )
-    parent = F.observation(
-        "dag-parent",
-        experiment.experiment_id,
-        F.o2_identity(),
-        Decimal("0"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="cycle-source",
+    parent = replace(
+        F.observation(
+            "dag-parent",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="cycle-source",
+        ),
+        read_from="cycle-pdf",
     )
     dag_left = replace(left, observation_id="dag-left", derived_from=("dag-parent",))
     dag_right = replace(right, observation_id="dag-right", derived_from=("dag-parent",))
@@ -7077,8 +7131,12 @@ def test_cyclic_ancestry_is_incomplete() -> None:
         dag_left.observation_id: dag_left,
         dag_right.observation_id: dag_right,
     }
-    assert _observation_lineage(dag_left.observation_id, dag, table_ids).complete
-    assert _observation_lineage(dag_right.observation_id, dag, table_ids).complete
+    assert _observation_lineage(
+        dag_left.observation_id, dag, table_ids, asset_ids=own_assets
+    ).complete
+    assert _observation_lineage(
+        dag_right.observation_id, dag, table_ids, asset_ids=own_assets
+    ).complete
 
 
 def test_missing_experiment_map_alias_is_incomplete() -> None:
@@ -7210,6 +7268,278 @@ def test_unknown_alias_is_incomplete() -> None:
     check()
     with bound_work_inputs(works, observations, experiments):
         check()
+
+
+def test_unresolved_read_from_is_incomplete() -> None:
+    """b-979: an unresolved read_from is incomplete on the reference and as a coefficient."""
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _table_ids,
+    )
+
+    work, experiment, *_rest = _alias_fixture("dangling-read")
+    row = replace(
+        F.observation(
+            "dangling-read-row",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dangling-read-source",
+        ),
+        read_from="missing::table",
+    )
+    works = {work.work_id: work}
+    direct = _observation_lineage(
+        row.observation_id,
+        {row.observation_id: row},
+        _table_ids(works),
+        asset_ids=_asset_ids(works),
+    )
+    assert direct.failure is AncestryFailure.UNRESOLVABLE_INPUT
+    _assert_alias_failure(
+        work,
+        experiment,
+        (row,),
+        (
+            row.observation_id,
+            work.work_id,
+            "dangling-read-source",
+            "dangling-read-pdf",
+        ),
+        AncestryFailure.UNRESOLVABLE_INPUT,
+    )
+
+    redox = replace(
+        F.observation(
+            "dangling-read-redox",
+            "exp-1",
+            _fe_ratio_identity(),
+            Decimal("0.4"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        read_from="missing::table",
+    )
+    redox_residual, redox_candidate = _compile_redox(redox)
+    assert redox_residual.source_relation is SourceRelation.UNKNOWN
+    assert redox_residual.score_eligible is False
+    assert (
+        "source_relation_independent_complete_ancestry" in redox_residual.exclusions
+    )
+    assert redox_candidate is not None and redox_candidate.engine is not None
+    assert redox_candidate.engine.lineage_complete is True
+
+    plain = replace(
+        F.observation(
+            "dangling-read-o2",
+            "exp-1",
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        read_from="missing::table",
+    )
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(
+            state=ExecutionState.PRODUCED, call_evidence="test:read-from"
+        ),
+        value=Decimal("0"),
+        unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=plain.identity,
+    )
+    plain_residual, plain_candidate = compile_residual(
+        plain,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), F.tabulation_experiment(), plain),
+        prediction=prediction,
+        comparison_ids={plain.observation_id},
+        derived_band=DecisionBand(
+            Decimal("1"), QUANTITY_UNITS[Quantity.DELTA_FG], "test"
+        ),
+    )
+    assert plain_residual.source_relation is SourceRelation.UNKNOWN
+    assert plain_residual.score_eligible is False
+    assert plain_candidate is not None and plain_candidate.engine is not None
+    assert plain_candidate.engine.lineage_complete is True
+
+
+def test_registered_read_from_stays_out_of_the_lineage() -> None:
+    """b-979: a registered non-table read_from stays complete and out of the id set."""
+
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import (
+        _asset_ids,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    work = F.work("registered-read-work")
+    experiment = F.tabulation_experiment(
+        experiment_id="registered-read-exp", work_id=work.work_id
+    )
+    row = F.observation(
+        "registered-read-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="janaf-4th",
+    )
+    assert row.read_from == "pdf-1"
+    observations = {row.observation_id: row}
+    experiments = {experiment.experiment_id: experiment}
+    works = {work.work_id: work}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    member_ids = frozenset({row.observation_id, "nasa-cea-thermo"})
+
+    def check() -> None:
+        direct = _observation_lineage(
+            row.observation_id, observations, table_ids, asset_ids=corpus
+        )
+        assert direct.complete and direct.ids == frozenset({row.observation_id})
+        for alias in (work.work_id, "janaf-4th", "pdf-1"):
+            expanded = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert expanded.complete and expanded.ids == member_ids
+            assert lineage_complete_for(
+                (alias,),
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            ) is True
+        assert (
+            resolve_source_relation(
+                row,
+                ("nasa-cea-thermo",),
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.INDEPENDENT
+        )
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+
+def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
+    """b-979: direct resolution and alias expansion accept the same cross-work asset."""
+
+    from simulator.battery.validate import (
+        AncestryFailure,
+        _asset_ids,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+        _table_ids,
+        bound_work_inputs,
+    )
+
+    wa, wa_experiment, *_rest_a = _alias_fixture("wa")
+    wb, wb_experiment, *_rest_b = _alias_fixture("wb")
+    parent = replace(
+        F.observation(
+            "wb-parent",
+            wb_experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="wb-source",
+            derivation=Derivation(
+                relation="source pdf",
+                inputs=("wb-pdf",),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="wb-pdf",
+    )
+    child = replace(
+        F.observation(
+            "wa-child",
+            wa_experiment.experiment_id,
+            F.o2_identity(),
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="wa-source",
+            derived_from=(parent.observation_id,),
+            derivation=Derivation(
+                relation="parent on the other work",
+                inputs=(parent.observation_id,),
+                parameters=(),
+                output_unit="dimensionless",
+            ),
+        ),
+        read_from="wa-pdf",
+    )
+    observations = {
+        parent.observation_id: parent,
+        child.observation_id: child,
+    }
+    experiments = {
+        wa_experiment.experiment_id: wa_experiment,
+        wb_experiment.experiment_id: wb_experiment,
+    }
+    works = {wa.work_id: wa, wb.work_id: wb}
+    table_ids = _table_ids(works)
+    corpus = _asset_ids(works)
+    direct_ids = frozenset({child.observation_id, parent.observation_id})
+    alias_ids = direct_ids | {"wa-table"}
+
+    def check() -> None:
+        direct = _observation_lineage(
+            child.observation_id, observations, table_ids, asset_ids=corpus
+        )
+        assert direct.complete and direct.ids == direct_ids
+        resolved = _resolve_coefficient_sources(
+            (child.observation_id,), observations, works, experiments
+        )
+        assert resolved.complete and resolved.ids == direct_ids
+        for alias in (wa.work_id, "wa-source", "wa-pdf"):
+            expanded = _resolve_coefficient_sources(
+                (alias,), observations, works, experiments
+            )
+            assert expanded.complete and expanded.ids == alias_ids
+            assert "wb-pdf" not in expanded.ids
+
+    check()
+    with bound_work_inputs(works, observations, experiments):
+        check()
+
+    bad = replace(
+        child,
+        observation_id="wa-bad",
+        derivation=replace(child.derivation, inputs=("not-a-real-asset",)),
+    )
+    bad_observations = {
+        bad.observation_id: bad,
+        parent.observation_id: parent,
+    }
+    assert (
+        _observation_lineage(
+            bad.observation_id, bad_observations, table_ids, asset_ids=corpus
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
+    assert (
+        _resolve_coefficient_sources(
+            (wa.work_id,), bad_observations, works, experiments
+        ).failure
+        is AncestryFailure.UNRESOLVABLE_INPUT
+    )
 
 
 def test_printed_unresolved_redox_coefficient_stays_unknown() -> None:
