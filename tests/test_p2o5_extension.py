@@ -921,15 +921,28 @@ def _scoring_pot(pot_id: str):
     return pots[pot_id]
 
 
+# openimcc eeea7b2 evaluate_p2o5_activity on each pot's original moles at 1643 K.
+_DOCUMENTED_POT_ACTIVITY_1643_K = {
+    "kambayashi_1985_feto_p2o5_s01": 2.4524910153305668e-14,
+    "ohara_1987_feto_p2o5_i_s14": 4.100328514723968e-13,
+}
+# Classifier dropped P2O5 wt% when the extension callable is absent.
+_DOCUMENTED_DROPPED_P2O5_WT_PCT = {
+    "kambayashi_1985_feto_p2o5_s01": 1.5488078260619524,
+    "ohara_1987_feto_p2o5_i_s14": 3.808440337999999,
+}
+
+
 def test_phosphorus_pots_are_assessed_before_the_parent_solve(monkeypatch) -> None:
     """The installed openimcc selects the pot assertion. Neither branch is skipped.
 
     With no evaluate_p2o5_activity, both pots still raise the typed 1 wt%
-    refusal after assessment, not the old S/P pack. With the callable
-    present, the same calls return the assessed liquid a(P2O5). The
-    landing pin has the callable, so that run executes both branches:
-    the refusal is forced by hiding the callable, then the real call
-    is repeated.
+    refusal after assessment, not the old S/P pack. The dropped P2O5 wt%
+    is the pot's own composition, and it exceeds the 1.0 wt% threshold.
+    With the callable present, a(P2O5) matches that producer called on the
+    original moles at 1643 K. The landing pin has the callable, so that
+    run executes both branches: the refusal is forced by hiding the
+    callable, then the real call is repeated.
     """
 
     import openimcc
@@ -948,13 +961,16 @@ def test_phosphorus_pots_are_assessed_before_the_parent_solve(monkeypatch) -> No
     )
     real_callable = openimcc_bridge.p2o5_extension_callable()
 
-    def equilibrate(pot_id: str):
-        backend = _OpenImccBatteryBackend("openimcc")
+    def pot_inputs(pot_id: str):
         pot = _scoring_pot(pot_id)
         composition_kg, composition_mol = composition_kg_and_mol(
             pot.composition_wt_pct
         )
-        return backend.equilibrate(
+        return pot, composition_kg, composition_mol
+
+    def equilibrate(pot_id: str):
+        _pot, composition_kg, composition_mol = pot_inputs(pot_id)
+        return _OpenImccBatteryBackend("openimcc").equilibrate(
             1643.0 - 273.15,
             composition_kg=composition_kg,
             composition_mol=composition_mol,
@@ -964,6 +980,7 @@ def test_phosphorus_pots_are_assessed_before_the_parent_solve(monkeypatch) -> No
     def assert_unavailable_refusal() -> None:
         sp_error = openimcc.ImccSPComponentRequiresExtensionError
         for pot_id in pot_ids:
+            pot, _kg, _mol = pot_inputs(pot_id)
             with pytest.raises(OpenImccCompositionPolicyRefusal) as caught:
                 equilibrate(pot_id)
             assert not isinstance(caught.value, sp_error)
@@ -973,22 +990,35 @@ def test_phosphorus_pots_are_assessed_before_the_parent_solve(monkeypatch) -> No
                 notice.get("code") == "openimcc_p2o5_extension_unavailable"
                 for notice in extension["notices"]
             )
+            classification = caught.value.diagnostics[
+                "composition_projection_classification"
+            ]
+            dropped = classification["dropped_component_wt_pct"]["P2O5"]
+            assert dropped == _DOCUMENTED_DROPPED_P2O5_WT_PCT[pot_id]
+            assert dropped == pytest.approx(pot.composition_wt_pct["P2O5"])
+            assert classification["threshold_wt_pct"] == 1.0
+            assert dropped > classification["threshold_wt_pct"]
 
     def assert_visible_activity() -> None:
         for pot_id in pot_ids:
+            _pot, composition_kg, composition_mol = pot_inputs(pot_id)
+            original_moles = openimcc_bridge.composition_moles_for_p2o5(
+                composition_mol, composition_kg
+            )
+            upstream = float(real_callable(original_moles, 1643.0).activity)
             result = equilibrate(pot_id)
             assert result.status == "ok"
             extension = result.diagnostics["p2o5_extension"]
             assert extension.get("evaluated") is True
             activity = result.activity_coefficients["P2O5"]
-            assert activity == pytest.approx(float(extension["activity"]))
-            assert activity > 0.0
+            assert activity == upstream
+            assert upstream == _DOCUMENTED_POT_ACTIVITY_1643_K[pot_id]
             assert "P2O5" not in result.reported_activity_coefficients
             reference = result.activities_standard_state
             assert reference["phase"] == "liquid"
             assert reference["component"] == "P2O5"
             assert reference["convention"] == "raoultian_pure_endmember"
-            assert reference["activity"] == pytest.approx(activity)
+            assert reference["activity"] == upstream
             codes = [notice.get("code") for notice in result.imcc_notices]
             assert "imcc_p2o5_activity_domain_notice" in codes
             assert "p2o5_feiii_phosphate_chemistry_not_modelled" in codes
