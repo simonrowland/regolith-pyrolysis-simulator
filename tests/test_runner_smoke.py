@@ -231,8 +231,10 @@ def test_completed_run_preserves_success_when_product_classification_raises(
 
     assert payload["status"] == "ok"
     assert payload["product_classification"] == {
-        "classification": {},
-        "markdown": "",
+        "status": "unavailable",
+        "section": "product_classification",
+        "exception_type": "RuntimeError",
+        "reason": "injected product-classification failure",
     }
 
 
@@ -259,7 +261,12 @@ def test_completed_run_preserves_success_when_terminal_taxonomy_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["terminal_product_taxonomy"] is None
+    assert payload["terminal_product_taxonomy"] == {
+        "status": "unavailable",
+        "section": "terminal_product_taxonomy",
+        "exception_type": "RuntimeError",
+        "reason": "injected terminal-taxonomy failure",
+    }
 
 
 def test_completed_run_preserves_success_when_yield_disposition_raises(
@@ -285,8 +292,115 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "injected yield-disposition refusal",
+    }
     assert payload["terminal_product_taxonomy"] is not None
+
+
+def test_completed_run_preserves_success_when_stage_purity_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_stage_purity_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected stage-purity failure")
+
+    monkeypatch.setattr(
+        "simulator.runner.stage_purity_report",
+        raise_stage_purity_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["stage_purity_report"] == {
+        "status": "unavailable",
+        "section": "stage_purity_report",
+        "exception_type": "RuntimeError",
+        "reason": "injected stage-purity failure",
+    }
+
+
+def test_completed_run_marks_final_unavailable_when_ledger_projection_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_ledger_projection_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "RuntimeError",
+        "reason": "injected ledger projection failure",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "RuntimeError",
+        "reason": (
+            "upstream section final_state unavailable: "
+            "injected ledger projection failure"
+        ),
+    }
+
+
+def test_sio_yield_report_propagates_unavailable_final_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.runner import build_sio_yield_report
+
+    def raise_ledger_projection_error(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("injected SiO ledger projection failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._final_state_from_ledger",
+        raise_ledger_projection_error,
+    )
+
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        include_diagnostics=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+
+    assert report["status"] == "unavailable"
+    assert report["section"] == "sio_yield_report"
+    assert report["exception_type"] == "RuntimeError"
+    assert "final_state" in report["reason"]
+    assert "wall_deposit_kg" not in report
+    assert diagnostics["status"] == "unavailable"
+    assert diagnostics["section"] == "sio_yield_report.diagnostics"
+    assert "final_state" in diagnostics["reason"]
+    assert "closure_error_pct" not in diagnostics
 
 
 def test_completed_run_reports_unresolved_wall_species_without_aborting(
@@ -2493,12 +2607,85 @@ def test_runner_failure_preserves_primary_when_yield_disposition_raises(
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    completed_hours = payload["run_metadata"]["hours_completed"]
+    assert completed_hours["status"] == "unavailable"
+    assert completed_hours["section"] == "run_metadata.hours_completed"
+    assert completed_hours["exception_type"] == "AttributeError"
+    assert "melt" in completed_hours["reason"]
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "OriginUnresolvedError",
+        "reason": "secondary disposition failure",
+    }
     assert "primary execution failure" in payload["error_message"]
     assert payload["error_message"].splitlines()[-1] == (
         "yield disposition unavailable: OriginUnresolvedError: "
         "secondary disposition failure"
     )
+
+
+def test_runner_failure_records_unavailable_engine_lookup():
+    class RaisingRegistryKernel:
+        @property
+        def registry(self):
+            raise AttributeError("engine registry unavailable")
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="",
+        per_hour=(),
+        shadow_trace=(),
+        simulator=SimpleNamespace(
+            atom_ledger=AtomLedger(),
+            _chem_kernel=RaisingRegistryKernel(),
+        ),
+        refusal_diagnostic={},
+        backend_status="unavailable",
+        backend_authoritative=False,
+        reduced_real_cache={},
+        campaigns_elapsed=0.0,
+    )
+
+    payload = run._minimal_failure_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert payload["error_message"].startswith("primary execution failure")
+    assert payload["run_metadata"]["engines_used"] == {
+        "status": "unavailable",
+        "section": "run_metadata.engines_used",
+        "exception_type": "AttributeError",
+        "reason": "engine registry unavailable",
+    }
+
+
+def test_engines_used_treats_kernel_without_registry_as_empty() -> None:
+    class KernelWithoutRegistry:
+        pass
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    engines_used = run._engines_used(
+        SimpleNamespace(_chem_kernel=KernelWithoutRegistry())
+    )
+
+    assert engines_used == {
+        "active": {},
+        "requested": {},
+        "registry": {},
+    }
 
 
 def test_runner_failure_preserves_primary_when_yield_disposition_serialization_raises(
@@ -2537,7 +2724,12 @@ def test_runner_failure_preserves_primary_when_yield_disposition_serialization_r
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "disposition serialization unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         (
@@ -2580,7 +2772,24 @@ def test_runner_failure_preserves_primary_when_atom_ledger_lookup_raises() -> No
 
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
-    assert payload["yield_disposition"] is None
+    assert payload["yield_disposition"] == {
+        "status": "unavailable",
+        "section": "yield_disposition",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
+    assert payload["final_state"] == {
+        "status": "unavailable",
+        "section": "final_state",
+        "exception_type": "LookupError",
+        "reason": "ledger unavailable",
+    }
+    assert payload["final"] == {
+        "status": "unavailable",
+        "section": "final",
+        "exception_type": "LookupError",
+        "reason": "upstream section final_state unavailable: ledger unavailable",
+    }
     assert payload["error_message"].splitlines() == [
         "primary execution failure",
         "envelope detail unavailable: RuntimeError: primary detail failure",
