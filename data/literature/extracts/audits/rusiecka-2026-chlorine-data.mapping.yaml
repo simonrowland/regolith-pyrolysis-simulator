@@ -1,0 +1,81 @@
+source_id: rusiecka-2026-chlorine-data
+table: S4_CorrectedExpData
+locator:
+  source_path: corpus/raw/rusiecka-2026-chlorine-data/rusiecka-2026-chlorine-data.xlsx
+  record: sheet data, rows 3:128
+transcription:
+  method: XLSX cell values with displayed number formats retained; formula outputs read from cached cell values. No PDF exists
+    in this dataset source directory; the companion article PDF is recorded separately for equation and sample-list comparison.
+  row_count: 126
+  sheet: data
+  data_rows: 3:128
+  source_groups:
+    Thomas and Wood 2023:
+      rows: '3:39'
+      count: 37
+    Thomas and Wood 2021:
+      rows: 40:70
+      count: 31
+    Rusiecka and Wood 2025:
+      rows: 71:80
+      count: 10
+    this study:
+      rows: 81:96
+      count: 16
+    Alletti et al. (2009):
+      rows: 97:100
+      count: 4
+    Alletti et al. (2014):
+      rows: 101:118
+      count: 18
+    Botcharnikov et al. (2015):
+      rows: 119:124
+      count: 6
+    Miranda et al. (2025):
+      rows: 125:128
+      count: 4
+  typed_columns:
+    composition_wt_percent: B:R
+    temperature_C: T
+    pressure_GPa: U
+    fCl2_bar: X
+    fO2_bar: Y
+    CCl_dimensionless: AA
+    log10CCl: AB
+    sample_id: AC
+  component_formula_headers:
+    SiO2: SiO2
+    TiO2: TiO2
+    Al2O3: Al2O3
+    FeOT: FeOT
+    MnO: MnO
+    MgO: MgO
+    CaO: CaO
+    Na2O: Na2O
+    K2O: K2O
+    Cl: Cl
+    I2O: I2O
+    Ag2O: Ag2O
+    Re: Re
+    P2O5*: P2O5
+    Cr2O3*: Cr2O3
+    NiO*: NiO
+    H2O: H2O
+  component_values_emitted: 816
+  blank_component_cells: []
+  capacity_values_emitted: 126
+  capacity_values_range: AB3:AB128
+  duplicate_composition_ranges:
+    Thomas and Wood 2023: B3:R39; existing extract thomas-2022-chlorine-bonding-silicate-melts; sample IDs bind rows.
+    Thomas and Wood 2021: B40:R70; existing extract thomas-wood-2021-chlorine-silicate-melts; sample IDs bind rows.
+    Rusiecka and Wood 2025: B71:R80; existing extract rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts; sample IDs
+      bind rows.
+  omitted_columns:
+    S: Printed Total; no species formula/component token, not reconstructed or treated as another oxide.
+    AD:CG: Calculated molar transforms and regression features; not independent measured compositions. Raw printed wt.% components
+      are the typed composition basis.
+    Z: Formula output has no header; not treated as a printed log-fO2 column. The headed linear fO2 column Y is retained as
+      the condition.
+  companion_table_disagreement: Article Table 2 (physical PDF p. 5) has AND-7 and no DCB-6; worksheet row 96 has DCB-6 and
+    no AND-7. Both printed records are retained separately; the worksheet is not silently edited.
+  source_pdf: 'No PDF is present in raw/rusiecka-2026-chlorine-data/. Companion paper: raw/rusiecka-wood-2026-chlorine-hcl/rusiecka-wood-2026-chlorine-hcl.pdf.'
