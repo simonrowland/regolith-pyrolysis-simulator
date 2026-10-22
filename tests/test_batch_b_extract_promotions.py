@@ -217,6 +217,17 @@ def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     assert _point(result, "adamkovicova_1980_heat_of_fusion_at_1817K") == Decimal(
         "57.3"
     )
+    fusion = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "::adamkovicova_1980_heat_of_fusion_at_1817K"
+        )
+    )
+    assert fusion.identity.species.phase.is_value
+    assert fusion.identity.species.phase.value.value == "cr"
+    assert fusion.identity.species.polymorph.is_value
+    assert fusion.identity.species.polymorph.value.value == "alpha"
     assert any(
         "adamkovicova_1980_table1_solid_cooling_measured" in row.observation_id
         and row.value.point == Decimal("139.6")
