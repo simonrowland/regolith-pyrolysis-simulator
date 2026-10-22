@@ -1,0 +1,1795 @@
+schema_version: literature_extract.v1
+source_id: davis-1990-forsterite-evaporation-isotopes
+source:
+  citation: Davis, A. M., Hashimoto, A., Clayton, R. N. & Mayeda, T. K. (1990), Isotope mass fractionation during evaporation
+    of Mg2SiO4, Nature 347:655–658, DOI 10.1038/347655a0.
+  doi: 10.1038/347655a0
+  url: https://doi.org/10.1038/347655a0
+  year: 1990
+extraction:
+  method: Transcribed from MinerU Table 1; all numeric cells were checked against the page 2 render because the pdftotext
+    layer contains only copyright headers. Table values use 2,050 °C for the rows where a prose sentence says 2,940 °C. The
+    paper describes the experiments as in vacuum but prints no numerical pressure in the article. Residue composition is not
+    printed; initial composition is encoded from the printed synthetic forsterite formula Mg2SiO4 as the oxide mole ratio
+    MgO:SiO2 = 2:1, without inferring the residue composition. Table 2 fitted Rayleigh fractionation factors are retained
+    as context only, not as independent measurements.
+  date: '2026-10-22'
+  worker: wave51-F60
+  provenance_path: text/davis-1990-forsterite-evaporation-isotopes/pdftotext-layout.txt and mineru/p001-p004
+review_status: draft
+fidelity_samples:
+- species: Mg2SiO4
+  observation_id: davis_1990_table1_row_01_26Mg
+  field: isotope_delta_isotope_delta
+  value: -0.41
+  locator:
+    published_page: 656
+    pdf_page_index: 1
+    table: '1'
+    row: '1'
+    note: δ26Mg; signed value confirmed against page 2 render.
+- species: Mg2SiO4
+  observation_id: davis_1990_table1_row_05_25Mg
+  field: isotope_delta_isotope_delta
+  value: 7.52
+  locator:
+    published_page: 656
+    pdf_page_index: 1
+    table: '1'
+    row: '5'
+    note: δ25Mg, first molten row; confirmed against page 2 render.
+- species: Mg2SiO4
+  observation_id: davis_1990_table1_row_11_30Si
+  field: isotope_delta_isotope_delta
+  value: 29.51
+  locator:
+    published_page: 656
+    pdf_page_index: 1
+    table: '1'
+    row: '11'
+    note: δ30Si at table temperature 2,050 °C; confirmed against page 2 render.
+- species: Mg2SiO4
+  observation_id: davis_1990_table1_row_11_mass_loss
+  field: mass_loss_pct
+  value: 87.8
+  locator:
+    published_page: 656
+    pdf_page_index: 1
+    table: '1'
+    row: '11'
+    note: Percent evaporated; confirmed against page 2 render.
+species:
+  Mg2SiO4:
+    observations:
+    - observation_id: davis_1990_table1_row_01_mass_loss
+      type: mass_loss
+      locator: &id001
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '1'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: cr
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 15.6
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1750
+        time_min: 60
+        sample_row: table1_row_01
+        point_conditions: &id002
+          temperature_K:
+            state:
+              tag: value
+              value: 2023.15
+            locator: *id001
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id001
+    - observation_id: davis_1990_table1_row_01_17O
+      type: rate_series
+      locator: *id001
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 0.54
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_01
+        T_C: 1750
+        time_min: 60
+        point_conditions: *id002
+        locator: *id001
+    - observation_id: davis_1990_table1_row_01_18O
+      type: rate_series
+      locator: *id001
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 1.04
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_01
+        T_C: 1750
+        time_min: 60
+        point_conditions: *id002
+        locator: *id001
+    - observation_id: davis_1990_table1_row_01_26Mg
+      type: rate_series
+      locator: *id001
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: -0.41
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_01
+        T_C: 1750
+        time_min: 60
+        point_conditions: *id002
+        locator: *id001
+    - observation_id: davis_1990_table1_row_01_30Si
+      type: rate_series
+      locator: *id001
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 0.24
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_01
+        T_C: 1750
+        time_min: 60
+        point_conditions: *id002
+        locator: *id001
+    - observation_id: davis_1990_table1_row_02_mass_loss
+      type: mass_loss
+      locator: &id003
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '2'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: cr
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 35.6
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1750
+        time_min: 180
+        sample_row: table1_row_02
+        point_conditions: &id004
+          temperature_K:
+            state:
+              tag: value
+              value: 2023.15
+            locator: *id003
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id003
+    - observation_id: davis_1990_table1_row_02_17O
+      type: rate_series
+      locator: *id003
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 0.59
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_02
+        T_C: 1750
+        time_min: 180
+        point_conditions: *id004
+        locator: *id003
+    - observation_id: davis_1990_table1_row_02_18O
+      type: rate_series
+      locator: *id003
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 1.12
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_02
+        T_C: 1750
+        time_min: 180
+        point_conditions: *id004
+        locator: *id003
+    - observation_id: davis_1990_table1_row_02_26Mg
+      type: rate_series
+      locator: *id003
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 0.72
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_02
+        T_C: 1750
+        time_min: 180
+        point_conditions: *id004
+        locator: *id003
+    - observation_id: davis_1990_table1_row_02_30Si
+      type: rate_series
+      locator: *id003
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 0.98
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_02
+        T_C: 1750
+        time_min: 180
+        point_conditions: *id004
+        locator: *id003
+    - observation_id: davis_1990_table1_row_03_mass_loss
+      type: mass_loss
+      locator: &id005
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '3'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: cr
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 62.4
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1750
+        time_min: 300
+        sample_row: table1_row_03
+        point_conditions: &id006
+          temperature_K:
+            state:
+              tag: value
+              value: 2023.15
+            locator: *id005
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id005
+    - observation_id: davis_1990_table1_row_03_17O
+      type: rate_series
+      locator: *id005
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 1.08
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_03
+        T_C: 1750
+        time_min: 300
+        point_conditions: *id006
+        locator: *id005
+    - observation_id: davis_1990_table1_row_03_18O
+      type: rate_series
+      locator: *id005
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 1.48
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_03
+        T_C: 1750
+        time_min: 300
+        point_conditions: *id006
+        locator: *id005
+    - observation_id: davis_1990_table1_row_03_26Mg
+      type: rate_series
+      locator: *id005
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 0.78
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_03
+        T_C: 1750
+        time_min: 300
+        point_conditions: *id006
+        locator: *id005
+    - observation_id: davis_1990_table1_row_03_30Si
+      type: rate_series
+      locator: *id005
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 1.91
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_03
+        T_C: 1750
+        time_min: 300
+        point_conditions: *id006
+        locator: *id005
+    - observation_id: davis_1990_table1_row_04_mass_loss
+      type: mass_loss
+      locator: &id007
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '4'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: cr
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 77.7
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1750
+        time_min: 370
+        sample_row: table1_row_04
+        point_conditions: &id008
+          temperature_K:
+            state:
+              tag: value
+              value: 2023.15
+            locator: *id007
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id007
+    - observation_id: davis_1990_table1_row_04_17O
+      type: rate_series
+      locator: *id007
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 0.94
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_04
+        T_C: 1750
+        time_min: 370
+        point_conditions: *id008
+        locator: *id007
+    - observation_id: davis_1990_table1_row_04_18O
+      type: rate_series
+      locator: *id007
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 1.8
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_04
+        T_C: 1750
+        time_min: 370
+        point_conditions: *id008
+        locator: *id007
+    - observation_id: davis_1990_table1_row_04_26Mg
+      type: rate_series
+      locator: *id007
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 0.89
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_04
+        T_C: 1750
+        time_min: 370
+        point_conditions: *id008
+        locator: *id007
+    - observation_id: davis_1990_table1_row_04_30Si
+      type: rate_series
+      locator: *id007
+      phase: cr
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 1.9
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_04
+        T_C: 1750
+        time_min: 370
+        point_conditions: *id008
+        locator: *id007
+    - observation_id: davis_1990_table1_row_05_mass_loss
+      type: mass_loss
+      locator: &id009
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '5'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 38.0
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1900
+        time_min: 20
+        sample_row: table1_row_05
+        point_conditions: &id010
+          temperature_K:
+            state:
+              tag: value
+              value: 2173.15
+            locator: *id009
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_17O
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 4.99
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_18O
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 9.89
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_25Mg
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 7.52
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_26Mg
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 16.61
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_29Si
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 3.78
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_05_30Si
+      type: rate_series
+      locator: *id009
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 7.54
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_05
+        T_C: 1900
+        time_min: 20
+        point_conditions: *id010
+        locator: *id009
+    - observation_id: davis_1990_table1_row_06_mass_loss
+      type: mass_loss
+      locator: &id011
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '6'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 67.0
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1900
+        time_min: 38
+        sample_row: table1_row_06
+        point_conditions: &id012
+          temperature_K:
+            state:
+              tag: value
+              value: 2173.15
+            locator: *id011
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_17O
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 10.94
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_18O
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 21.5
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_25Mg
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 16.95
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_26Mg
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 36.02
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_29Si
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 8.52
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_06_30Si
+      type: rate_series
+      locator: *id011
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 16.82
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_06
+        T_C: 1900
+        time_min: 38
+        point_conditions: *id012
+        locator: *id011
+    - observation_id: davis_1990_table1_row_07_mass_loss
+      type: mass_loss
+      locator: &id013
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '7'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 84.4
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1900
+        time_min: 64.5
+        sample_row: table1_row_07
+        point_conditions: &id014
+          temperature_K:
+            state:
+              tag: value
+              value: 2173.15
+            locator: *id013
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_17O
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 18.86
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_18O
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 37.06
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_25Mg
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 30.31
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_26Mg
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 61.39
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_29Si
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 14.02
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_07_30Si
+      type: rate_series
+      locator: *id013
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 27.82
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_07
+        T_C: 1900
+        time_min: 64.5
+        point_conditions: *id014
+        locator: *id013
+    - observation_id: davis_1990_table1_row_08_mass_loss
+      type: mass_loss
+      locator: &id015
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '8'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 54.2
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 1940
+        time_min: 11
+        sample_row: table1_row_08
+        point_conditions: &id016
+          temperature_K:
+            state:
+              tag: value
+              value: 2213.15
+            locator: *id015
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_17O
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 5.88
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_18O
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 11.81
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_25Mg
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 9.89
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_26Mg
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 21.87
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_29Si
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 4.65
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_08_30Si
+      type: rate_series
+      locator: *id015
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 9.4
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_08
+        T_C: 1940
+        time_min: 11
+        point_conditions: *id016
+        locator: *id015
+    - observation_id: davis_1990_table1_row_09_mass_loss
+      type: mass_loss
+      locator: &id017
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '9'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 42.3
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 2050
+        time_min: 4.0
+        sample_row: table1_row_09
+        point_conditions: &id018
+          temperature_K:
+            state:
+              tag: value
+              value: 2323.15
+            locator: *id017
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_17O
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 4.82
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_18O
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 9.62
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_25Mg
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 6.09
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_26Mg
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 13.2
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_29Si
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 4.2
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_09_30Si
+      type: rate_series
+      locator: *id017
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 7.63
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_09
+        T_C: 2050
+        time_min: 4.0
+        point_conditions: *id018
+        locator: *id017
+    - observation_id: davis_1990_table1_row_10_mass_loss
+      type: mass_loss
+      locator: &id019
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '10'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 67.4
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 2050
+        time_min: 9.2
+        sample_row: table1_row_10
+        point_conditions: &id020
+          temperature_K:
+            state:
+              tag: value
+              value: 2323.15
+            locator: *id019
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_17O
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 11.3
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_18O
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 22.37
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_25Mg
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 16.6
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_26Mg
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 34.14
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_29Si
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 7.05
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_10_30Si
+      type: rate_series
+      locator: *id019
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 13.87
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_10
+        T_C: 2050
+        time_min: 9.2
+        point_conditions: *id020
+        locator: *id019
+    - observation_id: davis_1990_table1_row_11_mass_loss
+      type: mass_loss
+      locator: &id021
+        published_page: 656
+        pdf_page_index: 1
+        table: '1'
+        row: '11'
+        note: Table 1 row, PDF page 2; row number excludes the final ±2σ line.
+      phase: l
+      units: '%'
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        mass_loss_pct: 87.8
+        composition_mole_fraction:
+          MgO: '0.666666666667'
+          SiO2: '0.333333333333'
+        composition_mole_fraction_basis: initial synthetic forsterite formula Mg2SiO4; MgO:SiO2 = 2:1
+        T_C: 2050
+        time_min: 15.2
+        sample_row: table1_row_11
+        point_conditions: &id022
+          temperature_K:
+            state:
+              tag: value
+              value: 2323.15
+            locator: *id021
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: the paper states vacuum but does not print a numerical pressure
+            locator:
+              published_page: 655
+              pdf_page_index: 0
+              section: Introduction
+              note: The source states experiments were conducted in vacuum; no pressure value appears in the article text.
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_17O
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ17O
+        isotope_pair: 17O/16O
+        isotope_delta_isotope_delta: 21.41
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_18O
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ18O
+        isotope_pair: 18O/16O
+        isotope_delta_isotope_delta: 42.55
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_25Mg
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ25Mg
+        isotope_pair: 25Mg/24Mg
+        isotope_delta_isotope_delta: 31.77
+        delta_2sigma_permil: 1.79
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_26Mg
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ26Mg
+        isotope_pair: 26Mg/24Mg
+        isotope_delta_isotope_delta: 63.74
+        delta_2sigma_permil: 3.08
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_29Si
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ29Si
+        isotope_pair: 29Si/28Si
+        isotope_delta_isotope_delta: 15.19
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    - observation_id: davis_1990_table1_row_11_30Si
+      type: rate_series
+      locator: *id021
+      units: per mil
+      status: typed_refusal
+      refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+        has no existing field that binds the pair to identity.subtype'
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        status: typed_refusal
+        refusal_reason: 'schema gap: isotope_delta identity requires a printed isotope-pair subtype, but the extract migrator
+          has no existing field that binds the pair to identity.subtype'
+        isotope_system_as_printed: δ30Si
+        isotope_pair: 30Si/28Si
+        isotope_delta_isotope_delta: 29.51
+        delta_2sigma_permil: 0.05
+        sample_row: table1_row_11
+        T_C: 2050
+        time_min: 15.2
+        point_conditions: *id022
+        locator: *id021
+    context:
+    - observation_id: davis_1990_table2_rayleigh_fit_context
+      type: method
+      locator:
+        published_page: 657
+        pdf_page_index: 2
+        table: '2'
+        note: Calculated gas/liquid partition coefficients; model-derived fit factors and theoretical values are context only.
+      units: dimensionless isotope fractionation factors
+      values:
+        quantity: rayleigh_fit_context
+        method_class: context_only
+        description: Table 2 reports Rayleigh-fit isotope fractionation factors for 1,900, 1,940, 2,050 °C, all temperatures
+          combined, and theoretical values. Fits use Table 1 residue measurements. Figure 1 and Figure 2 plotted values are
+          not digitized.
+    - observation_id: davis_1990_experimental_conditions_context
+      type: method
+      locator:
+        published_page: 656
+        pdf_page_index: 1
+        section: Experimental study
+      units: as printed
+      values:
+        quantity: experimental_conditions_context
+        method_class: method_only
+        starting_material: synthetic forsterite (Mg2SiO4)
+        evaporation_stoichiometry: Mg2SiO4 evaporates in stoichiometric elemental proportions
+        vacuum_pressure: not numerically stated in the article; experiments described as conducted in vacuum
+        temperature_discrepancy: The prose reports 2,940 °C; Table 1 and Figure 1 report 2,050 °C. Table 1 is transcribed
+          as printed.
+        residue_composition: not printed
+        deduplication: Distinct from wang-2001-solar-melt-evaporation-residues and wang-1999; neither source is in the corpus
+          text directory.
