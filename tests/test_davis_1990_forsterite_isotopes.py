@@ -28,6 +28,20 @@ def test_table1_rows_and_render_anchors_migrate_without_hard_issues(tmp_path: Pa
     assert len({row["values"]["sample_row"] for row in mass_rows}) == 11
     assert len(isotope_rows) == 58
     assert len([row for row in mass_rows if row["phase"] == "cr"]) == 4
+    assert len([row for row in isotope_rows if row["phase"] == "cr"]) == 16
+    assert len([row for row in isotope_rows if row["phase"] == "l"]) == 42
+    sigma_by_pair = {
+        "17O/16O": 0.05,
+        "18O/16O": 0.05,
+        "25Mg/24Mg": 1.79,
+        "26Mg/24Mg": 3.08,
+        "29Si/28Si": 0.05,
+        "30Si/28Si": 0.05,
+    }
+    for row in isotope_rows:
+        assert row["uncertainty"]["value"] == sigma_by_pair[row["values"]["isotope_pair"]]
+        assert row["uncertainty"]["confidence_level"] == "two_sigma"
+        assert "delta_2sigma_permil" not in row["values"]
     assert all(
         row["values"]["isotope_delta_isotope_delta"] != 0 for row in isotope_rows
     )
@@ -72,3 +86,17 @@ def test_table1_rows_and_render_anchors_migrate_without_hard_issues(tmp_path: Pa
     assert all(row.identity.temperature_K.is_value for row in source_observations)
     assert all("temperature_K" in row.point_conditions for row in source_observations)
     assert all(row.identity.composition.is_value for row in mass_observations)
+    assert all(
+        row.identity.composition.value.basis == "printed_mole_fraction"
+        for row in mass_observations
+    )
+    molten_delta = next(
+        row
+        for row in source_observations
+        if row.observation_id.endswith("table1_row_05_25Mg")
+    )
+    assert molten_delta.identity.species.phase.is_value
+    assert molten_delta.identity.species.phase.value.value == "l"
+    assert molten_delta.uncertainty.kind.value == "printed"
+    assert molten_delta.uncertainty.verbatim["value"] == 1.79
+    assert molten_delta.uncertainty.verbatim["confidence_level"] == "two_sigma"

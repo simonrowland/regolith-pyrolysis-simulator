@@ -95,33 +95,32 @@ Source: PDF page 2 (published page 656), Table 1, *Isotopic compositions of Mg2S
 | δ26Mg | 2 / 11 | 63.74 | no cell | (b), page render | `isotope_delta_isotope_delta` |
 | δ29Si | 2 / 11 | 15.19 | no cell | (b), page render | `isotope_delta_isotope_delta` |
 | δ30Si | 2 / 11 | 29.51 | no cell | (b), page render | `isotope_delta_isotope_delta` |
-| ±2σ / δ17O | 2 / uncertainty row | 0.05 | no cell | (b), page render | `delta_2sigma_permil` on each δ17O value |
-| ±2σ / δ18O | 2 / uncertainty row | 0.05 | no cell | (b), page render | `delta_2sigma_permil` on each δ18O value |
-| ±2σ / δ25Mg | 2 / uncertainty row | 1.79 | no cell | (b), page render | `delta_2sigma_permil` on each δ25Mg value |
-| ±2σ / δ26Mg | 2 / uncertainty row | 3.08 | no cell | (b), page render | `delta_2sigma_permil` on each δ26Mg value |
-| ±2σ / δ29Si | 2 / uncertainty row | 0.05 | no cell | (b), page render | `delta_2sigma_permil` on each δ29Si value |
-| ±2σ / δ30Si | 2 / uncertainty row | 0.05 | no cell | (b), page render | `delta_2sigma_permil` on each δ30Si value |
+| ±2σ / δ17O | 2 / uncertainty row | 0.05 | no cell | (b), page render | observation `uncertainty.value` for each δ17O row; `confidence_level: two_sigma` |
+| ±2σ / δ18O | 2 / uncertainty row | 0.05 | no cell | (b), page render | observation `uncertainty.value` for each δ18O row; `confidence_level: two_sigma` |
+| ±2σ / δ25Mg | 2 / uncertainty row | 1.79 | no cell | (b), page render | observation `uncertainty.value` for each δ25Mg row; `confidence_level: two_sigma` |
+| ±2σ / δ26Mg | 2 / uncertainty row | 3.08 | no cell | (b), page render | observation `uncertainty.value` for each δ26Mg row; `confidence_level: two_sigma` |
+| ±2σ / δ29Si | 2 / uncertainty row | 0.05 | no cell | (b), page render | observation `uncertainty.value` for each δ29Si row; `confidence_level: two_sigma` |
+| ±2σ / δ30Si | 2 / uncertainty row | 0.05 | no cell | (b), page render | observation `uncertainty.value` for each δ30Si row; `confidence_level: two_sigma` |
 
-All blank δ25Mg and δ29Si cells in rows 1–4 are absent, never zero. The table contains 11 sample rows; the extra bottom line is the six uncertainty entries above. MinerU's draft index calls this PDF page 2 (`p002-t01`, source `page_idx: 1`).
+All blank δ25Mg and δ29Si cells in rows 1–4 are absent, never zero. The table contains 11 sample rows; the extra bottom line is the six uncertainty entries above. Each isotope observation retains its printed uncertainty mapping with the numeric width and `confidence_level: two_sigma`. MinerU's draft index calls this PDF page 2 (`p002-t01`, source `page_idx: 1`).
 
 ## Compare output
 
-The staged standalone tool from the controller was used unchanged:
-`/private/tmp/claude-501/main-review/tools/mineru_table_draft.py compare`.
+The staged standalone `tools/mineru_table_draft.py` from the offer-21 line was used unchanged for `compare`.
 It reports `matched=0 no-match=0 mismatch=0 presence-only=0 needs_mapping=0 total=0`: its numeric-point collector does not recognize the extract's existing `mass_loss_pct` and `isotope_delta_isotope_delta` field names. No comparison cells were emitted. This is not treated as a pass; the page render audit above resolves every stored numeric cell and the focused regression test pins rendered values and row count.
 
 ## Conditions, state, and scope notes
 
-- Table 1 rows 1–4 are solid-state experiments at 1,750 °C; rows 5–11 are molten-state experiments at 1,900, 1,940, and 2,050 °C. The mass-loss observations retain these run states. The source says the Mg isotope analysis used a polished section and the O/Si analysis was bulk, but does not state the quenched structure for the molten-run residues; no glass state is asserted.
+- Table 1 rows 1–4 are solid-state experiments at 1,750 °C and their isotope observations have phase `cr`; rows 5–11 are molten-state experiments at 1,900, 1,940, and 2,050 °C and their isotope observations have phase `l`, matching the printed run state. The source says the Mg isotope analysis used a polished section and the O/Si analysis was bulk, but does not state the quenched structure for the molten-run residues; no glass state is asserted.
 - The article says the samples were evaporated in vacuum. The prompt supplies approximately 1e-6 mm Hg, but that number is absent from the machine text and page 1–2 renders; the extract keeps numeric total pressure unknown rather than inventing a locator. The source also does not state fO2, sample mass, or sweep gas.
 - Table 1 prints synthetic forsterite as the starting material and says evaporation is stoichiometric. It does not print the residue composition.
 - One prose sentence says 2,940 °C; Table 1 and Figure 1 say 2,050 °C. Table 1 wins for rows 9–11.
 - Table 2's Rayleigh-fit values are model-derived context and are not extracted as measured rows. Figure 1 and Figure 2 are figure-read candidates only and were not digitized.
-- The source is distinct from `wang-2001-solar-melt-evaporation-residues` and `wang-1999`; neither is in corpus text.
+- The source is distinct from `wang-2001-solar-melt-evaporation-residues`, which has a corpus text directory, and `wang-1999`, which does not.
 
 ## Isolated migration
 
-The repository's real extract migrator emitted 69 observations (11 mass-loss and 58 isotope rows), 0 hard validation issues, and 0 unavailable-valued observations. It queued 111 advisory axes; the isotope rows remain typed refusals because `isotope_delta` has no existing source mapping for `Identity.subtype`. The queue also includes advisories for the unreported measurement method. This does not remove the stored values or row-level evidence.
+The repository's real extract migrator emitted 69 observations (11 mass-loss and 58 isotope rows), 0 hard validation issues, and 0 unavailable-valued observations. It queued 69 advisory axes; the isotope rows remain typed refusals because `isotope_delta` has no existing source mapping for `Identity.subtype`. The queue also includes advisories for the unreported measurement method. This does not remove the stored values or row-level evidence. Isotope rows retain their printed uncertainty maps as `UncertaintyKind.PRINTED`; Table 1 widths preserve the stated 2σ level. All 42 molten isotope observations migrate with phase `l`. The 11 mass-loss compositions declare `printed_mole_fraction` through `composition_mol_basis`.
 
 For three representative mass-loss rows, the migrator's required identity axes resolve as follows:
 
@@ -131,4 +130,4 @@ For three representative mass-loss rows, the migrator's required identity axes r
 | 5 | 2173.15 K | printed starting forsterite oxide ratio, value | unknown; source only says vacuum | unknown; not printed |
 | 11 | 2323.15 K | printed starting forsterite oxide ratio, value | unknown; source only says vacuum | unknown; not printed |
 
-The focused regression test and these migration counts were run against the real migrator. The full repository extraction suite was also attempted before the sample-ID correction; it ran 370.13 seconds and failed only on those four stale fidelity references. After correction, the affected repository checks plus the focused test and YAML comma guard passed: 22 tests in 214.00 seconds.
+The focused regression test, including pins for isotope phase, printed uncertainty, and declared composition basis, passed in 3.68 seconds. The full repository extraction suite passed: 553 tests in 260.31 seconds. `tests/test_yaml_flow_scalar_commas.py` passed: 17 tests in 9.83 seconds. These checks and the isolated migration use the repository's real extract migrator. No store regeneration was run.
