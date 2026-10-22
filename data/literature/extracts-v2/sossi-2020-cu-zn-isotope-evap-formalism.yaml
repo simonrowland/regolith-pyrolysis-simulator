@@ -86,15 +86,6 @@ observations:
     figure: 5a
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5a
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_fractionation_measured_reduced::point:1
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -179,15 +170,6 @@ observations:
     figure: 5a
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5a
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-01/08/18a:h=15244af03916
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -2048,7 +2030,7 @@ observations:
         page: 6
         table: '1'
         section: modelled logK* values
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=eadfaa7b50a7
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=7043adabb4c0
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18a
   identity:
     quantity:
@@ -2111,21 +2093,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.6'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.05'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=7043adabb4c0
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2172,7 +2161,13 @@ observations:
         page: 6
         table: '1'
         record: P 01/08/18a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18b::T=1669.75:row=p-01/08/18b:h=1c1106c955c7
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18b::T=1669.75:row=p-01/08/18b:h=10181356b43c
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18b
   identity:
     quantity:
@@ -2235,21 +2230,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '2.51'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.04'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18b::T=1669.75:row=p-01/08/18b:h=10181356b43c
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2296,7 +2298,13 @@ observations:
         page: 6
         table: '1'
         record: P 01/08/18b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18c::T=1669.75:row=p-01/08/18c:h=0efdc7b5fd53
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18c::T=1669.75:row=p-01/08/18c:h=3abe5c1ac2a4
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18c
   identity:
     quantity:
@@ -2359,21 +2367,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '2.88'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.08'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18c::T=1669.75:row=p-01/08/18c:h=3abe5c1ac2a4
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2420,7 +2435,13 @@ observations:
         page: 6
         table: '1'
         record: P 01/08/18c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18d::T=1669.75:row=p-01/08/18d:h=f6e40b110efb
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18d::T=1669.75:row=p-01/08/18d:h=8103a100fc28
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18d
   identity:
     quantity:
@@ -2483,21 +2504,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '11.96'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.09'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18d::T=1669.75:row=p-01/08/18d:h=8103a100fc28
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2544,7 +2572,13 @@ observations:
         page: 6
         table: '1'
         record: P 01/08/18d
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-02-08-18a::T=1618.65:row=p-02/08/18a:h=c5990da23ab9
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-02-08-18a::T=1618.65:row=p-02/08/18a:h=9fd47a27fdd2
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-02-08-18a
   identity:
     quantity:
@@ -2607,21 +2641,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.66'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.06'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-02-08-18a::T=1618.65:row=p-02/08/18a:h=9fd47a27fdd2
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2668,7 +2709,13 @@ observations:
         page: 6
         table: '1'
         record: P 02/08/18a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-03-08-18b::T=1619.65:row=p-03/08/18b:h=e3eaf48df7b8
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-03-08-18b::T=1619.65:row=p-03/08/18b:h=f0505fe8f058
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-03-08-18b
   identity:
     quantity:
@@ -2731,21 +2778,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '2.18'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.02'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-03-08-18b::T=1619.65:row=p-03/08/18b:h=f0505fe8f058
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2792,7 +2846,13 @@ observations:
         page: 6
         table: '1'
         record: P 03/08/18b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a-r::T=1773.15:row=p-10/04/17a-r:h=6e7f2e3eb7a6
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a-r::T=1773.15:row=p-10/04/17a-r:h=81d4a8214df7
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-10-04-17a-r
   identity:
     quantity:
@@ -2855,21 +2915,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '0.92'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.08'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a-r::T=1773.15:row=p-10/04/17a-r:h=81d4a8214df7
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2916,7 +2983,13 @@ observations:
         page: 6
         table: '1'
         record: P 10/04/17a-r
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a::T=1773.15:row=p-10/04/17a:h=aee00719f295
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a::T=1773.15:row=p-10/04/17a:h=9ff1bc4a5b86
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-10-04-17a
   identity:
     quantity:
@@ -2979,21 +3052,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.03'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.02'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a::T=1773.15:row=p-10/04/17a:h=9ff1bc4a5b86
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -3040,6 +3120,12 @@ observations:
         page: 6
         table: '1'
         record: P 10/04/17a
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-19-06-18a::T=1572.15:row=p-19/06/18a:h=cdeb583c0ed8
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-19-06-18a
   identity:
@@ -4156,7 +4242,7 @@ observations:
         page: 6
         table: '1'
         record: P 21/06/18c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-25-07-18a::T=1671.15:row=p-25/07/18a:h=dfabae7f2ccf
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-25-07-18a::T=1671.15:row=p-25/07/18a:h=8cccd7d4ec97
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-25-07-18a
   identity:
     quantity:
@@ -4219,21 +4305,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '5.53'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.03'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-25-07-18a::T=1671.15:row=p-25/07/18a:h=8cccd7d4ec97
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4280,6 +4373,12 @@ observations:
         page: 6
         table: '1'
         record: P 25/07/18a
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-26-12-18a::T=1573.15:row=p-26/12/18a:h=1bc7526ba3e3
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-26-12-18a
   identity:
@@ -4652,7 +4751,7 @@ observations:
         page: 6
         table: '1'
         record: P 26/12/18c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-3-08-18a::T=1620.15:row=p-3/08/18a:h=21fe1ec92fa8
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-3-08-18a::T=1620.15:row=p-3/08/18a:h=de0057ac6a79
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-3-08-18a
   identity:
     quantity:
@@ -4715,21 +4814,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.68'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.04'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-3-08-18a::T=1620.15:row=p-3/08/18a:h=de0057ac6a79
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4776,7 +4882,13 @@ observations:
         page: 6
         table: '1'
         record: P 3/08/18a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18a::T=1775.15:row=p-31/07/18a:h=22c991725fd5
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18a::T=1775.15:row=p-31/07/18a:h=e03a20cd9002
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-31-07-18a
   identity:
     quantity:
@@ -4839,21 +4951,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.78'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.07'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18a::T=1775.15:row=p-31/07/18a:h=e03a20cd9002
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4900,7 +5019,13 @@ observations:
         page: 6
         table: '1'
         record: P 31/07/18a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18b::T=1775.15:row=p-31/07/18b:h=7e67bd5b6801
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18b::T=1775.15:row=p-31/07/18b:h=23f3a4752b26
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-31-07-18b
   identity:
     quantity:
@@ -4963,21 +5088,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.01'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.05'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18b::T=1775.15:row=p-31/07/18b:h=23f3a4752b26
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5024,7 +5156,13 @@ observations:
         page: 6
         table: '1'
         record: P 31/07/18b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18c::T=1774.85:row=p-31/07/18c:h=a66c4bbb97b9
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18c::T=1774.85:row=p-31/07/18c:h=5b54cba7303c
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-31-07-18c
   identity:
     quantity:
@@ -5087,21 +5225,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '3.44'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.02'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18c::T=1774.85:row=p-31/07/18c:h=5b54cba7303c
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5148,7 +5293,13 @@ observations:
         page: 6
         table: '1'
         record: P 31/07/18c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18d::T=1773.65:row=p-31/07/18d:h=8cd4edca9b9b
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18d::T=1773.65:row=p-31/07/18d:h=66ab154dddff
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-31-07-18d
   identity:
     quantity:
@@ -5211,21 +5362,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '8.81'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.07'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18d::T=1773.65:row=p-31/07/18d:h=66ab154dddff
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5272,7 +5430,13 @@ observations:
         page: 6
         table: '1'
         record: P 31/07/18d
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-4-04-17c::T=1573.15:row=p-4/04/17c:h=f9eecbe9b460
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-4-04-17c::T=1573.15:row=p-4/04/17c:h=e7cefd567b1f
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-4-04-17c
   identity:
     quantity:
@@ -5335,21 +5499,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '0.36'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.09'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-4-04-17c::T=1573.15:row=p-4/04/17c:h=e7cefd567b1f
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5396,7 +5567,13 @@ observations:
         page: 6
         table: '1'
         record: P 4/04/17c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17a::T=1673.15:row=p-5/04/17a:h=7013c8a1946a
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17a::T=1673.15:row=p-5/04/17a:h=163230fb760a
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-5-04-17a
   identity:
     quantity:
@@ -5459,21 +5636,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '1.15'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.06'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17a::T=1673.15:row=p-5/04/17a:h=163230fb760a
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5520,7 +5704,13 @@ observations:
         page: 6
         table: '1'
         record: P 5/04/17a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17b::T=1773.15:row=p-5/04/17b:h=6900ed3dcdff
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17b::T=1773.15:row=p-5/04/17b:h=f3d2fd292ca7
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-5-04-17b
   identity:
     quantity:
@@ -5583,21 +5773,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '2.15'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.02'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17b::T=1773.15:row=p-5/04/17b:h=f3d2fd292ca7
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5644,7 +5841,13 @@ observations:
         page: 6
         table: '1'
         record: P 5/04/17b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17a::T=1573.15:row=p-6/04/17a:h=1c30fe1612fd
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17a::T=1573.15:row=p-6/04/17a:h=5bf45e7f3b76
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-6-04-17a
   identity:
     quantity:
@@ -5707,21 +5910,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '0.57'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.1'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17a::T=1573.15:row=p-6/04/17a:h=5bf45e7f3b76
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5768,7 +5978,13 @@ observations:
         page: 6
         table: '1'
         record: P 6/04/17a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17b::T=1673.15:row=p-6/04/17b:h=0522f424329a
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17b::T=1673.15:row=p-6/04/17b:h=4a4f55af0940
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-6-04-17b
   identity:
     quantity:
@@ -5831,21 +6047,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '2.03'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.06'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17b::T=1673.15:row=p-6/04/17b:h=4a4f55af0940
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5892,7 +6115,13 @@ observations:
         page: 6
         table: '1'
         record: P 6/04/17b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17c::T=1773.15:row=p-6/04/17c:h=e5e76adf3f05
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17c::T=1773.15:row=p-6/04/17c:h=6702edf11b0d
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-6-04-17c
   identity:
     quantity:
@@ -5955,21 +6184,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '4.39'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.08'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17c::T=1773.15:row=p-6/04/17c:h=6702edf11b0d
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -6016,7 +6252,13 @@ observations:
         page: 6
         table: '1'
         record: P 6/04/17c
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17a::T=1573.15:row=p-7/04/17a:h=039295186845
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17a::T=1573.15:row=p-7/04/17a:h=7d47221232ef
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-7-04-17a
   identity:
     quantity:
@@ -6079,21 +6321,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '0.11'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.05'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17a::T=1573.15:row=p-7/04/17a:h=7d47221232ef
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -6140,7 +6389,13 @@ observations:
         page: 6
         table: '1'
         record: P 7/04/17a
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17b::T=1673.15:row=p-7/04/17b:h=71f6a6950cec
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17b::T=1673.15:row=p-7/04/17b:h=9fe01a91bdfb
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-7-04-17b
   identity:
     quantity:
@@ -6203,21 +6458,28 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: run, T_C, co_sccm, co2_sccm, logfO2, time_min,
-      loop, starting_mix, Cu_ppm, lnf_Cu, delta65Cu_SM_per_mil, delta65Cu_2SD_per_mil, delta65Cu_N'
+    kind: point
+    point: '0.79'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      two_sd_per_mil: '0.02'
+      units: per mil
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - isotope_delta
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17b::T=1673.15:row=p-7/04/17b:h=9fe01a91bdfb
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -6264,6 +6526,12 @@ observations:
         page: 6
         table: '1'
         record: P 7/04/17b
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:sossi-2020-cu-zn-isotope-evap-formalism
+    parameters: []
+    output_unit: ppm; ln(f(Cu)); per mil; °C; min; sccm; log10(fO2/bar)
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18a:h=dc5779d64a19
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -6760,15 +7028,6 @@ observations:
     figure: 5b
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5b
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:1
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -6853,15 +7112,6 @@ observations:
     figure: 5b
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5b
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:2
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -6946,15 +7196,6 @@ observations:
     figure: 5b
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5b
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:3
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -7039,15 +7280,6 @@ observations:
     figure: 5b
     section: 3.3 Copper and Zinc isotope ratios
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 7
-        figure: 5b
-        section: 3.3 Copper and Zinc isotope ratios
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_logKstar_model_runs
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
@@ -7133,15 +7365,6 @@ observations:
     table: '1'
     section: modelled logK* values
   read_from: pdf:sossi-2020-cu-zn-isotope-evap-formalism
-  point_conditions:
-    fO2_log:
-      state:
-        tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
-      locator:
-        page: 6
-        table: '1'
-        section: modelled logK* values
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=c530d082f206
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18a
   identity:

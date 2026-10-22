@@ -191,7 +191,7 @@ from simulator.vapour_rail.channels import (
     CHANNEL_O2,
     REACTION_PLANE_MELT_INTERFACE,
     ReactionThermoInputs,
-    clamp_physical_pO2_bar,
+    validate_physical_pO2_bar,
     compile_channel_term_from_binding,
     compile_o2_channel_term,
     o2_potential_from_pO2_bar,
@@ -1157,7 +1157,7 @@ HARD_CASES = (
         ),
         TypeError,
     ),
-    HardCase("physical_po2_clamp", clamp_physical_pO2_bar, TypeError),
+    HardCase("physical_po2_validation", validate_physical_pO2_bar, TypeError),
     HardCase(
         "o2_potential_temperature",
         lambda v: o2_potential_from_pO2_bar(

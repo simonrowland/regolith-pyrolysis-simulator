@@ -167,6 +167,14 @@ CODE_INPUTS = (
 #     The census compared 29 occurrences across repo data and battery store
 #     inputs with the green implementation. This is the store-neutrality
 #     receipt for this entry; no store regeneration was run.
+#   d6ccae4b4: SC-333 S333-04 (d-195), one formula owner for oxide molar
+#     masses. It routes oxide projection through simulator/accounting/formulas.py
+#     and removes the literal mass tables in core.py and the builtin
+#     electrolysis/overhead-gas engines. The landing train's full regen of b145
+#     (tip 3ae48641c on green a4608882d, studio-3) was a fixed point: the regen
+#     commit equals the tip, so no store change. This acknowledges STORE
+#     outputs only; the projection value moves (d-195) are covered by the
+#     commit's tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -182,6 +190,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "9364d3828",
     "b1d82d91d", "a571c4a70",
     "f74ef7a6f",
+    "d6ccae4b4",
 })
 
 

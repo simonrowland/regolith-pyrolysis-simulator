@@ -369,7 +369,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -431,43 +430,6 @@ observations:
     note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.094'
-          - - Fe
-            - '0.906'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -529,7 +491,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -591,43 +552,6 @@ observations:
     note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.319'
-          - - Fe
-            - '0.681'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -688,7 +612,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -750,43 +673,6 @@ observations:
     note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.153'
-          - - Fe
-            - '0.847'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -848,7 +734,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -910,43 +795,6 @@ observations:
     note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.244'
-          - - Fe
-            - '0.756'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1008,7 +856,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1070,43 +917,6 @@ observations:
     note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.239'
-          - - Fe
-            - '0.761'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1168,7 +978,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1230,43 +1039,6 @@ observations:
     note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.255'
-          - - Fe
-            - '0.745'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1327,7 +1099,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1389,43 +1160,6 @@ observations:
     note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.156'
-          - - Fe
-            - '0.844'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1486,7 +1220,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1548,43 +1281,6 @@ observations:
     note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.152'
-          - - Fe
-            - '0.848'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1646,7 +1342,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1708,43 +1403,6 @@ observations:
     note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.297'
-          - - Fe
-            - '0.703'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1805,7 +1463,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1867,43 +1524,6 @@ observations:
     note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.054'
-          - - Fe
-            - '0.946'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -1965,7 +1585,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2027,43 +1646,6 @@ observations:
     note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.436'
-          - - Fe
-            - '0.564'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2125,7 +1707,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2187,43 +1768,6 @@ observations:
     note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.606'
-          - - Fe
-            - '0.394'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2285,7 +1829,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2347,43 +1890,6 @@ observations:
     note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.406'
-          - - Fe
-            - '0.594'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2445,7 +1951,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2507,43 +2012,6 @@ observations:
     note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.404'
-          - - Fe
-            - '0.596'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2605,7 +2073,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2667,43 +2134,6 @@ observations:
     note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.444'
-          - - Fe
-            - '0.556'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2765,7 +2195,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2827,43 +2256,6 @@ observations:
     note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.727'
-          - - Fe
-            - '0.273'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -2925,7 +2317,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2987,43 +2378,6 @@ observations:
     note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.81'
-          - - Fe
-            - '0.19'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -3085,7 +2439,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3147,43 +2500,6 @@ observations:
     note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.775'
-          - - Fe
-            - '0.225'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -3245,7 +2561,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3307,43 +2622,6 @@ observations:
     note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.828'
-          - - Fe
-            - '0.172'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -3404,7 +2682,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3466,43 +2743,6 @@ observations:
     note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Ta
-            - '0.048'
-          - - Fe
-            - '0.952'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 846
-        pdf_page_index: 4
-        table: '1'
-        note: Printed X_Ta composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5783,7 +5023,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5845,43 +5084,6 @@ observations:
     note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.192'
-          - - Fe
-            - '0.808'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -5942,7 +5144,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6004,43 +5205,6 @@ observations:
     note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.242'
-          - - Fe
-            - '0.758'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6101,7 +5265,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6163,43 +5326,6 @@ observations:
     note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.234'
-          - - Fe
-            - '0.766'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6261,7 +5387,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6323,43 +5448,6 @@ observations:
     note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.32'
-          - - Fe
-            - '0.68'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6420,7 +5508,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6482,43 +5569,6 @@ observations:
     note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.502'
-          - - Fe
-            - '0.498'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6580,7 +5630,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6642,43 +5691,6 @@ observations:
     note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.394'
-          - - Fe
-            - '0.606'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6740,7 +5752,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6802,43 +5813,6 @@ observations:
     note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.388'
-          - - Fe
-            - '0.612'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -6900,7 +5874,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6962,43 +5935,6 @@ observations:
     note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.596'
-          - - Fe
-            - '0.404'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7060,7 +5996,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7122,43 +6057,6 @@ observations:
     note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.671'
-          - - Fe
-            - '0.329'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7220,7 +6118,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7282,43 +6179,6 @@ observations:
     note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.76'
-          - - Fe
-            - '0.24'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7380,7 +6240,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7442,43 +6301,6 @@ observations:
     note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.548'
-          - - Fe
-            - '0.452'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7540,7 +6362,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7602,43 +6423,6 @@ observations:
     note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.856'
-          - - Fe
-            - '0.144'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7700,7 +6484,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7762,43 +6545,6 @@ observations:
     note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.384'
-          - - Fe
-            - '0.616'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -7860,7 +6606,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7922,43 +6667,6 @@ observations:
     note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.37'
-          - - Fe
-            - '0.63'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8019,7 +6727,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8081,43 +6788,6 @@ observations:
     note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.094'
-          - - Fe
-            - '0.906'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8179,7 +6849,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8241,43 +6910,6 @@ observations:
     note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.298'
-          - - Fe
-            - '0.702'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8338,7 +6970,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8400,43 +7031,6 @@ observations:
     note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.091'
-          - - Fe
-            - '0.909'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8497,7 +7091,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8559,43 +7152,6 @@ observations:
     note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.144'
-          - - Fe
-            - '0.856'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8656,7 +7212,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8718,43 +7273,6 @@ observations:
     note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.139'
-          - - Fe
-            - '0.861'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value
@@ -8815,7 +7333,6 @@ observations:
             tag: value
             value: 0
         component_basis: Fe
-        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8877,43 +7394,6 @@ observations:
     note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_metals
-          components:
-          - - Nb
-            - '0.048'
-          - - Fe
-            - '0.952'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 848
-        pdf_page_index: 6
-        table: '5'
-        note: Printed X_Nb composition axis; observation remains tied to its heat.
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: Printed cell-chamber pressure about 1 x 10^-4 Pa.
-    fO2_Pa:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 844
-        pdf_page_index: 2
-        section: 2.1 Apparatus
-        note: No fO2 or pO2 is printed.
     temperature_K:
       state:
         tag: value

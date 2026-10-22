@@ -39,6 +39,7 @@ from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidatio
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.thermal_window import resolve_thermal_preheat_interval
 
 
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
@@ -59,8 +60,6 @@ VALID_FIDELITIES = (
     "auto",
 )
 KNOWN_STUDY_CONSTRAINTS = frozenset({"physics"})
-DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
-DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 _SETPOINT_CAMPAIGN_ALIASES = {
     "C2A": "C2A_continuous",
     "C2A_staged": "C2A_staged",
@@ -1093,14 +1092,19 @@ def _validate_run_thermal_window_caps(
     if not campaign:
         return
     temp_range = _profile_campaign_setting(profile, campaign, "temp_range_C")
-    bounds = _numeric_interval_optional(temp_range)
-    if bounds is None:
+    if temp_range is None:
         return
-    low_C, high_C = bounds
-    if high_C < low_C:
-        raise ProfileValidationError(
-            f"{source}: {campaign}.temp_range_C must be ascending"
+    try:
+        preheat_interval = resolve_thermal_preheat_interval(
+            temp_range,
+            _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr"),
+            _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr"),
         )
+    except ValueError as exc:
+        raise ProfileValidationError(
+            f"{source}: {campaign}.temp_range_C preheat interval is invalid: {exc}"
+        ) from exc
+    low_C, high_C = preheat_interval.low_C, preheat_interval.high_C
     run_hours = int(float(run_options.get("hours", 24)))
     duration_value = _profile_campaign_setting(profile, campaign, "duration_h")
     campaign_max_hold_hr = _campaign_max_hold_hr_for_profile(source, campaign)
@@ -1108,12 +1112,8 @@ def _validate_run_thermal_window_caps(
         duration_value,
         run_hours=run_hours,
     )
-    preheat_ramp = _thermal_preheat_ramp_C_per_hr(profile, campaign)
-    preheat_hours = int(
-        math.ceil(
-            max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / preheat_ramp
-        )
-    )
+    preheat_ramp = preheat_interval.ramp_rate_C_per_hr
+    preheat_hours = preheat_interval.hours
     max_hold_hr, max_hold_bound = _thermal_window_max_hold_bound(
         profile,
         campaign,
@@ -1249,20 +1249,6 @@ def _thermal_window_duration_h(
     if low == high:
         return low
     return (low + high) / 2.0
-
-
-def _thermal_preheat_ramp_C_per_hr(profile: Mapping[str, Any], campaign: str) -> float:
-    value = _profile_campaign_setting(profile, campaign, "preheat_ramp_C_per_hr")
-    if value is None:
-        value = _profile_campaign_setting(profile, campaign, "ramp_rate_C_per_hr")
-    numeric = _numeric_setting(value, sequence_policy="max")
-    if numeric is None:
-        return DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR
-    if numeric <= 0.0:
-        raise ProfileValidationError(
-            f"{campaign}.preheat_ramp_C_per_hr must be positive"
-        )
-    return numeric
 
 
 def _campaign_max_hold_hr_for_profile(source: str | Path, campaign: str) -> float | None:

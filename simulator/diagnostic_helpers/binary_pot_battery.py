@@ -2891,11 +2891,14 @@ def _internal_analytical_vapor_pressure_adapter(
         liquid_fraction=None,
     )
     if include_diagnostic_shadows:
-        core._refresh_vapor_pressures_from_kernel(equilibrium)
+        core._refresh_vapor_pressures_from_kernel(
+            equilibrium, observation_pO2_bar=po2_bar,
+        )
     else:
         core._refresh_vapor_pressures_from_kernel(
             equilibrium,
             include_diagnostic_shadows=False,
+            observation_pO2_bar=po2_bar,
         )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []

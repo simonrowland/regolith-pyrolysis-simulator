@@ -5714,13 +5714,11 @@ class _MELTSBackendSupport(MeltBackend):
     ) -> Dict[str, str]:
         from engines.builtin.vapor_pressure import (
             FIT_TARGET_STANDARD_REACTION,
-            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
             vapor_pressure_source_label,
         )
 
         table = self._load_vapor_pressure_table()
         notices = getattr(self, "_antoine_floor_inversion_notices", {}) or {}
-        token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         labels: Dict[str, str] = {}
         for species in pressures:
             spec = table.get(str(species), {})
@@ -5730,8 +5728,11 @@ class _MELTSBackendSupport(MeltBackend):
                 dict(spec, fit_target=FIT_TARGET_STANDARD_REACTION) if reaction_source else spec,
                 coefficient_block="compiled_reference_pressure_model" if reaction_source else None,
             )
-            if str(species) in notices and token not in str(label).split(":"):
-                label = f"{label}:{token}"
+            notice = notices.get(str(species))
+            if notice is not None:
+                token = notice["reason"]
+                if token not in str(label).split(":"):
+                    label = f"{label}:{token}"
             labels[str(species)] = label
         return labels
 
@@ -5857,7 +5858,9 @@ class _MELTSBackendSupport(MeltBackend):
             melt_dissociation_pO2_floor_inversion_notice,
             warn_pseudo_vapor_pressure_fallback,
         )
-        from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
+        from simulator.vapour_rail.channels import (
+            validate_physical_pO2_bar, _pO2_evaluation_notice,
+        )
 
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
         pressures: Dict[str, float] = {}
@@ -5879,7 +5882,7 @@ class _MELTSBackendSupport(MeltBackend):
                     f'{species} melt-source reaction without pO2_bar; '
                     'refusing activity-only vapor pressure'
                 )
-            pO2_value = float(pO2_bar) if pO2_bar is not None else 1.0
+            pO2_value = validate_physical_pO2_bar(pO2_bar) if pO2_bar is not None else 1.0
             if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
                 p_i = effective_equilibrium_pressure_Pa(
@@ -5902,12 +5905,12 @@ class _MELTSBackendSupport(MeltBackend):
             if p_i <= 0.0 or not math.isfinite(p_i):
                 continue
             pressures[str(species)] = p_i
-            notice = melt_dissociation_pO2_floor_inversion_notice(
+            notice = _pO2_evaluation_notice(pO2_value) or melt_dissociation_pO2_floor_inversion_notice(
                 species=str(species), pressure_Pa=p_i,
                 pO2_bar_used=pO2_value, pO2_exponent=pO2_exponent,
                 pressure_rail="liquid_oxide_standard_reaction",
-                fO2_log=math.log10(max(pO2_value, 1e-30)),
-                was_clamped=pO2_value < MELT_DISSOCIATION_PO2_MIN_BAR,
+                fO2_log=math.log10(pO2_value),
+                was_clamped=False,
             )
             if notice is not None:
                 self._antoine_floor_inversion_notices[str(species)] = notice

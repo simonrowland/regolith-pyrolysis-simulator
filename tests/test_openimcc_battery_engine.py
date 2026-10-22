@@ -227,13 +227,15 @@ def test_openimcc_battery_emits_one_notice_per_exhausted_sink(
     composition_mol, expected_sinks
 ) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+    from simulator.accounting import resolve_species_formula
 
-    molar_mass = {"Na2O": 61.9789, "CaO": 56.077, "Al2O3": 101.961, "TiO2": 79.866}
     backend = _OpenImccBatteryBackend("openimcc")
     result = backend.equilibrate(
         temperature_C=1800.0 - 273.15,
         composition_kg={
-            oxide: amount * molar_mass[oxide] / 1000.0
+            oxide: amount
+            * resolve_species_formula(oxide).molar_mass_g_per_mol()
+            / 1000.0
             for oxide, amount in composition_mol.items()
         },
         composition_mol=composition_mol,
@@ -277,6 +279,7 @@ def test_openimcc_battery_keeps_package_envelope_slack(composition_mol) -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
     backend = _OpenImccBatteryBackend("openimcc")
+    # Preserve this input exactly at the packaged-envelope boundary.
     molar_mass = {"K2O": 94.196, "Na2O": 61.9789, "SiO2": 60.0843}
     result = backend.equilibrate(
         temperature_C=1800.0 - 273.15,
