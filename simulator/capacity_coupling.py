@@ -11,7 +11,7 @@ from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     controlled_flow_capacity,
 )
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.environment import _capacity_partial_pressures_pa
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from simulator.transport_regime import (
     gas_dynamic_viscosity_Pa_s, pipe_mass_flow_kg_s,
@@ -282,13 +282,10 @@ def solve_capacity_shadow(
         )
 
     species_order = tuple(sorted(set(pre_holdup_mol) | set(molar_mass_kg_mol)))
-    partials = {
-        species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
-        * GAS_CONSTANT
-        * temperature_K
-        / volume_m3
-        for species in species_order
-    }
+    partials = _capacity_partial_pressures_pa(
+        {species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
+         for species in species_order}, volume_m3, temperature_K,
+    )
     delta_history: list[float] = []
     final_bled: dict[str, float] = {}
     final_offgas: dict[str, float] = {}
@@ -461,13 +458,9 @@ def solve_capacity_shadow(
             )
             for species in species_order
         }
-        next_partials = {
-            species: final_residual[species]
-            * GAS_CONSTANT
-            * temperature_K
-            / volume_m3
-            for species in species_order
-        }
+        next_partials = _capacity_partial_pressures_pa(
+            final_residual, volume_m3, temperature_K,
+        )
         max_delta = max(
             (abs(next_partials[s] - partials[s]) for s in species_order),
             default=0.0,

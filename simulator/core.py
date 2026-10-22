@@ -420,6 +420,8 @@ from simulator.feedstock_composition import (
     resolve_feedstock_composition,
 )
 from simulator.environment import (
+    _headspace_moles_at_pressure_pa,
+    _headspace_pressure_bar,
     DEFAULT_VACUUM_FLOOR_BAR, feedstock_body,
     feedstock_surface_pressure_mbar as _feedstock_surface_pressure_mbar,
 )
@@ -3429,8 +3431,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         chamber_mol_hr = sum(max(0.0, float(n)) for n in holdup.values())
         sweep_flow = self.melt.sweep_mol_per_s
         if sweep_flow is not None:
-            target_mol = (self.melt.p_total_mbar * 100.0 * self._headspace_volume_m3()
-                          / (GAS_CONSTANT * self._headspace_temperature_K()))
+            target_mol = _headspace_moles_at_pressure_pa(
+                self.melt.p_total_mbar * 100.0,
+                self._headspace_volume_m3(), self._headspace_temperature_K(),
+            )
             chamber_mol_hr = max(0.0, chamber_mol_hr - target_mol)
             chamber_mol_hr += sweep_flow * 3600.0
         chamber_mol_hr += sum(max(0.0, float(n)) for n in (source_mol_hr or {}).values())
@@ -4179,20 +4183,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         T_head_K = self._headspace_temperature_K()
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
-        return o2 * GAS_CONSTANT * T_head_K / (
-            volume_m3 * 1.0e5
-        )
+        return _headspace_pressure_bar(o2, volume_m3, T_head_K)
 
     def _headspace_o2_mol_for_pO2_bar(self, pO2_bar: float) -> float:
         volume_m3 = self._headspace_volume_m3()
         T_head_K = self._headspace_temperature_K()
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
-        return (
-            max(0.0, float(pO2_bar))
-            * 1.0e5
-            * volume_m3
-            / (GAS_CONSTANT * T_head_K)
+        return _headspace_moles_at_pressure_pa(
+            max(0.0, float(pO2_bar)) * 1.0e5, volume_m3, T_head_K,
         )
 
     def _headspace_floor_o2_mol(self) -> float:
@@ -4242,10 +4241,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 T_head_K = self._headspace_temperature_K()
                 p_total_bar = 0.0
                 if volume_m3 > 0.0 and T_head_K > 0.0:
-                    p_total_bar = (
-                        total_mol * GAS_CONSTANT * T_head_K
-                        / (volume_m3 * 1.0e5)
-                    )
+                    p_total_bar = _headspace_pressure_bar(total_mol, volume_m3, T_head_K)
                 bleed_kg = (
                     self._headspace_bleed_conductance_kg_s(
                         species_kg_for_M_avg=holdup_kg,
@@ -4376,7 +4372,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             holdup = plan['final_species_mol']
             pressure = self.melt.p_total_mbar / 1000.0
         elif sum(holdup.values()) > 0.0:
-            pressure = sum(holdup.values()) * GAS_CONSTANT * temperature / (volume * 1e5)
+            pressure = _headspace_pressure_bar(sum(holdup.values()), volume, temperature)
         else:
             # Preview the declared startup fill; the bleed transition alone
             # admits its delivered molecules into the chamber later this tick.

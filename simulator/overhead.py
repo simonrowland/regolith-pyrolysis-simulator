@@ -58,11 +58,12 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.environment import (
+    _headspace_moles_at_pressure_pa,
     controlled_background_partial_pressure,
     cover_gas_partial_pressures,
+    ideal_gas_partial_pressures_bar,
 )
 from simulator.state import (
-    GAS_CONSTANT,  # R: J/(mol·K)
     MOLAR_MASS,  # g/mol
     CondensationTrain,
     EvaporationFlux,
@@ -262,7 +263,7 @@ def continuous_sweep_balance(
     # n_i(t)=n_i(0)*exp(-Bt/N)+N*(g_i+F*delta_i)/B*(1-exp(-Bt/N)).
     # Bt/N is dimensionless; integrated outlet follows I+G+n0-n(t), mol.
     # B->0 leaves the prepared inventory; pure carrier tends to N as t->inf.
-    target = pressure * 1e5 * volume / (GAS_CONSTANT * temperature)
+    target = _headspace_moles_at_pressure_pa(pressure * 1e5, volume, temperature)
     initial_total = sum(initial.values())
     startup = max(0.0, target - initial_total)
     inlet = {carrier: startup + flow * duration}
@@ -1717,14 +1718,7 @@ class OverheadGasModel:
     def _compute_partial_pressures(holdup_mol: Mapping[str, float],  # mol by species — gas holdup
                                    volume_m3: float,  # m³ — gas volume
                                    temperature_K: float) -> dict[str, float]:  # K — gas temperature
-        if volume_m3 <= 0.0 or temperature_K <= 0.0:
-            return {}
-        scale = GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)  # bar/mol — ideal-gas pressure factor; Pa -> bar
-        return {
-            str(species): max(0.0, float(mol)) * scale  # bar — species partial pressure
-            for species, mol in dict(holdup_mol or {}).items()  # mol — species gas holdup
-            if max(0.0, float(mol)) > 0.0
-        }
+        return ideal_gas_partial_pressures_bar(holdup_mol, volume_m3, temperature_K)
 
     def _resolve_headspace_volume(self, explicit: Optional[float]) -> float:  # m³ or None — explicit volume override
         if not self._finite_headspace_enabled:

@@ -6,7 +6,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 _OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K = 8.31446
@@ -78,6 +78,42 @@ def ideal_gas_partial_pressures_bar(
         str(species): max(0.0, float(mol)) * scale
         for species, mol in dict(holdup_mol or {}).items()
         if max(0.0, float(mol)) > 0.0
+    }
+
+
+def _headspace_pressure_bar(mol: float, volume_m3: float, temperature_K: float) -> float:
+    """Legacy scalar EOS, after caller-specific zero/validity handling.
+
+    p=nRT/V; J/m³ is Pa, divided by 1e5 Pa/bar. At n=0 pressure is
+    zero. Keep the scalar multiplication order and historical R: factoring
+    out RT/V as in the map projection changes binary64 rounding.
+    """
+    return mol * _OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K * temperature_K / (
+        volume_m3 * 1.0e5
+    )
+
+
+def _headspace_moles_at_pressure_pa(
+    pressure_pa: float, volume_m3: float, temperature_K: float,
+) -> float:
+    """Inverse legacy EOS: PV/RT, Pa m³/(J/mol) = mol; P=0 gives n=0."""
+    return pressure_pa * volume_m3 / (
+        _OVERHEAD_EOS_GAS_CONSTANT_J_PER_MOL_K * temperature_K
+    )
+
+
+def _capacity_partial_pressures_pa(
+    holdup_mol: Mapping[str, float], volume_m3: float, temperature_K: float,
+) -> dict[str, float]:
+    """Picard EOS with its existing full-precision R and multiplication order.
+
+    nRT/V has units J/m³ = Pa. Unlike the legacy bar map, zero species
+    remain present for the fixed-point vector; zero inventory gives zero P.
+    Inputs have already passed the capacity solver's admission checks.
+    """
+    return {
+        species: mol * GAS_CONSTANT * temperature_K / volume_m3
+        for species, mol in holdup_mol.items()
     }
 
 
