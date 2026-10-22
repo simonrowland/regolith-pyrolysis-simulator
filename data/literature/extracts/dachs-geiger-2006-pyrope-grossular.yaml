@@ -264,14 +264,14 @@ species:
         attribution: Holland and Powell (1998)
       uncertainty:
         reported_status: not_reported
-    - observation_id: dachs_geiger_2006_pyrope_entropy_g97
-      type: heat_capacity_and_heat_content_series
+    context:
+    - observation_id: dachs_geiger_2006_pyrope_entropy_g97_context
+      type: calorimetric_entropy_context
       locator:
         page: 6
         pdf_page_index: 5
         published_page: 899
         table: '2'
-      phase: cr
       units: J/mol/K
       values:
         quantity: S
@@ -279,12 +279,12 @@ species:
         entropy: 274.45
         T_K: 298.15
         sigma: 0.27
-        attribution: Geiger et al. (1997)
+        attribution: Gottschalk (1997)
+        note: 'Footnote ‡: based on Kolesnik et al. (1977) Cp of a natural garnet with 18.8 mol% almandine and 8.2 mol% grossular; this is not endmember pyrope.'
       uncertainty:
         reported_status: printed
         value: 0.27
         units: J/mol/K
-    context:
     - observation_id: dachs_geiger_2006_intermediate_solution_entropies
       type: calorimetric_entropy_context
       locator:
@@ -1238,7 +1238,7 @@ species:
         entropy: 257.47
         T_K: 298.15
         sigma: 0.24
-        attribution: Geiger et al. (1997)
+        attribution: Gottschalk (1997)
       uncertainty:
         reported_status: printed
         value: 0.24

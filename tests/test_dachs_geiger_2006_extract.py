@@ -45,7 +45,6 @@ def test_all_typed_endmember_values_migrate_with_temperature_and_species() -> No
         "dachs_geiger_2006_pyrope_entropy_hw80": ("Mg3Al2Si3O12", Quantity.S, 266.27, None),
         "dachs_geiger_2006_pyrope_entropy_b88": ("Mg3Al2Si3O12", Quantity.S, 266.36, None),
         "dachs_geiger_2006_pyrope_entropy_hp98": ("Mg3Al2Si3O12", Quantity.S, 266.3, None),
-        "dachs_geiger_2006_pyrope_entropy_g97": ("Mg3Al2Si3O12", Quantity.S, 274.45, 0.27),
         "dachs_geiger_2006_pyrope_entropy_ppms_py4": ("Mg3Al2Si3O12", Quantity.S, 265.01, 0.24),
         "dachs_geiger_2006_grossular_cp_ppms_gr1": ("Ca3Al2Si3O12", Quantity.CP, 325.1, 1.0),
         "dachs_geiger_2006_grossular_entropy_ppms_gr1": ("Ca3Al2Si3O12", Quantity.S, 257.86, 0.26),
@@ -60,6 +59,25 @@ def test_all_typed_endmember_values_migrate_with_temperature_and_species() -> No
     }
     assert len(migrator.result.observations) == len(expected)
     document = _document()
+    assert len(expected) == 23
+    g97_attributions = {
+        row["values"]["attribution"]
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+        if row["observation_id"].endswith("_entropy_g97")
+    }
+    assert g97_attributions == {"Gottschalk (1997)"}
+    pyrope_context = next(
+        row
+        for row in document["species"]["Mg3Al2Si3O12"]["context"]
+        if row["observation_id"] == "dachs_geiger_2006_pyrope_entropy_g97_context"
+    )
+    assert pyrope_context["values"]["entropy"] == 274.45
+    assert pyrope_context["values"]["sigma"] == 0.27
+    assert pyrope_context["values"]["attribution"] == "Gottschalk (1997)"
+    assert "footnote ‡" in pyrope_context["values"]["note"].casefold()
+    assert "18.8 mol% almandine" in pyrope_context["values"]["note"]
+    assert "8.2 mol% grossular" in pyrope_context["values"]["note"]
     for observation_id, (formula, quantity, value, sigma) in expected.items():
         observation = migrator.result.observations[f"{EXTRACT.stem}::{observation_id}"]
         assert observation.identity.species.formula == formula
