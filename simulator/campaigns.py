@@ -233,11 +233,48 @@ class _CampaignOverrideStore(dict):
             self[str(key)] = value
 
 
-# Owner ruling pending. "backstop" is the selected C0 exit: incomplete
-# first-melt or maximum-hold only. "temperature_hold" restores the
-# pre-phase-2 temperature plus minimum-hold prediction and must stay
-# unselected until measured release curves exist (t-1417).
-C0_EXIT_MODE = "backstop"
+def c0_temperature_hold_exit_record(kinetics: str) -> dict[str, object]:
+    """One predict-and-flag record for a temperature-hold C0 exit.
+
+    Owner ruling d-235. The release curves are fiat-ledgered and
+    uncertified until t-1417. Authority level is the published
+    out-of-domain predict-and-flag level. Callers copy this record;
+    they do not build a second notice.
+    """
+    from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
+
+    authority = PUBLISHED_AUTHORITY_OUTSIDE
+    return {
+        "outcome": "incomplete",
+        "backstop": "temperature_hold",
+        "kinetics": kinetics,
+        "release_curves": "uncertified",
+        "ticket": "t-1417",
+        "authority": authority,
+        "message": (
+            "C0 release curves are fiat-ledgered and uncertified (t-1417); "
+            f"authority level {authority}."
+        ),
+    }
+
+
+def c0_temperature_hold_run_notice(sim: object) -> dict[str, object] | None:
+    """The temperature-hold exit record once, or None if that exit did not fire."""
+    manager = getattr(sim, "campaign_mgr", None)
+    record = getattr(manager, "last_c0_exit", None)
+    if not isinstance(record, Mapping):
+        return None
+    if record.get("backstop") != "temperature_hold":
+        return None
+    return dict(record)
+
+
+# Owner ruling d-235 (2026-10-22). "temperature_hold" is the selected C0
+# exit until measured release curves exist (t-1417): temperature plus
+# minimum hold, incomplete, with the predict-and-flag record above.
+# "backstop" remains reachable and still exits only on first melt or the
+# maximum hold. The maximum hold stays a backstop, not the selected exit.
+C0_EXIT_MODE = "temperature_hold"
 
 
 class CampaignManager:
@@ -2180,8 +2217,9 @@ class CampaignManager:
         Runtime completion on the paths in this function (not IR peak
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
-        - C0: C0_EXIT_MODE. Selected backstop is incomplete maximum-hold
-          or first melt. temperature_hold is unselected.
+        - C0: C0_EXIT_MODE. Selected temperature_hold is an incomplete
+          predict-and-flag exit (d-235, t-1417). Maximum hold and first
+          melt stay incomplete backstops.
         - C0B: max_hold only
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
@@ -2258,13 +2296,9 @@ class CampaignManager:
                     melt.temperature_C >= min_temperature_C
                     and melt.campaign_hour >= min_hold_hr
                 ):
-                    self.last_c0_exit = {
-                        "outcome": "incomplete",
-                        "backstop": "temperature_hold",
-                        "kinetics": STAGE0_RELEASE_KINETICS,
-                        "release_curves": "uncertified",
-                        "ticket": "t-1417",
-                    }
+                    self.last_c0_exit = c0_temperature_hold_exit_record(
+                        STAGE0_RELEASE_KINETICS,
+                    )
                     return True
                 if completed_campaign_hour >= max_hold_hr:
                     self.last_c0_exit = {
