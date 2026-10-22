@@ -1,0 +1,1626 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lopatin-2021-ce-ti-zr-kems-ru.yaml
+observations:
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_01
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.1'
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.72'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.053'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_02
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.82'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.02'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 1 footnote a: data from [6], Meng Z., Ren X., Wei P. (2014), J. Am. Ceram. Soc. 97, 1566, doi: 10.1111/jace.12886.'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_03
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.05'
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.86'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.024'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_04
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.91'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.01'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 1 footnote a: data from [6], Meng Z., Ren X., Wei P. (2014), J. Am. Ceram. Soc. 97, 1566, doi: 10.1111/jace.12886.'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_gamma_row_01
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.1'
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.72'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.29'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  derived_from:
+  - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_01
+  derivation:
+    relation: gamma_i = a_i/x_i from equation (3)
+    inputs:
+    - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_01
+    parameters: []
+    output_unit: dimensionless
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_gamma_row_02
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.82'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 1 footnote a: data from [6], Meng Z., Ren X., Wei P. (2014), J. Am. Ceram. Soc. 97, 1566, doi: 10.1111/jace.12886.'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.18, x(ZrO2)=0.82; row=2
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_gamma_row_03
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.05'
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.86'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  derived_from:
+  - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_03
+  derivation:
+    relation: gamma_i = a_i/x_i from equation (3)
+    inputs:
+    - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_activity_row_03
+    parameters: []
+    output_unit: dimensionless
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_ceo2_gamma_row_04
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CeO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CeO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The paper identifies CeO2(s) but does not name a polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CeO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.91'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 1 footnote a: data from [6], Meng Z., Ren X., Wei P. (2014), J. Am. Ceram. Soc. 97, 1566, doi: 10.1111/jace.12886.'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=–, x(CeO2)=0.09, x(ZrO2)=0.91; row=4
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_01
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: Equation (1) defines a pure-TiO2 pressure reference, but the method instead uses Ti3O5 as the TiO2 activity
+        standard and applies a comparative-evaporation correction. The paper does not identify the pure-endmember reference
+        phase at 2250 K.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.1'
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.72'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_03
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: Equation (1) defines a pure-TiO2 pressure reference, but the method instead uses Ti3O5 as the TiO2 activity
+        standard and applies a comparative-evaporation correction. The paper does not identify the pure-endmember reference
+        phase at 2250 K.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.05'
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.86'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.16'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_gamma_row_01
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: Equation (1) defines a pure-TiO2 pressure reference, but the method instead uses Ti3O5 as the TiO2 activity
+        standard and applies a comparative-evaporation correction. The paper does not identify the pure-endmember reference
+        phase at 2250 K.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.1'
+        - - CeO2
+          - '0.18'
+        - - ZrO2
+          - '0.72'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.10, x(CeO2)=0.18, x(ZrO2)=0.72; row=1
+  derived_from:
+  - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_01
+  derivation:
+    relation: gamma_i = a_i/x_i from equation (3)
+    inputs:
+    - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_01
+    parameters: []
+    output_unit: dimensionless
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_gamma_row_03
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: Equation (1) defines a pure-TiO2 pressure reference, but the method instead uses Ti3O5 as the TiO2 activity
+        standard and applies a comparative-evaporation correction. The paper does not identify the pure-endmember reference
+        phase at 2250 K.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - TiO2
+          - '0.05'
+        - - CeO2
+          - '0.09'
+        - - ZrO2
+          - '0.86'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '3.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    table: '1'
+    note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2250'
+      locator:
+        page: 3
+        published_page: 1570
+        pdf_page_index: 2
+        table: '1'
+        note: x(TiO2)=0.05, x(CeO2)=0.09, x(ZrO2)=0.86; row=3
+  derived_from:
+  - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_03
+  derivation:
+    relation: gamma_i = a_i/x_i from equation (3)
+    inputs:
+    - lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_table1_tio2_activity_row_03
+    parameters: []
+    output_unit: dimensionless
+- observation_id: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_tio2_ti3o5_reference_ion_ratio::rows:h=3e64a416d829
+  experiment_id: 10.31857/s0044460x21100127::lopatin-2021-ce-ti-zr-kems-ru
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2060, 2160]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.1'
+      parent: lopatin-2021-ce-ti-zr-kems-ru::lopatin_2021_tio2_ti3o5_reference_ion_ratio
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: lopatin-2021-ce-ti-zr-kems-ru
+  locator:
+    page: 3
+    published_page: 1570
+    pdf_page_index: 2
+    note: TiO2/Ti3O5 comparative evaporation paragraph immediately below Table 1
+  read_from: unknown:lopatin-2021-ce-ti-zr-kems-ru
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:lopatin-2021-ce-ti-zr-kems-ru
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless

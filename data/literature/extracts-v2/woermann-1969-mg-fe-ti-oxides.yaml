@@ -1,0 +1,3134 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml
+observations:
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mg2tio4_melting_temperature
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_melting_relations
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Mg2TiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2029.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: woermann-1969-mg-fe-ti-oxides::woermann1969_mg2tio4_melting_temperature
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 1
+    published_page: 463
+    pdf_page_index: 0
+    section: Abstract
+    note: 'Printed melting relation for Mg2TiO4: 1756 °C, incongruent melting'
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2029.15'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        section: Abstract
+        note: 'Printed melting relation for Mg2TiO4: 1756 °C, incongruent melting'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1756'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for Mg2TiO4: 1756 °C, incongruent melting'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for Mg2TiO4: 1756 °C, incongruent melting'
+        output_unit: K
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1620_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1620
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1893.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '28'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1893.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1620'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1620_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1620
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1893.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '72'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1893.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1620'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1620 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1630_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1630
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1903.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1903.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1630'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1630_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1630
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1903.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '68'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1903.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1630'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1630 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1632_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1632
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1905.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1905.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1632'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1632_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1632
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1905.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '86'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1905.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1632'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1632 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1756_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1756
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2029.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '43'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2029.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1756'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgo_tio2_invariant_1756_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_inv_1756
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2029.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '57'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 5
+    published_page: 467
+    pdf_page_index: 4
+    table: Liquidus invariant points after Fig. 4
+    note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2029.15'
+      locator:
+        page: 5
+        published_page: 467
+        pdf_page_index: 4
+        table: Liquidus invariant points after Fig. 4
+        note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1756'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 467
+              pdf_page_index: 4
+              table: Liquidus invariant points after Fig. 4
+              note: Printed liquid composition at 1756 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgti2o5_melting_temperature
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_melting_relations
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgTi2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1935.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: woermann-1969-mg-fe-ti-oxides::woermann1969_mgti2o5_melting_temperature
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 1
+    published_page: 463
+    pdf_page_index: 0
+    section: Abstract
+    note: 'Printed melting relation for MgTi2O5: 1662 °C, congruent melting'
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1935.15'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        section: Abstract
+        note: 'Printed melting relation for MgTi2O5: 1662 °C, congruent melting'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1662'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for MgTi2O5: 1662 °C, congruent melting'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for MgTi2O5: 1662 °C, congruent melting'
+        output_unit: K
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_mgtio3_melting_temperature
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_mgo_tio2_melting_relations
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgTiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1903.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: woermann-1969-mg-fe-ti-oxides::woermann1969_mgtio3_melting_temperature
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 1
+    published_page: 463
+    pdf_page_index: 0
+    section: Abstract
+    note: 'Printed melting relation for MgTiO3: 1630 °C, incongruent melting'
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1903.15'
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        section: Abstract
+        note: 'Printed melting relation for MgTiO3: 1630 °C, incongruent melting'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1630'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for MgTiO3: 1630 °C, incongruent melting'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 463
+              pdf_page_index: 0
+              section: Abstract
+              note: 'Printed melting relation for MgTiO3: 1630 °C, incongruent melting'
+        output_unit: K
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_fe2o3
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1803.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '65'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1803.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1530'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1803.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1803.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1530'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1530_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1530
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1803.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '28'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1803.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1530'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1530 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_fe2o3
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1869.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads Fe3O2,
+          while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads Fe3O2,
+      while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1869.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads Fe3O2,
+          while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1596'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads
+                Fe3O2, while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render; the line reads
+                Fe3O2, while its footnote defines total iron oxide as Fe2O3, so this component is stored on the footnote basis
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_mgo
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1869.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '26'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1869.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1596'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+- observation_id: woermann-1969-mg-fe-ti-oxides::woermann1969_ternary_invariant_1596_tio2
+  experiment_id: 10.2475/001c.125318::experiment::woermann1969_ternary_inv_1596
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1869.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '20265'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '65'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+  notices: []
+  source_id: woermann-1969-mg-fe-ti-oxides
+  locator:
+    page: 7
+    published_page: 469
+    pdf_page_index: 6
+    table: Liquidus invariant points in MgO-iron oxide-TiO2
+    note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+  read_from: unknown:woermann-1969-mg-fe-ti-oxides
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1869.15'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        table: Liquidus invariant points in MgO-iron oxide-TiO2
+        note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1596'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              table: Liquidus invariant points in MgO-iron oxide-TiO2
+              note: Printed liquid composition at 1596 °C; component value transcribed from the 600 dpi render
+        output_unit: K
+    pO2_Pa:
+      state:
+        tag: value
+        value: '20265'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed P(O2) = 0.2 atm; converted using 1 atm = 101325 Pa
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 1
+        published_page: 463
+        pdf_page_index: 0
+        note: The present study was carried out in air; printed with P(O2) = 0.2 atm in the introduction
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 7
+        published_page: 469
+        pdf_page_index: 6
+        note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 7
+              published_page: 469
+              pdf_page_index: 6
+              note: Printed total pressure = 1 atm for the MgO-iron oxide-TiO2 system; converted using 1 atm = 101325 Pa
+        output_unit: Pa

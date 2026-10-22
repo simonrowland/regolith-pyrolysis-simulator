@@ -1,0 +1,297 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/dohmen-2003-coupled-kinetics.yaml
+observations:
+- observation_id: dohmen-2003-coupled-kinetics::dohmen_2003_text_pfe_approximate
+  experiment_id: 10.1029/2001jb000587::experiment::dohmen-2003-kems-1400c
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam42-1022
+      date: '2026-10-22'
+      evidence:
+        page: 4
+        published_page: 5-4
+        pdf_page_index: 3
+        figure: '6'
+        section: 3.2 Gas Phase Composition
+        note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time series.
+  notices: []
+  source_id: dohmen-2003-coupled-kinetics
+  locator:
+    page: 4
+    published_page: 5-4
+    pdf_page_index: 3
+    figure: '6'
+    section: 3.2 Gas Phase Composition
+    note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time series.
+  read_from: unknown:dohmen-2003-coupled-kinetics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 4
+        published_page: 5-4
+        pdf_page_index: 3
+        figure: '6'
+        section: 3.2 Gas Phase Composition
+        note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time series.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 4
+              published_page: 5-4
+              pdf_page_index: 3
+              figure: '6'
+              section: 3.2 Gas Phase Composition
+              note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time
+                series.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 5-4
+              pdf_page_index: 3
+              figure: '6'
+              section: 3.2 Gas Phase Composition
+              note: The text gives the approximate Fe pressure and points to Figure 6, whose caption identifies the SC6 time
+                series.
+        output_unit: K
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - unknown:dohmen-2003-coupled-kinetics
+    parameters: []
+    output_unit: Pa
+- observation_id: dohmen-2003-coupled-kinetics::dohmen_2003_text_psio_approximate
+  experiment_id: 10.1029/2001jb000587::experiment::dohmen-2003-kems-1400c
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam42-1022
+      date: '2026-10-22'
+      evidence:
+        page: 5
+        published_page: 5-5
+        pdf_page_index: 4
+        figure: '6'
+        section: 3.2 Gas Phase Composition
+        note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source
+          sentence does not name a specific run.
+  notices: []
+  source_id: dohmen-2003-coupled-kinetics
+  locator:
+    page: 5
+    published_page: 5-5
+    pdf_page_index: 4
+    figure: '6'
+    section: 3.2 Gas Phase Composition
+    note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source sentence
+      does not name a specific run.
+  read_from: unknown:dohmen-2003-coupled-kinetics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 5
+        published_page: 5-5
+        pdf_page_index: 4
+        figure: '6'
+        section: 3.2 Gas Phase Composition
+        note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source
+          sentence does not name a specific run.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 5
+              published_page: 5-5
+              pdf_page_index: 4
+              figure: '6'
+              section: 3.2 Gas Phase Composition
+              note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source
+                sentence does not name a specific run.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5-5
+              pdf_page_index: 4
+              figure: '6'
+              section: 3.2 Gas Phase Composition
+              note: The text states SiO becomes unambiguous after about 10 hours and gives its approximate pressure; the source
+                sentence does not name a specific run.
+        output_unit: K
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - unknown:dohmen-2003-coupled-kinetics
+    parameters: []
+    output_unit: Pa

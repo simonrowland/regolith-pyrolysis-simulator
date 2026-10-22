@@ -1,0 +1,5797 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/yu-2003-k-na-evaporation-chondrule-melts.yaml
+observations:
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=03a8336d6241
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.5'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row NV-63; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-63; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-63; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-63; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-63; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-63; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: CO–CO2 gas mixture
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-63; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_control:
+      state:
+        tag: value
+        value: 0.5 log unit below the iron–wüstite buffer
+      locator:
+        page: 3
+        published_page: 775
+        pdf_page_index: 2
+        section: Materials and methods
+        note: Printed buffer offset; no absolute log fO2 is given.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '90'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-63; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=29b014fbe2a5
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '7.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.3'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-59; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-59; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-59; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    peak_temperature_hold_s:
+      state:
+        tag: value
+        value: '50'
+      locator:
+        page: 3
+        published_page: 775
+        pdf_page_index: 2
+        section: Materials and methods
+        note: Flash runs were at peak 1450°C for 50 s before continuous cooling.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    cooling_rate_C_per_hr:
+      state:
+        tag: value
+        value: '5000'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-59; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=29c03006b000
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '1.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row NV-61; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-61; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-61; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-61; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-61; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-61; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: CO–CO2 gas mixture
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-61; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_control:
+      state:
+        tag: value
+        value: 0.5 log unit below the iron–wüstite buffer
+      locator:
+        page: 3
+        published_page: 775
+        pdf_page_index: 2
+        section: Materials and methods
+        note: Printed buffer offset; no absolute log fO2 is given.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-61; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=2de1278e50ac
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '57.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.0'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V22; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V22; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V22; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V22; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V22; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00009'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V22; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V22; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V22; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=4a464a049117
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '87.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-46; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-46; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-46; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '48'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-46; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=65f4473a80e4
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '27.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.6'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V21; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V21; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V21; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V21; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V21; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00009'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V21; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V21; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V21; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=7f1b5342e970
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '20.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-43; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-43; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-43; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-43; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=81c409ffea27
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '18.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.4'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V20; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V20; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V20; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V20; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V20; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00009'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V20; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V20; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V20; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=a0f00bc4ff5b
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '2.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.4'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row NV-62; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-62; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-62; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row NV-62; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-62; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-62; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: CO–CO2 gas mixture
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-62; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    fO2_control:
+      state:
+        tag: value
+        value: 0.5 log unit below the iron–wüstite buffer
+      locator:
+        page: 3
+        published_page: 775
+        pdf_page_index: 2
+        section: Materials and methods
+        note: Printed buffer offset; no absolute log fO2 is given.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row NV-62; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=bd19c39edec4
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '68.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-45; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-45; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-45; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-45; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=cfc7d09a9900
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '44'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.8'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-44; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-44; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-44; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-44; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=d6cd77ce2934
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '22.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.8'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-60; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-60; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-60; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00001'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    peak_temperature_hold_s:
+      state:
+        tag: value
+        value: '50'
+      locator:
+        page: 3
+        published_page: 775
+        pdf_page_index: 2
+        section: Materials and methods
+        note: Flash runs were at peak 1450°C for 50 s before continuous cooling.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    cooling_rate_C_per_hr:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-60; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1723.15:h=daab465ac7b2
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2a, row V-54; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-54; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-54; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2a, row V-54; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1450'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-54; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2a, row V-54; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=024253e29b68
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '15.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-88; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-88; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-88; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-88; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=08270daa7ea9
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '13.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-92; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-92; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-92; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-92; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=2cf9384b5be1
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '57.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.1'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-95; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-95; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-95; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-95; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-95; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000072'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-95; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-95; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-95; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=406a2cf78e09
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '6.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.6'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-91; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-91; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-91; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-91; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=4863724860c7
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '13.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-93; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-93; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-93; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-93; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=52352495d5d7
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '20.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.6'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-97; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-97; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-97; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-97; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-97; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-97; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-97; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-97; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=65f972572b4e
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '7.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '3.0'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-99; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-99; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-99; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-99; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-99; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-99; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-99; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-99; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=671df1f252ff
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-103; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-103; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-103; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.013'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-103; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=6a8cbd178ac5
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '14.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-96; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-96; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-96; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-96; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-96; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000072'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-96; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-96; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-96; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=743e7582533c
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '15.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.8'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-101; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-101; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-101; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-101; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-101; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-101; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-101; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-101; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=86a910d1e828
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '59.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.6'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-98; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-98; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-98; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-98; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-98; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-98; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-98; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-98; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=92c7e53413dd
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '4.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.2'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-102; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-102; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-102; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-102; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-102; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-102; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-102; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-102; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=951584db29e3
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '48.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.0'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-89; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-89; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-89; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-89; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=9bf77df8f1c2
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '34'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.1'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-87; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-87; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-87; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-87; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=bb6657667652
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '62.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.8'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-86; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-86; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-86; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-86; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=dc327980e1e8
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '21.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.9'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-100; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-100; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-100; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-100; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-100; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.0014'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-100; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-100; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-100; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=ee1d9732ac2b
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '21.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.6'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-94; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-94; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-94; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-94; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-94; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000072'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-94; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: H2
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-94; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-94; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=f359befaf8c7
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '38.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.2'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-90; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-90; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-90; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.00018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '40'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-90; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil
+- observation_id: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k::T=1758.15:h=f375e7dcdd33
+  experiment_id: 10.1016/s0016-7037(02)01176-6::yu-2003-k-na-evaporation-chondrule-melts
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1758.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '17.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.7'
+      parent: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-2003-k-na-evaporation-chondrule-melts
+  locator:
+    page: 4
+    published_page: 776
+    pdf_page_index: 3
+    table: 2a and 2b
+    note: Table 2b, row V-85; printed δ41K and err.
+    source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  read_from: unknown:yu-2003-k-na-evaporation-chondrule-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1758.15'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1485'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-85; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 776
+              pdf_page_index: 3
+              table: 2a and 2b
+              note: Table 2b, row V-85; printed δ41K and err.
+              source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1485'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    total_pressure_atm:
+      state:
+        tag: value
+        value: '0.000018'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+    duration_min:
+      state:
+        tag: value
+        value: '5'
+      locator:
+        page: 4
+        published_page: 776
+        pdf_page_index: 3
+        table: 2a and 2b
+        note: Table 2b, row V-85; printed δ41K and err.
+        source_path: corpus/raw/yu-2003-k-na-evaporation-chondrule-melts/yu-2003-k-na-evaporation-chondrule-melts.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:yu-2003-k-na-evaporation-chondrule-melts
+    parameters: []
+    output_unit: per mil

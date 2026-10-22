@@ -1,0 +1,2350 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/leister-ehrt-2000-polyvalent-redox.yaml
+observations:
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=1:h=ad6d3f98d591
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - SiO2
+          - '0.67'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=1
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.8'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=1
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=2:h=0eb58827bfd8
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - SiO2
+          - '0.67'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '2.44827586206896551724137931'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=2
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.71'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=2
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=2073.15:row=3:h=67e2f92a5723
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - SiO2
+          - '0.67'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.6666666666666666666666666667'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=3
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.4'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=3
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1773.15:row=iron:h=62d1fb7bb45d
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '4.882352941176470588235294118'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 3
+    published_page: 196
+    pdf_page_index: 2
+    paragraph: Iron
+    section: Results and Discussion
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        published_page: 196
+        pdf_page_index: 2
+        paragraph: Iron
+        section: Results and Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 196
+              pdf_page_index: 2
+              paragraph: Iron
+              section: Results and Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 196
+              pdf_page_index: 2
+              paragraph: Iron
+              section: Results and Discussion
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        published_page: 196
+        pdf_page_index: 2
+        paragraph: Iron
+        section: Results and Discussion
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 3
+        published_page: 196
+        pdf_page_index: 2
+        paragraph: Iron
+        section: Results and Discussion
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.83'
+        locator:
+          page: 3
+          published_page: 196
+          pdf_page_index: 2
+          paragraph: Iron
+          section: Results and Discussion
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=1:h=0729256e08e2
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '3.166666666666666666666666667'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=1
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.76'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=1
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=2:h=a6361cadef9c
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '1.222222222222222222222222222'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=2
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.55'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=2
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2073.15:row=3:h=ecfb59e0dd04
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.6666666666666666666666666667'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=3
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.4'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=3
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2073.15:row=5:h=fb992e8c9550
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.0989010989010989010989010989'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=5
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=5
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: H2/N2
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.09'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=5
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2273.15:row=4:h=82c2f572b23e
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.15'
+        - - SiO2
+          - '0.85'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3333333333333333333333333333'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=4
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=4
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.25'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=4
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=1:h=ac46444fa1a6
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1'
+        - - BaO
+          - '0.1'
+        - - Al2O3
+          - '0.15'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '6.692307692307692307692307692'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=1
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=1
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.87'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=1
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=2:h=18497705bdc4
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1'
+        - - BaO
+          - '0.1'
+        - - Al2O3
+          - '0.15'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '4.263157894736842105263157895'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=2
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=2
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.81'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=2
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2073.15:row=3:h=00b1ab593e2a
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1'
+        - - BaO
+          - '0.1'
+        - - Al2O3
+          - '0.15'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '3.545454545454545454545454545'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=3
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=3
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.78'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=3
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2073.15:row=5:h=0fa7e4911530
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1'
+        - - BaO
+          - '0.1'
+        - - Al2O3
+          - '0.15'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1111111111111111111111111111'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=5
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=5
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: H2/N2
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.1'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=5
+    output_unit: dimensionless
+- observation_id: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2273.15:row=4:h=2ffba02b3d02
+  experiment_id: b04127a0c1112c2f5ffbd67ca2674049e94f326e8bb896e27b4d47817e867ff9::leister-ehrt-2000-polyvalent-redox
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1'
+        - - BaO
+          - '0.1'
+        - - Al2O3
+          - '0.15'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: leister-ehrt-2000-polyvalent-redox
+  locator:
+    page: 5
+    published_page: 198
+    pdf_page_index: 4
+    table: Tab. 1
+    note: row=4
+  read_from: unknown:leister-ehrt-2000-polyvalent-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+        note: row=4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 198
+              pdf_page_index: 4
+              table: Tab. 1
+              note: row=4
+        output_unit: K
+    T_C:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 5
+        published_page: 198
+        pdf_page_index: 4
+        table: Tab. 1
+  derived_from:
+  - unknown:leister-ehrt-2000-polyvalent-redox
+  derivation:
+    relation: Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed
+    inputs:
+    - unknown:leister-ehrt-2000-polyvalent-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.75'
+        locator:
+          page: 5
+          published_page: 198
+          pdf_page_index: 4
+          table: Tab. 1
+          note: row=4
+    output_unit: dimensionless

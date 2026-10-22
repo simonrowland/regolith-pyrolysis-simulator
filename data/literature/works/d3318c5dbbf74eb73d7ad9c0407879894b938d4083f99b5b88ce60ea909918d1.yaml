@@ -1,0 +1,271 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d3318c5dbbf74eb73d7ad9c0407879894b938d4083f99b5b88ce60ea909918d1
+  citation: Kropf A. (2009), Alkalien in Chondren – offenes oder geschlossenes System? Doctoral dissertation, Georg-August-Universität
+    Göttingen.
+  source_ids:
+  - kropf-2009-alkalis-chondrules-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:kropf-2009-alkalis-chondrules-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: kropf2009_table6_reference_olivine_na2o
+  type: measured_composition_table
+  locator:
+    pdf_page_index: 47
+    page: 48
+    table: '6'
+  units: wt.% Na2O
+  quote: 'Tabelle 6: Vergleich der SIMS- und EMS-Messungen von Na in Referenzolivinen; uncertainties: SIMS ±0.0005 wt.%, EMS
+    ±0.0015 wt.%.'
+  values:
+    measured_direct: true
+    reason_not_typed: No olivine phase_role exists for equilibrium_phase_composition; values are not reassigned to glass or
+      melt.
+    rows:
+    - sample: 08-06-B-2_0l-PmWE-141008a
+      SIMS: '0.01'
+      EMS: '0.0105'
+    - sample: 08-06-B-2_0l-PmWE-141008b
+      SIMS: '0.0097'
+      EMS: '0.0105'
+    - sample: 08-06-B-2_0l-PmWE-141008c
+      SIMS: '0.0102'
+      EMS: '0.0105'
+    - sample: 08-06-B-3_0l-PmWE-141008a
+      SIMS: '0.0099'
+      EMS: '0.0113'
+    - sample: 08-06-B-3_0l-PmWE-141008c
+      SIMS: '0.0102'
+      EMS: '0.0113'
+    - sample: 08-06-D-2_ol_MtOvl-151008a
+      SIMS: '0.0051'
+      EMS: '0.0051'
+    - sample: 08-06-D-2_ol_MtOvl-151008b
+      SIMS: '0.0051'
+      EMS: '0.0051'
+    - sample: 08-06-D-2_ol_MtOvl-151008c
+      SIMS: '0.0052'
+      EMS: '0.0047'
+    - sample: 08-07-ol_SC1-151008a
+      SIMS: '0.0063'
+      EMS: '0.0062'
+    - sample: 08-07-ol_SC1-151008b
+      SIMS: '0.0063'
+      EMS: '0.0062'
+    - sample: 08-07-ol_SC1-151008c
+      SIMS: '0.0062'
+      EMS: '0.0062'
+    - sample: 08-07-ol-SC1-151008d
+      SIMS: '0.0067'
+      EMS: '0.0062'
+    - sample: 08-07-ol-SC1-151008e
+      SIMS: '0.0063'
+      EMS: '0.0062'
+    - sample: 08-07-ol-SC1-151008f
+      SIMS: '0.0066'
+      EMS: '0.0062'
+    - sample: 08-07-ol-SC1-161008a
+      SIMS: '0.0066'
+      EMS: '0.0062'
+    - sample: 08-07-ol-SC1-161008b
+      SIMS: '0.007'
+      EMS: '0.0062'
+  context_id: kropf-2009-alkalis-chondrules-thesis::context::kropf2009_table6_reference_olivine_na2o
+  work_id: d3318c5dbbf74eb73d7ad9c0407879894b938d4083f99b5b88ce60ea909918d1
+  source_id: kropf-2009-alkalis-chondrules-thesis
+  species: Na2O
+- observation_id: kropf2009_table7_type_i_chondrules
+  type: measured_composition_table
+  locator:
+    pdf_page_index: 66
+    page: 67
+    table: '7'
+  units: wt.% Na2O; melt column is mesostasis, olivine column is olivine
+  quote: 'Tabelle 7: Na2O-Konzentrationen in Typ-I Chondren (Olivinkern und -rand).'
+  values:
+    measured_direct: true
+    reason_not_typed: Phase compositions include olivine, which has no equilibrium_phase_composition phase_role in this schema.
+    rows:
+    - zone: core
+      chondrule: C03
+      mesostasis: '1.83'
+      olivine: '0.0062'
+      method: SIMS
+    - zone: core
+      chondrule: C25
+      mesostasis: '0.73'
+      olivine: '0.0011'
+      method: SIMS
+    - zone: core
+      chondrule: C41
+      mesostasis: '1.09'
+      olivine: '0.0036'
+      method: SIMS
+    - zone: core
+      chondrule: C44
+      mesostasis: '0.41'
+      olivine: '0.0007'
+      method: SIMS
+    - zone: core
+      chondrule: C51
+      mesostasis: '0.18'
+      olivine: '0.0005'
+      method: SIMS
+    - zone: core
+      chondrule: C52
+      mesostasis: '0.45'
+      olivine: '0.0017'
+      method: SIMS
+    - zone: core
+      chondrule: C54
+      mesostasis: '0.61'
+      olivine: '0.0012'
+      method: SIMS
+    - zone: core
+      chondrule: C68
+      mesostasis: '2.2'
+      olivine: '0.003'
+      method: SIMS
+    - zone: rim
+      chondrule: C03
+      mesostasis: '3.3'
+      olivine: '0.0085'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C25
+      mesostasis: '1.07'
+      olivine: '0.0045'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C41
+      mesostasis: '1.66'
+      olivine: '0.0085'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C44
+      mesostasis: '0.81'
+      olivine: '0.0016'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C51
+      mesostasis: '0.19'
+      olivine: '0.0015'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C52
+      mesostasis: '0.59'
+      olivine: '0.0023'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C54
+      mesostasis: '0.93'
+      olivine: '0.0045'
+      method: EMS-extrapolated
+    - zone: rim
+      chondrule: C68
+      mesostasis: '5.59'
+      olivine: '0.0075'
+      method: EMS-extrapolated
+  context_id: kropf-2009-alkalis-chondrules-thesis::context::kropf2009_table7_type_i_chondrules
+  work_id: d3318c5dbbf74eb73d7ad9c0407879894b938d4083f99b5b88ce60ea909918d1
+  source_id: kropf-2009-alkalis-chondrules-thesis
+  species: Na2O
+- observation_id: kropf2009_table8_type_ii_chondrules
+  type: measured_composition_table
+  locator:
+    pdf_page_index: 69
+    page: 70
+    table: '8'
+  units: wt.% Na2O; melt column is mesostasis, olivine column is olivine
+  quote: 'Tabelle 8: Na2O-Konzentrationen in Typ-II Chondren für Olivinkern und -rand.'
+  values:
+    measured_direct: true
+    reason_not_typed: Phase compositions include olivine, which has no equilibrium_phase_composition phase_role in this schema.
+    rows:
+    - zone: core
+      chondrule: C01
+      mesostasis: '2.08'
+      olivine: '0.0085'
+    - zone: core
+      chondrule: C08
+      mesostasis: '1.94'
+      olivine: '0.0035'
+    - zone: core
+      chondrule: C09
+      mesostasis: '2.42'
+      olivine: '0.0045'
+    - zone: core
+      chondrule: C15
+      mesostasis: '1.41'
+      olivine: '0.0105'
+    - zone: core
+      chondrule: C33
+      mesostasis: '0'
+      olivine: '0.0016'
+    - zone: core
+      chondrule: C55
+      mesostasis: '2.15'
+      olivine: '0.0095'
+    - zone: core
+      chondrule: C58
+      mesostasis: '1.93'
+      olivine: '0.0065'
+    - zone: core
+      chondrule: C63
+      mesostasis: '1.32'
+      olivine: '0.0035'
+    - zone: core
+      chondrule: C72
+      mesostasis: '1.12'
+      olivine: '0.0065'
+    - zone: rim
+      chondrule: C01
+      mesostasis: '5.68'
+      olivine: '0.0175'
+    - zone: rim
+      chondrule: C08
+      mesostasis: '2.73'
+      olivine: '0.01'
+    - zone: rim
+      chondrule: C09
+      mesostasis: '2.79'
+      olivine: '0.0115'
+    - zone: rim
+      chondrule: C15
+      mesostasis: '8.27'
+      olivine: '0.0275'
+    - zone: rim
+      chondrule: C33
+      mesostasis: '0.02'
+      olivine: '0.0016'
+    - zone: rim
+      chondrule: C55
+      mesostasis: '5.38'
+      olivine: '0.0215'
+    - zone: rim
+      chondrule: C58
+      mesostasis: '5.02'
+      olivine: '0.0115'
+    - zone: rim
+      chondrule: C63
+      mesostasis: '5.37'
+      olivine: '0.0125'
+    - zone: rim
+      chondrule: C72
+      mesostasis: '1.41'
+      olivine: '0.0065'
+  context_id: kropf-2009-alkalis-chondrules-thesis::context::kropf2009_table8_type_ii_chondrules
+  work_id: d3318c5dbbf74eb73d7ad9c0407879894b938d4083f99b5b88ce60ea909918d1
+  source_id: kropf-2009-alkalis-chondrules-thesis
+  species: Na2O

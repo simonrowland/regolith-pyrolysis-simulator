@@ -1,0 +1,3426 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3390/met14010108
+  citation: Liu C, Xie X, Qiu J, Li W, Huo G (2024). The Phase Diagram of a CaO-Al2O3-VOx Slag System under Argon Atmosphere
+    at 1500 C. Metals 14, 108.
+  source_ids:
+  - liu-2024-cao-al2o3-vox-phase
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:liu-2024-cao-al2o3-vox-phase
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.3390/met14010108
+experiments:
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_01
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 1 initial charge, mass%: CaO 47.70; Al2O3 -; V2O5 52.30'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 sample 1 initial charge.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_02
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 2 initial charge, mass%: CaO -; Al2O3 7.75; V2O5 92.25'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 sample 2 initial charge.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_03
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.6749925209855261581013516981'
+          - - CaO
+            - '0.08813926334605414444151247975'
+          - - V2O5
+            - '0.2368682156684196974571358221'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 3 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '58.9'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '4.23'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '36.87'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 3 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '58.9'
+          CaO: '4.23'
+          V2O5: '36.87'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 3 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_04
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1479068222838019031962070799'
+          - - CaO
+            - '0.8066571862852488879613091062'
+          - - V2O5
+            - '0.04543599143094920884248381368'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 4 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '21.99'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '65.96'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '12.05'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 4 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '21.99'
+          CaO: '65.96'
+          V2O5: '12.05'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 4 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_05
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3507751770941876010821985265'
+          - - CaO
+            - '0.6426018139516743353084063441'
+          - - V2O5
+            - '0.006623008954138063609395129419'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 5 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '48.99'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '49.36'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '1.65'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 5 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '48.99'
+          CaO: '49.36'
+          V2O5: '1.65'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 5 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_06
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.6900753502546549897497833519'
+          - - CaO
+            - '0.2759794843261642056679907251'
+          - - V2O5
+            - '0.03394516541918080458222592337'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 6 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '76.47'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.82'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '6.71'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 6 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '76.47'
+          CaO: '16.82'
+          V2O5: '6.71'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 6 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_07
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.8429978431811533216760823817'
+          - - CaO
+            - '0.123537857095291196773607163'
+          - - V2O5
+            - '0.03346429972355548155031045481'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 7 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '86.85'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '6.15'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 7 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '86.85'
+          CaO: '7'
+          V2O5: '6.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 7 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_08
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 8 initial charge, mass%: CaO 9.20; Al2O3 -; V2O5 90.80'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 sample 8 initial charge.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_09
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 9 initial charge, mass%: CaO 78.49; Al2O3 -; V2O5 21.51'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 sample 9 initial charge.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_10
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1146378699490941090295949208'
+          - - CaO
+            - '0.1241092872990078790199831804'
+          - - V2O5
+            - '0.7612528427518980119504218987'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 10 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '7.44'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '4.43'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '88.13'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 10 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '7.44'
+          CaO: '4.43'
+          V2O5: '88.13'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 10 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 'Table 1 sample 11 initial charge, mass%: CaO -; Al2O3 52.25; V2O5 47.75'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 sample 11 initial charge.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_12
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.5775846163098881112834637907'
+          - - CaO
+            - '0.401375957262294703672421943'
+          - - V2O5
+            - '0.02103942642781718504411426686'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 12 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '69.1'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '26.41'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '4.49'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 12 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '69.1'
+          CaO: '26.41'
+          V2O5: '4.49'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 12 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.7540986163570857043102295533'
+          - - CaO
+            - '0.2122425384757108315182211081'
+          - - V2O5
+            - '0.0336588451672034641715493386'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 13 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '81.01'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.54'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '6.45'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 13 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '81.01'
+          CaO: '12.54'
+          V2O5: '6.45'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 13 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_14
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.9195984064473507725619449264'
+          - - CaO
+            - '0.06005564174642400867995017505'
+          - - V2O5
+            - '0.02034595180622521875810489854'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 14 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '92.99'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.34'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '3.67'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 14 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '92.99'
+          CaO: '3.34'
+          V2O5: '3.67'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 14 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_15
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.03374703375469300797042144583'
+          - - CaO
+            - '0.1753925762590105665754328496'
+          - - V2O5
+            - '0.7908603899862964254541457045'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 15 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.19'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.26'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '91.55'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 15 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '2.19'
+          CaO: '6.26'
+          V2O5: '91.55'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 15 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_16
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.5935680660781175918192859885'
+          - - CaO
+            - '0.2040537260253408296908469872'
+          - - V2O5
+            - '0.2023782078965415784898670242'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 16 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '55.64'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.52'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '33.84'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 16 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '55.64'
+          CaO: '10.52'
+          V2O5: '33.84'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 16 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_17
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.4303640928178123943294026554'
+          - - CaO
+            - '0.4398862552910073697384941795'
+          - - V2O5
+            - '0.129749651891180235932103165'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 17 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '47.62'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '26.77'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '25.61'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 17 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '47.62'
+          CaO: '26.77'
+          V2O5: '25.61'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 17 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+- experiment_id: 10.3390/met14010108::experiment::liu_2024_sample_18
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.08137130792256226403771484756'
+          - - CaO
+            - '0.844021672306590575061272669'
+          - - V2O5
+            - '0.07460701977084716090101248336'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 18 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.99'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '68.4'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - original_V2O5_wt_pct
+          - state:
+              tag: value
+              value: '19.61'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - M_V2O5_g_mol
+          - state:
+              tag: value
+              value: '181.878'
+            locator:
+              page: 6
+              pdf_page_index: 5
+              table: '3'
+              note: Table 3 sample 18 glass EDS Ca mass percent.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '11.99'
+          CaO: '68.4'
+          V2O5: '19.61'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3 sample 18 glass EDS Ca mass percent.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              pdf_page_index: 2
+              note: Section 2 prints the experiment temperature as 1500 C; converted to kelvin.
+              source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met14010108
+  locator:
+    page: 3
+    pdf_page_index: 2
+    note: 1500 C for 24 h under argon; quenched for 3 s in an ice-water mixture.
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+context:
+- observation_id: liu_2024_figure_1_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 2
+    page: 3
+    figure: '1'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: nominal charge compositions
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: initial charge
+    T_C: not applicable
+    axes_as_printed: 'x/y: ternary mass-percent composition; vertices CaO, Al2O3, V2O5'
+    caption_as_printed: Design composition of samples in the CaO-Al2O3-VOx system, mass%.
+    panels:
+    - single
+    series:
+    - samples 1#-18#
+    marker_count_per_series:
+      samples 1#-18#: 18
+    attribution: present work
+    schema_gap_or_disposition: design composition diagram; no measured equilibrium points
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_1_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_2_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 4
+    page: 5
+    figure: '2'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: phase assemblage and phase morphology
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: quenched SEM image
+    T_C: '1500'
+    axes_as_printed: no numeric axes (micrographs)
+    caption_as_printed: 'Typical SEM images of samples in the CaO-Al2O3-VOx system at 1500 C: (a) glass + CaO + Ca3Al2O6,
+      (b) glass + CaAl2O4 + CaAl4O7, (c) glass + CaAl4O7 + CaAl12O19, (d) glass + CaAl12O19 + Al2O3, (e) glass + CaO, (f)
+      glass + CaAl2O4, (g) glass + CaAl4O7, (h) glass + CaAl12O19, (i) glass + Al2O3, (j) glass + VO2, and (k) glass.'
+    panels:
+    - 'a: sample 5#'
+    - 'b: sample 6#'
+    - 'c: sample 13#'
+    - 'd: sample 14#'
+    - 'e: samples 4#, 9#, 18#'
+    - 'f: sample 12#'
+    - 'g: sample 17#'
+    - 'h: sample 7#'
+    - 'i: samples 3#, 16#'
+    - 'j: samples 2#, 8#, 10#, 15#'
+    - 'k: sample 1#'
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: panel images identify phase assemblages; no numeric points
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_2_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_3_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    figure: '3'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: X-ray diffraction intensity
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: post-quench crystalline phase
+    T_C: '1500'
+    axes_as_printed: 'x: 2theta (degrees); y: intensity (a.u.)'
+    caption_as_printed: XRD results of slag sample 10#.
+    panels:
+    - single
+    series:
+    - sample 10 XRD trace
+    marker_count_per_series:
+      sample 10 XRD trace: 0
+    attribution: present work
+    schema_gap_or_disposition: continuous diffractogram; numerical trace values are not printed
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_3_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_4_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 7
+    page: 8
+    figure: '4'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: XPS intensity by vanadium valence state
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: quenched glass
+    T_C: '1500'
+    axes_as_printed: 'x: binding energy (eV); y: intensity (a.u.)'
+    caption_as_printed: XPS spectrum results of samples in the CaO-Al2O3-VOx system at 1500 C.
+    panels:
+    - 'a: sample 1#'
+    - 'b: sample 3#'
+    - 'c: sample 4#'
+    - 'd: sample 7#'
+    - 'e: sample 9#'
+    - 'f: sample 11#'
+    - 'g: sample 12#'
+    - 'h: sample 13#'
+    - 'i: sample 14#'
+    - 'j: sample 15#'
+    - 'k: sample 16#'
+    - 'l: sample 17#'
+    series:
+    - original data
+    - fitted envelope
+    - V2+ peak
+    - V3+ peak
+    - V4+ peak
+    - V5+ peak
+    marker_count_per_series:
+      original data: 0
+      fitted envelope: 0
+      V2+ peak: 0
+      V3+ peak: 0
+      V4+ peak: 0
+      V5+ peak: 0
+    attribution: present work
+    schema_gap_or_disposition: continuous XPS spectra; Figure 4 panels a-i are on page 7 and j-l on page 8
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_4_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_5_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 8
+    page: 9
+    figure: '5'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: equilibrium_phase_composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: liquid represented by quenched glass
+    T_C: '1500'
+    axes_as_printed: 'axes: Ca, Al, V, O composition'
+    caption_as_printed: The positions of the glass compositions in the Ca-Al-V-O three-dimensional phase diagram.
+    panels:
+    - single
+    series:
+    - glass sample liquidus points
+    - compound reference points
+    marker_count_per_series:
+      glass sample liquidus points: 18
+      compound reference points: 5
+    attribution: present work
+    schema_gap_or_disposition: author-drawn three-dimensional phase diagram; values deferred
+    quantity: equilibrium_phase_composition
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_5_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_6_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 8
+    page: 9
+    figure: '6'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: equilibrium_phase_composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: liquid and coexisting solid phases
+    T_C: '1500'
+    axes_as_printed: 'composition axes: CaO, Al2O3, V2O5, VO2'
+    caption_as_printed: Phase diagram of CaO-Al2O3-V2O5-VO2 at 1500 C and p(O2) = 10^-3 atm.
+    panels:
+    - single
+    series:
+    - liquidus points
+    - compound points
+    - tie lines
+    - isobaric oxygen-potential line
+    - schematic liquidus boundary
+    marker_count_per_series:
+      liquidus points: 18
+      compound points: 5
+      tie lines: 0
+      isobaric oxygen-potential line: 0
+      schematic liquidus boundary: 0
+    attribution: present work
+    schema_gap_or_disposition: author-constructed phase diagram; plotted condition p(O2) = 10^-3 atm; values deferred
+    quantity: equilibrium_phase_composition
+    pO2_as_printed: 10^-3 atm
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_6_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_7_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 10
+    page: 11
+    figure: '7'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: equilibrium_phase_composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: liquid and coexisting solid phases
+    T_C: '1500'
+    axes_as_printed: 'ternary mass-percent composition axes: CaO, Al2O3, VO2'
+    caption_as_printed: Isothermal section of the CaO-Al2O3-VO2 system at 1500 C, mass%.
+    panels:
+    - single
+    series:
+    - liquid points at 1500 C in references
+    - liquid points at 1500 C in this paper
+    - liquidus
+    marker_count_per_series:
+      liquid points at 1500 C in references: 2
+      liquid points at 1500 C in this paper: 4
+      liquidus: 0
+    attribution: present work
+    schema_gap_or_disposition: author-constructed isothermal section; markers counted in the 600 dpi render; values deferred
+    quantity: equilibrium_phase_composition
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_7_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_figure_8_context
+  type: figure_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 10
+    page: 11
+    figure: '8'
+    note: Figure values are not digitized in this wave.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: equilibrium_phase_composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: CaO-Al2O3-VOx system
+    phase: liquid and coexisting solid phases
+    T_C: '1500'
+    axes_as_printed: 'ternary mass-percent composition axes: CaO, Al2O3, V2O5'
+    caption_as_printed: Isothermal section of the CaO-Al2O3-V2O5 system at 1500 C, mass%.
+    panels:
+    - single
+    series:
+    - liquid points at 1500 C in references
+    - liquid points at 1500 C in this paper
+    - liquidus
+    marker_count_per_series:
+      liquid points at 1500 C in references: 4
+      liquid points at 1500 C in this paper: 2
+      liquidus: 0
+    attribution: present work
+    schema_gap_or_disposition: author-constructed isothermal section; markers counted in the 600 dpi render; values deferred
+    quantity: equilibrium_phase_composition
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_figure_8_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: SiO2
+- observation_id: liu_2024_table2_xps_reference_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 3
+    page: 4
+    table: '2'
+    note: Table 2; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: V2p binding-energy, spin-orbit splitting, and FWHM reference values
+    candidate_tokens:
+    - binding_energy
+    - spectral_peak_separation
+    - spectral_line_width
+    schema_gap_or_disposition: Table 2 quotes XPS peak-fitting reference parameters from [36], not phase-equilibrium observations;
+      no existing quantity token fits binding energy or peak width.
+    rows_as_printed:
+    - oxidation_state: '+2'
+      V2p3_2_binding_energy_eV: '513.67'
+      binding_energy_std_dev_eV: '0.2'
+      V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+      V2p3_2_FWHM_eV: 2.0~2.3
+      V2p1_2_FWHM_eV: 2.6~3.4
+    - oxidation_state: '+3'
+      V2p3_2_binding_energy_eV: '515.30'
+      binding_energy_std_dev_eV: '0.2'
+      V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+      V2p3_2_FWHM_eV: 2.7~4.0
+      V2p1_2_FWHM_eV: 3.1~4.7
+    - oxidation_state: '+4'
+      V2p3_2_binding_energy_eV: '516.30'
+      binding_energy_std_dev_eV: '0.2'
+      V2p1_2_minus_V2p3_2_eV: 7.33~7.35
+      V2p3_2_FWHM_eV: 2.2~3.2
+      V2p1_2_FWHM_eV: 3.1~3.7
+    - oxidation_state: '+5'
+      V2p3_2_binding_energy_eV: '517.18'
+      binding_energy_std_dev_eV: '0.6'
+      V2p1_2_minus_V2p3_2_eV: 7.33~7.48
+      V2p3_2_FWHM_eV: 1.0~1.5
+      V2p1_2_FWHM_eV: '2.6'
+    method_class: quoted_attributed
+    attribution_as_printed: '[36]'
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table2_xps_reference_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: V
+- observation_id: liu_2024_table3_al2o3_solid_rows_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: solid-phase elemental EDS compositions
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role; these rows cannot be
+      typed as liquid-phase composition. Blank sample-number cells remain blank; sample_group records visual row grouping
+      only.
+    rows_as_printed:
+    - sample_id_as_printed: ''
+      sample_group: 3
+      phase_as_printed: Al2O3
+      Ca_mass_percent: '-'
+      Al_mass_percent: '49.06'
+      V_mass_percent: '4.56'
+      O_mass_percent: '46.38'
+      assemblage_id: liu_2024_sample_03
+      phase_assemblage_as_printed: Glass + Al2O3
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 6
+      phase_as_printed: CaAl4O7
+      Ca_mass_percent: '16.41'
+      Al_mass_percent: '39.95'
+      V_mass_percent: '-'
+      O_mass_percent: '43.64'
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 7
+      phase_as_printed: CaAl12O19
+      Ca_mass_percent: '-'
+      Al_mass_percent: '47.97'
+      V_mass_percent: '-'
+      O_mass_percent: '52.03'
+      assemblage_id: liu_2024_sample_07
+      phase_assemblage_as_printed: Glass + CaAl12O19
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 11
+      phase_as_printed: Al2O3
+      Ca_mass_percent: '-'
+      Al_mass_percent: '48.13'
+      V_mass_percent: '5.82'
+      O_mass_percent: '46.05'
+      assemblage_id: liu_2024_sample_11
+      phase_assemblage_as_printed: Glass + Al2O3
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 13
+      phase_as_printed: CaAl4O7
+      Ca_mass_percent: '17.44'
+      Al_mass_percent: '41.20'
+      V_mass_percent: '-'
+      O_mass_percent: '41.37'
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 13
+      phase_as_printed: CaAl12O19
+      Ca_mass_percent: '6.84'
+      Al_mass_percent: '45.13'
+      V_mass_percent: '-'
+      O_mass_percent: '48.03'
+      assemblage_id: liu_2024_sample_13
+      phase_assemblage_as_printed: Glass + CaAl4O7 + CaAl12O19
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 14
+      phase_as_printed: CaAl12O19
+      Ca_mass_percent: '5.77'
+      Al_mass_percent: '48.11'
+      V_mass_percent: '-'
+      O_mass_percent: '46.12'
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 14
+      phase_as_printed: Al2O3
+      Ca_mass_percent: '-'
+      Al_mass_percent: '42.17'
+      V_mass_percent: '-'
+      O_mass_percent: '57.83'
+      assemblage_id: liu_2024_sample_14
+      phase_assemblage_as_printed: Glass + CaAl12O19 + Al2O3
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 16
+      phase_as_printed: Al2O3
+      Ca_mass_percent: '0.43'
+      Al_mass_percent: '49.49'
+      V_mass_percent: '4.60'
+      O_mass_percent: '45.48'
+      assemblage_id: liu_2024_sample_16
+      phase_assemblage_as_printed: Glass + Al2O3
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 17
+      phase_as_printed: CaAl4O7
+      Ca_mass_percent: '16.00'
+      Al_mass_percent: '37.49'
+      V_mass_percent: '-'
+      O_mass_percent: '46.51'
+      assemblage_id: liu_2024_sample_17
+      phase_assemblage_as_printed: Glass + CaAl4O7
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    method_class: measured_direct
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table3_al2o3_solid_rows_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: Al2O3
+- observation_id: liu_2024_table3_cao_solid_rows_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: solid-phase elemental EDS compositions
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role; these rows cannot be
+      typed as liquid-phase composition. Blank sample-number cells remain blank; sample_group records visual row grouping
+      only.
+    rows_as_printed:
+    - sample_id_as_printed: ''
+      sample_group: 4
+      phase_as_printed: CaO
+      Ca_mass_percent: '61.69'
+      Al_mass_percent: '2.34'
+      V_mass_percent: '2.21'
+      O_mass_percent: '33.76'
+      assemblage_id: liu_2024_sample_04
+      phase_assemblage_as_printed: Glass + CaO
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 5
+      phase_as_printed: CaO
+      Ca_mass_percent: '63.14'
+      Al_mass_percent: '2.83'
+      V_mass_percent: '-'
+      O_mass_percent: '34.03'
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 5
+      phase_as_printed: Ca3Al2O6
+      Ca_mass_percent: '42.33'
+      Al_mass_percent: '17.94'
+      V_mass_percent: '3.68'
+      O_mass_percent: '36.05'
+      assemblage_id: liu_2024_sample_05
+      phase_assemblage_as_printed: Glass + CaO + Ca3Al2O6
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 6
+      phase_as_printed: CaAl2O4
+      Ca_mass_percent: '27.56'
+      Al_mass_percent: '29.83'
+      V_mass_percent: '4.32'
+      O_mass_percent: '38.29'
+      assemblage_id: liu_2024_sample_06
+      phase_assemblage_as_printed: Glass + CaAl2O4 + CaAl4O7
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 9
+      phase_as_printed: CaO
+      Ca_mass_percent: '49.54'
+      Al_mass_percent: '-'
+      V_mass_percent: '2.04'
+      O_mass_percent: '48.42'
+      assemblage_id: liu_2024_sample_09
+      phase_assemblage_as_printed: Glass + CaO
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 12
+      phase_as_printed: CaAl2O4
+      Ca_mass_percent: '27.97'
+      Al_mass_percent: '32.70'
+      V_mass_percent: ''
+      O_mass_percent: '39.33'
+      assemblage_id: liu_2024_sample_12
+      phase_assemblage_as_printed: Glass + CaAl2O4
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 18
+      phase_as_printed: CaO
+      Ca_mass_percent: '29.67'
+      Al_mass_percent: '0.79'
+      V_mass_percent: '2.57'
+      O_mass_percent: '66.97'
+      assemblage_id: liu_2024_sample_18
+      phase_assemblage_as_printed: Glass + CaO
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    method_class: measured_direct
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table3_cao_solid_rows_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: CaO
+- observation_id: liu_2024_table3_vo2_solid_rows_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: Table 3; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: solid-phase elemental EDS compositions
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 3 solid rows are measured, but d-223 PhaseRole has no solid role; these rows cannot be
+      typed as liquid-phase composition. Blank sample-number cells remain blank; sample_group records visual row grouping
+      only.
+    rows_as_printed:
+    - sample_id_as_printed: ''
+      sample_group: 2
+      phase_as_printed: VO2
+      Ca_mass_percent: '-'
+      Al_mass_percent: '-'
+      V_mass_percent: '49.57'
+      O_mass_percent: '50.43'
+      assemblage_id: liu_2024_sample_02
+      phase_assemblage_as_printed: Glass + VO2
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 8
+      phase_as_printed: VO2
+      Ca_mass_percent: '-'
+      Al_mass_percent: '-'
+      V_mass_percent: '51.14'
+      O_mass_percent: '48.86'
+      assemblage_id: liu_2024_sample_08
+      phase_assemblage_as_printed: Glass + VO2
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 10
+      phase_as_printed: VO2
+      Ca_mass_percent: '-'
+      Al_mass_percent: '1.50'
+      V_mass_percent: '49.46'
+      O_mass_percent: '49.04'
+      assemblage_id: liu_2024_sample_10
+      phase_assemblage_as_printed: Glass + VO2
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    - sample_id_as_printed: ''
+      sample_group: 15
+      phase_as_printed: VO2
+      Ca_mass_percent: '0.94'
+      Al_mass_percent: '0.35'
+      V_mass_percent: '46.21'
+      O_mass_percent: '52.49'
+      assemblage_id: liu_2024_sample_15
+      phase_assemblage_as_printed: Glass + VO2
+      T_C_as_printed: 1500 C
+      pO2_as_printed: 10^-3 atm
+    method_class: measured_direct
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table3_vo2_solid_rows_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: VO2
+- observation_id: liu_2024_table4_xps_valence_fractions_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 7
+    page: 8
+    table: '4'
+    note: Table 4; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: relative contents of V5+, V4+, and V3+ in equilibrium slag samples
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 4 gives XPS-derived fractions among vanadium valence states, not component fractions
+      of the whole glass phase; no token carries that denominator. Values remain as printed mole%.
+    rows_as_printed:
+    - sample: 1#
+      sample_number_as_printed: '1'
+      V5+_mole_percent: '77.29'
+      V4+_mole_percent: '17.85'
+      V3+_mole_percent: '4.07'
+    - sample: 3#
+      sample_number_as_printed: '3'
+      V5+_mole_percent: '70.18'
+      V4+_mole_percent: '23.06'
+      V3+_mole_percent: '6.76'
+    - sample: 4#
+      sample_number_as_printed: '4'
+      V5+_mole_percent: '83.77'
+      V4+_mole_percent: '6.83'
+      V3+_mole_percent: '9.40'
+    - sample: 7#
+      sample_number_as_printed: '7'
+      V5+_mole_percent: '78.09'
+      V4+_mole_percent: '19.77'
+      V3+_mole_percent: '2.14'
+    - sample: 9#
+      sample_number_as_printed: '9'
+      V5+_mole_percent: '84.77'
+      V4+_mole_percent: '14.24'
+      V3+_mole_percent: '0.99'
+    - sample: 11#
+      sample_number_as_printed: '11'
+      V5+_mole_percent: '72.79'
+      V4+_mole_percent: '20.14'
+      V3+_mole_percent: '7.07'
+    - sample: 12#
+      sample_number_as_printed: '12'
+      V5+_mole_percent: '90.61'
+      V4+_mole_percent: '9.39'
+      V3+_mole_percent: '-'
+    - sample: 13#
+      sample_number_as_printed: '13'
+      V5+_mole_percent: '81.56'
+      V4+_mole_percent: '11.35'
+      V3+_mole_percent: '7.09'
+    - sample: 14#
+      sample_number_as_printed: '14'
+      V5+_mole_percent: '71.07'
+      V4+_mole_percent: '24.97'
+      V3+_mole_percent: '3.96'
+    - sample: 15#
+      sample_number_as_printed: '15'
+      V5+_mole_percent: '66.56'
+      V4+_mole_percent: '32.57'
+      V3+_mole_percent: '0.87'
+    - sample: 16#
+      sample_number_as_printed: '16'
+      V5+_mole_percent: '64.52'
+      V4+_mole_percent: '27.17'
+      V3+_mole_percent: '8.31'
+    - sample: 17#
+      sample_number_as_printed: '17'
+      V5+_mole_percent: '81.27'
+      V4+_mole_percent: '12.82'
+      V3+_mole_percent: '5.91'
+    method_class: measured_reduced
+    raw_inputs:
+      state: not_printed
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 3
+        page: 4
+        note: XPS V2p fitting method; raw spectral values are not tabulated.
+    T_C_as_printed: 1500 C
+    pO2_as_printed: 10^-3 atm
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table4_xps_valence_fractions_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: V
+- observation_id: liu_2024_table5_derived_glass_compositions_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 7
+    page: 8
+    table: '5'
+    note: Table 5; every displayed row and cell retained.
+  units: printed values and units retained in rows_as_printed
+  values:
+    typed_quantity_as_printed: actual component contents and O/V of glass phase
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 5 synthesizes Table 3 EDS and Table 4 XPS valence data. The Table 4 input has no typed
+      token or registered table asset; derivation pending a corpus table asset (controller, t-1382). Inputs and displayed
+      results are retained in .agent-scratch/f46-tables/liu-2024-cao-al2o3-vox-phase/.
+    rows_as_printed:
+    - sample: 1#
+      sample_number_as_printed: '1'
+      CaO_mass_percent: '46.79'
+      Al2O3_mass_percent: '-'
+      V2O5_mass_percent: '42.43'
+      VO2_mass_percent: '8.94'
+      V2O3_mass_percent: '1.84'
+      O_over_V: '2.37'
+    - sample: 2#
+      sample_number_as_printed: '2'
+      CaO_mass_percent: '-'
+      Al2O3_mass_percent: '6.57'
+      V2O5_mass_percent: '73.67'
+      VO2_mass_percent: '16.04'
+      V2O3_mass_percent: '3.72'
+      O_over_V: '2.32'
+    - sample: 3#
+      sample_number_as_printed: '3'
+      CaO_mass_percent: '12.41'
+      Al2O3_mass_percent: '8.78'
+      V2O5_mass_percent: '57.14'
+      VO2_mass_percent: '17.13'
+      V2O3_mass_percent: '4.54'
+      O_over_V: '2.37'
+    - sample: 4#
+      sample_number_as_printed: '4'
+      CaO_mass_percent: '53.80'
+      Al2O3_mass_percent: '24.54'
+      V2O5_mass_percent: '18.56'
+      VO2_mass_percent: '1.38'
+      V2O3_mass_percent: '1.72'
+      O_over_V: '2.38'
+    - sample: 5#
+      sample_number_as_printed: '5'
+      CaO_mass_percent: '51.24'
+      Al2O3_mass_percent: '40.99'
+      V2O5_mass_percent: '6.13'
+      VO2_mass_percent: '1.33'
+      V2O3_mass_percent: '0.31'
+      O_over_V: '2.42'
+    - sample: 6#
+      sample_number_as_printed: '6'
+      CaO_mass_percent: '39.08'
+      Al2O3_mass_percent: '25.70'
+      V2O5_mass_percent: '27.77'
+      VO2_mass_percent: '6.05'
+      V2O3_mass_percent: '1.40'
+      O_over_V: '2.33'
+    - sample: 7#
+      sample_number_as_printed: '7'
+      CaO_mass_percent: '32.45'
+      Al2O3_mass_percent: '24.48'
+      V2O5_mass_percent: '34.36'
+      VO2_mass_percent: '7.93'
+      V2O3_mass_percent: '0.78'
+      O_over_V: '2.45'
+    - sample: 8#
+      sample_number_as_printed: '8'
+      CaO_mass_percent: '15.21'
+      Al2O3_mass_percent: '-'
+      V2O5_mass_percent: '66.86'
+      VO2_mass_percent: '14.55'
+      V2O3_mass_percent: '3.38'
+      O_over_V: '2.37'
+    - sample: 9#
+      sample_number_as_printed: '9'
+      CaO_mass_percent: '51.26'
+      Al2O3_mass_percent: '-'
+      V2O5_mass_percent: '41.91'
+      VO2_mass_percent: '6.42'
+      V2O3_mass_percent: '0.40'
+      O_over_V: '2.34'
+    - sample: 10#
+      sample_number_as_printed: '10'
+      CaO_mass_percent: '7.84'
+      Al2O3_mass_percent: '6.14'
+      V2O5_mass_percent: '67.83'
+      VO2_mass_percent: '14.77'
+      V2O3_mass_percent: '3.43'
+      O_over_V: '2.43'
+    - sample: 11#
+      sample_number_as_printed: '11'
+      CaO_mass_percent: '-'
+      Al2O3_mass_percent: '29.70'
+      V2O5_mass_percent: '52.76'
+      VO2_mass_percent: '13.31'
+      V2O3_mass_percent: '4.22'
+      O_over_V: '2.28'
+    - sample: 12#
+      sample_number_as_printed: '12'
+      CaO_mass_percent: '43.20'
+      Al2O3_mass_percent: '43.79'
+      V2O5_mass_percent: '11.88'
+      VO2_mass_percent: '1.12'
+      V2O3_mass_percent: '-'
+      O_over_V: '2.38'
+    - sample: 13#
+      sample_number_as_printed: '13'
+      CaO_mass_percent: '33.49'
+      Al2O3_mass_percent: '26.97'
+      V2O5_mass_percent: '32.99'
+      VO2_mass_percent: '4.19'
+      V2O3_mass_percent: '2.36'
+      O_over_V: '2.36'
+    - sample: 14#
+      sample_number_as_printed: '14'
+      CaO_mass_percent: '29.12'
+      Al2O3_mass_percent: '12.34'
+      V2O5_mass_percent: '42.84'
+      VO2_mass_percent: '13.73'
+      V2O3_mass_percent: '1.97'
+      O_over_V: '2.36'
+    - sample: 15#
+      sample_number_as_printed: '15'
+      CaO_mass_percent: '16.62'
+      Al2O3_mass_percent: '2.89'
+      V2O5_mass_percent: '71.24'
+      VO2_mass_percent: '8.48'
+      V2O3_mass_percent: '0.77'
+      O_over_V: '2.36'
+    - sample: 16#
+      sample_number_as_printed: '16'
+      CaO_mass_percent: '23.34'
+      Al2O3_mass_percent: '7.23'
+      V2O5_mass_percent: '46.59'
+      VO2_mass_percent: '17.89'
+      V2O3_mass_percent: '4.95'
+      O_over_V: '2.36'
+    - sample: 17#
+      sample_number_as_printed: '17'
+      CaO_mass_percent: '40.08'
+      Al2O3_mass_percent: '10.82'
+      V2O5_mass_percent: '40.79'
+      VO2_mass_percent: '5.87'
+      V2O3_mass_percent: '2.44'
+      O_over_V: '2.36'
+    - sample: 18#
+      sample_number_as_printed: '18'
+      CaO_mass_percent: '53.40'
+      Al2O3_mass_percent: '14.11'
+      V2O5_mass_percent: '25.62'
+      VO2_mass_percent: '5.58'
+      V2O3_mass_percent: '1.29'
+      O_over_V: '2.36'
+    - sample: X̄
+      sample_number_as_printed: null
+      CaO_mass_percent: ''
+      Al2O3_mass_percent: ''
+      V2O5_mass_percent: ''
+      VO2_mass_percent: ''
+      V2O3_mass_percent: ''
+      O_over_V: '2.367'
+    method_class: measured_reduced
+    T_C_as_printed: 1500 C
+    pO2_as_printed: 10^-3 atm
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_table5_derived_glass_compositions_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: V
+- observation_id: liu_2024_text_v2_plus_xps_estimate_context
+  type: table_context
+  locator:
+    source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+    pdf_page_index: 6
+    page: 7
+    note: Text immediately preceding Figure 4; V2+ peak fitting in sample 1.
+  units: mole percent as printed
+  values:
+    typed_quantity_as_printed: relative V2+ content in sample 1 glass
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: The approximately 0.73% value is a fitted share of the vanadium XPS signal, not a phase component
+      amount; it is below the reported XPS detection accuracy and authors disregard it.
+    method_class: measured_reduced
+    raw_inputs:
+      state: not_printed
+      locator:
+        source_path: raw/liu-2024-cao-al2o3-vox-phase/liu-2024-cao-al2o3-vox-phase.pdf
+        pdf_page_index: 3
+        page: 4
+        note: XPS V2p fitting method; raw spectral values are not tabulated.
+    value_as_printed: about 0.73%
+    approximate: true
+  context_id: liu-2024-cao-al2o3-vox-phase::context::liu_2024_text_v2_plus_xps_estimate_context
+  work_id: 10.3390/met14010108
+  source_id: liu-2024-cao-al2o3-vox-phase
+  species: V

@@ -1,0 +1,2600 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  citation: Vickerfält, A. (2024). A study of an autogenous slag for steel production with consideration of possible vanadium
+    extraction. Doctoral Thesis in Material Science, KTH Royal Institute of Technology, Stockholm. ISBN 978-91-8040-836-3.
+  source_ids:
+  - vickerfalt-2024-autogenous-slag-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:vickerfalt-2024-autogenous-slag-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_10_synthetic_slag
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 19
+    published_page: 8
+    pdf_page_index: 18
+    section: 2.2.2 Study of phase relationship
+    note: Five-gram synthetic autogenous slag samples were sealed in MgO crucibles with lids and included 1 g iron.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_1_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_2_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_3_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_4_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_5_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_6_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_7_h_dri
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 18
+        published_page: 7
+        pdf_page_index: 17
+        section: 2.2.1 Melting of pellets
+        note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g
+          samples spent 30 min moving to the even temperature zone and 30 min at target.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    section: 2.2.1 Melting of pellets
+    note: The H-DRI samples were melted in a closed MgO crucible at 1873 K; furnace Ar flowed at 0.1 L/min. The 100 g samples
+      spent 30 min moving to the even temperature zone and 30 min at target.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_8_synthetic_slag
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 19
+    published_page: 8
+    pdf_page_index: 18
+    section: 2.2.2 Study of phase relationship
+    note: Five-gram synthetic autogenous slag samples were sealed in MgO crucibles with lids and included 1 g iron.
+- experiment_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0::experiment::vickerfalt_thesis_s1_9_synthetic_slag
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 20
+        published_page: 9
+        pdf_page_index: 19
+        section: 2.2.2 Study of phase relationship
+        note: Argon was used for synthetic autogenous slag. The furnace reached atmospheric pressure, then heated at 1.5 K/min
+          to 1873 K for 12 h before oil quenching.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  locator:
+    page: 19
+    published_page: 8
+    pdf_page_index: 18
+    section: 2.2.2 Study of phase relationship
+    note: Five-gram synthetic autogenous slag samples were sealed in MgO crucibles with lids and included 1 g iron.
+context:
+- observation_id: vickerfalt_thesis_figure_26_context
+  type: figure_only
+  locator:
+    page: 49
+    published_page: 38
+    pdf_page_index: 48
+    figure: '26'
+  units: as plotted
+  attribution: Vickerfält (2024), present thesis
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: P
+    phase: slag / iron
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: reduction degree, %; y: L_P; calculated oxygen potentials in atm are printed next to experimental
+      points'
+    caption_as_printed: L_P as a function of the reduction degree with the oxygen potentials in [atm] next to the experimental
+      points.
+    series:
+    - name: L_P
+      marker_count: 7
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Values correspond to Table 4. Oxygen potentials are calculated in the source text and are not inferred or typed.
+    quantity: distribution_ratio
+    marker_count_per_series:
+      L_P: 7
+    panels:
+    - single
+    attribution: Vickerfält (2024), present thesis
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_26_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_27_context
+  type: figure_only
+  locator:
+    page: 50
+    published_page: 39
+    pdf_page_index: 49
+    figure: '27'
+  units: as plotted
+  attribution: Vickerfält (2024), present thesis
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: bulk slag
+    phase: bulk charge / slag
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: reduction degree, %; y: fraction of slag in H-DRI'
+    caption_as_printed: Fraction of slag in H-DRI as a function of reduction degree.
+    series:
+    - name: calculated slag fraction
+      marker_count: calculated curve; no discrete marker count
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Mass-balance calculation based on residual FeO and pellet composition; no numerical points digitized.
+    quantity_as_printed: Fraction of slag in H-DRI
+    schema_gap_or_disposition: The plotted slag fraction is a mass-balance calculation and has no compatible quantity token.
+    marker_count_per_series:
+      calculated slag fraction: not counted; calculated relation
+    panels:
+    - single
+    attribution: Vickerfält (2024), present thesis
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_27_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_28_context
+  type: figure_only
+  locator:
+    page: 51
+    published_page: 40
+    pdf_page_index: 50
+    figure: '28'
+  units: as plotted
+  attribution: Vickerfält (2024), present thesis
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: P and P2O5
+    phase: iron metal / slag
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: reduction degree, %; y: P in metal (wt%) and P2O5 in slag (wt%)'
+    caption_as_printed: The contents of P in metal (black diamonds) and P2O5 in slag (grey circles) versus degree of reduction
+      of the melted H-DRI pellet.
+    series:
+    - name: P in metal (black diamonds)
+      marker_count: 7
+    - name: P2O5 in slag (grey circles)
+      marker_count: 7
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Measured series are represented in Table 4. No values were read from the plot.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      P in metal (black diamonds): 7
+      P2O5 in slag (grey circles): 7
+    panels:
+    - single
+    attribution: Vickerfält (2024), present thesis
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_28_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_29_context
+  type: figure_only
+  locator:
+    page: 52
+    published_page: 41
+    pdf_page_index: 51
+    figure: '29'
+  units: as plotted
+  attribution: Vickerfält (2024), present thesis
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: V2O3 and V
+    phase: slag / iron metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: '(a) x: reduction degree, %; y: L_V; (b) x: reduction degree, %; y: V in iron (wt%) and V2O3 in slag
+      (wt%); calculated oxygen potentials in atm are shown in panel (a)'
+    caption_as_printed: ' (a) L_V, (b) the V content in the iron (black diamonds) and the V2O3 content in the slag (grey circles)
+      vs the degree of reduction. The calculated oxygen potentials in [atm] are given in (a).'
+    series:
+    - name: L_V, panel a
+      marker_count: 5
+    - name: V in iron, panel b
+      marker_count: 7
+    - name: V2O3 in slag, panel b
+      marker_count: 7
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Values correspond to Table 4. Calculated oxygen potentials are not typed or inferred.
+    quantity: distribution_ratio
+    marker_count_per_series:
+      L_V, panel a: 5
+      V in iron, panel b: 7
+      V2O3 in slag, panel b: 7
+    panels:
+    - a
+    - b
+    attribution: Vickerfält (2024), present thesis
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_29_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_30_context
+  type: figure_only
+  locator:
+    page: 54
+    published_page: 43
+    pdf_page_index: 53
+    figure: '30'
+  units: as plotted
+  attribution: Present work and refs. [79, 80, 81]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: MgO-V2O3
+    phase: MgO-halite, spinel, V2O3-corundum
+    temperature_as_printed: 1661, 1761, 1873 K
+    axes_as_printed: 'x: V2O3, wt%; y: T, K'
+    caption_as_printed: Phase boundaries based on measurements by the present author at 3 different temperatures and pO2=1.75×10^-11
+      atm plotted together with data from other work.
+    series:
+    - name: present-work phase boundaries (filled circles)
+      marker_count: 12
+    - name: present-work single-phase charge compositions (open circles)
+      marker_count: 2
+    - name: phase boundaries from refs. [79, 80] (filled squares)
+      marker_count: 2
+    - name: Cini [81] single-phase samples (open triangles)
+      marker_count: count not stated; overlapped glyphs deferred
+    - name: Cini [81] two-phase samples (filled triangles)
+      marker_count: count not stated; overlapped glyphs deferred
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Thesis version duplicates Vickerfält et al. (2020), Figure 6a; plotted phase-boundary compositions are in Tables
+      9-10. No plot values were digitized.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      present-work phase boundaries (filled circles): 12
+      present-work single-phase charge compositions (open circles): 2
+      phase boundaries from refs. [79, 80] (filled squares): 2
+      Cini [81] single-phase samples (open triangles): count not stated; overlapped glyphs deferred
+      Cini [81] two-phase samples (filled triangles): count not stated; overlapped glyphs deferred
+    panels:
+    - single
+    attribution: Present work and refs. [79, 80, 81]
+    published_source_id: vickerfalt-2020-mgo-v2o3
+    published_observation_ids:
+    - vickerfalt_2020_mgo_v2o3_figure_6a_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_30_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_31_context
+  type: figure_only
+  locator:
+    page: 55
+    published_page: 44
+    pdf_page_index: 54
+    figure: '31'
+  units: as plotted
+  attribution: Present work and refs. [79, 80, 81]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: MgO-V2O3
+    phase: MgO-halite, spinel, V2O3-corundum
+    temperature_as_printed: 1661, 1761, 1873 K
+    axes_as_printed: 'x: V2O3, wt%; y: T, K'
+    caption_as_printed: Phase boundaries based on measurements by the present author at 3 different temperatures and pO2=1.75×10^-10
+      atm plotted together with data from other work.
+    series:
+    - name: present-work phase boundaries (filled circles)
+      marker_count: 12
+    - name: present-work single-phase charge compositions (open circles)
+      marker_count: 2
+    - name: phase boundaries from refs. [79, 80] (filled squares)
+      marker_count: 2
+    - name: Cini [81] single-phase samples (open triangles)
+      marker_count: count not stated; overlapped glyphs deferred
+    - name: Cini [81] two-phase samples (filled triangles)
+      marker_count: count not stated; overlapped glyphs deferred
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Thesis version duplicates Vickerfält et al. (2020), Figure 6b; plotted phase-boundary compositions are in Tables
+      9-10. No plot values were digitized.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      present-work phase boundaries (filled circles): 12
+      present-work single-phase charge compositions (open circles): 2
+      phase boundaries from refs. [79, 80] (filled squares): 2
+      Cini [81] single-phase samples (open triangles): count not stated; overlapped glyphs deferred
+      Cini [81] two-phase samples (filled triangles): count not stated; overlapped glyphs deferred
+    panels:
+    - single
+    attribution: Present work and refs. [79, 80, 81]
+    published_source_id: vickerfalt-2020-mgo-v2o3
+    published_observation_ids:
+    - vickerfalt_2020_mgo_v2o3_figure_6b_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_31_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_32_context
+  type: figure_only
+  locator:
+    page: 57
+    published_page: 46
+    pdf_page_index: 56
+    figure: '32'
+  units: as plotted
+  attribution: Present work; comparison to refs. [12-14]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: Al2O3-SiO2-V2O3
+    phase: mullite, Al2O3-corundum, V2O3-corundum, cristobalite, liquid
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+    caption_as_printed: Phase diagram at pO2=3.4×10^-9 atm.
+    series:
+    - name: Mullite+V2O3+Al2O3 sample compositions
+      marker_count: 2
+    - name: Mullite+V2O3+Al2O3 invariant compositions
+      marker_count: 6
+    - name: Mullite+V2O3+liquid sample compositions
+      marker_count: 2
+    - name: Mullite+V2O3+liquid invariant points
+      marker_count: 6
+    - name: Liquid+V2O3+SiO2 sample compositions
+      marker_count: 2
+    - name: Liquid+V2O3+SiO2 invariant points
+      marker_count: 6
+    - name: Literature data [12-14]
+      marker_count: 2
+    - name: Phase boundary
+      marker_count: 0
+    - name: Tie line
+      marker_count: 0
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Thesis diagram duplicates Vickerfält et al. (2024), Figure 4; tables 11-15 provide the corresponding compositions.
+      No numerical plot values were digitized.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      Mullite+V2O3+Al2O3 sample compositions: 2
+      Mullite+V2O3+Al2O3 invariant compositions: 6
+      Mullite+V2O3+liquid sample compositions: 2
+      Mullite+V2O3+liquid invariant points: 6
+      Liquid+V2O3+SiO2 sample compositions: 2
+      Liquid+V2O3+SiO2 invariant points: 6
+      Literature data [12-14]: 2
+      Phase boundary: 0
+      Tie line: 0
+    panels:
+    - single
+    attribution: Present work; comparison to refs. [12-14]
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_figure_4_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_32_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_33_context
+  type: figure_only
+  locator:
+    page: 58
+    published_page: 47
+    pdf_page_index: 57
+    figure: '33'
+  units: as plotted
+  attribution: Present work; comparison to refs. [12-14]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: Al2O3-SiO2-V2O3
+    phase: mullite, Al2O3-corundum, V2O3-corundum, cristobalite, liquid
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+    caption_as_printed: Phase diagram at pO2=3.3×10^-10 atm.
+    series:
+    - name: Mullite+V2O3+Al2O3 sample compositions
+      marker_count: 1
+    - name: Mullite+V2O3+Al2O3 invariant compositions
+      marker_count: 3
+    - name: Mullite+V2O3+liquid sample compositions
+      marker_count: 2
+    - name: Mullite+V2O3+liquid invariant points
+      marker_count: 6
+    - name: Liquid+V2O3+SiO2 sample compositions
+      marker_count: 2
+    - name: Liquid+V2O3+SiO2 invariant points
+      marker_count: 6
+    - name: Mullite+liquid sample compositions
+      marker_count: 1
+    - name: Mullite+liquid phase compositions
+      marker_count: 2
+    - name: Mullite+Al2O3 sample compositions
+      marker_count: 2
+    - name: Mullite+Al2O3 phase compositions
+      marker_count: 4
+    - name: Literature data [12-14]
+      marker_count: 2
+    - name: Phase boundary
+      marker_count: 0
+    - name: Tie line
+      marker_count: 0
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Thesis diagram duplicates Vickerfält et al. (2024), Figure 5; tables 11-15 provide the corresponding compositions.
+      No numerical plot values were digitized.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      Mullite+V2O3+Al2O3 sample compositions: 1
+      Mullite+V2O3+Al2O3 invariant compositions: 3
+      Mullite+V2O3+liquid sample compositions: 2
+      Mullite+V2O3+liquid invariant points: 6
+      Liquid+V2O3+SiO2 sample compositions: 2
+      Liquid+V2O3+SiO2 invariant points: 6
+      Mullite+liquid sample compositions: 1
+      Mullite+liquid phase compositions: 2
+      Mullite+Al2O3 sample compositions: 2
+      Mullite+Al2O3 phase compositions: 4
+      Literature data [12-14]: 2
+      Phase boundary: 0
+      Tie line: 0
+    panels:
+    - single
+    attribution: Present work; comparison to refs. [12-14]
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_figure_5_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_33_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_figure_34_context
+  type: figure_only
+  locator:
+    page: 59
+    published_page: 48
+    pdf_page_index: 58
+    figure: '34'
+  units: as plotted
+  attribution: Present work; comparison to refs. [12-14]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: Al2O3-SiO2-V2O3
+    phase: mullite, Al2O3-corundum, V2O3-corundum, cristobalite, liquid
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'ternary composition axes: Al2O3, SiO2, V2O3 (wt%)'
+    caption_as_printed: Phase diagram at pO2=3.4×10^-11 atm.
+    series:
+    - name: Mullite+V2O3+Al2O3 sample compositions
+      marker_count: 2
+    - name: Mullite+V2O3+Al2O3 invariant compositions
+      marker_count: 6
+    - name: Mullite+V2O3+liquid sample compositions
+      marker_count: 2
+    - name: Mullite+V2O3+liquid invariant points
+      marker_count: 6
+    - name: Liquid+V2O3+SiO2 sample compositions
+      marker_count: 1
+    - name: Liquid+V2O3+SiO2 invariant points
+      marker_count: 3
+    - name: V2O3+SiO2 sample composition
+      marker_count: 1
+    - name: V2O3+SiO2 phase compositions
+      marker_count: 2
+    - name: Literature data [12-14]
+      marker_count: 2
+    - name: Phase boundary
+      marker_count: 0
+    - name: Tie line
+      marker_count: 0
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    note: Thesis diagram duplicates Vickerfält et al. (2024), Figure 6; tables 11-15 provide the corresponding compositions.
+      No numerical plot values were digitized.
+    quantity: equilibrium_phase_composition
+    marker_count_per_series:
+      Mullite+V2O3+Al2O3 sample compositions: 2
+      Mullite+V2O3+Al2O3 invariant compositions: 6
+      Mullite+V2O3+liquid sample compositions: 2
+      Mullite+V2O3+liquid invariant points: 6
+      Liquid+V2O3+SiO2 sample compositions: 1
+      Liquid+V2O3+SiO2 invariant points: 3
+      V2O3+SiO2 sample composition: 1
+      V2O3+SiO2 phase compositions: 2
+      Literature data [12-14]: 2
+      Phase boundary: 0
+      Tie line: 0
+    panels:
+    - single
+    attribution: Present work; comparison to refs. [12-14]
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_figure_6_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_figure_34_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table10_context
+  type: measured_table_context
+  locator:
+    page: 36
+    published_page: 25
+    pdf_page_index: 35
+    table: '10'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2020), Table 3; solid phase compositions have no d-223 solid
+      PhaseRole. Thesis pO2 values are preserved verbatim and are about half the article values.
+    columns_as_printed:
+    - pO2, atm
+    - Temperature, K
+    - Initial V2O3, wt%
+    - Phase
+    - Analysed V2O3, wt%
+    rows_as_printed:
+    - - 1.75×10^-11
+      - '1873'
+      - '17.1'
+      - MgO-halite
+      - 16.6±0.3
+    - - 1.75×10^-11
+      - '1873'
+      - '78.1'
+      - Spinel
+      - 79.2±0.2
+    - - 1.75×10^-10
+      - '1873'
+      - '17.0'
+      - MgO-halite
+      - 16.5±0.3
+    - - 1.75×10^-10
+      - '1873'
+      - '78.2'
+      - Spinel
+      - 78.6±0.1
+    published_source_id: vickerfalt-2020-mgo-v2o3
+    published_observation_ids:
+    - vickerfalt_2020_mgo_v2o3_table_3_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table10_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table11_context
+  type: measured_table_context
+  locator:
+    page: 40
+    published_page: 29
+    pdf_page_index: 39
+    table: '11'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2024), Table 1 mullite phase rows; d-223 has no solid PhaseRole.
+      Oxygen values remain verbatim in atm; the thesis values link to the published article context.
+    columns_as_printed:
+    - Sample
+    - Mixed Al2O3 wt%
+    - Mixed SiO2 wt%
+    - Mixed V2O3 wt%
+    - pO2, atm
+    - Mullite Al2O3 wt%
+    - Mullite SiO2 wt%
+    - Mullite V2O3 wt%
+    rows_as_printed:
+    - - S3.1
+      - '80'
+      - '10'
+      - '10'
+      - 3.3×10^-10
+      - '64.6'
+      - '27.2'
+      - '8.3'
+    - - S3.2
+      - '82'
+      - '13'
+      - '5'
+      - 3.3×10^-10
+      - '69.2'
+      - '26.1'
+      - '4.7'
+    - - S3.3
+      - '50'
+      - '45'
+      - '5'
+      - 3.3×10^-10
+      - '64.5'
+      - '28.5'
+      - '7.0'
+    - - S3.4
+      - '54'
+      - '6'
+      - '40'
+      - 3.4×10^-11
+      - '63.7'
+      - '24.8'
+      - '11.5'
+    - - S3.5
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-11
+      - '63.2'
+      - '25.7'
+      - '11.1'
+    - - S3.6
+      - '64'
+      - '16'
+      - '20'
+      - 3.3×10^-10
+      - '61.7'
+      - '26.9'
+      - '11.4'
+    - - S3.7
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-9
+      - '62.7'
+      - '26.1'
+      - '11.2'
+    - - S3.8
+      - '60'
+      - '10'
+      - '30'
+      - 3.4×10^-9
+      - '62.3'
+      - '26.6'
+      - '11.2'
+    - - S3.9
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-11
+      - '61.9'
+      - '25.7'
+      - '12.4'
+    - - S3.10
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-11
+      - '61.2'
+      - '25.9'
+      - '12.9'
+    - - S3.11
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '57.6'
+      - '28.6'
+      - '13.9'
+    - - S3.12
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '57.8'
+      - '27.8'
+      - '14.4'
+    - - S3.13
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-9
+      - '57.0'
+      - '28.3'
+      - '14.7'
+    - - S3.14
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-9
+      - '59.0'
+      - '26.5'
+      - '14.5'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table1_al2o3_solid_compositions_context
+    - vickerfalt_2024_table1_sio2_solid_compositions_context
+    - vickerfalt_2024_table1_v2o3_solid_compositions_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table11_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table12_context
+  type: measured_table_context
+  locator:
+    page: 41
+    published_page: 30
+    pdf_page_index: 40
+    table: '12'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2024), Table 1 Al2O3-corundum phase rows; d-223 has no solid
+      PhaseRole. Printed 0.0 remains a composition value, not an uncertainty.
+    columns_as_printed:
+    - Sample
+    - Mixed Al2O3 wt%
+    - Mixed SiO2 wt%
+    - Mixed V2O3 wt%
+    - pO2, atm
+    - Al2O3-corundum Al2O3 wt%
+    - Al2O3-corundum SiO2 wt%
+    - Al2O3-corundum V2O3 wt%
+    rows_as_printed:
+    - - S3.1
+      - '80'
+      - '10'
+      - '10'
+      - 3.3×10^-10
+      - '87.5'
+      - '0.1'
+      - '12.5'
+    - - S3.2
+      - '82'
+      - '13'
+      - '5'
+      - 3.3×10^-10
+      - '93.9'
+      - '0.0'
+      - '6.1'
+    - - S3.4
+      - '54'
+      - '6'
+      - '40'
+      - 3.4×10^-11
+      - '73.6'
+      - '0.1'
+      - '26.3'
+    - - S3.5
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-11
+      - '75.1'
+      - '0.1'
+      - '24.8'
+    - - S3.6
+      - '64'
+      - '16'
+      - '20'
+      - 3.3×10^-10
+      - '75.0'
+      - '0.1'
+      - '24.9'
+    - - S3.7
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-9
+      - '75.6'
+      - '0.1'
+      - '24.4'
+    - - S3.8
+      - '60'
+      - '10'
+      - '30'
+      - 3.4×10^-9
+      - '74.9'
+      - '0.1'
+      - '25.1'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table1_al2o3_solid_compositions_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table12_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table13_context
+  type: measured_table_context
+  locator:
+    page: 42
+    published_page: 31
+    pdf_page_index: 41
+    table: '13'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2024), Table 1 V2O3-corundum phase rows; d-223 has no solid
+      PhaseRole. Table 13 compositions are normalized; the article context retains the same printed rows.
+    columns_as_printed:
+    - Sample
+    - Mixed Al2O3 wt%
+    - Mixed SiO2 wt%
+    - Mixed V2O3 wt%
+    - pO2, atm
+    - V2O3-corundum Al2O3 wt%
+    - V2O3-corundum SiO2 wt%
+    - V2O3-corundum V2O3 wt%
+    rows_as_printed:
+    - - S3.4
+      - '54'
+      - '6'
+      - '40'
+      - 3.4×10^-11
+      - '21.4'
+      - '0.1'
+      - '78.5'
+    - - S3.5
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-11
+      - '21.9'
+      - '0.1'
+      - '78.0'
+    - - S3.6
+      - '64'
+      - '16'
+      - '20'
+      - 3.3×10^-10
+      - '21.2'
+      - '0.1'
+      - '78.7'
+    - - S3.7
+      - '64'
+      - '16'
+      - '20'
+      - 3.4×10^-9
+      - '18.3'
+      - '0'
+      - '81.7'
+    - - S3.8
+      - '60'
+      - '10'
+      - '30'
+      - 3.4×10^-9
+      - '19.4'
+      - '0'
+      - '80.6'
+    - - S3.9
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-11
+      - '14.1'
+      - '0.1'
+      - '85.8'
+    - - S3.10
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-11
+      - '14.1'
+      - '0.1'
+      - '85.8'
+    - - S3.11
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '11.4'
+      - '0.2'
+      - '88.4'
+    - - S3.12
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '11.1'
+      - '0.1'
+      - '88.7'
+    - - S3.13
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-9
+      - '10.5'
+      - '0.1'
+      - '89.3'
+    - - S3.14
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-9
+      - '10.3'
+      - '0.1'
+      - '89.6'
+    - - S3.15
+      - '10'
+      - '65'
+      - '25'
+      - 3.3×10^-10
+      - '10.5'
+      - '0.4'
+      - '89.1'
+    - - S3.16
+      - '2'
+      - '48'
+      - '50'
+      - 3.4×10^-11
+      - '4.1'
+      - '0.2'
+      - '95.7'
+    - - S3.17
+      - '4'
+      - '66'
+      - '30'
+      - 3.4×10^-11
+      - '7.7'
+      - '0.3'
+      - '92.0'
+    - - S3.18
+      - '5'
+      - '55'
+      - '40'
+      - 3.3×10^-10
+      - '7.7'
+      - '0.4'
+      - '91.9'
+    - - S3.19
+      - '6'
+      - '44'
+      - '50'
+      - 3.3×10^-10
+      - '8.6'
+      - '0.2'
+      - '91.3'
+    - - S3.20
+      - '6'
+      - '54'
+      - '40'
+      - 3.4×10^-9
+      - '8.0'
+      - '0.2'
+      - '91.8'
+    - - S3.21
+      - '6'
+      - '44'
+      - '50'
+      - 3.4×10^-9
+      - '8.4'
+      - '0.3'
+      - '91.3'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table1_v2o3_solid_compositions_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table13_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table14_context
+  type: measured_table_context
+  locator:
+    page: 43
+    published_page: 32
+    pdf_page_index: 42
+    table: '14'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Exact duplicate of the liquid values in Vickerfält et al. (2024), Table 1; each thesis composition
+      is linked to the corresponding article observations. Do not score the thesis rows again. Thesis pO2 remains as printed
+      in atm.
+    columns_as_printed:
+    - Sample
+    - Mixed Al2O3 wt%
+    - Mixed SiO2 wt%
+    - Mixed V2O3 wt%
+    - pO2, atm
+    - Liquid Al2O3 wt%
+    - Liquid SiO2 wt%
+    - Liquid V2O3 wt%
+    rows_as_printed:
+    - - S3.3
+      - '50'
+      - '45'
+      - '5'
+      - 3.3×10^-10
+      - '7.6'
+      - '91.4'
+      - '1.1'
+    - - S3.15
+      - '10'
+      - '65'
+      - '25'
+      - 3.3×10^-10
+      - '7.0'
+      - '91.1'
+      - '1.9'
+    - - S3.9
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-11
+      - '24.1'
+      - '72.3'
+      - '3.5'
+    - - S3.10
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-11
+      - '24.0'
+      - '72.4'
+      - '3.6'
+    - - S3.11
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '14.3'
+      - '83.0'
+      - '2.8'
+    - - S3.12
+      - '28'
+      - '32'
+      - '40'
+      - 3.3×10^-10
+      - '14.3'
+      - '82.8'
+      - '2.8'
+    - - S3.13
+      - '40'
+      - '35'
+      - '25'
+      - 3.4×10^-9
+      - '6.3'
+      - '92.0'
+      - '1.7'
+    - - S3.14
+      - '28'
+      - '32'
+      - '40'
+      - 3.4×10^-9
+      - '7.2'
+      - '91.0'
+      - '1.8'
+    - - S3.17
+      - '4'
+      - '66'
+      - '30'
+      - 3.4×10^-11
+      - '5.2'
+      - '93.1'
+      - '1.7'
+    - - S3.18
+      - '5'
+      - '55'
+      - '40'
+      - 3.3×10^-10
+      - '5.0'
+      - '93.6'
+      - '1.4'
+    - - S3.19
+      - '6'
+      - '44'
+      - '50'
+      - 3.3×10^-10
+      - '5.3'
+      - '93.0'
+      - '1.7'
+    - - S3.20
+      - '6'
+      - '54'
+      - '40'
+      - 3.4×10^-9
+      - '5.5'
+      - '93.1'
+      - '1.4'
+    - - S3.21
+      - '6'
+      - '44'
+      - '50'
+      - 3.4×10^-9
+      - '5.2'
+      - '93.1'
+      - '1.8'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table1_sample_03_liquid_al2o3
+    - vickerfalt_2024_table1_sample_03_liquid_sio2
+    - vickerfalt_2024_table1_sample_03_liquid_v2o3
+    - vickerfalt_2024_table1_sample_15_liquid_al2o3
+    - vickerfalt_2024_table1_sample_15_liquid_sio2
+    - vickerfalt_2024_table1_sample_15_liquid_v2o3
+    - vickerfalt_2024_table1_sample_09_liquid_al2o3
+    - vickerfalt_2024_table1_sample_09_liquid_sio2
+    - vickerfalt_2024_table1_sample_09_liquid_v2o3
+    - vickerfalt_2024_table1_sample_10_liquid_al2o3
+    - vickerfalt_2024_table1_sample_10_liquid_sio2
+    - vickerfalt_2024_table1_sample_10_liquid_v2o3
+    - vickerfalt_2024_table1_sample_11_liquid_al2o3
+    - vickerfalt_2024_table1_sample_11_liquid_sio2
+    - vickerfalt_2024_table1_sample_11_liquid_v2o3
+    - vickerfalt_2024_table1_sample_12_liquid_al2o3
+    - vickerfalt_2024_table1_sample_12_liquid_sio2
+    - vickerfalt_2024_table1_sample_12_liquid_v2o3
+    - vickerfalt_2024_table1_sample_13_liquid_al2o3
+    - vickerfalt_2024_table1_sample_13_liquid_sio2
+    - vickerfalt_2024_table1_sample_13_liquid_v2o3
+    - vickerfalt_2024_table1_sample_14_liquid_al2o3
+    - vickerfalt_2024_table1_sample_14_liquid_sio2
+    - vickerfalt_2024_table1_sample_14_liquid_v2o3
+    - vickerfalt_2024_table1_sample_17_liquid_al2o3
+    - vickerfalt_2024_table1_sample_17_liquid_sio2
+    - vickerfalt_2024_table1_sample_17_liquid_v2o3
+    - vickerfalt_2024_table1_sample_18_liquid_al2o3
+    - vickerfalt_2024_table1_sample_18_liquid_sio2
+    - vickerfalt_2024_table1_sample_18_liquid_v2o3
+    - vickerfalt_2024_table1_sample_19_liquid_al2o3
+    - vickerfalt_2024_table1_sample_19_liquid_sio2
+    - vickerfalt_2024_table1_sample_19_liquid_v2o3
+    - vickerfalt_2024_table1_sample_20_liquid_al2o3
+    - vickerfalt_2024_table1_sample_20_liquid_sio2
+    - vickerfalt_2024_table1_sample_20_liquid_v2o3
+    - vickerfalt_2024_table1_sample_21_liquid_al2o3
+    - vickerfalt_2024_table1_sample_21_liquid_sio2
+    - vickerfalt_2024_table1_sample_21_liquid_v2o3
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table14_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table15_context
+  type: measured_table_context
+  locator:
+    page: 43
+    published_page: 32
+    pdf_page_index: 42
+    table: '15'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2024), Table 1 cristobalite phase rows; d-223 has no solid
+      PhaseRole. The source names cristobalite; compositions are retained only in context.
+    columns_as_printed:
+    - Sample
+    - Mixed Al2O3 wt%
+    - Mixed SiO2 wt%
+    - Mixed V2O3 wt%
+    - pO2, atm
+    - Cristobalite Al2O3 wt%
+    - Cristobalite SiO2 wt%
+    - Cristobalite V2O3 wt%
+    rows_as_printed:
+    - - S3.16
+      - '2'
+      - '48'
+      - '50'
+      - 3.4×10^-11
+      - '0.3'
+      - '98.7'
+      - '1.0'
+    - - S3.17
+      - '4'
+      - '66'
+      - '30'
+      - 3.4×10^-11
+      - '0.2'
+      - '99.3'
+      - '0.5'
+    - - S3.18
+      - '5'
+      - '55'
+      - '40'
+      - 3.3×10^-10
+      - '0.3'
+      - '99.3'
+      - '0.4'
+    - - S3.19
+      - '6'
+      - '44'
+      - '50'
+      - 3.3×10^-10
+      - '0.1'
+      - '99.2'
+      - '0.6'
+    - - S3.20
+      - '6'
+      - '54'
+      - '40'
+      - 3.4×10^-9
+      - '0.1'
+      - '99.4'
+      - '0.5'
+    - - S3.21
+      - '6'
+      - '44'
+      - '50'
+      - 3.4×10^-9
+      - '0.1'
+      - '99.2'
+      - '0.7'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table1_sio2_solid_compositions_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table15_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table1_quoted_hematite_pellet_context
+  type: measured_table_context
+  locator:
+    page: 18
+    published_page: 7
+    pdf_page_index: 17
+    table: '1'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    schema_gap_or_disposition: Table 1 gives a publicly available whole-pellet composition cited as reference [21], not an
+      analysis of one phase. No bulk-feed composition token fits; retain it as quoted context.
+    columns_as_printed:
+    - Pellet grade, cited reference
+    - Fe wt%
+    - MgO wt%
+    - Al2O3 wt%
+    - SiO2 wt%
+    - P2O5 wt%
+    - CaO wt%
+    - TiO2 wt%
+    - V2O3 wt%
+    - MnO wt%
+    rows_as_printed:
+    - - Commercial hematite pellets [21]
+      - '67.8'
+      - '0.65'
+      - '0.2'
+      - '0.8'
+      - '0.06'
+      - '0.9'
+      - '0.18'
+      - '0.2'
+      - '0.07'
+    attribution: Reference [21], as cited by Vickerfält (2024)
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table1_quoted_hematite_pellet_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table2_initial_synthetic_slag_compositions_context
+  type: measured_table_context
+  locator:
+    page: 19
+    published_page: 8
+    pdf_page_index: 18
+    table: '2'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    schema_gap_or_disposition: These are initial mixed synthetic slag recipes, not equilibrium phase compositions; no token
+      represents starting-charge vectors.
+    columns_as_printed:
+    - Test
+    - FeO wt%
+    - Al2O3 wt%
+    - CaO wt%
+    - MgO wt%
+    - SiO2 wt%
+    - TiO2 wt%
+    - V2O3 wt%
+    rows_as_printed:
+    - - S1.8
+      - '10.1'
+      - '6.3'
+      - '26.2'
+      - '16.5'
+      - '28.9'
+      - '5.7'
+      - '6.3'
+    - - S1.9
+      - '20.2'
+      - '5.6'
+      - '23.2'
+      - '14.6'
+      - '25.7'
+      - '5.0'
+      - '5.6'
+    - - S1.10
+      - '40.4'
+      - '4.2'
+      - '17.4'
+      - '10.9'
+      - '19.2'
+      - '3.8'
+      - '4.2'
+    attribution: Vickerfält (2024), present work
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table2_initial_synthetic_slag_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table3_foaming_phase_compositions_context
+  type: measured_table_context
+  locator:
+    page: 22
+    published_page: 11
+    pdf_page_index: 21
+    table: '3'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 3 is from an experimental slag-foaming selection study. Its liquid analyses are normalized
+      to listed FeO-CaO-SiO2-MgO even though the liquid also contained around 10 wt% MoO2; storing these values as full-phase
+      wt% would misstate composition. The table also reports magnesiowustite solid rows and phase fractions for which no faithful
+      phase-role/phase-fraction token is available.
+    columns_as_printed:
+    - Slag no.
+    - Initial FeO wt%
+    - Initial CaO wt%
+    - Initial SiO2 wt%
+    - Initial MgO wt%
+    - MW fraction vol%
+    - MW FeO wt%
+    - Liquid FeO wt%
+    - Liquid CaO wt%
+    - Liquid SiO2 wt%
+    - Liquid MgO wt%
+    rows_as_printed:
+    - - S5.0'
+      - '36'
+      - '27'
+      - '27'
+      - '10'
+      - '-'
+      - '-'
+      - '29'
+      - '33'
+      - '28'
+      - '10'
+    - - S5.1'
+      - '40.3'
+      - '22.7'
+      - '22.7'
+      - '14.3'
+      - '1.6'
+      - '52'
+      - '31'
+      - '31'
+      - '25'
+      - '13'
+    - - S5.2'
+      - '42.3'
+      - '21'
+      - '21'
+      - '15.7'
+      - '8.7'
+      - '51'
+      - '33'
+      - '30'
+      - '25'
+      - '12'
+    - - S5.3'
+      - '43.5'
+      - '20'
+      - '20'
+      - '16.5'
+      - '12.5'
+      - '53'
+      - '33'
+      - '30'
+      - '25'
+      - '12'
+    MoO2_content_in_liquid_as_printed: around 10 wt%
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table3_foaming_phase_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table4_process_and_calculated_context
+  type: measured_table_context
+  locator:
+    page: 24
+    published_page: 12
+    pdf_page_index: 23
+    table: '4'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap_or_disposition: Reduction degree is a process descriptor without a matching observable token; FeO(calc.) is
+      calculated from the reduction degree, Eq. 1 and feed composition rather than measured.
+    columns_as_printed:
+    - Sample
+    - Reduction degree, %
+    - FeO(calc.), wt%
+    rows_as_printed:
+    - - S1.1
+      - '99.3'
+      - '22.7'
+    - - S1.2
+      - '98.7'
+      - '35.3'
+    - - S1.3
+      - '98.8'
+      - '33.9'
+    - - S1.4
+      - '98.1'
+      - '44.2'
+    - - S1.5
+      - '96.8'
+      - '57.6'
+    - - S1.6
+      - '94.2'
+      - '71.0'
+    - - S1.7
+      - '91.0'
+      - '79.3'
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table4_process_and_calculated_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table4_v_below_detection_context
+  type: measured_table_context
+  locator:
+    page: 24
+    published_page: 12
+    pdf_page_index: 23
+    table: '4'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap_or_disposition: Iron V in S1.6/S1.7 is printed only as <0.001 wt%; LV is unreported because V is below OES
+      detection. Preserve the bound and dash as printed, never as points.
+    columns_as_printed:
+    - Sample
+    - Iron V, wt%
+    - LV
+    rows_as_printed:
+    - - S1.6
+      - <0.001
+      - '-'
+    - - S1.7
+      - <0.001
+      - '-'
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table4_v_below_detection_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table5_mw_solid_phase_compositions_context
+  type: measured_table_context
+  locator:
+    page: 26
+    published_page: 14
+    pdf_page_index: 25
+    table: '5'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 5 reports solid MW compositions. The d-223 PhaseRole enum has no solid role; values are
+      retained verbatim with the post-cooling provenance, and are not typed as liquid compositions.
+    columns_as_printed:
+    - Sample
+    - Reduction degree, %
+    - MgO, wt%
+    - Al2O3, wt%
+    - SiO2, wt%
+    - CaO, wt%
+    - TiO2, wt%
+    - V2O3, wt%
+    - FeO, wt%
+    rows_as_printed:
+    - - S1.1
+      - '99.3'
+      - 31-33
+      - 0-1
+      - '0'
+      - 0-1
+      - 0-1
+      - 5-9
+      - 58-62
+    - - S1.2
+      - '98.8'
+      - 10-15
+      - 0-1
+      - 0-3
+      - 0-2
+      - 0-1
+      - '1'
+      - 77-88
+    - - S1.3
+      - '98.7'
+      - 16-18
+      - '0'
+      - '0'
+      - 0-1
+      - '0'
+      - '3'
+      - 79-80
+    - - S1.4
+      - '98.1'
+      - '16'
+      - '0'
+      - '0'
+      - 0-1
+      - 0-1
+      - 2-3
+      - 80-82
+    - - S1.5
+      - '96.8'
+      - '7'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '2'
+      - '91'
+    - - S1.6
+      - '94.2'
+      - 4-5
+      - '0'
+      - '0'
+      - 0-1
+      - 0-1
+      - '1'
+      - 92-94
+    - - S1.7
+      - '91.0'
+      - '3'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '1'
+      - 95-96
+    phase_as_printed: Magnesiowüstite
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table5_mw_solid_phase_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table5_spinel_solid_phase_compositions_context
+  type: measured_table_context
+  locator:
+    page: 26
+    published_page: 14
+    pdf_page_index: 25
+    table: '5'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 5 reports solid Spinel compositions. The d-223 PhaseRole enum has no solid role; values
+      are retained verbatim with the post-cooling provenance, and are not typed as liquid compositions.
+    columns_as_printed:
+    - Sample
+    - Reduction degree, %
+    - MgO, wt%
+    - Al2O3, wt%
+    - SiO2, wt%
+    - CaO, wt%
+    - TiO2, wt%
+    - V2O3, wt%
+    - FeO, wt%
+    rows_as_printed:
+    - - S1.1
+      - '99.3'
+      - 10-11
+      - 10-12
+      - '0'
+      - 1-2
+      - '23'
+      - 11-15
+      - 40-43
+    - - S1.2
+      - '98.8'
+      - '9'
+      - 7-9
+      - '0'
+      - '1'
+      - 21-22
+      - 12-13
+      - 47-48
+    - - S1.3
+      - '98.7'
+      - '7'
+      - '8'
+      - '0'
+      - 1-2
+      - '21'
+      - 12-14
+      - 49-50
+    - - S1.4
+      - '98.1'
+      - 7-8
+      - 10-11
+      - '0'
+      - '1'
+      - 21-24
+      - 5-13
+      - 47-52
+    - - S1.5
+      - '96.8'
+      - 4-7
+      - 7-12
+      - '0'
+      - 0-2
+      - 17-23
+      - 5-9
+      - 57-59
+    - - S1.6
+      - '94.2'
+      - 3-6
+      - 6-15
+      - 0-7
+      - 1-7
+      - 15-23
+      - 1-5
+      - 55-62
+    - - S1.7
+      - '91.0'
+      - 2-3
+      - 5-7
+      - 2-5
+      - 1-9
+      - 17-20
+      - 0-2
+      - 58-70
+    phase_as_printed: Spinel
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table5_spinel_solid_phase_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table6_magnesiowustite_solid_compositions_context
+  type: measured_table_context
+  locator:
+    page: 30
+    published_page: 18
+    pdf_page_index: 29
+    table: '6'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 6 reports solid magnesiowustite compositions. d-223 has no solid PhaseRole; exact SEM-EDS
+      numbers are preserved in context.
+    columns_as_printed:
+    - Sample
+    - FeOtot, wt%
+    - Location / phase
+    - MgO, wt%
+    - Al2O3, wt%
+    - SiO2, wt%
+    - CaO, wt%
+    - TiO2, wt%
+    - V2O3, wt%
+    - FeO, wt%
+    rows_as_printed:
+    - - S1.8
+      - '10'
+      - MW small
+      - '43'
+      - '3'
+      - '0'
+      - '2'
+      - '4'
+      - '19'
+      - '29'
+    - - S1.9
+      - '20'
+      - MW small
+      - '33'
+      - '2'
+      - '0'
+      - '2'
+      - '3'
+      - '13'
+      - '47'
+    - - S1.10
+      - '40'
+      - MW small
+      - '19'
+      - '2'
+      - '0'
+      - '1'
+      - '3'
+      - '8'
+      - '67'
+    - - S1.8
+      - '10'
+      - MW large surface
+      - '47'
+      - '2'
+      - '0'
+      - '1'
+      - '2'
+      - '20'
+      - '27'
+    - - S1.9
+      - '20'
+      - MW large surface
+      - '37'
+      - '2'
+      - '0'
+      - '1'
+      - '2'
+      - '14'
+      - '44'
+    - - S1.10
+      - '40'
+      - MW large surface
+      - '22'
+      - '1'
+      - '0'
+      - '0'
+      - '2'
+      - '7'
+      - '67'
+    - - S1.8
+      - '10'
+      - MW large center
+      - '57'
+      - '0'
+      - '0'
+      - '0'
+      - '1'
+      - '18'
+      - '24'
+    - - S1.9
+      - '20'
+      - MW large center
+      - '52'
+      - '0'
+      - '0'
+      - '0'
+      - '1'
+      - '11'
+      - '37'
+    - - S1.10
+      - '40'
+      - MW large center
+      - '42'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '5'
+      - '52'
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table6_magnesiowustite_solid_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table6_spinel_solid_compositions_context
+  type: measured_table_context
+  locator:
+    page: 30
+    published_page: 18
+    pdf_page_index: 29
+    table: '6'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Table 6 reports solid spinel compositions. d-223 has no solid PhaseRole; exact SEM-EDS numbers
+      are preserved in context.
+    columns_as_printed:
+    - Sample
+    - FeOtot, wt%
+    - Location / phase
+    - MgO, wt%
+    - Al2O3, wt%
+    - SiO2, wt%
+    - CaO, wt%
+    - TiO2, wt%
+    - V2O3, wt%
+    - FeO, wt%
+    rows_as_printed:
+    - - S1.8
+      - '10'
+      - Spinel
+      - '20'
+      - '10'
+      - '1'
+      - '2'
+      - '21'
+      - '27'
+      - '19'
+    - - S1.9
+      - '20'
+      - Spinel
+      - '16'
+      - '9'
+      - '1'
+      - '2'
+      - '21'
+      - '23'
+      - '29'
+    - - S1.10
+      - '40'
+      - Spinel
+      - '11'
+      - '7'
+      - '2'
+      - '3'
+      - '19'
+      - '12'
+      - '46'
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table6_spinel_solid_compositions_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table7_context
+  type: measured_table_context
+  locator:
+    page: 30
+    published_page: 18
+    pdf_page_index: 29
+    table: '7'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2020), Table 4; the d-223 enum has no solid PhaseRole for spinel.
+      Thesis pO2 is 1.74×10^-10 atm; the published article reports (3.55±0.3)×10^-5 Pa. Both remain as printed, and the thesis
+      is not scored twice.
+    columns_as_printed:
+    - Initial V2O3 wt%
+    - MgO wt%
+    - Six analyses of V2O3 wt%
+    - Average V2O3 wt%
+    rows_as_printed:
+    - sample_id: Table 7 first spinel
+      initial_V2O3_wt_percent: '84.8'
+      MgO: Bal.
+      analysed_V2O3_wt_percent:
+      - '79.56'
+      - '79.95'
+      - '79.46'
+      - '80.08'
+      - '79.52'
+      - '79.21'
+      average_V2O3_wt_percent: '79.63'
+    - sample_id: Table 7 second spinel
+      initial_V2O3_wt_percent: '88.2'
+      MgO: Bal.
+      analysed_V2O3_wt_percent:
+      - '79.04'
+      - '79.05'
+      - '78.65'
+      - '79.29'
+      - '79.07'
+      - '79.22'
+      average_V2O3_wt_percent: '79.05'
+    published_source_id: vickerfalt-2020-mgo-v2o3
+    published_observation_ids:
+    - vickerfalt_2020_mgo_v2o3_table_4_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table7_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table8_context
+  type: measured_table_context
+  locator:
+    page: 31
+    published_page: 19
+    pdf_page_index: 30
+    table: '8'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2024), Table 2 and Table 1 mullite means; no solid PhaseRole
+      is available. Retain the replicates as printed and do not rescore.
+    columns_as_printed:
+    - Sample
+    - Starting composition Al2O3/SiO2/V2O3 wt%
+    - Three analyses Al2O3/SiO2/V2O3 wt%
+    - Average Al2O3/SiO2/V2O3 wt%
+    rows_as_printed:
+    - sample_id: S3.7
+      starting_composition:
+      - '64'
+      - '16'
+      - '20'
+      analyses:
+      - - '62.3'
+        - '26.5'
+        - '11.2'
+      - - '62.7'
+        - '26.1'
+        - '11.3'
+      - - '63.2'
+        - '25.8'
+        - '11.0'
+      average:
+      - '62.7'
+      - '26.1'
+      - '11.2'
+    - sample_id: S3.8
+      starting_composition:
+      - '60'
+      - '10'
+      - '30'
+      analyses:
+      - - '62.4'
+        - '26.4'
+        - '11.2'
+      - - '62.5'
+        - '26.4'
+        - '11.1'
+      - - '61.9'
+        - '26.9'
+        - '11.2'
+      average:
+      - '62.3'
+      - '26.6'
+      - '11.2'
+    published_source_id: vickerfalt-2024-al-si-v-phase-diagram
+    published_observation_ids:
+    - vickerfalt_2024_table2_mullite_replicates_context
+    - vickerfalt_2024_table1_al2o3_solid_compositions_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table8_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2
+- observation_id: vickerfalt_thesis_table9_context
+  type: measured_table_context
+  locator:
+    page: 35
+    published_page: 24
+    pdf_page_index: 34
+    table: '9'
+  units: wt% as printed
+  values:
+    quantity: printed_table_values_without_compatible_token
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: Duplicate of Vickerfält et al. (2020), Tables 1 and 2. d-223 lacks a solid PhaseRole. Thesis
+      pO2 values 1.75×10^-11 and 1.75×10^-10 atm are approximately half the article values; preserve the thesis values verbatim,
+      including printed ±0.0 as text only.
+    columns_as_printed:
+    - pO2, atm
+    - Temperature, K
+    - Initial composition V2O3, wt%
+    - Boundary compositions V2O3, wt%
+    rows_as_printed:
+    - pO2_atm: 1.75×10^-11
+      T_K: '1661'
+      initial_V2O3_wt%:
+      - '31.9'
+      - '55.3'
+      - '65.0'
+      - '84.8'
+      - '88.3'
+      - '91.2'
+      boundaries:
+      - MgO-halite 9.4±0.5
+      - MgO-saturated spinel 77.2±0.6
+      - V2O3-saturated spinel 80.0±0.3
+      - V2O3-corundum 98.8±0.1
+    - pO2_atm: 1.75×10^-11
+      T_K: '1761'
+      initial_V2O3_wt%:
+      - '55.3'
+      - '65.0'
+      - '84.7'
+      - '88.2'
+      - '91.4'
+      boundaries:
+      - MgO-halite 17.4±0.6
+      - MgO-saturated spinel 77.7±0.3
+      - V2O3-saturated spinel 80.8±0.3
+      - V2O3-corundum 99.1±0.1
+    - pO2_atm: 1.75×10^-11
+      T_K: '1873'
+      initial_V2O3_wt%:
+      - '47.9'
+      - '74.4'
+      - '84.8'
+      - '91.3'
+      boundaries:
+      - MgO-halite 31.3±1.4
+      - MgO-saturated spinel 78.5±0.7
+      - V2O3-saturated spinel 82.1±0.5
+      - V2O3-corundum 99.4±0.0
+    - pO2_atm: 1.75×10^-10
+      T_K: '1661'
+      initial_V2O3_wt%:
+      - '55.3'
+      - '65.0'
+      - '84.8'
+      - '88.2'
+      boundaries:
+      - MgO-halite 9.4±1.6
+      - MgO-saturated spinel 76.1±0.2
+      - V2O3-saturated spinel 79.3±0.4
+      - V2O3-corundum 98.0±0.1
+    - pO2_atm: 1.75×10^-10
+      T_K: '1761'
+      initial_V2O3_wt%:
+      - '55.4'
+      - '65.0'
+      - '84.9'
+      - '91.4'
+      boundaries:
+      - MgO-halite 14.6±0.7
+      - MgO-saturated spinel 76.8±0.3
+      - V2O3-saturated spinel 80.1±0.2
+      - V2O3-corundum 98.5±0.0
+    - pO2_atm: 1.75×10^-10
+      T_K: '1873'
+      initial_V2O3_wt%:
+      - '38.2'
+      - '65.1'
+      - '84.7'
+      - '88.2'
+      boundaries:
+      - MgO-halite 25.7±0.6
+      - MgO-saturated spinel 77.3±0.4
+      - V2O3-saturated spinel 81.2±0.3
+      - V2O3-corundum 99.0±0.0
+    published_source_id: vickerfalt-2020-mgo-v2o3
+    published_observation_ids:
+    - vickerfalt_2020_mgo_v2o3_table_1_context
+    - vickerfalt_2020_mgo_v2o3_table_2_context
+  context_id: vickerfalt-2024-autogenous-slag-thesis::context::vickerfalt_thesis_table9_context
+  work_id: 4c86808b2d619735c096b7c012a3954e77d8bc20b4489defe1f0438ed342d3e0
+  source_id: vickerfalt-2024-autogenous-slag-thesis
+  species: SiO2

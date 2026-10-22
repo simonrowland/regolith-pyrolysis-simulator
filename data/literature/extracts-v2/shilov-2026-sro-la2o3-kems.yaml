@@ -1,0 +1,4358 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shilov-2026-sro-la2o3-kems.yaml
+observations:
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_sample1_partial_molar_enthalpy::T=1798:h=06b32c80a991
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1798'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: point
+    point: '49'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '3'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_sample1_partial_molar_enthalpy
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 6
+        published_page: 1159
+        pdf_page_index: 5
+        section: Results and discussion
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 6
+    published_page: 1159
+    pdf_page_index: 5
+    section: Results and discussion
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1798'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 1159
+        pdf_page_index: 5
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derived_from:
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+  derivation:
+    relation: Partial molar mixing enthalpy estimated from the slope coefficient of equation (11).
+    inputs:
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_sample2_partial_molar_enthalpy::T=1696:h=2bea7ccf9874
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1696'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: point
+    point: '80'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '30'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_sample2_partial_molar_enthalpy
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 6
+        published_page: 1159
+        pdf_page_index: 5
+        section: Results and discussion
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 6
+    published_page: 1159
+    pdf_page_index: 5
+    section: Results and discussion
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1696'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 1159
+        pdf_page_index: 5
+        section: Results and discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derived_from:
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+  derivation:
+    relation: Partial molar mixing enthalpy estimated from the slope coefficient of equation (12).
+    inputs:
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+    parameters: []
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1::T=1740:row=1:h=521dbaec4951
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1740'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=1
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1740'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1::T=1777:row=2:h=43840c94b3a8
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1777'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.64'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.10'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=2
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1777'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1::T=1809:row=3:h=f4ac0271779a
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1809'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.97'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.15'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=3
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1809'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1::T=1832:row=4:h=24d1cdf7cb38
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1832'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.19'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=4
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1832'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1::T=1855:row=5:h=e3e57b582002
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1855'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.3'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=5
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1855'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1617:row=7:h=fd5c1e31cd42
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1617'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.008'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=7
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1617'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1623:row=6:h=1d2af89cb9ff
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.06'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.009'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=6
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1662:row=8:h=e0e40664ac2a
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1662'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.08'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=8
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1662'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1696:row=9:h=1ab6ca4ce772
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1696'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=9
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1696'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1743:row=10:h=f9f908bde6af
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1743'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=10
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1743'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1770:row=12:h=00ed09fdc1cc
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1770'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.39'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=12
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1770'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2::T=1775:row=11:h=338fa6de3193
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Sr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1775'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.42'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sr_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=11
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1775'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: Pa
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1740'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.08'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=1
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1740'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1777'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.07'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=2
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1777'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1809'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.07'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=3
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1809'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1832'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=4
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1832'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1855'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.9'
+        - - La2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.16'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 section, rows 1-5.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=5
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1855'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.9'
+          - - La2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 1 heading prints SrO:La2O3 = 90:10 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1_activity_1900k_estimate::T=1900:h=c9c27b2f5852
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_XRF_mole_fraction_central_values
+        components:
+        - - SrO
+          - '0.88'
+        - - La2O3
+          - '0.12'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1_activity_1900k_estimate
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 8
+        published_page: 1161
+        pdf_page_index: 7
+        section: Model results
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 8
+    published_page: 1161
+    pdf_page_index: 7
+    section: Model results
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1900'
+          approximate: false
+      locator:
+        page: 8
+        published_page: 1161
+        pdf_page_index: 7
+        section: Model results
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_XRF_mole_fraction_central_values
+          components:
+          - - SrO
+            - '0.88'
+          - - La2O3
+            - '0.12'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1157
+        pdf_page_index: 3
+        table: '1'
+        note: Central XRF composition values; the printed ratio is (88 ± 8):(12 ± 5) mol%.
+  derived_from:
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+  derivation:
+    relation: Extrapolated from equation (11) to 1900 K as reported by the authors.
+    inputs:
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1617'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=7
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1617'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1623'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.19'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.07'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=6
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1662'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=8
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1662'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1696'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.06'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=9
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1696'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1743'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=10
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1743'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1770'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=12
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1770'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1775'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_synthesis_mole_fraction
+        components:
+        - - SrO
+          - '0.5'
+        - - La2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 section, rows 6-12.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+    note: row=11
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1775'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_synthesis_mole_fraction
+          components:
+          - - SrO
+            - '0.5'
+          - - La2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2 sample 2 heading prints SrO:La2O3 = 50:50 mol%.
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shilov-2026-sro-la2o3-kems
+    parameters: []
+    output_unit: dimensionless activity as printed
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2_activity_1900k_estimate::T=1900:h=0d7aa87bcb56
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1900'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_XRF_mole_fraction_central_values
+        components:
+        - - SrO
+          - '0.49'
+        - - La2O3
+          - '0.51'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.07'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2_activity_1900k_estimate
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 8
+        published_page: 1161
+        pdf_page_index: 7
+        section: Model results
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 8
+    published_page: 1161
+    pdf_page_index: 7
+    section: Model results
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1900'
+          approximate: false
+      locator:
+        page: 8
+        published_page: 1161
+        pdf_page_index: 7
+        section: Model results
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_XRF_mole_fraction_central_values
+          components:
+          - - SrO
+            - '0.49'
+          - - La2O3
+            - '0.51'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1157
+        pdf_page_index: 3
+        table: '1'
+        note: Central XRF composition values; the printed ratio is (49 ± 4):(51 ± 6) mol%.
+  derived_from:
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+  derivation:
+    relation: Extrapolated from equation (12) to 1900 K as reported by the authors.
+    inputs:
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_weighted_activity_1750k::T=1750:h=583101e4096f
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SrO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1750'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SrO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The activity reference names SrO but does not specify its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: SrO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: attributed_phase_boundary_mole_fraction
+        components:
+        - - SrO
+          - '0.168'
+        - - La2O3
+          - '0.832'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.13'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_weighted_activity_1750k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam43-1022
+      date: '2026-10-22'
+      evidence:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: Text below Table 2 reports the weighted activity at the 16.8 mol% SrO two-phase boundary.
+  notices: []
+  source_id: shilov-2026-sro-la2o3-kems
+  locator:
+    page: 7
+    published_page: 1160
+    pdf_page_index: 6
+    table: '2'
+  read_from: unknown:shilov-2026-sro-la2o3-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1750'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: attributed_phase_boundary_mole_fraction
+          components:
+          - - SrO
+            - '0.168'
+          - - La2O3
+            - '0.832'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 1160
+        pdf_page_index: 6
+        table: '2'
+        note: The paper states that the NUCLEA boundary is 16.8-100.0 mol% SrO at 1750 K.
+  derived_from:
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+  - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+  derivation:
+    relation: Weighted activity at 1750 K from equations (11) and (12), treating the samples as in the two-phase solid-solution
+      field; the 16.8 mol% SrO boundary composition is reported from the NUCLEA phase diagram.
+    inputs:
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1740:row=1:h=fbfb82d55b09
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1777:row=2:h=a49f66f1af91
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1809:row=3:h=f0d167a67296
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1832:row=4:h=0cb38ed51c4a
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1::T=1855:row=5:h=322531fb0af8
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1623:row=6:h=496443d050d4
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1617:row=7:h=9cf95f5e795f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1662:row=8:h=f4b2d2056b71
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1696:row=9:h=de8ebe8a6d7f
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1743:row=10:h=99d10462abbc
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1775:row=11:h=c3125e0b149d
+    - shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2::T=1770:row=12:h=efcb8264a937
+    parameters: []
+    output_unit: dimensionless activity

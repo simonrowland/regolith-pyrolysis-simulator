@@ -1,0 +1,3166 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kirschen-1998-silicate-miscibility-thesis.yaml
+observations:
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_2_phase1_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '18.07'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.86'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.98'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_2_phase1_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '47.54'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.18'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.98'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_2_phase1_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '33.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.47'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.98'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-2, liquid row 1, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase1_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.78'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.11'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase1_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '91.95'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.80'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase1_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '6.89'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.35'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 1, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase2_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '18.35'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.69'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.86'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase2_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '48.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.86'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.86'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_3_phase2_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '33.31'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.09'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '99.86'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-3, liquid row 2, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_4_phase1_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_4
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1867.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '18.69'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.28'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1867.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1594'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.35'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_4_phase1_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_4
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1867.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '45.61'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '6.21'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1867.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1594'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.35'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_2_4_phase1_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_2_4
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1867.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '36.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '3.71'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1867.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1594'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.35'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 2-4, liquid row 1, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase1_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.52'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.05'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.48'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase1_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '88.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.67'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.48'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase1_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '9.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.56'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '98.48'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 1, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase2_cao
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '18.67'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '2.68'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, CaO column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase2_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '29.46'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '4.70'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_ii_1_stc_3_1_phase2_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_ii_1_stc_3_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '52.48'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '7.30'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 45
+    published_page: II-30
+    pdf_page_index: 44
+    table: II-1
+    note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 45
+              published_page: II-30
+              pdf_page_index: 44
+              table: II-1
+              note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+        output_unit: K
+    printed_sum:
+      state:
+        tag: value
+        value: '100.62'
+      locator:
+        page: 45
+        published_page: II-30
+        pdf_page_index: 44
+        table: II-1
+        note: Table II-1, run STC 3-1, liquid row 2, TiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_iii_1_ti_phase1_al2o3
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_iii_1_ti
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2280'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.04'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, Al2O3 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 89
+    published_page: III-74
+    pdf_page_index: 88
+    table: III-1
+    note: Table III-1, run Ti, liquid row 1, Al2O3 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2280'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, Al2O3 column.
+    gas_mix:
+      state:
+        tag: value
+        value: pure oxygen
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, Al2O3 column.
+    printed_sum:
+      state:
+        tag: value
+        value: '101.77'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, Al2O3 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_iii_1_ti_phase1_sio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_iii_1_ti
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2280'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.05'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, SiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 89
+    published_page: III-74
+    pdf_page_index: 88
+    table: III-1
+    note: Table III-1, run Ti, liquid row 1, SiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2280'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, SiO2 column.
+    gas_mix:
+      state:
+        tag: value
+        value: pure oxygen
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, SiO2 column.
+    printed_sum:
+      state:
+        tag: value
+        value: '101.77'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, SiO2 column.
+- observation_id: kirschen-1998-silicate-miscibility-thesis::kirschen_1998_iii_1_ti_phase1_tio2
+  experiment_id: 0426ab3acd91fac823a178b03e35b6e63e4cd078c6dfc37007e49f29a470862f::experiment::kirschen_1998_iii_1_ti
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2280'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '101.57'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '1.23'
+      units: wt_percent
+      confidence_level: one_sigma
+      note: Parenthetical component standard deviation as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam40-1022
+      date: '2026-10-22'
+      evidence:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, TiO2 column.
+  notices: []
+  source_id: kirschen-1998-silicate-miscibility-thesis
+  locator:
+    page: 89
+    published_page: III-74
+    pdf_page_index: 88
+    table: III-1
+    note: Table III-1, run Ti, liquid row 1, TiO2 column.
+  read_from: unknown:kirschen-1998-silicate-miscibility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2280'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, TiO2 column.
+    gas_mix:
+      state:
+        tag: value
+        value: pure oxygen
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, TiO2 column.
+    printed_sum:
+      state:
+        tag: value
+        value: '101.77'
+      locator:
+        page: 89
+        published_page: III-74
+        pdf_page_index: 88
+        table: III-1
+        note: Table III-1, run Ti, liquid row 1, TiO2 column.

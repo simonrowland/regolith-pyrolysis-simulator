@@ -1,0 +1,196 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/rcm.9298
+  citation: Lopatin SI, Shugurov SM, Tyurnina NG, Tyurnina ZG, Polyakova IG, Balabanova EA (2022). Vaporization and thermodynamic
+    properties of the SrO–Al2O3 system studied by Knudsen effusion mass spectrometry. Rapid Communications in Mass Spectrometry
+    36(12):e9298.
+  source_ids:
+  - lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1002/rcm.9298
+experiments:
+- experiment_id: 10.1002/rcm.9298::lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1002/rcm.9298
+  locator:
+    table: S2
+context:
+- observation_id: lopatin_2022_figure_s1_xrd_figure_record
+  type: figure_record
+  locator:
+    figure: S1
+  units: XRD pattern as printed
+  values:
+    quantity: x_ray_diffraction_pattern (no store token)
+    typed_quantity: XRD pattern; no numeric observation token
+    species_as_filed: Sr
+    phase_as_printed: crystalline phases in SrO–Al2O3 samples
+    T_C: 1250
+    axes_as_printed:
+    - 2θ
+    - intensity
+    caption_as_printed: Experimental XRD patterns of samples NN 1–6, synthesized at 1250 °C and held isothermally for 12 hours.
+    panel: not labelled
+    series:
+    - NN 1
+    - NN 2
+    - NN 3
+    - NN 4
+    - NN 5
+    - NN 6
+    marker_count_per_series: continuous patterns; no discrete markers printed
+    digitisation: deferred to a figure pass
+  context_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems::context::lopatin_2022_figure_s1_xrd_figure_record
+  work_id: 10.1002/rcm.9298
+  source_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+  species: Sr
+- observation_id: lopatin_2022_figure_s2_xrd_figure_record
+  type: figure_record
+  locator:
+    figure: S2
+  units: XRD pattern as printed
+  values:
+    quantity: x_ray_diffraction_pattern (no store token)
+    typed_quantity: XRD pattern; no numeric observation token
+    species_as_filed: Sr
+    phase_as_printed: crystalline phases in SrO–Al2O3 samples
+    T_C: 1250
+    axes_as_printed:
+    - 2θ
+    - intensity
+    caption_as_printed: Experimental XRD patterns of samples NN 7–12, synthesized at 1250 °C and held isothermally for 12
+      hours.
+    panel: not labelled
+    series:
+    - NN 7
+    - NN 8
+    - NN 9
+    - NN 10
+    - NN 11
+    - NN 12
+    marker_count_per_series: continuous patterns; no discrete markers printed
+    digitisation: deferred to a figure pass
+  context_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems::context::lopatin_2022_figure_s2_xrd_figure_record
+  work_id: 10.1002/rcm.9298
+  source_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+  species: Sr
+- observation_id: lopatin_2022_table_s1_sample_charge_and_xrd_phase_context
+  type: sample_phase_context
+  locator:
+    table: S1
+  units: starting composition mol.% of oxides; qualitative XRD phase identification
+  values:
+    quantity: sample_composition_and_identified_phases_context_no_component_amount_token
+    T_C: 1250
+    duration_h: 12
+    schema_gap: 'No token fits the table''s qualitative XRD phase identification and starting-charge mol.%: equilibrium_phase_composition
+      requires a numeric component amount in a measured phase, while this table gives no phase amounts and each sample is
+      multiphase.'
+    samples:
+    - sample: NN 1
+      SrO_mol_percent: 90
+      Al2O3_mol_percent: 10
+      identified_phases_as_printed:
+      - Sr4Al2O7
+      - SrO — an extremely small amount
+    - sample: NN 2
+      SrO_mol_percent: 80
+      Al2O3_mol_percent: 20
+      identified_phases_as_printed:
+      - Sr4Al2O7
+    - sample: NN 3
+      SrO_mol_percent: 75
+      Al2O3_mol_percent: 25
+      identified_phases_as_printed:
+      - Sr3Al2O6
+      - SrAl2O4 — an extremely small amount
+    - sample: NN 4
+      SrO_mol_percent: 70
+      Al2O3_mol_percent: 30
+      identified_phases_as_printed:
+      - Sr3Al2O6
+    - sample: NN 5
+      SrO_mol_percent: 60
+      Al2O3_mol_percent: 40
+      identified_phases_as_printed:
+      - Sr3Al2O6
+      - SrAl2O4
+    - sample: NN 6
+      SrO_mol_percent: 50
+      Al2O3_mol_percent: 50
+      identified_phases_as_printed:
+      - SrAl2O4
+    - sample: NN 7
+      SrO_mol_percent: 40
+      Al2O3_mol_percent: 60
+      identified_phases_as_printed:
+      - SrAl2O4
+    - sample: NN 8
+      SrO_mol_percent: '33.3'
+      Al2O3_mol_percent: '66.7'
+      identified_phases_as_printed:
+      - SrAl2O4
+      - SrAl2O7
+    - sample: NN 9
+      SrO_mol_percent: 30
+      Al2O3_mol_percent: 70
+      identified_phases_as_printed:
+      - SrAl2O4
+      - SrAl2O7
+    - sample: NN 10
+      SrO_mol_percent: 20
+      Al2O3_mol_percent: 80
+      identified_phases_as_printed:
+      - SrAl12O19
+      - SrAl2O7 — an extremely small amount
+    - sample: NN 11
+      SrO_mol_percent: '14.3'
+      Al2O3_mol_percent: '85.7'
+      identified_phases_as_printed:
+      - SrAl12O19
+    - sample: NN 12
+      SrO_mol_percent: 10
+      Al2O3_mol_percent: 90
+      identified_phases_as_printed:
+      - SrAl12O19
+      - Al2O3
+  context_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems::context::lopatin_2022_table_s1_sample_charge_and_xrd_phase_context
+  work_id: 10.1002/rcm.9298
+  source_id: lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+  species: Sr

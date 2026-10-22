@@ -1,0 +1,1612 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  citation: Kim, D.-H., Won, S.-Y., Han, J.-S., Nam, H.-S. and Pak, J.-J. (2018), “Thermodynamics of Sulfur in Carbon Saturated
+    Liquid Ferro-alloys Containing Ni, Mo and V at 1 873 K”, ISIJ International, 58(3), 408–414.
+  source_ids:
+  - kim-2018-sulfur-fe-v-mo-ni
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:kim-2018-sulfur-fe-v-mo-ni
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.isijint-2017-509
+experiments:
+- experiment_id: 10.2355/isijinternational.isijint-2017-509::experiment::kim2018-slag-metal-equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 409
+        pdf_page_index: 1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  locator:
+    page: 2
+    published_page: 409
+    pdf_page_index: 1
+- experiment_id: 10.2355/isijinternational.isijint-2017-509::experiment::kim2018-table4-present-fit
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        published_page: 413
+        pdf_page_index: 5
+        table: '4'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 409
+        pdf_page_index: 1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    section: '3.3'
+- experiment_id: 10.2355/isijinternational.isijint-2017-509::kim-2018-sulfur-fe-v-mo-ni
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  locator:
+    page: 6
+    published_page: 413
+    pdf_page_index: 5
+    table: '4'
+    note: 'row_label=epsilon_S_V; column_header=Ref. 2 as printed in Table 4, V: 17 mass%; printed_cell=-0.016'
+context:
+- observation_id: kim2018_figure_10_deferred
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 413
+    pdf_page_index: 5
+    figure: '10'
+  units: as plotted
+  values:
+    quantity: calculated final sulfur content in the metal
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Calculated material-balance curves, not measured data; no curve coordinates are digitised.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: Sulfur content in spent catalyst (%)
+      y: Sulfur content in the metal
+    caption_as_printed: Variation of final sulfur content in Fe-25%V-8%Ni-5%Mo-8%C melt vs. initial sulfur content in spent
+      catalyst for different slag compositions at 1 873 K.
+    panel: single panel
+    series:
+    - name: C/A = 35/65
+      marker_count: 0
+    - name: C/A = 40/60
+      marker_count: 0
+    - name: C/A = 45/55
+      marker_count: 0
+    - name: C/A = 50/50
+      marker_count: 0
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    model_class: model_derived
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_10_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_1_deferred
+  type: figure_only
+  locator:
+    page: 2
+    published_page: 409
+    pdf_page_index: 1
+    figure: '1'
+  units: as plotted
+  values:
+    quantity: experimental apparatus schematic
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Apparatus schematic; no plotted data series.
+    digitisation: deferred to a figure pass
+    species_formula: not applicable
+    phase: not applicable
+    temperature_K: not printed
+    axes_as_printed:
+      x: not applicable
+      y: not applicable
+    caption_as_printed: A schematic diagram of the experimental apparatus.
+    panel: single panel
+    series:
+    - name: apparatus schematic
+      marker_count: 0
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    candidate_tokens_checked: []
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_1_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_2_deferred
+  type: figure_only
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    figure: '2'
+  units: as plotted
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: slag
+    temperature_K: '1873'
+    axes_as_printed:
+      x: Time (hr)
+      y: (S), mass%
+    caption_as_printed: Sulfur solubility in CaS saturated CaO–Al2O3 slags at 1 873 K.
+    panel: single panel
+    series:
+    - name: 40%CaO-60%Al2O3
+      marker_count: 6
+    - name: 50%CaO-50%Al2O3
+      marker_count: 6
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    component: S
+    phase_role: slag
+    basis: wt_percent
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_2_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_3_deferred
+  type: figure_only
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    figure: '3'
+  units: as plotted
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: slag
+    temperature_K: '1873'
+    axes_as_printed:
+      x: X_CaO
+      y: log C_S
+    caption_as_printed: Sulfide capacity of CaO–Al2O3 slag at 1 873 K.
+    panel: single panel
+    series:
+    - name: present study, low sulfur symbols
+      marker_count: not counted; plotted symbols overlap the fit line
+    - name: present study, CaS-saturated symbols
+      marker_count: not counted; plotted symbols overlap the fit line
+    - name: Banya et al. (ref. 11), gas/slag
+      marker_count: not counted; cited points are overplotted
+    - name: Ozturk and Turkdogan (ref. 12), metal/slag
+      marker_count: not counted; cited points are overplotted
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    printed_form: log10
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_3_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_4_deferred
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    figure: '4'
+  units: as plotted
+  values:
+    quantity: distribution_ratio
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: slag / metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[% i]'
+      y: log L_S
+    caption_as_printed: Sulfur distribution between a 40%CaO-60%Al2O3 slag and Fe-Csat-i melts (i = V, Ni, Mo).
+    panel: single panel
+    series:
+    - name: Fe-Csat-V
+      marker_count: 5
+    - name: Fe-Csat-Ni
+      marker_count: 10
+    - name: Fe-Csat-Mo
+      marker_count: 10
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    printed_form: log10
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_4_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_5_deferred
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    figure: '5'
+  units: as plotted
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[% i]'
+      y: '[% C]'
+    caption_as_printed: Carbon solubility in Fe–V, Fe–Ni and Fe–Mo melts.
+    panel: single panel
+    series:
+    - name: Fe-Csat-V measured symbols
+      marker_count: 5
+    - name: Fe-Csat-Ni measured symbols
+      marker_count: 10
+    - name: Fe-Csat-Mo measured symbols
+      marker_count: 10
+    - name: calculated lines from Kim et al. (ref. 13)
+      marker_count: 0
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    component: C
+    phase_role: metal
+    basis: wt_percent
+    calculated_series_method: model_derived
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_5_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_6_deferred
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    figure: '6'
+  units: as plotted
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[%V]'
+      y: log f_S^V
+    caption_as_printed: The relation of log f_S^V vs. [%V] in liquid Fe–V–S.
+    panel: single panel
+    series:
+    - name: present study
+      marker_count: 5
+    - name: Banya and Chipman (ref. 3), 1823 K
+      marker_count: not counted; cited symbols overlap
+    - name: Ishii et al. (ref. 4), 1823 K
+      marker_count: not counted; cited symbols overlap
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    printed_form: log10
+    phase_role: metal
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_6_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_7_deferred
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    figure: '7'
+  units: as plotted
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[%Ni]'
+      y: log f_S^Ni
+    caption_as_printed: The relation of log f_S^Ni vs. [%Ni] in liquid Fe–Ni–S.
+    panel: single panel
+    series:
+    - name: present study
+      marker_count: 10
+    - name: Banya and Chipman (ref. 3), 1823 K
+      marker_count: not counted; cited symbols overlap
+    - name: Ishii et al. (ref. 4), 1823 K
+      marker_count: not counted; cited symbols overlap
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    printed_form: log10
+    phase_role: metal
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_7_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_8_deferred
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    figure: '8'
+  units: as plotted
+  values:
+    quantity: activity_coefficient
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Plotted values are deferred; no numeric points were read from the figure.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[%Mo]'
+      y: log f_S^Mo
+    caption_as_printed: The relation of log f_S^Mo vs. [%Mo] in liquid Fe–Mo–S.
+    panel: single panel
+    series:
+    - name: present study
+      marker_count: 10
+    - name: Banya and Chipman (ref. 3), 1823 K
+      marker_count: not counted; cited symbols overlap
+    - name: Ishii et al. (ref. 4), 1823 K
+      marker_count: not counted; cited symbols overlap
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    printed_form: log10
+    phase_role: metal
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_8_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_figure_9_deferred
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 413
+    pdf_page_index: 5
+    figure: '9'
+  units: as plotted
+  values:
+    quantity: wagner_interaction_parameter
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure shows regression residuals for second-order cross terms; digitisation is deferred and Table 4 values are
+      preserved in context.
+    digitisation: deferred to a figure pass
+    species_formula: S
+    phase: metal
+    temperature_K: '1873'
+    axes_as_printed:
+      x: '[%i]·[%j]'
+      y: log L_S − calculated first-order terms
+    caption_as_printed: Relation of Eq. (5) to determine the value of (a) r_S^{V,Ni}, (b) r_S^{Mo,Ni} and (c) r_S^{V,Mo} in
+      liquid iron.
+    panel: panels a, b, c
+    series:
+    - name: panel a, Fe-Csat-V-Ni
+      marker_count: 2
+    - name: panel b, Fe-Csat-Mo-Ni
+      marker_count: 3
+    - name: panel c, Fe-Csat-V-Mo-Ni
+      marker_count: 4
+    attribution: Kim et al., present study unless a cited source is named in the series.
+    candidate_tokens_checked:
+    - wagner_interaction_parameter
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_figure_9_deferred
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p003_t01_r03_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    table: '1'
+    row_label: '3'
+    column_header: log L_S
+    printed_cell: '2.66'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.66'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p003-t01-r03
+    system_as_printed: Fe-Csat-S
+    table_value_as_printed: '458'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p003_t01_r03_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p003_t01_r04_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    table: '1'
+    row_label: '4'
+    column_header: log L_S
+    printed_cell: '2.71'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.71'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p003-t01-r04
+    system_as_printed: Fe-Csat-S
+    table_value_as_printed: '507'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p003_t01_r04_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p003_t01_r05_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    table: '1'
+    row_label: '5'
+    column_header: log L_S
+    printed_cell: '2.68'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.68'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p003-t01-r05
+    system_as_printed: Fe-Csat-S
+    table_value_as_printed: '484'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p003_t01_r05_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p003_t01_r06_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 3
+    published_page: 410
+    pdf_page_index: 2
+    table: '1'
+    row_label: '6'
+    column_header: log L_S
+    printed_cell: '3.30'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '3.30'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p003-t01-r06
+    system_as_printed: Fe-Csat-S
+    table_value_as_printed: '2010'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p003_t01_r06_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r03_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '3'
+    column_header: log L_S
+    printed_cell: '2.73'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.73'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r03
+    system_as_printed: Fe-Csat-V
+    table_value_as_printed: '536'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r03_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r04_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '4'
+    column_header: log L_S
+    printed_cell: '2.76'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.76'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r04
+    system_as_printed: Fe-Csat-V
+    table_value_as_printed: '577'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r04_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r05_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '5'
+    column_header: log L_S
+    printed_cell: '2.80'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.80'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r05
+    system_as_printed: Fe-Csat-V
+    table_value_as_printed: '625'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r05_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r06_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '6'
+    column_header: log L_S
+    printed_cell: '2.83'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.83'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r06
+    system_as_printed: Fe-Csat-V
+    table_value_as_printed: '682'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r06_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r07_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '7'
+    column_header: log L_S
+    printed_cell: '2.88'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.88'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r07
+    system_as_printed: Fe-Csat-V
+    table_value_as_printed: '750'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r07_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r08_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '8'
+    column_header: log L_S
+    printed_cell: '2.64'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.64'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r08
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '435'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r08_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r09_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '9'
+    column_header: log L_S
+    printed_cell: '2.58'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.58'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r09
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '381'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r09_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r10_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '10'
+    column_header: log L_S
+    printed_cell: '2.59'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.59'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r10
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '393'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r10_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r11_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '11'
+    column_header: log L_S
+    printed_cell: '2.54'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.54'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r11
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '344'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r11_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r12_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '12'
+    column_header: log L_S
+    printed_cell: '2.49'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.49'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r12
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '306'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r12_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r13_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '13'
+    column_header: log L_S
+    printed_cell: '2.48'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.48'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r13
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '302'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r13_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r14_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '14'
+    column_header: log L_S
+    printed_cell: '2.48'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.48'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r14
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '301'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r14_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r15_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '15'
+    column_header: log L_S
+    printed_cell: '2.40'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.40'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r15
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '251'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r15_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r16_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '16'
+    column_header: log L_S
+    printed_cell: '2.56'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.56'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r16
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '366'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r16_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r17_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '17'
+    column_header: log L_S
+    printed_cell: '2.54'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.54'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r17
+    system_as_printed: Fe-Csat-Ni
+    table_value_as_printed: '349'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r17_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r18_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '18'
+    column_header: log L_S
+    printed_cell: '2.75'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.75'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r18
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '563'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r18_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r19_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '19'
+    column_header: log L_S
+    printed_cell: '2.77'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.77'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r19
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '582'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r19_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r20_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '20'
+    column_header: log L_S
+    printed_cell: '2.76'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.76'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r20
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '570'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r20_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r21_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '21'
+    column_header: log L_S
+    printed_cell: '2.80'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.80'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r21
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '630'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r21_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r22_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '22'
+    column_header: log L_S
+    printed_cell: '2.82'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.82'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r22
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '660'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r22_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r23_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '23'
+    column_header: log L_S
+    printed_cell: '2.83'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.83'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r23
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '674'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r23_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r24_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '24'
+    column_header: log L_S
+    printed_cell: '2.88'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.88'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r24
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '763'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r24_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r25_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '25'
+    column_header: log L_S
+    printed_cell: '2.91'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.91'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r25
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '803'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r25_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r26_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '26'
+    column_header: log L_S
+    printed_cell: '2.92'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.92'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r26
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '833'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r26_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p004_t02_r27_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 4
+    published_page: 411
+    pdf_page_index: 3
+    table: '2'
+    row_label: '27'
+    column_header: log L_S
+    printed_cell: '2.91'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.91'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p004-t02-r27
+    system_as_printed: Fe-Csat-Mo
+    table_value_as_printed: '810'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p004_t02_r27_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r03_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '3'
+    column_header: log L_S
+    printed_cell: '2.65'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.65'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r03
+    system_as_printed: Fe-Csat-V-Ni
+    table_value_as_printed: '442'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r03_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r04_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '4'
+    column_header: log L_S
+    printed_cell: '2.68'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.68'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r04
+    system_as_printed: Fe-Csat-V-Ni
+    table_value_as_printed: '474'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r04_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r05_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '5'
+    column_header: log L_S
+    printed_cell: '2.83'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.83'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r05
+    system_as_printed: Fe-Csat-Mo-Ni
+    table_value_as_printed: '672'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r05_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r06_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '6'
+    column_header: log L_S
+    printed_cell: '2.81'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.81'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r06
+    system_as_printed: Fe-Csat-Mo-Ni
+    table_value_as_printed: '651'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r06_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r07_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '7'
+    column_header: log L_S
+    printed_cell: '2.69'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.69'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r07
+    system_as_printed: Fe-Csat-Mo-Ni
+    table_value_as_printed: '493'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r07_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r08_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '8'
+    column_header: log L_S
+    printed_cell: '2.53'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.53'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r08
+    system_as_printed: Fe-Csat-V-Ni-Mo
+    table_value_as_printed: '338'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r08_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r09_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '9'
+    column_header: log L_S
+    printed_cell: '2.53'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.53'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r09
+    system_as_printed: Fe-Csat-V-Ni-Mo
+    table_value_as_printed: '339'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r09_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r10_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '10'
+    column_header: log L_S
+    printed_cell: '2.58'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.58'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r10
+    system_as_printed: Fe-Csat-V-Ni-Mo
+    table_value_as_printed: '376'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r10_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_p005_t03_r11_log_L_S_context
+  type: measurement_context
+  locator:
+    page: 5
+    published_page: 412
+    pdf_page_index: 4
+    table: '3'
+    row_label: '11'
+    column_header: log L_S
+    printed_cell: '2.62'
+  units: log10(dimensionless ratio)
+  values:
+    quantity_as_printed: log L_S
+    value_as_printed: '2.62'
+    printed_form: log10
+    method_class: measured_reduced
+    candidate_tokens_checked:
+    - distribution_ratio
+    reason: The distribution_ratio token stores the positive linear ratio and has no printed logarithmic value field; the
+      corresponding L_S is typed once for this sample.
+    sample_id: p005-t03-r11
+    system_as_printed: Fe-Csat-V-Ni-Mo
+    table_value_as_printed: '420'
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_p005_t03_r11_log_L_S_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_table4_second_order_parameters_context
+  type: model_fit_context
+  locator:
+    page: 6
+    published_page: 413
+    pdf_page_index: 5
+    table: '4'
+  units: dimensionless, as printed in the mass-percent Wagner formalism
+  values:
+    quantity_as_printed: second-order interaction parameters r_S^i and cross-product parameters r_S^{i,j}
+    method_class: model_derived
+    candidate_tokens_checked:
+    - wagner_interaction_parameter
+    reason: Table 4 reports second-order r parameters; the existing scalar Wagner extraction uses the first-order epsilon
+      field. The table values are kept here with their fitted status.
+    temperature_K: '1873'
+    rows:
+    - parameter: r_S^V
+      value_as_printed: '0'
+      range_as_printed: 'V: 29 mass%'
+      attribution: Present
+    - parameter: r_S^Ni
+      value_as_printed: '0'
+      range_as_printed: 'Ni: 37 mass%'
+      attribution: Present
+    - parameter: r_S^Mo
+      value_as_printed: '0'
+      range_as_printed: 'Mo: 25 mass%'
+      attribution: Present
+    - parameter: r_S^{V,Ni}
+      value_as_printed: '0'
+      range_as_printed: 'V: 18 mass%; Ni: 29 mass%'
+      attribution: Present
+    - parameter: r_S^{V,Mo}
+      value_as_printed: '0.0003'
+      range_as_printed: 'V: 18 mass%; Mo: 19 mass%'
+      attribution: Present
+    - parameter: r_S^{Ni,Mo}
+      value_as_printed: '0'
+      range_as_printed: 'Ni: 29 mass%; Mo: 19 mass%'
+      attribution: Present
+    reported_again_in_text:
+    - parameter: r_S^{V,Mo}
+      value_as_printed: 0.0003 ± 0.00002
+      locator:
+        page: 5
+        published_page: 412
+        pdf_page_index: 4
+    - parameter: r_S^{Ni,Mo}
+      range_as_printed: 'Ni: 29 mass%; Mo: 9 mass%'
+      locator:
+        page: 7
+        published_page: 414
+        pdf_page_index: 6
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_table4_second_order_parameters_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S
+- observation_id: kim2018_table5_spent_petroleum_catalyst_context
+  type: measurement_context
+  locator:
+    page: 6
+    published_page: 413
+    pdf_page_index: 5
+    table: '5'
+  units: not printed in Table 5
+  values:
+    quantity_as_printed: typical whole spent petroleum catalyst composition
+    method_class: measured_tabulated
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    reason: This is a whole-sample catalyst composition, not a single equilibrated phase; the table does not print units.
+    values_as_printed:
+      V: '15'
+      Ni: '5'
+      Mo: '3'
+      Al2O3: '50'
+      S: < 15
+    sulfur_bound_as_printed: < 15
+  context_id: kim-2018-sulfur-fe-v-mo-ni::context::kim2018_table5_spent_petroleum_catalyst_context
+  work_id: 10.2355/isijinternational.isijint-2017-509
+  source_id: kim-2018-sulfur-fe-v-mo-ni
+  species: S

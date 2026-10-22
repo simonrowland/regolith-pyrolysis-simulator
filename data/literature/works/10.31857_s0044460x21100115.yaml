@@ -1,0 +1,891 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.31857/s0044460x21100115
+  citation: Stolyarova, V. L., Vorozhtsov, V. A., Shemchuk, D. V., Lopatin, S. I., & Bogdanov, O. A. (2021). High Temperature
+    Mass Spectrometric Study of the TiO2–Al2O3 System. Journal of General Chemistry, 91(10), 1558–1567.
+  source_ids:
+  - stolyarova-2021-ti-al-kems-ru
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:stolyarova-2021-ti-al-kems-ru
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.31857/s0044460x21100115
+experiments:
+- experiment_id: 10.31857/s0044460x21100115::experiment::stolyarova-2021-knudsen-kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.31857/s0044460x21100115
+  locator:
+    page: 6
+    published_page: 1563
+    pdf_page_index: 5
+    table: '3'
+    note: row=1
+context:
+- observation_id: stolyarova_2021_excess_gibbs_energy_fit_context
+  type: model_fit_context
+  what: author_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1564
+    figure: '5'
+    equations: 13–14
+  units: Gibbs energy kJ/mol; 2345 K
+  values:
+    quantity_token_gap: No existing token represents Gibbs energy of formation from oxides or excess Gibbs energy as plotted.
+    candidate_tokens:
+    - delta_fG (formation from oxides is not formation from elements)
+    method_class: model_derived
+    temperature_K: 2345
+    coefficients_as_printed:
+      B:
+        value: '-0.276'
+        uncertainty: '0.047'
+      C:
+        value: '-0.294'
+        uncertainty: '0.084'
+    figure_series:
+    - Gibbs energy of formation from oxides
+    - excess Gibbs energy
+    digitisation: deferred to a figure pass
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_excess_gibbs_energy_fit_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_figure1_phase_diagram_deferred
+  what: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1559
+    figure: '1'
+  units: temperature K; Al2O3 mole fraction
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    species:
+    - TiO2
+    - Al2O3
+    - Al2TiO5
+    phase: TiO2–Al2O3 phase fields as printed
+    temperature_K:
+    - 1552
+    - 1999
+    - 2112
+    axes_as_printed:
+      x: Al2O3 content, mole fraction
+      x_tick_values:
+      - '0.2'
+      - '0.6'
+      - '1'
+      y: Temperature, K
+      y_tick_values:
+      - 1600
+      - 2000
+      - 2400
+    caption_as_printed: Phase diagram of the TiO2–Al2O3 system [9].
+    series:
+    - name: source points [9], triangles
+      marker: open triangles
+      marker_count: 13
+    - name: source points [9], asterisks
+      marker: asterisks
+      marker_count: 9
+    - name: source points [9], squares
+      marker: open squares
+      marker_count: 5
+    - name: source points [9], crosses
+      marker: crosses
+      marker_count: 2
+    - name: source points [9], diamonds
+      marker: open diamonds
+      marker_count: 2
+    - name: phase boundaries
+      marker: line
+      marker_count: 0
+    attribution: Ilatovskaia, Savinykh & Fabrichnaya (2017), ref. [9], doi:10.1007/s11669-016-0509-4.
+    digitisation: deferred to a figure pass
+    note: Transition labels and phase fields are recorded; no phase-boundary points were digitised.
+  type: figure_record
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_figure1_phase_diagram_deferred
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_figure2_xrd_deferred
+  what: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1561
+    figure: '2'
+    panel: a and b
+  units: 2theta degrees; intensity as plotted
+  values:
+    method_class: figure_only
+    quantity_token_gap: No store token represents powder X-ray diffraction intensity traces.
+    candidate_token: equilibrium_phase_composition (phase labels only; not a printed composition vector)
+    species:
+    - Al2O3
+    - TiO2
+    - Al2TiO5
+    phase: crystalline sample phases as printed
+    temperature_K:
+    - 1573
+    - 1873
+    axes_as_printed:
+      x: 2theta, degrees
+      x_tick_values:
+      - 15
+      - 25
+      - 35
+      - 45
+      - 55
+      - 65
+      y: Intensity
+      panel_a_tick_values:
+      - 2000
+      - 6000
+      - 10000
+      - 14000
+      panel_b_tick_values:
+      - 4000
+      - 8000
+      - 12000
+      - 16000
+    caption_as_printed: 'X-ray diffraction patterns of samples 1–3 in the TiO2–Al2O3 system; beta: corundum Al2O3, nu: TiO2,
+      sigma: Al2TiO5; samples synthesized at 1573 K (a) and 1873 K (b).'
+    panel: 'a: 1573 K; b: 1873 K'
+    series:
+    - name: sample 1, 1573 K
+      marker: continuous XRD trace
+      marker_count: 0
+    - name: sample 2, 1573 K
+      marker: continuous XRD trace
+      marker_count: 0
+    - name: sample 3, 1573 K
+      marker: continuous XRD trace
+      marker_count: 0
+    - name: sample 1, 1873 K
+      marker: continuous XRD trace
+      marker_count: 0
+    - name: sample 2, 1873 K
+      marker: continuous XRD trace
+      marker_count: 0
+    - name: sample 3, 1873 K
+      marker: continuous XRD trace
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    note: Phase labels are retained; diffraction peaks were not digitised.
+    attribution: Stolyarova et al. (2021), present study.
+  type: figure_record
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_figure2_xrd_deferred
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_figure3_partial_pressures_deferred
+  what: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1562
+    figure: '3'
+  phase: gas
+  units: Pa; evaporation time min
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    species:
+    - TiO2
+    - TiO
+    - Al
+    - AlO
+    - Al2O
+    phase: gas
+    temperature_K:
+    - 2345
+    - 2500
+    - 2710
+    axes_as_printed:
+      x: Evaporation time, min
+      x_tick_values:
+      - 50
+      - 100
+      - 150
+      - 200
+      - 250
+      - 300
+      - 350
+      y: p, Pa
+      y_tick_values:
+      - '0.5'
+      - '1'
+      - '1.5'
+      - '2'
+      - '2.5'
+    caption_as_printed: 'Partial pressures of molecular vapor forms over sample 3 (Al2TiO5) versus evaporation time and temperature;
+      numbered curves: 1 TiO2, 2 TiO, 3 Al, 4 AlO, 5 Al2O. Condensed-phase compositions are calculated by complete isothermal
+      evaporation [27].'
+    series:
+    - name: 1 TiO2
+      species: TiO2
+      marker: open squares
+      marker_count: 29
+    - name: 2 TiO
+      species: TiO
+      marker: open circles
+      marker_count: 29
+    - name: 3 Al
+      species: Al
+      marker: open triangles
+      marker_count: 29
+    - name: 4 AlO
+      species: AlO
+      marker: open inverted triangles
+      marker_count: 29
+    - name: 5 Al2O
+      species: Al2O
+      marker: open diamonds
+      marker_count: 29
+    digitisation: deferred to a figure pass
+    note: Plot points are not digitised. The 29 sample-3 rows exclude the two superscript-a starting-sample comparisons in
+      Table 3.
+    attribution: Stolyarova et al. (2021), present study.
+  type: figure_record
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_figure3_partial_pressures_deferred
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_figure4_activities_deferred
+  what: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1564
+    figure: '4'
+  phase: l
+  units: dimensionless activity
+  values:
+    quantity: activity
+    method_class: figure_only
+    species:
+    - TiO2
+    - Al2O3
+    phase: l
+    temperature_K: 2345
+    axes_as_printed:
+      x: TiO2 mole fraction
+      x_tick_values:
+      - '0.1'
+      - '0.3'
+      - '0.5'
+      y: a_i
+      y_tick_values:
+      - '0.2'
+      - '0.4'
+      - '0.6'
+      - '0.8'
+      - '1'
+    caption_as_printed: 'Activities of TiO2 and Al2O3 in the TiO2–Al2O3 system at 2345 K. Series 1: TiO2, starting composition
+      sample 3; 2: TiO2, sample 2; 3: TiO2, sample 1; 4: Al2O3 calculated by Gibbs–Duhem. Curves are Redlich–Kister fits,
+      Eqs. (12) and (14).'
+    series:
+    - name: 1 TiO2, starting sample 3
+      species: TiO2
+      marker: open squares
+      marker_count: 19
+    - name: 2 TiO2, starting sample 2
+      species: TiO2
+      marker: open circles
+      marker_count: 1
+    - name: 3 TiO2, starting sample 1
+      species: TiO2
+      marker: open triangles
+      marker_count: 1
+    - name: 4 Al2O3, Gibbs–Duhem
+      species: Al2O3
+      marker: fitted line
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    note: The printed activity values in Table 3 are typed separately; curves are not digitised.
+    attribution: Stolyarova et al. (2021), present study.
+  type: figure_record
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_figure4_activities_deferred
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_figure5_gibbs_energy_deferred
+  what: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1564
+    figure: '5'
+  phase: l
+  units: kJ/mol
+  values:
+    method_class: figure_only
+    quantity_token_gap: No token represents Gibbs energy of formation from oxides or excess Gibbs energy as plotted.
+    candidate_tokens:
+    - delta_fG (not valid for formation from oxides)
+    - interaction_parameter (not a Gibbs-energy observable)
+    species:
+    - TiO2
+    - Al2O3
+    - Al2TiO5
+    phase: l
+    temperature_K: 2345
+    axes_as_printed:
+      x: TiO2 mole fraction
+      x_tick_values:
+      - '0.1'
+      - '0.3'
+      - '0.5'
+      left_y: Delta GfE, kJ/mol
+      right_y: Delta GE, kJ/mol
+      y_tick_values:
+      - -4
+      - -8
+      - -12
+      - -16
+    caption_as_printed: Gibbs energy of formation from oxides (1) and excess Gibbs energy (2) in the TiO2–Al2O3 system at
+      2345 K.
+    series:
+    - name: 1 Gibbs energy of formation from oxides
+      marker: open squares
+      marker_count: 12
+    - name: 2 excess Gibbs energy
+      marker: open circles
+      marker_count: 17
+    digitisation: deferred to a figure pass
+    note: No energy values are digitised. The formation-from-oxides ordinate is not delta_fG from elements.
+    attribution: Stolyarova et al. (2021), present study.
+  type: figure_record
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_figure5_gibbs_energy_deferred
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_redlich_kister_fit_parameters_context
+  type: fitted_model_parameters
+  what: author_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1564
+    equations: 12–14
+  units: dimensionless Redlich–Kister coefficients; 2345 K
+  values:
+    quantity: activity
+    method_class: model_derived
+    candidate_tokens:
+    - activity
+    - interaction_parameter
+    temperature_K: 2345
+    coefficients_as_printed:
+      B:
+        value: '-0.276'
+        uncertainty: '0.047'
+      C:
+        value: '-0.294'
+        uncertainty: '0.084'
+    equation_12_note: Three-parameter fit coefficient D was statistically not distinguishable from zero; no numeric D value
+      was printed.
+    note: Fitted coefficients and curves are model-derived context, not activity observations. Table 3's printed activity
+      values are typed separately.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_redlich_kister_fit_parameters_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_table1_bulk_compositions_context
+  type: initial_sample_composition_table
+  what: table_context_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1560
+    table: '1'
+  units: 'oxide synthesis and XRF values: mol%; elemental synthesis and XRF values: atom%'
+  values:
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    schema_gap_reason: Whole-sample starting compositions and XRF analyses represent multiphase ceramic samples, not one printed
+      phase; equilibrium_phase_composition would misstate them, while residue_component_composition is not an initial bulk-analysis
+      token.
+    rows:
+    - sample: '1'
+      synthesis_oxide_mol_percent:
+        TiO2: '25'
+        Al2O3: '75'
+      XRF_oxide_mol_percent:
+        TiO2: '25.4'
+        Al2O3: '74.6'
+      synthesis_element_atom_percent:
+        Ti: '5.56'
+        Al: '33.33'
+        O: '61.11'
+      XRF_element_atom_percent:
+        Ti: '7.08'
+        Al: '24.95'
+        O: '67.96'
+    - sample: '2'
+      synthesis_oxide_mol_percent:
+        TiO2: '33'
+        Al2O3: '67'
+      XRF_oxide_mol_percent:
+        TiO2: '30.0'
+        Al2O3: '70.0'
+      synthesis_element_atom_percent:
+        Ti: '7.60'
+        Al: '30.88'
+        O: '61.52'
+      XRF_element_atom_percent:
+        Ti: '8.61'
+        Al: '24.11'
+        O: '67.28'
+    - sample: '3'
+      synthesis_oxide_mol_percent:
+        TiO2: '50'
+        Al2O3: '50'
+      XRF_oxide_mol_percent:
+        TiO2: '42.8'
+        Al2O3: '57.2'
+      synthesis_element_atom_percent:
+        Ti: '12.50'
+        Al: '25.00'
+        O: '62.50'
+      XRF_element_atom_percent:
+        Ti: '11.76'
+        Al: '18.88'
+        O: '69.05'
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_table1_bulk_compositions_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_table2_xrd_and_sample_descriptions_context
+  type: sample_characterization
+  what: table_context_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1560
+    table: '2'
+  units: synthesis temperature K; phase identifications and physical descriptions qualitative
+  values:
+    candidate_tokens:
+    - equilibrium_phase_composition
+    - transition_temperature
+    schema_gap_reason: Table 2 reports qualitative XRD phase identifications and physical descriptions after synthesis, with
+      no quantitative composition of a single equilibrium phase; its synthesis setpoints are not transition-temperature observables.
+    rows:
+    - sample: '1'
+      synthesis_temperature_K: 1573
+      phase_analysis_as_printed: Al2O3 predominant [20], TiO2 secondary [21], Al2TiO5 also present
+      physical_description_as_printed: Dense sintered ceramic, fine uniform porosity; difficult to grind; broken into small
+        pieces in steel mold.
+    - sample: '1'
+      synthesis_temperature_K: 1873
+      phase_analysis_as_printed: Al2O3 predominant; Al2TiO5 secondary
+      physical_description_as_printed: Dense ceramic body with uniform porosity; ground in agate mortar.
+    - sample: '2'
+      synthesis_temperature_K: 1573
+      phase_analysis_as_printed: Approximately equal TiO2 and Al2O3; minor Al2TiO5
+      physical_description_as_printed: Dense sintered ceramic, fine uniform porosity; difficult to grind; broken into small
+        pieces in steel mold.
+    - sample: '2'
+      synthesis_temperature_K: 1873
+      phase_analysis_as_printed: Al2TiO5 predominant; Al2O3 secondary
+      physical_description_as_printed: Dense ceramic body with uniform porosity; ground in agate mortar.
+    - sample: '3'
+      synthesis_temperature_K: 1573
+      phase_analysis_as_printed: TiO2 predominant, Al2O3 secondary, minor Al2TiO5
+      physical_description_as_printed: Dense sintered ceramic, fine uniform porosity; difficult to grind; broken into small
+        pieces in steel mold.
+    - sample: '3'
+      synthesis_temperature_K: 1873
+      phase_analysis_as_printed: Al2TiO5 predominant
+      physical_description_as_printed: Dense ceramic body with uniform porosity; ground in agate mortar.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_table2_xrd_and_sample_descriptions_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_table3_calculated_residue_composition_context
+  type: model_derived_context
+  what: table_context_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1563
+    table: '3'
+  units: mole fraction as printed; evaporation time min; temperature K
+  values:
+    quantity: residue_composition_series_context
+    method_class: model_derived
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    schema_gap_reason: The reported changing condensed-phase composition is calculated by complete isothermal evaporation
+      [27] and is printed as mole fractions. residue_component_composition stores residue ppm or oxide wt%, not this mole-fraction
+      series; equilibrium_phase_composition would incorrectly label a calculated evaporation residue as an equilibrated phase.
+    table_header_as_printed: Состав пара, мол% (vapor composition, mol%)
+    caption_and_text_as_printed: Figure 3 caption and the accompanying text identify these values as condensed-phase compositions
+      calculated by complete isothermal evaporation [27].
+    rows:
+    - row: 1
+      time_min_as_printed: '0'
+      TiO2_mole_fraction_as_printed: '0.50'
+      Al2O3_mole_fraction_as_printed: '0.50'
+      temperature_K_as_printed: '2349'
+      sample_id: sample3
+    - row: 2
+      time_min_as_printed: '5'
+      TiO2_mole_fraction_as_printed: '0.49'
+      Al2O3_mole_fraction_as_printed: '0.51'
+      temperature_K_as_printed: '2349'
+      sample_id: sample3
+    - row: 3
+      time_min_as_printed: '10'
+      TiO2_mole_fraction_as_printed: '0.49'
+      Al2O3_mole_fraction_as_printed: '0.51'
+      temperature_K_as_printed: '2345'
+      sample_id: sample3
+    - row: 4
+      time_min_as_printed: '15'
+      TiO2_mole_fraction_as_printed: '0.48'
+      Al2O3_mole_fraction_as_printed: '0.52'
+      temperature_K_as_printed: '2346'
+      sample_id: sample3
+    - row: 5
+      time_min_as_printed: '20'
+      TiO2_mole_fraction_as_printed: '0.48'
+      Al2O3_mole_fraction_as_printed: '0.52'
+      temperature_K_as_printed: '2347'
+      sample_id: sample3
+    - row: 6
+      time_min_as_printed: '25'
+      TiO2_mole_fraction_as_printed: '0.47'
+      Al2O3_mole_fraction_as_printed: '0.53'
+      temperature_K_as_printed: '2346'
+      sample_id: sample3
+    - row: 7
+      time_min_as_printed: '30'
+      TiO2_mole_fraction_as_printed: '0.47'
+      Al2O3_mole_fraction_as_printed: '0.53'
+      temperature_K_as_printed: '2345'
+      sample_id: sample3
+    - row: 8
+      time_min_as_printed: '40'
+      TiO2_mole_fraction_as_printed: '0.46'
+      Al2O3_mole_fraction_as_printed: '0.54'
+      temperature_K_as_printed: '2352'
+      sample_id: sample3
+    - row: 9
+      time_min_as_printed: '50'
+      TiO2_mole_fraction_as_printed: '0.44'
+      Al2O3_mole_fraction_as_printed: '0.56'
+      temperature_K_as_printed: '2353'
+      sample_id: sample3
+    - row: 10
+      time_min_as_printed: '60'
+      TiO2_mole_fraction_as_printed: '0.43'
+      Al2O3_mole_fraction_as_printed: '0.57'
+      temperature_K_as_printed: '2353'
+      sample_id: sample3
+    - row: 11
+      time_min_as_printed: '70'
+      TiO2_mole_fraction_as_printed: '0.42'
+      Al2O3_mole_fraction_as_printed: '0.8'
+      temperature_K_as_printed: '2359'
+      sample_id: sample3
+    - row: 12
+      time_min_as_printed: '80'
+      TiO2_mole_fraction_as_printed: '0.40'
+      Al2O3_mole_fraction_as_printed: '0.60'
+      temperature_K_as_printed: '2359'
+      sample_id: sample3
+    - row: 13
+      time_min_as_printed: '100'
+      TiO2_mole_fraction_as_printed: '0.37'
+      Al2O3_mole_fraction_as_printed: '0.63'
+      temperature_K_as_printed: '2370'
+      sample_id: sample3
+    - row: 14
+      time_min_as_printed: '120'
+      TiO2_mole_fraction_as_printed: '0.33'
+      Al2O3_mole_fraction_as_printed: '0.67'
+      temperature_K_as_printed: '2367'
+      sample_id: sample3
+    - row: 15
+      time_min_as_printed: a
+      TiO2_mole_fraction_as_printed: '0.33'
+      Al2O3_mole_fraction_as_printed: '0.67'
+      temperature_K_as_printed: '2355'
+      sample_id: sample2
+    - row: 16
+      time_min_as_printed: '150'
+      TiO2_mole_fraction_as_printed: '0.27'
+      Al2O3_mole_fraction_as_printed: '0.73'
+      temperature_K_as_printed: '2368'
+      sample_id: sample3
+    - row: 17
+      time_min_as_printed: a
+      TiO2_mole_fraction_as_printed: '0.25'
+      Al2O3_mole_fraction_as_printed: '0.75'
+      temperature_K_as_printed: '2376'
+      sample_id: sample1
+    - row: 18
+      time_min_as_printed: '180'
+      TiO2_mole_fraction_as_printed: '0.21'
+      Al2O3_mole_fraction_as_printed: '0.79'
+      temperature_K_as_printed: '2372'
+      sample_id: sample3
+    - row: 19
+      time_min_as_printed: '200'
+      TiO2_mole_fraction_as_printed: '0.17'
+      Al2O3_mole_fraction_as_printed: '0.83'
+      temperature_K_as_printed: '2371'
+      sample_id: sample3
+    - row: 20
+      time_min_as_printed: '220'
+      TiO2_mole_fraction_as_printed: '0.14'
+      Al2O3_mole_fraction_as_printed: '0.87'
+      temperature_K_as_printed: '2362'
+      sample_id: sample3
+    - row: 21
+      time_min_as_printed: '240'
+      TiO2_mole_fraction_as_printed: '0.10'
+      Al2O3_mole_fraction_as_printed: '0.90'
+      temperature_K_as_printed: '2375'
+      sample_id: sample3
+    - row: 22
+      time_min_as_printed: '240'
+      TiO2_mole_fraction_as_printed: '0.10'
+      Al2O3_mole_fraction_as_printed: '0.90'
+      temperature_K_as_printed: '2477'
+      sample_id: sample3
+    - row: 23
+      time_min_as_printed: '245'
+      TiO2_mole_fraction_as_printed: '0.08'
+      Al2O3_mole_fraction_as_printed: '0.92'
+      temperature_K_as_printed: '2491'
+      sample_id: sample3
+    - row: 24
+      time_min_as_printed: '250'
+      TiO2_mole_fraction_as_printed: '0.04'
+      Al2O3_mole_fraction_as_printed: '0.96'
+      temperature_K_as_printed: '2499'
+      sample_id: sample3
+    - row: 25
+      time_min_as_printed: '260'
+      TiO2_mole_fraction_as_printed: '0.04'
+      Al2O3_mole_fraction_as_printed: '0.96'
+      temperature_K_as_printed: '2500'
+      sample_id: sample3
+    - row: 26
+      time_min_as_printed: '270'
+      TiO2_mole_fraction_as_printed: '0.02'
+      Al2O3_mole_fraction_as_printed: '0.98'
+      temperature_K_as_printed: '2489'
+      sample_id: sample3
+    - row: 27
+      time_min_as_printed: '285'
+      TiO2_mole_fraction_as_printed: '0.01'
+      Al2O3_mole_fraction_as_printed: '0.99'
+      temperature_K_as_printed: '2489'
+      sample_id: sample3
+    - row: 28
+      time_min_as_printed: '300'
+      TiO2_mole_fraction_as_printed: '0'
+      Al2O3_mole_fraction_as_printed: '1.00'
+      temperature_K_as_printed: '2491'
+      sample_id: sample3
+    - row: 29
+      time_min_as_printed: '300'
+      TiO2_mole_fraction_as_printed: '0'
+      Al2O3_mole_fraction_as_printed: '1.00'
+      temperature_K_as_printed: '2711'
+      sample_id: sample3
+    - row: 30
+      time_min_as_printed: '305'
+      TiO2_mole_fraction_as_printed: '0'
+      Al2O3_mole_fraction_as_printed: '1.00'
+      temperature_K_as_printed: '2705'
+      sample_id: sample3
+    - row: 31
+      time_min_as_printed: '310'
+      TiO2_mole_fraction_as_printed: '0'
+      Al2O3_mole_fraction_as_printed: '1.00'
+      temperature_K_as_printed: '2701'
+      sample_id: sample3
+    note: The row 70 Al2O3 value is printed as 0.8 and retained verbatim; this makes the displayed pair sum to 1.22. The two
+      superscript-a rows are measurements above original samples 2 and 1, not sample 3.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_table3_calculated_residue_composition_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_text_enthalpy_reaction_17_context
+  type: reaction_thermochemistry_context
+  what: author_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 1565
+    equation: '17'
+  units: kJ per mole reaction
+  values:
+    candidate_tokens:
+    - 'delta_fH (pre-ruled: reaction enthalpy from oxides is not formation enthalpy from elements)'
+    method_class: measured_reduced
+    reaction_as_printed: Al2TiO5(cr) = 0.7 TiO2(g) + 0.3 TiO(g) + 0.3 O(g) + Al2O3(cr)
+    dissociation_enthalpy_at_mean_temperature:
+      value: '776'
+      uncertainty: '75'
+      unit: kJ
+      mean_temperature_K: 2019
+    reaction_enthalpy_recalculated_to_298_K_using_refs_29_30:
+      value: '810.2'
+      uncertainty: '78'
+      unit: kJ
+    standard_enthalpy_of_formation_Al2TiO5_as_reported:
+      value: '-2628'
+      uncertainty: '80'
+      unit: kJ/mol
+      temperature_K: 298
+    comparison_values_as_printed:
+    - value: '-2628.8'
+      unit: kJ/mol
+      attribution: Barin (1995), reference [30]
+    - value: '-2635.5'
+      unit: kJ/mol
+      attribution: Babushkin, Matveev & Mchedlov-Petrossyan (1986), reference [31]
+    note: The reaction enthalpies are for the printed oxide-dissociation reaction, not delta_fH. The standard formation value
+      is reported after combining that reaction result with literature thermochemical data; it is retained here without creating
+      unsupported derivation lineage.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_text_enthalpy_reaction_17_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_text_equation_fits_context
+  type: quoted_context
+  what: author_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1559
+    section: Background equations (4)–(8)
+  units: pressure Pa; T K; log10 pressure as printed
+  values:
+    quantity: partial_pressure
+    method_class: quoted_attributed
+    candidate_tokens:
+    - partial_pressure
+    attribution: Equations (4)–(6) cite Bondar, Lopatin & Stolyarova (2005) [14]; equations (7)–(8) cite Semenov, Lopatin
+      & Kuligina (1994) [19].
+    equations_as_printed:
+    - species: Al
+      relation: log10 p(Pa) = -(26777 ± 1373)/T + (10.98 ± 0.57)
+    - species: AlO
+      relation: log10 p(Pa) = -(30446 ± 1600)/T + (11.46 ± 0.66)
+    - species: Al2O
+      relation: log10 p(Pa) = -(29796 ± 2113)/T + (11.53 ± 0.88)
+    - species: TiO2
+      relation: log10 p(Pa) = -25120/T + 10.54
+    - species: TiO
+      relation: log10 p(Pa) = -25450/T + 10.96
+    note: These are quoted prior-work fit equations, not measured points in the present paper; no curve values were generated.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_text_equation_fits_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_text_ionization_parameters_context
+  type: pressure_calibration_context
+  what: author_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1561
+    section: Mass-spectral ion identification and pressure reduction
+  units: ion appearance energies eV; cross-section ratios dimensionless
+  values:
+    quantity: ion_intensity_ratio
+    method_class: measured_tabulated
+    candidate_tokens:
+    - ion_intensity_ratio
+    - partial_pressure
+    ion_appearance_energies_eV:
+      TiO2: '10.3'
+      TiO: '7.0'
+      Al: '6.0'
+      AlO: '9.6'
+      Al2O: '7.8'
+    reported_uncertainty_eV: ±0.3
+    ionization_cross_section_ratios:
+      sigma_TiO_over_Ti: '0.85'
+      sigma_TiO2_over_TiO: '0.45'
+      sigma_AlO_over_Al: '0.65'
+      sigma_Al2_over_Al: '1.8'
+      sigma_Al2O_over_Al: '1.17'
+    note: Ion appearance energies and adopted relative ionization cross sections are method inputs, not independent thermodynamic
+      observations.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_text_ionization_parameters_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2
+- observation_id: stolyarova_2021_text_vapor_pressure_fit_parameters_context
+  type: fitted_parameters
+  what: author_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 1564
+    equations: 15–16
+  units: log10 pressure Pa; T K
+  values:
+    quantity: partial_pressure
+    method_class: model_derived
+    temperature_range_K:
+    - 1925
+    - 2113
+    equations_as_printed:
+    - species: TiO2
+      relation: log10 p(Pa) = -(30766 ± 1983)/T + (13.89 ± 0.97)
+    - species: TiO
+      relation: log10 p(Pa) = -(31814 ± 4229)/T + (13.95 ± 2.09)
+    mean_partial_pressure_ratio_TiO2_to_TiO_as_printed: '7:3'
+    note: Author fit equations and their coefficients are context only; no curve points were computed.
+  context_id: stolyarova-2021-ti-al-kems-ru::context::stolyarova_2021_text_vapor_pressure_fit_parameters_context
+  work_id: 10.31857/s0044460x21100115
+  source_id: stolyarova-2021-ti-al-kems-ru
+  species: TiO2

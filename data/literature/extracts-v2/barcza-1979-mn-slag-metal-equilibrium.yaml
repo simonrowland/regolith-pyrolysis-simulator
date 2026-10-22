@@ -1,0 +1,1476 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml
+observations:
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Fe
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '7.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Fe; column_header=Content, %; printed_cell=7,5
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Fe; column_header=Content, %; printed_cell=7,5
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Fe; column_header=Content, %; printed_cell=7,5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Fe; column_header=Content, %; printed_cell=7,5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Fe; column_header=Content, %; printed_cell=7,5
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Mn
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '84.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Mn; column_header=Content, %; printed_cell=84,5
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Mn; column_header=Content, %; printed_cell=84,5
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Mn; column_header=Content, %; printed_cell=84,5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Mn; column_header=Content, %; printed_cell=84,5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Mn; column_header=Content, %; printed_cell=84,5
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Mn_activity
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::barcza-1979-mn-slag-metal-equilibrium
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in Barcza; the cited reference’s basis is not reproduced in
+        Table V.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.85'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference 22 (Ohtani, 1959)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Mn_activity
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Mn; column_header=Approx. activity; printed_cell=0,85
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Si
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Si; column_header=Content, %; printed_cell=8,0
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Si; column_header=Content, %; printed_cell=8,0
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Si; column_header=Content, %; printed_cell=8,0
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Si; column_header=Content, %; printed_cell=8,0
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Si; column_header=Content, %; printed_cell=8,0
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Si_activity
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::barcza-1979-mn-slag-metal-equilibrium
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in Barcza; the cited reference’s basis is not reproduced in
+        Table V.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.05'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference 23 (Rawling and Elliot, 1965)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_alloy_Si_activity
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Si; column_header=Approx. activity; printed_cell=0,05
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_Al2O3
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '5'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Al2O3; column_header=Content, %; printed_cell=Approx. 5,0
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=Al2O3; column_header=Content, %; printed_cell=Approx. 5,0
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=Al2O3; column_header=Content, %; printed_cell=Approx. 5,0
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Al2O3; column_header=Content, %; printed_cell=Approx. 5,0
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=Al2O3; column_header=Content, %; printed_cell=Approx. 5,0
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_CaO
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=CaO; column_header=Content, %; printed_cell=32
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=CaO; column_header=Content, %; printed_cell=32
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=CaO; column_header=Content, %; printed_cell=32
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=CaO; column_header=Content, %; printed_cell=32
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=CaO; column_header=Content, %; printed_cell=32
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_MgO
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=MgO; column_header=Content, %; printed_cell=4,0
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=MgO; column_header=Content, %; printed_cell=4,0
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=MgO; column_header=Content, %; printed_cell=4,0
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=MgO; column_header=Content, %; printed_cell=4,0
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=MgO; column_header=Content, %; printed_cell=4,0
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_MnO
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '14.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=MnO; column_header=Content, %; printed_cell=14,3
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=MnO; column_header=Content, %; printed_cell=14,3
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=MnO; column_header=Content, %; printed_cell=14,3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=MnO; column_header=Content, %; printed_cell=14,3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=MnO; column_header=Content, %; printed_cell=14,3
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_MnO_activity
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::barcza-1979-mn-slag-metal-equilibrium
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in Barcza; the cited reference’s basis is not reproduced in
+        Table V.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.14'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference 13 (Riboud and Muan, 1963)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_MnO_activity
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=MnO; column_header=Approx. activity; printed_cell=0,14
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_SiO2
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::experiment::barcza-table-v-equilibrium-composition
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '33.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam47-1022
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=SiO2; column_header=Content, %; printed_cell=33,5
+  notices: []
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=SiO2; column_header=Content, %; printed_cell=33,5
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 10
+        published_page: 278
+        pdf_page_index: 9
+        table: V
+        note: row_label=SiO2; column_header=Content, %; printed_cell=33,5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=SiO2; column_header=Content, %; printed_cell=33,5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              published_page: 278
+              pdf_page_index: 9
+              table: V
+              note: row_label=SiO2; column_header=Content, %; printed_cell=33,5
+        output_unit: K
+- observation_id: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_SiO2_activity
+  experiment_id: 4bfffcf48dfe9c56bac95898ede60b2010b465de79cfacfb14f4c89b4b047700::barcza-1979-mn-slag-metal-equilibrium
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in Barcza; the cited reference’s basis is not reproduced in
+        Table V.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.1'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference 21 (Sharma and Richardson, 1955)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: barcza-1979-mn-slag-metal-equilibrium::barcza_1979_table_v_slag_SiO2_activity
+  source_id: barcza-1979-mn-slag-metal-equilibrium
+  locator:
+    page: 10
+    published_page: 278
+    pdf_page_index: 9
+    table: V
+    note: row_label=SiO2; column_header=Approx. activity; printed_cell=0,10
+  read_from: unknown:barcza-1979-mn-slag-metal-equilibrium

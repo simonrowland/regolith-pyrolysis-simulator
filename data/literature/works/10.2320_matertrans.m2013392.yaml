@@ -1,0 +1,3884 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans.m2013392
+  citation: Kim, D.-H., Paek, M.-K., Kim, T.-J., Won, S.-Y. and Pak, J.-J. (2014), “Carbon Solubility in Liquid Iron Containing
+    V, Mo and Ni”, Materials Transactions, 55(3), 610–615.
+  source_ids:
+  - kim-2014-carbon-fe-v-mo-ni
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:kim-2014-carbon-fe-v-mo-ni
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans.m2013392
+experiments:
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r01
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 01; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r02
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 02; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r03
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 03; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r04
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 04; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r05
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 05; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r06
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 06; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r07
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 07; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r08
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 08; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r09
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 09; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r10
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 10; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 11; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r12
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 12; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 13; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r14
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 14; Fe-Csat-V
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r15
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 15; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r16
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 16; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r17
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 17; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r18
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 18; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r19
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 19; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r20
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 20; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r21
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 21; Fe-Csat-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r22
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 22; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r23
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 23; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r24
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 24; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r25
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 25; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r26
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 26; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r27
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 27; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r28
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 28; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r29
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 29; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 30; Fe-Csat-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r31
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 31; Fe-Csat-V-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r32
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 32; Fe-Csat-V-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r33
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 33; Fe-Csat-V-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r34
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 34; Fe-Csat-V-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r35
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 35; Fe-Csat-V-Mo
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r36
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 36; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r37
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 37; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r38
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 38; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r39
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 39; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r40
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 40; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r41
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 41; Fe-Csat-V-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r42
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 42; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r43
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 43; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r44
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 44; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r45
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 45; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r46
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 46; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r47
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 47; Fe-Csat-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r48
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 48; Fe-Csat-V-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t1-r49
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 caption specifies 1873 K.
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=row 49; Fe-Csat-V-Mo-Ni
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r01
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 01; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r02
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 02; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r03
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 03; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r04
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 04; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r05
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 05; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r06
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 06; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r07
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 07; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r08
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 08; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r09
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 09; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r10
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 10; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 11; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r12
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 12; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 13; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r14
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 14; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r15
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 15; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r16
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 16; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::experiment::kim2014_t2-r17
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 3
+        published_page: 612
+        pdf_page_index: 2
+        table: '2'
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 1
+        published_page: 610
+        pdf_page_index: 0
+        section: Experimental Procedures
+        note: The printed procedure says the iron was melted under an Ar atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    table: '2'
+    note: row_label=row 17; Fe-V melt
+- experiment_id: 10.2320/matertrans.m2013392::kim-2014-carbon-fe-v-mo-ni
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans.m2013392
+  locator:
+    page: 6
+    published_page: 615
+    pdf_page_index: 5
+    table: '3'
+    note: First-order mole-fraction interaction parameter from linear regression; the same V value is also printed in the
+      Results text on physical PDF page 4.; row_label=epsilon_C^V; printed_cell=-1.94 ± 0.018
+context:
+- observation_id: kim2014_figure_10_context
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 614
+    pdf_page_index: 4
+    figure: '10'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: X_i X_j; y: equation (8) residual for the corresponding alloy system'
+    caption_as_printed: Simultaneous effect of alloying elements on carbon at 1873 K.
+    series:
+    - name: Fe-Csat-V-Mo (circles)
+      marker_count: 5
+    - name: Fe-Csat-V-Ni (triangles)
+      marker_count: 6
+    - name: Fe-Csat-Mo-Ni (squares)
+      marker_count: 6
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equation (8) residual
+    basis: mole_fraction
+    note: The plotted residual is the fitted second-order cross term; no scalar token stores the residual itself.
+    marker_count_per_series:
+      Fe-Csat-V-Mo (circles): 5
+      Fe-Csat-V-Ni (triangles): 6
+      Fe-Csat-Mo-Ni (squares): 6
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_10_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_11_context
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 615
+    pdf_page_index: 5
+    figure: '11'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: calculated X_C; y: observed X_C'
+    caption_as_printed: Correlations between calculated and observed carbon solubility in Fe-V-Mo-Ni alloy melts.
+    series:
+    - name: Fe-Csat-V-Mo (inverted triangles)
+      marker_count: 5
+    - name: Fe-Csat-V-Ni (upright triangles)
+      marker_count: 6
+    - name: Fe-Csat-Mo-Ni (squares)
+      marker_count: 6
+    - name: Fe-Csat-V-Mo-Ni (circles)
+      marker_count: 2
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: mole_fraction
+    note: Calculated and observed values are shown; no plot points were digitized.
+    marker_count_per_series:
+      Fe-Csat-V-Mo (inverted triangles): 5
+      Fe-Csat-V-Ni (upright triangles): 6
+      Fe-Csat-Mo-Ni (squares): 6
+      Fe-Csat-V-Mo-Ni (circles): 2
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_11_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_1_context
+  type: figure_only
+  locator:
+    page: 1
+    published_page: 610
+    pdf_page_index: 0
+    figure: '1'
+  units: not applicable
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Schematic apparatus illustration; it contains no measured data series.
+    digitisation: deferred to a figure pass
+    caption_as_printed: A schematic diagram of the experimental apparatus.
+    species_formula: C
+    phase: experimental apparatus
+    temperature_as_printed: not shown
+    axes_as_printed: none
+    series: []
+    marker_count_per_series: {}
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_1_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_2_context
+  type: figure_only
+  locator:
+    page: 2
+    published_page: 611
+    pdf_page_index: 1
+    figure: '2'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: time, min; y: carbon content, mass%'
+    caption_as_printed: Change of carbon solubility with time in Fe-V melt.
+    series:
+    - name: Present study; Fe-Csat-V (circles)
+      marker_count: 5
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: wt_percent
+    marker_count_per_series:
+      Present study; Fe-Csat-V (circles): 5
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_2_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_3_context
+  type: figure_only
+  locator:
+    page: 2
+    published_page: 611
+    pdf_page_index: 1
+    figure: '3'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: X_i, alloying-element mole fraction; y: X_C, carbon mole fraction'
+    caption_as_printed: Carbon solubility in Fe-V, Fe-Ni and Fe-Mo melts at 1873 K.
+    series:
+    - name: Present study; Fe-Csat-V (circles)
+      marker_count: 14
+    - name: Present study; Fe-Csat-Mo (triangles)
+      marker_count: 7
+    - name: Present study; Fe-Csat-Ni (squares)
+      marker_count: 9
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: mole_fraction
+    marker_count_per_series:
+      Present study; Fe-Csat-V (circles): 14
+      Present study; Fe-Csat-Mo (triangles): 7
+      Present study; Fe-Csat-Ni (squares): 9
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_3_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_4_context
+  type: figure_only
+  locator:
+    page: 3
+    published_page: 612
+    pdf_page_index: 2
+    figure: '4'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1873 K
+    axes_as_printed: 'x: X_i, alloying-element mole fraction; y: ln(X_C*/X_C)'
+    caption_as_printed: Relations between ln(X_C*/X_C) and X_i at 1873 K.
+    series:
+    - name: Present study; Fe-Csat-V (circles)
+      marker_count: 14
+    - name: Present study; Fe-Csat-Mo (triangles)
+      marker_count: 7
+    - name: Present study; Fe-Csat-Ni (squares)
+      marker_count: 9
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: ln(X_C*/X_C)
+    basis: mole_fraction
+    note: The transformed logarithmic ratio has no scalar quantity token; data points were not digitized.
+    marker_count_per_series:
+      Present study; Fe-Csat-V (circles): 14
+      Present study; Fe-Csat-Mo (triangles): 7
+      Present study; Fe-Csat-Ni (squares): 9
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_4_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_5_context
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 613
+    pdf_page_index: 3
+    figure: '5'
+  units: as plotted
+  attribution: Present study; literature series [10]-[13]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1823–1923 K; literature series are separately attributed
+    axes_as_printed: 'x: 1/T × 10^4, K^-1 (top axis T, K); y: X_C'
+    caption_as_printed: Carbon solubility in liquid iron with temperature.
+    series:
+    - name: Present study (symbols)
+      marker_count: 3
+    - name: Chipman et al. [10] (curve)
+      marker_count: 0
+    - name: Kitchener et al. [11] (curve)
+      marker_count: 0
+    - name: Banya et al. [12] (curve)
+      marker_count: 0
+    - name: Turkdogan et al. [13] (curve)
+      marker_count: 0
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: mole_fraction
+    marker_count_per_series:
+      Present study (symbols): 3
+      Chipman et al. [10] (curve): 0
+      Kitchener et al. [11] (curve): 0
+      Banya et al. [12] (curve): 0
+      Turkdogan et al. [13] (curve): 0
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_5_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_6_context
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 613
+    pdf_page_index: 3
+    figure: '6'
+  units: as plotted
+  attribution: Present study
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1823, 1873 and 1923 K
+    axes_as_printed: 'x: X_V, vanadium mole fraction; y: X_C, carbon mole fraction'
+    caption_as_printed: Carbon solubility in Fe-V melts.
+    series:
+    - name: Present study, 1823 K (squares)
+      marker_count: 9
+    - name: Present study, 1873 K (circles)
+      marker_count: 14
+    - name: Present study, 1923 K (triangles)
+      marker_count: 8
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: mole_fraction
+    marker_count_per_series:
+      Present study, 1823 K (squares): 9
+      Present study, 1873 K (circles): 14
+      Present study, 1923 K (triangles): 8
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_6_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_7_context
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 613
+    pdf_page_index: 3
+    figure: '7'
+  units: as plotted
+  attribution: Present study; Fuwa and Chipman [1]; Guojun et al. [2]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: 1623–1923 K; series-specific temperatures in legend
+    axes_as_printed: 'x: X_V, vanadium mole fraction; y: ln(X_C*/X_C)'
+    caption_as_printed: Relations between ln(X_C*/X_C) and X_V in Fe-Csat-V melts.
+    series:
+    - name: Fuwa and Chipman [1], 1833 K (circles)
+      marker_count: count unresolved; overlaps other series
+    - name: Guojun et al. [2], 1623 K (open squares)
+      marker_count: count unresolved; overlaps other series
+    - name: Guojun et al. [2], 1673 K (light squares)
+      marker_count: count unresolved; overlaps other series
+    - name: Guojun et al. [2], 1773 K (dark squares)
+      marker_count: count unresolved; overlaps other series
+    - name: Present study, 1823 K (squares)
+      marker_count: 9
+    - name: Present study, 1873 K (circles)
+      marker_count: 14
+    - name: Present study, 1923 K (triangles)
+      marker_count: 8
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: ln(X_C*/X_C)
+    basis: mole_fraction
+    note: Literature glyphs are heavily overlapped; no values were digitized and unresolved symbol counts are stated rather
+      than inferred.
+    marker_count_per_series:
+      Fuwa and Chipman [1], 1833 K (circles): count unresolved; overlaps other series
+      Guojun et al. [2], 1623 K (open squares): count unresolved; overlaps other series
+      Guojun et al. [2], 1673 K (light squares): count unresolved; overlaps other series
+      Guojun et al. [2], 1773 K (dark squares): count unresolved; overlaps other series
+      Present study, 1823 K (squares): 9
+      Present study, 1873 K (circles): 14
+      Present study, 1923 K (triangles): 8
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_7_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_8_context
+  type: figure_only
+  locator:
+    page: 4
+    published_page: 613
+    pdf_page_index: 3
+    figure: '8'
+  units: as plotted
+  attribution: Present study; Mori et al. [4, 5]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: Present study 1873 K; Mori et al. [4, 5] 1823 K
+    axes_as_printed: 'panel a: x X_Mo, y X_C; panel b: x X_Ni, y X_C'
+    caption_as_printed: Carbon solubility in (a) Fe-Mo melt and (b) Fe-Ni melt.
+    series:
+    - name: Present study, panel a Fe-Csat-Mo (triangles)
+      marker_count: 7
+    - name: Mori et al. [4], panel a (open squares)
+      marker_count: count unresolved; overlaps symbols
+    - name: Present study, panel b Fe-Csat-Ni (squares)
+      marker_count: 9
+    - name: Mori et al. [5], panel b (open circles)
+      marker_count: count unresolved; overlaps symbols
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: equilibrium_phase_composition
+    basis: mole_fraction
+    note: The present-study counts match Tables 1-2; literature symbols overlap and no values were digitized.
+    marker_count_per_series:
+      Present study, panel a Fe-Csat-Mo (triangles): 7
+      Mori et al. [4], panel a (open squares): count unresolved; overlaps symbols
+      Present study, panel b Fe-Csat-Ni (squares): 9
+      Mori et al. [5], panel b (open circles): count unresolved; overlaps symbols
+  panels:
+  - a
+  - b
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_8_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_figure_9_context
+  type: figure_only
+  locator:
+    page: 5
+    published_page: 614
+    pdf_page_index: 4
+    figure: '9'
+  units: as plotted
+  attribution: Present study; Mori et al. [4, 5]
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure digitisation is deferred; no numerical points were read from this figure.
+    digitisation: deferred to a figure pass
+    species_formula: C
+    phase: liquid iron alloy
+    phase_role: metal
+    temperature_as_printed: Present study 1873 K; Mori et al. [4, 5] 1823 K
+    axes_as_printed: 'panel a: x X_Mo, y ln(X_C*/X_C); panel b: x X_Ni, y ln(X_C*/X_C)'
+    caption_as_printed: Relations between ln(X_C*/X_C) and X_i in (a) Fe-Mo melt and (b) Fe-Ni melt.
+    series:
+    - name: Present study, panel a Fe-Csat-Mo (triangles)
+      marker_count: 7
+    - name: Mori et al. [4], panel a (open squares)
+      marker_count: count unresolved; overlaps symbols
+    - name: Present study, panel b Fe-Csat-Ni (squares)
+      marker_count: 9
+    - name: Mori et al. [5], panel b (open circles)
+      marker_count: count unresolved; overlaps symbols
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - wagner_interaction_parameter
+    quantity: ln(X_C*/X_C)
+    basis: mole_fraction
+    note: Transformed logarithmic-ratio quantity has no scalar token; literature symbols overlap and no values were digitized.
+    marker_count_per_series:
+      Present study, panel a Fe-Csat-Mo (triangles): 7
+      Mori et al. [4], panel a (open squares): count unresolved; overlaps symbols
+      Present study, panel b Fe-Csat-Ni (squares): 9
+      Mori et al. [5], panel b (open circles): count unresolved; overlaps symbols
+  panels:
+  - a
+  - b
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_figure_9_context
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2
+- observation_id: kim2014_printed_fit_expressions_without_scalar_token
+  type: model_derived
+  locator:
+    page: 2
+    published_page: 611
+    pdf_page_index: 1
+    equations: 1-6
+    note: The article also discusses these expressions on physical PDF pages 3-5.
+  phase: carbon-saturated liquid iron alloy
+  units: as printed
+  attribution: Present study, except where reference [2] is named
+  values:
+    method_class: model_derived
+    candidate_tokens_checked:
+    - equilibrium_phase_composition
+    - activity_coefficient
+    - wagner_interaction_parameter
+    schema_gap: No scalar quantity token fits the solubility slope K_i, the transformed log-composition ratios, or the second-order
+      rho parameters. The three current-study first-order epsilon values are typed separately.
+    printed_reference_state: The authors state a_C = gamma_C X_C = 1 at carbon saturation in liquid iron held in a graphite
+      crucible.
+    X_C_star_as_printed: 0.21 mole fraction at 1873 K; author-reported mole-fraction reference for the Table 1 pure-Fe carbon
+      result, retained here to avoid scoring the same sample twice.
+    equation_1_as_printed: X_C = X_C* + K_i X_i
+    K_i_values_at_1873K:
+      V: '0.47'
+      Mo: '0.26'
+      Ni: '-0.18'
+    equation_3_as_printed: ln gamma_C = ln gamma_C* + epsilon_C*^i X_i + rho_C*^i X_i^2
+    equation_4_as_printed: ln(X_C*/X_C) = epsilon_C*^i X_i + rho_C*^i X_i^2
+    table_3_untyped_rows:
+    - parameter: rho_C*^V
+      value_as_printed: '0'
+      temperature_range_K: 1623-1923
+      concentration_range: 'V: 27 mass%'
+      reference: Present study
+      reason: second-order term; no scalar rho field
+    - parameter: epsilon_C*^V
+      value_as_printed: 5930/T - 5.84
+      temperature_range_K: 1623-1773
+      concentration_range: 'V: 6 mass%'
+      reference: Q. Guojun et al. [2]
+      reason: temperature-dependent fitted expression, not a scalar point; quoted attribution retained
+    - parameter: rho_C*^V
+      value_as_printed: -1410/T + 11.1
+      temperature_range_K: 1623-1773
+      concentration_range: 'V: 6 mass%'
+      reference: Q. Guojun et al. [2]
+      reason: temperature-dependent second-order expression; no scalar rho field
+    - parameter: rho_C*^Mo
+      value_as_printed: '0'
+      temperature_range_K: 1823-1873
+      concentration_range: 'Mo: 27 mass%'
+      reference: Present study
+      reason: second-order term; no scalar rho field
+    - parameter: rho_C*^Ni
+      value_as_printed: '0'
+      temperature_range_K: 1823-1873
+      concentration_range: 'Ni: 25 mass%'
+      reference: Present study
+      reason: second-order term; no scalar rho field
+    - parameter: rho_C*^(V,Mo)
+      value_as_printed: '0'
+      temperature_K: '1873'
+      concentration_range: 'V: 10 mass%; Mo: 27 mass%'
+      reference: Present study
+      reason: second-order cross term; no scalar rho field
+    - parameter: rho_C*^(V,Ni)
+      value_as_printed: '0'
+      temperature_K: '1873'
+      concentration_range: 'V: 17 mass%; Ni: 15 mass%'
+      reference: Present study
+      reason: second-order cross term; no scalar rho field
+    - parameter: rho_C*^(Mo,Ni)
+      value_as_printed: '0'
+      temperature_K: '1873'
+      concentration_range: 'Mo: 15 mass%; Ni: 20 mass%'
+      reference: Present study
+      reason: second-order cross term; no scalar rho field
+  context_id: kim-2014-carbon-fe-v-mo-ni::context::kim2014_printed_fit_expressions_without_scalar_token
+  work_id: 10.2320/matertrans.m2013392
+  source_id: kim-2014-carbon-fe-v-mo-ni
+  species: SiO2

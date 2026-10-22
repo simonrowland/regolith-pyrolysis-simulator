@@ -1,0 +1,1124 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  citation: Khedim, H., Abdelouhab, S., Podor, R., Rapin, C., Vilasi, M., Panteix, P.-J., Toplis, M. & Faure, F. (2011). Kinetic
+    and equilibrium factors affecting saturation of chromium oxide in soda-silicate melts. Journal of Non-Crystalline Solids,
+    357(1), 31-42.
+  source_ids:
+  - khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jnoncrysol.2010.10.012
+experiments:
+- experiment_id: 10.1016/j.jnoncrysol.2010.10.012::khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  locator:
+    page: 10
+    pdf_page_index: 9
+    paragraph: chromium oxide crystal volatilisation mass balance
+context:
+- observation_id: khedim_abdelouhab_2011_chromia_pyroxene_transition_temperature
+  type: transition_temperature_context
+  locator:
+    page: 16
+    pdf_page_index: 15
+    paragraph: determination of the transition temperature from Cr2O3 to NaCrSi2O6
+  phase: Na2O-3SiO2 melt phase-stability transition
+  units: °C as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: transition from Cr2O3 to NaCrSi2O6 stability
+    candidate_quantity_tokens:
+    - transition_temperature
+    schema_gap: The printed transition is composition-specific, but transition_temperature identity does not retain the melt
+      composition. Preserve it in context rather than emit a point with incomplete phase-boundary identity.
+    temperature_C_as_printed: '1160'
+    uncertainty_as_printed: ±15
+    uncertainty_units: °C
+    confidence_convention: not stated
+    composition_as_printed: Na2O-3SiO2
+    method_as_printed: The authors identify the change in slope of chromium solubility with temperature as the transition
+      from Cr2O3 to NaCrSi2O6 stability.
+    note: The adjacent Figure 12 caption describes Na2O-3.25SiO2 data; the prose assigns the estimated transition temperature
+      to Na2O-3SiO2, so those compositions are kept distinct.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_chromia_pyroxene_transition_temperature
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_cr2o3_nucleation_timing
+  type: experimental_kinetic_finding
+  locator:
+    page: 17
+    pdf_page_index: 16
+    section: II.6.2 Decreasing the melt temperature
+  phase: Cr2O3 nucleation in Na2O-3.25SiO2 melt
+  units: hours; as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: time at maximum number of Cr2O3 nuclei
+    candidate_quantity_tokens: []
+    schema_gap: The store has no token for nucleus count or its time-dependent maximum.
+    supersaturated_melt_preparation_temperature_C: 1250
+    buffer: Ni/NiO
+    run_temperature_C: 1150
+    run_duration_range_h:
+    - '1'
+    - '49'
+    time_to_maximum_nucleus_count_h: 9
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_cr2o3_nucleation_timing
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_crvi_mass_balance
+  type: author_mass_balance_context
+  locator:
+    page: 10
+    pdf_page_index: 9
+    equation: '8'
+  phase: Cr2O3 in Na2O-1.5SiO2 charge, liquid, and residual crystals
+  units: wt% of the sample charge as printed
+  values:
+    quantity_as_published: chromium oxide volatilised from the sample by mass balance
+    candidate_quantity_tokens:
+    - mass_loss_fraction
+    schema_gap: derivation pending a corpus table asset (controller, t-1382) because the authors derive 14 wt% Cr2O3 volatilised
+      from phase contribution values that have no token in this extract; source inputs are retained in .agent-scratch/f45b-tables/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/text-equation-8-inputs.csv.
+    method_class: measured_reduced
+    experiment_conditions_as_printed:
+      mixture: Na2O-1.5SiO2 plus 40 wt% Cr2O3
+      temperature_C: 1300
+      duration_min: 120
+      atmosphere: air
+    equation_as_printed: wt% Cr2O3 volatilised = wt% initial crystal - (wt% final melt + wt% final crystal)
+    initial_Cr2O3_wt_percent: '40'
+    final_melt_Cr2O3_wt_percent: '10'
+    final_crystal_Cr2O3_wt_percent: '16'
+    total_Cr2O3_volatilised_wt_percent: '14'
+    attribution_scope: Both direct volatilisation of crystals and volatilisation of dissolved CrVI contribute; the paper says
+      the two effects cannot be decoupled.
+    predicted_direct_liquid_loss_after_2h:
+      value_as_published: approximately 0.6
+      units: wt% Cr2O3
+      approximate: true
+      method_class: model_derived
+    note: The quoted 8.15 wt% equilibrium content from reference [3] is typed as a separate attributed observation and is
+      not merged with this experiment.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_crvi_mass_balance
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure10_deferred
+  type: figure_record
+  locator:
+    page: 36
+    pdf_page_index: 35
+    figure: '10'
+  phase: Cr2O3 crystals and Na2O-3SiO2 melt
+  units: at.% Cr(total)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: Cr2O3 dissolution kinetics and corresponding melt microstructure
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The plotted concentration series includes transient values and is printed in at.%.
+    T_C: 1100
+    conditions_as_published: Ni/NiO oxygen buffer; numerical fO2 not printed in caption
+    axes_as_published:
+      x: sqrt(t) (h^0.5)
+      y: At.% Cr(total)
+    caption: Dissolution kinetics of Cr2O3 in a Na2O-3SiO2 melt, T=1100°C, Ni/NiO fO2 buffer (a); corresponding melt features
+      showing the Cr2O3 to NaCrSi2O6 transformation (b).
+    panel: a-b
+    series:
+    - label: panel a, measured Cr(total)
+      marker: error-bar point
+      marker_count: 6
+    digitisation: deferred to a figure pass
+    note: Panel b has micrographs labeled 16 h, 48 h, 64 h, and 96 h.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure10_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure11_deferred
+  type: figure_record
+  locator:
+    page: 37
+    pdf_page_index: 36
+    figure: '11'
+  phase: Cr2O3 in Na2O-3.25SiO2 melt
+  units: at.% Cr(total)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: dissolution kinetics from undersaturated and supersaturated starting conditions
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The plotted concentration series includes transient values and is printed in at.%.
+    T_C: 1150
+    conditions_as_published: Ni/NiO oxygen buffer; numerical fO2 not printed in caption
+    axes_as_published:
+      x: Run duration (hours)
+      y: At.% Cr(total)
+    caption: Dissolution kinetics of Cr2O3 in a Na2O-3.25SiO2 melt, T=1150°C, Ni/NiO fO2 buffer.
+    panel: single panel
+    series:
+    - label: '%Cr-undersaturated'
+      marker: open square
+      marker_count: 6
+    - label: '%Cr-supersaturated'
+      marker: open circle
+      marker_count: 7
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure11_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure12_deferred
+  type: figure_record
+  locator:
+    page: 38
+    pdf_page_index: 37
+    figure: '12'
+  phase: Cr-bearing Na2O-3.25SiO2 melts
+  units: ln(At.% Cr)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: Arrhenius plot of chromium solubility
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The plotted chromium amount is at.% and logarithmic; no scored values are represented in this deferred record.
+    axes_as_published:
+      x: 10^3/T (K^-1)
+      y: ln(At.% Cr)
+    caption: Arrhenius plot of Cr solubility in Na2O-3.25SiO2 melts in the studied temperature domain; the open-circle point
+      corresponds to pseudo-equilibrium dissolution of Cr2O3 when T>1160°C.
+    panel: single panel
+    series:
+    - label: T<1150°C
+      marker: filled diamond
+      marker_count: 3
+    - label: T>1175°C
+      marker: filled circle
+      marker_count: 3
+    - label: metastable equilibrium
+      marker: open circle
+      marker_count: 1
+    digitisation: deferred to a figure pass
+    note: Printed regression equations and R-squared values are preserved in a separate context record. Prose gives a transition
+      estimate of 1160(±15)°C for Na2O-3SiO2; the composition-specific estimate is in its own context record because the transition
+      token does not retain composition identity.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure12_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure12_printed_regressions
+  type: model_fit_context
+  locator:
+    page: 38
+    pdf_page_index: 37
+    figure: '12'
+  phase: Cr-bearing Na2O-3.25SiO2 melts
+  units: regression equations and dimensionless R-squared values as printed
+  values:
+    quantity_as_published: linear fits on the two chromium-solubility stability branches
+    method_class: model_derived
+    fits_as_printed:
+    - branch: chromium-oxide stability
+      equation: y = -5.754x + 3.142
+      R_squared: '0.9989'
+    - branch: pyroxene stability
+      equation: y = -14.995x + 9.586
+      R_squared: '0.9994'
+    schema_gap: The plotted fit parameters do not have a stored quantity token; no curve points were digitised.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure12_printed_regressions
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure13_deferred
+  type: figure_record
+  locator:
+    page: 39
+    pdf_page_index: 38
+    figure: '13'
+  phase: precipitated Cr2O3 crystals in Na2O-2SiO2 melt
+  units: micrograph
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: crystals and melt
+    quantity_as_published: morphology of precipitated Cr2O3 crystals
+    T_C: 1200
+    conditions_as_published: precipitated from a CrVI-containing melt by fast fO2 decrease
+    axes_as_published: none
+    caption: Morphology of Cr2O3 crystals precipitated from a CrVI-containing Na2O-2SiO2 melt obtained by fast fO2 decrease
+      at T=1200°C.
+    panel: single panel
+    series: []
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure13_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure14_deferred
+  type: figure_record
+  locator:
+    page: 40
+    pdf_page_index: 39
+    figure: '14'
+  phase: Cr2O3 nodules in N3.25S glass
+  units: germ density mm^-2; crystal length µm
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: crystals in glass
+    quantity_as_published: Cr2O3 nodule micrograph, germ density, and crystal length versus heat-treatment duration
+    T_C: 1150
+    conditions_as_published: Ni/NiO oxygen buffer; numerical fO2 not printed in caption
+    axes_as_published:
+      panel_b:
+        x: sqrt(t) (h^0.5)
+        y: Germ density (mm^-2)
+      panel_c:
+        x: sqrt(t) (h^0.5)
+        y: Cr2O3 crystal length (µm)
+    caption: Typical morphology of Cr2O3 nodules crystallised in N3.25S glass, T=1150°C, Ni/NiO (a), density of germs (b),
+      and Cr2O3 crystal length (c) versus heat-treatment duration.
+    panel: a-c
+    series:
+    - label: panel b, germ density
+      marker: filled circle
+      marker_count: 7
+    - label: panel c, average crystal length
+      marker: filled circle
+      marker_count: 6
+    - label: panel c, maximum crystal length
+      marker: open square
+      marker_count: 7
+    - label: panel c, minimum crystal length
+      marker: gray square
+      marker_count: 6
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure14_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure15_deferred
+  type: figure_record
+  locator:
+    page: 41
+    pdf_page_index: 40
+    figure: '15'
+  phase: pyroxene nodules in N3.25S glass
+  units: pyroxene perimeter µm; pyroxene surface µm^2
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: pyroxene in glass
+    quantity_as_published: pyroxene nodule micrograph, perimeter, and surface versus heat-treatment duration
+    T_C: 1150
+    conditions_as_published: Ni/NiO oxygen buffer; numerical fO2 not printed in caption
+    axes_as_published:
+      panel_b:
+        x: sqrt(t) (h^0.5)
+        y: Pyroxene perimeter (µm)
+      panel_c:
+        x: sqrt(t) (h^0.5)
+        y: Pyroxene surface (µm^2)
+    caption: Typical morphology of pyroxene nodules crystallised in N3.25S glass, T=1150°C, Ni/NiO (a), pyroxene perimeter
+      (b), and pyroxene surface (c) versus heat-treatment duration.
+    panel: a-c
+    series:
+    - label: panel b, average perimeter
+      marker: filled circle
+      marker_count: 7
+    - label: panel b, maximum perimeter
+      marker: gray circle
+      marker_count: 7
+    - label: panel b, minimum perimeter
+      marker: open circle
+      marker_count: 7
+    - label: panel c, average surface
+      marker: filled circle
+      marker_count: 7
+    - label: panel c, maximum surface
+      marker: gray circle
+      marker_count: 7
+    - label: panel c, minimum surface
+      marker: open circle
+      marker_count: 7
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure15_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure16_deferred
+  type: figure_record
+  locator:
+    page: 42
+    pdf_page_index: 41
+    figure: '16'
+  phase: soda-silicate melts and coexisting phases
+  units: stability-domain diagram
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt and crystals
+    quantity_as_published: stability domains of phases in equilibrium with soda-silicate melts
+    axes_as_published:
+      x: x(SiO2), composition categories N4S through N1.5S
+      y: log(fO2)
+      z: T (°C)
+    temperature_axis_as_published: 1100-1250°C
+    series:
+    - label: Na2CrO4 stability domain
+      marker: domain boundary
+      marker_count: 0
+    - label: NaCrSi2O6 stability domain
+      marker: domain boundary
+      marker_count: 0
+    - label: Cr2O3 stability domain
+      marker: domain boundary
+      marker_count: 0
+    caption: Representation of stability domains of the phases in equilibrium with soda-silicate melts as a function of melt
+      composition, temperature, and oxygen fugacity.
+    panel: single panel
+    digitisation: deferred to a figure pass
+    note: The plotted log(fO2) ticks are retained as axis metadata; no stability boundary was digitised.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure16_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure17_deferred
+  type: figure_record
+  locator:
+    page: 43
+    pdf_page_index: 42
+    figure: '17'
+  phase: Na2O-SiO2-Cr2O3 system
+  units: phase-diagram composition fractions and micrographs
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: liquid, Cr2O3, NaCrSi2O6, and SiO2-bearing fields
+    quantity_as_published: reducing-condition phase diagram below 1160°C
+    temperature_range_as_published: T<1160°C
+    conditions_as_published: reducing conditions; numerical fO2 not printed
+    axes_as_published:
+      ternary_components:
+      - Na2O
+      - SiO2
+      - Cr2O3
+    caption: Na2O-SiO2-Cr2O3 phase diagrams under reducing conditions at T<1160°C.
+    panel: two micrographs and one ternary diagram
+    series:
+    - label: phase fields and boundaries
+      marker: none
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    note: Micrographs are labeled 1 and 2; those labels identify samples, not plotted series.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure17_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure18_deferred
+  type: figure_record
+  locator:
+    page: 44
+    pdf_page_index: 43
+    figure: '18'
+  phase: Na2O-SiO2-Cr2O3 system
+  units: phase-diagram composition fractions and micrograph
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: liquid, Cr2O3, and SiO2-bearing fields
+    quantity_as_published: reducing-condition phase diagram above 1160°C
+    temperature_range_as_published: T>1160°C
+    conditions_as_published: reducing conditions; numerical fO2 not printed
+    axes_as_published:
+      ternary_components:
+      - Na2O
+      - SiO2
+      - Cr2O3
+    caption: Na2O-SiO2-Cr2O3 phase diagrams under reducing conditions at T>1160°C.
+    panel: one micrograph and one ternary diagram
+    series:
+    - label: phase fields and boundaries
+      marker: none
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    note: Micrograph label 3 identifies a sample, not a plotted data series.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure18_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure1_deferred
+  type: figure_record
+  locator:
+    page: 27
+    pdf_page_index: 26
+    figure: '1'
+  phase: Cr2O3 crystals and soda-silicate melt
+  units: schematic; no numeric data
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: crystal and melt
+    quantity_as_published: schematic of dissolution and chromium redox reactions
+    axes_as_published: none
+    caption: Schematic representation of the equilibria involved in the dissolution of Cr2O3 crystals in glass melts.
+    panel: single panel
+    series: []
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure1_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure2_deferred
+  type: figure_record
+  locator:
+    page: 28
+    pdf_page_index: 27
+    figure: '2'
+  phase: Cr-bearing Na2O-2SiO2 glass
+  units: Cr content at.%
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: glass
+    quantity_as_published: distributions of 50 electron-probe Cr analyses for two beam programs
+    axes_as_published:
+      x: Cr content interval (at.%)
+      y: Number of analyses
+    caption: Distribution of the EPM analyses of a Na2O-2SiO2 glass doped with 1 wt% Cr2O3 using two different electron beam
+      conditions P1 (a) and P2 (b); averages are from 50 analyses.
+    panel: a-b
+    series:
+    - label: P1, panel a
+      marker: histogram bars
+      marker_count: 0
+      bar_count: 11
+    - label: P2, panel b
+      marker: histogram bars
+      marker_count: 0
+      bar_count: 5
+    digitisation: deferred to a figure pass
+    note: The histograms contain bars, not discrete point markers; no bin values were transcribed.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure2_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure3_deferred
+  type: figure_record
+  locator:
+    page: 29
+    pdf_page_index: 28
+    figure: '3'
+  phase: Cr2O3 dissolved in Na2O-2SiO2 melt
+  units: C/C0
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: dissolved Cr2O3 concentration ratio versus run duration
+    candidate_quantity_tokens:
+    - mass_loss_fraction
+    - equilibrium_phase_composition
+    schema_gap: The plotted C/C0 is a time-varying concentration ratio, not sample mass-loss fraction or an equilibrated component
+      amount.
+    T_C:
+    - 993
+    - 1107
+    - 1207
+    - 1310
+    axes_as_published:
+      x: Run duration (minutes)
+      y: C/C0
+    caption: Variations of the Cr2O3 wt% dissolved in the initial Na2O-2SiO2 (+ 0.93% Cr2O3) melt reported as a function of
+      run duration and temperature.
+    panel: single panel
+    series:
+    - label: 993°C
+      marker: square
+      marker_count: 6
+    - label: 1107°C
+      marker: diamond
+      marker_count: 7
+    - label: 1207°C
+      marker: triangle
+      marker_count: 6
+    - label: 1310°C
+      marker: circle
+      marker_count: 9
+    digitisation: deferred to a figure pass
+    note: Figure 3 plots C/C0; Table 3 separately prints the rates. No plotted coordinates were read.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure3_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure4_deferred
+  type: figure_record
+  locator:
+    page: 30
+    pdf_page_index: 29
+    figure: '4'
+  phase: Cr2O3 volatilisation from Na2O-2SiO2 melt
+  units: ln(VR)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: natural logarithm of the reported Cr volatilisation rate versus reciprocal temperature
+    candidate_quantity_tokens:
+    - mass_loss_rate
+    - evaporation_rate
+    schema_gap: VR is a dissolved-concentration slope, not a total mass-loss or total evaporation rate.
+    axes_as_published:
+      x: 10^4/T (K^-1)
+      y: ln(VR)
+    caption: Plot of ln(VR) versus 1/T in Na2O-2SiO2 (+ 0.93% Cr2O3).
+    panel: single panel
+    series:
+    - label: experimental VR points
+      marker: diamond
+      marker_count: 4
+    - label: printed linear regression
+      marker: line
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    note: The printed fit equation and R-squared are preserved in a separate context record.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure4_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure4_printed_regression
+  type: model_fit_context
+  locator:
+    page: 30
+    pdf_page_index: 29
+    figure: '4'
+  phase: Cr2O3 volatilisation from Na2O-2SiO2 melt
+  units: regression equation and dimensionless R-squared as printed
+  values:
+    quantity_as_published: linear fit of ln(VR) against the plotted reciprocal-temperature axis
+    method_class: model_derived
+    equation_as_printed: y = -2.3084x + 9.752
+    R_squared_as_printed: '0.9995'
+    activation_energy_as_printed_kJ_mol: '108'
+    activation_energy_relation_as_printed: ln(VR) = C - E/(RT)
+    schema_gap: derivation pending a corpus table asset (controller, t-1382) because the fitted slope, intercept, and derived
+      activation energy do not have a stored quantity token; no curve points were digitised, and Table 3 inputs are retained
+      in .agent-scratch/f45b-tables/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/table3.csv.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure4_printed_regression
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure5_deferred
+  type: figure_record
+  locator:
+    page: 31
+    pdf_page_index: 30
+    figure: '5'
+  phase: Na2O-2SiO2 drops containing Cr2O3
+  units: SEM micrographs
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: glass and crystals
+    quantity_as_published: microstructure and oxidized zones
+    T_C: 1230
+    composition_as_published: 15 wt% Cr2O3
+    conditions_as_published: air; heat treated for 10 minutes (a) and 30 minutes (b)
+    axes_as_published: none
+    caption: SEM observations on Na2O-2SiO2 drops containing 15 Cr2O3 wt% heat treated at T=1230°C for 10 minutes (a) and
+      30 minutes (b) in air.
+    panel: a-b
+    series: []
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure5_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure6_deferred
+  type: figure_record
+  locator:
+    page: 32
+    pdf_page_index: 31
+    figure: '6'
+  phase: supersaturated soda-silicate melts
+  units: at.% Cr(total)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: Cr2O3 crystal dissolution kinetics
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The plotted series include transient, non-equilibrium Cr concentrations.
+    T_C: 1230
+    axes_as_published:
+      x: Run duration (minutes)
+      y: At.% Cr(total)
+    caption: Dissolution kinetics of Cr2O3 crystals at T=1230°C from supersaturated Na2O-2SiO2 (N2S) and Na2O-4SiO2 (N4S)
+      melts.
+    panel: single panel
+    series:
+    - label: Core (N2S)
+      marker: open circle
+      marker_count: 7
+    - label: Rim (N2S)
+      marker: open square
+      marker_count: 7
+    - label: Core (N4S)
+      marker: filled circle
+      marker_count: 7
+    - label: Rim (N4S)
+      marker: filled square
+      marker_count: 7
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure6_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure7_deferred
+  type: figure_record
+  locator:
+    page: 33
+    pdf_page_index: 32
+    figure: '7'
+  phase: soda-silicate melts
+  units: time in minutes; viscosity in Pa s
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: time necessary to reach equilibrium versus melt viscosity
+    candidate_quantity_tokens:
+    - viscosity
+    schema_gap: No quantity token represents time to reach equilibrium; viscosity is only the independent axis.
+    axes_as_published:
+      x: Log eta (Pa.s)
+      y: Time to reach equilibrium (minutes)
+    caption: Time necessary to reach equilibrium reported as a function of melt viscosity (expressed in log eta).
+    panel: single panel
+    series:
+    - label: Na2O-1.5SiO2
+      marker: filled diamond
+      marker_count: 5
+    - label: Na2O-2SiO2
+      marker: filled square
+      marker_count: 5
+    - label: Na2O-2.5SiO2
+      marker: open triangle
+      marker_count: 5
+    - label: Na2O-4SiO2
+      marker: open circle
+      marker_count: 2
+    digitisation: deferred to a figure pass
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure7_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure8_deferred
+  type: figure_record
+  locator:
+    page: 34
+    pdf_page_index: 33
+    figure: '8'
+  phase: Cr2O3 and Na2O-3SiO2 melt
+  units: at.% Cr(total)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: equilibration of Cr2O3 with Na2O-3SiO2 melt and associated microstructure
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The kinetic plot contains a transient concentration series and the plotted component is at.% rather than a
+      supported phase-composition basis.
+    T_C: 1200
+    conditions_as_published: fO2=1.3×10^-11 atm (Fe/FeO buffer); melt is in the T>1160°C domain
+    axes_as_published:
+      x: sqrt(t) (h^0.5)
+      y: At.% Cr(total)
+    caption: Equilibration of Cr2O3 with Na2O-3SiO2 soda-silicate melts at T=1200°C (T>1160°C domain), fO2=1.3×10^-11 atm
+      (Fe/FeO buffer) (a); corresponding melt features showing the Cr2O3 to NaCrSi2O6 transformation are reported (b).
+    panel: a-b
+    series:
+    - label: panel a, measured Cr(total)
+      marker: symbol not specified in caption
+      marker_count: 5
+    digitisation: deferred to a figure pass
+    note: Panel b contains micrographs at 4 h and 48 h. Oxygen fugacity is retained exactly as printed with its atm reference.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure8_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_figure9_deferred
+  type: figure_record
+  locator:
+    page: 35
+    pdf_page_index: 34
+    figure: '9'
+  phase: chromium oxide in Na2O-2SiO2 melt
+  units: at.% Cr(total)
+  values:
+    method_class: figure_only
+    species_formula: Cr
+    phase_label: melt
+    quantity_as_published: chromium oxide dissolution kinetics
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The plotted concentration changes with time and is printed in at.%.
+    T_C: 1150
+    conditions_as_published: fO2=2.3×10^-8 bars (Ni/NiO buffer)
+    axes_as_published:
+      x: sqrt(t) (h^0.5)
+      y: At.% Cr(total)
+    caption: Kinetics of dissolution of chromium oxide in Na2O-2SiO2 at T=1150°C, fO2=2.3×10^-8 bars (Ni/NiO buffer).
+    panel: single panel
+    series:
+    - label: Na2O-2SiO2
+      marker: diamond
+      marker_count: 5
+    digitisation: deferred to a figure pass
+    note: Printed oxygen fugacity uses bars; it is not converted.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_figure9_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_high_temperature_equilibration_bound
+  type: experimental_kinetic_finding
+  locator:
+    page: 13
+    pdf_page_index: 12
+    section: II.4.1 T > 1160°C
+  phase: chromium oxide dissolution in reducing soda-silicate melts
+  units: hours; as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: time required to reach equilibrium
+    candidate_quantity_tokens: []
+    schema_gap: The store has no token for equilibration time.
+    temperature_domain_as_printed: T > 1160°C
+    time_to_equilibrium_upper_bound_h: 16
+    bound_operator: no longer than
+    atmosphere_as_printed: low oxygen fugacity; no numeric fO2 stated
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_high_temperature_equilibration_bound
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_low_temperature_kinetic_findings
+  type: experimental_kinetic_finding
+  locator:
+    page: 14
+    pdf_page_index: 13
+    section: II.4.2 T < 1160°C
+  phase: chromium oxide and pyroxene in reducing soda-silicate melts
+  units: hours and micrometres; as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: chromium oxide dissolution and crystal coalescence timing and sizes
+    candidate_quantity_tokens: []
+    schema_gap: The store has no token for equilibration duration or crystal-size measurements.
+    silica_poor_Na2O_2SiO2_at_1100C:
+      buffer: Ni/NiO
+      equilibrium_time_upper_bound_h: 24
+      bound_operator: less than
+    silica_rich_composition_range_x: 2.5 < x < 5
+    run_duration_upper_bound_h: 96
+    crystal_coalescence_time: generally more than 16 h
+    initial_Cr2O3_crystal_diameter_um: 1 to 5
+    aggregate_diameter_um: 10 to 100
+    atmosphere_as_printed: reducing; no numeric fO2 stated
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_low_temperature_kinetic_findings
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_n3p25_equilibration_times
+  type: experimental_kinetic_finding
+  locator:
+    page: 15
+    pdf_page_index: 14
+    section: II.4.2 T < 1160°C
+  phase: chromium oxide and NaCrSi2O6 in Na2O-3.25SiO2 melt
+  units: hours; as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: convergence time from undersaturated and supersaturated starting melts
+    candidate_quantity_tokens: []
+    schema_gap: The store has no token for equilibration duration or crystal-product appearance.
+    temperature_C: 1150
+    buffer: Ni/NiO
+    equilibrium_time_h: 25
+    sole_equilibrium_crystalline_product_after_50h: NaCrSi2O6
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_n3p25_equilibration_times
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_reversibility_and_redox_drop_tests
+  type: experimental_kinetic_finding
+  locator:
+    page: 16
+    pdf_page_index: 15
+    section: II.5 and II.6.1
+  phase: chromium oxide in soda-silicate melts
+  units: temperatures and durations as printed
+  values:
+    method_class: measured_direct
+    quantity_as_published: reversibility and rapid precipitation findings
+    candidate_quantity_tokens: []
+    schema_gap: The store has no token for these phase-appearance and reaction-duration findings.
+    reversibility_test:
+      composition: Na2O-3SiO2
+      temperature_C: 1200
+      duration_h: 24
+      equilibrium_crystalline_phase_as_printed: Cr2O3 only
+    fO2_decrease_test:
+      composition: Na2O-2SiO2
+      initial_Cr2O3_wt_percent: 3
+      initial_atmosphere: air
+      temperature_C: 1200
+      duration_min: 5
+      outcome: CrIII precipitation of Cr2O3 at the melt-drop edge
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_reversibility_and_redox_drop_tests
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_table1_glass_compositions
+  type: starting_material_composition
+  locator:
+    page: 24
+    pdf_page_index: 23
+    table: '1'
+  phase: starting soda-silicate glass
+  units: atomic percent as printed
+  values:
+    quantity_as_published: theoretical, EPMA, and chemical-analysis glass compositions
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: These are starting-glass compositions, not reported equilibrated phase compositions.
+    method_class: measured_direct
+    compositions_as_printed:
+    - glass_formula: Na2O-1.5SiO2
+      theoretical_Na2O_atomic_percent: '40.00'
+      theoretical_SiO2_atomic_percent: '60.00'
+      EPMA_Na2O_atomic_percent: '39.08'
+      EPMA_Na2O_parenthetical: '0.25'
+      EPMA_SiO2_atomic_percent: '58.25'
+      EPMA_SiO2_parenthetical: '0.92'
+      chemical_analysis_Na2O_atomic_percent: '39.45'
+      chemical_analysis_Na2O_parenthetical: '0.19'
+      chemical_analysis_SiO2_atomic_percent: '59.09'
+      chemical_analysis_SiO2_parenthetical: '0.52'
+    - glass_formula: Na2O-2SiO2
+      theoretical_Na2O_atomic_percent: '33.33'
+      theoretical_SiO2_atomic_percent: '66.67'
+      EPMA_Na2O_atomic_percent: '32.20'
+      EPMA_Na2O_parenthetical: '0.46'
+      EPMA_SiO2_atomic_percent: '66.73'
+      EPMA_SiO2_parenthetical: '0.39'
+      chemical_analysis_Na2O_atomic_percent: '33.07'
+      chemical_analysis_Na2O_parenthetical: '0.22'
+      chemical_analysis_SiO2_atomic_percent: '65.59'
+      chemical_analysis_SiO2_parenthetical: '0.61'
+    - glass_formula: Na2O-2.5SiO2
+      theoretical_Na2O_atomic_percent: '28.57'
+      theoretical_SiO2_atomic_percent: '71.43'
+      EPMA_Na2O_atomic_percent: '28.83'
+      EPMA_Na2O_parenthetical: '0.52'
+      EPMA_SiO2_atomic_percent: '71.17'
+      EPMA_SiO2_parenthetical: '0.22'
+      chemical_analysis_Na2O_atomic_percent: —
+      chemical_analysis_SiO2_atomic_percent: —
+    - glass_formula: Na2O-3SiO2
+      theoretical_Na2O_atomic_percent: '25.00'
+      theoretical_SiO2_atomic_percent: '75.00'
+      EPMA_Na2O_atomic_percent: '24.21'
+      EPMA_Na2O_parenthetical: '0.14'
+      EPMA_SiO2_atomic_percent: '77.44'
+      EPMA_SiO2_parenthetical: '0.69'
+      chemical_analysis_Na2O_atomic_percent: —
+      chemical_analysis_SiO2_atomic_percent: —
+    - glass_formula: Na2O-3.5SiO2
+      theoretical_Na2O_atomic_percent: '22.22'
+      theoretical_SiO2_atomic_percent: '77.78'
+      EPMA_Na2O_atomic_percent: '21.44'
+      EPMA_Na2O_parenthetical: '0.66'
+      EPMA_SiO2_atomic_percent: '77.16'
+      EPMA_SiO2_parenthetical: '0.89'
+      chemical_analysis_Na2O_atomic_percent: '22.38'
+      chemical_analysis_Na2O_parenthetical: '0.28'
+      chemical_analysis_SiO2_atomic_percent: '76.78'
+      chemical_analysis_SiO2_parenthetical: '0.49'
+    - glass_formula: Na2O-4SiO2
+      theoretical_Na2O_atomic_percent: '20.00'
+      theoretical_SiO2_atomic_percent: '80.00'
+      EPMA_Na2O_atomic_percent: '20.09'
+      EPMA_Na2O_parenthetical: '0.09'
+      EPMA_SiO2_atomic_percent: '81.73'
+      EPMA_SiO2_parenthetical: '0.58'
+      chemical_analysis_Na2O_atomic_percent: —
+      chemical_analysis_SiO2_atomic_percent: —
+    note: The printed dash is retained as a dash and is not treated as zero. Parenthetical widths are reproduced as printed.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_table1_glass_compositions
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Na2O
+- observation_id: khedim_abdelouhab_2011_table2_epma_program_comparison
+  type: analytical_method_comparison
+  locator:
+    page: 25
+    pdf_page_index: 24
+    table: '2'
+  phase: Na2O-2SiO2 glass doped with Cr2O3
+  units: instrument settings as labeled; elemental at.% and oxide wt.% as printed
+  values:
+    quantity_as_published: EPMA program settings and mean composition analyses
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The table compares two electron-beam programs on a starting glass and includes atomic-percent elemental results;
+      it is not a printed equilibrated melt composition vector in a supported basis.
+    method_class: measured_direct
+    n_analyses_per_program: 50
+    parenthetical_values: standard deviations calculated from the 50 analyses
+    programs_as_printed:
+      P1:
+        accelerating_voltage_kV: '10'
+        beam_current_nA: '5'
+        spot_size_diameter_um: '5'
+        counting_time_peak_Na_s: '6'
+        counting_time_background_Na_s: '3'
+        counting_time_peak_Si_s: '10'
+        counting_time_background_Si_s: '5'
+        counting_time_peak_Cr_s: '30'
+        counting_time_background_Cr_s: '15'
+      P2:
+        accelerating_voltage_kV: '25'
+        beam_current_nA: '10'
+        spot_size_diameter_um: '12'
+        counting_time_peak_Na_s: '6'
+        counting_time_background_Na_s: '3'
+        counting_time_peak_Si_s: '10'
+        counting_time_background_Si_s: '5'
+        counting_time_peak_Cr_s: '30'
+        counting_time_background_Cr_s: '15'
+    elemental_results_at_percent:
+      Na:
+      - 19.27 ± 0.36
+      - 20.65 ± 0.19
+      Si:
+      - 23.44 ± 0.18
+      - 22.76 ± 0.10
+      Cr:
+      - 0.26 ± 0.03
+      - 0.250 ± 0.01
+    oxide_results_wt_percent:
+      Na2O:
+      - 28.89 ± 0.58
+      - 31.39 ± 0.31
+      SiO2:
+      - 68.14 ± 0.82
+      - 67.09 ± 0.62
+      Cr2O3:
+      - 0.97 ± 0.09
+      - 0.93 ± 0.04
+    program_order:
+    - P1
+    - P2
+    note: The authors describe electron-beam-induced sodium loss and use P2 for analyses unless stated otherwise. Both printed
+      program results are retained without averaging them together.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_table2_epma_program_comparison
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr
+- observation_id: khedim_abdelouhab_2011_table3_crvi_volatilisation_rates
+  type: measured_rate_context
+  locator:
+    page: 26
+    pdf_page_index: 25
+    table: '3'
+  phase: dissolved Cr(VI) in Na2O-2SiO2 melt
+  units: (Cr2O3 wt.% / s) × 10^5, exactly as indicated by the table heading
+  values:
+    quantity_as_published: volatilisation rate of dissolved CrVI species
+    candidate_quantity_tokens:
+    - mass_loss_rate
+    - evaporation_rate
+    schema_gap: The printed measurand is the slope of dissolved-Cr2O3 concentration versus time, not total mass lost per second;
+      neither mass_loss_rate (kg/s) nor evaporation_rate (kg/s total) represents this concentration rate.
+    method_class: measured_reduced
+    reported_values_as_printed:
+    - temperature_C: '993'
+      rate: '-1.52'
+      parenthetical_width: '0.70'
+    - temperature_C: '1107'
+      rate: '-4.48'
+      parenthetical_width: '1.44'
+    - temperature_C: '1207'
+      rate: '-5.80'
+      parenthetical_width: '1.11'
+    - temperature_C: '1310'
+      rate: '-13.43'
+      parenthetical_width: '2.73'
+    experimental_conditions_as_printed:
+      starting_glass: Na2O-2SiO2 glass doped with 1 wt% Cr2O3
+      glass_preparation: 10 g heated at 1100°C for 24 h in air
+      EPMA_initial_Cr2O3_mass_fraction: 0.93 ± 0.04
+      bead_mass_mg: 150
+      run_temperature_prose_C:
+      - '997'
+      - '1107'
+      - '1207'
+      - '1310'
+      run_duration_min:
+      - '10'
+      - '120'
+      run_atmosphere: air
+    note: The table prints 993°C for the first point. The experimental-procedure text prints 997°C for that run; both values
+      are retained without reconciliation. Parenthetical widths are retained as printed.
+  context_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::context::khedim_abdelouhab_2011_table3_crvi_volatilisation_rates
+  work_id: 10.1016/j.jnoncrysol.2010.10.012
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  species: Cr

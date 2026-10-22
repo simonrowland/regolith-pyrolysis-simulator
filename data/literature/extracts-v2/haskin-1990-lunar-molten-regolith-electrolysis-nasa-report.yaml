@@ -1,0 +1,4488 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.yaml
+observations:
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_al2o3
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '10.78'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_cao
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '9.96'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_feo
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '13.23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_k2o
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_mgo
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '10.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_na2o
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '1.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_sio2
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '49.48'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_tio2
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '2.34'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_fe
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '92.13'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_ir
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ir
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_si
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.024'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_ti
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_al2o3
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '18.92'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_cao
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '12.48'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_feo
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.69'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_k2o
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.08'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_mgo
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '14.23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_na2o
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.82'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_sio2
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '49.21'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_tio2
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '2.76'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_cr
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.567'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_fe
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '33.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_ir
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ir
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '56.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_mn
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.231'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_si
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '2.471'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_ti
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.142'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_cr
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_fe
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '29.28'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_ir
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ir
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '56.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_mn
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.041'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_si
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '6.999'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_ti
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.464'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_cr
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.356'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_fe
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '30.06'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_ir
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ir
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '56.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_mn
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_si
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '7.389'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_ti
+  experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.581'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam50-1022
+      date: '2026-10-22'
+      evidence:
+        page: 66
+        published_page: I-56
+        pdf_page_index: 65
+        table: '1.8'
+  notices: []
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  locator:
+    page: 66
+    published_page: I-56
+    pdf_page_index: 65
+    table: '1.8'
+  read_from: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1623.15'
+          approximate: true
+      locator:
+        page: 65
+        pdf_page_index: 64
+        note: Text describes the electrolysis experiments at approximately 1350°C
+    atmosphere:
+      state:
+        tag: unknown
+        reason: not stated for these analyses
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'

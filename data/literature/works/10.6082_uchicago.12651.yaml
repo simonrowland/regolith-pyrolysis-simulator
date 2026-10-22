@@ -1,0 +1,4045 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.6082/uchicago.12651
+  citation: 'Zhang, Zhe (2024), Experimental Study of Alkali Evaporation and Titanium Isotope Variations: Tracing Moderately
+    Volatile Elements Loss and Magma Differentiation in Planetary Bodies, PhD dissertation, University of Chicago.'
+  source_ids:
+  - zhang-2024-alkali-evaporation-ti-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:zhang-2024-alkali-evaporation-ti-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.6082/uchicago.12651
+experiments:
+- experiment_id: 10.6082/uchicago.12651::zhang-2024-alkali-evaporation-ti-thesis
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6082/uchicago.12651
+  locator:
+    page: 144
+    published_page: 126
+    pdf_page_index: 143
+    table: '2.1'
+    note: Two thesis-only samples; overlapping Table 2.1 rows remain linked context.
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+context:
+- observation_id: zhang_2024_figure_2_10_k_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 81
+    pdf_page_index: 80
+    published_page: 63
+    figure: '2.10'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: δ′41K (‰)
+    caption: K isotopic compositions of the bulk residues measured by SIMS plotted as a function of evaporation time.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_10_k_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: K
+- observation_id: zhang_2024_figure_2_10_na_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 81
+    pdf_page_index: 80
+    published_page: 63
+    figure: '2.10'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: δ′41K (‰)
+    caption: K isotopic compositions of the bulk residues measured by SIMS plotted as a function of evaporation time.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_10_na_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Na
+- observation_id: zhang_2024_figure_2_10_rb_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 81
+    pdf_page_index: 80
+    published_page: 63
+    figure: '2.10'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: δ′41K (‰)
+    caption: K isotopic compositions of the bulk residues measured by SIMS plotted as a function of evaporation time.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_10_rb_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Rb
+- observation_id: zhang_2024_figure_2_11_k_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 82
+    pdf_page_index: 81
+    published_page: 64
+    figure: '2.11'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: -ln f
+      y: δ′87Rb (‰)
+    caption: Rb isotopic compositions of bulk residues as a function of -ln f.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_11_k_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: K
+- observation_id: zhang_2024_figure_2_11_na_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 82
+    pdf_page_index: 81
+    published_page: 64
+    figure: '2.11'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: -ln f
+      y: δ′87Rb (‰)
+    caption: Rb isotopic compositions of bulk residues as a function of -ln f.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_11_na_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Na
+- observation_id: zhang_2024_figure_2_11_rb_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 82
+    pdf_page_index: 81
+    published_page: 64
+    figure: '2.11'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: -ln f
+      y: δ′87Rb (‰)
+    caption: Rb isotopic compositions of bulk residues as a function of -ln f.
+    panel: all panels
+    series:
+    - name: 1200 °C runs
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C runs
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_11_rb_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Rb
+- observation_id: zhang_2024_figure_2_16_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 111
+    pdf_page_index: 110
+    published_page: 93
+    figure: '2.16'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: evaporation_rate
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: duration
+      y: mol cm-2 s-1
+    caption: Averaged evaporation rates in moles per cm2 per second for different duration runs.
+    panel: all panels
+    series:
+    - name: Na 1200 °C
+      marker_count: 5
+      attribution: present work
+    - name: Na 1400 °C
+      marker_count: 5
+      attribution: present work
+    - name: K 1200 °C
+      marker_count: 5
+      attribution: present work
+    - name: K 1400 °C
+      marker_count: 5
+      attribution: present work
+    - name: Rb 1200 °C
+      marker_count: 5
+      attribution: present work
+    - name: Rb 1400 °C
+      marker_count: 5
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_16_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_17_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 111
+    pdf_page_index: 110
+    published_page: 93
+    figure: '2.17'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: activity_coefficient
+    species: Na2O, K2O
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: oxide concentration
+      y: activity coefficient
+    caption: MELTS calculated activity coefficients for NaO0.5 and KO0.5 in evaporated residues.
+    panel: all panels
+    series:
+    - name: NaO0.5
+      marker_count: 0
+      attribution: present work
+    - name: KO0.5
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_17_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_18_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 112
+    pdf_page_index: 111
+    published_page: 94
+    figure: '2.18'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: mass_loss_fraction
+    species: Na, K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: ln f
+    caption: Modeled and measured fractions f of alkali elements evaporated.
+    panel: all panels
+    series:
+    - name: measured Na
+      marker_count: 6
+      attribution: present work
+    - name: measured K
+      marker_count: 6
+      attribution: present work
+    - name: modeled series
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_18_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_20_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 117
+    pdf_page_index: 116
+    published_page: 99
+    figure: '2.20'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: model curve
+    species: Na, K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: Na concentration
+      y: K concentration
+    caption: Evaporation trajectories for Na and K in this study with data compiled from the literature.
+    panel: all panels
+    series:
+    - name: this study
+      marker_count: 0
+      attribution: present work
+    - name: literature
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_20_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_21_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 117
+    pdf_page_index: 116
+    published_page: 99
+    figure: '2.21'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: model curve
+    species: Rb, K
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: Rb concentration
+      y: K concentration
+    caption: Evaporation trajectories of Rb and K with data compiled from the literature.
+    panel: all panels
+    series:
+    - name: this study
+      marker_count: 0
+      attribution: present work
+    - name: literature
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_21_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_23_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 124
+    pdf_page_index: 123
+    published_page: 106
+    figure: '2.23'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: model-derived evaporation trajectory
+    species: K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: temperature and oxygen fugacity
+      y: normalized K/Rb and isotopes
+    caption: Color contour plot showing the K/Rb ratio, δ41K and δ87Rb isotopic compositions.
+    panel: all panels
+    series:
+    - name: model contour
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_23_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_6_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 75
+    pdf_page_index: 74
+    published_page: 57
+    figure: '2.6'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: residue_component_composition
+    species: Na2O, K2O, Rb2O
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (min)
+      y: element wt% / concentration
+    caption: Bulk elemental compositions of evaporation residues at 1200°C (A) and 1400°C (B), showing the weight-percent
+      change of elements as a function of time.
+    panel: all panels
+    series:
+    - name: 1200 °C
+      marker_count: 6
+      attribution: present work
+    - name: 1400 °C
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_6_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_7_k_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 75
+    pdf_page_index: 74
+    published_page: 57
+    figure: '2.7'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: X/X0
+    caption: Fractions of Na, K, and Rb remaining in the bulk residues (X/X0) as a function of time.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 6
+      attribution: present work
+    - name: K
+      marker_count: 6
+      attribution: present work
+    - name: Rb
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_7_k_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: K
+- observation_id: zhang_2024_figure_2_7_na_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 75
+    pdf_page_index: 74
+    published_page: 57
+    figure: '2.7'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: X/X0
+    caption: Fractions of Na, K, and Rb remaining in the bulk residues (X/X0) as a function of time.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 6
+      attribution: present work
+    - name: K
+      marker_count: 6
+      attribution: present work
+    - name: Rb
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_7_na_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Na
+- observation_id: zhang_2024_figure_2_7_rb_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 75
+    pdf_page_index: 74
+    published_page: 57
+    figure: '2.7'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: X/X0
+    caption: Fractions of Na, K, and Rb remaining in the bulk residues (X/X0) as a function of time.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 6
+      attribution: present work
+    - name: K
+      marker_count: 6
+      attribution: present work
+    - name: Rb
+      marker_count: 6
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_7_rb_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: Rb
+- observation_id: zhang_2024_figure_2_8_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 77
+    pdf_page_index: 76
+    published_page: 59
+    figure: '2.8'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: residue_component_composition and isotope_delta
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: distance from center
+      y: element/isotope concentration
+    caption: Measurements of isotopic and elemental profiles of Bas1400C15m.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 0
+      attribution: present work
+    - name: K
+      marker_count: 0
+      attribution: present work
+    - name: Rb
+      marker_count: 0
+      attribution: present work
+    - name: δ41K
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_8_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_2_9_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 79
+    pdf_page_index: 78
+    published_page: 61
+    figure: '2.9'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: residue_component_composition and isotope_delta
+    species: Na, K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: distance from center
+      y: element/isotope concentration
+    caption: Isotopic and elemental profiles in Bas1200C10h.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 0
+      attribution: present work
+    - name: K
+      marker_count: 0
+      attribution: present work
+    - name: Rb
+      marker_count: 0
+      attribution: present work
+    - name: δ41K
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_2_9_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_10_k_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 178
+    pdf_page_index: 177
+    published_page: 160
+    figure: '3.10'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: δ′41K and δ′87Rb (‰)
+    caption: The K and Rb isotopic compositions of bulk residues for Fe-bearing and Fe-free andesite experiments.
+    panel: all panels
+    series:
+    - name: K Fe-bearing
+      marker_count: 14
+      attribution: present work
+    - name: Rb Fe-bearing
+      marker_count: 15
+      attribution: present work
+    - name: K Fe-free
+      marker_count: 4
+      attribution: present work
+    - name: Rb Fe-free
+      marker_count: 4
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_10_k_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: K
+- observation_id: zhang_2024_figure_3_11_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 179
+    pdf_page_index: 178
+    published_page: 161
+    figure: '3.11'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: isotope_delta
+    species: K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: δ′41K and δ′87Rb (‰)
+    caption: The K and Rb isotopic compositions of bulk Fe-bearing andesite residues from 1-bar runs.
+    panel: all panels
+    series:
+    - name: K
+      marker_count: 0
+      attribution: present work
+    - name: Rb
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_11_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_20_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 195
+    pdf_page_index: 194
+    published_page: 177
+    figure: '3.20'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: activity_coefficient
+    species: Li2O, Na2O, K2O, Rb2O, Cs2O
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: temperature (°C)
+      y: activity coefficient
+    caption: The calculated activity coefficients of alkali oxides in silicate melts as a function of temperature.
+    panel: all panels
+    series:
+    - name: Li2O
+      marker_count: 0
+      attribution: present work
+    - name: Na2O
+      marker_count: 0
+      attribution: present work
+    - name: K2O
+      marker_count: 0
+      attribution: present work
+    - name: Rb2O
+      marker_count: 0
+      attribution: present work
+    - name: Cs2O
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_20_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_21_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 198
+    pdf_page_index: 197
+    published_page: 180
+    figure: '3.21'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: activity_coefficient
+    species: Li2O, Na2O, K2O, Rb2O, Cs2O
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: oxide composition
+      y: activity coefficient
+    caption: The activity coefficients of alkalis in silicate melts as a function of composition.
+    panel: all panels
+    series:
+    - name: Li2O
+      marker_count: 0
+      attribution: present work
+    - name: Na2O
+      marker_count: 0
+      attribution: present work
+    - name: K2O
+      marker_count: 0
+      attribution: present work
+    - name: Rb2O
+      marker_count: 0
+      attribution: present work
+    - name: Cs2O
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_21_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_24_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 208
+    pdf_page_index: 207
+    published_page: 190
+    figure: '3.24'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: K/Rb ratio
+    species: K, Rb
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time
+      y: K/Rb normalized to time zero
+    caption: The K/Rb ratios of evaporation residues (normalized to time-zero runs) as a function of time.
+    panel: all panels
+    series:
+    - name: Eucrite
+      marker_count: 15
+      attribution: present work
+    - name: Fe-bearing andesite
+      marker_count: 26
+      attribution: present work
+    - name: Fe-free andesite
+      marker_count: 5
+      attribution: present work
+    - name: H chondrite
+      marker_count: 16
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_24_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_2_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 163
+    pdf_page_index: 162
+    published_page: 145
+    figure: '3.2'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Li, Na, K, Rb, Cs
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: distance from center
+      y: normalized alkali concentration
+    caption: Cross-sectional variations of alkali concentrations (normalized to the time-zero run) in evaporation residues.
+    panel: all panels
+    series:
+    - name: Li
+      marker_count: 0
+      attribution: present work
+    - name: Na
+      marker_count: 0
+      attribution: present work
+    - name: K
+      marker_count: 0
+      attribution: present work
+    - name: Rb
+      marker_count: 0
+      attribution: present work
+    - name: Cs
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_2_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_3_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 168
+    pdf_page_index: 167
+    published_page: 150
+    figure: '3.3'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Li, Na, K, Rb, Cs
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (min)
+      y: fraction remaining
+    caption: The fraction of remaining alkali elements plotted against time in normal and reduced conditions.
+    panel: all panels
+    series:
+    - name: Li
+      marker_count: 0
+      attribution: present work
+    - name: Na
+      marker_count: 0
+      attribution: present work
+    - name: K
+      marker_count: 0
+      attribution: present work
+    - name: Rb
+      marker_count: 0
+      attribution: present work
+    - name: Cs
+      marker_count: 0
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_3_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_6_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 173
+    pdf_page_index: 172
+    published_page: 155
+    figure: '3.6'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Li, Na, K, Rb, Cs
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (min)
+      y: fraction remaining
+    caption: The fraction of remaining alkalis in eucrite evaporation residues as a function of time.
+    panel: all panels
+    series:
+    - name: Li
+      marker_count: 15
+      attribution: present work
+    - name: Na
+      marker_count: 15
+      attribution: present work
+    - name: K
+      marker_count: 15
+      attribution: present work
+    - name: Rb
+      marker_count: 15
+      attribution: present work
+    - name: Cs
+      marker_count: 15
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_6_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_7_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 176
+    pdf_page_index: 175
+    published_page: 158
+    figure: '3.7'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Na, K, Rb, Cs
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (min)
+      y: fraction remaining
+    caption: The fraction of remaining Na, K, Rb, and Cs as a function of time for Fe-bearing andesite-like runs.
+    panel: all panels
+    series:
+    - name: Na
+      marker_count: 26
+      attribution: present work
+    - name: K
+      marker_count: 26
+      attribution: present work
+    - name: Rb
+      marker_count: 26
+      attribution: present work
+    - name: Cs
+      marker_count: 26
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_7_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_8_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 176
+    pdf_page_index: 175
+    published_page: 158
+    figure: '3.8'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Li
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (min)
+      y: fraction remaining
+    caption: The fraction of remaining Li as a function of time for Fe-bearing andesite-like runs.
+    panel: all panels
+    series:
+    - name: Li
+      marker_count: 26
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_8_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_figure_3_9_sio2_deferred
+  type: figure_record
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 177
+    pdf_page_index: 176
+    published_page: 159
+    figure: '3.9'
+  attribution: present work
+  digitisation: deferred to a figure pass
+  units: axes and marker counts as printed; numeric points deferred
+  values:
+    quantity: f_i normalized residual concentrations
+    species: Li, Na, K, Rb, Cs
+    phase: silicate melt residue
+    T_C: as printed in caption; see caption
+    axes_as_published:
+      x: time (hr)
+      y: fraction remaining
+    caption: The fraction of remaining alkalis in H chondrite-like evaporation residues for 1400°C runs.
+    panel: all panels
+    series:
+    - name: Li
+      marker_count: 12
+      attribution: present work
+    - name: Na
+      marker_count: 12
+      attribution: present work
+    - name: K
+      marker_count: 12
+      attribution: present work
+    - name: Rb
+      marker_count: 12
+      attribution: present work
+    - name: Cs
+      marker_count: 12
+      attribution: present work
+    numeric_points: []
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_figure_3_9_sio2_deferred
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c0h1_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C0h1
+    T_C_as_published: '1200'
+    duration_min_as_published: '0'
+    printed_cells:
+      Na2O: '2.00'
+      MgO: '6.63'
+      CaO: '10.88'
+      TiO2: '1.52'
+      SiO2: '47.67'
+      Al2O3: '15.24'
+      FeO: '9.66'
+      K2O: '2.56'
+      Rb2O: '1.98'
+      Na_over_Al: '0.181'
+      Rb_over_Al: '0.241'
+    row_as_published: Bas1200C0h1     1200   0      2.00     6.63   10.88   1.52   47.67   15.24   9.66    2.56   1.98     0.181    0.241
+    isotope_and_redox_tail_as_published: ''
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: Na/Al, Rb/Al, δ′87Rb, δ′41K, and Fe3+/Fetotal are retained as printed. The residue token maps only SiO2, Al2O3,
+      FeO, MgO, and CaO wt% fields; Na2O, TiO2, K2O, and Rb2O lack a matching field on this base.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c0h1_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c0h2_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C0h2
+    T_C_as_published: '1200'
+    duration_min_as_published: '0'
+    printed_cells:
+      Na2O: '2.30'
+      MgO: '6.46'
+      CaO: '11.09'
+      TiO2: '1.57'
+      SiO2: '49.03'
+      Al2O3: '15.41'
+      FeO: '9.69'
+      K2O: '2.58'
+      Rb2O: '1.87'
+      Na_over_Al: '0.192'
+      Rb_over_Al: '0.250'
+    row_as_published: Bas1200C0h2     1200   0      2.30     6.46   11.09   1.57   49.03   15.41   9.69    2.58   1.87     0.192    0.250    0        0.06   0       0.2    0.43
+    isotope_and_redox_tail_as_published: 0 0.06 0 0.2 0.43
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c0h2_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c10h_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C10h
+    T_C_as_published: '1200'
+    duration_min_as_published: '595'
+    printed_cells:
+      Na2O: '0.69'
+      MgO: '7.33'
+      CaO: '11.13'
+      TiO2: '1.59'
+      SiO2: '50.27'
+      Al2O3: '15.71'
+      FeO: '10.17'
+      K2O: '1.84'
+      Rb2O: '1.27'
+      Na_over_Al: '0.059'
+      Rb_over_Al: '0.160'
+    row_as_published: Bas1200C10h     1200   595    0.69     7.33   11.13   1.59   50.27   15.71   10.17   1.84   1.27     0.059    0.160                    9.7     0.2    0.49
+    isotope_and_redox_tail_as_published: 9.7 0.2 0.49
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c10h_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c1h_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C1h
+    T_C_as_published: '1200'
+    duration_min_as_published: '55'
+    printed_cells:
+      Na2O: '1.99'
+      MgO: '7.00'
+      CaO: '10.98'
+      TiO2: '1.55'
+      SiO2: '48.43'
+      Al2O3: '15.54'
+      FeO: '10.05'
+      K2O: '2.53'
+      Rb2O: '1.93'
+      Na_over_Al: '0.173'
+      Rb_over_Al: '0.238'
+    row_as_published: Bas1200C1h      1200   55     1.99     7.00   10.98   1.55   48.43   15.54   10.05   2.53   1.93     0.173    0.238    0.58     0.04   1.1     0.2
+    isotope_and_redox_tail_as_published: 0.58 0.04 1.1 0.2
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c1h_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c40h_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C40h
+    T_C_as_published: '1200'
+    duration_min_as_published: '2395'
+    printed_cells:
+      Na2O: '0.10'
+      MgO: '7.61'
+      CaO: '11.18'
+      TiO2: '1.64'
+      SiO2: '51.61'
+      Al2O3: '15.74'
+      FeO: '10.35'
+      K2O: '1.09'
+      Rb2O: '0.67'
+      Na_over_Al: '0.009'
+      Rb_over_Al: '0.088'
+    row_as_published: Bas1200C40h     1200   2395   0.10     7.61   11.18   1.64   51.61   15.74   10.35   1.09   0.67     0.009    0.088    11.16    0.06   21.8    0.3    0.36
+    isotope_and_redox_tail_as_published: 11.16 0.06 21.8 0.3 0.36
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c40h_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1200c4h_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1200C4h
+    T_C_as_published: '1200'
+    duration_min_as_published: '235'
+    printed_cells:
+      Na2O: '1.08'
+      MgO: '7.19'
+      CaO: '10.99'
+      TiO2: '1.57'
+      SiO2: '49.87'
+      Al2O3: '15.54'
+      FeO: '10.05'
+      K2O: '2.15'
+      Rb2O: '1.56'
+      Na_over_Al: '0.088'
+      Rb_over_Al: '0.182'
+    row_as_published: Bas1200C4h      1200   235    1.08     7.19   10.99   1.57   49.87   15.54   10.05   2.15   1.56     0.088    0.182    3.11     0.06   5.6     0.4
+    isotope_and_redox_tail_as_published: 3.11 0.06 5.6 0.4
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1200c4h_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c0m1_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C0m1
+    T_C_as_published: '1400'
+    duration_min_as_published: '0'
+    printed_cells:
+      Na2O: '1.90'
+      MgO: '7.11'
+      CaO: '10.88'
+      TiO2: '1.54'
+      SiO2: '48.89'
+      Al2O3: '15.29'
+      FeO: '10.00'
+      K2O: '2.50'
+      Rb2O: '1.89'
+      Na_over_Al: '0.167'
+      Rb_over_Al: '0.233'
+    row_as_published: Bas1400C0m1     1400   0      1.90     7.11   10.88   1.54   48.89   15.29   10.00   2.50   1.89     0.167    0.233    0.76     0.03   0.9     0.3    0.31
+    isotope_and_redox_tail_as_published: 0.76 0.03 0.9 0.3 0.31
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c0m1_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c0m2_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C0m2
+    T_C_as_published: '1400'
+    duration_min_as_published: '0'
+    printed_cells:
+      Na2O: '1.82'
+      MgO: '7.08'
+      CaO: '10.90'
+      TiO2: '1.58'
+      SiO2: '48.99'
+      Al2O3: '15.33'
+      FeO: '9.98'
+      K2O: '2.46'
+      Rb2O: '1.86'
+      Na_over_Al: '0.163'
+      Rb_over_Al: '0.231'
+    row_as_published: Bas1400C0m2     1400   0      1.82     7.08   10.90   1.58   48.99   15.33   9.98    2.46   1.86     0.163    0.231
+    isotope_and_redox_tail_as_published: ''
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: Na/Al, Rb/Al, δ′87Rb, δ′41K, and Fe3+/Fetotal are retained as printed. The residue token maps only SiO2, Al2O3,
+      FeO, MgO, and CaO wt% fields; Na2O, TiO2, K2O, and Rb2O lack a matching field on this base.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c0m2_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c15m_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C15m
+    T_C_as_published: '1400'
+    duration_min_as_published: '15'
+    printed_cells:
+      Na2O: '0.66'
+      MgO: '7.38'
+      CaO: '11.25'
+      TiO2: '1.60'
+      SiO2: '50.31'
+      Al2O3: '15.86'
+      FeO: '10.15'
+      K2O: '1.63'
+      Rb2O: '1.12'
+      Na_over_Al: '0.055'
+      Rb_over_Al: '0.137'
+    row_as_published: Bas1400C15m     1400   15     0.66     7.38   11.25   1.60   50.31   15.86   10.15   1.63   1.12     0.055    0.137    6.24     0.03   12.1    0.5    0.37
+    isotope_and_redox_tail_as_published: 6.24 0.03 12.1 0.5 0.37
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c15m_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c30m_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C30m
+    T_C_as_published: '1400'
+    duration_min_as_published: '30'
+    printed_cells:
+      Na2O: '0.29'
+      MgO: '7.45'
+      CaO: '11.41'
+      TiO2: '1.61'
+      SiO2: '51.20'
+      Al2O3: '16.16'
+      FeO: '10.21'
+      K2O: '1.19'
+      Rb2O: '0.74'
+      Na_over_Al: '0.026'
+      Rb_over_Al: '0.097'
+    row_as_published: Bas1400C30m     1400   30     0.29     7.45   11.41   1.61   51.20   16.16   10.21   1.19   0.74     0.026    0.097    9.71     0.03   19.9    0.3
+    isotope_and_redox_tail_as_published: 9.71 0.03 19.9 0.3
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c30m_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c60m_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C60m
+    T_C_as_published: '1400'
+    duration_min_as_published: '60'
+    printed_cells:
+      Na2O: '0.01'
+      MgO: '7.61'
+      CaO: '11.46'
+      TiO2: '1.63'
+      SiO2: '52.55'
+      Al2O3: '16.10'
+      FeO: '10.28'
+      K2O: '0.28'
+      Rb2O: '0.10'
+      Na_over_Al: '0.001'
+      Rb_over_Al: '0.021'
+    row_as_published: Bas1400C60m     1400   60     0.01     7.61   11.46   1.63   52.55   16.10   10.28   0.28   0.10     0.001    0.021    25.75    0.03   49.0    1.4
+    isotope_and_redox_tail_as_published: 25.75 0.03 49.0 1.4
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c60m_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_bas1400c90m_context
+  type: context_link
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.1 evaporation-residue composition, isotope ratios, and redox columns
+    method_class: measured_direct
+    sample_id: Bas1400C90m
+    T_C_as_published: '1400'
+    duration_min_as_published: '90'
+    printed_cells:
+      Na2O: b.d.l.
+      MgO: '7.65'
+      CaO: '11.50'
+      TiO2: '1.65'
+      SiO2: '52.55'
+      Al2O3: '16.29'
+      FeO: '10.30'
+      K2O: '0.05'
+      Rb2O: b.d.l.
+      Na_over_Al: '0.001'
+      Rb_over_Al: '0.003'
+    row_as_published: Bas1400C90m     1400   90     b.d.l.   7.65   11.50   1.65   52.55   16.29   10.30   0.05   b.d.l.   0.001    0.003    43.78    0.05   71.5    2.6
+    isotope_and_redox_tail_as_published: 43.78 0.05 71.5 2.6
+    candidate_tokens:
+    - residue_component_composition
+    - isotope_delta
+    - fe3_fe2_ratio
+    reason: This thesis row repeats a sample already represented in Zhang et al. (2021); retained as context and linked to
+      the published observation.
+    related_observation_id: zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_bas1400c90m_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_initial_glass_context
+  type: initial_composition
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: unheated initial glass composition and ratios
+    method_class: measured_direct
+    composition_wt_pct:
+      Na2O: '2.27'
+      MgO: '7.09'
+      CaO: '11.21'
+      TiO2: '1.79'
+      SiO2: '45.94'
+      Al2O3: '16.00'
+      FeO: '10.67'
+      K2O: '2.49'
+      Rb2O: '1.86'
+    Na_over_Al: '0.208'
+    Rb_over_Al: '0.259'
+    Fe3_over_Fetotal: '0.85'
+    candidate_tokens:
+    - residue_component_composition
+    - fe3_fe2_ratio
+    reason: Unheated starting charge and Fe3+/Fetotal ratio; starting composition retained as context and pending by design.
+  T_C_is_initial_composition: true
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_initial_glass_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_1_mixed_powder_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 144
+    pdf_page_index: 143
+    published_page: 126
+    table: '2.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: mixed-powder ratios
+    method_class: measured_direct
+    Na_over_Al: '0.210'
+    Rb_over_Al: '0.260'
+    candidate_tokens:
+    - residue_component_composition
+    reason: Table reports ratios only; they do not match a stored oxide wt% component.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_1_mixed_powder_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_2_derived_values
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 145
+    pdf_page_index: 144
+    published_page: 127
+    table: '2.2'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.2 printed derived or compiled values
+    method_class: model_derived
+    candidate_tokens:
+    - delta_fG
+    - log10_Kf
+    - activity_coefficient
+    reason: compiled G° values, reaction ΔG, linear equilibrium constants, and calculated coefficients; no single typed quantity
+      fits this mixed table.
+    printed_rows_as_published:
+    - 1         1200℃   -1897300         -1042108      -631061a    -143555a    -339548a              224131     1.1E-08    87089      8.16E-04   4.11E-05     0.08
+    - 2         1200℃   -1900181         -1042444      -631061     -143555     -339548               226676     9.2E-09    87089      8.16E-04   3.70E-05     0.09
+    - 3         1200℃   -1894985         -1042444b     -628472     -142834     -339601               224069     1.1E-08    86502      8.56E-04   4.12E-05     0.08
+    - 1         1400℃   -1977220         -1072774      -684147     -181197a    -391541a              220299     1.3E-07    62992      1.08E-02   1.94E-04     0.13
+    - 2         1400℃   -1980936         -1072757      -684147     -181197     -391541               224032     1.0E-07    62992      1.08E-02   1.70E-04     0.15
+    - 3         1400℃   -1975807         -1072757b     -681626     -180480     -391537               221423     1.2E-07    62448      1.12E-02   1.87E-04     0.14
+    - 1         1200℃   -2478695         -616539a      -1042108    -1840448    -171672a   -339548a   416187     1.7E-15    51710      1.47E-02   1.11E-06     0.06
+    - 2         1200℃   -2478695         -616539       -1042444    -1844916    -171672    -339548    411046     2.7E-15    51710      1.47E-02   1.37E-06     0.05
+    - 3         1200℃   -2478695         -614649       -1042444b   -1844916b   -171534    -339601    412936     2.3E-15    50890      1.57E-02   1.27E-06     0.05
+    - 1         1400℃   -2562230         -669941a      -1072774    -1895135    -210646a   -391541a   413836     1.2E-13    26439      1.49E-01   8.18E-06     0.14
+    - 2         1400℃   -2562230c        -669941       -1072757    -1897765    -210646    -391541    411239     1.4E-13    26439      1.49E-01   8.98E-06     0.12
+    - 3         1400℃   -2562230         -668097       -1072757b   -1897765b   -210517    -391537    413083     1.3E-13    25647      1.58E-01   8.41E-06     0.13
+    - 2         1200℃   -648947c         -194156       -339601                                       45417      2.45E-02                         1.37E-06     0.07
+    - 3         1200℃   -648947          -194186       -339548                                       45401      2.46E-02                         1.27E-06     0.07
+    - 2         1400℃   -710289c         -235083       -391541                                       22176      2.03E-01                         8.98E-06     0.17
+    - 3         1400℃   -710289          -235116       -391537                                       22144      2.04E-01                         8.41E-06     0.18
+    derivation_pending: derivation pending a corpus table asset (controller, t-1382)
+    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_2.csv
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_2_derived_values
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_3_derived_values
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 147
+    pdf_page_index: 146
+    published_page: 129
+    table: '2.3'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.3 printed derived or compiled values
+    method_class: model_derived
+    candidate_tokens:
+    - evaporation_rate
+    - diffusion_coefficient
+    reason: diffusion correction factors, velocities, diffusion coefficients, and L are calculated transport diagnostics with
+      no matching quantity token.
+    printed_rows_as_published:
+    - Na           1400        0.15      0.91          6.6×10-5   1.98×10-5   0.5
+    - K_line 1     1400        0.15      0.96          3.0×10-5   2.0×10-5    0.225
+    - K_line 2     1400        0.15      0.91          3.0×10-5   1.0×10-5    0.45
+    - Rb           1400        0.15      0.91          3.5×10-5   1.1×10-5    0.5
+    - Na           1200        0.15      1             1.0×10-6   >3.0×10-6   0
+    - K            1200        0.15      >0.99         3.0×10-7   >1.2×10-6   <0.0375
+    - Rb           1200        0.15      >0.98         4.5×10-7   >6.0×10-7   <0.1125
+    derivation_pending: derivation pending a corpus table asset (controller, t-1382)
+    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_3.csv
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_3_derived_values
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_2_4_derived_values
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 148
+    pdf_page_index: 147
+    published_page: 130
+    table: '2.4'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 2.4 printed derived or compiled values
+    method_class: model_derived
+    candidate_tokens:
+    - evaporation_coefficient_alpha
+    - activity_coefficient
+    reason: combined evaporation and activity coefficients include re-analyses of prior work and overlap with the already
+      extracted Zhang et al. (2021) observations; retained without duplicating or assigning incomplete lineage.
+    printed_rows_as_published:
+    - Bas1400C   1400   <10-9     0.14± 0.03     0.13± 0.1       0.17±0.05   1.9E-4     8.4E-6    8.4E-6     2.62E-5       1.11E-6      1.44E-6    1
+    - Bas1200C   1200   <10-9     0.08± 0.02     0.05± 0.02      0.07±0.02   4.1E-5     1.3E-6    1.3E-6     3.20E-6       6.90E-8      8.40E-8    1
+    - IIAB1      1470   <10-9     0.10 ± 0.01    0.08 ± 0.02                 2.9E-4     1.4E-5               2.96E-5       1.10E-6                 2,1*
+    - IIAB1      1470   <10-9     0.071 ± .013   0.061 ± 0.014                                                                                     2
+    - C1         1450   10-5      0.11 ± 0.01    0.13 ± 0.02                 2.6E-4     1.2E-5               2.95E-5       1.56E-6                 3,1*
+    - C1         1450   10-5      0.13 ± 0.02    0.26 ± 0.05                                                                                       3,4*
+    - C1         1450   10-5      0.12           0.12                        ~3.5E-4    ~3.2E-5              ~4.20E-5      3.84E-6                 3,5*
+    - FCMAS      1300   1                                                                                                               1.00E-6    6,1*
+    - FCMAS      1400   1                                                                                    2.23E-6       5.69E-7      3.44E-6    6,1*
+    - FCMAS      1500   1                                                                                                               4.83E-6    6,1*
+    - FCMAS      1550   1                                                                                                               6.95E-6    6,1*
+    derivation_pending: derivation pending a corpus table asset (controller, t-1382)
+    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_2_4.csv
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_2_4_derived_values
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_1_eukrb_initial_charge
+  type: initial_composition
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 152
+    pdf_page_index: 151
+    published_page: 134
+    table: '3.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: unheated starting-charge composition
+    method_class: measured_direct
+    material: Eucrite
+    sample_id: EuKRb
+    composition_wt_pct:
+      Li2O: '0.87'
+      Na2O: '0.81'
+      MgO: '7.26'
+      Al2O3: '13.26'
+      SiO2: '48.56'
+      K2O: '0.63'
+      CaO: '9.49'
+      TiO2: '0.48'
+      FeO: '17.37'
+      Cs2O: '0.73'
+      Rb2O: '0.53'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: Printed unheated initial charge; retained with T_C_is_initial_composition true and pending by design.
+  T_C_is_initial_composition: true
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_1_eukrb_initial_charge
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_1_hchh_initial_charge
+  type: initial_composition
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 152
+    pdf_page_index: 151
+    published_page: 134
+    table: '3.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: unheated starting-charge composition
+    method_class: measured_direct
+    material: H chondrite
+    sample_id: HCHH
+    composition_wt_pct:
+      Li2O: '1.06'
+      Na2O: '1.54'
+      MgO: '24.7'
+      Al2O3: '2.52'
+      SiO2: '37.9'
+      K2O: '1.43'
+      CaO: '1.77'
+      TiO2: '0.11'
+      MnO: '1.24'
+      FeO: '22.05'
+      Cs2O: '2.36'
+      Rb2O: '1.47'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: Printed unheated initial charge; retained with T_C_is_initial_composition true and pending by design.
+  T_C_is_initial_composition: true
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_1_hchh_initial_charge
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_1_hchmg_initial_charge
+  type: initial_composition
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 152
+    pdf_page_index: 151
+    published_page: 134
+    table: '3.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: unheated starting-charge composition
+    method_class: measured_direct
+    material: Fe-free andesite
+    sample_id: HCHMg
+    composition_wt_pct:
+      Li2O: '0.94'
+      Na2O: '0.87'
+      MgO: '12.16'
+      Al2O3: '13.75'
+      SiO2: '65.21'
+      K2O: '0.48'
+      CaO: '6.70'
+      Cs2O: '0.83'
+      Rb2O: '0.33'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: Printed unheated initial charge; retained with T_C_is_initial_composition true and pending by design.
+  T_C_is_initial_composition: true
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_1_hchmg_initial_charge
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_1_hchpm_initial_charge
+  type: initial_composition
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 152
+    pdf_page_index: 151
+    published_page: 134
+    table: '3.1'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: unheated starting-charge composition
+    method_class: measured_direct
+    material: Fe-bearing andesite
+    sample_id: HCHPM
+    composition_wt_pct:
+      Li2O: '0.99'
+      Na2O: '1.39'
+      MgO: '5.93'
+      Al2O3: '13.91'
+      SiO2: '60.64'
+      K2O: '0.88'
+      CaO: '7.02'
+      TiO2: '0.55'
+      MnO2: '0.63'
+      FeO: '7.89'
+      Cs2O: '1.15'
+      Rb2O: '0.73'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: Printed unheated initial charge; retained with T_C_is_initial_composition true and pending by design.
+  T_C_is_initial_composition: true
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_1_hchpm_initial_charge
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_2_starting_material_preparation
+  type: method_context
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 153
+    pdf_page_index: 152
+    published_page: 135
+    table: '3.2'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: starting-charge preparation procedure
+    method_class: measured_direct
+    printed_rows_as_published:
+    - Powder           all oxides and carbonate   all oxides and carbonate   (Except Fe)                (Except Fe)
+    - Homogenizing     Ball Mill >5hr             Ball Mill >5hr             mix in an agate mortar     mix in an agate mortar
+    - Decarbonate      950°C for >12hr            950°C for >12hr            950°C for >12hr            950°C for >12hr
+    - Powder           N/A                        N/A                        add FeO                    add FeO
+    - Homogenizing     N/A                        N/A                        Ball Mill >5hr             Ball Mill >5hr
+    - Heating Step 1   1000°C 5min in air         1000°C 5min in air         N/A                        N/A
+    - Heating Step 2   1200°C 5min at IW+2        1200°C 5min at IW+2        1200°C 5min at IW+2        1200°C 5min at IW+2
+    - Heating Step 3   N/A                        N/A                        1300°C 1hr at IW+2         N/A
+    candidate_tokens:
+    - temperature_C
+    - duration_s
+    - fO2_control
+    reason: Preparation steps, not measurements of residue composition, vapor, or activity.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_2_starting_material_preparation
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_3_remaining_concentration_ratios
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 164
+    pdf_page_index: 163
+    published_page: 146
+    table: '3.3'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: f_i normalized residual concentrations
+    method_class: measured_direct
+    candidate_tokens:
+    - yield_fraction
+    - mass_loss_fraction
+    reason: f_i is the residual concentration normalized to the time-zero concentration; it is not a mass or yield fraction.
+    points:
+    - sample_id: HCHPM 1-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '1.000'
+        fNa: '1.000'
+        fK: '1.000'
+        fRb: '1.000'
+        fCs: '1.000'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 3-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '122'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.763'
+        fNa: '0.922'
+        fK: '0.980'
+        fRb: '0.934'
+        fCs: '0.877'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 3-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '246'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.677'
+        fNa: '0.985'
+        fK: '0.959'
+        fRb: '0.994'
+        fCs: '0.886'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 3-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '244'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.779'
+        fNa: '1.066'
+        fK: '0.956'
+        fRb: '1.060'
+        fCs: '0.966'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 3-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '409'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.674'
+        fNa: '1.093'
+        fK: '0.917'
+        fRb: '0.835'
+        fCs: '0.725'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 3-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '720'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.293'
+        fNa: '1.224'
+        fK: '0.844'
+        fRb: '0.799'
+        fCs: '0.623'
+      fO2_as_published: IW+2
+    - sample_id: HCHPM 9-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '390'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.576'
+        fNa: '0.687'
+        fK: '0.870'
+        fRb: '0.846'
+        fCs: '0.786'
+      fO2_as_published: IW
+    - sample_id: HCHPM 9-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '780'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.349'
+        fNa: '0.556'
+        fK: '0.824'
+        fRb: '0.761'
+        fCs: '0.620'
+      fO2_as_published: IW
+    - sample_id: HCHPM 9-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.703'
+        fNa: '0.805'
+        fK: '0.964'
+        fRb: '0.926'
+        fCs: '0.820'
+      fO2_as_published: IW
+    - sample_id: HCHPM 9-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '1440'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.169'
+        fNa: '0.446'
+        fK: '0.694'
+        fRb: '0.610'
+        fCs: '0.480'
+      fO2_as_published: IW
+    - sample_id: HCHPM 9-6
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.846'
+        fNa: '0.874'
+        fK: '0.957'
+        fRb: '0.940'
+        fCs: '0.921'
+      fO2_as_published: IW
+    - sample_id: HCHPM 9-7
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '1.000'
+        fNa: '1.000'
+        fK: '1.000'
+        fRb: '1.000'
+        fCs: '1.000'
+      fO2_as_published: IW
+    - sample_id: HCHPM 7-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '126'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.846'
+        fNa: '0.579'
+        fK: '0.812'
+        fRb: '0.856'
+        fCs: '0.805'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 7-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '64'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.913'
+        fNa: '0.669'
+        fK: '0.843'
+        fRb: '0.810'
+        fCs: '0.845'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 7-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '900'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.295'
+        fNa: '0.185'
+        fK: '0.403'
+        fRb: '0.327'
+        fCs: '0.424'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 7-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '420'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.468'
+        fNa: '0.249'
+        fK: '0.499'
+        fRb: '0.442'
+        fCs: '0.534'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 5-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '240'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.687'
+        fNa: '0.339'
+        fK: '0.702'
+        fRb: '0.649'
+        fCs: '0.694'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 8-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '20'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.969'
+        fNa: '0.840'
+        fK: '0.995'
+        fRb: '0.915'
+        fCs: '0.927'
+      fO2_as_published: IW-2
+    - sample_id: HCHPM 4-7
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.979'
+        fNa: '0.015'
+        fK: '0.497'
+        fRb: '0.541'
+        fCs: '0.688'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 4-9
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.869'
+        fNa: '0.002'
+        fK: '0.206'
+        fRb: '0.205'
+        fCs: '0.380'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 4-8
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.961'
+        fNa: '0.004'
+        fK: '0.386'
+        fRb: '0.420'
+        fCs: '0.582'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 6-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '1.000'
+        fNa: '1.000'
+        fK: '1.000'
+        fRb: '1.000'
+        fCs: '1.000'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 6-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.967'
+        fNa: '0.336'
+        fK: '0.787'
+        fRb: '0.723'
+        fCs: '0.807'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 6-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.947'
+        fNa: '0.050'
+        fK: '0.457'
+        fRb: '0.460'
+        fCs: '0.602'
+      fO2_as_published: Vacuum
+    - sample_id: HCHPM 6-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.836'
+        fNa: '0.002'
+        fK: '0.076'
+        fRb: '0.091'
+        fCs: '0.230'
+      fO2_as_published: Vacuum
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_3_remaining_concentration_ratios
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_3_unsupported_residue_components
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 164
+    pdf_page_index: 163
+    published_page: 146
+    table: '3.3'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: printed evaporation-residue oxide components without a matching source field
+    method_class: measured_direct
+    candidate_tokens:
+    - residue_component_composition
+    reason: The residue-composition token on this base maps only residue_ppm and the named SiO2, Al2O3, FeO, MgO, and CaO
+      wt% fields. No matching field maps these printed oxide components, and they are not equilibrium-phase measurements.
+    points:
+    - sample_id: HCHPM 1-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9943'
+        Na2O: '1.390'
+        K2O: '0.881'
+        TiO2: '0.55'
+        MnO2: '0.63'
+        Cs2O: '1.0804'
+        Rb2O: '0.7319'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 1-1; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 3-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '122'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.7765'
+        Na2O: '1.337'
+        K2O: '0.885'
+        TiO2: '0.54'
+        MnO2: '0.54'
+        Cs2O: '0.9697'
+        Rb2O: '0.7002'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 3-5; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 3-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '246'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.6883'
+        Na2O: '1.295'
+        K2O: '0.865'
+        TiO2: '0.56'
+        MnO2: '0.54'
+        Cs2O: '0.9795'
+        Rb2O: '0.7444'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 3-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 3-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '244'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.7976'
+        Na2O: '1.322'
+        K2O: '0.868'
+        TiO2: '0.53'
+        MnO2: '0.54'
+        Cs2O: '1.0746'
+        Rb2O: '0.7987'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 3-4; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 3-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '409'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.6899'
+        Na2O: '1.640'
+        K2O: '0.832'
+        TiO2: '0.51'
+        MnO2: '0.57'
+        Cs2O: '0.8068'
+        Rb2O: '0.6293'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 3-1; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 3-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '720'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.3056'
+        Na2O: '1.738'
+        K2O: '0.781'
+        TiO2: '0.55'
+        MnO2: '0.54'
+        Cs2O: '0.7070'
+        Rb2O: '0.6140'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 3-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-1
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '390'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.5856'
+        Na2O: '0.942'
+        K2O: '0.810'
+        TiO2: '0.55'
+        MnO2: '0.54'
+        Cs2O: '0.8704'
+        Rb2O: '0.6306'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-1; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '780'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.3613'
+        Na2O: '0.781'
+        K2O: '0.721'
+        TiO2: '0.48'
+        MnO2: '0.56'
+        Cs2O: '0.6984'
+        Rb2O: '0.5773'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.7078'
+        Na2O: '1.086'
+        K2O: '0.856'
+        TiO2: '0.53'
+        MnO2: '0.57'
+        Cs2O: '0.8977'
+        Rb2O: '0.6829'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-4; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '1440'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.1769'
+        Na2O: '0.587'
+        K2O: '0.638'
+        TiO2: '0.54'
+        MnO2: '0.57'
+        Cs2O: '0.5473'
+        Rb2O: '0.4678'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-5; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-6
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.8528'
+        Na2O: '1.214'
+        K2O: '0.899'
+        TiO2: '0.57'
+        MnO2: '0.53'
+        Cs2O: '1.0101'
+        Rb2O: '0.6948'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-6; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 9-7
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '1.0483'
+        Na2O: '1.382'
+        K2O: '0.895'
+        TiO2: '0.57'
+        MnO2: '0.52'
+        Cs2O: '1.1412'
+        Rb2O: '0.7686'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 9-7; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 7-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '126'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.8453'
+        Na2O: '0.806'
+        K2O: '0.757'
+        TiO2: '0.53'
+        MnO2: '0.52'
+        Cs2O: '0.9077'
+        Rb2O: '0.6004'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 7-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 7-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '64'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9082'
+        Na2O: '0.925'
+        K2O: '0.782'
+        TiO2: '0.54'
+        MnO2: '0.57'
+        Cs2O: '0.9474'
+        Rb2O: '0.6178'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 7-4; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 7-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '900'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.3135'
+        Na2O: '0.268'
+        K2O: '0.398'
+        TiO2: '0.56'
+        MnO2: '0.42'
+        Cs2O: '0.5072'
+        Rb2O: '0.2660'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 7-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 7-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '420'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.4925'
+        Na2O: '0.350'
+        K2O: '0.490'
+        TiO2: '0.53'
+        MnO2: '0.49'
+        Cs2O: '0.6345'
+        Rb2O: '0.3575'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 7-5; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 5-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '240'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.6891'
+        Na2O: '0.456'
+        K2O: '0.656'
+        TiO2: '0.55'
+        MnO2: '0.52'
+        Cs2O: '0.7841'
+        Rb2O: '0.4996'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 5-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 8-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '20'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9523'
+        Na2O: '1.110'
+        K2O: '0.852'
+        TiO2: '0.52'
+        MnO2: '0.53'
+        Cs2O: '1.0269'
+        Rb2O: '0.6897'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 8-5; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 4-7
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9999'
+        Na2O: '0.183'
+        K2O: '0.474'
+        TiO2: '0.53'
+        MnO2: '0.58'
+        Cs2O: '0.7924'
+        Rb2O: '0.4243'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 4-7; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 4-9
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.8822'
+        Na2O: '0.028'
+        K2O: '0.195'
+        TiO2: '0.54'
+        MnO2: '0.50'
+        Cs2O: '0.4352'
+        Rb2O: '0.1601'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 4-9; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 4-8
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9799'
+        Na2O: '0.085'
+        K2O: '0.367'
+        TiO2: '0.53'
+        MnO2: '0.54'
+        Cs2O: '0.6690'
+        Rb2O: '0.3289'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 4-8; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 6-3
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9776'
+        Na2O: '1.331'
+        K2O: '0.911'
+        TiO2: '0.51'
+        MnO2: '0.58'
+        Cs2O: '1.1022'
+        Rb2O: '0.7501'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 6-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 6-2
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9591'
+        Na2O: '0.504'
+        K2O: '0.727'
+        TiO2: '0.49'
+        MnO2: '0.49'
+        Cs2O: '0.9027'
+        Rb2O: '0.5506'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 6-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 6-5
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.9529'
+        Na2O: '0.057'
+        K2O: '0.429'
+        TiO2: '0.51'
+        MnO2: '0.54'
+        Cs2O: '0.6834'
+        Rb2O: '0.3551'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 6-5; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHPM 6-4
+      composition_id: HCHPM
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.8477'
+        Na2O: '0.030'
+        K2O: '0.050'
+        TiO2: '0.57'
+        MnO2: '0.56'
+        Cs2O: '0.2631'
+        Rb2O: '0.0707'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 164
+        pdf_page_index: 163
+        published_page: 146
+        table: '3.3'
+        note: Row HCHPM 6-4; values and column assignment checked against the 600 dpi table render.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_3_unsupported_residue_components
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_4_remaining_concentration_ratios
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 165
+    pdf_page_index: 164
+    published_page: 147
+    table: '3.4'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: f_i normalized residual concentrations
+    method_class: measured_direct
+    candidate_tokens:
+    - yield_fraction
+    - mass_loss_fraction
+    reason: f_i is the residual concentration normalized to the time-zero concentration; it is not a mass or yield fraction.
+    points:
+    - sample_id: HCHMg 2-2
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '1.000'
+        fNa: '1.000'
+        fK: '1.000'
+        fRb: '1.000'
+        fCs: '1.000'
+      fO2_as_published: Vacuum
+    - sample_id: HCHMg 1-8
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '1.026'
+        fNa: '0.546'
+        fK: '0.819'
+        fRb: '0.842'
+        fCs: '0.851'
+      fO2_as_published: Vacuum
+    - sample_id: HCHMg 1-6
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.980'
+        fNa: '0.424'
+        fK: '0.756'
+        fRb: '0.772'
+        fCs: '0.775'
+      fO2_as_published: Vacuum
+    - sample_id: HCHMg 1-7
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.900'
+        fNa: '0.183'
+        fK: '0.546'
+        fRb: '0.553'
+        fCs: '0.573'
+      fO2_as_published: Vacuum
+    - sample_id: HCHMg 2-3
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      f_i_concentration_ratios_as_published:
+        fLi: '0.898'
+        fNa: '0.124'
+        fK: '0.522'
+        fRb: '0.508'
+        fCs: '0.574'
+      fO2_as_published: Vacuum
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_4_remaining_concentration_ratios
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_4_unsupported_residue_components
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 165
+    pdf_page_index: 164
+    published_page: 147
+    table: '3.4'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: printed evaporation-residue oxide components without a matching source field
+    method_class: measured_direct
+    candidate_tokens:
+    - residue_component_composition
+    reason: The residue-composition token on this base maps only residue_ppm and the named SiO2, Al2O3, FeO, MgO, and CaO
+      wt% fields. No matching field maps these printed oxide components, and they are not equilibrium-phase measurements.
+    points:
+    - sample_id: HCHMg 2-2
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.93'
+        Na2O: '0.85'
+        K2O: '0.43'
+        Cs2O: '0.66'
+        Rb2O: '0.33'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 165
+        pdf_page_index: 164
+        published_page: 147
+        table: '3.4'
+        note: Row HCHMg 2-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHMg 1-8
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '30'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.97'
+        Na2O: '0.46'
+        K2O: '0.36'
+        Cs2O: '0.58'
+        Rb2O: '0.29'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 165
+        pdf_page_index: 164
+        published_page: 147
+        table: '3.4'
+        note: Row HCHMg 1-8; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHMg 1-6
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '60'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.93'
+        Na2O: '0.38'
+        K2O: '0.36'
+        Cs2O: '0.66'
+        Rb2O: '0.26'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 165
+        pdf_page_index: 164
+        published_page: 147
+        table: '3.4'
+        note: Row HCHMg 1-6; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHMg 1-7
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '90'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.85'
+        Na2O: '0.12'
+        K2O: '0.26'
+        Cs2O: '0.43'
+        Rb2O: '0.19'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 165
+        pdf_page_index: 164
+        published_page: 147
+        table: '3.4'
+        note: Row HCHMg 1-7; values and column assignment checked against the 600 dpi table render.
+    - sample_id: HCHMg 2-3
+      composition_id: HCHMg
+      T_C_as_published: '1400'
+      duration_as_published: '180'
+      duration_unit_as_published: min
+      composition_wt_pct_as_published:
+        Li2O: '0.85'
+        Na2O: '0.11'
+        K2O: '0.23'
+        Cs2O: '0.36'
+        Rb2O: '0.17'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 165
+        pdf_page_index: 164
+        published_page: 147
+        table: '3.4'
+        note: Row HCHMg 2-3; values and column assignment checked against the 600 dpi table render.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_4_unsupported_residue_components
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_5_eukrb_2-5_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 166
+    pdf_page_index: 165
+    published_page: 148
+    table: '3.5'
+    note: Row EuKRb 2-5; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: EuKRb 2-5
+    composition_id: EuKRb
+    T_C_as_published: '1100'
+    duration_as_published: '24'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.890'
+      Na2O: '0.399'
+      MgO: '7.473'
+      Al2O3: '13.220'
+      SiO2: '48.409'
+      K2O: '0.530'
+      CaO: '9.676'
+      TiO2: '0.486'
+      FeO: '17.721'
+      Cs2O: '0.714'
+      Rb2O: '0.481'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The paper reports crystals in eucrite residues at 1100°C; this is a whole-sample multiphase analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_5_eukrb_2-5_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_5_eukrb_2-7_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 166
+    pdf_page_index: 165
+    published_page: 148
+    table: '3.5'
+    note: Row EuKRb 2-7; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: EuKRb 2-7
+    composition_id: EuKRb
+    T_C_as_published: '1100'
+    duration_as_published: '48'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.848'
+      Na2O: '0.186'
+      MgO: '7.494'
+      Al2O3: '13.230'
+      SiO2: '48.445'
+      K2O: '0.416'
+      CaO: '9.396'
+      TiO2: '0.488'
+      FeO: '18.430'
+      Cs2O: '0.650'
+      Rb2O: '0.409'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The paper reports crystals in eucrite residues at 1100°C; this is a whole-sample multiphase analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_5_eukrb_2-7_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_5_unsupported_residue_components
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 166
+    pdf_page_index: 165
+    published_page: 148
+    table: '3.5'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: printed evaporation-residue oxide components without a matching source field
+    method_class: measured_direct
+    candidate_tokens:
+    - residue_component_composition
+    reason: The residue-composition token on this base maps only residue_ppm and the named SiO2, Al2O3, FeO, MgO, and CaO
+      wt% fields. No matching field maps these printed oxide components, and they are not equilibrium-phase measurements.
+    points:
+    - sample_id: EuKRb 2-11
+      composition_id: EuKRb
+      T_C_as_published: '1400'
+      duration_as_published: '0'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.871'
+        Na2O: '0.814'
+        K2O: '0.632'
+        TiO2: '0.483'
+        Cs2O: '0.729'
+        Rb2O: '0.528'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-11; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 3-1
+      composition_id: EuKRb
+      T_C_as_published: '1400'
+      duration_as_published: '0.25'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.860'
+        Na2O: '0.149'
+        K2O: '0.295'
+        TiO2: '0.507'
+        Cs2O: '0.378'
+        Rb2O: '0.223'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 3-1; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 3-2
+      composition_id: EuKRb
+      T_C_as_published: '1400'
+      duration_as_published: '0.5'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.857'
+        Na2O: '0.035'
+        K2O: '0.166'
+        TiO2: '0.508'
+        Cs2O: '0.231'
+        Rb2O: '0.114'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 3-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 3-3
+      composition_id: EuKRb
+      T_C_as_published: '1400'
+      duration_as_published: '0.75'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.814'
+        Na2O: '0.005'
+        K2O: '0.049'
+        TiO2: '0.479'
+        Cs2O: '0.077'
+        Rb2O: '0.029'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 3-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-10
+      composition_id: EuKRb
+      T_C_as_published: '1400'
+      duration_as_published: '1'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.822'
+        Na2O: '0.005'
+        K2O: '0.059'
+        TiO2: '0.516'
+        Cs2O: '0.085'
+        Rb2O: '0.034'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-10; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-9
+      composition_id: EuKRb
+      T_C_as_published: '1300'
+      duration_as_published: '0'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.861'
+        Na2O: '1.066'
+        K2O: '0.698'
+        TiO2: '0.479'
+        Cs2O: '0.780'
+        Rb2O: '0.580'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-9; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-1
+      composition_id: EuKRb
+      T_C_as_published: '1300'
+      duration_as_published: '1'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.883'
+        Na2O: '0.269'
+        K2O: '0.406'
+        TiO2: '0.492'
+        Cs2O: '0.489'
+        Rb2O: '0.318'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-1; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-2
+      composition_id: EuKRb
+      T_C_as_published: '1300'
+      duration_as_published: '4'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.851'
+        Na2O: '0.011'
+        K2O: '0.165'
+        TiO2: '0.485'
+        Cs2O: '0.195'
+        Rb2O: '0.091'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-2; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 3-7
+      composition_id: EuKRb
+      T_C_as_published: '1300'
+      duration_as_published: '6'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.849'
+        Na2O: '0.006'
+        K2O: '0.078'
+        TiO2: '0.485'
+        Cs2O: '0.127'
+        Rb2O: '0.046'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 3-7; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-3
+      composition_id: EuKRb
+      T_C_as_published: '1300'
+      duration_as_published: '8'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.826'
+        Na2O: '0.001'
+        K2O: '0.020'
+        TiO2: '0.526'
+        Cs2O: '0.030'
+        Rb2O: '0.008'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-3; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-4
+      composition_id: EuKRb
+      T_C_as_published: '1200'
+      duration_as_published: '24'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.856'
+        Na2O: '0.013'
+        K2O: '0.193'
+        TiO2: '0.484'
+        Cs2O: '0.244'
+        Rb2O: '0.124'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-4; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 3-4
+      composition_id: EuKRb
+      T_C_as_published: '1200'
+      duration_as_published: '36'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.852'
+        Na2O: '0.005'
+        K2O: '0.062'
+        TiO2: '0.514'
+        Cs2O: '0.086'
+        Rb2O: '0.038'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 3-4; values and column assignment checked against the 600 dpi table render.
+    - sample_id: EuKRb 2-12
+      composition_id: EuKRb
+      T_C_as_published: '1200'
+      duration_as_published: '48'
+      duration_unit_as_published: hr
+      composition_wt_pct_as_published:
+        Li2O: '0.840'
+        Na2O: '0.002'
+        K2O: '0.069'
+        TiO2: '0.487'
+        Cs2O: '0.067'
+        Rb2O: '0.027'
+      locator:
+        source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+        page: 166
+        pdf_page_index: 165
+        published_page: 148
+        table: '3.5'
+        note: Row EuKRb 2-12; values and column assignment checked against the 600 dpi table render.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_5_unsupported_residue_components
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-10_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-10; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-10
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '1'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.8921'
+      Na2O: '1.1005'
+      MgO: '26.8'
+      Al2O3: '2.89'
+      SiO2: '38.3'
+      K2O: '0.7898'
+      CaO: '2.15'
+      TiO2: '0.14'
+      MnO: '1.39'
+      FeO: '32.29'
+      Cs2O: '0.0479'
+      Rb2O: '0.3937'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-10_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-11_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-11; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-11
+    composition_id: HCHH
+    T_C_as_published: '1200'
+    duration_as_published: '7.6'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.8407'
+      Na2O: '1.2625'
+      MgO: '33.3'
+      Al2O3: '3.55'
+      SiO2: '37.5'
+      K2O: '0.9329'
+      CaO: '2.59'
+      TiO2: '0.16'
+      MnO: '1.69'
+      FeO: '33.24'
+      Cs2O: '0.0683'
+      Rb2O: '0.4825'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-11_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-1_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-1; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-1
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '1'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.7736'
+      Na2O: '0.9290'
+      MgO: '25.3'
+      Al2O3: '2.61'
+      SiO2: '38.1'
+      K2O: '0.6719'
+      CaO: '1.97'
+      TiO2: '0.13'
+      MnO: '1.29'
+      FeO: '22.70'
+      Cs2O: '0.0495'
+      Rb2O: '0.3121'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-1_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-2_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-2; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-2
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '2'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.6293'
+      Na2O: '0.6959'
+      MgO: '30.6'
+      Al2O3: '2.76'
+      SiO2: '38.5'
+      K2O: '0.4282'
+      CaO: '1.96'
+      TiO2: '0.13'
+      MnO: '1.47'
+      FeO: '32.11'
+      Cs2O: '0.0244'
+      Rb2O: '0.1424'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-2_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-3_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-3; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-3
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '0.25'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '1.0097'
+      Na2O: '1.3836'
+      MgO: '24.7'
+      Al2O3: '2.68'
+      SiO2: '38.0'
+      K2O: '1.2003'
+      CaO: '1.92'
+      TiO2: '0.13'
+      MnO: '1.31'
+      FeO: '23.77'
+      Cs2O: '0.6876'
+      Rb2O: '1.0017'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-3_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-4_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-4; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-4
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '0.5'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.9756'
+      Na2O: '1.2443'
+      MgO: '22.9'
+      Al2O3: '2.67'
+      SiO2: '37.2'
+      K2O: '0.9923'
+      CaO: '2.05'
+      TiO2: '0.13'
+      MnO: '1.24'
+      FeO: '30.36'
+      Cs2O: '0.2687'
+      Rb2O: '0.6819'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-4_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-5_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-5; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-5
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '0.75'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.8897'
+      Na2O: '1.1427'
+      MgO: '24.8'
+      Al2O3: '2.72'
+      SiO2: '38.5'
+      K2O: '0.8606'
+      CaO: '2.13'
+      TiO2: '0.15'
+      MnO: '1.30'
+      FeO: '31.93'
+      Cs2O: '0.1239'
+      Rb2O: '0.5586'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-5_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-6_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-6; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-6
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '2'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.6325'
+      Na2O: '0.7749'
+      MgO: '26.0'
+      Al2O3: '2.73'
+      SiO2: '38.4'
+      K2O: '0.4398'
+      CaO: '2.07'
+      TiO2: '0.13'
+      MnO: '1.32'
+      FeO: '27.93'
+      Cs2O: '0.0190'
+      Rb2O: '0.1484'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-6_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-7_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-7; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-7
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '0'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '1.0581'
+      Na2O: '1.5366'
+      MgO: '24.7'
+      Al2O3: '2.52'
+      SiO2: '37.9'
+      K2O: '1.4321'
+      CaO: '1.77'
+      TiO2: '0.11'
+      MnO: '1.24'
+      FeO: '22.05'
+      Cs2O: '2.3582'
+      Rb2O: '1.4694'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-7_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-8_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-8; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-8
+    composition_id: HCHH
+    T_C_as_published: '1200'
+    duration_as_published: '19.5'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.4594'
+      Na2O: '0.8278'
+      MgO: '37.6'
+      Al2O3: '3.74'
+      SiO2: '39.3'
+      K2O: '0.6121'
+      CaO: '2.92'
+      TiO2: '0.18'
+      MnO: '1.87'
+      FeO: '35.07'
+      Cs2O: '0.0290'
+      Rb2O: '0.2538'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-8_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_1-9_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 1-9; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 1-9
+    composition_id: HCHH
+    T_C_as_published: '1200'
+    duration_as_published: '3.22'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.9148'
+      Na2O: '1.3061'
+      MgO: '27.8'
+      Al2O3: '2.82'
+      SiO2: '37.2'
+      K2O: '1.1027'
+      CaO: '2.04'
+      TiO2: '0.14'
+      MnO: '1.40'
+      FeO: '35.25'
+      Cs2O: '0.3005'
+      Rb2O: '0.8035'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_1-9_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_2-1_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 2-1; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 2-1
+    composition_id: HCHH
+    T_C_as_published: '1200'
+    duration_as_published: '42.17'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.1658'
+      Na2O: '0.5035'
+      MgO: '33.6'
+      Al2O3: '3.30'
+      SiO2: '19.6'
+      K2O: '0.4208'
+      CaO: '3.00'
+      TiO2: '0.17'
+      MnO: '1.72'
+      FeO: '37.28'
+      Cs2O: '0.0102'
+      Rb2O: '0.1613'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_2-1_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_2-2_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 2-2; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 2-2
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '4.08'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.4013'
+      Na2O: '0.4585'
+      MgO: '23.7'
+      Al2O3: '2.60'
+      SiO2: '37.3'
+      K2O: '0.2045'
+      CaO: '2.17'
+      TiO2: '0.14'
+      MnO: '1.22'
+      FeO: '31.73'
+      Cs2O: '0.0044'
+      Rb2O: '0.0389'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_2-2_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_2-3_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 2-3; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 2-3
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '3'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.4495'
+      Na2O: '0.4853'
+      MgO: '24.4'
+      Al2O3: '2.35'
+      SiO2: '37.6'
+      K2O: '0.2565'
+      CaO: '2.00'
+      TiO2: '0.12'
+      MnO: '1.20'
+      FeO: '31.08'
+      Cs2O: '0.0015'
+      Rb2O: '0.0576'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_2-3_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_2-5_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 2-5; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 2-5
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '15.53'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.0689'
+      Na2O: '0.2335'
+      MgO: '23.5'
+      Al2O3: '2.68'
+      SiO2: '38.2'
+      K2O: '0.0445'
+      CaO: '4.31'
+      TiO2: '0.17'
+      MnO: '1.20'
+      FeO: '29.59'
+      Cs2O: '0.0007'
+      Rb2O: '0.0036'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_2-5_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_6_hchh_2-9_multiphase_context
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 167
+    pdf_page_index: 166
+    published_page: 149
+    table: '3.6'
+    note: Row HCHH 2-9; values and column assignment checked against the 600 dpi table render.
+  attribution: present work
+  units: as printed
+  values:
+    quantity: whole-sample multiphase evaporation-residue composition
+    method_class: measured_direct
+    sample_id: HCHH 2-9
+    composition_id: HCHH
+    T_C_as_published: '1400'
+    duration_as_published: '8'
+    duration_unit_as_published: hr
+    composition_wt_pct_as_published:
+      Li2O: '0.2237'
+      Na2O: '0.2897'
+      MgO: '26.5'
+      Al2O3: '2.29'
+      SiO2: '38.1'
+      K2O: '0.1021'
+      CaO: '2.13'
+      TiO2: '0.12'
+      MnO: '1.24'
+      FeO: '28.98'
+      Cs2O: '0.0019'
+      Rb2O: '0.0141'
+    candidate_tokens:
+    - residue_component_composition
+    - equilibrium_phase_composition
+    reason: The H-chondrite run products contain olivine crystals and glass, so the table is a whole-sample multiphase residue
+      analysis.
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_6_hchh_2-9_multiphase_context
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2
+- observation_id: zhang_2024_table_3_7_derived_values
+  type: data
+  locator:
+    source_path: corpus/raw/zhang-2024-alkali-evaporation-ti-thesis/zhang-2024-alkali-evaporation-ti-thesis.pdf
+    page: 187
+    pdf_page_index: 186
+    published_page: 169
+    table: '3.7'
+  attribution: present work
+  units: as printed
+  values:
+    quantity: Table 3.7 printed derived or compiled values
+    method_class: model_derived
+    candidate_tokens:
+    - evaporation_coefficient_alpha
+    - activity_coefficient
+    reason: the evaporation coefficient is imposed as 0.1 and activity coefficients are constrained outputs of the vacuum-run
+      model; the fitted outputs have no printed raw input series in this table.
+    printed_rows_as_published:
+    - Eucrite               1100     Li         0.1           4.0E-03       4.0E-04
+    - Eucrite               1100     Na         0.1           8.0E-06       8.0E-07
+    - Eucrite               1100     K          0.1           2.5E-07       2.5E-08
+    - Eucrite               1100     Rb         0.1           2.0E-07       2.0E-08
+    - Eucrite               1100     Cs         0.1           3.0E-07       3.0E-08
+    - Eucrite               1200     Li         0.1           1.2E-02       1.2E-03
+    - Eucrite               1200     Na         0.1           3.4E-05       3.4E-06
+    - Eucrite               1200     K          0.1           1.3E-06       1.3E-07
+    - Eucrite               1200     Rb         0.1           1.7E-06       1.7E-07
+    - Eucrite               1200     Cs         0.1           2.6E-06       2.6E-07
+    - Eucrite               1300     Li         0.1           6.0E-03       6.0E-04
+    - Eucrite               1300     Na         0.1           6.0E-05       6.0E-06
+    - Eucrite               1300     K          0.1           3.2E-06       3.2E-07
+    - Eucrite               1300     Rb         0.1           5.6E-06       5.6E-07
+    - Eucrite               1300     Cs         0.1           7.6E-06       7.6E-07
+    - Eucrite               1400     Li         0.1           2.0E-02       2.0E-03
+    - Eucrite               1400     Na         0.1           2.3E-04       2.3E-05
+    - Eucrite               1400     K          0.1           1.7E-05       1.7E-06
+    - Eucrite               1400     Rb         0.1           2.7E-05       2.7E-06
+    - Eucrite               1400     Cs         0.1           4.5E-05       4.5E-06
+    - Fe-bearing Andesite   1400     Li         0.1           9.0E-03       9.0E-04
+    - Fe-bearing Andesite   1400     Na         0.1           7.0E-05       7.0E-06
+    - Fe-bearing Andesite   1400     K          0.1           4.0E-06       4.0E-07
+    - Fe-bearing Andesite   1400     Rb         0.1           5.0E-06       5.0E-07
+    - Fe-bearing Andesite   1400     Cs         0.1           6.0E-06       6.0E-07
+    - Fe-free Andesite      1400     Li         0.1           2.0E-03       2.0E-04
+    - Fe-free Andesite      1400     Na         0.1           1.2E-05       1.2E-06
+    - Fe-free Andesite      1400     K          0.1           6.0E-07       6.0E-08
+    - Fe-free Andesite      1400     Rb         0.1           8.0E-07       8.0E-08
+    - Fe-free Andesite      1400     Cs         0.1           1.5E-06       1.5E-07
+    derivation_pending: derivation pending a corpus table asset (controller, t-1382)
+    inputs_csv: .agent-scratch/f39-tables/zhang-2024-alkali-evaporation-ti-thesis/table_3_7.csv
+  context_id: zhang-2024-alkali-evaporation-ti-thesis::context::zhang_2024_table_3_7_derived_values
+  work_id: 10.6082/uchicago.12651
+  source_id: zhang-2024-alkali-evaporation-ti-thesis
+  species: SiO2

@@ -1,0 +1,1479 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.17632/th5knvw2dh.3
+  citation: 'Z, N (2025). Chr-Basalt (Version 3). Mendeley Data. DOI: 10.17632/th5knvw2dh.3.'
+  source_ids:
+  - zagrtdenov-2025-chromite-magnesiochromite-dataset
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:zagrtdenov-2025-chromite-magnesiochromite-dataset
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.17632/th5knvw2dh.3
+experiments: []
+context:
+- type: compiled_natural_glass_composition_data_inventory
+  observation_id: zagrtdenov_2025_compiled_natural_glass_data
+  locator:
+    record: Research data/Nat_glass_data_sheets.xlsx and Research data/compiled CSV files
+    sheet: Basalt; Tholeiitic basalt; Boninite; Picrite; CSV files
+    cell_range: source CSV contents as archived in Chr-Basalt Version 3
+  units: Oxide weight percentages, Cr ppm, and calculated optical-basicity/main-ratio columns as labelled in the archived
+    files.
+  values:
+    method_class: compilation_assessed
+    natural_glass_sheet_row_counts_including_header:
+      Basalt: 72960
+      Tholeiitic basalt: 16153
+      Boninite: 1065
+      Picrite: 1026
+    natural_glass_data_rows: 91200
+    compiled_csv_data_rows_by_file:
+      2024-12-2JETOA_BASALT_part1.csv: 12271
+      2024-12-2JETOA_BASALT_part2.csv: 936
+      2024-12-2JETOA_BASALT_part3.csv: 933
+      2024-12-2JETOA_BASALT_part4.csv: 752
+      2024-12-2JETOA_BASALT_part5.csv: 695
+      2024-12-2JETOA_BASALT_part6.csv: 1303
+      2024-12-2JETOA_BASALT_part7.csv: 1579
+      2024-12-2JETOA_BASALT_part8.csv: 1534
+      2024-12-2JETOA_BASALT_part9.csv: 1394
+      BONINITE.csv: 1639
+      PICRITE.csv: 1930
+      THOLEIITIC_BASALT_part1.csv: 9082
+      THOLEIITIC_BASALT_part2.csv: 1219
+    compiled_csv_data_rows_total: 35267
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: These are compiled natural-glass/bulk sample compositions without a row-specific equilibrium temperature,
+      atmosphere, or phase-equilibrium identity; calculated optical basicity/main ratio also have no quantity token. They
+      remain compilation context, not equilibrium-phase observations.
+    this_study_separated_from_compiled_rows: The 11 own runs in Dataset input/output are listed separately above; none of
+      the 214 literature-input rows are relabelled as this study's measurements.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_compiled_natural_glass_data
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_1
+  locator:
+    record: Research data/Figure 1. Crystals in melts photos.jpg
+    figure: '1'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: chromite and magnesiochromite micrographs; no numeric y quantity
+    species: Cr
+    phase_as_printed: Cr-bearing oxide crystals in silicate glass
+    temperature_C_as_printed: 1440
+    axes_as_printed: []
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 1. Crystals in melts photos.jpg.'
+    panel: 'A: E19 glass/chromite; B: E33 glass/Cr2O3/magnesiochromite'
+    series:
+    - label: E19 reflected-light micrograph
+      marker_count: 0
+    - label: E33 back-scattered-electron micrograph
+      marker_count: 0
+    attribution: Zagrtdenov (2025) dataset; run temperature from Table 2.
+    method_class: measured_direct
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Micrographs are qualitative evidence and have no numeric composition token; caption text is not included in
+      the archive, so the image filename and visible panel labels are retained.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_1
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_2
+  locator:
+    record: Research data/Figure 2. Cr_ppm & D vs log fO2.jpeg
+    figure: '2'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: Cr concentration (ppm) and D(Cr) crystal/glass versus log fO2
+    species: Cr
+    phase_as_printed: silicate glass with chromite/magnesiochromite
+    temperature_C_as_printed: 1440
+    axes_as_printed:
+    - 'panel a x: log fO2; y: Cr, ppm'
+    - 'panel b x: log fO2; y: D Cr crystal/glass'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 2. Cr_ppm & D vs log fO2.jpeg.'
+    panel: a-b
+    series:
+    - label: Chr-MORB
+      marker_count: 3
+    - label: Chr-Di63An37
+      marker_count: 2
+    - label: Cr2O3-MORB
+      marker_count: 3
+    - label: Cr2O3-Di63An37
+      marker_count: 3
+    attribution: Zagrtdenov (2025) dataset.
+    method_class: measured_tabulated
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Cr ppm has no matching component-unit token; D(Cr) depends on a crystal phase with no PhaseRole and is pending
+      the table-asset rule. No points digitised.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_2
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_3
+  locator:
+    record: Research data/Figure 3. Calc vs. measured & independant dataset.jpeg
+    figure: '3'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: model-calculated versus measured chromium ratios, temperature, oxygen fugacity, and optical basicity
+    species: Cr
+    phase_as_printed: silicate glass and chromite
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'panels a-b: Cr liquid/chromite ratio measured versus calculated'
+    - 'panels c-d: T calculated versus measured, °C'
+    - 'panels e-f: log fO2 calculated versus measured'
+    - 'panels g-h: theoretical optical basicity calculated versus measured'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 3. Calc vs. measured & independant
+      dataset.jpeg.'
+    panel: a-h
+    series:
+    - label: Literature data
+      marker_count: 187
+    - label: This study data
+      marker_count: 11
+    - label: Independent data
+      marker_count: 33
+    attribution: Zagrtdenov (2025) dataset; literature and independent series as labelled.
+    method_class: model_derived
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Comparison fits and calculated quantities are model results; oxygen-fugacity values are not experimental conditions.
+      No plotted values digitised.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_3
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_4
+  locator:
+    record: Research data/Figure 4. Models comparison.jpeg
+    figure: '4'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: predicted chromite composition, temperature, and log fO2 compared with literature/model data
+    species: Cr
+    phase_as_printed: chromite in silicate melt
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'panels: measured versus calculated XCrO1.5 in chromite'
+    - T, °C measured versus calculated
+    - log fO2 measured versus calculated
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 4. Models comparison.jpeg.'
+    panel: 3 rows × 3 columns
+    series:
+    - label: Poustovetov & Roeder (2001)
+      marker_count: 220
+    - label: Nikolaev et al. (2018)
+      marker_count: 220
+    - label: This study model
+      marker_count: 220
+    - label: y=x and uncertainty bounds
+      marker_count: 0
+    attribution: Zagrtdenov (2025) dataset; comparator attribution as labelled.
+    method_class: model_derived
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Model comparison and prediction values are not measurements from this dataset; no points digitised.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_4
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_5
+  locator:
+    record: Research data/Figure 5. Cr ppm vs. fO2.jpeg
+    figure: '5'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: Cr concentration in glass, ppm
+    species: Cr
+    phase_as_printed: silicate glass
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'y: Cr in glass, ppm'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 5. Cr ppm vs. fO2.jpeg.'
+    panel: single
+    series:
+    - label: This study, Chr-MORB
+      marker_count: 3
+    - label: This study, Chr-Di63An37
+      marker_count: 2
+    - label: This study, Cr2O3-MORB
+      marker_count: 3
+    - label: This study, Cr2O3-Di63An37
+      marker_count: 3
+    - label: Murck & Campbell (1986), 1250 °C
+      marker_count: 17
+    - label: Murck & Campbell (1986), 1400 °C
+      marker_count: 18
+    - label: Murck & Campbell (1986), FMQ
+      marker_count: 18
+    - label: Roeder & Reynolds (1991), 1200 °C
+      marker_count: 11
+    - label: Roeder & Reynolds (1991), 1300 °C
+      marker_count: 45
+    attribution: Zagrtdenov (2025) dataset; quoted studies as labelled.
+    method_class: measured_tabulated
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Figure plots Cr ppm and literature/model conditions that have no matching scalar phase-composition token here;
+      no points digitised.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_5
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_6
+  locator:
+    record: Research data/Figure 6. Natural Glasses, MainRatio vs OB.jpeg
+    figure: '6'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: calculated chromium main ratio versus theoretical optical basicity
+    species: Cr
+    phase_as_printed: compiled natural glass compositions and modelled silicate melt
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'panel a x: theoretical optical basicity; y: chromium main ratio'
+    - 'panel b x: theoretical optical basicity; y: chromium main ratio at FMQ'
+    - 'panel c x: log fO2; y: chromium main ratio at 1200 °C'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 6. Natural Glasses, MainRatio vs
+      OB.jpeg.'
+    panel: a-c
+    series:
+    - label: Picrite natural-glass compilation
+      marker_count: 1025
+    - label: Boninite natural-glass compilation
+      marker_count: 1064
+    - label: Basalt natural-glass compilation
+      marker_count: 72959
+    - label: FMQ, optical basicity 0.596 model curve
+      marker_count: 0
+    - label: 1200 °C, optical basicity 0.596 model curve
+      marker_count: 0
+    attribution: Zagrtdenov (2025) dataset; compiled glass series as archived.
+    method_class: model_derived
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Main ratio and theoretical optical basicity have no store quantity; natural glass rows lack a row-specific
+      equilibrium identity. Model curves are deferred.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_6
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_7
+  locator:
+    record: Research data/Figure 7. Buffers & Contour Main ratio vs logfO2 vs OB.jpeg
+    figure: '7'
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: modelled Cr concentration and main-ratio contours
+    species: Cr
+    phase_as_printed: silicate melt
+    temperature_C_as_printed:
+      tag: unknown
+      reason: figure combines a temperature series with an oxygen fugacity/basicity contour panel
+    axes_as_printed:
+    - 'panel a x: T, °C; y: Cr ppm in liquid'
+    - 'panel b x: log fO2; y: theoretical optical basicity; contours: main ratio'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Research data/Figure 7. Buffers & Contour Main ratio
+      vs logfO2 vs OB.jpeg.'
+    panel: a-b
+    series:
+    - label: IW
+      marker_count: 0
+    - label: FMQ-2
+      marker_count: 0
+    - label: FMQ
+      marker_count: 0
+    - label: FMQ+2
+      marker_count: 0
+    - label: main-ratio contours
+      marker_count: 0
+    attribution: Zagrtdenov (2025) dataset.
+    method_class: model_derived
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: All plotted curves/contours are model output; fO2 axes/buffers are not measurements. Main ratio has no current
+      quantity token. No points digitised.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_7
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_s1
+  locator:
+    record: Figures txt data/Supplementary figures/SF1. GOR132-G/
+    figure: S1
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: glass-reference composition by measurement number
+    species: Cr
+    phase_as_printed: GOR132-G reference glass
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'x: measurement number'
+    - 'y: oxide wt.% or Cr/Ni ppm by panel'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Figures txt data/Supplementary figures/SF1. GOR132-G/.'
+    panel: 10 component panels
+    series:
+    - label: Na2O
+      marker_count: 17
+    - label: MgO
+      marker_count: 17
+    - label: Al2O3
+      marker_count: 17
+    - label: SiO2
+      marker_count: 17
+    - label: CaO
+      marker_count: 17
+    - label: TiO2
+      marker_count: 17
+    - label: Cr ppm
+      marker_count: 17
+    - label: MnO
+      marker_count: 17
+    - label: FeO
+      marker_count: 17
+    - label: Ni ppm
+      marker_count: 17
+    attribution: Zagrtdenov (2025) dataset; GOR132-G reference-material files.
+    method_class: measured_direct
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Reference-glass analyses are not equilibrated run compositions; the current equilibrium_phase_composition
+      identity is not applicable. Figure data not transcribed as observations.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_s1
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_s2
+  locator:
+    record: Figures txt data/Supplementary figures/SF2. KL2-G/KL2-G reference material.png
+    figure: S2
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: glass-reference composition by measurement number
+    species: Cr
+    phase_as_printed: KL2-G reference glass
+    temperature_C_as_printed:
+      tag: unknown
+      reason: not stated for the plotted natural-glass samples
+    axes_as_printed:
+    - 'x: measurement number'
+    - 'y: oxide wt.% or Cr ppm by panel'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Figures txt data/Supplementary figures/SF2. KL2-G/KL2-G
+      reference material.png.'
+    panel: 11 component panels
+    series:
+    - label: Na2O
+      marker_count: 17
+    - label: CaO
+      marker_count: 17
+    - label: MgO
+      marker_count: 17
+    - label: TiO2
+      marker_count: 17
+    - label: Al2O3
+      marker_count: 17
+    - label: Cr ppm
+      marker_count: 17
+    - label: SiO2
+      marker_count: 17
+    - label: MnO
+      marker_count: 17
+    - label: P2O5
+      marker_count: 17
+    - label: FeO(t)
+      marker_count: 17
+    - label: K2O
+      marker_count: 17
+    attribution: Zagrtdenov (2025) dataset; KL2-G reference-material files.
+    method_class: measured_direct
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Reference-glass analyses are not equilibrated run compositions; the current equilibrium_phase_composition
+      identity is not applicable. Figure data not transcribed as observations.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_s2
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: figure_record
+  observation_id: zagrtdenov_2025_figure_s3
+  locator:
+    record: Figures txt data/Supplementary figures/SF3. E19/
+    figure: S3
+    note: No PDF or printed caption text is present in this dataset archive; image/series labels and axes are recorded from
+      the included figure assets and text-series inventory.
+  units: No figure values digitised; axes, panels, series, and marker counts are recorded from the dataset assets.
+  values:
+    quantity_as_printed: glass composition by measurement number
+    species: Cr
+    phase_as_printed: quenched glass from run E19
+    temperature_C_as_printed: 1440
+    axes_as_printed:
+    - 'x: measurement number'
+    - 'y: oxide wt.% or Cr/Mn ppm by panel'
+    caption_as_printed: 'Caption unavailable in archive; asset name: Figures txt data/Supplementary figures/SF3. E19/.'
+    panel: 9 component panels
+    series:
+    - label: Na2O
+      marker_count: 71
+    - label: MgO
+      marker_count: 71
+    - label: Al2O3
+      marker_count: 71
+    - label: SiO2
+      marker_count: 71
+    - label: CaO
+      marker_count: 71
+    - label: TiO2
+      marker_count: 71
+    - label: Cr ppm
+      marker_count: 71
+    - label: Mn ppm
+      marker_count: 71
+    - label: FeO
+      marker_count: 71
+    attribution: Zagrtdenov (2025) dataset; E19 individual glass analyses.
+    method_class: measured_direct
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: Individual analyses underlie the already-scored mean rows in source-2020 Table 3; figures are deferred and
+      no second observation is created.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_figure_s3
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: dataset_input_output_workbook_inventory
+  observation_id: zagrtdenov_2025_input_output_workbooks
+  locator:
+    record: Research data/Dataset input.xlsx and Dataset output.xlsx
+    sheet: Sheet1
+    cell_range: A1:CV229
+    note: Input rows 2–12 and 222–223/229 contain this study's runs/materials; compiled prior-work rows occupy A13:AI221 and
+      A224:AI228. Output repeats inputs and adds model-calculated quantities.
+  units: Oxide wt.% and spinel component values in the input; calculated ratios, oxygen fugacity, and formula terms in the
+    output, each as displayed.
+  values:
+    method_class: model_derived
+    this_study_runs:
+    - E19
+    - E23
+    - E24
+    - E25
+    - E26
+    - E27
+    - E28
+    - E29
+    - E30
+    - E31
+    - E33
+    compiled_literature_row_count: 214
+    compiled_reference_row_counts:
+      Roeder & Reynolds (1991): 60
+      Murck & Campbell (1986): 48
+      Barnes (1986): 40
+      Poustovetov & Roeder (2000): 15
+      Fisk & Bence (1980): 13
+      Forsythe & Fisk (1994): 11
+      Sack et al. (1987): 8
+      Akella et al. (1976): 7
+      Grove & Bryan (1983): 5
+      Berry et al. (2006): 3
+      Voigt (2016): 2
+      spinel from clac example: 1
+      spine from Loferski & Lipin (1983): 1
+    model_outputs_as_printed:
+    - calculated log fO2
+    - Cr ratios
+    - spinell formula recalculation
+    - figure series and curves
+    disposition: Workbook model inputs repeat Tables 1–5 and source-2020 experiments; compiled rows are prior-work inputs,
+      and output values are calculations. No model output is treated as a measured condition or new observation.
+    oxygen_note: Calculated workbook log fO2 values are not experimental conditions and are not migrated.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_input_output_workbooks
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: starting_material_compositions
+  observation_id: zagrtdenov_2025_table1_starting_material_compositions
+  locator:
+    record: Research data/Table 1. Starting materials.xlsx
+    sheet: Sheet1
+    cell_range: B2:Q7
+    note: Table 1, displayed workbook cells.
+  units: Oxide weight percentages, Cr ppm, and analysis counts as labelled.
+  values:
+    method_class: measured_tabulated
+    rows_as_printed:
+    - starting_material_as_printed: S2 chromite
+      number_of_analyses_as_printed: '31'
+      cells_as_printed:
+        Na2O: null
+        MgO: 14.81±0.34
+        Al2O3: 26.45±0.42
+        SiO2: null
+        P2O5: null
+        K2O: null
+        CaO: null
+        TiO2: 0.10±0.02
+        Cr2O3: 41.15±0.27
+        MnO: 0.21±0.04
+        FeO: 15.87±0.62
+        NiO: 0.16±0.05
+        Total: '98.75'
+        Cr ppm: null
+    - starting_material_as_printed: Cr2O3
+      number_of_analyses_as_printed: '19'
+      cells_as_printed:
+        Na2O: null
+        MgO: 0.28±0.28
+        Al2O3: 0.14±0.01
+        SiO2: null
+        P2O5: null
+        K2O: null
+        CaO: null
+        TiO2: 1.45±0.03
+        Cr2O3: 97.92±1.19
+        MnO: null
+        FeO: null
+        NiO: null
+        Total: '99.79'
+        Cr ppm: null
+    - starting_material_as_printed: MORB 3786/3 *
+      number_of_analyses_as_printed: null
+      cells_as_printed:
+        Na2O: '3.04'
+        MgO: '8.21'
+        Al2O3: '15.31'
+        SiO2: '50.31'
+        P2O5: '0.18'
+        K2O: '0.31'
+        CaO: '10.29'
+        TiO2: '1.45'
+        Cr2O3: '0.04'
+        MnO: '0.17'
+        FeO: '8.91'
+        NiO: null
+        Total: '98.22'
+        Cr ppm: '275'
+    - starting_material_as_printed: Di63An37
+      number_of_analyses_as_printed: '15'
+      cells_as_printed:
+        Na2O: null
+        MgO: 11.30±0.19
+        Al2O3: 15.22±0.25
+        SiO2: 50.52±0.35
+        P2O5: null
+        K2O: null
+        CaO: 22.95±0.31
+        TiO2: null
+        Cr2O3: null
+        MnO: null
+        FeO: null
+        NiO: null
+        Total: '99.99'
+        Cr ppm: null
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: These are unheated starting powders/glasses, not equilibrated melt or glass compositions. The current phase-composition
+      token has no initial-material role.
+    related_observation_id: zagrtdenov_2020_table1_starting_material_compositions
+    comparison_note: The source-2025 S2 chromite total is 98.75 wt.% in cell P4; the source-2020 Table 1 context has 98.54
+      wt.%. Both displayed values are retained because the companion dataset differs.
+    blank_cells: Unreported cells are blank, not zero or D.L.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_table1_starting_material_compositions
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: experimental_conditions_table
+  observation_id: zagrtdenov_2025_table2_conditions
+  locator:
+    record: Research data/Table 2. Conditions.xlsx
+    sheet: Sheet1
+    cell_range: B2:F15
+    note: Merged cells C4:C15, D4:D15, and E4:E6/E7:E9/E10:E12/E13:E15 apply to each run they span.
+  units: Temperature °C, duration hours, system and buffer labels as printed.
+  values:
+    method_class: measured_tabulated
+    rows_as_printed:
+    - run_as_printed: E23
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – MORB melt
+      buffer_as_printed: FMQ-2
+      related_experiment_id: zagrtdenov_2020_E23
+    - run_as_printed: E19
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – MORB melt
+      buffer_as_printed: FMQ
+      related_experiment_id: zagrtdenov_2020_E19
+    - run_as_printed: E27
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – MORB melt
+      buffer_as_printed: FMQ+2
+      related_experiment_id: zagrtdenov_2020_E27
+    - run_as_printed: E24
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ-2
+      related_experiment_id: zagrtdenov_2020_E24
+    - run_as_printed: E32
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ
+      related_experiment_id: zagrtdenov_2020_E32
+    - run_as_printed: E28
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Chromite – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ+2
+      related_experiment_id: zagrtdenov_2020_E28
+    - run_as_printed: E25
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – MORB melt
+      buffer_as_printed: FMQ-2
+      related_experiment_id: zagrtdenov_2020_E25
+    - run_as_printed: E31
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – MORB melt
+      buffer_as_printed: FMQ
+      related_experiment_id: zagrtdenov_2020_E31
+    - run_as_printed: E29
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – MORB melt
+      buffer_as_printed: FMQ+2
+      related_experiment_id: zagrtdenov_2020_E29
+    - run_as_printed: E26
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ-2
+      related_experiment_id: zagrtdenov_2020_E26
+    - run_as_printed: E33
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ
+      related_experiment_id: zagrtdenov_2020_E33
+    - run_as_printed: E30
+      temperature_C_as_printed: '1440'
+      duration_hours_as_printed: '24'
+      system_as_printed: Cr2O3 – haplobasaltic (Di63An37) melt
+      buffer_as_printed: FMQ+2
+      related_experiment_id: zagrtdenov_2020_E30
+    candidate_quantity_tokens:
+    - transition_temperature
+    disposition: Context linked to the same runs and conditions in the 2020 paper; no second scored observation.
+    blank_cells: Merged cells are expanded only over their actual merged ranges; non-merged blank cells stay blank.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_table2_conditions
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: crystal_center_compositions
+  observation_id: zagrtdenov_2025_table3_crystal_centers
+  locator:
+    record: Research data/Table 3. Central parts of crystalline material.xlsx
+    sheet: Sheet1
+    cell_range: B1:K9
+    note: Table 3, displayed workbook cells.
+  units: Oxide weight percentages and analysis counts as labelled.
+  values:
+    method_class: measured_tabulated
+    rows_as_printed:
+    - run_as_printed: E25
+      number_of_analyses_as_printed: '2'
+      cells_as_printed:
+        MgO: 13.06±0.32
+        Al2O3: 9.37±1.97
+        TiO2: 0.36±0.01
+        V2O3: 0.19±0.01
+        Cr2O3: 61.22±1.98
+        MnO: 0.27±0.05
+        FeO: 13.27±0.25
+        Total: '97.74'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E26
+      number_of_analyses_as_printed: '3'
+      cells_as_printed:
+        MgO: 20.14±0.07
+        Al2O3: 4.77±0.70
+        TiO2: D.L.
+        V2O3: D.L.
+        Cr2O3: 71.78±0.70
+        MnO: D.L.
+        FeO: 1.28±0.04
+        Total: '97.97'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E27
+      number_of_analyses_as_printed: '3'
+      cells_as_printed:
+        MgO: 15.95±0.53
+        Al2O3: 21.49±2.73
+        TiO2: 0.40±0.06
+        V2O3: D.L.
+        Cr2O3: 42.73±3.16
+        MnO: 0.26±0.05
+        FeO: 16.91±0.28
+        Total: '97.74'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E29
+      number_of_analyses_as_printed: '5'
+      cells_as_printed:
+        MgO: D.L.
+        Al2O3: 0.22±0.03
+        TiO2: 1.55±0.58
+        V2O3: D.L.
+        Cr2O3: 95.32±2.69
+        MnO: D.L.
+        FeO: 1.08±0.75
+        Total: '98.17'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E30
+      number_of_analyses_as_printed: '14'
+      cells_as_printed:
+        MgO: D.L.
+        Al2O3: D.L.
+        TiO2: 1.11±0.53
+        V2O3: D.L.
+        Cr2O3: 98.13±1.39
+        MnO: D.L.
+        FeO: 0.20±0.08
+        Total: '99.44'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E31
+      number_of_analyses_as_printed: '12'
+      cells_as_printed:
+        MgO: D.L.
+        Al2O3: D.L.
+        TiO2: 1.53±0.30
+        V2O3: D.L.
+        Cr2O3: 97.48±0.90
+        MnO: D.L.
+        FeO: 0.64±0.28
+        Total: '99.65'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E33
+      number_of_analyses_as_printed: '19'
+      cells_as_printed:
+        MgO: D.L.
+        Al2O3: D.L.
+        TiO2: 1.45±0.30
+        V2O3: D.L.
+        Cr2O3: 97.92±1.19
+        MnO: D.L.
+        FeO: D.L.
+        Total: '99.37'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: PhaseRole has no crystal role, so the crystal-component vector cannot be typed.
+    related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    blank_cells: D.L. and blank cells retain their distinct printed meanings.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_table3_crystal_centers
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: crystal_rim_compositions_distribution_ratio_and_formula
+  observation_id: zagrtdenov_2025_table4_crystal_rims
+  locator:
+    record: Research data/Table 4. Compositions of rims of crystalline materials.xlsx
+    sheet: Sheet1
+    cell_range: B1:T19
+    note: Table 4, displayed workbook cells; D(Cr) is displayed to one decimal and AB2O4 formula terms to two decimals.
+  units: Oxide weight percentages; D(Cr) dimensionless; formula terms and analysis counts as displayed.
+  values:
+    method_class: measured_tabulated
+    rows_as_printed:
+    - run_as_printed: E19
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 13.07±0.33
+        Al2O3: 16.24±1.68
+        TiO2: 0.41±0.01
+        Cr2O3: 51.53±2.17
+        MnO: 0.24±0.04
+        FeO: 16.82±0.12
+      total_wt_percent_as_printed: '98.31'
+      D_Cr_cryst_glass_as_displayed: '153.6'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.62'
+        Al: '0.61'
+        Ti: '0.01'
+        Cr: '1.30'
+        Mn: '0.01'
+        Fe2+: '0.38'
+        Fe3+: '0.07'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E23
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 14.47±0.16
+        Al2O3: 14.71±1.09
+        TiO2: 0.39±0.02
+        Cr2O3: 55.42±1.03
+        MnO: 0.29±0.04
+        FeO: 12.04±0.19
+      total_wt_percent_as_printed: '97.32'
+      D_Cr_cryst_glass_as_displayed: '76.9'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.69'
+        Al: '0.56'
+        Ti: '0.01'
+        Cr: '1.41'
+        Mn: '0.01'
+        Fe2+: '0.31'
+        Fe3+: '0.02'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E24
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Mchr
+      composition_wt_percent_as_printed:
+        MgO: 20.60±0.21
+        Al2O3: 11.45±1.65
+        TiO2: D.L.
+        Cr2O3: 63.78±1.84
+        MnO: D.L.
+        FeO: 1.73±0.07
+      total_wt_percent_as_printed: '97.56'
+      D_Cr_cryst_glass_as_displayed: '89.7'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.96'
+        Al: '0.42'
+        Ti: '0.00'
+        Cr: '1.57'
+        Mn: '0.00'
+        Fe2+: '0.04'
+        Fe3+: '0.00'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E25
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 13.47±0.23
+        Al2O3: 11.65±0.49
+        TiO2: 0.41±0.01
+        Cr2O3: 58.67±0.51
+        MnO: 0.30±0.03
+        FeO: 13.25±0.12
+      total_wt_percent_as_printed: '97.75'
+      D_Cr_cryst_glass_as_displayed: '80.2'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.66'
+        Al: '0.45'
+        Ti: '0.01'
+        Cr: '1.52'
+        Mn: '0.01'
+        Fe2+: '0.35'
+        Fe3+: '0.02'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E26
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Mchr
+      composition_wt_percent_as_printed:
+        MgO: 20.48±0.20
+        Al2O3: 7.72±0.72
+        TiO2: D.L.
+        Cr2O3: 68.16±0.92
+        MnO: D.L.
+        FeO: 1.25±0.03
+      total_wt_percent_as_printed: '97.61'
+      D_Cr_cryst_glass_as_displayed: '85.8'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.97'
+        Al: '0.29'
+        Ti: '0.00'
+        Cr: '1.71'
+        Mn: '0.00'
+        Fe2+: '0.03'
+        Fe3+: '0.00'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E27
+      number_of_analyses_as_printed: '13'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 14.67±0.85
+        Al2O3: 14.73±1.38
+        TiO2: 0.35±0.03
+        Cr2O3: 51.70±1.63
+        MnO: 0.27±0.03
+        FeO: 16.34±0.23
+      total_wt_percent_as_printed: '98.06'
+      D_Cr_cryst_glass_as_displayed: '222.7'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.70'
+        Al: '0.55'
+        Ti: '0.01'
+        Cr: '1.30'
+        Mn: '0.01'
+        Fe2+: '0.31'
+        Fe3+: '0.13'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E28
+      number_of_analyses_as_printed: '11'
+      phase_as_printed: Mchr
+      composition_wt_percent_as_printed:
+        MgO: 21.22±0.37
+        Al2O3: 9.74±0.19
+        TiO2: D.L.
+        Cr2O3: 65.97±0.67
+        MnO: D.L.
+        FeO: 1.07±0.05
+      total_wt_percent_as_printed: '98.00'
+      D_Cr_cryst_glass_as_displayed: '170.3'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.99'
+        Al: '0.36'
+        Ti: '0.00'
+        Cr: '1.63'
+        Mn: '0.00'
+        Fe2+: '0.01'
+        Fe3+: '0.01'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E29
+      number_of_analyses_as_printed: '6'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 11.89±0.35
+        Al2O3: 8.42±1.03
+        TiO2: 0.35±0.02
+        Cr2O3: 56.13±2.33
+        MnO: 0.27±0.05
+        FeO: 20.70±0.47
+      total_wt_percent_as_printed: '97.76'
+      D_Cr_cryst_glass_as_displayed: '254.4'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.59'
+        Al: '0.33'
+        Ti: '0.01'
+        Cr: '1.48'
+        Mn: '0.01'
+        Fe2+: '0.41'
+        Fe3+: '0.17'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E30
+      number_of_analyses_as_printed: '6'
+      phase_as_printed: Mchr
+      composition_wt_percent_as_printed:
+        MgO: 19.70±0.17
+        Al2O3: 5.99±1.25
+        TiO2: D.L.
+        Cr2O3: 68.57±1.68
+        MnO: D.L.
+        FeO: 3.10±0.18
+      total_wt_percent_as_printed: '97.36'
+      D_Cr_cryst_glass_as_displayed: '169.5'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.94'
+        Al: '0.23'
+        Ti: '0.00'
+        Cr: '1.74'
+        Mn: '0.00'
+        Fe2+: '0.06'
+        Fe3+: '0.03'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E31
+      number_of_analyses_as_printed: '5'
+      phase_as_printed: Chr
+      composition_wt_percent_as_printed:
+        MgO: 11.60±0.31
+        Al2O3: 8.65±1.97
+        TiO2: 0.40±0.01
+        Cr2O3: 60.34±2.90
+        MnO: 0.26±0.02
+        FeO: 17.01±0.16
+      total_wt_percent_as_printed: '98.26'
+      D_Cr_cryst_glass_as_displayed: '176.4'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.58'
+        Al: '0.34'
+        Ti: '0.01'
+        Cr: '1.59'
+        Mn: '0.01'
+        Fe2+: '0.43'
+        Fe3+: '0.05'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    - run_as_printed: E33
+      number_of_analyses_as_printed: '6'
+      phase_as_printed: Mchr
+      composition_wt_percent_as_printed:
+        MgO: 20.90±0.37
+        Al2O3: 6.44±1.89
+        TiO2: D.L.
+        Cr2O3: 69.95±2.20
+        MnO: D.L.
+        FeO: D.L.
+      total_wt_percent_as_printed: '97.29'
+      D_Cr_cryst_glass_as_displayed: '134.9'
+      spinel_formula_AB2O4_recalculation_as_displayed:
+        Mg: '0.99'
+        Al: '0.24'
+        Ti: '0.00'
+        Cr: '1.76'
+        Mn: '0.00'
+        Fe2+: '0.00'
+        Fe3+: '0.00'
+        O: '4'
+      related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - distribution_ratio
+    schema_gap: PhaseRole has no crystal role. The printed D(Cr) is derived from crystal/glass composition inputs, and the
+      component inputs have no crystal-composition token; D(Cr) therefore remains context pending a corpus table asset (controller,
+      t-1382). The AB2O4 recalculation is also retained as author-derived context.
+    derivation_note: No D(Cr) formula was inferred from the displayed values. Printed input rows and D(Cr) cells are preserved
+      in .agent-scratch/f45b-tables/zagrtdenov-2025-chromite-magnesiochromite-dataset/table4.csv pending a corpus TABLE_CSV
+      asset (controller, t-1382).
+    related_observation_id: zagrtdenov_2020_table2_crystal_compositions_and_log_kd
+    blank_cells: D.L. remains below detection limit; formula cells displayed as 0.00 are kept as printed author recalculations,
+      not measured component zeros.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_table4_crystal_rims
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr
+- type: glass_compositions_and_auxiliary_columns
+  observation_id: zagrtdenov_2025_table5_glass
+  locator:
+    record: Research data/Table 5. Glass.xlsx
+    sheet: Sheet1
+    cell_range: B1:P17
+    note: Table 5, displayed workbook cells; optical basicity is displayed to three decimals.
+  units: Oxide weight percentages, Cr ppm, dimensionless optical basicity, and analysis counts as labelled.
+  values:
+    method_class: measured_tabulated
+    rows_as_printed:
+    - sample_as_printed: E19
+      number_of_analyses_as_printed: '71'
+      composition_wt_percent_as_printed:
+        Na2O: 1.02±0.04
+        MgO: 8.60±0.08
+        Al2O3: 15.89±0.08
+        SiO2: 52.09±0.19
+        K2O: 0.23±0.02
+        CaO: 10.67±0.11
+        TiO2: 1.50±0.03
+        Cr2O3: 0.420±0.005
+        MnO: 0.17±0.05
+        FeO: 8.91±0.13
+      total_wt_percent_as_printed: '99.50'
+      Cr_ppm_as_printed: 2874±37
+      optical_basicity_as_displayed: '0.590'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E19_na2o
+        MgO: zagrtdenov_2020_E19_mgo
+        Al2O3: zagrtdenov_2020_E19_al2o3
+        SiO2: zagrtdenov_2020_E19_sio2
+        K2O: zagrtdenov_2020_E19_k2o
+        CaO: zagrtdenov_2020_E19_cao
+        TiO2: zagrtdenov_2020_E19_tio2
+        Cr2O3: zagrtdenov_2020_E19_cr2o3
+        MnO: zagrtdenov_2020_E19_mno
+        FeO: zagrtdenov_2020_E19_feo
+    - sample_as_printed: E23
+      number_of_analyses_as_printed: '50'
+      composition_wt_percent_as_printed:
+        Na2O: 0.51±0.03
+        MgO: 8.98±0.09
+        Al2O3: 16.54±0.10
+        SiO2: 53.96±0.22
+        K2O: 0.19±0.02
+        CaO: 10.93±0.1
+        TiO2: 1.57±0.03
+        Cr2O3: 0.922±0.008
+        MnO: 0.18±0.03
+        FeO: 6.04±0.09
+      total_wt_percent_as_printed: '99.82'
+      Cr_ppm_as_printed: 6308±54
+      optical_basicity_as_displayed: '0.581'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E23_na2o
+        MgO: zagrtdenov_2020_E23_mgo
+        Al2O3: zagrtdenov_2020_E23_al2o3
+        SiO2: zagrtdenov_2020_E23_sio2
+        K2O: zagrtdenov_2020_E23_k2o
+        CaO: zagrtdenov_2020_E23_cao
+        TiO2: zagrtdenov_2020_E23_tio2
+        Cr2O3: zagrtdenov_2020_E23_cr2o3
+        MnO: zagrtdenov_2020_E23_mno
+        FeO: zagrtdenov_2020_E23_feo
+    - sample_as_printed: E24
+      number_of_analyses_as_printed: '50'
+      composition_wt_percent_as_printed:
+        Na2O: D.L.
+        MgO: 15.03±0.11
+        Al2O3: 9.21±0.07
+        SiO2: 49.77±0.20
+        K2O: D.L.
+        CaO: 24.66±0.2
+        TiO2: D.L.
+        Cr2O3: 0.880±0.008
+        MnO: D.L.
+        FeO: 1.04±0.04
+      total_wt_percent_as_printed: '100.59'
+      Cr_ppm_as_printed: 6020±57
+      optical_basicity_as_displayed: '0.619'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E24_na2o
+        MgO: zagrtdenov_2020_E24_mgo
+        Al2O3: zagrtdenov_2020_E24_al2o3
+        SiO2: zagrtdenov_2020_E24_sio2
+        K2O: zagrtdenov_2020_E24_k2o
+        CaO: zagrtdenov_2020_E24_cao
+        TiO2: zagrtdenov_2020_E24_tio2
+        Cr2O3: zagrtdenov_2020_E24_cr2o3
+        MnO: zagrtdenov_2020_E24_mno
+        FeO: zagrtdenov_2020_E24_feo
+    - sample_as_printed: E25
+      number_of_analyses_as_printed: '50'
+      composition_wt_percent_as_printed:
+        Na2O: 0.60±0.03
+        MgO: 8.31±0.08
+        Al2O3: 15.90±0.10
+        SiO2: 54.66±0.17
+        K2O: 0.20±0.02
+        CaO: 11.08±0.1
+        TiO2: 1.63±0.03
+        Cr2O3: 0.938±0.008
+        MnO: 0.16±0.03
+        FeO: 6.27±0.11
+      total_wt_percent_as_printed: '99.75'
+      Cr_ppm_as_printed: 6418±53
+      optical_basicity_as_displayed: '0.581'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E25_na2o
+        MgO: zagrtdenov_2020_E25_mgo
+        Al2O3: zagrtdenov_2020_E25_al2o3
+        SiO2: zagrtdenov_2020_E25_sio2
+        K2O: zagrtdenov_2020_E25_k2o
+        CaO: zagrtdenov_2020_E25_cao
+        TiO2: zagrtdenov_2020_E25_tio2
+        Cr2O3: zagrtdenov_2020_E25_cr2o3
+        MnO: zagrtdenov_2020_E25_mno
+        FeO: zagrtdenov_2020_E25_feo
+    - sample_as_printed: E26
+      number_of_analyses_as_printed: '49'
+      composition_wt_percent_as_printed:
+        Na2O: D.L.
+        MgO: 14.47±0.12
+        Al2O3: 8.46±0.08
+        SiO2: 50.61±0.17
+        K2O: D.L.
+        CaO: 25.17±0.17
+        TiO2: D.L.
+        Cr2O3: 0.997±0.008
+        MnO: D.L.
+        FeO: 0.68±0.04
+      total_wt_percent_as_printed: '100.39'
+      Cr_ppm_as_printed: 6821±56
+      optical_basicity_as_displayed: '0.617'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E26_na2o
+        MgO: zagrtdenov_2020_E26_mgo
+        Al2O3: zagrtdenov_2020_E26_al2o3
+        SiO2: zagrtdenov_2020_E26_sio2
+        K2O: zagrtdenov_2020_E26_k2o
+        CaO: zagrtdenov_2020_E26_cao
+        TiO2: zagrtdenov_2020_E26_tio2
+        Cr2O3: zagrtdenov_2020_E26_cr2o3
+        MnO: zagrtdenov_2020_E26_mno
+        FeO: zagrtdenov_2020_E26_feo
+    - sample_as_printed: E27
+      number_of_analyses_as_printed: '70'
+      composition_wt_percent_as_printed:
+        Na2O: 1.84±0.04
+        MgO: 8.63±0.09
+        Al2O3: 16.07±0.11
+        SiO2: 52.75±0.21
+        K2O: 0.27±0.02
+        CaO: 10.76±0.1
+        TiO2: 1.52±0.02
+        Cr2O3: 0.292±0.005
+        MnO: 0.17±0.03
+        FeO: 7.19±0.11
+      total_wt_percent_as_printed: '99.49'
+      Cr_ppm_as_printed: 1998±33
+      optical_basicity_as_displayed: '0.588'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E27_na2o
+        MgO: zagrtdenov_2020_E27_mgo
+        Al2O3: zagrtdenov_2020_E27_al2o3
+        SiO2: zagrtdenov_2020_E27_sio2
+        K2O: zagrtdenov_2020_E27_k2o
+        CaO: zagrtdenov_2020_E27_cao
+        TiO2: zagrtdenov_2020_E27_tio2
+        Cr2O3: zagrtdenov_2020_E27_cr2o3
+        MnO: zagrtdenov_2020_E27_mno
+        FeO: zagrtdenov_2020_E27_feo
+    - sample_as_printed: E28
+      number_of_analyses_as_printed: '71'
+      composition_wt_percent_as_printed:
+        Na2O: 0.20±0.02
+        MgO: 14.93±0.11
+        Al2O3: 9.10±0.08
+        SiO2: 50.20±0.18
+        K2O: D.L.
+        CaO: 25.04±0.15
+        TiO2: D.L.
+        Cr2O3: 0.480±0.007
+        MnO: D.L.
+        FeO: 0.52±0.04
+      total_wt_percent_as_printed: '100.47'
+      Cr_ppm_as_printed: 3284±51
+      optical_basicity_as_displayed: '0.618'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E28_na2o
+        MgO: zagrtdenov_2020_E28_mgo
+        Al2O3: zagrtdenov_2020_E28_al2o3
+        SiO2: zagrtdenov_2020_E28_sio2
+        K2O: zagrtdenov_2020_E28_k2o
+        CaO: zagrtdenov_2020_E28_cao
+        TiO2: zagrtdenov_2020_E28_tio2
+        Cr2O3: zagrtdenov_2020_E28_cr2o3
+        MnO: zagrtdenov_2020_E28_mno
+        FeO: zagrtdenov_2020_E28_feo
+    - sample_as_printed: E29
+      number_of_analyses_as_printed: '63'
+      composition_wt_percent_as_printed:
+        Na2O: 2.16±0.05
+        MgO: 7.82±0.07
+        Al2O3: 15.03±0.09
+        SiO2: 51.66±0.19
+        K2O: 0.27±0.02
+        CaO: 10.60±0.1
+        TiO2: 1.54±0.03
+        Cr2O3: 0.287±0.006
+        MnO: 0.16±0.04
+        FeO: 9.73±0.11
+      total_wt_percent_as_printed: '99.26'
+      Cr_ppm_as_printed: 1964±42
+      optical_basicity_as_displayed: '0.594'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E29_na2o
+        MgO: zagrtdenov_2020_E29_mgo
+        Al2O3: zagrtdenov_2020_E29_al2o3
+        SiO2: zagrtdenov_2020_E29_sio2
+        K2O: zagrtdenov_2020_E29_k2o
+        CaO: zagrtdenov_2020_E29_cao
+        TiO2: zagrtdenov_2020_E29_tio2
+        Cr2O3: zagrtdenov_2020_E29_cr2o3
+        MnO: zagrtdenov_2020_E29_mno
+        FeO: zagrtdenov_2020_E29_feo
+    - sample_as_printed: E30
+      number_of_analyses_as_printed: '64'
+      composition_wt_percent_as_printed:
+        Na2O: 0.13±0.02
+        MgO: 14.24±0.08
+        Al2O3: 8.37±0.08
+        SiO2: 50.26±0.20
+        K2O: D.L.
+        CaO: 25.16±0.16
+        TiO2: D.L.
+        Cr2O3: 0.513±0.006
+        MnO: D.L.
+        FeO: 1.59±0.06
+      total_wt_percent_as_printed: '100.26'
+      Cr_ppm_as_printed: 3510±41
+      optical_basicity_as_displayed: '0.619'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E30_na2o
+        MgO: zagrtdenov_2020_E30_mgo
+        Al2O3: zagrtdenov_2020_E30_al2o3
+        SiO2: zagrtdenov_2020_E30_sio2
+        K2O: zagrtdenov_2020_E30_k2o
+        CaO: zagrtdenov_2020_E30_cao
+        TiO2: zagrtdenov_2020_E30_tio2
+        Cr2O3: zagrtdenov_2020_E30_cr2o3
+        MnO: zagrtdenov_2020_E30_mno
+        FeO: zagrtdenov_2020_E30_feo
+    - sample_as_printed: E31
+      number_of_analyses_as_printed: '77'
+      composition_wt_percent_as_printed:
+        Na2O: 1.25±0.04
+        MgO: 8.00±0.08
+        Al2O3: 15.39±0.10
+        SiO2: 52.94±0.14
+        K2O: 0.25±0.02
+        CaO: 10.79±0.11
+        TiO2: 1.58±0.03
+        Cr2O3: 0.447±0.007
+        MnO: 0.17±0.03
+        FeO: 8.56±0.12
+      total_wt_percent_as_printed: '99.38'
+      Cr_ppm_as_printed: 3058±45
+      optical_basicity_as_displayed: '0.588'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E31_na2o
+        MgO: zagrtdenov_2020_E31_mgo
+        Al2O3: zagrtdenov_2020_E31_al2o3
+        SiO2: zagrtdenov_2020_E31_sio2
+        K2O: zagrtdenov_2020_E31_k2o
+        CaO: zagrtdenov_2020_E31_cao
+        TiO2: zagrtdenov_2020_E31_tio2
+        Cr2O3: zagrtdenov_2020_E31_cr2o3
+        MnO: zagrtdenov_2020_E31_mno
+        FeO: zagrtdenov_2020_E31_feo
+    - sample_as_printed: E32
+      number_of_analyses_as_printed: '50'
+      composition_wt_percent_as_printed:
+        Na2O: 0.11±0.02
+        MgO: 15.11±0.13
+        Al2O3: 9.18±0.07
+        SiO2: 50.22±0.19
+        K2O: D.L.
+        CaO: 25.10±0.14
+        TiO2: D.L.
+        Cr2O3: 0.598±0.007
+        MnO: D.L.
+        FeO: 0.22±0.03
+      total_wt_percent_as_printed: '100.54'
+      Cr_ppm_as_printed: 4095±45
+      optical_basicity_as_displayed: '0.618'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E32_na2o
+        MgO: zagrtdenov_2020_E32_mgo
+        Al2O3: zagrtdenov_2020_E32_al2o3
+        SiO2: zagrtdenov_2020_E32_sio2
+        K2O: zagrtdenov_2020_E32_k2o
+        CaO: zagrtdenov_2020_E32_cao
+        TiO2: zagrtdenov_2020_E32_tio2
+        Cr2O3: zagrtdenov_2020_E32_cr2o3
+        MnO: zagrtdenov_2020_E32_mno
+        FeO: zagrtdenov_2020_E32_feo
+    - sample_as_printed: E33
+      number_of_analyses_as_printed: '50'
+      composition_wt_percent_as_printed:
+        Na2O: D.L.
+        MgO: 14.55±0.13
+        Al2O3: 8.55±0.06
+        SiO2: 51.15±0.21
+        K2O: D.L.
+        CaO: 25.55±0.18
+        TiO2: D.L.
+        Cr2O3: 0.657±0.005
+        MnO: D.L.
+        FeO: D.L.
+      total_wt_percent_as_printed: '100.46'
+      Cr_ppm_as_printed: 4495±32
+      optical_basicity_as_displayed: '0.616'
+      related_observation_ids:
+        Na2O: zagrtdenov_2020_E33_na2o
+        MgO: zagrtdenov_2020_E33_mgo
+        Al2O3: zagrtdenov_2020_E33_al2o3
+        SiO2: zagrtdenov_2020_E33_sio2
+        K2O: zagrtdenov_2020_E33_k2o
+        CaO: zagrtdenov_2020_E33_cao
+        TiO2: zagrtdenov_2020_E33_tio2
+        Cr2O3: zagrtdenov_2020_E33_cr2o3
+        MnO: zagrtdenov_2020_E33_mno
+        FeO: zagrtdenov_2020_E33_feo
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    disposition: Same 12 post-quench glass samples as the already-scored 2020 Table 3. Kept in context and linked per component
+      to avoid duplicate scoring.
+    difference_note: 'The companion workbook prints slightly different means/uncertainties for some duplicate cells; both
+      versions remain distinct. Examples: E23 Cr ppm 6308±54 here vs 6306(54) in 2020 Table 3; E24 6020±57 vs 6023(57); E25
+      6418±53 vs 6415(53); E26 6821±56 vs 6824(56); E31 3058±45 vs 3058(52).'
+    blank_cells: D.L. and blank cells retain their distinct printed meanings.
+  context_id: zagrtdenov-2025-chromite-magnesiochromite-dataset::context::zagrtdenov_2025_table5_glass
+  work_id: 10.17632/th5knvw2dh.3
+  source_id: zagrtdenov-2025-chromite-magnesiochromite-dataset
+  species: Cr

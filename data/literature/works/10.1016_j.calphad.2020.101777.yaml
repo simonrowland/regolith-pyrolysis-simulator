@@ -1,0 +1,593 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.calphad.2020.101777
+  citation: Vickerfält A, Martinsson J, Yan B, Sichen D (2020). Phase relationship in the system MgO-V2O3 between 1661 and
+    1873 K at PO2=(3.55±0.2)×10^-6 and (3.55±0.3)×10^-5 Pa. Calphad 70, 101777.
+  source_ids:
+  - vickerfalt-2020-mgo-v2o3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:vickerfalt-2020-mgo-v2o3
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.calphad.2020.101777
+experiments: []
+context:
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_1_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 1
+    page: 2
+    figure: '1'
+    note: Figure 1 on physical page 2; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: experimental apparatus schematic
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3 experimental system
+    phase: equilibration and protected oil-quench apparatus
+    T_K: 1661–1873 K
+    axes_as_printed: no plotted axes; apparatus labels
+    caption_as_printed: Schematic drawing of the setup.
+    panels:
+    - single
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_1_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_2_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 2
+    page: 3
+    figure: '2'
+    note: Figure 2 on physical page 3; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: illustrated single-phase MgO sample and captioned charge composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: V2O3 in MgO
+    phase: MgO single phase
+    T_K: '1873'
+    axes_as_printed: no plotted axes; 100 µm scale bar
+    caption_as_printed: SEM micrograph of a sample containing only MgO phase (17 wt% V2O3-83 wt% MgO, equilibrated at PO2=(3.55
+      ± 0.2) × 10^-6 Pa and T=1873 K).
+    panels:
+    - single
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_2_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_3_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 2
+    page: 3
+    figure: '3'
+    note: Figure 3 on physical page 3; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: illustrated MgO-spinel assemblage and captioned charge composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3
+    phase: MgO + spinel
+    T_K: '1873'
+    axes_as_printed: no plotted axes; 100 µm scale bar
+    caption_as_printed: SEM microphotograph of a sample consisting of MgO and spinel phase (65 wt% V2O3-35 wt% MgO, equilibrated
+      at PO2=(3.55 ± 0.3) × 10^-5 Pa and T=1873 K).
+    panels:
+    - single
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_3_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_4_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 2
+    page: 3
+    figure: '4'
+    note: Figure 4 on physical page 3; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: illustrated single-phase spinel sample and captioned charge composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3
+    phase: spinel single phase
+    T_K: '1873'
+    axes_as_printed: no plotted axes; 100 µm scale bar
+    caption_as_printed: SEM microphotograph showing a sample containing only spinel phase (78 wt% V2O3-22 wt% MgO, equilibrated
+      at PO2=(3.55 ± 0.2) × 10^-6 Pa and T=1873 K).
+    panels:
+    - single
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_4_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_5_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 3
+    page: 4
+    figure: '5'
+    note: Figure 5 on physical page 4; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: illustrated spinel-V2O3 assemblage and captioned charge composition
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3
+    phase: spinel + V2O3
+    T_K: '1873'
+    axes_as_printed: no plotted axes; 100 µm scale bar
+    caption_as_printed: SEM microphotograph of a sample consisting of spinel and V2O3 phase (85 wt% V2O3-15 wt% MgO, equilibrated
+      at PO2=(3.55 ± 0.3) × 10^-5 Pa and T=1873 K).
+    panels:
+    - single
+    series: []
+    marker_count_per_series: {}
+    attribution: present work
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_5_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_6a_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 4
+    page: 5
+    figure: 6a
+    note: Figure 6a on physical page 5; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: MgO-V2O3 phase-boundary diagram
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3
+    phase: MgO, spinel, and V2O3 solid phase boundaries
+    T_K: 1661, 1761, and 1873 K
+    axes_as_printed: 'x: V2O3, wt%; y: T, K'
+    caption_as_printed: Phase boundaries based on measurements by the present authors at 3 different temperatures and PO2=(3.55
+      ± 0.2) × 10^-6 Pa plotted together with data from other work.
+    panels:
+    - single
+    series:
+    - present-work phase boundaries (filled circles)
+    - present-work single-phase charge compositions (open circles)
+    - phase boundaries from refs. [2,22] (filled squares)
+    - Cini [21] single-phase samples (open triangles)
+    - Cini [21] two-phase samples (filled triangles)
+    marker_count_per_series:
+      present-work phase boundaries (filled circles): 12
+      present-work single-phase charge compositions (open circles): 2
+      phase boundaries from refs. [2,22] (filled squares): 2
+      Cini [21] single-phase samples (open triangles): count not stated; overlapped glyphs deferred
+      Cini [21] two-phase samples (filled triangles): count not stated; overlapped glyphs deferred
+    attribution: present work and refs. [2, 21, 22]
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_6a_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_figure_6b_context
+  type: figure_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 4
+    page: 5
+    figure: 6b
+    note: Figure 6b on physical page 5; numeric figure data are deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: MgO-V2O3 phase-boundary diagram
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: MgO-V2O3
+    phase: MgO, spinel, and V2O3 solid phase boundaries
+    T_K: 1661, 1761, and 1873 K
+    axes_as_printed: 'x: V2O3, wt%; y: T, K'
+    caption_as_printed: Phase boundaries based on measurements by the present authors at 3 different temperatures and PO2=(3.55
+      ± 0.3) × 10^-5 Pa plotted together with data from other work.
+    panels:
+    - single
+    series:
+    - present-work phase boundaries (filled circles)
+    - present-work single-phase charge compositions (open circles)
+    - phase boundaries from refs. [2,22] (filled squares)
+    - Cini [21] single-phase samples (open triangles)
+    - Cini [21] two-phase samples (filled triangles)
+    marker_count_per_series:
+      present-work phase boundaries (filled circles): 12
+      present-work single-phase charge compositions (open circles): 2
+      phase boundaries from refs. [2,22] (filled squares): 2
+      Cini [21] single-phase samples (open triangles): count not stated; overlapped glyphs deferred
+      Cini [21] two-phase samples (filled triangles): count not stated; overlapped glyphs deferred
+    attribution: present work and refs. [2, 21, 22]
+    schema_gap_or_disposition: Figure numeric points are deferred; no value was estimated from the plot.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_figure_6b_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_table_1_context
+  type: table_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 2
+    page: 3
+    table: '1'
+    note: The measured phase compositions are reported in Tables 2-4.
+  units: printed weighed-in V2O3 wt%, K, pO2 range in Pa, and CO2 fraction
+  values:
+    typed_quantity_as_printed: weighed-in binary sample compositions and equilibration conditions
+    candidate_tokens: []
+    schema_gap_or_disposition: Table 1 reports starting charges and experimental conditions, not measured phase compositions.
+      Its displayed sample values and conditions are retained as experimental context; the pO2 ranges remain verbatim.
+    columns_as_printed:
+    - Sample
+    - V2O3, wt%
+    - Temperature, K
+    - PO2, Pa
+    - XCO2
+    rows_as_printed:
+    - - '1'
+      - '31.9'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '2'
+      - '55.3'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '3'
+      - '65.0'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '4'
+      - '84.8'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '5'
+      - '88.3'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '6'
+      - '91.2'
+      - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.092'
+    - - '7'
+      - '55.3'
+      - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.031'
+    - - '8'
+      - '65.0'
+      - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.031'
+    - - '9'
+      - '84.7'
+      - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.031'
+    - - '10'
+      - '88.2'
+      - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.031'
+    - - '11'
+      - '91.4'
+      - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.031'
+    - - '12'
+      - '17.1'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '13'
+      - '47.9'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '14'
+      - '74.4'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '15'
+      - '78.1'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '16'
+      - '84.8'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '17'
+      - '91.3'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - '0.01'
+    - - '18'
+      - '55.3'
+      - '1661'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.242'
+    - - '19'
+      - '65.0'
+      - '1661'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.242'
+    - - '20'
+      - '84.8'
+      - '1661'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.242'
+    - - '21'
+      - '88.2'
+      - '1661'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.242'
+    - - '22'
+      - '55.4'
+      - '1761'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.092'
+    - - '23'
+      - '65.0'
+      - '1761'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.092'
+    - - '24'
+      - '84.9'
+      - '1761'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.092'
+    - - '25'
+      - '91.4'
+      - '1761'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.092'
+    - - '26'
+      - '17.0'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+    - - '27'
+      - '38.2'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+    - - '28'
+      - '65.1'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+    - - '29'
+      - '78.2'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+    - - '30'
+      - '84.7'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+    - - '31'
+      - '88.2'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - '0.031'
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_table_1_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_table_2_context
+  type: table_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 3
+    page: 4
+    table: '2'
+    note: Table 2 states that each boundary was determined from two samples and that values are means of measurements; relative
+      EPMA uncertainty is <1%.
+  units: printed mean ± standard deviation in wt% V2O3; pO2 ranges in Pa
+  values:
+    typed_quantity_as_printed: EPMA phase-boundary V2O3 concentrations
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: The measured MgO, spinel, and V2O3-corundum phases are solids. The d-223 PhaseRole enum is
+      closed to melt, slag, glass, metal, and matte, so equilibrium_phase_composition cannot represent these solid rows. All
+      displayed values remain here; no oxide components are reconstructed from a partial analysis.
+    columns_as_printed:
+    - T, K
+    - PO2, Pa
+    - Boundary between MgO and MgO+spinel, wt% V2O3
+    - Boundary between MgO+spinel and spinel, wt% V2O3
+    - Boundary between spinel and spinel+V2O3, wt% V2O3
+    - Boundary between spinel+V2O3 and V2O3, wt% V2O3
+    rows_as_printed:
+    - - '1661'
+      - (3.55 ± 0.2) × 10^-6
+      - 9.4 ± 0.5
+      - 77.2 ± 0.6
+      - 80.0 ± 0.3
+      - 98.8 ± 0.1
+    - - '1761'
+      - (3.55 ± 0.2) × 10^-6
+      - 17.4 ± 0.6
+      - 77.7 ± 0.3
+      - 80.8 ± 0.3
+      - 99.1 ± 0.1
+    - - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - 31.3 ± 1.4
+      - 78.5 ± 0.7
+      - 82.1 ± 0.5
+      - 99.4 ± 0.0
+    - - '1661'
+      - (3.55 ± 0.3) × 10^-5
+      - 9.4 ± 1.6
+      - 76.1 ± 0.2
+      - 79.3 ± 0.4
+      - 98.0 ± 0.1
+    - - '1761'
+      - (3.55 ± 0.3) × 10^-5
+      - 14.6 ± 0.7
+      - 76.8 ± 0.3
+      - 80.1 ± 0.2
+      - 98.5 ± 0.0
+    - - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - 25.7 ± 0.6
+      - 77.3 ± 0.4
+      - 81.2 ± 0.3
+      - 99.0 ± 0.0
+    related_thesis_Table9_pO2_comparison:
+      related_source: vickerfalt-2024-autogenous-slag-thesis, Table 9, physical PDF page 35
+      article_pO2_as_printed:
+      - (3.55 ± 0.2) × 10^-6 Pa
+      - (3.55 ± 0.3) × 10^-5 Pa
+      thesis_pO2_as_printed:
+      - 1.75×10^-11 atm
+      - 1.75×10^-10 atm
+      triage_flag: The paired conditions differ by a factor of 2; both printed sets are retained without conversion or a second
+        scored observation.
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_table_2_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_table_3_context
+  type: table_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 4
+    page: 5
+    table: '3'
+    note: The table gives four separate single-phase sample analyses; the weighed-in and EPMA values are both retained.
+  units: printed wt% V2O3, K, pO2 range in Pa
+  values:
+    typed_quantity_as_printed: EPMA V2O3 compositions of single-phase samples
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: The measured MgO, spinel, and V2O3-corundum phases are solids. The d-223 PhaseRole enum is
+      closed to melt, slag, glass, metal, and matte, so equilibrium_phase_composition cannot represent these solid rows. All
+      displayed values remain here; no oxide components are reconstructed from a partial analysis.
+    columns_as_printed:
+    - Weight in V2O3, wt%
+    - T, K
+    - PO2, Pa
+    - Phase
+    - V2O3 by EPMA, wt%
+    rows_as_printed:
+    - - '17.1'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - MgO
+      - 16.6 ± 0.3
+    - - '78.1'
+      - '1873'
+      - (3.55 ± 0.2) × 10^-6
+      - Spinel
+      - 79.2 ± 0.2
+    - - '17.0'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - MgO
+      - 16.5 ± 0.3
+    - - '78.2'
+      - '1873'
+      - (3.55 ± 0.3) × 10^-5
+      - Spinel
+      - 78.6 ± 0.1
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_table_3_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3
+- observation_id: vickerfalt_2020_mgo_v2o3_table_4_context
+  type: table_context
+  locator:
+    source_path: raw/vickerfalt-2020-mgo-v2o3/vickerfalt-2020-mgo-v2o3.pdf
+    pdf_page_index: 4
+    page: 5
+    table: '4'
+    note: The caption gives 1661 K and pO2=(3.55 ± 0.3) × 10^-5 Pa. Table 4 prints per-sample averages; Table 2 separately
+      reports the boundary mean ± standard deviation.
+  units: printed weighed-in wt% V2O3 and six EPMA point analyses plus the average, wt%
+  values:
+    typed_quantity_as_printed: EPMA V2O3 analyses of V2O3-saturated spinel
+    candidate_tokens:
+    - equilibrium_phase_composition
+    schema_gap_or_disposition: The measured MgO, spinel, and V2O3-corundum phases are solids. The d-223 PhaseRole enum is
+      closed to melt, slag, glass, metal, and matte, so equilibrium_phase_composition cannot represent these solid rows. All
+      displayed values remain here; no oxide components are reconstructed from a partial analysis.
+    columns_as_printed:
+    - Weight in V2O3, wt%
+    - V2O3 by EPMA, wt% analysis 1
+    - analysis 2
+    - analysis 3
+    - analysis 4
+    - analysis 5
+    - analysis 6
+    - Average, wt%
+    rows_as_printed:
+    - - '84.8'
+      - '79.56'
+      - '79.95'
+      - '79.46'
+      - '80.08'
+      - '79.52'
+      - '79.21'
+      - '79.63'
+    - - '88.2'
+      - '79.04'
+      - '79.05'
+      - '78.65'
+      - '79.29'
+      - '79.07'
+      - '79.22'
+      - '79.05'
+  context_id: vickerfalt-2020-mgo-v2o3::context::vickerfalt_2020_mgo_v2o3_table_4_context
+  work_id: 10.1016/j.calphad.2020.101777
+  source_id: vickerfalt-2020-mgo-v2o3
+  species: V2O3

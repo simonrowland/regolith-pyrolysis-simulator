@@ -1,0 +1,6063 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/rcm.9459
+  citation: Stolyarova VL, Vorozhtcov VA, Lopatin SI, Selyutin AA, Shugurov SM, Shilov AL, Stolyarov VA, Almjashev VI (2023).
+    Mass spectrometric study and modeling of the thermodynamic properties of SrO-Al2O3 melts at high temperatures. Rapid Communications
+    in Mass Spectrometry 37(5):e9459.
+  source_ids:
+  - stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1002/rcm.9459
+experiments:
+- experiment_id: 10.1002/rcm.9459::stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1002/rcm.9459
+  locator:
+    table: S1
+context:
+- observation_id: stolyarova_2023_figure_s10_record
+  type: figure_record
+  locator:
+    figure: S10
+  phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 10 μm printed on image
+    caption_as_printed: Microphotograph of sample 3 in the SrO-Al2O3 system containing 10 mol% SrO at magnification of ×1000
+    panel: single micrograph
+    series:
+    - sample 3 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s10_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s11_record
+  type: figure_record
+  locator:
+    figure: S11
+  phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 100 μm printed on image
+    caption_as_printed: Microphotograph of sample 3 in the SrO-Al2O3 system containing 10 mol% SrO at magnification of ×64
+    panel: single micrograph
+    series:
+    - sample 3 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s11_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s12_record
+  type: figure_record
+  locator:
+    figure: S12
+  phase_as_printed: samples 1, 2, and 3 in SrO-Al2O3 system
+  units: as printed in the figure
+  values:
+    quantity: DTA/TGA signals vs temperature (no numeric point token for the plotted signals) (no scored numeric points)
+    typed_quantity: DTA/TGA signals vs temperature (no numeric point token for the plotted signals)
+    species_as_filed: SrO
+    phase_as_printed: samples 1, 2, and 3 in SrO-Al2O3 system
+    temperature_as_printed: not stated as an experiment condition in the caption; x-axis is Temperature, K
+    axes_as_printed:
+    - Temperature (K)
+    - DTA (μV)
+    - TGA (mg)
+    caption_as_printed: Temperature dependences of DTA (1, μV) and TGA (2, mg) signals for samples 1 (A), 2 (B), and 3 (C)
+      according to Table 1 in the main text of the manuscript. D is the temperature dependences of mass losses of the samples
+      containing 33 mol% of SrO (33Sr), 20 mol% of SrO (20Sr), and 10 mol% of SrO (10Sr)
+    panel: A, B, C, D
+    series:
+    - 'A: DTA signal 1, TGA signal 2, sample 1'
+    - 'B: DTA signal 1, TGA signal 2, sample 2'
+    - 'C: DTA signal 1, TGA signal 2, sample 3'
+    - 'D: mass loss, 33Sr'
+    - 'D: mass loss, 20Sr'
+    - 'D: mass loss, 10Sr'
+    marker_count_per_series: continuous traces; no discrete markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: Candidate mass_loss_fraction_vs_T does not fit the plotted TGA mass in mg, and the DTA signal in μV has no matching
+      token. Curves deferred; no coordinates estimated.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s12_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s1_record
+  type: figure_record
+  locator:
+    figure: S1
+  phase_as_printed: sample 2 ceramic; caption says 20 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: EDX spectrum (no direct composition token) (no scored numeric points)
+    typed_quantity: EDX spectrum (no direct composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 2 ceramic; caption says 20 mol% SrO
+    temperature_as_printed: not stated for the spectrum
+    axes_as_printed:
+    - energy (keV)
+    - counts per second per microampere (cps/μA)
+    caption_as_printed: EDX-spectrum of sample 2 containing 20 mol% SrO. In the right corner, an increased part of the spectrum
+      is shown. Rhodium lines are from the spectrometer anode
+    panel: main spectrum with inset
+    series:
+    - sample 2 EDX spectrum; Rh anode lines labeled
+    marker_count_per_series: continuous spectrum; no discrete markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: Candidate quantity equilibrium_phase_composition does not fit an EDX spectrum without tabulated phase-component
+      values.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s1_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s2_record
+  type: figure_record
+  locator:
+    figure: S2
+  phase_as_printed: SrO-Al2O3 samples at 10, 20, and 33 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: X-ray diffraction pattern (no phase-composition token) (no scored numeric points)
+    typed_quantity: X-ray diffraction pattern (no phase-composition token)
+    species_as_filed: SrO
+    phase_as_printed: SrO-Al2O3 samples at 10, 20, and 33 mol% SrO
+    temperature_as_printed: figure labels 1723 K and 1823 K; see caption-label discrepancy
+    axes_as_printed:
+    - 2θ (deg)
+    - intensity (not unit-labeled)
+    caption_as_printed: X-ray diffraction patterns of the samples in the SrO-Al2O3 system with the SrO content of 33 mol%,
+      20 mol%, and 10 mol%. Lower patterns correspond to the samples before the final calcination at the temperature 1823
+      K. Upper patterns correspond to the samples after the final calcination at the temperature 1823 K
+    panel: three composition panels
+    series:
+    - 10 mol% SrO, 1723 K
+    - 10 mol% SrO, 1823 K
+    - 20 mol% SrO, 1723 K
+    - 20 mol% SrO, 1823 K
+    - 33 mol% SrO, 1723 K
+    - 33 mol% SrO, 1823 K
+    marker_count_per_series: continuous XRD patterns; no discrete markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The plot itself labels 1723 K and 1823 K; the caption describes both pre- and post-final-calcination patterns as
+      1823 K. Both statements are preserved without reconciliation.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s2_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s3_record
+  type: figure_record
+  locator:
+    figure: S3
+  phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 1 μm printed on image
+    caption_as_printed: Microphotograph of sample 1 in the SrO-Al2O3 system containing 33 mol% SrO at magnification of ×10
+      000
+    panel: single micrograph
+    series:
+    - sample 1 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s3_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s4_record
+  type: figure_record
+  locator:
+    figure: S4
+  phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 10 μm printed on image
+    caption_as_printed: Microphotograph of sample 1 in the SrO-Al2O3 system containing 33 mol% SrO at magnification of ×1000
+    panel: single micrograph
+    series:
+    - sample 1 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s4_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s5_record
+  type: figure_record
+  locator:
+    figure: S5
+  phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 1 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 100 μm printed on image
+    caption_as_printed: Microphotograph of sample 1 in the SrO-Al2O3 system containing 33 mol% SrO at magnification of ×66
+    panel: single micrograph
+    series:
+    - sample 1 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s5_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s6_record
+  type: figure_record
+  locator:
+    figure: S6
+  phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 33 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 1 μm printed on image
+    caption_as_printed: Microphotograph of sample 2 in the SrO-Al2O3 system containing 33 mol% SrO at magnification of ×10
+      000
+    panel: single micrograph
+    series:
+    - sample 2 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s6_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s7_record
+  type: figure_record
+  locator:
+    figure: S7
+  phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 20 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 20 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 10 μm printed on image
+    caption_as_printed: Microphotograph of sample 2 in the SrO-Al2O3 system containing 20 mol% SrO at magnification of ×1000
+    panel: single micrograph
+    series:
+    - sample 2 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s7_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s8_record
+  type: figure_record
+  locator:
+    figure: S8
+  phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 20 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 2 SrO-Al2O3 ceramic; caption says 20 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 100 μm printed on image
+    caption_as_printed: Microphotograph of sample 2 in the SrO-Al2O3 system containing 20 mol% SrO at magnification of ×66
+    panel: single micrograph
+    series:
+    - sample 2 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s8_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_figure_s9_record
+  type: figure_record
+  locator:
+    figure: S9
+  phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+  units: as printed in the figure
+  values:
+    quantity: scanning-electron micrograph (no numeric composition token) (no scored numeric points)
+    typed_quantity: scanning-electron micrograph (no numeric composition token)
+    species_as_filed: SrO
+    phase_as_printed: sample 3 SrO-Al2O3 ceramic; caption says 10 mol% SrO
+    temperature_as_printed: not stated for microscopy
+    axes_as_printed:
+    - none; scale bar 1 μm printed on image
+    caption_as_printed: Microphotograph of sample 3 in the SrO-Al2O3 system containing 10 mol% SrO at magnification of ×10
+      000
+    panel: single micrograph
+    series:
+    - sample 3 micrograph
+    marker_count_per_series: single image; no plotted markers
+    attribution: Stolyarova et al. (2023), Supporting Information
+    digitisation: deferred to a figure pass
+    note: The micrograph has no composition values. Figure S6's caption says sample 2 contains 33 mol% SrO; Figures S7-S8
+      and Table S8 say sample 2 contains 20 mol% SrO; this caption conflict is retained.
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_figure_s9_record
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s1_sample1_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S1
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.308'
+        Al2O3: '0.692'
+      value_as_published: '0.21'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.21'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '0.21'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.21'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.294'
+        Al2O3: '0.706'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.288'
+        Al2O3: '0.712'
+      value_as_published: '0.23'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.23'
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.282'
+        Al2O3: '0.718'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.271'
+        Al2O3: '0.729'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2437'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.259'
+        Al2O3: '0.741'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.254'
+        Al2O3: '0.746'
+      value_as_published: '0.29'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.29'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.248'
+        Al2O3: '0.752'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2464'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.243'
+        Al2O3: '0.757'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.232'
+        Al2O3: '0.768'
+      value_as_published: '0.32'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.32'
+    - T_K: '2463'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.34'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.34'
+    - T_K: '2459'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.221'
+        Al2O3: '0.779'
+      value_as_published: '0.35'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.35'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.216'
+        Al2O3: '0.784'
+      value_as_published: '0.36'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.36'
+    - T_K: '2456'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.206'
+        Al2O3: '0.794'
+      value_as_published: '0.38'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.38'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.197'
+        Al2O3: '0.803'
+      value_as_published: '0.40'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.4'
+    - T_K: '2462'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.188'
+        Al2O3: '0.812'
+      value_as_published: '0.42'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.42'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.175'
+        Al2O3: '0.825'
+      value_as_published: '0.46'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.46'
+    - T_K: '2445'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2450'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.49'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.49'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.155'
+        Al2O3: '0.842'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.147'
+        Al2O3: '0.853'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.55'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.55'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.57'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.57'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s1_sample1_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s1_sample1_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S1
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.308'
+        Al2O3: '0.692'
+      value_as_published: '0.10'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.1'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '0.11'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.11'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.294'
+        Al2O3: '0.706'
+      value_as_published: '0.11'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.11'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.288'
+        Al2O3: '0.712'
+      value_as_published: '0.12'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.12'
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.282'
+        Al2O3: '0.718'
+      value_as_published: '0.12'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.12'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '0.12'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.12'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.271'
+        Al2O3: '0.729'
+      value_as_published: '0.13'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.13'
+    - T_K: '2437'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.259'
+        Al2O3: '0.741'
+      value_as_published: '0.14'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.14'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.254'
+        Al2O3: '0.746'
+      value_as_published: '0.14'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.14'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.248'
+        Al2O3: '0.752'
+      value_as_published: '0.15'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.15'
+    - T_K: '2464'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.243'
+        Al2O3: '0.757'
+      value_as_published: '0.15'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.15'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.232'
+        Al2O3: '0.768'
+      value_as_published: '0.17'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.17'
+    - T_K: '2463'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.17'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.17'
+    - T_K: '2459'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.221'
+        Al2O3: '0.779'
+      value_as_published: '0.18'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.18'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.216'
+        Al2O3: '0.784'
+      value_as_published: '0.18'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.18'
+    - T_K: '2456'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.206'
+        Al2O3: '0.794'
+      value_as_published: '0.20'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.2'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.197'
+        Al2O3: '0.803'
+      value_as_published: '0.21'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.21'
+    - T_K: '2462'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.188'
+        Al2O3: '0.812'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.23'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.23'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.175'
+        Al2O3: '0.825'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2445'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2450'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.155'
+        Al2O3: '0.842'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.147'
+        Al2O3: '0.853'
+      value_as_published: '0.29'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.29'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.31'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.31'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s1_sample1_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s1_sample1_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S1
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.308'
+        Al2O3: '0.692'
+      value_as_published: '3.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000033'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '2.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000029'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.294'
+        Al2O3: '0.706'
+      value_as_published: '2.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000027'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.288'
+        Al2O3: '0.712'
+      value_as_published: '2.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000024'
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.282'
+        Al2O3: '0.718'
+      value_as_published: '2.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000022'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '2.0'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000002'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.271'
+        Al2O3: '0.729'
+      value_as_published: '1.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000019'
+    - T_K: '2437'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.259'
+        Al2O3: '0.741'
+      value_as_published: '1.5'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000015'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.254'
+        Al2O3: '0.746'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000014'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.248'
+        Al2O3: '0.752'
+      value_as_published: '1.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000013'
+    - T_K: '2464'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.243'
+        Al2O3: '0.757'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000011'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.232'
+        Al2O3: '0.768'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000009'
+    - T_K: '2463'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000008'
+    - T_K: '2459'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.221'
+        Al2O3: '0.779'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000007'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.216'
+        Al2O3: '0.784'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000007'
+    - T_K: '2456'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.206'
+        Al2O3: '0.794'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000005'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.197'
+        Al2O3: '0.803'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000004'
+    - T_K: '2462'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.188'
+        Al2O3: '0.812'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.175'
+        Al2O3: '0.825'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2445'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2450'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.155'
+        Al2O3: '0.842'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.147'
+        Al2O3: '0.853'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s1_sample1_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s1_sample1_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S1
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.308'
+        Al2O3: '0.692'
+      value_as_published: '2.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000029'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '2.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000026'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.294'
+        Al2O3: '0.706'
+      value_as_published: '2.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000024'
+    - T_K: '2444'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.288'
+        Al2O3: '0.712'
+      value_as_published: '2.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000022'
+    - T_K: '2448'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.282'
+        Al2O3: '0.718'
+      value_as_published: '2.0'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000002'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '1.8'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000018'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.271'
+        Al2O3: '0.729'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000016'
+    - T_K: '2437'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.259'
+        Al2O3: '0.741'
+      value_as_published: '1.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000013'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.254'
+        Al2O3: '0.746'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000012'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.248'
+        Al2O3: '0.752'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000011'
+    - T_K: '2464'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.243'
+        Al2O3: '0.757'
+      value_as_published: '1.0'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000001'
+    - T_K: '2452'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.232'
+        Al2O3: '0.768'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000008'
+    - T_K: '2463'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000007'
+    - T_K: '2459'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.221'
+        Al2O3: '0.779'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000006'
+    - T_K: '2455'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.216'
+        Al2O3: '0.784'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000006'
+    - T_K: '2456'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.206'
+        Al2O3: '0.794'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000004'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.197'
+        Al2O3: '0.803'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2462'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.188'
+        Al2O3: '0.812'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2454'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.175'
+        Al2O3: '0.825'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2445'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2450'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.155'
+        Al2O3: '0.842'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.147'
+        Al2O3: '0.853'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2457'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2458'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: 410-2
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000004'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s1_sample1_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s2_sample2_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S2
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '0.41'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.41'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.190'
+        Al2O3: '0.810'
+      value_as_published: '0.42'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.42'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.186'
+        Al2O3: '0.814'
+      value_as_published: '0.43'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.43'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.183'
+        Al2O3: '0.817'
+      value_as_published: '0.43'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.43'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.180'
+        Al2O3: '0.820'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2451'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.173'
+        Al2O3: '0.827'
+      value_as_published: '0.46'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.46'
+    - T_K: '2464'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.168'
+        Al2O3: '0.832'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2453'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.162'
+        Al2O3: '0.838'
+      value_as_published: '0.49'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.49'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.160'
+        Al2O3: '0.840'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.159'
+        Al2O3: '0.841'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.156'
+        Al2O3: '0.844'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.151'
+        Al2O3: '0.849'
+      value_as_published: '0.52'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.52'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.146'
+        Al2O3: '0.854'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.144'
+        Al2O3: '0.856'
+      value_as_published: '0.55'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.55'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.55'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.55'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.139'
+        Al2O3: '0.861'
+      value_as_published: '0.56'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.56'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.131'
+        Al2O3: '0.861'
+      value_as_published: '0.59'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.59'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.129'
+        Al2O3: '0.871'
+      value_as_published: '0.60'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.6'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s2_sample2_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s2_sample2_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S2
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '0.21'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.21'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.190'
+        Al2O3: '0.810'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.186'
+        Al2O3: '0.814'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.183'
+        Al2O3: '0.817'
+      value_as_published: '0.23'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.23'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.180'
+        Al2O3: '0.820'
+      value_as_published: '0.23'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.23'
+    - T_K: '2451'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.173'
+        Al2O3: '0.827'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2464'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.168'
+        Al2O3: '0.832'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2453'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.162'
+        Al2O3: '0.838'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.160'
+        Al2O3: '0.840'
+      value_as_published: '0.27'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.27'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.159'
+        Al2O3: '0.841'
+      value_as_published: '0.27'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.27'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.156'
+        Al2O3: '0.844'
+      value_as_published: '0.27'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.27'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.151'
+        Al2O3: '0.849'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.146'
+        Al2O3: '0.854'
+      value_as_published: '0.29'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.29'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.144'
+        Al2O3: '0.856'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.139'
+        Al2O3: '0.861'
+      value_as_published: '0.31'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.31'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.131'
+        Al2O3: '0.861'
+      value_as_published: '0.33'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.33'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.129'
+        Al2O3: '0.871'
+      value_as_published: '0.33'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.33'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s2_sample2_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s2_sample2_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S2
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '3.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000039'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.190'
+        Al2O3: '0.810'
+      value_as_published: '3.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000037'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.186'
+        Al2O3: '0.814'
+      value_as_published: '3.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000033'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.183'
+        Al2O3: '0.817'
+      value_as_published: '3.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000031'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.180'
+        Al2O3: '0.820'
+      value_as_published: '2.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000028'
+    - T_K: '2451'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.173'
+        Al2O3: '0.827'
+      value_as_published: '2.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000023'
+    - T_K: '2464'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '2.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000021'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.168'
+        Al2O3: '0.832'
+      value_as_published: '2.0'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2453'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.162'
+        Al2O3: '0.838'
+      value_as_published: '1.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000017'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.160'
+        Al2O3: '0.840'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000016'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.159'
+        Al2O3: '0.841'
+      value_as_published: '1.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000015'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.156'
+        Al2O3: '0.844'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000014'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.151'
+        Al2O3: '0.849'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000012'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.146'
+        Al2O3: '0.854'
+      value_as_published: '1.0'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.144'
+        Al2O3: '0.856'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.139'
+        Al2O3: '0.861'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.131'
+        Al2O3: '0.861'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.129'
+        Al2O3: '0.871'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s2_sample2_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s2_sample2_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S2
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '3.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000031'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.190'
+        Al2O3: '0.810'
+      value_as_published: '2.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000028'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.186'
+        Al2O3: '0.814'
+      value_as_published: '2.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000025'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.183'
+        Al2O3: '0.817'
+      value_as_published: '2.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000023'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.180'
+        Al2O3: '0.820'
+      value_as_published: '2.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000021'
+    - T_K: '2451'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.173'
+        Al2O3: '0.827'
+      value_as_published: '1.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000017'
+    - T_K: '2464'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '1.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000015'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.168'
+        Al2O3: '0.832'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000014'
+    - T_K: '2453'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.162'
+        Al2O3: '0.838'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000012'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.160'
+        Al2O3: '0.840'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000011'
+    - T_K: '2478'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.159'
+        Al2O3: '0.841'
+      value_as_published: '1.0'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.156'
+        Al2O3: '0.844'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.151'
+        Al2O3: '0.849'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.146'
+        Al2O3: '0.854'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.144'
+        Al2O3: '0.856'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+    - T_K: '2474'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.142'
+        Al2O3: '0.858'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+    - T_K: '2477'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.139'
+        Al2O3: '0.861'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.131'
+        Al2O3: '0.861'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000003'
+    - T_K: '2480'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.129'
+        Al2O3: '0.871'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000003'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s2_sample2_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s3_sample1_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S3
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2536'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.313'
+        Al2O3: '0.687'
+      value_as_published: '0.17'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.17'
+    - T_K: '2538'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '0.19'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.19'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.289'
+        Al2O3: '0.711'
+      value_as_published: '0.20'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.2'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.258'
+        Al2O3: '0.742'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.249'
+        Al2O3: '0.751'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.241'
+        Al2O3: '0.759'
+      value_as_published: '0.27'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.27'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.233'
+        Al2O3: '0.767'
+      value_as_published: '0.29'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.29'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.220'
+        Al2O3: '0.78'
+      value_as_published: '0.31'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.31'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.214'
+        Al2O3: '0.786'
+      value_as_published: '0.33'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.33'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.202'
+        Al2O3: '0.798'
+      value_as_published: '0.35'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.35'
+    - T_K: '2542'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.192'
+        Al2O3: '0.808'
+      value_as_published: '0.38'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.38'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.182'
+        Al2O3: '0.818'
+      value_as_published: '0.40'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.4'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.843'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.150'
+        Al2O3: '0.850'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.143'
+        Al2O3: '0.857'
+      value_as_published: '0.52'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.52'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.138'
+        Al2O3: '0.862'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.56'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.56'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.128'
+        Al2O3: '0.872'
+      value_as_published: '0.57'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.57'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.124'
+        Al2O3: '0.876'
+      value_as_published: '0.59'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.59'
+    - T_K: '2552'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.121'
+        Al2O3: '0.879'
+      value_as_published: '0.60'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.6'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.117'
+        Al2O3: '0.883'
+      value_as_published: '0.61'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.61'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.110'
+        Al2O3: '0.890'
+      value_as_published: '0.64'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.64'
+    - T_K: '2555'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.104'
+        Al2O3: '0.896'
+      value_as_published: '0.66'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.66'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.68'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.68'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s3_sample1_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s3_sample1_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S3
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2536'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.313'
+        Al2O3: '0.687'
+      value_as_published: '0.11'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.11'
+    - T_K: '2538'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '0.12'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.12'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.289'
+        Al2O3: '0.711'
+      value_as_published: '0.13'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.13'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '0.14'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.14'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.258'
+        Al2O3: '0.742'
+      value_as_published: '0.16'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.16'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.249'
+        Al2O3: '0.751'
+      value_as_published: '0.17'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.17'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.241'
+        Al2O3: '0.759'
+      value_as_published: '0.18'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.18'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.233'
+        Al2O3: '0.767'
+      value_as_published: '0.19'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.19'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.19'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.19'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.220'
+        Al2O3: '0.78'
+      value_as_published: '0.20'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.2'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.214'
+        Al2O3: '0.786'
+      value_as_published: '0.21'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.21'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.202'
+        Al2O3: '0.798'
+      value_as_published: '0.22'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.22'
+    - T_K: '2542'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.192'
+        Al2O3: '0.808'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.182'
+        Al2O3: '0.818'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.843'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.150'
+        Al2O3: '0.850'
+      value_as_published: '0.32'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.32'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.143'
+        Al2O3: '0.857'
+      value_as_published: '0.33'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.33'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.138'
+        Al2O3: '0.862'
+      value_as_published: '0.34'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.34'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.36'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.36'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.128'
+        Al2O3: '0.872'
+      value_as_published: '0.37'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.37'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.124'
+        Al2O3: '0.876'
+      value_as_published: '0.38'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.38'
+    - T_K: '2552'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.121'
+        Al2O3: '0.879'
+      value_as_published: '0.39'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.39'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.117'
+        Al2O3: '0.883'
+      value_as_published: '0.40'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.4'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.110'
+        Al2O3: '0.890'
+      value_as_published: '0.42'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.42'
+    - T_K: '2555'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.104'
+        Al2O3: '0.896'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.46'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.46'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s3_sample1_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s3_sample1_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S3
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2536'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.313'
+        Al2O3: '0.687'
+      value_as_published: '4.0'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000004'
+    - T_K: '2538'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '3.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000034'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.289'
+        Al2O3: '0.711'
+      value_as_published: '2.8'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000028'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '2.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000023'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.258'
+        Al2O3: '0.742'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000016'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.249'
+        Al2O3: '0.751'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000014'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.241'
+        Al2O3: '0.759'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000012'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.233'
+        Al2O3: '0.767'
+      value_as_published: '1.0'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000001'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000008'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.220'
+        Al2O3: '0.78'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000007'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.214'
+        Al2O3: '0.786'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000006'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.202'
+        Al2O3: '0.798'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000005'
+    - T_K: '2542'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.192'
+        Al2O3: '0.808'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000004'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.182'
+        Al2O3: '0.818'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.843'
+      value_as_published: '0.12'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000012'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.150'
+        Al2O3: '0.850'
+      value_as_published: '0.09'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.143'
+        Al2O3: '0.857'
+      value_as_published: '0.07'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000007'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.138'
+        Al2O3: '0.862'
+      value_as_published: '0.06'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.05'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.128'
+        Al2O3: '0.872'
+      value_as_published: '0.04'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000004'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.124'
+        Al2O3: '0.876'
+      value_as_published: '0.03'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000003'
+    - T_K: '2552'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.121'
+        Al2O3: '0.879'
+      value_as_published: '0.03'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000003'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.117'
+        Al2O3: '0.883'
+      value_as_published: '0.02'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000002'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.110'
+        Al2O3: '0.890'
+      value_as_published: '0.02'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000002'
+    - T_K: '2555'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.104'
+        Al2O3: '0.896'
+      value_as_published: '0.01'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.01'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s3_sample1_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s3_sample1_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S3
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '1'
+    data:
+    - T_K: '2536'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.313'
+        Al2O3: '0.687'
+      value_as_published: '5.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000052'
+    - T_K: '2538'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.301'
+        Al2O3: '0.699'
+      value_as_published: '4.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000044'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.289'
+        Al2O3: '0.711'
+      value_as_published: '3.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000037'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.277'
+        Al2O3: '0.723'
+      value_as_published: '3.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000031'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.258'
+        Al2O3: '0.742'
+      value_as_published: '2.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000022'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.249'
+        Al2O3: '0.751'
+      value_as_published: '1.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000019'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.241'
+        Al2O3: '0.759'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000016'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.233'
+        Al2O3: '0.767'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000014'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.226'
+        Al2O3: '0.774'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000012'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.220'
+        Al2O3: '0.78'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000011'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.214'
+        Al2O3: '0.786'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000009'
+    - T_K: '2547'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.202'
+        Al2O3: '0.798'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000007'
+    - T_K: '2542'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.192'
+        Al2O3: '0.808'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000005'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.182'
+        Al2O3: '0.818'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000004'
+    - T_K: '2544'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.169'
+        Al2O3: '0.831'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.843'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000002'
+    - T_K: '2537'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.150'
+        Al2O3: '0.850'
+      value_as_published: '0.14'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000014'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.143'
+        Al2O3: '0.857'
+      value_as_published: '0.10'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000001'
+    - T_K: '2540'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.138'
+        Al2O3: '0.862'
+      value_as_published: '0.08'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.06'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+    - T_K: '2541'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.128'
+        Al2O3: '0.872'
+      value_as_published: '0.05'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.124'
+        Al2O3: '0.876'
+      value_as_published: '0.04'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000004'
+    - T_K: '2552'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.121'
+        Al2O3: '0.879'
+      value_as_published: '0.04'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000004'
+    - T_K: '2546'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.117'
+        Al2O3: '0.883'
+      value_as_published: '0.03'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000003'
+    - T_K: '2550'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.110'
+        Al2O3: '0.890'
+      value_as_published: '0.02'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000002'
+    - T_K: '2555'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.104'
+        Al2O3: '0.896'
+      value_as_published: '0.01'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+    - T_K: '2558'
+      sample_id_as_printed: '1'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.01'
+      scale_factor:
+        header: acal(SrO) × 10^7
+        exponent: -7
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s3_sample1_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s4_sample2_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S4
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.195'
+        Al2O3: '0.805'
+      value_as_published: '0.37'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.37'
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '0.37'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.37'
+    - T_K: '2540'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.191'
+        Al2O3: '0.809'
+      value_as_published: '0.38'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.38'
+    - T_K: '2541'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.189'
+        Al2O3: '0.811'
+      value_as_published: '0.38'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.38'
+    - T_K: '2543'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.185'
+        Al2O3: '0.815'
+      value_as_published: '0.39'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.39'
+    - T_K: '2544'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.41'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.41'
+    - T_K: '2555'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.177'
+        Al2O3: '0.823'
+      value_as_published: '0.42'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.42'
+    - T_K: '2539'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.174'
+        Al2O3: '0.826'
+      value_as_published: '0.42'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.42'
+    - T_K: '2560'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2561'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.167'
+        Al2O3: '0.833'
+      value_as_published: '0.44'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.44'
+    - T_K: '2562'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.45'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.45'
+    - T_K: '2564'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.842'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2566'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.153'
+        Al2O3: '0.847'
+      value_as_published: '0.49'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.49'
+    - T_K: '2570'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.149'
+        Al2O3: '0.851'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.145'
+        Al2O3: '0.855'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2547'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.141'
+        Al2O3: '0.859'
+      value_as_published: '0.53'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.53'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.56'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.56'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s4_sample2_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s4_sample2_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S4
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.195'
+        Al2O3: '0.805'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2540'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.191'
+        Al2O3: '0.809'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2541'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.189'
+        Al2O3: '0.811'
+      value_as_published: '0.24'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.24'
+    - T_K: '2543'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.185'
+        Al2O3: '0.815'
+      value_as_published: '0.25'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.25'
+    - T_K: '2544'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2555'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.177'
+        Al2O3: '0.823'
+      value_as_published: '0.26'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.26'
+    - T_K: '2539'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.174'
+        Al2O3: '0.826'
+      value_as_published: '0.27'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.27'
+    - T_K: '2560'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2561'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.167'
+        Al2O3: '0.833'
+      value_as_published: '0.28'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.28'
+    - T_K: '2562'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '0.29'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.29'
+    - T_K: '2564'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.842'
+      value_as_published: '0.30'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.3'
+    - T_K: '2566'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.153'
+        Al2O3: '0.847'
+      value_as_published: '0.31'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.31'
+    - T_K: '2570'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.149'
+        Al2O3: '0.851'
+      value_as_published: '0.32'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.32'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.145'
+        Al2O3: '0.855'
+      value_as_published: '0.33'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.33'
+    - T_K: '2547'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.141'
+        Al2O3: '0.859'
+      value_as_published: '0.34'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.34'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.35'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.35'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.36'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.36'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s4_sample2_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s4_sample2_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S4
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.195'
+        Al2O3: '0.805'
+      value_as_published: '3.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000039'
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '3.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000037'
+    - T_K: '2540'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.191'
+        Al2O3: '0.809'
+      value_as_published: '3.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000035'
+    - T_K: '2541'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.189'
+        Al2O3: '0.811'
+      value_as_published: '3.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000033'
+    - T_K: '2543'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.185'
+        Al2O3: '0.815'
+      value_as_published: '3.0'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000003'
+    - T_K: '2544'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '2.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000027'
+    - T_K: '2555'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.177'
+        Al2O3: '0.823'
+      value_as_published: '2.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000023'
+    - T_K: '2539'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.174'
+        Al2O3: '0.826'
+      value_as_published: '2.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000021'
+    - T_K: '2560'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '1.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000019'
+    - T_K: '2561'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.167'
+        Al2O3: '0.833'
+      value_as_published: '1.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000017'
+    - T_K: '2562'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000016'
+    - T_K: '2564'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.842'
+      value_as_published: '1.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000013'
+    - T_K: '2566'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.153'
+        Al2O3: '0.847'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000011'
+    - T_K: '2570'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.149'
+        Al2O3: '0.851'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.145'
+        Al2O3: '0.855'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2547'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.141'
+        Al2O3: '0.859'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000007'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000005'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s4_sample2_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s4_sample2_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S4
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '2'
+    data:
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.195'
+        Al2O3: '0.805'
+      value_as_published: '5.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000058'
+    - T_K: '2538'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.193'
+        Al2O3: '0.807'
+      value_as_published: '5.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000055'
+    - T_K: '2540'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.191'
+        Al2O3: '0.809'
+      value_as_published: '5.2'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000052'
+    - T_K: '2541'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.189'
+        Al2O3: '0.811'
+      value_as_published: '4.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000049'
+    - T_K: '2543'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.185'
+        Al2O3: '0.815'
+      value_as_published: '4.4'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000044'
+    - T_K: '2544'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.181'
+        Al2O3: '0.819'
+      value_as_published: '3.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000039'
+    - T_K: '2555'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.177'
+        Al2O3: '0.823'
+      value_as_published: '3.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000035'
+    - T_K: '2539'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.174'
+        Al2O3: '0.826'
+      value_as_published: '3.2'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000032'
+    - T_K: '2560'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.170'
+        Al2O3: '0.830'
+      value_as_published: '2.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000028'
+    - T_K: '2561'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.167'
+        Al2O3: '0.833'
+      value_as_published: '2.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000025'
+    - T_K: '2562'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.164'
+        Al2O3: '0.836'
+      value_as_published: '2.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000023'
+    - T_K: '2564'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.157'
+        Al2O3: '0.842'
+      value_as_published: '1.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000018'
+    - T_K: '2566'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.153'
+        Al2O3: '0.847'
+      value_as_published: '1.5'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000015'
+    - T_K: '2570'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.149'
+        Al2O3: '0.851'
+      value_as_published: '1.3'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000013'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.145'
+        Al2O3: '0.855'
+      value_as_published: '1.1'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000011'
+    - T_K: '2547'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.141'
+        Al2O3: '0.859'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000009'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.137'
+        Al2O3: '0.863'
+      value_as_published: '0.8'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000008'
+    - T_K: '2573'
+      sample_id_as_printed: '2'
+      composition_as_printed:
+        SrO: '0.132'
+        Al2O3: '0.868'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^8
+        exponent: -8
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000006'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s4_sample2_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s5_sample3_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S5
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2548'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.68'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.68'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.69'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.69'
+    - T_K: '2533'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.70'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.7'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.70'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.7'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.71'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.71'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.73'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.73'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.079'
+        Al2O3: '0.921'
+      value_as_published: '0.76'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.76'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.074'
+        Al2O3: '0.926'
+      value_as_published: '0.78'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.78'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.070'
+        Al2O3: '0.930'
+      value_as_published: '0.80'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.8'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.065'
+        Al2O3: '0.935'
+      value_as_published: '0.82'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.82'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.059'
+        Al2O3: '0.941'
+      value_as_published: '0.84'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.84'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.049'
+        Al2O3: '0.951'
+      value_as_published: '0.88'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.88'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.042'
+        Al2O3: '0.958'
+      value_as_published: '0.90'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.9'
+    - T_K: '2547'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.036'
+        Al2O3: '0.964'
+      value_as_published: '0.92'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.92'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.027'
+        Al2O3: '0.973'
+      value_as_published: '0.95'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.95'
+    - T_K: '2552'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.015'
+        Al2O3: '0.985'
+      value_as_published: '0.98'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.98'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s5_sample3_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s5_sample3_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S5
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2548'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.46'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.46'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.46'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.46'
+    - T_K: '2533'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.47'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.47'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.48'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.48'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.48'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.48'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.079'
+        Al2O3: '0.921'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.074'
+        Al2O3: '0.926'
+      value_as_published: '0.56'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.56'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.070'
+        Al2O3: '0.930'
+      value_as_published: '0.58'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.58'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.065'
+        Al2O3: '0.935'
+      value_as_published: '0.60'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.6'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.059'
+        Al2O3: '0.941'
+      value_as_published: '0.64'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.64'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.049'
+        Al2O3: '0.951'
+      value_as_published: '0.69'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.69'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.042'
+        Al2O3: '0.958'
+      value_as_published: '0.74'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.74'
+    - T_K: '2547'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.036'
+        Al2O3: '0.964'
+      value_as_published: '0.78'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.78'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.027'
+        Al2O3: '0.973'
+      value_as_published: '0.84'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.84'
+    - T_K: '2552'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.015'
+        Al2O3: '0.985'
+      value_as_published: '0.93'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.93'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s5_sample3_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s5_sample3_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S5
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2548'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '1.00'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.95'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000095'
+    - T_K: '2533'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.80'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000008'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.76'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000076'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.68'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000068'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000054'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.079'
+        Al2O3: '0.921'
+      value_as_published: '0.32'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000032'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.074'
+        Al2O3: '0.926'
+      value_as_published: '0.23'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000023'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.070'
+        Al2O3: '0.930'
+      value_as_published: '0.18'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000018'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.065'
+        Al2O3: '0.935'
+      value_as_published: '0.13'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000013'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.059'
+        Al2O3: '0.941'
+      value_as_published: '0.08'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000008'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.049'
+        Al2O3: '0.951'
+      value_as_published: '0.04'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000004'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.042'
+        Al2O3: '0.958'
+      value_as_published: '0.02'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000002'
+    - T_K: '2547'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.036'
+        Al2O3: '0.964'
+      value_as_published: 1.3×10-2
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000000013'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.027'
+        Al2O3: '0.973'
+      value_as_published: 5.5×10-3
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000000055'
+    - T_K: '2552'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.015'
+        Al2O3: '0.985'
+      value_as_published: 1.3×10-3
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000000013'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s5_sample3_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s5_sample3_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S5
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2548'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.96'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000096'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.89'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000089'
+    - T_K: '2533'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.72'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000072'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.67'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000067'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.57'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000057'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.41'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000041'
+    - T_K: '2551'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.079'
+        Al2O3: '0.921'
+      value_as_published: '0.19'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000019'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.074'
+        Al2O3: '0.926'
+      value_as_published: '0.11'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000011'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.070'
+        Al2O3: '0.930'
+      value_as_published: '0.07'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000007'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.065'
+        Al2O3: '0.935'
+      value_as_published: '0.04'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000004'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.059'
+        Al2O3: '0.941'
+      value_as_published: '0.02'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000002'
+    - T_K: '2553'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.049'
+        Al2O3: '0.951'
+      value_as_published: 4.1×10-3
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000000041'
+    - T_K: '2555'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.042'
+        Al2O3: '0.958'
+      value_as_published: 1.1×10-3
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000000011'
+    - T_K: '2547'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.036'
+        Al2O3: '0.964'
+      value_as_published: 3.0×10-4
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000000003'
+    - T_K: '2550'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.027'
+        Al2O3: '0.973'
+      value_as_published: 2.6×10-5
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000000000026'
+    - T_K: '2552'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.015'
+        Al2O3: '0.985'
+      value_as_published: 2.6×10-7
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.00000000000000026'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s5_sample3_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s6_sample3_al2o3_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S6
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.66'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.66'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.66'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.66'
+    - T_K: '2649'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.67'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.67'
+    - T_K: '2653'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.097'
+        Al2O3: '0.903'
+      value_as_published: '0.67'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.67'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.096'
+        Al2O3: '0.904'
+      value_as_published: '0.67'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.67'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.68'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.68'
+    - T_K: '2648'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.68'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.68'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.69'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.69'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.090'
+        Al2O3: '0.910'
+      value_as_published: '0.70'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.7'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.71'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.71'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.083'
+        Al2O3: '0.917'
+      value_as_published: '0.73'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.73'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.080'
+        Al2O3: '0.920'
+      value_as_published: '0.74'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.74'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.078'
+        Al2O3: '0.922'
+      value_as_published: '0.75'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.75'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.076'
+        Al2O3: '0.924'
+      value_as_published: '0.76'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.76'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s6_sample3_al2o3_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s6_sample3_al2o3_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S6
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: Al2O3
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.49'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.49'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.49'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.49'
+    - T_K: '2649'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2653'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.097'
+        Al2O3: '0.903'
+      value_as_published: '0.50'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.5'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.096'
+        Al2O3: '0.904'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2648'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.51'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.51'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.52'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.52'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.090'
+        Al2O3: '0.910'
+      value_as_published: '0.53'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.53'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.54'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.54'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.083'
+        Al2O3: '0.917'
+      value_as_published: '0.56'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.56'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.080'
+        Al2O3: '0.920'
+      value_as_published: '0.57'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.57'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.078'
+        Al2O3: '0.922'
+      value_as_published: '0.58'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.58'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.076'
+        Al2O3: '0.924'
+      value_as_published: '0.59'
+      scale_factor:
+        header: acal(Al2O3)
+        exponent: 0
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.59'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s6_sample3_al2o3_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: Al2O3
+- observation_id: stolyarova_2023_s6_sample3_sro_rk_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S6
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Redlich-Kister polynomial (10)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000007'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '0.7'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000007'
+    - T_K: '2649'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000006'
+    - T_K: '2653'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.097'
+        Al2O3: '0.903'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000006'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.096'
+        Al2O3: '0.904'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000006'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000005'
+    - T_K: '2648'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000005'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000004'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.090'
+        Al2O3: '0.910'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000004'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000003'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.083'
+        Al2O3: '0.917'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000003'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.080'
+        Al2O3: '0.920'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000002'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.078'
+        Al2O3: '0.922'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000002'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.076'
+        Al2O3: '0.924'
+      value_as_published: '0.2'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000002'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s6_sample3_sro_rk_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO
+- observation_id: stolyarova_2023_s6_sample3_sro_wilson_calculated_activity_context
+  type: model_derived_table
+  locator:
+    table: S6
+  units: dimensionless activity after the printed header scale factor
+  values:
+    quantity: activity (candidate token; model output retained in context)
+    method_class: model_derived
+    component: SrO
+    model_as_printed: Wilson polynomial (12)
+    sample_id_as_printed: '3'
+    data:
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.100'
+        Al2O3: '0.900'
+      value_as_published: '2.1'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000021'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.099'
+        Al2O3: '0.901'
+      value_as_published: '1.9'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000019'
+    - T_K: '2649'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.098'
+        Al2O3: '0.902'
+      value_as_published: '1.8'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000018'
+    - T_K: '2653'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.097'
+        Al2O3: '0.903'
+      value_as_published: '1.7'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000017'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.096'
+        Al2O3: '0.904'
+      value_as_published: '1.6'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000016'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.095'
+        Al2O3: '0.905'
+      value_as_published: '1.5'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000015'
+    - T_K: '2648'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.094'
+        Al2O3: '0.906'
+      value_as_published: '1.4'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000014'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.092'
+        Al2O3: '0.908'
+      value_as_published: '1.2'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000012'
+    - T_K: '2652'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.090'
+        Al2O3: '0.910'
+      value_as_published: '1.0'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.000000001'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.088'
+        Al2O3: '0.912'
+      value_as_published: '0.9'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000009'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.083'
+        Al2O3: '0.917'
+      value_as_published: '0.6'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000006'
+    - T_K: '2650'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.080'
+        Al2O3: '0.920'
+      value_as_published: '0.5'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000005'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.078'
+        Al2O3: '0.922'
+      value_as_published: '0.4'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000004'
+    - T_K: '2651'
+      sample_id_as_printed: '3'
+      composition_as_printed:
+        SrO: '0.076'
+        Al2O3: '0.924'
+      value_as_published: '0.3'
+      scale_factor:
+        header: acal(SrO) × 10^9
+        exponent: -9
+        direction: multiply
+      activity_dimensionless_after_header_scale: '0.0000000003'
+  context_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement::context::stolyarova_2023_s6_sample3_sro_wilson_calculated_activity_context
+  work_id: 10.1002/rcm.9459
+  source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
+  species: SrO

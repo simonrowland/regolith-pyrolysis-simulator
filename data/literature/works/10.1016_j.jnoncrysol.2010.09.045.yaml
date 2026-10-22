@@ -1,0 +1,1004 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  citation: Khedim, H., Podor, R., Panteix, P.-J., Rapin, C. & Vilasi, M. (2010). Solubility of chromium oxide in binary soda-silicate
+    melts. Journal of Non-Crystalline Solids, 356(50-51), 2734-2741.
+  source_ids:
+  - khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jnoncrysol.2010.09.045
+experiments:
+- experiment_id: 10.1016/j.jnoncrysol.2010.09.045::khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  locator:
+    page: 21
+    published_page: 20
+    pdf_page_index: 20
+    table: '2'
+    note: Table 2 total dissolved chromium; parenthetical value is the stated standard deviation.; row=Fe/FeO; column=Na2O-1.5SiO2
+      / At.% Cr
+context:
+- observation_id: khedim_2010_cell_pressure_and_quench
+  type: method
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 6
+    note: Section 2, Experimental
+  phase: silicate melt and quenched glass
+  units: as printed
+  values:
+    quantity: experimental protocol
+    method_class: method_only
+    quench: After heat treatment, sealed silica tubes were removed from the furnace and directly quenched into water; the
+      first 10 seconds cooling rate is estimated to be 50°C/s.
+    residual_pressure_bound_at_room_temperature: never exceed 10^-6 bar
+    pressure_scope: room-temperature residual cell pressure, not the experimental-temperature chamber pressure
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_cell_pressure_and_quench
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure4_printed_intercepts
+  type: thermodynamic_example
+  locator:
+    page: 28
+    pdf_page_index: 27
+    published_page: 27
+    figure: '4'
+    note: Printed B and C labels inside the figure panels, transcribed without digitising the plotted data.
+  phase: Na2O-2SiO2 melt
+  units: dimensionless logarithmic redox-ratio intercepts
+  values:
+    quantity_as_published: redox-ratio fit intercepts
+    method_class: model_derived
+    values_as_printed:
+    - T_C: 1250
+      B_as_printed: '1.35'
+      C_as_printed: '-2.96'
+    - T_C: 1200
+      B_as_printed: '1.27'
+      C_as_printed: '-3.13'
+    - T_C: 1175
+      B_as_printed: '1.24'
+      C_as_printed: '-3.29'
+    - T_C: 1125
+      B_as_printed: '1.10'
+      C_as_printed: '-3.31'
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure4_printed_intercepts
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure4_theoretical_slopes
+  type: thermodynamic_example
+  locator:
+    page: 27
+    pdf_page_index: 26
+    published_page: 26
+    figure: '4'
+    note: Section 4, Discussion
+  phase: Na2O-2SiO2 melt
+  units: dimensionless slope per log10 fO2
+  values:
+    quantity_as_published: theoretical redox-ratio slopes
+    method_class: model_derived
+    log_Rred_d_log_fO2: '-0.25'
+    log_Rox_d_log_fO2: '0.75'
+    note: These are theoretical slopes from the printed equilibrium equations, not measured values.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure4_theoretical_slopes
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure7_printed_regressions
+  type: thermodynamic_example
+  locator:
+    page: 31
+    pdf_page_index: 30
+    published_page: 30
+    figure: '7'
+    note: Regression coefficients are printed in the figure caption.
+  phase: Na2O-SiO2 melt
+  units: dimensionless slope and intercept; R-squared dimensionless
+  values:
+    quantity_as_published: Arrhenius regressions for log[Cr(III)] versus 1/T
+    method_class: model_derived
+    values_as_printed:
+      Na2O-1.5SiO2:
+        slope: '-0.252'
+        intercept: '1.085'
+        R2: '0.999'
+      Na2O-2SiO2:
+        slope: '-0.262'
+        intercept: '1.262'
+        R2: '0.994'
+      Na2O-2.5SiO2:
+        slope: '-0.212'
+        intercept: '1.013'
+        R2: '0.996'
+      Na2O-3SiO2:
+        slope: '-0.237'
+        intercept: '1.258'
+        R2: '0.996'
+    equation_as_published: log[Cr(III)] = slope × (1/T) + intercept
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure7_printed_regressions
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 25
+    pdf_page_index: 24
+    published_page: 24
+    figure: '2'
+  phase: melt; samples quenched and analyzed as glass
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1125
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: log fO2
+      y: at.% Cr
+    caption: Total chromium contents reported as a function of oxygen fugacity for different temperatures and glass compositions.
+      (a) T=1125°C – (b) T=1175°C – (c) T=1200°C – (d) T=1250°C.
+    panel: a-d
+    series:
+    - panel: a
+      T_C: 1125
+      composition: Na2O-1.5SiO2
+      marker: diamond
+      marker_count: 5
+    - panel: a
+      T_C: 1125
+      composition: Na2O-2SiO2
+      marker: square
+      marker_count: 5
+    - panel: a
+      T_C: 1125
+      composition: Na2O-2.5SiO2
+      marker: triangle
+      marker_count: 5
+    - panel: a
+      T_C: 1125
+      composition: Na2O-3SiO2
+      marker: x
+      marker_count: 5
+    - panel: b
+      T_C: 1175
+      composition: Na2O-1.5SiO2
+      marker: diamond
+      marker_count: 5
+    - panel: b
+      T_C: 1175
+      composition: Na2O-2SiO2
+      marker: square
+      marker_count: 5
+    - panel: b
+      T_C: 1175
+      composition: Na2O-2.5SiO2
+      marker: triangle
+      marker_count: 5
+    - panel: b
+      T_C: 1175
+      composition: Na2O-3SiO2
+      marker: x
+      marker_count: 5
+    - panel: c
+      T_C: 1200
+      composition: Na2O-1.5SiO2
+      marker: diamond
+      marker_count: 5
+    - panel: c
+      T_C: 1200
+      composition: Na2O-2SiO2
+      marker: square
+      marker_count: 5
+    - panel: c
+      T_C: 1200
+      composition: Na2O-2.5SiO2
+      marker: triangle
+      marker_count: 5
+    - panel: c
+      T_C: 1200
+      composition: Na2O-3SiO2
+      marker: x
+      marker_count: 5
+    - panel: d
+      T_C: 1250
+      composition: Na2O-1.5SiO2
+      marker: diamond
+      marker_count: 5
+    - panel: d
+      T_C: 1250
+      composition: Na2O-2SiO2
+      marker: square
+      marker_count: 5
+    - panel: d
+      T_C: 1250
+      composition: Na2O-2.5SiO2
+      marker: triangle
+      marker_count: 5
+    - panel: d
+      T_C: 1250
+      composition: Na2O-3SiO2
+      marker: x
+      marker_count: 5
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity: equilibrium_phase_composition
+    note: The values from this figure are tabulated in Table 2 and scored once there.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_2_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 27
+    pdf_page_index: 26
+    published_page: 26
+    figure: '3'
+  phase: melt; samples quenched and analyzed as glass
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1125
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: log fO2
+      y: at.% Cr
+    caption: Plots of total chromium contents in the Na2O-2SiO2 melt as a function of oxygen fugacity for different temperatures.
+    panel: not printed
+    series:
+    - label: T=1250°C, Na2O-2SiO2
+      marker: square
+      marker_count: 5
+    - label: T=1175°C, Na2O-2SiO2
+      marker: x
+      marker_count: 5
+    - label: T=1200°C, Na2O-2SiO2
+      marker: triangle
+      marker_count: 5
+    - label: T=1125°C, Na2O-2SiO2
+      marker: circle
+      marker_count: 5
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity: equilibrium_phase_composition
+    note: The plotted total-Cr data are deferred; Table 2 values are typed once.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_3_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_4a_deferred
+  type: figure_record
+  locator:
+    page: 28
+    pdf_page_index: 27
+    published_page: 27
+    figure: '4'
+  phase: model-derived redox ratios for the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1250
+    - 1200
+    - 1175
+    - 1125
+    axes_as_published:
+      x: log fO2
+      y: log(Rred)
+    caption: 'Plots of log(Rred) (a) and log(Rox) (b) determined in the Na2O-2SiO2 system as a function of logfO2 for different
+      temperatures. The obtained equations of the lines are in agreement with the theoretical equations: log(Rred) = -0.25log(fO2)
+      + C and log(Rox) = 0.75log(fO2) + B. The values of B and C parameters deduced from these plots at each temperature are
+      reported on the figure.'
+    panel: a
+    series:
+    - label: T=1250°C, Na2O-2SiO2
+      ratio_as_published: log(Rred)=log(Cr(II)/Cr(III))
+      marker: diamond
+      marker_count: 5
+    - label: T=1200°C, Na2O-2SiO2
+      ratio_as_published: log(Rred)=log(Cr(II)/Cr(III))
+      marker: circle
+      marker_count: 5
+    - label: T=1175°C, Na2O-2SiO2
+      ratio_as_published: log(Rred)=log(Cr(II)/Cr(III))
+      marker: triangle
+      marker_count: 5
+    - label: T=1125°C, Na2O-2SiO2
+      ratio_as_published: log(Rred)=log(Cr(II)/Cr(III))
+      marker: x
+      marker_count: 5
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: log(Rred)=log(Cr(II)/Cr(III))
+    note: The curves and their numeric point values are deferred; no Cr-compatible general valence-ratio enum exists.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_4a_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_4b_deferred
+  type: figure_record
+  locator:
+    page: 28
+    pdf_page_index: 27
+    published_page: 27
+    figure: '4'
+  phase: model-derived redox ratios for the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1250
+    - 1200
+    - 1175
+    - 1125
+    axes_as_published:
+      x: log fO2
+      y: log(Rox)
+    caption: 'Plots of log(Rred) (a) and log(Rox) (b) determined in the Na2O-2SiO2 system as a function of logfO2 for different
+      temperatures. The obtained equations of the lines are in agreement with the theoretical equations: log(Rred) = -0.25log(fO2)
+      + C and log(Rox) = 0.75log(fO2) + B. The values of B and C parameters deduced from these plots at each temperature are
+      reported on the figure.'
+    panel: b
+    series:
+    - label: T=1250°C, Na2O-2SiO2
+      ratio_as_published: log(Rox)=log(Cr(VI)/Cr(III))
+      marker: diamond
+      marker_count: 5
+    - label: T=1200°C, Na2O-2SiO2
+      ratio_as_published: log(Rox)=log(Cr(VI)/Cr(III))
+      marker: circle
+      marker_count: 5
+    - label: T=1175°C, Na2O-2SiO2
+      ratio_as_published: log(Rox)=log(Cr(VI)/Cr(III))
+      marker: triangle
+      marker_count: 5
+    - label: T=1125°C, Na2O-2SiO2
+      ratio_as_published: log(Rox)=log(Cr(VI)/Cr(III))
+      marker: x
+      marker_count: 5
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: log(Rox)=log(Cr(VI)/Cr(III))
+    note: The curves and their numeric point values are deferred; no Cr-compatible general valence-ratio enum exists.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_4b_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_5a_deferred
+  type: figure_record
+  locator:
+    page: 29
+    pdf_page_index: 28
+    published_page: 28
+    figure: '5'
+  phase: model-derived chromium speciation in the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1250
+    - 1200
+    - 1175
+    - 1125
+    axes_as_published:
+      x: log[a(O2-)]
+      y: log[Cr(III)]
+    caption: Logarithmic plot of Cr(III) (a), Rox (b) and Rred (c) as a function of aO2-.
+    panel: a
+    series:
+    - label: T=1250°C, Na2O-2SiO2, Cr(III)
+      marker: diamond
+      marker_count: 4
+    - label: T=1200°C, Na2O-2SiO2, Cr(III)
+      marker: circle
+      marker_count: 3
+    - label: T=1175°C, Na2O-2SiO2, Cr(III)
+      marker: triangle
+      marker_count: 4
+    - label: T=1125°C, Na2O-2SiO2, Cr(III)
+      marker: x
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity: equilibrium_phase_composition
+    note: The numeric markers and model curves are deferred; no plotted point was read.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_5a_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_5b_deferred
+  type: figure_record
+  locator:
+    page: 29
+    pdf_page_index: 28
+    published_page: 28
+    figure: '5'
+  phase: model-derived chromium speciation in the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1250
+    - 1200
+    - 1175
+    - 1125
+    axes_as_published:
+      x: log[a(O2-)]
+      y: log(Rox)
+    caption: Logarithmic plot of Cr(III) (a), Rox (b) and Rred (c) as a function of aO2-.
+    panel: b
+    series:
+    - label: T=1250°C, Na2O-2SiO2, Rox=Cr(VI)/Cr(III)
+      marker: diamond
+      marker_count: 5
+    - label: T=1200°C, Na2O-2SiO2, Rox=Cr(VI)/Cr(III)
+      marker: circle
+      marker_count: 4
+    - label: T=1175°C, Na2O-2SiO2, Rox=Cr(VI)/Cr(III)
+      marker: triangle
+      marker_count: 4
+    - label: T=1125°C, Na2O-2SiO2, Rox=Cr(VI)/Cr(III)
+      marker: x
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: Rox=Cr(VI)/Cr(III)
+    note: The numeric markers and model curves are deferred; no plotted point was read.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_5b_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_5c_deferred
+  type: figure_record
+  locator:
+    page: 29
+    pdf_page_index: 28
+    published_page: 28
+    figure: '5'
+  phase: model-derived chromium speciation in the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1250
+    - 1200
+    - 1175
+    - 1125
+    axes_as_published:
+      x: log[a(O2-)]
+      y: log(Rred)
+    caption: Logarithmic plot of Cr(III) (a), Rox (b) and Rred (c) as a function of aO2-.
+    panel: c
+    series:
+    - label: T=1250°C, Na2O-2SiO2, Rred=Cr(II)/Cr(III)
+      marker: diamond
+      marker_count: 4
+    - label: T=1200°C, Na2O-2SiO2, Rred=Cr(II)/Cr(III)
+      marker: circle
+      marker_count: 4
+    - label: T=1175°C, Na2O-2SiO2, Rred=Cr(II)/Cr(III)
+      marker: triangle
+      marker_count: 4
+    - label: T=1125°C, Na2O-2SiO2, Rred=Cr(II)/Cr(III)
+      marker: x
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: Rred=Cr(II)/Cr(III)
+    note: The numeric markers and model curves are deferred; no plotted point was read.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_5c_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_6_deferred
+  type: figure_record
+  locator:
+    page: 30
+    pdf_page_index: 29
+    published_page: 29
+    figure: '6'
+  phase: model-derived chromium complexes in the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1125
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: T (°C)
+      y: stoichiometric coefficient x, y, or z
+    caption: Stoichiometric coefficients x, y and z of the chromium oxo-complexes as a function of temperature.
+    panel: not printed
+    series:
+    - label: x
+      marker: circle
+      marker_count: 4
+    - label: y
+      marker: triangle
+      marker_count: 4
+    - label: z
+      marker: square
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: fitted chromium-complex stoichiometric parameters
+    note: Table 3 prints the x, y, and z values; the figure adds no numeric data points outside those values.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_6_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_7_deferred
+  type: figure_record
+  locator:
+    page: 31
+    pdf_page_index: 30
+    published_page: 30
+    figure: '7'
+  phase: model-derived Cr(III) concentration in the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1125
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: 1/T
+      y: log[Cr(III)]
+    caption: log[Cr(III)] reported as a function of 1/T for 4 compositions of the Na2O-SiO2 system.
+    panel: not printed
+    series:
+    - label: Na2O-1.5SiO2
+      marker: circle
+      marker_count: 4
+    - label: Na2O-2SiO2
+      marker: square
+      marker_count: 4
+    - label: Na2O-2.5SiO2
+      marker: triangle
+      marker_count: 4
+    - label: Na2O-3SiO2
+      marker: diamond
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity: equilibrium_phase_composition
+    note: The four printed regression equations are retained in a separate context record; no plotted coordinates were digitised.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_7_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_figure_8_deferred
+  type: figure_record
+  locator:
+    page: 32
+    pdf_page_index: 31
+    published_page: 31
+    figure: '8'
+  phase: model-derived redox parameters for the melt
+  units: as plotted
+  values:
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Digitisation is deferred; no plotted point was read.
+    species_formula: Cr
+    phase_label: melt
+    T_C:
+    - 1125
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: 1/T
+      y: B and C intercept parameters
+    caption: Plot of the B and C parameters as a function of the reverse of temperature. The results concern the Na2O-2SiO2
+      compositions.
+    panel: not printed
+    series:
+    - label: B
+      marker: circle
+      marker_count: 4
+    - label: C
+      marker: square
+      marker_count: 4
+    attribution: Khedim, Podor, Panteix, Rapin and Vilasi (2010), this work
+    digitisation: deferred to a figure pass
+    quantity_as_published: temperature-dependent redox-ratio intercepts
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_figure_8_deferred
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_microprobe_measurement_and_error
+  type: method
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 7
+    note: Section 2, Experimental
+  phase: quenched chromium-bearing glass
+  units: as printed
+  values:
+    quantity: electron-microprobe analysis
+    method_class: method_only
+    melt_and_glass_measurement: The glass compositions and total dissolved chromium were measured by electron microprobe.
+    measurement_count: The data used in this work are mean values determined from 10 measurements.
+    uncertainty: Standard deviations are considered as error bars; they are always in the range of 5% from the mean value.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_microprobe_measurement_and_error
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_table1_starting_glass_compositions
+  type: starting_material_composition
+  locator:
+    page: 20
+    pdf_page_index: 19
+    published_page: 19
+    table: '1'
+    note: Table 1 compositions are measured in the starting glasses, before the chromium saturation experiments.
+  phase: starting soda-silicate glass
+  units: at.% Na and Si; x=SiO2/Na2O as printed
+  values:
+    quantity_as_published: starting-glass elemental composition
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: No token represents the measured elemental at.% composition of starting glasses; equilibrium_phase_composition
+      would misidentify the starting glass as an equilibrated experimental melt.
+    method_class: measured_direct
+    theoretical_and_WDS_values:
+    - glass: Na2O-1.5SiO2
+      theoretical_Na_at_percent: '26.67'
+      theoretical_Si_at_percent: '20.00'
+      WDS_Na_at_percent: '25.95'
+      WDS_Na_sigma_at_percent: '0.40'
+      WDS_Si_at_percent: '20.17'
+      WDS_Si_sigma_at_percent: '0.19'
+      x: '1.56'
+      x_sigma: '0.04'
+    - glass: Na2O-2SiO2
+      theoretical_Na_at_percent: '22.22'
+      theoretical_Si_at_percent: '22.22'
+      WDS_Na_at_percent: '21.91'
+      WDS_Na_sigma_at_percent: '0.44'
+      WDS_Si_at_percent: '22.38'
+      WDS_Si_sigma_at_percent: '0.22'
+      x: '2.04'
+      x_sigma: '0.06'
+    - glass: Na2O-2.5SiO2
+      theoretical_Na_at_percent: '19.04'
+      theoretical_Si_at_percent: 23,81
+      WDS_Na_at_percent: '19.22'
+      WDS_Na_sigma_at_percent: '0.49'
+      WDS_Si_at_percent: '23.72'
+      WDS_Si_sigma_at_percent: '0.25'
+      x: '2.47'
+      x_sigma: '0.09'
+    - glass: Na2O-3SiO2
+      theoretical_Na_at_percent: '16.67'
+      theoretical_Si_at_percent: '25.00'
+      WDS_Na_at_percent: '16.34'
+      WDS_Na_sigma_at_percent: '0.22'
+      WDS_Si_at_percent: '25.16'
+      WDS_Si_sigma_at_percent: '0.11'
+      x: '3.08'
+      x_sigma: '0.06'
+    - glass: Na2O-3.5SiO2
+      theoretical_Na_at_percent: '14.81'
+      theoretical_Si_at_percent: '25.92'
+      WDS_Na_at_percent: '14.94'
+      WDS_Na_sigma_at_percent: '0.19'
+      WDS_Si_at_percent: '25.86'
+      WDS_Si_sigma_at_percent: '0.09'
+      x: '3.46'
+      x_sigma: '0.06'
+    parenthetical_values: WDS parenthetical values are standard deviations as stated for the analyses in the experimental
+      method.
+    x_definition: X is the x in the stated Na2O-xSiO2 glass composition; it is printed in Table 1 and is not recomputed here.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_table1_starting_glass_compositions
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_table3_fitted_chromium_complex_parameters
+  type: thermodynamic_example
+  locator:
+    page: 22
+    pdf_page_index: 21
+    published_page: 21
+    table: '3'
+  phase: Na2O-SiO2 melt
+  units: dimensionless fitted slopes and stoichiometric coefficients; standard deviations in parentheses
+  values:
+    quantity_as_published: fitted chromium redox-complex stoichiometric parameters
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - interaction_parameter
+    schema_gap: No quantity token represents these fitted stoichiometric exponents; they are not phase component amounts or
+      melt interaction parameters.
+    method_class: model_derived
+    evidence_class: model_derived
+    derivation_note: Slopes of log[Cr(III)], log(Rox), and log(Rred) versus log[a(O2-)]; x, y, and z are calculated from the
+      fitted slopes using the printed relations x-3/2, y-x-3/2, and z-x+1/2. Parenthetical widths are standard deviations
+      of experimental slopes.
+    printed_values:
+      slopes:
+        x_minus_3_over_2:
+        - T_C: 1250
+          value: '-0.18'
+          sigma: '0.03'
+        - T_C: 1200
+          value: '-0.17'
+          sigma: '0.04'
+        - T_C: 1175
+          value: '-0.15'
+          sigma: '0.03'
+        - T_C: 1125
+          value: '-0.15'
+          sigma: '0.03'
+        y_minus_x_minus_3_over_2:
+        - T_C: 1250
+          value: '0.73'
+          sigma: '0.13'
+        - T_C: 1200
+          value: '0.66'
+          sigma: '0.14'
+        - T_C: 1175
+          value: '0.42'
+          sigma: '0.08'
+        - T_C: 1125
+          value: '0.40'
+          sigma: '0.08'
+        z_minus_x_plus_1_over_2:
+        - T_C: 1250
+          value: '-0.30'
+          sigma: '0.05'
+        - T_C: 1200
+          value: '-0.26'
+          sigma: '0.05'
+        - T_C: 1175
+          value: '-0.24'
+          sigma: '0.04'
+        - T_C: 1125
+          value: '-0.36'
+          sigma: '0.07'
+      complex_coefficients:
+        x:
+        - T_C: 1250
+          value: '1.35'
+          sigma: '0.03'
+        - T_C: 1200
+          value: '1.33'
+          sigma: '0.04'
+        - T_C: 1175
+          value: '1.35'
+          sigma: '0.03'
+        - T_C: 1125
+          value: '1.35'
+          sigma: '0.03'
+        y:
+        - T_C: 1250
+          value: '3.50'
+          sigma: '0.16'
+        - T_C: 1200
+          value: '3.49'
+          sigma: '0.18'
+        - T_C: 1175
+          value: '3.27'
+          sigma: '0.10'
+        - T_C: 1125
+          value: '3.24'
+          sigma: '0.11'
+        z:
+        - T_C: 1250
+          value: '0.55'
+          sigma: '0.08'
+        - T_C: 1200
+          value: '0.57'
+          sigma: '0.09'
+        - T_C: 1175
+          value: '0.61'
+          sigma: '0.08'
+        - T_C: 1125
+          value: '0.49'
+          sigma: '0.10'
+        printed_averages:
+          x: '1.345'
+          y: '3.375'
+          z: '0.555'
+        fitted_species_complexes:
+          Cr(III): Cr3O4+
+          Cr(VI): Cr2O7^2-
+          Cr(II): Cr2O2+
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_table3_fitted_chromium_complex_parameters
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr
+- observation_id: khedim_2010_table4_reaction_thermodynamics
+  type: thermodynamic_example
+  locator:
+    page: 23
+    pdf_page_index: 22
+    published_page: 22
+    table: '4'
+  phase: Na2O-SiO2 melt
+  units: kJ/mol for reaction enthalpy; J/(K mol) for reaction entropy
+  values:
+    quantity_as_published: standard reaction enthalpy and entropy
+    candidate_quantity_tokens:
+    - delta_fH
+    - S
+    schema_gap: Table 4 values are reaction ΔH°/ΔS° for Cr2O3 dissolution, Cr(III) oxidation, and Cr(III) reduction, not formation
+      enthalpy from elements or absolute entropy.
+    method_class: model_derived
+    evidence_class: model_derived
+    reaction_definitions_as_printed:
+      dissolution: 1/2 Cr2O3(crystal) ⇌ Cr(III)Ox^(2x-3)- (melt) + (3/2-x) O2- (melt)
+      oxidation: Cr(III)Ox^(2x-3)- (melt) + 3/4 O2(gas) ⇌ Cr(VI)Oy^(2y-6)- (melt) + (x-y+3/2) O2- (melt)
+      reduction: Cr(III)Ox^(2x-3)- (melt) + (z-x+1/2) O2- (melt) ⇌ Cr(II)Oz^(2z-2)- (melt) + 1/4 O2(gas)
+    values_as_printed:
+    - composition: Na2O-1.5SiO2
+      dH_diss_kJ_mol:
+      - '85'
+      - '4'
+      dS_diss_J_K_mol:
+      - '18'
+      - '5'
+      dH_oxy_kJ_mol:
+      - '-105'
+      - '8'
+      dS_oxy_J_K_mol:
+      - '35'
+      - '5'
+      dH_red_kJ_mol:
+      - '218'
+      - '43'
+      dS_red_J_K_mol:
+      - '49'
+      - '8'
+    - composition: Na2O-2SiO2
+      dH_diss_kJ_mol:
+      - '88'
+      - '1'
+      dS_diss_J_K_mol:
+      - '24'
+      - '4'
+      dH_oxy_kJ_mol:
+      - '-63'
+      - '14'
+      dS_oxy_J_K_mol:
+      - '67'
+      - '10'
+      dH_red_kJ_mol:
+      - '185'
+      - '36'
+      dS_red_J_K_mol:
+      - '21'
+      - '7'
+    - composition: Na2O-2.5SiO2
+      dH_diss_kJ_mol:
+      - '79'
+      - '11'
+      dS_diss_J_K_mol:
+      - '20'
+      - '6'
+      dH_oxy_kJ_mol:
+      - '-120'
+      - '6'
+      dS_oxy_J_K_mol:
+      - '30'
+      - '6'
+      dH_red_kJ_mol:
+      - '228'
+      - '41'
+      dS_red_J_K_mol:
+      - '48'
+      - '7'
+    - composition: Na2O-3SiO2
+      dH_diss_kJ_mol:
+      - '84'
+      - '15'
+      dS_diss_J_K_mol:
+      - '26'
+      - '5'
+      dH_oxy_kJ_mol:
+      - '-115'
+      - '22'
+      dS_oxy_J_K_mol:
+      - '30'
+      - '6'
+      dH_red_kJ_mol:
+      - '246'
+      - '47'
+      dS_red_J_K_mol:
+      - '61'
+      - '12'
+    uncertainty_note: Each ± width is retained in the adjacent value array; confidence level is not separately stated in the
+      table.
+  context_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility::context::khedim_2010_table4_reaction_thermodynamics
+  work_id: 10.1016/j.jnoncrysol.2010.09.045
+  source_id: khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility
+  species: Cr

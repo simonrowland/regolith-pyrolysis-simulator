@@ -1,0 +1,309 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  citation: Haskin LA (1990). “Oxygen Production by Electrolysis of Molten Lunar Regolith,” Annual Progress Report 1989–90,
+    NASA Space Engineering Research Center for Utilization of Local Planetary Resources, University of Arizona, report N9125/8
+    (NASA NTRS 19910015909).
+  source_ids:
+  - haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+- experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+context:
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_21_deferred
+  type: figure_record
+  units: figure axes as printed
+  locator:
+    page: 61
+    pdf_page_index: 60
+    figure: '1.21'
+  values:
+    caption: Dependence of oxygen production efficiency on concentration of ferrous iron in the melt.
+    caption_locator:
+      page: 61
+      pdf_page_index: 60
+      figure: '1.21'
+    panel: as printed
+    typed_quantity: oxygen production, redox/electrochemical response, instrument setup, or metal microstructure; figure-only
+      values deferred
+    identity:
+      species: FeO, NiO, or Pt as caption states
+      phase: melt, metal, or apparatus as caption states
+      T: as printed or not stated
+      axes: oxygen production efficiency vs. 1/XFeO (mole fraction)
+    series: Haskin et al. (1990)
+    marker_count_per_series:
+      oxygen production efficiency: 1
+    attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+    digitisation: deferred to a figure pass
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_21_deferred
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_22_deferred
+  type: figure_record
+  units: figure axes as printed
+  locator:
+    page: 62
+    pdf_page_index: 61
+    figure: '1.22'
+  values:
+    caption: Dependence of Ni reduction potential on polymerization of the melt.
+    caption_locator:
+      page: 62
+      pdf_page_index: 61
+      figure: '1.22'
+    panel: as printed
+    typed_quantity: oxygen production, redox/electrochemical response, instrument setup, or metal microstructure; figure-only
+      values deferred
+    identity:
+      species: FeO, NiO, or Pt as caption states
+      phase: melt, metal, or apparatus as caption states
+      T: as printed or not stated
+      axes: Ni reduction potential vs. non-bridging/bridging oxygen fractions
+    series: preliminary experiments
+    marker_count_per_series:
+      Ni reduction potential series: 1
+    attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+    digitisation: deferred to a figure pass
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_22_deferred
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_23_deferred
+  type: figure_record
+  units: figure axes as printed
+  locator:
+    page: 64
+    pdf_page_index: 63
+    figure: '1.23'
+  values:
+    caption: Diagram of circuit designed to measure cell resistance and control the DC potential.
+    caption_locator:
+      page: 64
+      pdf_page_index: 63
+      figure: '1.23'
+    panel: as printed
+    typed_quantity: oxygen production, redox/electrochemical response, instrument setup, or metal microstructure; figure-only
+      values deferred
+    identity:
+      species: FeO, NiO, or Pt as caption states
+      phase: melt, metal, or apparatus as caption states
+      T: as printed or not stated
+      axes: electrolysis measurement/control circuit schematic
+    series: schematic
+    marker_count_per_series:
+      circuit schematic: 0
+    attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+    digitisation: deferred to a figure pass
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_23_deferred
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_24_deferred
+  type: figure_record
+  units: figure axes as printed
+  locator:
+    page: 65
+    pdf_page_index: 64
+    figure: '1.24'
+  values:
+    caption: Backscattered electron image of the three metal phases in Al21cb showing differences in density and the mixed
+      nature of the phases.
+    caption_locator:
+      page: 65
+      pdf_page_index: 64
+      figure: '1.24'
+    panel: as printed
+    typed_quantity: oxygen production, redox/electrochemical response, instrument setup, or metal microstructure; figure-only
+      values deferred
+    identity:
+      species: FeO, NiO, or Pt as caption states
+      phase: melt, metal, or apparatus as caption states
+      T: as printed or not stated
+      axes: backscattered-electron image
+    series: image
+    marker_count_per_series:
+      micrograph: 0
+    attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+    digitisation: deferred to a figure pass
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_24_deferred
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_25_deferred
+  type: figure_record
+  units: figure axes as printed
+  locator:
+    page: 65
+    pdf_page_index: 64
+    figure: '1.25'
+  values:
+    caption: Microprobe profile across the Pt L-alpha peak illustrating the absence of Pt in the glass of experiment Al21.
+    caption_locator:
+      page: 65
+      pdf_page_index: 64
+      figure: '1.25'
+    panel: as printed
+    typed_quantity: oxygen production, redox/electrochemical response, instrument setup, or metal microstructure; figure-only
+      values deferred
+    identity:
+      species: FeO, NiO, or Pt as caption states
+      phase: melt, metal, or apparatus as caption states
+      T: as printed or not stated
+      axes: Pt microprobe profile vs. spectrometer position (LIF)
+    series: one profile
+    marker_count_per_series:
+      Pt L-alpha profile: 1
+    attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+    digitisation: deferred to a figure pass
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_25_deferred
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2
+- observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_table1_8_mixed_phase_and_negative_values
+  type: mixed_phase_and_refused_microprobe_composition_values
+  units: wt.%
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+    published_page: I-56
+  values:
+    S+G_measured_components:
+    - component: SiO2
+      A12_1_S+G_wt_percent: '0.13'
+      A12_1cb_S+G_wt_percent: '48.07'
+    - component: TiO2
+      A12_1_S+G_wt_percent: '1.16'
+      A12_1cb_S+G_wt_percent: '2.78'
+    - component: Al2O3
+      A12_1_S+G_wt_percent: '9.10'
+      A12_1cb_S+G_wt_percent: '19.31'
+    - component: FeO
+      A12_1_S+G_wt_percent: '42.37'
+      A12_1cb_S+G_wt_percent: '0.41'
+    - component: MgO
+      A12_1_S+G_wt_percent: '12.63'
+      A12_1cb_S+G_wt_percent: '14.69'
+    - component: CaO
+      A12_1_S+G_wt_percent: '0.31'
+      A12_1cb_S+G_wt_percent: '11.99'
+    - component: Na2O
+      A12_1_S+G_wt_percent: '-0.01'
+      A12_1cb_S+G_wt_percent: '0.70'
+    - component: K2O
+      A12_1_S+G_wt_percent: '0.00'
+      A12_1cb_S+G_wt_percent: '0.08'
+    negative_metal_readings:
+    - analysis: metal-1
+      component: Cr
+      value_as_printed: '-0.007'
+      units: wt.%
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+      reason_not_typed: The printed microprobe result is negative for a composition amount, outside its physical range; preserved
+        verbatim as a refused analytical result.
+    - analysis: metal-1
+      component: Mn
+      value_as_printed: '-0.037'
+      units: wt.%
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+      reason_not_typed: The printed microprobe result is negative for a composition amount, outside its physical range; preserved
+        verbatim as a refused analytical result.
+    - analysis: metal-1
+      component: Pt
+      value_as_printed: '-0.021'
+      units: wt.%
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+      reason_not_typed: The printed microprobe result is negative for a composition amount, outside its physical range; preserved
+        verbatim as a refused analytical result.
+    reason_not_typed: S+G analyses combine spinel and glass and cannot be represented as a single phase; negative component
+      amounts are physically out of range and remain preserved as refusals. The paper reports spinel grains too small to analyze,
+      so the S+G values include glass.
+  context_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::context::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_table1_8_mixed_phase_and_negative_values
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  species: SiO2

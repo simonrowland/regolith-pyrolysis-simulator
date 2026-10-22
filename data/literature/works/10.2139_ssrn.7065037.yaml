@@ -1,0 +1,1284 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2139/ssrn.7065037
+  citation: Terashima, D., Urata, K., Kobayashi, Y., Irisawa, E., Amano, M., and Kikuchi, T. (2026), “Measurement of the Activity
+    Coefficient of SrO in Molten CaO-SiO2-Al2O3-MgO-MnO Slag at 1873 K,” SSRN preprint 7065037 (not peer reviewed).
+  source_ids:
+  - terashima-2026-sro-slag-activity-preprint
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:terashima-2026-sro-slag-activity-preprint
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2139/ssrn.7065037
+experiments:
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_a_0
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 13
+    published_page: '225'
+    pdf_page_index: 12
+    table: '4'
+    note: A-0 experimental series; procedure and atmosphere described in the article text.
+    record: A-0
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_a_1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 15
+    published_page: '259'
+    pdf_page_index: 14
+    table: '6'
+    note: A-1 experimental series; procedure and atmosphere described in the article text.
+    record: A-1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_a_2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 15
+    published_page: '259'
+    pdf_page_index: 14
+    table: '6'
+    note: A-2 experimental series; procedure and atmosphere described in the article text.
+    record: A-2
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_a_3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 15
+    published_page: '259'
+    pdf_page_index: 14
+    table: '6'
+    note: A-3 experimental series; procedure and atmosphere described in the article text.
+    record: A-3
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-1 experimental series; procedure and atmosphere described in the article text.
+    record: B-1
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-2 experimental series; procedure and atmosphere described in the article text.
+    record: B-2
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-3 experimental series; procedure and atmosphere described in the article text.
+    record: B-3
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-4 experimental series; procedure and atmosphere described in the article text.
+    record: B-4
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-5 experimental series; procedure and atmosphere described in the article text.
+    record: B-5
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-6 experimental series; procedure and atmosphere described in the article text.
+    record: B-6
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-7 experimental series; procedure and atmosphere described in the article text.
+    record: B-7
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::experiment::terashima_2026_b_8
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 18
+    published_page: '280'
+    pdf_page_index: 17
+    table: '7'
+    note: B-8 experimental series; procedure and atmosphere described in the article text.
+    record: B-8
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000000047'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        note: 'Abstract: at 1873 K, P_O2 = 4.70 × 10^-11 Pa; the abstract states this value with its unit.'
+- experiment_id: 10.2139/ssrn.7065037::terashima-2026-sro-slag-activity-preprint
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2139/ssrn.7065037
+  locator:
+    page: 13
+    published_page: '225'
+    pdf_page_index: 12
+    table: '4'
+    note: Table 4, Ueda et al.[14], Sr cell; every numeric cell was checked against the 600 dpi page render.
+    record: Ueda et al.[14], Sr
+context:
+- observation_id: terashima_2026_equations_2_3_8_9_model_context
+  type: model_context
+  units: equations and fitted relations as printed
+  locator:
+    page: 5
+    pdf_page_index: 4
+    section: 2. Thermodynamic Consideration
+    note: Eqs. (2)-(9) define activity and interaction reductions; no numeric curves digitized.
+  values:
+    candidate_tokens_considered:
+    - activity
+    - activity_coefficient
+    - interaction_parameter
+    disposition: context_model_derivation
+    reason: Equation definitions and the temperature expression for γ°Sr are model/reduction methods; no additional numeric
+      points are digitized from curves.
+    equations_as_printed:
+    - aSr = γSr XSr
+    - ln γSr = ln γ°Sr + εSrSi XSi
+    - γSrO from Eq. (9)
+    temperature_relation_as_printed: ln γ°Sr = 11.2 - 21,500/T
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_equations_2_3_8_9_model_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig1_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 7
+    pdf_page_index: 6
+    figure: '1'
+    note: Figure 1 is reprinted in the back matter; this is the primary body occurrence.
+  values:
+    quantity: activity_coefficient
+    species_as_printed:
+    - Sr in Cu
+    - SrO
+    phase_role: metal and slag
+    temperature_as_published: not stated in figure; experiments described at 1873 K
+    axes_as_printed: schematic apparatus diagram; no plotted axes
+    caption_as_printed: Figure 1. Schematic diagram of the experimental apparatus.
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 1.
+    series:
+    - name: Experimental apparatus schematic
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig1_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig2_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '2'
+    note: Figure 2 is reprinted in the back matter; this is the primary body occurrence.
+  values:
+    quantity: equilibrium_phase_composition
+    species_as_printed:
+    - Sr in Cu
+    phase_role: metal
+    temperature_as_published: not applicable; sample preparation schematic
+    axes_as_printed: sample-preparation flow diagram; no plotted axes
+    caption_as_printed: Figure 2. Procedures to prepare copper aqueous solutions for ICP-OES analysis.
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 2.
+    series:
+    - name: Acid dissolution and alkali-fusion preparation steps
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig2_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig3_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: '3'
+    note: Figure 3 is a literature phase diagram; the B-sample markers are labelled but their coordinates are not digitized.
+    published_page: '209'
+  values:
+    quantity: equilibrium_phase_composition
+    species_as_printed:
+    - Al2O3
+    - CaO
+    - MgO
+    - SiO2
+    phase_role: melt
+    temperature_as_published: liquidus region; MgO fixed at 5 mass%
+    axes_as_printed: composition diagram for Al2O3-CaO-MgO-SiO2 at 5 mass% MgO; plotted region as captioned
+    caption_as_printed: Figure 3. Liquidus region in the Al2O3-CaO-MgO-SiO2 system with 5 mass% MgO [16].
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 3.
+    series:
+    - name: Liquidus region reproduced from reference [16]; B-1 to B-8 compositions labelled
+      marker_count: 8
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig3_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig4_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 13
+    pdf_page_index: 12
+    figure: '4'
+    note: Figure 4 is reprinted in the back matter; this is the primary body occurrence.
+    published_page: '226'
+  values:
+    quantity: activity_coefficient
+    species_as_printed:
+    - Sr
+    phase_role: metal
+    temperature_as_published: 1473–1873 K
+    axes_as_printed: 'x: 10,000/T [1/K]; y: ln γSr in Cu'
+    caption_as_printed: Figure 4. Temperature-dependent equilibrium activity coefficient of Sr in liquid Cu saturated with
+      SrO.
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 4.
+    series:
+    - name: Ueda et al. [14], filled symbols
+      marker_count: 7
+    - name: This study, open symbol at 1873 K
+      marker_count: 1
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig4_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig5_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 16
+    pdf_page_index: 15
+    figure: '5'
+    note: Figure 5 is reprinted in the back matter; the 15.1 fitted slope is reported in text and retained in context.
+    published_page: '261'
+  values:
+    quantity: interaction_parameter
+    species_as_printed:
+    - Si-Sr in Cu
+    phase_role: metal
+    temperature_as_published: 1873 K
+    axes_as_printed: 'x: mole fraction of Si; y: ySi-Sr'
+    caption_as_printed: Figure 5. Effect of Si concentration on the Si-Sr interaction in liquid Cu at 1873 K.
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 5.
+    series:
+    - name: Measured ySi-Sr versus XSi points
+      marker_count: 4
+    - name: Linear fit used to obtain εSrSi
+      marker_count: 0
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig5_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig6_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 17
+    pdf_page_index: 16
+    figure: '6'
+    note: Figure 6 is reprinted in the back matter; this is the primary body occurrence.
+    published_page: '276'
+  values:
+    quantity: equilibrium_phase_composition
+    species_as_printed:
+    - SiO2
+    - CaO
+    - Al2O3
+    - SrO
+    - MgO
+    - MnO
+    phase_role: slag
+    temperature_as_published: XRF calibration standards C-1 to C-3; not an equilibrium temperature
+    axes_as_printed: six panels, XRF intensity versus component concentration
+    caption_as_printed: 'Figure 6. XRF calibration curves obtained from C-1, C-2, and C-3 for the semi-quantitative analysis
+      of slag composition: (a) SiO2, (b) CaO, (c) Al2O3, (d) SrO, (e) MgO, and (f) MnO.'
+    panel_as_printed: panels (a)-(f)
+    attribution: Terashima et al. (2026), Figure 6.
+    series:
+    - name: Panel (a), SiO2 calibration; C-1 to C-3
+      marker_count: 3
+    - name: Panel (b), CaO calibration; C-1 to C-3
+      marker_count: 3
+    - name: Panel (c), Al2O3 calibration; C-1 to C-3
+      marker_count: 3
+    - name: Panel (d), SrO calibration; C-1 to C-3
+      marker_count: 3
+    - name: Panel (e), MgO calibration; C-1 to C-3
+      marker_count: 3
+    - name: Panel (f), MnO calibration; C-1 to C-3
+      marker_count: 3
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig6_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_fig7_figure_context
+  type: figure_context
+  units: figure metadata only; no plotted coordinates digitized
+  locator:
+    page: 20
+    pdf_page_index: 19
+    figure: '7'
+    note: Figure 7 is reprinted in the back matter; Table 9 values are typed and figure coordinates remain deferred.
+    published_page: '307'
+  values:
+    quantity: activity_coefficient
+    species_as_printed:
+    - SrO
+    phase_role: slag
+    temperature_as_published: 1873 K
+    axes_as_printed: 'x: basicity; y: γSrO'
+    caption_as_printed: Figure 7. Change in γSrO with basicity and Al2O3 content in the molten slag under C-CO equilibrium
+      condition at 1873 K.
+    panel_as_printed: whole figure
+    attribution: Terashima et al. (2026), Figure 7.
+    series:
+    - name: Al2O3 9 mass%, circles
+      marker_count: 4
+    - name: Al2O3 18 mass%, triangles
+      marker_count: 4
+    digitisation: deferred to a figure pass
+    method_class: figure_only
+    admission_status: figure_only
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_fig7_figure_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table1_context
+  type: table_context
+  units: as printed in the table headers
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: '175'
+    table: '1'
+    note: Table 1; numeric cells checked against the 600 dpi page render.
+  values:
+    table_title_as_printed: Chemical compositions of Cu-Si alloys used in the chemical equilibrium experiment
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    disposition: context_starting_charge
+    reason: Cu-Si starting-alloy compositions are charge preparation, not equilibrium liquid compositions.
+    column_headers_as_printed:
+    - Sample No.
+    - Cu
+    - Si
+    rows_as_printed:
+    - - A-1
+      - '98.96'
+      - '1.04'
+    - - A-2
+      - '97.95'
+      - '2.05'
+    - - A-3
+      - '96.47'
+      - '3.53'
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table1_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table2_context
+  type: table_context
+  units: as printed in the table headers
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: '205'
+    table: '2'
+    note: Table 2; numeric cells checked against the 600 dpi page render.
+  values:
+    table_title_as_printed: Chemical compositions of slag samples used in XRF semi-quantitative analysis
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    disposition: context_starting_charge
+    reason: Initial slag-pellet recipes and Eq. (11) basicity are pre-equilibration preparation values, not the post-equilibrium
+      phase composition.
+    column_headers_as_printed:
+    - Sample No.
+    - SiO_2
+    - CaO
+    - Al_2O_3
+    - MgO
+    - MnO
+    - SrO
+    - Basicity
+    rows_as_printed:
+    - - B-1
+      - '36.0'
+      - '36.0'
+      - '9.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.89'
+    - - B-2
+      - '43.2'
+      - '28.8'
+      - '9.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.60'
+    - - B-3
+      - '50.4'
+      - '21.6'
+      - '9.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.39'
+    - - B-4
+      - '57.6'
+      - '14.6'
+      - '9.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.24'
+    - - B-5
+      - '27.0'
+      - '36.0'
+      - '18.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '1.00'
+    - - B-6
+      - '34.2'
+      - '28.8'
+      - '18.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.67'
+    - - B-7
+      - '41.4'
+      - '21.6'
+      - '18.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.43'
+    - - B-8
+      - '48.5'
+      - '14.5'
+      - '18.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+      - '0.25'
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table2_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table3_context
+  type: table_context
+  units: as printed in the table headers
+  locator:
+    page: 12
+    pdf_page_index: 11
+    published_page: '210'
+    table: '3'
+    note: Table 3; numeric cells checked against the 600 dpi page render.
+  values:
+    table_title_as_printed: Chemical compositions of standard samples used for XRF calibration
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    disposition: context_calibration_standards
+    reason: C-1 to C-3 are XRF calibration standards, not measured equilibrium slag compositions in the experiments.
+    column_headers_as_printed:
+    - No.
+    - SiO_2
+    - CaO
+    - Al_2O_3
+    - MgO
+    - MnO
+    - SrO
+    rows_as_printed:
+    - - C-1
+      - '30.0'
+      - '42.0'
+      - '14.0'
+      - '3.0'
+      - '6.0'
+      - '5.0'
+    - - C-2
+      - '46.8'
+      - '25.2'
+      - '9.0'
+      - '4.5'
+      - '4.5'
+      - '10.0'
+    - - C-3
+      - '57.0'
+      - '15.0'
+      - '4.0'
+      - '6.0'
+      - '3.0'
+      - '15.0'
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table3_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table4_oxygen_unit_inference_context
+  type: table_context
+  units: P_O2 values as printed; Table 4 unit is not printed
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: '225'
+    table: '4'
+    note: Table 4 oxygen-pressure column; the unit inference follows the controller ruling.
+  values:
+    table_title_as_printed: Molar fraction and activity coefficient of Sr in liquid Cu saturated with SrO
+    candidate_tokens_considered:
+    - point_conditions.oxygen_partial_pressure
+    disposition: condition_with_inferred_unit
+    reason: 'Table 4 does not print a unit for P_O2. Unit inferred as atm by the controller ruling: A-0 abstract 4.70e-11
+      Pa / Table 4 A-0 4.64e-16 = 1.013e5 Pa per Table 4 unit = 1 atm. The table number remains verbatim; no Pa conversion
+      is stored as a printed value.'
+    column_headers_as_printed:
+    - Sample No.
+    - T [K]
+    - P_O2 (unit not printed)
+    rows_as_printed:
+    - - Ueda et al.[14]
+      - '1473'
+      - 9.06 × 10^{-18}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1523'
+      - 1.66 × 10^{-17}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1573'
+      - 2.93 × 10^{-17}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1623'
+      - 4.98 × 10^{-17}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1673'
+      - 8.21 × 10^{-17}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1723'
+      - 1.31 × 10^{-16}
+      - atm inferred by A-0 cross-check
+    - - Ueda et al.[14]
+      - '1773'
+      - 2.05 × 10^{-16}
+      - atm inferred by A-0 cross-check
+    - - A-0
+      - '1873'
+      - 4.64 × 10^{-16}
+      - 4.70e-11 Pa abstract canonical; raw table value retained
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table4_oxygen_unit_inference_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table5_context
+  type: table_context
+  units: as printed in the table headers
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: '244'
+    table: '5'
+    note: Table 5; numeric cells checked against the 600 dpi page render.
+  values:
+    table_title_as_printed: EDS analysis results of the insoluble residues in sample B-1
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    disposition: context_method_validation
+    reason: The rows are dissolution-residue EDS assays used to validate analytical recovery; they are not equilibrium slag
+      or metal phase compositions.
+    column_headers_as_printed:
+    - Dissolution method
+    - Si
+    - Sr
+    - Al
+    - O
+    - Total
+    rows_as_printed:
+    - - Acid dissolution
+      - '34.1'
+      - '0.2'
+      - '0.2'
+      - '65.5'
+      - '100'
+    - - Alkali fusion followed by acid dissolution
+      - '34.5'
+      - N.D.
+      - N.D.
+      - '65.5'
+      - '100'
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table5_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table6_filtrate_assay_components_context
+  type: table_context
+  units: mole fractions as printed
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '259'
+    table: '6'
+    note: Table 6 XSr^1 and XSr^2 are filtrate assay contributions; XTotalSr is typed as the alloy component amount.
+  values:
+    table_title_as_printed: Molar fraction of Si and Sr in liquid Cu alloy at 1873 K
+    candidate_tokens_considered:
+    - equilibrium_phase_composition
+    disposition: context_assay_components
+    reason: XSr^1 and XSr^2 are the separate amounts in filtrates A and B under Eq. (10), not independent component amounts
+      in the equilibrated Cu phase. The printed total XSr is typed once for A-1 through A-3; A-0 is linked to Table 4.
+    column_headers_as_printed:
+    - Sample No.
+    - XSr^1
+    - XSr^2
+    rows_as_printed:
+    - - A-1
+      - 4.92 × 10^{-4}
+      - 1.66 × 10^{-5}
+      - 5.09 × 10^{-4}
+    - - A-2
+      - 3.33 × 10^{-4}
+      - 4.51 × 10^{-5}
+      - 3.78 × 10^{-4}
+    - - A-3
+      - 1.94 × 10^{-4}
+      - 1.95 × 10^{-5}
+      - 2.14 × 10^{-4}
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table6_filtrate_assay_components_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table6_interaction_parameter_context
+  type: table_context
+  units: dimensionless interaction parameter; mol%Si range as printed
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: '259'
+    table: '6'
+    note: Text and Eqs. (13)-(14) on the Table 6 page.
+  values:
+    quantity_as_printed: Si-Sr interaction parameter εSrSi
+    candidate_tokens_considered:
+    - interaction_parameter
+    disposition: context_model_derived_fit
+    reason: The authors report εSrSi = 15.1 as the fitted slope of the ySi-Sr versus XSi line; it is a regression parameter,
+      not a direct measurement.
+    value_as_printed: '15.1'
+    composition_range_as_printed: 0 ≤ mol% Si ≤ 7.65
+    equation_as_printed: ySi-Sr = εSrSi XSi (Eq. 14)
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table6_interaction_parameter_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2
+- observation_id: terashima_2026_table9_gamma_sr_cu_context
+  type: table_context
+  units: dimensionless activity coefficients as printed
+  locator:
+    page: 20
+    pdf_page_index: 19
+    published_page: '304'
+    table: '9'
+    note: Table 9 γSr column.
+  values:
+    quantity_as_printed: activity coefficient of Sr in Cu, γSr
+    candidate_tokens_considered:
+    - activity_coefficient
+    disposition: context_model_adjusted_values
+    reason: The authors say these γSr values were modified using the fitted Si-Sr interaction parameter in Cu (Eq. 8); the
+      printed adjusted values are retained here without treating the fitted calculation as a direct measurement.
+    rows_as_printed:
+    - - B-1
+      - '2.13'
+    - - B-2
+      - '3.50'
+    - - B-3
+      - '3.15'
+    - - B-4
+      - '3.50'
+    - - B-5
+      - '1.38'
+    - - B-6
+      - '2.03'
+    - - B-7
+      - '4.19'
+    - - B-8
+      - '3.01'
+    fitted_parameter_as_printed: εSrSi = 15.1; 0 ≤ mol% Si ≤ 7.65
+  context_id: terashima-2026-sro-slag-activity-preprint::context::terashima_2026_table9_gamma_sr_cu_context
+  work_id: 10.2139/ssrn.7065037
+  source_id: terashima-2026-sro-slag-activity-preprint
+  species: SiO2

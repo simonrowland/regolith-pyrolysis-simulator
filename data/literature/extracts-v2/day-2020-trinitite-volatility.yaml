@@ -1,0 +1,3535 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/day-2020-trinitite-volatility.yaml
+observations:
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1593:h=514a8f9b6e1e
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '2.56'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1593:h=5878538bd8bb
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.07'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.12'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 8; IG-2 20m H2O US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1593:h=827e544718aa
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1663:h=69a116b31c48
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-1.11'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 3; IF-2 20m H2O US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1663:h=7a3e6ac09c72
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.63'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.10'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta::T=1663:h=af4d0c36e592
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_aq_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta::T=1593:h=1971239c3391
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.45'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 7; IG-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta::T=1593:h=f5ab2d669ed8
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 6; IG-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta::T=1663:h=c963f22bf376
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.04'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 1; IF-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta::T=1663:h=fef72d9c18a1
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.46'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.05'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 2; IF-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta::points:h=29d85b855cf2
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: day-2020-trinitite-volatility::day_2020_table_s1_cu_glass_isotope_delta
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: present work
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 13; T-3 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1593:h=78036001128b
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.34'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1593:h=8f637832bd67
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.42'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1593:h=ef261b47cec9
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.77'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 8; IG-2 20m H2O US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1663:h=3d47cf2e4426
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.41'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 3; IF-2 20m H2O US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1663:h=51e68b942be1
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_aq_isotope_delta::T=1663:h=b750c05226e4
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.26'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::T=1593:h=4874a65ea574
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.43'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 7; IG-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::T=1593:h=c3f0ff22ac2d
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 6; IG-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::T=1663:h=06e69b434d92
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 1; IF-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::T=1663:h=5cc9d81a0908
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 2; IF-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::points:h=0bf062e896b6
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.46'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 12; T-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::points:h=3efdb93c3e47
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.48'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 11; T-1 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_k_glass_isotope_delta::points:h=e9adb5bf0642
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.42'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chen et al. (2019)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 13; T-3 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_aq_isotope_delta::T=1593:h=9d5ac5a562ea
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.63'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 10; IG-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_aq_isotope_delta::T=1593:h=b9d1d6f5e4a6
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 9; IG-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_aq_isotope_delta::T=1663:h=0a922abba5ac
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '-0.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 4; IF-2 20m 3N HCl US isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_aq_isotope_delta::T=1663:h=e6ea274846fc
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.67'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 5; IF-2 2hr 1N HF-HNO3 isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_glass_isotope_delta::T=1593:h=2a9a35296078
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 6; IG-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_glass_isotope_delta::T=1593:h=693f2d97b7f8
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1593'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.65'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 7; IG-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_glass_isotope_delta::T=1663:h=12df05bcf923
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.72'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 1; IF-2 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_glass_isotope_delta::T=1663:h=7aa5b9176eb5
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: value
+      value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.85'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 2; IF-2 Residue isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1663'
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil
+- observation_id: day-2020-trinitite-volatility::day_2020_table_s1_zn_glass_isotope_delta::points:h=faa408729217
+  experiment_id: 10.7185/geochemlet.2014::day-2020-trinitite-volatility
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: point
+    point: '0.31'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Day et al. (2017)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: day-2020-trinitite-volatility
+  locator:
+    page: 11
+    published_page: SI-4
+    pdf_page_index: 10
+    table: S-1
+    note: Table S-1 row 13; T-3 Bulk isotope cell.
+    source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  read_from: unknown:day-2020-trinitite-volatility
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 2
+        published_page: 55
+        pdf_page_index: 1
+        section: Samples and Methods
+        note: Formation temperature stated for IF and IG samples; other samples are not assigned a numeric formation temperature
+          here.
+        source_path: corpus/raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:day-2020-trinitite-volatility
+    parameters: []
+    output_unit: permil

@@ -1,0 +1,4485 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2020.07.038
+  citation: Bonnand, P., Bruand, E., Matzen, A. K., Jerram, M., Schiavi, F., Wood, B. J., Boyet, M., & Halliday, A. N. (2020).
+    Redox control on chromium isotope behaviour in silicate melts in contact with magnesiochromite. Geochimica et Cosmochimica
+    Acta, 288, 282–300.
+  source_ids:
+  - bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2020.07.038
+experiments:
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09234274008954791520450191767'
+          - - CaO
+            - '0.1897800444106186101297856894'
+          - - Cr2O3
+            - '0.003237229606567227141006526488'
+          - - FeO
+            - '0.05723996747861149791421924209'
+          - - MgO
+            - '0.1791987262309098685427002871'
+          - - SiO2
+            - '0.4782012921837448810677863371'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.5'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.52'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.81'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '6.77'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.89'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.3'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.5'
+          CaO: '17.52'
+          Cr2O3: '0.81'
+          FeO: '6.77'
+          MgO: '11.89'
+          SiO2: '47.3'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A1; Table 2 conditions applied by sample id. ; row=A1; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A1; Table 2.; row=A1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-11.9; ΔQFM=-4.57; loop=Re
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0919083936670976120561598325'
+          - - CaO
+            - '0.1909665384950142372606539237'
+          - - Cr2O3
+            - '0.001120283640678453391767954409'
+          - - FeO
+            - '0.06297455730170097760909566014'
+          - - MgO
+            - '0.1774360510478323185180095482'
+          - - SiO2
+            - '0.4755941758476764011643130809'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.41'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.61'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.28'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.44'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.76'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.99'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.41'
+          CaO: '17.61'
+          Cr2O3: '0.28'
+          FeO: '7.44'
+          MgO: '11.76'
+          SiO2: '46.99'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A2; Table 2 conditions applied by sample id. ; row=A2; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A2; Table 2.; row=A2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-9.6; ΔQFM=-2.26; loop=Re
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09225645372388625287692155419'
+          - - CaO
+            - '0.1901438148742276900881694301'
+          - - Cr2O3
+            - '0.0007187121540716383913117589658'
+          - - FeO
+            - '0.06200129619613853534457396579'
+          - - MgO
+            - '0.1769232585957272378635685243'
+          - - SiO2
+            - '0.4779564644559486454354547667'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table 3 time-series
+          blocks; represented once.; row=A3; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.5'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.57'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.18'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.34'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.75'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.32'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table
+                3 time-series blocks; represented once.; row=A3; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.5'
+          CaO: '17.57'
+          Cr2O3: '0.18'
+          FeO: '7.34'
+          MgO: '11.75'
+          SiO2: '47.32'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3; Table 2 conditions applied by sample id. The 168 h row is repeated in the Table 2 and Table 3 time-series
+          blocks; represented once.; row=A3; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A3; Table 2.; row=A3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-8.4; ΔQFM=-1.09; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A3a
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09300392684997535843297859115'
+          - - CaO
+            - '0.190847410531673399284128151'
+          - - Cr2O3
+            - '0.00007983433815458420516675295721'
+          - - FeO
+            - '0.0619837744033268638311133284'
+          - - MgO
+            - '0.1774753811707539500474957941'
+          - - SiO2
+            - '0.4766096727061158441991173827'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.63'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.64'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.34'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.79'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.2'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.63'
+          CaO: '17.64'
+          Cr2O3: '0.02'
+          FeO: '7.34'
+          MgO: '11.79'
+          SiO2: '47.2'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3a; Table 2 conditions applied by sample id. ; row=A3a; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A3a; Table 2.; row=A3a
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-8.4; ΔQFM=-1.09; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A3b
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09274561864939665061351014213'
+          - - CaO
+            - '0.1901566601814010916985031617'
+          - - Cr2O3
+            - '0.0004789012372251647668778085974'
+          - - FeO
+            - '0.0622234985253048658253031487'
+          - - MgO
+            - '0.1775870525492472702985341834'
+          - - SiO2
+            - '0.4768082688574249567972715556'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.59'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.58'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.12'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.37'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.8'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.23'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.59'
+          CaO: '17.58'
+          Cr2O3: '0.12'
+          FeO: '7.37'
+          MgO: '11.8'
+          SiO2: '47.23'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3b; Table 2 conditions applied by sample id. ; row=A3b; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A3b; Table 2.; row=A3b
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-8.4; ΔQFM=-1.09; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A3c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09287176047722667826441417283'
+          - - CaO
+            - '0.1898467989838329048218935122'
+          - - Cr2O3
+            - '0.0006385842212895213827016605672'
+          - - FeO
+            - '0.06265046964203834387830040039'
+          - - MgO
+            - '0.1774502374271877623184315331'
+          - - SiO2
+            - '0.4765421492484247893342587212'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.61'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.55'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.16'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.42'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.79'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.2'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.61'
+          CaO: '17.55'
+          Cr2O3: '0.16'
+          FeO: '7.42'
+          MgO: '11.79'
+          SiO2: '47.2'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3c; Table 2 conditions applied by sample id. ; row=A3c; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A3c; Table 2.; row=A3c
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-8.4; ΔQFM=-1.09; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A3d
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09255215871175948286771269147'
+          - - CaO
+            - '0.1897208331649351224033166315'
+          - - Cr2O3
+            - '0.0007191599095814046399696137758'
+          - - FeO
+            - '0.062378015039576728475654594'
+          - - MgO
+            - '0.1771841480461211649590280566'
+          - - SiO2
+            - '0.4774456851280260966543184129'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.54'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.52'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.18'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.38'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.76'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.24'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.54'
+          CaO: '17.52'
+          Cr2O3: '0.18'
+          FeO: '7.38'
+          MgO: '11.76'
+          SiO2: '47.24'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A3d; Table 2 conditions applied by sample id. ; row=A3d; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A3d; Table 2.; row=A3d
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-8.4; ΔQFM=-1.09; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09080454448284702063088137843'
+          - - CaO
+            - '0.1894775714237428188422952895'
+          - - Cr2O3
+            - '0.0005995581375993468732117972546'
+          - - FeO
+            - '0.06274312897566325438892917015'
+          - - MgO
+            - '0.1777126843145859142406922346'
+          - - SiO2
+            - '0.4786625126655616450239901301'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.24'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.49'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.15'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.42'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.79'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.34'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.24'
+          CaO: '17.49'
+          Cr2O3: '0.15'
+          FeO: '7.42'
+          MgO: '11.79'
+          SiO2: '47.34'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A4; Table 2 conditions applied by sample id. ; row=A4; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A4; Table 2.; row=A4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-7.5; ΔQFM=-0.13; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09240375736842359973675196155'
+          - - CaO
+            - '0.1897166669249560745229711394'
+          - - Cr2O3
+            - '0.000480526503768810666286977788'
+          - - FeO
+            - '0.06294295660593038600167460545'
+          - - MgO
+            - '0.1753205801478845945398051632'
+          - - SiO2
+            - '0.4791355124490365345325101526'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.48'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.48'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.12'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.43'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.61'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.3'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.48'
+          CaO: '17.48'
+          Cr2O3: '0.12'
+          FeO: '7.43'
+          MgO: '11.61'
+          SiO2: '47.3'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A5; Table 2 conditions applied by sample id. ; row=A5; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A5; Table 2.; row=A5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-6.6; ΔQFM=0.74; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09202644409888944207991483014'
+          - - CaO
+            - '0.1919431919160411730082918837'
+          - - Cr2O3
+            - '0.0003617273615683519409159917278'
+          - - FeO
+            - '0.06513131486122643038486281975'
+          - - MgO
+            - '0.1733921591308828589491462982'
+          - - SiO2
+            - '0.4771451626313917436368681765'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.36'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.62'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.09'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.66'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.44'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.93'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.36'
+          CaO: '17.62'
+          Cr2O3: '0.09'
+          FeO: '7.66'
+          MgO: '11.44'
+          SiO2: '46.93'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A6; Table 2 conditions applied by sample id. ; row=A6; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A6; Table 2.; row=A6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-5.8; ΔQFM=1.58; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_A7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165696343302733228442835608'
+          - - CaO
+            - '0.1904285486042982040106180894'
+          - - Cr2O3
+            - '0.0003605097547302965464135951679'
+          - - FeO
+            - '0.06465785215191245728371841061'
+          - - MgO
+            - '0.1746211821572272992537753086'
+          - - SiO2
+            - '0.4782749438988044106210462404'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.35'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.54'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.09'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.63'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.56'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.2'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.35'
+          CaO: '17.54'
+          Cr2O3: '0.09'
+          FeO: '7.63'
+          MgO: '11.56'
+          SiO2: '47.2'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample A7; Table 2 conditions applied by sample id. ; row=A7; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample A7; Table 2.; row=A7
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-3.9; ΔQFM=3.40; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_B1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09091830358952098495533379696'
+          - - CaO
+            - '0.1955326919848152062617746371'
+          - - Cr2O3
+            - '0.001199044967326022728345019557'
+          - - FeO
+            - '0.05766613115791319488668822029'
+          - - MgO
+            - '0.1751398296068789333156130532'
+          - - SiO2
+            - '0.479543998693545657852245273'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.05'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '6.82'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.62'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.43'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.26'
+          CaO: '18.05'
+          Cr2O3: '0.3'
+          FeO: '6.82'
+          MgO: '11.62'
+          SiO2: '47.43'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B1; Table 2 conditions applied by sample id. ; row=B1; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample B1; Table 2.; row=B1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-10.2; ΔQFM=-2.86; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_B2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0906615440267355262988192131'
+          - - CaO
+            - '0.194862812925560084825388888'
+          - - Cr2O3
+            - '0.0005997946419218511233551901361'
+          - - FeO
+            - '0.06242950758960301842726769458'
+          - - MgO
+            - '0.1743145888004942847572287003'
+          - - SiO2
+            - '0.4771317520156852345679403139'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.21'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.98'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.15'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.38'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.56'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.17'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.21'
+          CaO: '17.98'
+          Cr2O3: '0.15'
+          FeO: '7.38'
+          MgO: '11.56'
+          SiO2: '47.17'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B2; Table 2 conditions applied by sample id. ; row=B2; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample B2; Table 2.; row=B2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-7.8; ΔQFM=-0.46; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+- experiment_id: 10.1016/j.gca.2020.07.038::experiment::bonnand_2020_B3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09094079278316798634798760589'
+          - - CaO
+            - '0.1949861081073368457019299222'
+          - - Cr2O3
+            - '0.0004034821909326858313649182038'
+          - - FeO
+            - '0.06273847159034579295246795879'
+          - - MgO
+            - '0.1728491629377347255121078012'
+          - - SiO2
+            - '0.4780819823904819636541417934'
+          amount_basis: mole_fraction
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.12'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.83'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.35'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.36'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.84'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 42
+              published_page: 41
+              pdf_page_index: 41
+              table: '3'
+              note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.12'
+          CaO: '17.83'
+          Cr2O3: '0.1'
+          FeO: '7.35'
+          MgO: '11.36'
+          SiO2: '46.84'
+      locator:
+        page: 42
+        published_page: 41
+        pdf_page_index: 41
+        table: '3'
+        note: Sample B3; Table 2 conditions applied by sample id. ; row=B3; column=MgO
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1300 °C; methods state control within ±5 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: Printed 1 bar; exact conversion to Pa.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas flow rate or gas partial pressures published
+      locator:
+        page: 7
+        published_page: 6
+        pdf_page_index: 6
+        note: CO and CO2 are stated as flowing gases, but no sweep-gas flow rate or gas partial pressures are tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: flow regime not published
+  work_id: 10.1016/j.gca.2020.07.038
+  locator:
+    page: 41
+    published_page: 40
+    pdf_page_index: 40
+    table: '2'
+    note: Run conditions for sample B3; Table 2.; row=B3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: log fO2=-5.5; ΔQFM=1.84; loop=Pt
+      locator:
+        page: 41
+        published_page: 40
+        pdf_page_index: 40
+        table: '2'
+        note: log fO2 is unreferenced in the source; family convention log10(bar).
+context:
+- observation_id: bonnand_2020_experimental_procedure_context
+  type: experimental_procedure_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 6
+    note: Methods, 3.1 Experiments; numeric conditions and water-quench procedure.
+  units: °C, °C h−1, h, log units, mg, mm
+  values:
+    method_class: measured_direct
+    starting_loads_as_printed:
+      series_A_starting_melt_mg: '100'
+      natural_chromite_mg: '5'
+      series_B_starting_melt_mg: '100'
+      pellet_diameter_approx_mm: '4'
+    temperature_control_as_printed: 1300 °C within ±5 °C
+    oxygen_sensor_precision_as_printed: ±0.1 log unit (1 s.d.)
+    series_B_temperature_schedule_as_printed:
+      first_peak_C: '1550'
+      first_cooling_target_C: '1300'
+      cooling_rate_C_per_h: '5'
+      second_peak_C: '1450'
+      second_cooling_target_C: '1300'
+      final_hold_h: '168'
+    quench_as_printed: At the end of all experiments, samples were quenched by dropping them into water.
+    note: Numerical procedure facts are recorded as printed; no fugacity or thermal history was recalculated.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_experimental_procedure_context
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_1
+  locator:
+    page: 29
+    pdf_page_index: 28
+    published_page: 28
+    figure: '1'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: qualitative experimental reaction schematic; no numeric quantity
+    species: Cr
+    phase_as_printed: silicate glass and MgCr2O4 crystals
+    temperature_C_as_printed: 1300
+    axes_as_printed: []
+    caption_as_printed: Schematic of series A magnesiochromite dissolution and Cr reduction in melt, and series B magnesiochromite
+      crystallization; modified from Khedim et al. (2008).
+    panel: single schematic
+    series:
+    - label: qualitative reaction schematic
+      marker_count: 0
+    attribution: Modified from Khedim et al. (2008), as captioned.
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens: []
+    schema_gap: No numeric observable is plotted.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_1
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_10
+  locator:
+    page: 38
+    pdf_page_index: 37
+    published_page: 37
+    figure: '10'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: δ53Cr versus Cr3+/CrTOT in series A melts
+    species: Cr
+    phase_as_printed: silicate melt
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: Cr3+/CrTOT'
+    - 'y: δ53Cr (‰)'
+    caption_as_printed: Chromium isotope composition versus the Cr3+/CrTOT ratio in series A experiments at log fO2 < -6.
+    panel: single panel
+    series:
+    - label: series A melt, purple squares
+      marker_count: 5
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - isotope_delta
+    schema_gap: δ53Cr subtype is not mapped into identity by the extract migration path; plotted values are not digitised.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_10
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_11
+  locator:
+    page: 39
+    pdf_page_index: 38
+    published_page: 38
+    figure: '11'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: δ53Cr versus Cr concentration in series B melts and chromite
+    species: Cr
+    phase_as_printed: silicate melt and chromite
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: Cr (µg g−1)'
+    - 'y: δ53Cr (‰)'
+    caption_as_printed: Series B isotope compositions versus Cr concentration; Rayleigh model uses fractionation factor 0.085,
+      equilibrium model uses δ53Crchromite − δ53Crmelt = 0.4‰, and starting Cr is 13500 µg g−1.
+    panel: single panel
+    series:
+    - label: series B silicate melts, blue squares
+      marker_count: 3
+    - label: series B chromite, red circles
+      marker_count: 3
+    - label: Rayleigh melt / instantaneous chromite / cumulative chromite model curves
+      marker_count: 0
+    - label: equilibrium melt / chromite model curves
+      marker_count: 0
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - isotope_delta
+    schema_gap: Measured isotope points need an identity subtype; model curves are not digitised.
+    model_parameters_as_printed:
+      Rayleigh_fractionation_factor: '0.085'
+      equilibrium_delta53Cr_chromite_minus_melt_permil: '0.4'
+      starting_Cr_concentration_ug_g: '13500'
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_11
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_2
+  locator:
+    page: 30
+    pdf_page_index: 29
+    published_page: 29
+    figure: '2'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: Cr concentration and δ53Cr in silicate melt versus duration
+    species: Cr
+    phase_as_printed: silicate melt
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: duration (hours)'
+    - 'left y: Cr (µg g−1)'
+    - 'right y: δ53Cr (‰)'
+    caption_as_printed: Chromium concentration in melt versus time for time-series runs A3, A3a, A3b, A3c and A3d; grey band
+      is starting chromite isotope composition.
+    panel: single panel
+    series:
+    - label: Cr concentration, blue squares; A3 and A3a–A3d
+      marker_count: 5
+    - label: melt δ53Cr, red squares; A3 and A3a–A3d
+      marker_count: 5
+    - label: starting chromite δ53Cr, grey horizontal band
+      marker_count: 1
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - isotope_delta
+    schema_gap: Cr concentration is plotted in ppm-equivalent units and δ53Cr needs an isotope subtype; no figure values are
+      digitised.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_2
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_3
+  locator:
+    page: 31
+    pdf_page_index: 30
+    published_page: 30
+    figure: '3'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: Cr2O3 wt.% in silicate melt versus log fO2
+    species: Cr
+    phase_as_printed: silicate melt
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'y: Cr2O3 (wt.%)'
+    caption_as_printed: Cr chemical compositions in series A and B melts; grey and yellow comparison data are attributed to
+      Roeder and Reynolds (1991) and Hanson and Jones (1998).
+    panel: single panel (caption references panel a)
+    series:
+    - label: series A, purple circles
+      marker_count: 7
+    - label: series B, orange squares
+      marker_count: 3
+    - label: Roeder and Reynolds (1991), grey squares
+      marker_count: 8
+    - label: Hanson and Jones (1998), grey circles
+      marker_count: 5
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The present-work series overlaps the Table 3 Cr2O3 component rows; literature comparison points remain deferred.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_3
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_4
+  locator:
+    page: 32
+    pdf_page_index: 31
+    published_page: 31
+    figure: '4'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: chromite Cr# and Fe3+# versus Mg#
+    species: Cr
+    phase_as_printed: chromite cores and rims
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: Mg#'
+    - 'panel a y: Cr#'
+    - 'panel b y: Fe3+#'
+    caption_as_printed: Cr# and Fe3+# for series A chromite; checkered square is the starting material.
+    panel: a, b
+    series:
+    - label: series A runs A1–A7, cores and rims (multiple analyses)
+      marker_count: multiple overlapping points; exact count not reliably separable
+    - label: starting material (SM), checkered square
+      marker_count: 1
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens: []
+    schema_gap: Crystal phase role and these spinel ratios do not fit a current quantity token.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_4
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_5
+  locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 32
+    figure: '5'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: Cr# and Fe3+# in rim or small chromite versus oxygen fugacity
+    species: Cr
+    phase_as_printed: chromite rim or small crystals
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'left y: Cr number'
+    - 'right y: Fe3+#'
+    caption_as_printed: Cr number (green) and Fe3+# (blue) in rim or small chromite versus oxygen fugacity.
+    panel: single panel
+    series:
+    - label: Cr#, series A squares
+      marker_count: 7
+    - label: Cr#, series B circles
+      marker_count: 3
+    - label: Fe3+#, series A squares
+      marker_count: 7
+    - label: Fe3+#, series B circles
+      marker_count: 3
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens: []
+    schema_gap: Crystal phase role and these spinel ratios do not fit a current quantity token.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_5
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_6
+  locator:
+    page: 34
+    pdf_page_index: 33
+    published_page: 33
+    figure: '6'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: chromite Fe3+# and Cr# versus Mg# in series B
+    species: Cr
+    phase_as_printed: series B chromite cores and rims
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: Mg#'
+    - 'panel a y: Fe3+#'
+    - 'panel b y: Cr#'
+    caption_as_printed: Fe3+# and Cr# for chromite in series B experiments.
+    panel: a, b
+    series:
+    - label: B1, log fO2 = -10.2; blue diamonds
+      marker_count: multiple overlapping analyses; exact count not reliably separable
+    - label: B2, log fO2 = -7.8; green triangles
+      marker_count: multiple overlapping analyses; exact count not reliably separable
+    - label: B3, log fO2 = -5.5; orange squares
+      marker_count: multiple overlapping analyses; exact count not reliably separable
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens: []
+    schema_gap: Crystal phase role and these spinel ratios do not fit a current quantity token.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_6
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_7
+  locator:
+    page: 35
+    pdf_page_index: 34
+    published_page: 34
+    figure: '7'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: Cr valence ratios and Fe3+/FeTOT versus log fO2
+    species: Cr
+    phase_as_printed: silicate melt
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'panel a y: log(Cr2+/Cr3+)'
+    - 'panel b y: Cr3+/CrTOT and Fe3+/FeTOT'
+    caption_as_printed: Log(Cr2+/Cr3+) and Cr3+/CrTOT in silicate melts versus oxygen fugacity; blue Fe3+/FeTOT values are
+      calculated using O’Neill (2018).
+    panel: a, b
+    series:
+    - label: panel a Cr2+/Cr3+, series A squares
+      marker_count: 5
+    - label: panel a Cr2+/Cr3+, series B circles
+      marker_count: 3
+    - label: panel b Cr3+/CrTOT, series A green squares
+      marker_count: 7
+    - label: panel b Cr3+/CrTOT, series B green circles
+      marker_count: 3
+    - label: panel b Fe3+/FeTOT, series A blue squares
+      marker_count: 7
+    - label: panel b Fe3+/FeTOT, series B blue circles
+      marker_count: 3
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    schema_gap: The Cr valence ratios have no fitting quantity token; Fe3+/FeTOT is already typed from Table 3. The printed
+      fit slopes in panel a are recorded as model parameters.
+    model_parameters_as_printed:
+      panel_a_series_A_slope: -0.27 ± 0.01
+      panel_a_series_B_slope: -0.25 ± 0.01
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_7
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_8
+  locator:
+    page: 36
+    pdf_page_index: 35
+    published_page: 35
+    figure: '8'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: DCr and DCr3+ chromite–melt partition coefficients versus log fO2
+    species: Cr
+    phase_as_printed: chromite and coexisting silicate melt
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'y: DCr or DCr3+ (dimensionless)'
+    caption_as_printed: Chromite–melt DCr and DCr3+ partition coefficients versus oxygen fugacity; squares are series A and
+      circles series B.
+    panel: single panel
+    series:
+    - label: DCr3+, series A squares
+      marker_count: 7
+    - label: DCr3+, series B circles
+      marker_count: 3
+    - label: DCr, series A squares
+      marker_count: 7
+    - label: DCr, series B circles
+      marker_count: 3
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - distribution_ratio
+    schema_gap: Partition ratios appear only in the figure; digitisation is deferred.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_8
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- type: figure_record
+  observation_id: bonnand_2020_figure_9
+  locator:
+    page: 37
+    pdf_page_index: 36
+    published_page: 36
+    figure: '9'
+  units: No figure points digitised; axes and series are recorded as printed.
+  values:
+    quantity_as_printed: δ53Cr of silicate melts and chromite versus log fO2
+    species: Cr
+    phase_as_printed: silicate melt and chromite
+    temperature_C_as_printed: 1300
+    axes_as_printed:
+    - 'x: log fO2'
+    - 'y: δ53Cr (‰)'
+    caption_as_printed: Cr isotope compositions versus log fO2 for series A and B; red circles are chromite, blue squares
+      are melt, and the grey band in panel a is starting chromite.
+    panel: 'a: series A; b: series B'
+    series:
+    - label: series A melt, blue squares
+      marker_count: 7
+    - label: series A starting chromite reference band
+      marker_count: 1
+    - label: series B melt, blue squares
+      marker_count: 3
+    - label: series B chromite, red circles
+      marker_count: 3
+    attribution: Bonnand et al. (2020)
+    digitisation: deferred to a figure pass
+    points: []
+    candidate_quantity_tokens:
+    - isotope_delta
+    schema_gap: The isotope_delta token requires identity subtype; isotope points remain deferred and Table 5 values are preserved
+      in context.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_figure_9
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- observation_id: bonnand_2020_table1_starting_melt_compositions
+  type: starting_composition_context
+  locator:
+    page: 40
+    pdf_page_index: 39
+    published_page: 39
+    table: '1'
+  units: wt.%
+  values:
+    method_class: measured_direct
+    table_title_as_printed: Average chemical composition of the starting silicate melts in series A and B experiments.
+    columns:
+    - oxide
+    - series_A_wt_pct
+    - series_A_2sd
+    - series_B_wt_pct
+    - series_B_2sd
+    rows_as_printed:
+    - oxide: MgO
+      series_A_wt_pct: '11.78'
+      series_A_2sd: '0.17'
+      series_B_wt_pct: '11.74'
+      series_B_2sd: '0.25'
+    - oxide: Al2O3
+      series_A_wt_pct: '15.59'
+      series_A_2sd: '0.15'
+      series_B_wt_pct: '15.39'
+      series_B_2sd: '0.29'
+    - oxide: SiO2
+      series_A_wt_pct: '47.22'
+      series_A_2sd: '0.31'
+      series_B_wt_pct: '45.78'
+      series_B_2sd: '0.43'
+    - oxide: Cr2O3
+      series_A_wt_pct: n.d.
+      series_A_2sd: n.d.
+      series_B_wt_pct: '1.97'
+      series_B_2sd: '0.04'
+    - oxide: FeO
+      series_A_wt_pct: '7.36'
+      series_A_2sd: '0.11'
+      series_B_wt_pct: '7.41'
+      series_B_2sd: '0.21'
+    - oxide: CaO
+      series_A_wt_pct: '17.58'
+      series_A_2sd: '0.16'
+      series_B_wt_pct: '17.43'
+      series_B_2sd: '0.45'
+    - oxide: Total
+      series_A_wt_pct: '99.53'
+      series_A_2sd: '0.38'
+      series_B_wt_pct: '99.72'
+      series_B_2sd: '0.51'
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: These are pre-run starting glass compositions, not equilibrated phases; the equilibrium_phase_composition
+      token does not fit the sample state. n.d. is retained and is not zero.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_table1_starting_melt_compositions
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- observation_id: bonnand_2020_table3_auxiliary_columns
+  type: author_derived_table_context
+  locator:
+    page: 42
+    pdf_page_index: 41
+    published_page: 41
+    table: '3'
+  units: wt.% total; dimensionless ratios
+  values:
+    method_class: author_derived
+    table_title_as_printed: Auxiliary columns from the major element concentration table, including printed Fe3+/FeTOT.
+    columns:
+    - sample
+    - Total_wt_pct
+    - Total_2sd_wt_pct
+    - NBO/T
+    - Fe3_over_FeT
+    - Cr2_over_Cr3
+    - Cr3_over_CrTOT
+    rows_as_printed:
+    - sample: A1
+      Total_wt_pct: '99.79'
+      Total_2sd_wt_pct: '0.41'
+      NBO/T: '0.53'
+      Fe3_over_FeT: '0.01'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A1
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '7.64'
+      Cr3_over_CrTOT: '0.12'
+    - sample: A2
+      Total_wt_pct: '99.49'
+      Total_2sd_wt_pct: '0.66'
+      NBO/T: '0.55'
+      Fe3_over_FeT: '0.03'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A2
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '2.01'
+      Cr3_over_CrTOT: '0.33'
+    - sample: A3
+      Total_wt_pct: '99.66'
+      Total_2sd_wt_pct: '0.52'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.06'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A3
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.95'
+      Cr3_over_CrTOT: '0.51'
+    - sample: A4
+      Total_wt_pct: '99.42'
+      Total_2sd_wt_pct: '0.28'
+      NBO/T: '0.55'
+      Fe3_over_FeT: '0.09'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A4
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.56'
+      Cr3_over_CrTOT: '0.64'
+    - sample: A5
+      Total_wt_pct: '99.41'
+      Total_2sd_wt_pct: '0.50'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.15'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A5
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.26'
+      Cr3_over_CrTOT: '0.79'
+    - sample: A6
+      Total_wt_pct: '99.10'
+      Total_2sd_wt_pct: '0.31'
+      NBO/T: '0.55'
+      Fe3_over_FeT: '0.22'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A6
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.00'
+      Cr3_over_CrTOT: '1.00'
+    - sample: A7
+      Total_wt_pct: '99.38'
+      Total_2sd_wt_pct: '0.18'
+      NBO/T: '0.55'
+      Fe3_over_FeT: '0.44'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A7
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '-0.07'
+      Cr3_over_CrTOT: '1.07'
+    - sample: A3a
+      Total_wt_pct: '99.62'
+      Total_2sd_wt_pct: '0.53'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.06'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A3a
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: N/A
+      Cr3_over_CrTOT: N/A
+    - sample: A3b
+      Total_wt_pct: '99.67'
+      Total_2sd_wt_pct: '0.35'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.06'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A3b
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: N/A
+      Cr3_over_CrTOT: N/A
+    - sample: A3c
+      Total_wt_pct: '99.72'
+      Total_2sd_wt_pct: '0.37'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.06'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A3c
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: N/A
+      Cr3_over_CrTOT: N/A
+    - sample: A3d
+      Total_wt_pct: '99.62'
+      Total_2sd_wt_pct: '0.26'
+      NBO/T: '0.54'
+      Fe3_over_FeT: '0.06'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: A3d
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: N/A
+      Cr3_over_CrTOT: N/A
+    - sample: B1
+      Total_wt_pct: '99.57'
+      Total_2sd_wt_pct: '0.64'
+      NBO/T: '0.55'
+      Fe3_over_FeT: '0.02'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: B1
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '2.25'
+      Cr3_over_CrTOT: '0.31'
+    - sample: B2
+      Total_wt_pct: '99.59'
+      Total_2sd_wt_pct: '0.55'
+      NBO/T: '0.56'
+      Fe3_over_FeT: '0.08'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: B2
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.57'
+      Cr3_over_CrTOT: '0.64'
+    - sample: B3
+      Total_wt_pct: '99.43'
+      Total_2sd_wt_pct: '1.67'
+      NBO/T: '0.58'
+      Fe3_over_FeT: '0.24'
+      Fe3_over_FeT_locator:
+        page: 42
+        pdf_page_index: 41
+        published_page: 41
+        table: '3'
+        row: B3
+        column: Fe3+/FeTOT
+      Cr2_over_Cr3: '0.07'
+      Cr3_over_CrTOT: '0.93'
+    calculation_notes: 'Table 3 footnote: Cr2+/Cr3+ and Cr3+/CrTOT are calculated using the Hanson and Jones (1998) method;
+      NBO/T and total are also reported as printed. A3 is repeated in the time-series block and represented once.'
+    candidate_quantity_tokens: []
+    schema_gap: No current quantity token fits NBO/T, the oxide total, or the calculated redox ratios. The component columns
+      are typed separately as glass equilibrium_phase_composition; no ratios were recomputed.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_table3_auxiliary_columns
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- observation_id: bonnand_2020_table4_chromite_compositions
+  type: measured_table_context
+  locator:
+    page: 43
+    pdf_page_index: 42
+    published_page: 42
+    table: '4'
+  units: wt.% and dimensionless ratios
+  values:
+    method_class: measured_direct
+    table_title_as_printed: Chemical composition of selected chromite in series A and B experiments; core and rim compositions.
+    columns:
+    - sample
+    - position
+    - MgO
+    - Al2O3
+    - TiO2
+    - Cr2O3
+    - FeO
+    - MnO
+    - Total
+    - Mg_hash
+    - Cr_hash
+    - Fe3_hash
+    rows_as_printed:
+    - sample: A1
+      position: core
+      MgO: '12.11'
+      Al2O3: '16.20'
+      TiO2: '0.51'
+      Cr2O3: '47.41'
+      FeO: '23.32'
+      MnO: '0.19'
+      Total: '99.8'
+      Mg_hash: '0.56'
+      Cr_hash: '0.66'
+      Fe3_hash: '0.09'
+      conditions_table2_row: A1
+    - sample: A1
+      position: rim
+      MgO: '17.50'
+      Al2O3: '29.00'
+      TiO2: '0.02'
+      Cr2O3: '43.54'
+      FeO: '9.89'
+      MnO: '0.07'
+      Total: '100.2'
+      Mg_hash: '0.76'
+      Cr_hash: '0.50'
+      Fe3_hash: '0.00'
+      conditions_table2_row: A1
+    - sample: A2
+      position: core
+      MgO: '13.02'
+      Al2O3: '16.10'
+      TiO2: '0.51'
+      Cr2O3: '47.98'
+      FeO: '22.04'
+      MnO: '0.14'
+      Total: '99.9'
+      Mg_hash: '0.60'
+      Cr_hash: '0.67'
+      Fe3_hash: '0.09'
+      conditions_table2_row: A2
+    - sample: A2
+      position: rim
+      MgO: '17.08'
+      Al2O3: '27.75'
+      TiO2: '0.01'
+      Cr2O3: '43.97'
+      FeO: '10.96'
+      MnO: '0.04'
+      Total: '100.2'
+      Mg_hash: '0.75'
+      Cr_hash: '0.52'
+      Fe3_hash: '0.01'
+      conditions_table2_row: A2
+    - sample: A3
+      position: core
+      MgO: '10.85'
+      Al2O3: '15.96'
+      TiO2: '0.50'
+      Cr2O3: '47.21'
+      FeO: '25.00'
+      MnO: '0.23'
+      Total: '99.8'
+      Mg_hash: '0.51'
+      Cr_hash: '0.67'
+      Fe3_hash: '0.09'
+      conditions_table2_row: A3
+    - sample: A3
+      position: rim
+      MgO: '15.50'
+      Al2O3: '22.52'
+      TiO2: '0.22'
+      Cr2O3: '47.81'
+      FeO: '12.23'
+      MnO: '0.06'
+      Total: '98.9'
+      Mg_hash: '0.70'
+      Cr_hash: '0.59'
+      Fe3_hash: '0.01'
+      conditions_table2_row: A3
+    - sample: A4
+      position: core
+      MgO: '10.82'
+      Al2O3: '15.82'
+      TiO2: '0.50'
+      Cr2O3: '47.59'
+      FeO: '24.97'
+      MnO: '0.23'
+      Total: '100.0'
+      Mg_hash: '0.51'
+      Cr_hash: '0.67'
+      Fe3_hash: '0.09'
+      conditions_table2_row: A4
+    - sample: A4
+      position: rim
+      MgO: '16.48'
+      Al2O3: '24.87'
+      TiO2: '0.16'
+      Cr2O3: '45.40'
+      FeO: '12.72'
+      MnO: '0.06'
+      Total: '100.1'
+      Mg_hash: '0.73'
+      Cr_hash: '0.55'
+      Fe3_hash: '0.02'
+      conditions_table2_row: A4
+    - sample: A5
+      position: core
+      MgO: '12.42'
+      Al2O3: '15.99'
+      TiO2: '0.50'
+      Cr2O3: '48.14'
+      FeO: '22.85'
+      MnO: '0.18'
+      Total: '100.1'
+      Mg_hash: '0.57'
+      Cr_hash: '0.67'
+      Fe3_hash: '0.09'
+      conditions_table2_row: A5
+    - sample: A5
+      position: rim
+      MgO: '15.80'
+      Al2O3: '19.59'
+      TiO2: '0.40'
+      Cr2O3: '48.42'
+      FeO: '15.65'
+      MnO: '0.10'
+      Total: '100.2'
+      Mg_hash: '0.71'
+      Cr_hash: '0.62'
+      Fe3_hash: '0.05'
+      conditions_table2_row: A5
+    - sample: A6
+      position: core
+      MgO: '17.54'
+      Al2O3: '16.05'
+      TiO2: '0.50'
+      Cr2O3: '49.20'
+      FeO: '16.20'
+      MnO: '0.08'
+      Total: '99.6'
+      Mg_hash: '0.78'
+      Cr_hash: '0.67'
+      Fe3_hash: '0.10'
+      conditions_table2_row: A6
+    - sample: A6
+      position: rim
+      MgO: '17.95'
+      Al2O3: '20.79'
+      TiO2: '0.05'
+      Cr2O3: '38.98'
+      FeO: '21.77'
+      MnO: '0.04'
+      Total: '99.8'
+      Mg_hash: '0.78'
+      Cr_hash: '0.56'
+      Fe3_hash: '0.17'
+      conditions_table2_row: A6
+    - sample: A7
+      position: core
+      MgO: '18.22'
+      Al2O3: '16.18'
+      TiO2: '0.52'
+      Cr2O3: '50.20'
+      FeO: '15.00'
+      MnO: '0.06'
+      Total: '100.2'
+      Mg_hash: '0.81'
+      Cr_hash: '0.68'
+      Fe3_hash: '0.10'
+      conditions_table2_row: A7
+    - sample: A7
+      position: rim
+      MgO: '18.66'
+      Al2O3: '18.16'
+      TiO2: '0.06'
+      Cr2O3: '39.75'
+      FeO: '23.17'
+      MnO: '0.04'
+      Total: '100.2'
+      Mg_hash: '0.80'
+      Cr_hash: '0.60'
+      Fe3_hash: '0.20'
+      conditions_table2_row: A7
+    - sample: B1
+      position: core
+      MgO: '13.85'
+      Al2O3: '8.02'
+      TiO2: '0.03'
+      Cr2O3: '64.91'
+      FeO: '11.95'
+      MnO: '0.00'
+      Total: '98.7'
+      Mg_hash: '0.67'
+      Cr_hash: '0.84'
+      Fe3_hash: '0.00'
+      conditions_table2_row: B1
+    - sample: B1
+      position: rim/small
+      MgO: '17.86'
+      Al2O3: '27.01'
+      TiO2: '0.00'
+      Cr2O3: '44.48'
+      FeO: '9.97'
+      MnO: '0.06'
+      Total: '100.0'
+      Mg_hash: '0.78'
+      Cr_hash: '0.53'
+      Fe3_hash: '0.01'
+      conditions_table2_row: B1
+    - sample: B2
+      position: core
+      MgO: '14.73'
+      Al2O3: '13.20'
+      TiO2: '0.01'
+      Cr2O3: '58.37'
+      FeO: '12.30'
+      MnO: '0.06'
+      Total: '98.7'
+      Mg_hash: '0.70'
+      Cr_hash: '0.75'
+      Fe3_hash: '0.01'
+      conditions_table2_row: B2
+    - sample: B2
+      position: rim/small
+      MgO: '17.92'
+      Al2O3: '28.06'
+      TiO2: '0.00'
+      Cr2O3: '42.43'
+      FeO: '11.75'
+      MnO: '0.05'
+      Total: '100.7'
+      Mg_hash: '0.78'
+      Cr_hash: '0.50'
+      Fe3_hash: '0.03'
+      conditions_table2_row: B2
+    - sample: B3
+      position: core
+      MgO: '14.67'
+      Al2O3: '8.36'
+      TiO2: '0.00'
+      Cr2O3: '62.37'
+      FeO: '13.80'
+      MnO: '0.06'
+      Total: '99.3'
+      Mg_hash: '0.71'
+      Cr_hash: '0.83'
+      Fe3_hash: '0.04'
+      conditions_table2_row: B3
+    - sample: B3
+      position: rim/small
+      MgO: '18.20'
+      Al2O3: '25.46'
+      TiO2: '0.00'
+      Cr2O3: '39.12'
+      FeO: '15.87'
+      MnO: '0.05'
+      Total: '99.2'
+      Mg_hash: '0.80'
+      Cr_hash: '0.51'
+      Fe3_hash: '0.10'
+      conditions_table2_row: B3
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    schema_gap: The measured phase is chromite crystal (core, rim or rim/small), but the d-223 phase_role enum has no crystal/spinel
+      role. Mg#, Cr# and Fe3+# also have no fitting ratio token. Full printed rows are retained; no composition was reconstructed.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_table4_chromite_compositions
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr
+- observation_id: bonnand_2020_table5_chromium_isotope_data
+  type: measured_table_context
+  locator:
+    page: 44
+    pdf_page_index: 43
+    published_page: 43
+    table: '5'
+  units: δ53Cr and 2 s.e. or 2 s.d. in ‰
+  values:
+    method_class: measured_direct
+    table_title_as_printed: Cr isotopic composition for silicate melts and chromite in series A and B experiments.
+    columns:
+    - sample
+    - Table2_condition_row
+    - melt_delta53Cr_permil
+    - melt_uncertainty_as_printed
+    - chromite_delta53Cr_permil
+    - chromite_uncertainty_as_printed
+    rows_as_printed:
+    - sample: A1
+      Table2_condition_row: A1
+      melt_delta53Cr_permil: '-0.117'
+      melt_uncertainty_as_printed: '0.006'
+      chromite_delta53Cr_permil: '-0.110'
+      chromite_uncertainty_as_printed: '0.006'
+    - sample: A2
+      Table2_condition_row: A2
+      melt_delta53Cr_permil: '-0.137'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A3
+      Table2_condition_row: A3
+      melt_delta53Cr_permil: '-0.138'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: '-0.115'
+      chromite_uncertainty_as_printed: '0.004'
+    - sample: A4
+      Table2_condition_row: A4
+      melt_delta53Cr_permil: '-0.149'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A5
+      Table2_condition_row: A5
+      melt_delta53Cr_permil: '-0.153'
+      melt_uncertainty_as_printed: '0.004'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A6
+      Table2_condition_row: A6
+      melt_delta53Cr_permil: '-0.449'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: '-0.102'
+      chromite_uncertainty_as_printed: '0.009'
+    - sample: A7
+      Table2_condition_row: A7
+      melt_delta53Cr_permil: '-0.431'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: '-0.108'
+      chromite_uncertainty_as_printed: '0.009'
+    - sample: A3a
+      Table2_condition_row: A3a
+      melt_delta53Cr_permil: '-0.251'
+      melt_uncertainty_as_printed: '0.018'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A3b
+      Table2_condition_row: A3b
+      melt_delta53Cr_permil: '-0.167'
+      melt_uncertainty_as_printed: '0.007'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A3c
+      Table2_condition_row: A3c
+      melt_delta53Cr_permil: '-0.147'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: A3d
+      Table2_condition_row: A3d
+      melt_delta53Cr_permil: '-0.143'
+      melt_uncertainty_as_printed: '0.005'
+      chromite_delta53Cr_permil: n.d.
+      chromite_uncertainty_as_printed: n.d.
+    - sample: B1
+      Table2_condition_row: B1
+      melt_delta53Cr_permil: '-0.240'
+      melt_uncertainty_as_printed: '0.006'
+      chromite_delta53Cr_permil: '0.063'
+      chromite_uncertainty_as_printed: '0.010'
+    - sample: B2
+      Table2_condition_row: B2
+      melt_delta53Cr_permil: '-0.274'
+      melt_uncertainty_as_printed: '0.006'
+      chromite_delta53Cr_permil: '0.088'
+      chromite_uncertainty_as_printed: '0.011'
+    - sample: B3
+      Table2_condition_row: B3
+      melt_delta53Cr_permil: '-0.437'
+      melt_uncertainty_as_printed: '0.008'
+      chromite_delta53Cr_permil: '0.150'
+      chromite_uncertainty_as_printed: '0.008'
+    - sample: starting material
+      Table2_condition_row: null
+      melt_delta53Cr_permil: '-0.060'
+      melt_uncertainty_as_printed: '0.007'
+      chromite_delta53Cr_permil: null
+      chromite_uncertainty_as_printed: null
+    - sample: JP-1
+      Table2_condition_row: N/A
+      melt_delta53Cr_permil: '-0.108'
+      melt_uncertainty_as_printed: 0.014*
+      chromite_delta53Cr_permil: null
+      chromite_uncertainty_as_printed: null
+    footnote_as_printed: '* JP-1 uncertainty is 2 s.d., n=8.'
+    duplicate_note: A3 is printed in both the Series A and time-series blocks with identical isotope data; represented once.
+      The Table 5 log fO2 entries repeat the Table 2 conditions, referenced by sample id rather than duplicated here.
+    candidate_quantity_tokens:
+    - isotope_delta
+    schema_gap: The isotope_delta token requires identity subtype in addition to temperature_K. The literature extract migration
+      path does not map a printed isotope label (δ53Cr) into identity.subtype. Preserve the complete isotope table in context
+      rather than changing the public schema or API.
+  context_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::context::bonnand_2020_table5_chromium_isotope_data
+  work_id: 10.1016/j.gca.2020.07.038
+  source_id: bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite
+  species: Cr

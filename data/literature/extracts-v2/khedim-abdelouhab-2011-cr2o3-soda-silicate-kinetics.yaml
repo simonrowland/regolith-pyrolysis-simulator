@@ -1,0 +1,148 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml
+observations:
+- observation_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics::khedim_abdelouhab_2011_reference3_chromia_saturation
+  experiment_id: 10.1016/j.jnoncrysol.2010.10.012::khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '8.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[3]'
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-68849-1792655353
+      date: '2026-10-22'
+      evidence:
+        page: 10
+        pdf_page_index: 9
+        paragraph: chromium oxide crystal volatilisation mass balance
+  notices: []
+  source_id: khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  locator:
+    page: 10
+    pdf_page_index: 9
+    paragraph: chromium oxide crystal volatilisation mass balance
+  read_from: unknown:khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        paragraph: chromium oxide crystal volatilisation mass balance
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              paragraph: chromium oxide crystal volatilisation mass balance
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 10
+              pdf_page_index: 9
+              paragraph: chromium oxide crystal volatilisation mass balance
+        output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - SiO2
+            - '1.5'
+          amount_basis: mol_inventory
+      locator:
+        page: 10
+        pdf_page_index: 9
+        paragraph: chromium oxide crystal volatilisation mass balance

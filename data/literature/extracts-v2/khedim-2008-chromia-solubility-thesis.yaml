@@ -1,0 +1,4144 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml
+observations:
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r03_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000000524807460249772597364312157'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00476'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.28'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r03_c04
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000000524807460249772597364312157'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00538'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-4SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.28'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r03_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000000524807460249772597364312157'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00599'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-7SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.28'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '7'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r04_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0001995262314968879601352455397'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00286'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.7'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r04_c04
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0001995262314968879601352455397'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00331'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-4SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.7'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r04_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0001995262314968879601352455397'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00356'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-7SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.7'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '7'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r05_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.03090295432513590519551306539'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00261'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.51'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r05_c04
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.03090295432513590519551306539'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00283'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-4SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-4SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.51'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r05_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.03090295432513590519551306539'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00274'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-7SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-7SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.51'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '7'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r06_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '1584.893192461113485202101373'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00387'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-1.8'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r06_c04
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '1584.893192461113485202101373'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00318'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-4SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-4SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-4SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-4SiO2 / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-4SiO2 / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-1.8'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r06_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '1584.893192461113485202101373'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00292'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-7SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-7SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-7SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-7SiO2 / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-7SiO2 / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-1.8'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '7'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r07_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '21379.62089502232097519411057'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.01248'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.67'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+    gas_mix:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r07_c04
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '21379.62089502232097519411057'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00627'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-4SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-4SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-4SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-4SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.67'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '4'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+    gas_mix:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t22_r07_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '21379.62089502232097519411057'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00467'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-7SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-7SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-7SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '22'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-7SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.67'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '7'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+    gas_mix:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '22'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r03_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0000001288249551693133962842653113'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00376'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.89'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r03_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.000001995262314968879601352455397'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00688'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.7'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r04_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.00005623413251903490803949510398'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00252'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-9.25'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r04_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.0006456542290346555158782140681'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00378'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Co/CoO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.19'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r05_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.008912509381337455299531086811'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00226'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.05'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r05_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '0.1'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00315'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Ni/NiO; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-6'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r06_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '1445.439770745927511931481546'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00314'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-1.84'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r06_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '1819.700858609983440103680806'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00494'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe3O4/Fe2O3;
+                column=Na2O-CaO-3SiO2 / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-1.74'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r07_c03
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '21379.62089502232097519411057'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00958'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.67'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+    gas_mix:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+- observation_id: khedim-2008-chromia-solubility-thesis::khedim_2008_chromia_solubility_thesis_p170_t23_r07_c05
+  experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: value
+      value: '21379.62089502232097519411057'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: melt
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.01586'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam45-1022
+      date: '2026-10-22'
+      evidence:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+  notices: []
+  source_id: khedim-2008-chromia-solubility-thesis
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '23'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+      / At.% Cr
+  read_from: unknown:khedim-2008-chromia-solubility-thesis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+          / At.% Cr
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 170
+              pdf_page_index: 169
+              table: '23'
+              note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Air; column=Na2O-CaO-3SiO2
+                / At.% Cr
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.67'
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+        note: Unreferenced printed log fO2; stored under the family convention log10(bar), without conversion.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_stoichiometric_formula_ratio
+          components:
+          - - Na2O
+            - '1'
+          - - CaO
+            - '1'
+          - - SiO2
+            - '3'
+          amount_basis: mol_inventory
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'
+    gas_mix:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 170
+        pdf_page_index: 169
+        table: '23'

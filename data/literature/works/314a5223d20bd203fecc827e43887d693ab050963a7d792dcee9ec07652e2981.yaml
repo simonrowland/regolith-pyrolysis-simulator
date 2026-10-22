@@ -1,0 +1,3400 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  citation: Khedim, H. (2008). Etude de la limite de solubilité de la chromine « Cr2O3 » dans les liquides silicates – détermination
+    de grandeurs thermodynamique et physico-chimique [Doctoral thesis, Université Henri Poincaré Nancy 1].
+  source_ids:
+  - khedim-2008-chromia-solubility-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:khedim-2008-chromia-solubility-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981::khedim-2008-chromia-solubility-thesis
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '22'
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.; row=Fe/FeO; column=Na2O-CaO-3SiO2
+      / At.% Cr
+context:
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r04_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00437'
+    value_as_published: 0,437
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,042
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.28'
+    linked_published_observation_id: khedim_2010_binary_t1250_r01_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r04_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r04_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00571'
+    value_as_published: 0,571
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,055
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.28'
+    linked_published_observation_id: khedim_2010_binary_t1250_r01_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r04_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r04_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00769'
+    value_as_published: 0,769
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,070
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.28'
+    linked_published_observation_id: khedim_2010_binary_t1250_r01_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r04_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r04_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01035'
+    value_as_published: 1,035
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,042
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.28'
+    linked_published_observation_id: khedim_2010_binary_t1250_r01_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r04_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r05_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00308'
+    value_as_published: 0,308
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,037
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-8.7'
+    linked_published_observation_id: khedim_2010_binary_t1250_r02_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r05_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r05_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00395'
+    value_as_published: 0,395
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,021
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-8.7'
+    linked_published_observation_id: khedim_2010_binary_t1250_r02_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r05_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r05_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.005'
+    value_as_published: 0,500
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,024
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-8.7'
+    linked_published_observation_id: khedim_2010_binary_t1250_r02_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r05_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r05_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00619'
+    value_as_published: 0,619
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,024
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-8.7'
+    linked_published_observation_id: khedim_2010_binary_t1250_r02_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r05_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r06_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00275'
+    value_as_published: 0,275
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,038
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-6.51'
+    linked_published_observation_id: khedim_2010_binary_t1250_r03_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r06_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r06_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00359'
+    value_as_published: 0,359
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,022
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-6.51'
+    linked_published_observation_id: khedim_2010_binary_t1250_r03_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r06_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r06_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00442'
+    value_as_published: 0,442
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,005
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-6.51'
+    linked_published_observation_id: khedim_2010_binary_t1250_r03_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r06_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r06_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00532'
+    value_as_published: 0,532
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,013
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-6.51'
+    linked_published_observation_id: khedim_2010_binary_t1250_r03_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r06_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r07_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00685'
+    value_as_published: 0,685
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,012
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.8'
+    linked_published_observation_id: khedim_2010_binary_t1250_r04_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r07_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r07_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00685'
+    value_as_published: 0,685
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,04
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.8'
+    linked_published_observation_id: khedim_2010_binary_t1250_r04_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r07_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r07_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00605'
+    value_as_published: 0,605
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,031
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.8'
+    linked_published_observation_id: khedim_2010_binary_t1250_r04_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r07_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r07_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00628'
+    value_as_published: 0,628
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,047
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.8'
+    linked_published_observation_id: khedim_2010_binary_t1250_r04_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r07_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r08_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.03187'
+    value_as_published: 3,187
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,206
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1250_r05_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r08_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r08_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.02755'
+    value_as_published: 2,755
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,15
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1250_r05_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r08_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r08_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01727'
+    value_as_published: 1,727
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,218
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1250_r05_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r08_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r08_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01424'
+    value_as_published: 1,424
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,082
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1250
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1250_r05_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r08_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r12_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00581'
+    value_as_published: 0,581
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,012
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.89'
+    linked_published_observation_id: khedim_2010_binary_t1200_r01_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r12_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r12_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00633'
+    value_as_published: 0,633
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,067
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.89'
+    linked_published_observation_id: khedim_2010_binary_t1200_r01_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r12_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r12_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00873'
+    value_as_published: 0,873
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,047
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.89'
+    linked_published_observation_id: khedim_2010_binary_t1200_r01_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r12_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r12_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-3.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0105'
+    value_as_published: 1,05
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,029
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-11.89'
+    linked_published_observation_id: khedim_2010_binary_t1200_r01_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r12_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r13_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00349'
+    value_as_published: 0,349
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,08
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.25'
+    linked_published_observation_id: khedim_2010_binary_t1200_r02_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r13_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r13_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00431'
+    value_as_published: 0,431
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,017
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.25'
+    linked_published_observation_id: khedim_2010_binary_t1200_r02_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r13_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r13_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00536'
+    value_as_published: 0,536
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,021
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.25'
+    linked_published_observation_id: khedim_2010_binary_t1200_r02_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r13_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r13_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-3.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0051'
+    value_as_published: 0,510
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,014
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.25'
+    linked_published_observation_id: khedim_2010_binary_t1200_r02_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r13_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r14_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0032'
+    value_as_published: 0,320
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,015
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.05'
+    linked_published_observation_id: khedim_2010_binary_t1200_r03_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r14_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r14_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00389'
+    value_as_published: 0,389
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,010
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.05'
+    linked_published_observation_id: khedim_2010_binary_t1200_r03_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r14_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r14_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00469'
+    value_as_published: 0,469
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,010
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.05'
+    linked_published_observation_id: khedim_2010_binary_t1200_r03_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r14_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r14_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-3.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00474'
+    value_as_published: 0,474
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,015
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.05'
+    linked_published_observation_id: khedim_2010_binary_t1200_r03_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r14_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r15_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00547'
+    value_as_published: 0,547
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,003
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.84'
+    linked_published_observation_id: khedim_2010_binary_t1200_r04_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r15_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r15_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00518'
+    value_as_published: 0,518
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,031
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.84'
+    linked_published_observation_id: khedim_2010_binary_t1200_r04_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r15_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r15_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00552'
+    value_as_published: 0,552
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,024
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.84'
+    linked_published_observation_id: khedim_2010_binary_t1200_r04_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r15_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r15_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-3.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00532'
+    value_as_published: 0,532
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,008
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.84'
+    linked_published_observation_id: khedim_2010_binary_t1200_r04_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r15_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r16_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.02128'
+    value_as_published: 2,128
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,113
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1200_r05_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r16_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r16_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01492'
+    value_as_published: 1,492
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,097
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1200_r05_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r16_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r16_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01259'
+    value_as_published: 1,259
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,058
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1200_r05_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r16_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r16_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-3.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00942'
+    value_as_published: 0,942
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,033
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1200
+    composition_as_published: Na2O-3,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1200_r05_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r16_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r20_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00295'
+    value_as_published: 0,295
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,027
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.21'
+    linked_published_observation_id: khedim_2010_binary_t1175_r01_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r20_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r20_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00494'
+    value_as_published: 0,494
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,033
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.21'
+    linked_published_observation_id: khedim_2010_binary_t1175_r01_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r20_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r20_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00612'
+    value_as_published: 0,612
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,027
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.21'
+    linked_published_observation_id: khedim_2010_binary_t1175_r01_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r20_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r20_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe/FeO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00822'
+    value_as_published: 0,822
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,029
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.21'
+    linked_published_observation_id: khedim_2010_binary_t1175_r01_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r20_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r21_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00225'
+    value_as_published: 0,225
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,011
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.54'
+    linked_published_observation_id: khedim_2010_binary_t1175_r02_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r21_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r21_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00328'
+    value_as_published: 0,328
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,009
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.54'
+    linked_published_observation_id: khedim_2010_binary_t1175_r02_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r21_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r21_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00413'
+    value_as_published: 0,413
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,019
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.54'
+    linked_published_observation_id: khedim_2010_binary_t1175_r02_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r21_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r21_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Co/CoO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00498'
+    value_as_published: 0,498
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,020
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-9.54'
+    linked_published_observation_id: khedim_2010_binary_t1175_r02_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r21_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r22_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00214'
+    value_as_published: 0,214
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,009
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.34'
+    linked_published_observation_id: khedim_2010_binary_t1175_r03_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r22_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r22_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0029'
+    value_as_published: 0,290
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,009
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.34'
+    linked_published_observation_id: khedim_2010_binary_t1175_r03_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r22_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r22_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00371'
+    value_as_published: 0,371
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,028
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.34'
+    linked_published_observation_id: khedim_2010_binary_t1175_r03_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r22_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r22_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Ni/NiO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00435'
+    value_as_published: 0,435
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,021
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.34'
+    linked_published_observation_id: khedim_2010_binary_t1175_r03_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r22_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r23_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00485'
+    value_as_published: 0,485
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,015
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.87'
+    linked_published_observation_id: khedim_2010_binary_t1175_r04_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r23_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r23_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00481'
+    value_as_published: 0,481
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,025
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.87'
+    linked_published_observation_id: khedim_2010_binary_t1175_r04_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r23_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r23_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00482'
+    value_as_published: 0,482
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,024
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.87'
+    linked_published_observation_id: khedim_2010_binary_t1175_r04_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r23_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r23_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Fe3O4/Fe2O3
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00507'
+    value_as_published: 0,507
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,026
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.87'
+    linked_published_observation_id: khedim_2010_binary_t1175_r04_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r23_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r24_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.02436'
+    value_as_published: 2,436
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,206
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1175_r05_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r24_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r24_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01834'
+    value_as_published: 1,834
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,049
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1175_r05_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r24_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r24_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01415'
+    value_as_published: 1,415
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,034
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1175_r05_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r24_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p169_t20_r24_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 169
+    pdf_page_index: 168
+    table: '20'
+    row: Air
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01172'
+    value_as_published: 1,172
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,040
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1175
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1175_r05_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p169_t20_r24_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r03_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe/FeO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00223'
+    value_as_published: 0,223
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,015
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.9'
+    linked_published_observation_id: khedim_2010_binary_t1125_r01_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r03_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r03_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe/FeO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00438'
+    value_as_published: 0,438
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,011
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.9'
+    linked_published_observation_id: khedim_2010_binary_t1125_r01_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r03_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r03_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe/FeO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00562'
+    value_as_published: 0,562
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,025
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.9'
+    linked_published_observation_id: khedim_2010_binary_t1125_r01_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r03_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r03_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe/FeO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00768'
+    value_as_published: 0,768
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,026
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe/FeO
+    fO2_log_as_published: '-12.9'
+    linked_published_observation_id: khedim_2010_binary_t1125_r01_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r03_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r04_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Co/CoO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00196'
+    value_as_published: 0,196
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,029
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-10.14'
+    linked_published_observation_id: khedim_2010_binary_t1125_r02_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r04_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r04_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Co/CoO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00284'
+    value_as_published: 0,284
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,011
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-10.14'
+    linked_published_observation_id: khedim_2010_binary_t1125_r02_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r04_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r04_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Co/CoO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00388'
+    value_as_published: 0,388
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,020
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-10.14'
+    linked_published_observation_id: khedim_2010_binary_t1125_r02_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r04_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r04_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Co/CoO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00466'
+    value_as_published: 0,466
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,026
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Co/CoO
+    fO2_log_as_published: '-10.14'
+    linked_published_observation_id: khedim_2010_binary_t1125_r02_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r04_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r05_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Ni/NiO
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00191'
+    value_as_published: 0,191
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,004
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.94'
+    linked_published_observation_id: khedim_2010_binary_t1125_r03_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r05_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r05_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Ni/NiO
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00254'
+    value_as_published: 0,254
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,004
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.94'
+    linked_published_observation_id: khedim_2010_binary_t1125_r03_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r05_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r05_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Ni/NiO
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00326'
+    value_as_published: 0,326
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,011
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.94'
+    linked_published_observation_id: khedim_2010_binary_t1125_r03_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r05_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r05_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Ni/NiO
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00379'
+    value_as_published: 0,379
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,012
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Ni/NiO
+    fO2_log_as_published: '-7.94'
+    linked_published_observation_id: khedim_2010_binary_t1125_r03_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r05_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r06_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe3O4/Fe2O3
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00395'
+    value_as_published: 0,395
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,028
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.93'
+    linked_published_observation_id: khedim_2010_binary_t1125_r04_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r06_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r06_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00368'
+    value_as_published: 0,368
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,007
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.93'
+    linked_published_observation_id: khedim_2010_binary_t1125_r04_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r06_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r06_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe3O4/Fe2O3
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00418'
+    value_as_published: 0,418
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,001
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.93'
+    linked_published_observation_id: khedim_2010_binary_t1125_r04_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r06_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r06_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Fe3O4/Fe2O3
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.00436'
+    value_as_published: 0,436
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,018
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Fe3O4/Fe2O3
+    fO2_log_as_published: '-1.93'
+    linked_published_observation_id: khedim_2010_binary_t1125_r04_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r06_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r07_c03
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Air
+    column: Na2O-1.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0198'
+    value_as_published: 1,980
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,221
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-1,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '1.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1125_r05_c01
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r07_c03
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r07_c04
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Air
+    column: Na2O-2SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01297'
+    value_as_published: 1,297
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,084
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1125_r05_c02
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r07_c04
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r07_c05
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Air
+    column: Na2O-2.5SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.01215'
+    value_as_published: 1,215
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,058
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-2,5SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '2.5'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1125_r05_c03
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r07_c05
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_chromia_solubility_thesis_p170_t21_r07_c06
+  type: duplicate_measurement_context
+  locator:
+    page: 170
+    pdf_page_index: 169
+    table: '21'
+    row: Air
+    column: Na2O-3SiO2 / At.% Cr
+    note: Parenthetical number retained verbatim; Appendix III does not identify its statistic.
+  phase: equilibrated silicate melt, quenched and analyzed as glass
+  units: at.% Cr; parenthetical number as printed
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: measured_direct
+    component_amount: '0.0099'
+    value_as_published: 0,990
+    value_units_as_published: at.%
+    parenthetical_value_as_published: 0,063
+    parenthetical_units_as_published: at.%
+    parenthetical_meaning: not stated on the Appendix III table pages
+    T_C: 1125
+    composition_as_published: Na2O-3SiO2
+    composition:
+      basis: printed_stoichiometric_formula_ratio
+      amount_basis: mol_inventory
+      components:
+      - - Na2O
+        - '1'
+      - - SiO2
+        - '3'
+    redox_buffer_as_published: Air
+    fO2_log_as_published: '-0.67'
+    linked_published_observation_id: khedim_2010_binary_t1125_r05_c04
+    note: This Table 20/21 measurement is also printed in Khedim et al. (2010) Table 2 and is scored there once; the thesis
+      printing is retained here as linked context.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_chromia_solubility_thesis_p170_t21_r07_c06
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_figure_1_deferred
+  type: figure_record
+  locator:
+    page: 109
+    pdf_page_index: 108
+    figure: '1'
+  phase: melt at T, analyzed after quench as glass
+  units: as plotted
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure data are deferred for digitisation; no plotted point was read.
+    phase_label: melt
+    basis: mole_fraction
+    species_formula: Cr
+    T_C:
+    - 1175
+    - 1200
+    - 1250
+    axes_as_published:
+      x: 10^4/T (K^-1)
+      y: Ln at.% Cr
+    caption: Ln Cr (At.%) dissolved in Na2O-3SiO2 versus 1/T (K^-1) for three oxygen fugacities.
+    panel: not printed
+    series:
+    - label: Log fO2 = -1
+      marker: red diamond
+      marker_count: 3
+      printed_fit: y=-0,761x+4,924; R2=0,965
+    - label: Log fO2 = -10
+      marker: blue diamond
+      marker_count: 3
+      printed_fit: y=-0,954x+6,048; R2=0,999
+    - label: Log fO2 = -5
+      marker: green diamond
+      marker_count: 3
+      printed_fit: y=-0,712x+4,058; R2=0,991
+    attribution: Khedim (2008), this work
+    digitisation: deferred to a figure pass
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_figure_1_deferred
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_figure_2_deferred
+  type: figure_record
+  locator:
+    page: 110
+    pdf_page_index: 109
+    figure: '2'
+  phase: melt at T, analyzed after quench as glass
+  units: as plotted
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure data are deferred for digitisation; no plotted point was read.
+    phase_label: melt
+    basis: mole_fraction
+    species_formula: Cr
+    T_C: 1250
+    axes_as_published:
+      x: x(Na2O-xSiO2), x=SiO2/Na2O
+      y: at.% Cr
+    caption: Total dissolved chromium at 1250°C versus x in Na2O-xSiO2 for two oxygen fugacities.
+    panel: not printed
+    series:
+    - label: Log fO2=-0,6 (oxidizing medium)
+      marker: red diamond
+      marker_count: 5
+    - label: Log fO2=-11 (reducing medium)
+      marker: blue diamond
+      marker_count: 5
+    attribution: Khedim (2008), this work
+    digitisation: deferred to a figure pass
+    note: The surrounding text prints the oxidizing value as log fO2=-0.61 and the figure caption as -0.6; the appendix gives
+      -0.67 for Air. These printed values are retained as separate source statements.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_figure_2_deferred
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_figure_3_deferred
+  type: figure_record
+  locator:
+    page: 111
+    pdf_page_index: 110
+    figure: '3'
+  phase: melt at T, analyzed after quench as glass
+  units: as plotted
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: typed_refusal
+    reason: Figure data are deferred for digitisation; no plotted point was read.
+    phase_label: melt
+    basis: mole_fraction
+    species_formula: Cr
+    T_C:
+    - 1175
+    - 1250
+    axes_as_published:
+      x: log fO2
+      y: at.% Cr
+    caption: Total dissolved chromium versus imposed oxygen fugacity.
+    panel: not printed
+    series:
+    - label: Na2O-3SiO2, T=1250°C
+      marker: blue diamond
+      marker_count: 7
+    - label: Na2O-3SiO2, T=1175°C
+      marker: red diamond
+      marker_count: 7
+    - label: Na2O-1.5SiO2, T=1250°C
+      marker: green diamond
+      marker_count: 7
+    attribution: Khedim (2008), this work
+    digitisation: deferred to a figure pass
+    note: 'The discussion also prints three qualitative fO2 domains: about 10^-14 to 10^-7, 10^-7 to 10^-3, and above 10^-3.
+      The curves were not digitised.'
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_figure_3_deferred
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr
+- observation_id: khedim_2008_speciation_model_fit_table1
+  type: thermodynamic_example
+  locator:
+    page: 136
+    pdf_page_index: 135
+    table: '1'
+    section: Chapitre VI, Extension du modèle
+  phase: silicate melt
+  units: fit coefficients as printed; parenthetical standard deviations as printed
+  values:
+    quantity: chromium_silicate_speciation_model_fit_parameters
+    method_class: model_derived
+    evidence_class: model_derived
+    parameters:
+      x_minus_3_over_2:
+      - T_C: 1250
+        value: '-0.175'
+        sigma: '0.029'
+      - T_C: 1200
+        value: '-0.170'
+        sigma: '0.035'
+      - T_C: 1175
+        value: '-0.148'
+        sigma: '0.027'
+      - T_C: 1125
+        value: '-0.153'
+        sigma: '0.029'
+      y_minus_x_minus_3_over_2:
+      - T_C: 1250
+        value: '0.729'
+        sigma: '0.129'
+      - T_C: 1200
+        value: '0.660'
+        sigma: '0.144'
+      - T_C: 1175
+        value: '0.415'
+        sigma: '0.075'
+      - T_C: 1125
+        value: '0.397'
+        sigma: '0.078'
+      z_minus_x_plus_1_over_2:
+      - T_C: 1250
+        value: '-0.297'
+        sigma: '0.052'
+      - T_C: 1200
+        value: '-0.257'
+        sigma: '0.054'
+      - T_C: 1175
+        value: '-0.240'
+        sigma: '0.044'
+      - T_C: 1125
+        value: '-0.359'
+        sigma: '0.072'
+      x:
+      - T_C: 1250
+        value: '1.347'
+        sigma: '0.029'
+      - T_C: 1200
+        value: '1.330'
+        sigma: '0.035'
+      - T_C: 1175
+        value: '1.352'
+        sigma: '0.027'
+      - T_C: 1125
+        value: '1.348'
+        sigma: '0.029'
+      y:
+      - T_C: 1250
+        value: '3.497'
+        sigma: '0.158'
+      - T_C: 1200
+        value: '3.490'
+        sigma: '0.179'
+      - T_C: 1175
+        value: '3.267'
+        sigma: '0.100'
+      - T_C: 1125
+        value: '3.245'
+        sigma: '0.107'
+      z:
+      - T_C: 1250
+        value: '0.549'
+        sigma: '0.081'
+      - T_C: 1200
+        value: '0.573'
+        sigma: '0.089'
+      - T_C: 1175
+        value: '0.612'
+        sigma: '0.081'
+      - T_C: 1125
+        value: '0.489'
+        sigma: '0.101'
+    fitted_complexes:
+      Cr(III): Cr3O4+
+      Cr(VI): Cr2O7^2-
+      Cr(II): Cr2O2+
+    note: The table reports slopes and fitted complex parameters. Parenthetical values are standard deviations computed from
+      three slope values. No current quantity token represents these model parameters.
+  context_id: khedim-2008-chromia-solubility-thesis::context::khedim_2008_speciation_model_fit_table1
+  work_id: 314a5223d20bd203fecc827e43887d693ab050963a7d792dcee9ec07652e2981
+  source_id: khedim-2008-chromia-solubility-thesis
+  species: Cr

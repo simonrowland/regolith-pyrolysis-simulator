@@ -1,0 +1,236 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml
+observations:
+- observation_id: panda-2019-ten-oxide-thermodynamics::panda2019_quoted_gamma_mn_ag_ito_1723k
+  experiment_id: ef43d68256cef094ea4166d393bf9be89869db0e4c29a48ad2df22b6f4e4effc::panda-2019-ten-oxide-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1723'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Mn
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Mn
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.395'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ito et al. [6.22], as cited by Panda (2019)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 253
+        published_page: 213
+        pdf_page_index: 252
+        section: 6.6.3
+  notices: []
+  source_id: panda-2019-ten-oxide-thermodynamics
+  locator:
+    page: 253
+    published_page: 213
+    pdf_page_index: 252
+    section: 6.6.3
+  read_from: unknown:panda-2019-ten-oxide-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 253
+        published_page: 213
+        pdf_page_index: 252
+        section: 6.6.3
+- observation_id: panda-2019-ten-oxide-thermodynamics::panda2019_quoted_gamma_mn_ag_jung_1723k
+  experiment_id: ef43d68256cef094ea4166d393bf9be89869db0e4c29a48ad2df22b6f4e4effc::panda-2019-ten-oxide-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1723'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Mn
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Mn
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.596'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jung et al. [6.91], as cited by Panda (2019)
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: Codex
+      date: '2026-10-22'
+      evidence:
+        page: 253
+        published_page: 213
+        pdf_page_index: 252
+        section: 6.6.3
+  notices: []
+  source_id: panda-2019-ten-oxide-thermodynamics
+  locator:
+    page: 253
+    published_page: 213
+    pdf_page_index: 252
+    section: 6.6.3
+  read_from: unknown:panda-2019-ten-oxide-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 253
+        published_page: 213
+        pdf_page_index: 252
+        section: 6.6.3

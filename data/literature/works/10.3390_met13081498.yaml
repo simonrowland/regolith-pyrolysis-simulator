@@ -1,0 +1,2237 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3390/met13081498
+  citation: Miao Q, Li M, Yan B (2023). Experimental Determination of the Standard Gibbs Energy of Formation of Fe3−xVxO4
+    at 1473 K. Metals 13, 1498.
+  source_ids:
+  - miao-li-yan-2023-fe-v-spinel-gibbs
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:miao-li-yan-2023-fe-v-spinel-gibbs
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.3390/met13081498
+experiments:
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-1; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.4
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-2; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-3; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-4; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.8
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-5; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_1_6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.6
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 1-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000024216675'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000239'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 2.39 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 2.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 1-6; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.8
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-1; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-2; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.4
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-3; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-4; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-5; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_2_6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 0.8
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 2-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.00000096968025'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000957'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 9.57 × 10^-12 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 1.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 2-6; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.8
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-1; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-1; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.6
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-2; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-2; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-3; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-3; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 2.0
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-4; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-4; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.6
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-5; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-5; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::experiment::miao_2023_sample_3_6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_preparation_then_liquid_copper_equilibration' is not a closed method token (kems_effusion
+      alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Fe/V molar ratio y = 1.0
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 sample 3-6; Fe/V molar ratio, CO/CO2 volume ratio, and printed oxygen partial pressure.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: 2.2 Experimental Procedure
+        note: Equilibration at 1473 K for 72 h under the Table 1 atmosphere.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pO2_Pa:
+      state:
+        tag: value
+        value: '0.0000038807475'
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000383'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 4
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 prints pO2 = 3.83 × 10^-11 atm; converted from atm to Pa for the canonical point condition.
+              source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+        output_unit: Pa
+    gas_mix:
+      state:
+        tag: unknown
+        reason: condition gas_mix is not a scalar numeric value
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 prints CO/CO2 volume ratio 0.5.
+        source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 equilibration result for sample 3-6; method details on physical page 5.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+- experiment_id: 10.3390/met13081498::miao-li-yan-2023-fe-v-spinel-gibbs
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.3390/met13081498
+  locator:
+    page: 10
+    pdf_page_index: 9
+    section: 3.3 Standard Gibbs Energy of Formation
+    note: Figure 2 discussion; the quoted FactSage value is also shown by a star marker in Figure 2.
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+context:
+- observation_id: miao_2023_figure1_activity_context
+  type: figure_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 6
+    page: 7
+    figure: '1'
+    note: Figure 1 on physical page 7; numeric points deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: exp[(µFe−µθFe)/RT], equivalent to the Fe component activity relative to pure solid Fe
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: Fe component in Fe3−xVxO4
+    phase: spinel solid solution
+    T_K: '1473'
+    axes_as_printed: 'x: Fe/V molar ratio y; y: exp[(µFe−µθFe)/RT]'
+    caption_as_printed: Plots of exp[(µFe−µθFe)/RT] against Fe/V ratio of Fe3−xVxO4 and the linear fitting results.
+    panels:
+    - single
+    series:
+    - pO2 = 2.39 × 10^-12 atm (6 markers; red squares; linear fit)
+    - pO2 = 9.57 × 10^-12 atm (6 markers; orange squares; linear fit)
+    - pO2 = 3.83 × 10^-11 atm (6 markers; blue squares; linear fit)
+    marker_count_per_series:
+      2.39 × 10^-12 atm: 6
+      9.57 × 10^-12 atm: 6
+      3.83 × 10^-11 atm: 6
+    attribution: Present work; standard state µθFe is pure solid Fe.
+    schema_gap_or_disposition: No numeric values were estimated from the figure.
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_figure1_activity_context
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_figure2_delta_fg_context
+  type: figure_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 9
+    page: 10
+    figure: '2'
+    note: Figure 2 on physical page 10; numeric points deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: standard Gibbs energy of formation of Fe3−xVxO4
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: Fe3−xVxO4
+    phase: spinel solid solution
+    T_K: '1473'
+    axes_as_printed: 'x: Fe/V molar ratio; y: ΔfG/10^5 J/mol'
+    caption_as_printed: The changing trend of ΔfG of Fe3−xVxO4 with Fe/V ratio under different oxygen partial pressures.
+    panels:
+    - single
+    series:
+    - pO2 = 2.39 × 10^-12 atm (6 markers)
+    - pO2 = 9.57 × 10^-12 atm (6 markers)
+    - pO2 = 2.83 × 10^-11 atm in figure legend (6 markers)
+    - FeV2O4, FactSage reference [26], star marker (1)
+    marker_count_per_series:
+      2.39 × 10^-12 atm: 6
+      9.57 × 10^-12 atm: 6
+      2.83 × 10^-11 atm (figure legend): 6
+      FeV2O4 reference: 1
+    attribution: Present-study series; FeV2O4 star from FactSage System [26].
+    printed_discrepancy: The high-pressure figure legend reads 2.83 × 10^-11 atm, while Tables 1, 3, 5, 6 and Figure 1 print
+      3.83 × 10^-11 atm; both are retained as printed.
+    schema_gap_or_disposition: No numeric values were estimated from the figure.
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_figure2_delta_fg_context
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_figure3_delta_fg_context
+  type: figure_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 10
+    page: 11
+    figure: '3'
+    note: Figure 3 on physical page 11; numeric points deferred.
+  units: no numeric figure points stored
+  values:
+    typed_quantity_as_printed: standard Gibbs energy of formation of Fe3−xVxO4 and regular-solution model
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    species: Fe3−xVxO4
+    phase: spinel solid solution
+    T_K: '1473'
+    axes_as_printed: 'x: x/2 in Fe3−xVxO4; y: ΔfG/10^5 J/mol'
+    caption_as_printed: Comparing the present determined ΔfG of Fe3−xVxO4 with the model calculating results.
+    panels:
+    - single
+    series:
+    - pO2 = 2.39 × 10^-12 atm (6 present-study markers)
+    - pO2 = 9.57 × 10^-12 atm (6 present-study markers)
+    - pO2 = 2.83 × 10^-11 atm in figure legend (6 present-study markers)
+    - Fe3O4 FactSage reference [26] (1 star)
+    - FeV2O4 FactSage reference [26] (1 pentagon)
+    - regular-solution model, Equation (23) (curve; 0 markers)
+    marker_count_per_series:
+      2.39 × 10^-12 atm: 6
+      9.57 × 10^-12 atm: 6
+      2.83 × 10^-11 atm (figure legend): 6
+      Fe3O4 reference: 1
+      FeV2O4 reference: 1
+      Equation (23) curve: 0
+    attribution: Present-study series; FactSage System [26] end members; Equation (23) model.
+    printed_discrepancy: The high-pressure figure legend reads 2.83 × 10^-11 atm, while Tables 1, 3, 5, 6 and Figure 1 print
+      3.83 × 10^-11 atm; both are retained as printed.
+    schema_gap_or_disposition: No numeric values were estimated from the figure.
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_figure3_delta_fg_context
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table2_single_phase_limits
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '2'
+    note: Table 2 prints the lower and upper Fe/V ratios delimiting the single-phase spinel field.
+  units: Fe/V molar ratio; pO2 in atm, all as printed
+  values:
+    typed_quantity_as_printed: Fe/V molar-ratio limits of the Fe3−xVxO4 single-phase area
+    candidate_tokens: []
+    schema_gap_or_disposition: Table 2 gives phase-field boundary ratios, not measured compositions or a quantity with a store
+      token; values are retained as printed.
+    attribution: Present work; the paper describes the preceding FeO–V2O3 phase diagram as prior work [21].
+    columns_as_printed:
+    - pO2 / atm
+    - ys
+    - yL
+    rows_as_printed:
+    - - 2.39 × 10^-12
+      - '0.524'
+      - '1.604'
+    - - 9.57 × 10^-12
+      - '0.565'
+      - '2.300'
+    - - 3.83 × 10^-11
+      - '0.567'
+      - '3.098'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table2_single_phase_limits
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table3_mu_fe_context
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 5
+    page: 6
+    table: '3'
+    note: The last Table 3 column is calculated by Equation (12) using the liquid-Cu Henry constant 24.1 relative to pure
+      solid Fe (reference [30]).
+  units: J/mol, as printed
+  values:
+    typed_quantity_as_printed: calculated µFe − µθFe column
+    candidate_tokens: []
+    method_class: model_derived
+    schema_gap_or_disposition: Chemical-potential differences have no quantity token. The Table 3 Fe mass-percent and xFe(Cu)
+      columns are typed as equilibrium-phase composition; the printed µFe column is retained here. Table 5 repeats these µFe
+      numbers and is not counted a second time.
+    columns_as_printed:
+    - sample
+    - µFe − µθFe (J/mol)
+    rows_as_printed:
+    - - 1-1
+      - '-23861.3'
+    - - 1-2
+      - '-25630.8'
+    - - 1-3
+      - '-27700.2'
+    - - 1-4
+      - '-28706.8'
+    - - 1-5
+      - '-33325.5'
+    - - 1-6
+      - '-36847.6'
+    - - 2-1
+      - '-26770.1'
+    - - 2-2
+      - '-28362.0'
+    - - 2-3
+      - '-30192.4'
+    - - 2-4
+      - '-33325.5'
+    - - 2-5
+      - '-39079.9'
+    - - 2-6
+      - '-46777.0'
+    - - 3-1
+      - '-30192.4'
+    - - 3-2
+      - '-31438.4'
+    - - 3-3
+      - '-35557.6'
+    - - 3-4
+      - '-36185.6'
+    - - 3-5
+      - '-37547.4'
+    - - 3-6
+      - '-46777.0'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table3_mu_fe_context
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table4_mu_fe_fits
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 7
+    page: 8
+    table: '4'
+    note: Table 4 is the authors' fit. The middle expression is retained exactly as printed without adding parentheses.
+  units: µFe function equations, pO2 in atm; as printed
+  values:
+    typed_quantity_as_printed: fitted functional relations between µFe and Fe/V ratio
+    candidate_tokens: []
+    method_class: model_derived
+    schema_gap_or_disposition: These regression relations and coefficients are model fits, not measured activity or chemical-potential
+      points; no numeric model curve is digitized.
+    columns_as_printed:
+    - pO2 / atm
+    - functional relation between µFe and y
+    rows_as_printed:
+    - - 2.39 × 10^-12
+      - µFe = µθFe + RT ln(−0.0048 + 0.092y)
+    - - 9.57 × 10^-12
+      - µFe = µθFe + RT ln − 0.0488 + 0.092y
+    - - 3.83 × 10^-11
+      - µFe = µθFe + RT ln(−0.0116 + 0.033y)
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table4_mu_fe_fits
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table5_mu_v_page_8
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 7
+    page: 8
+    table: '5'
+    note: Table 5 derives µV from the Table 4 fit, Table 2 ys boundaries, Equation (18), and the printed V2O3 standard Gibbs
+      energy.
+  units: J/mol, as printed
+  values:
+    typed_quantity_as_printed: derived µV − µθV column
+    candidate_tokens: []
+    method_class: model_derived
+    schema_gap_or_disposition: The table reports Equation (18) derived chemical-potential differences; no chemical-potential
+      quantity token fits. Table 5's repeated µFe column is stored only in the Table 3 context row.
+    columns_as_printed:
+    - sample
+    - µV − µθV (J/mol)
+    rows_as_printed:
+    - - 1-1
+      - '-200496.5'
+    - - 1-2
+      - '-197958.8'
+    - - 1-3
+      - '-195406.8'
+    - - 1-4
+      - '-192835.2'
+    - - 1-5
+      - '-190234.6'
+    - - 1-6
+      - '-187586.3'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table5_mu_v_page_8
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table5_mu_v_page_9
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 8
+    page: 9
+    table: '5'
+    note: Table 5 derives µV from the Table 4 fit, Table 2 ys boundaries, Equation (18), and the printed V2O3 standard Gibbs
+      energy.
+  units: J/mol, as printed
+  values:
+    typed_quantity_as_printed: derived µV − µθV column
+    candidate_tokens: []
+    method_class: model_derived
+    schema_gap_or_disposition: The table reports Equation (18) derived chemical-potential differences; no chemical-potential
+      quantity token fits. Table 5's repeated µFe column is stored only in the Table 3 context row.
+    columns_as_printed:
+    - sample
+    - µV − µθV (J/mol)
+    rows_as_printed:
+    - - 2-1
+      - '-237836.0'
+    - - 2-2
+      - '-234273.1'
+    - - 2-3
+      - '-230479.1'
+    - - 2-4
+      - '-226331.9'
+    - - 2-5
+      - '-221577.7'
+    - - 2-6
+      - '-215523.2'
+    - - 3-1
+      - '-249849.2'
+    - - 3-2
+      - '-247033.0'
+    - - 3-3
+      - '-241291.1'
+    - - 3-4
+      - '-238348.9'
+    - - 3-5
+      - '-232253.9'
+    - - 3-6
+      - '-222086.1'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table5_mu_v_page_9
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table6_delta_fg_page_10
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 9
+    page: 10
+    table: '6'
+    note: Table 6 lists the author-calculated formation Gibbs energies at 1473 K; y and pO2 are repeated from Table 1/3.
+  units: J/mol, as printed
+  values:
+    typed_quantity_as_printed: calculated standard Gibbs energy of formation of Fe3−xVxO4
+    quantity: delta_fG
+    candidate_tokens:
+    - delta_fG
+    method_class: model_derived
+    schema_gap_or_disposition: The printed values are retained in context because their µFe and µV inputs are not stored as
+      observations and no corpus table asset can be registered in this run; derivation pending a corpus table asset (controller,
+      t-1382).
+    derived_from_as_printed:
+    - Table 3 µFe − µθFe
+    - Table 5 µV − µθV
+    - Equation (21)
+    columns_as_printed:
+    - sample
+    - ΔfG of Fe3−xVxO4 (J/mol)
+    rows_as_printed:
+    - - 2-1
+      - '-927899.3'
+    - - 2-2
+      - '-944122.7'
+    - - 2-3
+      - '-962382.6'
+    - - 2-4
+      - '-984614.1'
+    - - 2-5
+      - '-1012433.4'
+    - - 2-6
+      - '-1043021.7'
+    - - 3-1
+      - '-851470.1'
+    - - 3-2
+      - '-861457.0'
+    - - 3-3
+      - '-887027.6'
+    - - 3-4
+      - '-898199.8'
+    - - 3-5
+      - '-924783.2'
+    - - 3-6
+      - '-990774.3'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table6_delta_fg_page_10
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe
+- observation_id: miao_2023_table6_delta_fg_page_9
+  type: table_context
+  locator:
+    source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
+    pdf_page_index: 8
+    page: 9
+    table: '6'
+    note: Table 6 lists the author-calculated formation Gibbs energies at 1473 K; y and pO2 are repeated from Table 1/3.
+  units: J/mol, as printed
+  values:
+    typed_quantity_as_printed: calculated standard Gibbs energy of formation of Fe3−xVxO4
+    quantity: delta_fG
+    candidate_tokens:
+    - delta_fG
+    method_class: model_derived
+    schema_gap_or_disposition: The printed values are retained in context because their µFe and µV inputs are not stored as
+      observations and no corpus table asset can be registered in this run; derivation pending a corpus table asset (controller,
+      t-1382).
+    derived_from_as_printed:
+    - Table 3 µFe − µθFe
+    - Table 5 µV − µθV
+    - Equation (21)
+    columns_as_printed:
+    - sample
+    - ΔfG of Fe3−xVxO4 (J/mol)
+    rows_as_printed:
+    - - 1-1
+      - '-930820.9'
+    - - 1-2
+      - '-947729.6'
+    - - 1-3
+      - '-967218.6'
+    - - 1-4
+      - '-987740.2'
+    - - 1-5
+      - '-1016918.9'
+    - - 1-6
+      - '-1048605.1'
+  context_id: miao-li-yan-2023-fe-v-spinel-gibbs::context::miao_2023_table6_delta_fg_page_9
+  work_id: 10.3390/met13081498
+  source_id: miao-li-yan-2023-fe-v-spinel-gibbs
+  species: Fe

@@ -1,0 +1,857 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/rcm.9894
+  citation: 'Shugurov SM, Lopatin SI, Zhinkina OA, Panin AI, Panina NS (2024). Thermodynamics of gaseous strontium and calcium
+    cerates studied by Knudsen effusion mass spectrometry and estimation of relative electron ionization cross-section for
+    CeO2(g). Rapid Communications in Mass Spectrometry 38(21): e9894.'
+  source_ids:
+  - shugurov-2024-gaseous-cerates-si
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shugurov-2024-gaseous-cerates-si
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1002/rcm.9894
+experiments:
+- experiment_id: 10.1002/rcm.9894::shugurov-2024-gaseous-cerates-si
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1002/rcm.9894
+  locator:
+    table: S1
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+context:
+- observation_id: shugurov_2024_figure_s1_xrd
+  type: figure_record
+  locator:
+    figure: S1
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: not stated
+  values:
+    quantity: powder_x_ray_diffraction_patterns
+    species:
+    - SrCeO3
+    - 50 mol% CaO + 50 mol% CeO2
+    phase: crystalline solids
+    temperature: not stated
+    axes_as_printed: not recoverable from the available DOCX text layer
+    caption: Experimental and theoretical x-ray diffraction patterns of a) SrCeO3 and b) sample containing 50 mol.% CaO and
+      50 mol.% CeO2.
+    panels:
+    - panel: a
+      system: SrCeO3
+      series:
+      - experimental
+      - theoretical
+      marker_count: not assessed
+    - panel: b
+      system: 50 mol% CaO + 50 mol% CeO2
+      series:
+      - experimental
+      - theoretical
+      marker_count: not assessed
+    digitisation: deferred to a figure pass
+    note: Only the DOCX SI and embedded EMF assets are present; a paginated PDF is absent and no local EMF renderer is available.
+      No numerical values were estimated.
+  title_as_printed: Supplementary Figure S1
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_figure_s1_xrd
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrCeO3
+- observation_id: shugurov_2024_s10_srceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S10
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule SrCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000      1.166288000
+
+        O        0.000000000      1.550314000     -0.038590000
+
+        O       -1.342611000     -0.775157000     -0.038590000
+
+        O        1.342611000     -0.775157000     -0.038590000
+
+        Sr       0.000000000      0.000000000     -1.755751000'
+      - 'Ce       0.720208000      0.939339000      0.000000000
+
+        O       -0.066508000     -0.433234000      1.345531000
+
+        O       -0.066508000     -0.433234000     -1.345531000
+
+        O       -0.066508000      2.576376000      0.000000000
+
+        Sr      -1.057261000     -1.793709000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nA1\nE\nA1\nE\nA1"
+      - "206\n268       \n321\n447\n572 \n741"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "76\n133       \n223       \n242       \n336     \n  485        \n534       \n608       \n804"
+  title_as_printed: PBE0 molecular structures and harmonic frequencies for SrCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s10_srceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrCeO3
+- observation_id: shugurov_2024_s11_srceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S11
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule SrCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000     -1.147639140
+
+        O       -1.548562864      0.000000000      0.059579296
+
+        O        0.774281432      1.341094779      0.059579296
+
+        O        0.774281432     -1.341094779      0.059579296
+
+        Sr       0.000000000      0.000000000      1.793992835'
+      - 'Ce       0.728024000      0.942458000      0.000000000
+
+        O       -0.063167000     -0.436145000      1.348463000
+
+        O       -0.063167000     -0.436145000     -1.348463000
+
+        O       -0.063167000      2.563202000      0.000000000
+
+        Sr      -1.071300000     -1.794470000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nA1\nE\nA1\nE\nA1"
+      - "180\n263       \n316\n438\n545 \n724"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "77 \n122       \n230       \n238       \n303     \n  473         \n532       \n591       \n806"
+  title_as_printed: M06 molecular structures and harmonic frequencies for SrCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s11_srceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrCeO3
+- observation_id: shugurov_2024_s12_srceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S12
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule SrCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000      1.169013000
+
+        O        0.000000000      1.557887000     -0.041041000
+
+        O       -1.349170000     -0.778944000     -0.041041000
+
+        O        1.349170000     -0.778944000     -0.041041000
+
+        Sr       0.000000000      0.000000000     -1.758362000'
+      - 'Ce       0.842674000      0.851327000      0.000000000
+
+        O       -0.062003000     -0.428605000      1.361863000
+
+        O       -0.062003000     -0.428605000     -1.361863000
+
+        O       -0.062003000      2.448052000      0.000000000
+
+        Sr      -1.247027000     -1.634307000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nA1\nE\nA1\nE\nA1"
+      - "216\n269       \n322\n448\n574 \n736"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "76\n163       \n229       \n244       \n343     \n  486         \n522       \n611       \n794"
+  title_as_printed: MP2(Full) molecular structures and harmonic frequencies for SrCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s12_srceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrCeO3
+- observation_id: shugurov_2024_s13_total_energies
+  type: model_table_context
+  locator:
+    table: S13
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: a.u.
+  values:
+    quantity: calculated_total_electronic_energy_plus_zero_point_energy
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - delta_fG
+    reason_not_typed: Absolute calculated molecular total energies are not formation enthalpies or Gibbs energies.
+    printed_cells:
+    - - Species
+      - Method
+    - - ''
+      - PBE0
+      - M06
+      - MP2(Full)
+    - - CaO
+      - '-752.5736198'
+      - '-752.7759304'
+      - '-752.2215567'
+    - - SrO
+      - '-105.85480715'
+      - '-105.870680847'
+      - '-105.7585942'
+    - - CeO2
+      - '-625.476253'
+      - '-625.601399'
+      - '-625.311721'
+    - - CaO+ CeO2
+      - '-1378.0498728'
+      - '-1378.3773294'
+      - '-1377.5332777'
+    - - SrO+ CeO2
+      - '-731.33106015'
+      - '-731.472079847'
+      - '-731.0703152'
+    - - CaCeO3 (C3v)
+      - '-1378.1943348'
+      - '-1378.5108443'
+      - '-1377.6975273'
+    - - CaCeO3 (Cs)
+      - '-1378.1970919'
+      - '-1378.5147311'
+      - '-1377.69212690'
+    - - SrCeO3 (C3v)
+      - '-731.4766738'
+      - '-731.6039787'
+      - '-731.2311115'
+    - - SrCeO3 (Cs)
+      - '-731.4760405'
+      - '-731.6048064'
+      - '-731.2239472'
+  title_as_printed: Relevant energies E_tot = E_el + ZPE
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s13_total_energies
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CeO2
+- observation_id: shugurov_2024_s1_sr_reaction_enthalpy_calculations
+  type: model_table_context
+  locator:
+    table: S1
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: kJ/mol
+  values:
+    quantity: negative_reaction_enthalpy_at_0K
+    method_class: model_derived
+    reaction_as_printed: reaction (8), M=Sr; values are −ΔrH⁰(0)
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: These are calculated reaction enthalpy values at 0 K for the stated molecular structures, not formation
+      enthalpies from elements or partial molar enthalpies.
+    calculation_as_printed: Rigid-rotor harmonic-oscillator thermodynamic functions for C3v and Cs structures evaluated using
+      quantum chemical calculations.
+    runs:
+    - T_K_as_printed: '2226'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '381.4'
+        Cs: '327.0'
+    - T_K_as_printed: '2229'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '377.6'
+        Cs: '323.2'
+    - T_K_as_printed: '2235'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '382.5'
+        Cs: '327.9'
+    - T_K_as_printed: '2232'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '376.7'
+        Cs: '322.3'
+    - T_K_as_printed: '2236'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '378.3'
+        Cs: '323.7'
+    - T_K_as_printed: '2237'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '372.5'
+        Cs: '317.9'
+    - T_K_as_printed: '2236'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '379.8'
+        Cs: '325.3'
+    - T_K_as_printed: '2223'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '370.3'
+        Cs: '316.1'
+    - T_K_as_printed: '2230'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '370.2'
+        Cs: '315.8'
+    - T_K_as_printed: '2229'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '368.7'
+        Cs: '314.3'
+    - T_K_as_printed: '2227'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '371.0'
+        Cs: '316.6'
+    - T_K_as_printed: '2230'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '367.3'
+        Cs: '312.9'
+    - T_K_as_printed: '2224'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '364.9'
+        Cs: '310.7'
+    - T_K_as_printed: '2218'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '366.1'
+        Cs: '312.0'
+    - T_K_as_printed: '2240'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '365.5'
+        Cs: '310.9'
+    - T_K_as_printed: '2240'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '366.0'
+        Cs: '311.3'
+    - T_K_as_printed: '2247'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '367.9'
+        Cs: '313.0'
+    - T_K_as_printed: '2244'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '367.4'
+        Cs: '312.6'
+    - T_K_as_printed: '2249'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '371.3'
+        Cs: '316.4'
+    - T_K_as_printed: '2245'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '368.8'
+        Cs: '314.0'
+    average_values_as_printed:
+      C3v: 371.7 ± 4.7
+      Cs: 317.2 ± 4.7
+  title_as_printed: Table S1 −ΔrH⁰(0) values for reaction (8), M=Sr
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s1_sr_reaction_enthalpy_calculations
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrCeO3
+- observation_id: shugurov_2024_s2_ca_reaction_enthalpy_calculations
+  type: model_table_context
+  locator:
+    table: S2
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: kJ/mol
+  values:
+    quantity: negative_reaction_enthalpy_at_0K
+    method_class: model_derived
+    reaction_as_printed: reaction (8), M=Ca; values are −ΔrH⁰(0)
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: These are calculated reaction enthalpy values at 0 K for the stated molecular structures, not formation
+      enthalpies from elements or partial molar enthalpies.
+    calculation_as_printed: Rigid-rotor harmonic-oscillator thermodynamic functions for C3v and Cs structures evaluated using
+      quantum chemical calculations.
+    runs:
+    - T_K_as_printed: '2167'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '436.5'
+        Cs: '383.1'
+    - T_K_as_printed: '2158'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '437.1'
+        Cs: '383.9'
+    - T_K_as_printed: '2154'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '435.2'
+        Cs: '382.1'
+    - T_K_as_printed: '2155'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '435.7'
+        Cs: '382.6'
+    - T_K_as_printed: '2157'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '434.8'
+        Cs: '381.7'
+    - T_K_as_printed: '2165'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '435.9'
+        Cs: '382.5'
+    - T_K_as_printed: '2159'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '434.8'
+        Cs: '381.6'
+    - T_K_as_printed: '2164'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '436.4'
+        Cs: '383.0'
+    - T_K_as_printed: '2166'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '434.4'
+        Cs: '381.0'
+    - T_K_as_printed: '2159'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '434.0'
+        Cs: '380.8'
+    - T_K_as_printed: '2158'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '428.8'
+        Cs: '375.6'
+    - T_K_as_printed: '2164'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '435.4'
+        Cs: '382.1'
+    - T_K_as_printed: '2162'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '431.1'
+        Cs: '377.8'
+    - T_K_as_printed: '2198'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '436.9'
+        Cs: '382.7'
+    - T_K_as_printed: '2192'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '426.3'
+        Cs: '372.3'
+    - T_K_as_printed: '2200'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '432.6'
+        Cs: '378.3'
+    - T_K_as_printed: '2208'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '426.2'
+        Cs: '371.8'
+    - T_K_as_printed: '2199'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '429.4'
+        Cs: '375.2'
+    - T_K_as_printed: '2207'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '423.0'
+        Cs: '368.6'
+    - T_K_as_printed: '2207'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '426.2'
+        Cs: '371.7'
+    - T_K_as_printed: '2207'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '424.0'
+        Cs: '369.6'
+    - T_K_as_printed: '2207'
+      negative_reaction_enthalpy_at_0K_kJ_mol:
+        C3v: '423.2'
+        Cs: '368.7'
+    average_values_as_printed:
+      C3v: 431.7 ± 4.9
+      Cs: 378.0 ± 5.3
+  title_as_printed: Table S2 −ΔrH⁰(0) values for reaction (8), M=Ca
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s2_ca_reaction_enthalpy_calculations
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaCeO3
+- observation_id: shugurov_2024_s3_structure_energy_comparison
+  type: model_table_context
+  locator:
+    table: S3
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: kJ/mol
+  values:
+    quantity: computed_favorable_molecular_structures_and_energy_differences
+    method_class: model_derived
+    printed_cells:
+    - - ''
+      - CaCeO3
+      - SrCeO3
+    - - MP2
+      - C3v (~14 kJ/mol)
+      - C3v (~19 kJ/mol)
+    - - PBE0
+      - Cs  (~7 kJ/mol)
+      - Cs  (~2 kJ/mol)
+    - - M06
+      - Cs  (~10 kJ/mol)
+      - Cs  (~2 kJ/mol)
+    reason_not_typed: No store quantity represents computed molecular structure preference or relative structure energy.
+  title_as_printed: Energetically favorable structures using different methods and energy difference between the various structures
+    for the same species
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s3_structure_energy_comparison
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaCeO3
+- observation_id: shugurov_2024_s4_cao_computed_molecular_properties
+  type: model_table_context
+  locator:
+    table: S4
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+    methods_as_printed:
+    - PBE0
+    - M06
+    - MP2(Full)
+    calculated_values:
+    - characteristic: Re, Å
+      PBE0: '1.787'
+      M06: '1.797'
+      MP2(Full): '1.817'
+    - characteristic: ωe, cm-1
+      PBE0: '808'
+      M06: '794'
+      MP2(Full): '714'
+  title_as_printed: Theoretical characteristics of CaO(g) ground state
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s4_cao_computed_molecular_properties
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaO
+- observation_id: shugurov_2024_s4_cao_quoted_experiment
+  type: quoted_table_context
+  locator:
+    table: S4
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: quoted_molecular_structure_or_vibrational_values
+    method_class: quoted_attributed
+    attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+    reason_not_typed: No store quantity represents the reported molecular characteristic.
+    values_as_printed:
+    - characteristic: Re, Å
+      value_as_printed: '1.822'
+    - characteristic: ωe, cm-1
+      value_as_printed: '732'
+  title_as_printed: Experimental comparison values in Table S4
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s4_cao_quoted_experiment
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaO
+- observation_id: shugurov_2024_s5_sro_computed_molecular_properties
+  type: model_table_context
+  locator:
+    table: S5
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+    methods_as_printed:
+    - PBE0
+    - M06
+    - MP2(Full)
+    calculated_values:
+    - characteristic: Re, Å
+      PBE0: '1.897'
+      M06: '1.890'
+      MP2(Full): '1.925'
+    - characteristic: ωe, cm-1
+      PBE0: '702'
+      M06: '685'
+      MP2(Full): '649'
+  title_as_printed: Theoretical characteristics of SrO(g) ground state
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s5_sro_computed_molecular_properties
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrO
+- observation_id: shugurov_2024_s5_sro_quoted_experiment
+  type: quoted_table_context
+  locator:
+    table: S5
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: quoted_molecular_structure_or_vibrational_values
+    method_class: quoted_attributed
+    attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+    reason_not_typed: No store quantity represents the reported molecular characteristic.
+    values_as_printed:
+    - characteristic: Re, Å
+      value_as_printed: '1.920'
+    - characteristic: ωe, cm-1
+      value_as_printed: '653'
+  title_as_printed: Experimental comparison values in Table S5
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s5_sro_quoted_experiment
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: SrO
+- observation_id: shugurov_2024_s6_ceo2_computed_molecular_properties
+  type: model_table_context
+  locator:
+    table: S6
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: computed_molecular_bond_lengths_angles_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents molecular structure or harmonic vibrational frequency values.
+    methods_as_printed:
+    - PBE0
+    - M06
+    - MP2(Full)
+    calculated_values:
+    - characteristic: R(Ce-O), Å
+      PBE0: '1.798'
+      M06: '1.784'
+      MP2(Full): '1.819'
+    - characteristic: <O-Ce-O, deg
+      PBE0: '140'
+      M06: '149'
+      MP2(Full): '116'
+    - characteristic: A1
+      PBE0: '77'
+      M06: '96'
+      MP2(Full): '142'
+    - characteristic: B2
+      PBE0: '810'
+      M06: '808'
+      MP2(Full): '779'
+    - characteristic: A1
+      PBE0: '814'
+      M06: '829'
+      MP2(Full): '826'
+  title_as_printed: Theoretical characteristics of CeO2(g) ground state
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s6_ceo2_computed_molecular_properties
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CeO2
+- observation_id: shugurov_2024_s6_ceo2_quoted_experiment
+  type: quoted_table_context
+  locator:
+    table: S6
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, cm-1
+  values:
+    quantity: quoted_molecular_structure_or_vibrational_values
+    method_class: quoted_attributed
+    attribution: NIST Chemistry WebBook, Reference [1] (as cited in the supplementary table)
+    reason_not_typed: No store quantity represents the reported molecular characteristic.
+    values_as_printed:
+    - characteristic: B2
+      value_as_printed: '759'
+    - characteristic: A1
+      value_as_printed: '777'
+  title_as_printed: Experimental comparison values in Table S6
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s6_ceo2_quoted_experiment
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CeO2
+- observation_id: shugurov_2024_s7_caceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S7
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule CaCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000      0.835080000
+
+        O        0.000000000      1.530177000     -0.395550000
+
+        O       -1.325172000     -0.765089000     -0.395550000
+
+        O        1.325172000     -0.765089000     -0.395550000
+
+        Ca       0.000000000      0.000000000     -1.947073000'
+      - 'Ce       0.510117000      0.610216000      0.000000000
+
+        O       -0.274225000     -0.786284000      1.328224000
+
+        O       -0.274225000     -0.786284000     -1.328224000
+
+        O       -0.274225000      2.244068000      0.000000000
+
+        Ca      -1.150268000     -2.038226000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nE\nA1\nA1\nE\nA1"
+      - "227       \n332\n344 \n505\n584\n  742"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "83 \n129       \n234       \n309       \n354     \n  528         \n574       \n639       \n810"
+  title_as_printed: PBE0 molecular structures and harmonic frequencies for CaCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s7_caceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaCeO3
+- observation_id: shugurov_2024_s8_caceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S8
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule CaCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000      0.838892000
+
+        O        0.000000000      1.528429000     -0.393909000
+
+        O       -1.323659000     -0.764215000     -0.393909000
+
+        O        1.323659000     -0.764215000     -0.393909000
+
+        Ca       0.000000000      0.000000000     -1.960096000'
+      - 'Ce       0.510206000      0.615913000      0.000000000
+
+        O       -0.273143000     -0.788763000      1.333521000
+
+        O       -0.273143000     -0.788763000     -1.333521000
+
+        O       -0.273143000      2.236356000      0.000000000
+
+        Ca      -1.151826000     -2.049680000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nE\nA1\nA1\nE\nA1"
+      - "212       \n328\n341 \n504\n560\n  724"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "76 \n113       \n231       \n303       \n320    \n  514         \n559      \n626       \n810"
+  title_as_printed: M06 molecular structures and harmonic frequencies for CaCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s8_caceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaCeO3
+- observation_id: shugurov_2024_s9_caceo3_molecular_model_data
+  type: model_table_context
+  locator:
+    table: S9
+    note: publisher supplementary-information DOCX; no matching paginated PDF found
+  units: Å, degrees, dimensionless coordinates, cm-1
+  values:
+    quantity: computed_molecular_coordinates_and_harmonic_frequencies
+    method_class: model_derived
+    candidate_tokens_considered:
+    - delta_fH
+    - partial_molar_enthalpy
+    reason_not_typed: No store quantity represents calculated molecular coordinates or harmonic vibrational frequencies.
+    printed_cells:
+    - - Molecule CaCeO3
+    - - Structure I (C3v, 1A1)
+      - Structure II (Cs, 1A’)
+    - - 'Ce       0.000000000      0.000000000      0.836966000
+
+        O        0.000000000      1.536037000     -0.400329000
+
+        O       -1.330247000     -0.768018000     -0.400329000
+
+        O        1.330247000     -0.768018000     -0.400329000
+
+        Ca       0.000000000      0.000000000     -1.946806000'
+      - 'Ce       0.594352000      0.555782000      0.000000000
+
+        O       -0.308940000     -0.749167000      1.344802000
+
+        O       -0.308940000     -0.749167000     -1.344802000
+
+        O       -0.308940000      2.148287000      0.000000000
+
+        Ca      -1.352894000     -1.871749000      0.000000000'
+    - - Symmetry label
+      - Vibrational frequencies, cm-1
+      - Symmetry label
+      - Vibrational frequencies, cm-1
+    - - "E \nE\nA1\nA1\nE\nA1"
+      - "252       \n333\n349 \n507\n588\n  739"
+      - "A’\nA” \nA’\nA’\nA”\nA”\nA’\nA’\nA’"
+      - "87 \n159       \n237       \n309       \n375    \n  528         \n570      \n636      \n799"
+  title_as_printed: MP2(Full) molecular structures and harmonic frequencies for CaCeO3
+  context_id: shugurov-2024-gaseous-cerates-si::context::shugurov_2024_s9_caceo3_molecular_model_data
+  work_id: 10.1002/rcm.9894
+  source_id: shugurov-2024-gaseous-cerates-si
+  species: CaCeO3

@@ -1,0 +1,870 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1029/2001jb000587
+  citation: 'Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (2003), "Role of element solubility on the kinetics
+    of element partitioning: In situ observations and a thermodynamic kinetic model," Journal of Geophysical Research: Solid
+    Earth, 108(B3), 2157.'
+  source_ids:
+  - dohmen-2003-coupled-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:dohmen-2003-coupled-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1029/2001jb000587
+experiments:
+- experiment_id: 10.1029/2001jb000587::experiment::dohmen-2003-kems-1400c
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 5-3
+        pdf_page_index: 2
+        section: Experimental conditions
+        note: Printed setpoint 1400 °C, represented at the canonical K condition.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 5-3
+        pdf_page_index: 2
+        section: Experimental conditions
+        note: Canonical Pa value from the printed chamber vacuum pressure 10^-7 mbar.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: vacuum_Knudsen_cell_experiment
+      locator:
+        page: 3
+        published_page: 5-3
+        pdf_page_index: 2
+        section: Experimental conditions
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen_flow_regime_not_numeric_or_explicitly_classified
+  work_id: 10.1029/2001jb000587
+  locator:
+    page: 3
+    published_page: 5-3
+    pdf_page_index: 2
+    section: Experimental conditions
+    note: All runs used the same heating schedule and vacuum chamber pressure.
+context:
+- observation_id: dohmen_2003_figure_1
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 5-3
+    figure: '1'
+  phase: gas, Fe metal, and olivine
+  units: schematic
+  values:
+    quantity_as_printed: apparatus configuration
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    - SiO
+    phase: Knudsen cell gas with Fe metal powder and an olivine single crystal
+    T_C: 1400
+    axes_as_printed:
+      x: not applicable; apparatus schematic
+      y: not applicable; apparatus schematic
+    caption_as_printed: Configuration used in Knudsen cell experiments. The cell material in all experiments was alumina,
+      and the diameter of the hole was 1 mm. The partial pressure of Fe in the Knudsen cell is buffered by evaporation of
+      Fe metal powder.
+    panel: whole figure
+    series: []
+    attribution: This study
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_1
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_10
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 5-9
+    figure: '10'
+  phase: gas and olivine
+  units: schematic
+  values:
+    quantity_as_printed: moving-boundary diffusion model schematic
+    method_class: model_derived
+    species:
+    - Fe
+    - Mg
+    - SiO
+    phase: gas and olivine
+    T_C: 1400
+    axes_as_printed:
+      x: distance x from the moving boundary
+      y: concentration
+    caption_as_printed: Schematic illustration of the model used to numerically simulate the experiments as an open-system
+      moving-boundary diffusion problem. Various fluxes into and out of the crystal are shown by arrows.
+    panel: whole figure
+    series: []
+    attribution: Present-work model
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_10
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_11
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 5-10
+    figure: '11'
+  phase: olivine, run SC3
+  units: mole fraction; µm
+  values:
+    quantity_as_printed: olivine composition profiles
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    sample_id: SC3 profile 5
+    T_C: 1400
+    axes_as_printed:
+      x: distance from surface (µm)
+      y: Fe/(Fe+Mg)
+    caption_as_printed: Illustration of modeling results. Experimentally measured concentrations as a function of distance
+      from SC3 (profile 5 in Figure 3) are squares; lines are calculated profiles with different parameters.
+    panel: a–e
+    series:
+    - name: measured SC3 profile 5, repeated across panels
+      marker: square
+      marker_count: 23
+      evidence_class: measured_reduced
+    - name: calculated profiles, panels a–e
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Measured profile and present-work calculated profiles
+    digitisation: deferred to a figure pass
+    note: Calculated curves are model-derived; the measured profile is only shown in this deferred figure.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_11
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_12
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 5-11
+    figure: '12'
+  phase: olivine
+  units: mole fraction; µm; cm^2
+  values:
+    quantity_as_printed: olivine composition profiles
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: distance (µm)
+      y: Fe/(Fe+Mg)
+    caption_as_printed: Simulation of fayalite profiles along (a) [001] and (b) [010] from runs SC2–SC4; aS is total olivine
+      surface area and D* is the diffusion coefficient for pure forsterite used in the simulations.
+    panel: a, b
+    series:
+    - name: run SC2 observed profile
+      marker: open diamond
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: run SC3 observed profile
+      marker: open triangle
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: run SC4 observed profile
+      marker: open square
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: simulated profiles
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Measured run profiles and present-work simulations
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_12
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_13
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 5-11
+    figure: '13'
+  phase: fluid and solid A
+  units: schematic
+  values:
+    quantity_as_printed: trace-element exchange model schematic
+    method_class: model_derived
+    species: element i as a model variable
+    phase: solid A and homogeneous fluid
+    axes_as_printed:
+      x: distance x into solid A
+      y: concentration of i
+    caption_as_printed: Schematic illustration of a simplified system used to model the kinetics of element exchange between
+      a solid and a fluid.
+    panel: whole figure
+    series: []
+    attribution: Present-work model
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_13
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_14
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 12
+    pdf_page_index: 11
+    published_page: 5-12
+    figure: '14'
+  phase: solid A in an isothermal trace-element model
+  units: dimensionless
+  values:
+    quantity_as_printed: normalized concentration in a model solution
+    method_class: model_derived
+    species: element i as a model variable
+    phase: solid A
+    axes_as_printed:
+      x: x/(4Dt)^0.5
+      y: normalized concentration
+    caption_as_printed: Illustration of the behavior of the solution (equation 25) used to model the system in Figure 13.
+      Numbers on the curves denote dimensionless parameter y values.
+    panel: whole figure
+    series:
+    - name: y=0.05
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=0.25
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=0.5
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=1
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=2
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=4
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: y=100
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Present-work analytical model
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_14
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_2
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 5-4
+    figure: '2'
+  phase: olivine crystal SC5
+  units: image scale in µm as printed
+  values:
+    quantity_as_printed: backscatter electron image
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: image direction [010]; no quantitative x axis
+      y: image direction [001]; no quantitative y axis
+    caption_as_printed: Backscatter electron image of a cross section of the olivine SC5 after the experiment. No new phases
+      formed; all surfaces are enriched in Fe compared with Mg, and zoning perpendicular to the surface propagates as a parallel
+      front.
+    panel: whole figure
+    series: []
+    attribution: This study
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_2
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_3
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 5-4
+    figure: '3'
+  phase: olivine, SC3
+  units: mole fraction; µm
+  values:
+    quantity_as_printed: olivine composition profile
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: distance from the surface (µm)
+      y: Fe/(Fe+Mg+Ni)
+    caption_as_printed: Fayalite contents of the olivine SC3 perpendicular to surfaces (010), (100), and (001) from one run.
+      Different symbols show profiles measured along different lines and the inset keys lines to crystallographic orientations.
+    panel: whole figure
+    series:
+    - name: line 1; crystallographic orientation keyed in inset
+      marker: cross
+      marker_count: 27
+      evidence_class: measured_reduced
+    - name: line 2; crystallographic orientation keyed in inset
+      marker: open circle
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: line 3; crystallographic orientation keyed in inset
+      marker: open triangle
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: line 4; crystallographic orientation keyed in inset
+      marker: diamond
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: line 5; crystallographic orientation keyed in inset
+      marker: square
+      marker_count: 22
+      evidence_class: measured_reduced
+    attribution: Measured profiles from this study
+    digitisation: deferred to a figure pass
+    note: Plotted composition profiles have no matching equilibrium-phase-composition token because they are spatially zoned
+      and not equilibrium values.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_3
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_4
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 5-4
+    figure: '4'
+  phase: olivine
+  units: mole fraction; µm
+  values:
+    quantity_as_printed: olivine composition profile
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: distance from the surface (µm)
+      y: Fe/(Fe+Mg+Ni)
+    caption_as_printed: Fayalite contents of olivines perpendicular to (010) after experiments of different durations, shown
+      in hours. Profiles follow line 1 in Figure 3.
+    panel: whole figure
+    series:
+    - name: 0.5 h
+      marker: open square
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 2 h
+      marker: filled diamond
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 5 h
+      marker: plus
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 10 h
+      marker: filled triangle
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 15 h
+      marker: open circle
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 20 h
+      marker: open square
+      marker_count: 20
+      evidence_class: measured_reduced
+    attribution: Measured profiles from this study
+    digitisation: deferred to a figure pass
+    note: Plotted composition profiles are deferred; no points are transcribed.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_4
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_5
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5-5
+    figure: '5'
+  phase: olivine
+  units: wt %; µm
+  values:
+    quantity_as_printed: olivine NiO composition profile
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - NiO
+    - Fe
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: distance from the surface (µm)
+      y: wt % NiO
+    caption_as_printed: NiO contents along [001] after experiments of different durations, shown in hours. The lines are fifth-degree
+      polynomials fitted by regression to show trends and have no physical basis.
+    panel: whole figure
+    series:
+    - name: 2 h measured values
+      marker: open square
+      marker_count: 20
+      evidence_class: measured_reduced
+    - name: 5 h measured values
+      marker: filled circle
+      marker_count: 24
+      evidence_class: measured_reduced
+    - name: 15 h measured values
+      marker: open triangle
+      marker_count: 25
+      evidence_class: measured_reduced
+    - name: 20 h measured values
+      marker: filled diamond
+      marker_count: 27
+      evidence_class: measured_reduced
+    - name: fitted fifth-degree trend curves
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Measured values and author-fitted trend lines from this study
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_5
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_6
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5-5
+    figure: '6'
+  phase: gas
+  units: A
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    - SiO
+    phase: gas
+    temperature_as_printed: 1400 °C
+    sample_id: SC6
+    axes_as_printed:
+      x: time (hours)
+      y: ion current (A)
+    caption_as_printed: In situ observation of the partial pressures (illustrated in terms of measured ion current) of Fe,
+      Mg, and SiO at 1400 °C as a function of time during experiment SC6. The y axis is broken to show the much higher Fe
+      partial pressure.
+    panel: whole figure
+    series:
+    - name: 56Fe+
+      marker: continuous measured trace
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: 24Mg+
+      marker: continuous measured trace
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: 45SiO+ signal with 45CO2+ overlap
+      marker: continuous measured trace
+      marker_count: 0
+      evidence_class: measured_direct
+    - name: 46SiO+
+      marker: continuous measured trace
+      marker_count: 0
+      evidence_class: measured_direct
+    attribution: In situ measured ion-current traces from this study; no conversion to pressure is digitized.
+    digitisation: deferred to a figure pass
+    note: The text's approximate pressure values are recorded separately; the plotted axes report ion current, not pressure
+      units.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_6
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_7
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 5-6
+    figure: '7'
+  phase: olivine
+  units: µm; s^0.5
+  values:
+    quantity_as_printed: concentration-front diffusion width
+    method_class: figure_only
+    species:
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    axes_as_printed:
+      x: square root of elapsed time t−t0 (s^0.5)
+      y: diffusion width (µm)
+    caption_as_printed: Propagation of a concentration front of Fa15 into olivines along (a) [010] and (b) [001] as a function
+      of run duration. The square root of elapsed time from first attainment of Fa15 at the surface is plotted to linearize
+      diffusion.
+    panel: a, b
+    series:
+    - name: panel a, [010]
+      marker: square with error bars
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: panel a, fitted linear trend
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: panel b, [001]
+      marker: square with error bars
+      marker_count: 6
+      evidence_class: measured_reduced
+    - name: panel b, fitted linear trend
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    attribution: Measured front positions and author fits from this study
+    digitisation: deferred to a figure pass
+    note: No concentration-front coordinates or fitted coefficients are digitized.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_7
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_8
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 5-7
+    figure: '8'
+  phase: olivine with a molten surface region
+  units: wt % NiO; mole fraction; µm
+  values:
+    quantity_as_printed: olivine NiO and XFe composition profiles
+    candidate_tokens:
+    - equilibrium_phase_composition
+    method_class: figure_only
+    species:
+    - NiO
+    - Fe
+    - Mg
+    phase: olivine
+    T_C: 1400
+    sample_id: SC6
+    axes_as_printed:
+      x: distance from surface (µm)
+      y_left: Fe/(Fe+Mg+Ni)
+      y_right: wt % NiO
+    caption_as_printed: NiO contents and XFe along [010] after 20 hours. Profiles correspond to line 1 in Figure 3. The NiO
+      flattening in the molten region reflects a concentration below the microprobe resolution.
+    panel: whole figure
+    series:
+    - name: NiO
+      marker: open triangle
+      marker_count: 25
+      evidence_class: measured_reduced
+    - name: XFe = Fe/(Fe+Mg+Ni)
+      marker: square
+      marker_count: 25
+      evidence_class: measured_reduced
+    attribution: Electron-microprobe profiles from this study
+    digitisation: deferred to a figure pass
+    note: These are spatially varying olivine measurements, not equilibrium-phase-composition observations.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_8
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_figure_9
+  what: figure_record
+  type: figure_record
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 5-9
+    figure: '9'
+  phase: olivine surface
+  units: mol cm^-2 s^-1; mole fraction; bar
+  values:
+    quantity_as_printed: Fe exchange flux into or out of olivine
+    method_class: model_derived
+    species:
+    - Fe
+    phase: olivine surface
+    T_C: 1400
+    axes_as_printed:
+      x: fayalite content of the surface (mole fraction)
+      y: flux of Fe into olivine (mol cm^-2 s^-1)
+    caption_as_printed: Illustration of Fe flow into or out of olivine as a function of fayalite content at different fO2.
+      The inset shows the crossover where flux direction reverses, corresponding to the quasi-equilibrium stage in the partial
+      open system.
+    panel: whole figure and inset
+    series:
+    - name: pO2 = 1.0 × 10^-10 bar
+      marker: line
+      marker_count: 0
+      evidence_class: model_derived
+    - name: pO2 = 5.0 × 10^-11 bar
+      marker: dashed line
+      marker_count: 0
+      evidence_class: model_derived
+    candidate_tokens: []
+    schema_gap: Fe exchange flux into or out of a solid is not an evaporation-rate or partial-pressure quantity.
+    attribution: Present-work calculation
+    digitisation: deferred to a figure pass
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_figure_9
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_model_redox_conditions
+  type: model_conditions_context
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 5-9
+    figure: '9'
+    section: 5.1.1
+  units: bar
+  values:
+    quantity_as_printed: model pO2 and redox constraints
+    method_class: model_derived
+    pO2_figure9_series:
+    - 1.0 × 10^-10
+    - 5.0 × 10^-11
+    experiment_redox_inference: The paper constrains pO2 above 10^-11 bar for the observed fayalite-rich surface and places
+      experimental pO2 near or slightly below the iron-wüstite buffer, printed as 1.7 × 10^-10 bar at 1400 °C.
+    note: These are printed model conditions or author inferences; the run oxygen fugacity is not assigned an invented point.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_model_redox_conditions
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_numeric_prose_context
+  type: measured_and_model_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 5-4
+    section: 3.1 Reaction Products and 3.2 Gas Phase Composition
+  units: as printed
+  values:
+    measured_values:
+      initial_San_Carlos_olivine_NiO: ~3300 ppm
+      Fe_metal_purity: 99.999 wt % Fe
+      estimated_initial_metal_Ni: 0.001 wt %
+      detection_limit_for_NiO: ~100 ppm NiO
+      apparatus_detection_limit_for_gas_partial_pressure: ~10^-9 bar
+    inferred_or_model_values:
+      pO2_needed_to_prevent_Fe_flux_inversion: '>10^-11 bar'
+      iron_wustite_buffer_pO2_at_1400_C: 1.7 × 10^-10 bar
+      text_conclusion: The run pO2 was in the vicinity of, and perhaps slightly below, the iron-wüstite buffer.
+      undetected_O_and_O2: Inferred below the stated ~10^-9 bar detection limit.
+    note: The SiO value is separately typed as an approximate partial-pressure point; the quoted text does not identify a
+      specific run at the detection time. Other sample values lack a matching store quantity, and redox/model constraints
+      are not promoted to measured conditions.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_numeric_prose_context
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_table1_runs_SC1_SC6
+  type: table_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 5-3
+    table: '1'
+    note: Table 1, all six runs. Numeric entries retain the printed signs and precision.
+  units: as printed in the column headings
+  values:
+    quantity_as_printed: Experimental Conditions, Initial Size, Weight, Evaporated Fraction, and Comments
+    method_class: measured_direct
+    candidate_tokens:
+    - mass_loss_fraction
+    schema_gap: Table 1 reports signed net mass change derived from initial and final sample masses (including two mass gains),
+      neither mass nor dimensions has a store token, and the average length change is explicitly calculated from mass loss.
+      The derived quantities remain context pending a corpus table asset (controller, t-1382); the input grid is in .agent-scratch/f42-tables/dohmen-2003-coupled-kinetics/table1.csv.
+    printed_uncertainties:
+      m0_mg: ±0.02
+      m1_mg: ±0.02
+      delta_m_percent: ±0.3
+      a0_mm: ±0.01
+      b0_mm: ±0.01
+      c0_mm: ±0.01
+    rows:
+    - run: SC1
+      time_h: '0.5'
+      m0_mg: '10.52'
+      m1_mg: '10.53'
+      delta_m_percent: '-0.10'
+      a0_mm: '1.26'
+      b0_mm: '1.86'
+      c0_mm: '1.37'
+      delta_l_calculated_mm: '0.000'
+      comments: concave profiles
+    - run: SC2
+      time_h: '2'
+      m0_mg: '10.84'
+      m1_mg: '10.86'
+      delta_m_percent: '-0.18'
+      a0_mm: '1.26'
+      b0_mm: '1.86'
+      c0_mm: '1.40'
+      delta_l_calculated_mm: '-0.001'
+      comments: concave profiles
+    - run: SC3
+      time_h: '5'
+      m0_mg: '11.03'
+      m1_mg: '11.02'
+      delta_m_percent: '0.09'
+      a0_mm: '1.30'
+      b0_mm: '1.87'
+      c0_mm: '1.38'
+      delta_l_calculated_mm: '0.000'
+      comments: convex profiles
+    - run: SC4
+      time_h: '10'
+      m0_mg: '10.77'
+      m1_mg: '10.68'
+      delta_m_percent: '0.84'
+      a0_mm: '1.28'
+      b0_mm: '1.86'
+      c0_mm: '1.39'
+      delta_l_calculated_mm: '0.004'
+      comments: convex profiles
+    - run: SC5
+      time_h: '15'
+      m0_mg: '11.44'
+      m1_mg: '11.30'
+      delta_m_percent: '1.22'
+      a0_mm: '1.32'
+      b0_mm: '1.91'
+      c0_mm: '1.39'
+      delta_l_calculated_mm: '0.006'
+      comments: melt formation; complex profiles
+    - run: SC6
+      time_h: '20'
+      m0_mg: '11.15'
+      m1_mg: '10.84'
+      delta_m_percent: '2.78'
+      a0_mm: '1.30'
+      b0_mm: '1.90'
+      c0_mm: '1.38'
+      delta_l_calculated_mm: '0.014'
+      comments: melt formation; complex profiles
+    table_note_as_printed: m0 is initial mass; m1 is mass after annealing; delta_m is mass change; a0, b0, c0 are initial
+      dimensions; delta_l is average length change calculated from mass loss because mass loss can be measured more accurately
+      than length change.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_table1_runs_SC1_SC6
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg
+- observation_id: dohmen_2003_text_pmg_approximate_range
+  type: measured_numeric_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 5-4
+    section: 3.2 Gas Phase Composition
+    figure: '6'
+  units: bar
+  values:
+    quantity_as_printed: partial_pressure
+    candidate_tokens:
+    - partial_pressure
+    method_class: measured_tabulated
+    gas_species: Mg(g)
+    value_as_printed: ~10^-7–10^-8 bar
+    numeric_range_bar:
+    - 1e-8
+    - 1e-7
+    trend_as_printed: The Mg partial pressure decreases during the course of the reaction.
+    schema_gap: The printed values are a time-varying range, not one point; the extract pressure selector accepts point values,
+      so neither endpoint is promoted as a point.
+  context_id: dohmen-2003-coupled-kinetics::context::dohmen_2003_text_pmg_approximate_range
+  work_id: 10.1029/2001jb000587
+  source_id: dohmen-2003-coupled-kinetics
+  species: Mg

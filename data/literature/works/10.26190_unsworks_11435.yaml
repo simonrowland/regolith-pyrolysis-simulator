@@ -1,0 +1,3142 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.26190/unsworks/11435
+  citation: Farah, H. (1998). Redox chemistry and ESR studies of vanadium in quenched silicate melts. PhD thesis, University
+    of New South Wales.
+  source_ids:
+  - farah-1998-vanadium-silicate-melts-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:farah-1998-vanadium-silicate-melts-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.26190/unsworks/11435
+experiments: []
+context:
+- observation_id: farah_1998_appendix_ix_melts_redox_page_225
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 248
+    page: 249
+    published_page: 225
+    table: Appendix IX
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio token is Fe-specific;
+      ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity axis and would
+      collapse the separate V3+, V4+ and V5+ amounts under species V.
+    printed_data:
+      columns:
+      - melt
+      - temperature_C
+      - pO2_atm
+      - V3+_wt_percent
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - log10_V4_over_V5_mean
+      - log10_V3_over_V4_mean
+      blocks:
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.095'
+          - '0.06'
+          - '0.06'
+          V5+_wt_percent:
+          - '1.56'
+          - '1.47'
+          - '1.469'
+          log10_V4_over_V5_mean:
+          - '-1.325'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.161'
+          - '0.161'
+          - '0.178'
+          V5+_wt_percent:
+          - '1.476'
+          - '1.370'
+          - '1.371'
+          log10_V4_over_V5_mean:
+          - '-0.927'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.116'
+          - '0.27'
+          - '0.27'
+          V5+_wt_percent:
+          - '1.382'
+          - '1.260'
+          - '1.261'
+          log10_V4_over_V5_mean:
+          - '-0.768'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.178'
+          - '0.45'
+          - '0.45'
+          V5+_wt_percent:
+          - '1.370'
+          - '1.080'
+          - '1.081'
+          log10_V4_over_V5_mean:
+          - '-0.494'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.41'
+          - '0.70'
+          - '0.70'
+          V5+_wt_percent:
+          - '1.07'
+          - '0.830'
+          - '1.07'
+          log10_V4_over_V5_mean:
+          - '-0.272'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-12
+        cell_values:
+          V3+_wt_percent:
+          - '0.177'
+          - '0.06'
+          - '0.06'
+          V4+_wt_percent:
+          - '0.518'
+          - '0.80'
+          - '0.80'
+          V5+_wt_percent:
+          - '0.835'
+          - '0.72'
+          - '0.719'
+          log10_V4_over_V5_mean:
+          - '-0.023'
+          log10_V3_over_V4_mean:
+          - '-0.775'
+      - melt: A
+        temperature_C: '1125'
+        pO2_atm: 10^-14
+        cell_values:
+          V3+_wt_percent:
+          - '0.578'
+          - '0.880'
+          - '0.879'
+          V4+_wt_percent:
+          - '0.952'
+          - '0.650'
+          - '0.651'
+          V5+_wt_percent:
+          - '-'
+          log10_V4_over_V5_mean:
+          - '-'
+          log10_V3_over_V4_mean:
+          - '0.043'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.60'
+          - '0.90'
+          - '0.91'
+          V5+_wt_percent:
+          - '1.51'
+          - '1.45'
+          - '1.45'
+          log10_V4_over_V5_mean:
+          - '-1.263'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.169'
+          - '0.210'
+          - '0.322'
+          V5+_wt_percent:
+          - '1.431'
+          - '1.33'
+          - '1.218'
+          log10_V4_over_V5_mean:
+          - '-0.744'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.168'
+          - '0.370'
+          - '0.37'
+          V5+_wt_percent:
+          - '1.392'
+          - '1.17'
+          - '1.19'
+          log10_V4_over_V5_mean:
+          - '-0.600'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.356'
+          - '0.510'
+          - '0.510'
+          V5+_wt_percent:
+          - '1.184'
+          - '1.03'
+          - '1.03'
+          log10_V4_over_V5_mean:
+          - '-0.366'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '0.263'
+          - '0.175'
+          - '0.263'
+          V4+_wt_percent:
+          - '0.623'
+          - '0.800'
+          - '0.623'
+          V5+_wt_percent:
+          - '0.624'
+          - '0.565'
+          - '0.623'
+          log10_V4_over_V5_mean:
+          - '0.056'
+          log10_V3_over_V4_mean:
+          - '-0.450'
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-12
+        cell_values:
+          V3+_wt_percent:
+          - '0.983'
+          - '0.860'
+          - '0.86'
+          V4+_wt_percent:
+          - '0.398'
+          - '0.680'
+          - '0.680'
+          V5+_wt_percent:
+          - '-'
+          log10_V4_over_V5_mean:
+          - '-'
+          log10_V3_over_V4_mean:
+          - '0.222'
+      note: Each list preserves the vertically ordered printed entries inside the corresponding table cell. A singleton dash
+        in a merged cell is recorded once. Dashes are not zero and blank cells are not repeated values.
+    printed_condition: pO2 values are printed as powers of ten in atm; no logarithm or bar conversion is applied.
+  units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; temperature is °C; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_ix_melts_redox_page_225
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_appendix_ix_melts_redox_page_226
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 249
+    page: 250
+    published_page: 226
+    table: Appendix IX continued
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio token is Fe-specific;
+      ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity axis and would
+      collapse the separate V3+, V4+ and V5+ amounts under species V.
+    printed_data:
+      columns:
+      - melt
+      - temperature_C
+      - pO2_atm
+      - V3+_wt_percent
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - log10_V4_over_V5_mean
+      - log10_V3_over_V4_mean
+      blocks:
+      - melt: A
+        temperature_C: '1225'
+        pO2_atm: 10^-14
+        cell_values:
+          V3+_wt_percent:
+          - '0.105'
+          - '0.910'
+          - '0.9'
+          V4+_wt_percent:
+          - '0.402'
+          - '0.630'
+          - '0.630'
+          V5+_wt_percent:
+          - '-'
+          log10_V4_over_V5_mean:
+          - '-'
+          log10_V3_over_V4_mean:
+          - '0.263'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.140'
+          V5+_wt_percent:
+          - '1.39'
+          log10_V4_over_V5_mean:
+          - '-0.997'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.438'
+          - '0.310'
+          V5+_wt_percent:
+          - '1.092'
+          - '1.22'
+          log10_V4_over_V5_mean:
+          - '-0.397'
+          - '-0.595'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.600'
+          V5+_wt_percent:
+          - '0.93'
+          log10_V4_over_V5_mean:
+          - '-0.190'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.900'
+          V5+_wt_percent:
+          - '0.63'
+          log10_V4_over_V5_mean:
+          - '0.155'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '0.325'
+          - '0.447'
+          V4+_wt_percent:
+          - '0.980'
+          - '0.735'
+          V5+_wt_percent:
+          - '0.226'
+          - '0.348'
+          log10_V4_over_V5_mean:
+          - '0.638'
+          - '0.325'
+          log10_V3_over_V4_mean:
+          - '-0.480'
+          - '-0.216'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-12
+        cell_values:
+          V3+_wt_percent:
+          - '0.788'
+          - '0.55'
+          V4+_wt_percent:
+          - '0.741'
+          - '0.98'
+          V5+_wt_percent:
+          - '-'
+          log10_V4_over_V5_mean:
+          - '-'
+          log10_V3_over_V4_mean:
+          - '0.027'
+          - '-0.251'
+      - melt: A
+        temperature_C: '1325'
+        pO2_atm: 10^-14
+        cell_values:
+          V3+_wt_percent:
+          - '1.013'
+          V4+_wt_percent:
+          - '0.517'
+          V5+_wt_percent:
+          - '-'
+          log10_V4_over_V5_mean:
+          - '-'
+          log10_V3_over_V4_mean:
+          - '0.292'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '0.23'
+          - '0.14'
+          V5+_wt_percent:
+          - '7.17'
+          - '7.06'
+          log10_V4_over_V5_mean:
+          - '-1.494'
+          - '-1.5'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.40'
+          V5+_wt_percent:
+          - '7.0'
+          log10_V4_over_V5_mean:
+          - '-1.243'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.88'
+          V5+_wt_percent:
+          - '6.52'
+          log10_V4_over_V5_mean:
+          - '-0.870'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '2.50'
+          V5+_wt_percent:
+          - '4.9'
+          log10_V4_over_V5_mean:
+          - '-0.292'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '5.90'
+          - '3.2'
+          V5+_wt_percent:
+          - '1.5'
+          - '4.0'
+          log10_V4_over_V5_mean:
+          - '0.594'
+          - '-0.096'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: B
+        temperature_C: '1225'
+        pO2_atm: 10^-12
+        cell_values:
+          V3+_wt_percent:
+          - '1.595'
+          V4+_wt_percent:
+          - '4.30'
+          V5+_wt_percent:
+          - '1.505'
+          log10_V4_over_V5_mean:
+          - '0.456'
+          log10_V3_over_V4_mean:
+          - '-0.431'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.010'
+          V5+_wt_percent:
+          - '6.99'
+          log10_V4_over_V5_mean:
+          - '-2.844'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.015'
+          V5+_wt_percent:
+          - '6.985'
+          log10_V4_over_V5_mean:
+          - '-2.668'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '0.05'
+          - '0.10'
+          V5+_wt_percent:
+          - '6.95'
+          - '6.87'
+          log10_V4_over_V5_mean:
+          - '-2.143'
+          - '-1.829'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '0.100'
+          - '0.071'
+          V5+_wt_percent:
+          - '6.9'
+          - '6.89'
+          log10_V4_over_V5_mean:
+          - '-1.839'
+          - '-1.989'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '0.70'
+          - '0.378'
+          V5+_wt_percent:
+          - '6.3'
+          - '6.58'
+          log10_V4_over_V5_mean:
+          - '-0.954'
+          - '-1.241'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: C
+        temperature_C: not_printed
+        pO2_atm: 10^-12
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          - '-'
+          V4+_wt_percent:
+          - '1.75'
+          - '1.879'
+          V5+_wt_percent:
+          - '5.25'
+          - '5.06'
+          log10_V4_over_V5_mean:
+          - '-0.477'
+          - '-0.430'
+          log10_V3_over_V4_mean:
+          - '-'
+          - '-'
+      - melt: D
+        temperature_C: not_printed
+        pO2_atm: 10^-2
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.595'
+          V5+_wt_percent:
+          - '13.21'
+          log10_V4_over_V5_mean:
+          - '-1.346'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: D
+        temperature_C: not_printed
+        pO2_atm: 10^-4
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '0.960'
+          V5+_wt_percent:
+          - '12.84'
+          log10_V4_over_V5_mean:
+          - '-1.126'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: D
+        temperature_C: not_printed
+        pO2_atm: 10^-6
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '2.060'
+          V5+_wt_percent:
+          - '11.74'
+          log10_V4_over_V5_mean:
+          - '-0.756'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: D
+        temperature_C: not_printed
+        pO2_atm: 10^-8
+        cell_values:
+          V3+_wt_percent:
+          - '-'
+          V4+_wt_percent:
+          - '4.420'
+          V5+_wt_percent:
+          - '9.38'
+          log10_V4_over_V5_mean:
+          - '-0.327'
+          log10_V3_over_V4_mean:
+          - '-'
+      - melt: D
+        temperature_C: not_printed
+        pO2_atm: 10^-10
+        cell_values:
+          V3+_wt_percent:
+          - '2.81'
+          V4+_wt_percent:
+          - '8.18'
+          V5+_wt_percent:
+          - '2.81'
+          log10_V4_over_V5_mean:
+          - '0.464'
+          log10_V3_over_V4_mean:
+          - '-0.464'
+      note: The data continue from physical page 249. Cell value lists preserve the displayed vertical order; empty table
+        cells remain unreported. Temperature is printed only for melt A and melt B on this page.
+    printed_condition: Melt B is shown at 1225°C; oxygen pressures are printed in atm as powers of ten. Blank temperature
+      cells for melts C and D are left unassigned.
+  units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; temperature is °C; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_ix_melts_redox_page_226
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_appendix_xx_slags_redox_page_233
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 256
+    page: 257
+    published_page: 233
+    table: Appendix XX
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio token is Fe-specific;
+      ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity axis and would
+      collapse the separate V3+, V4+ and V5+ amounts under species V.
+    printed_data:
+      columns:
+      - slag
+      - pO2_atm
+      - V3+_wt_percent
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - log10_V4_over_V5
+      - log10_V3_over_V4
+      rows:
+      - - F
+        - 10^-2
+        - '-'
+        - '3.45'
+        - '4.51'
+        - '-0.116'
+        - '-'
+      - - F
+        - 10^-4
+        - '1.23'
+        - '5.5'
+        - '1.23'
+        - '0.651'
+        - '-0.651'
+      - - F
+        - 10^-6
+        - '2.76'
+        - '5.2'
+        - '-'
+        - '-'
+        - '-0.275'
+      - - F
+        - 10^-8
+        - '5.86'
+        - '2.1'
+        - '-'
+        - '-'
+        - '0.446'
+      - - F
+        - 10^-9
+        - '6.76'
+        - '1.2'
+        - '-'
+        - '-'
+        - '0.751'
+      - - G
+        - 10^-2
+        - '-'
+        - '2.9'
+        - '5.06'
+        - '-0.242'
+        - '-'
+      - - G
+        - 10^-4
+        - '1.0'
+        - '5.0'
+        - '1.96'
+        - '0.407'
+        - '-0.699'
+      - - G
+        - 10^-6
+        - '1.63'
+        - '4.7'
+        - '1.63'
+        - '0.459'
+        - '-0.459'
+      - - G
+        - 10^-8
+        - '4.96'
+        - '3.0'
+        - '-'
+        - '-'
+        - '0.218'
+      - - G
+        - 10^-9
+        - '5.96'
+        - '2.0'
+        - '-'
+        - '-'
+        - '0.474'
+      - - J
+        - 10^-2
+        - '-'
+        - '2.5'
+        - '2.487'
+        - '0.002'
+        - '-'
+      - - J
+        - 10^-4
+        - '-'
+        - '3.0'
+        - '1.987'
+        - '0.179'
+        - '-'
+      - - J
+        - 10^-6
+        - '0.80'
+        - '3.3'
+        - '0.887'
+        - '0.571'
+        - '-0.615'
+      - - J
+        - 10^-8
+        - '2.087'
+        - '2.9'
+        - '-'
+        - ''
+        - '-0.143'
+      - - J
+        - 10^-9
+        - '2.987'
+        - '2.0'
+        - '-'
+        - ''
+        - '0.174'
+      - - K
+        - 10^-2
+        - '-'
+        - '2.8'
+        - '6.95'
+        - '-0.95'
+        - '-'
+      - - K
+        - 10^-4
+        - '0.75'
+        - '6.0'
+        - '3.0'
+        - '0.301'
+        - '-0.903'
+      - - K
+        - 10^-6
+        - '1.75'
+        - '5.6'
+        - '2.45'
+        - '0.359'
+        - '-0.518'
+      - - K
+        - 10^-8
+        - '5.85'
+        - '3.9'
+        - '-'
+        - '-'
+        - '0.176'
+      - - K
+        - 10^-9
+        - '6.55'
+        - '3.2'
+        - '-'
+        - '-'
+        - '0.311'
+      - - L
+        - 10^-2
+        - '-'
+        - '2.5'
+        - '5.63'
+        - '-0.353'
+        - '-'
+      - - L
+        - 10^-4
+        - '0.95'
+        - '5.1'
+        - '2.08'
+        - '0.389'
+        - '-0.729'
+      - - L
+        - 10^-6
+        - '1.6'
+        - '4.8'
+        - '1.73'
+        - '0.443'
+        - '-0.477'
+      - - L
+        - 10^-8
+        - '5.23'
+        - '2.9'
+        - '-'
+        - '-'
+        - '0.256'
+      - - L
+        - 10^-9
+        - '6.23'
+        - '1.9'
+        - '-'
+        - '-'
+        - '0.516'
+      - - M
+        - 10^-2
+        - '-'
+        - '2.8'
+        - '4.88'
+        - '-0.241'
+        - '-'
+      - - M
+        - 10^-4
+        - '0.85'
+        - '4.3'
+        - '2.53'
+        - '0.230'
+        - '-0.704'
+      - - M
+        - 10^-6
+        - '1.955'
+        - '3.77'
+        - '1.955'
+        - '0.285'
+        - '-0.285'
+      - - M
+        - 10^-8
+        - '5.18'
+        - '2.5'
+        - '-'
+        - '-'
+        - '0.316'
+      - - M
+        - 10^-9
+        - '6.18'
+        - '1.5'
+        - '-'
+        - '-'
+        - '0.615'
+      - - N
+        - 10^-2
+        - '-'
+        - '1.2'
+        - '8.55'
+        - '-0.853'
+        - '-'
+      - - N
+        - 10^-4
+        - '-'
+        - '3.0'
+        - '6.75'
+        - '-0.352'
+        - '-'
+      - - N
+        - 10^-6
+        - '-'
+        - '4.3'
+        - '5.45'
+        - '-0.103'
+        - '-'
+      - - N
+        - 10^-8
+        - '5.75'
+        - '4.0'
+        - '-'
+        - '-'
+        - '0.158'
+      - - N
+        - 10^-9
+        - '5.75'
+        - '4.0'
+        - '-'
+        - '-'
+        - '0.158'
+      note: Empty cells in the printed ratio columns for melt J are preserved as empty strings; printed dashes are unreported
+        values and are not converted to zero.
+    printed_condition: Redox data are for slags F-O at 1600°C; the table gives pO2 in atm as powers of ten.
+  units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_xx_slags_redox_page_233
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_appendix_xx_slags_redox_page_234
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 257
+    page: 258
+    published_page: 234
+    table: Appendix XX continued
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and ratios. The ratio token is Fe-specific;
+      ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity axis and would
+      collapse the separate V3+, V4+ and V5+ amounts under species V.
+    printed_data:
+      columns:
+      - slag
+      - pO2_atm
+      - V3+_wt_percent
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - log10_V4_over_V5
+      - log10_V3_over_V4
+      rows:
+      - - O
+        - 10^-2
+        - '-'
+        - '0.79'
+        - '7.34'
+        - '-0.968'
+        - '-'
+      - - O
+        - 10^-4
+        - '-'
+        - '2.09'
+        - '6.04'
+        - '-0.461'
+        - '-'
+      - - O
+        - 10^-6
+        - '-'
+        - '3.2'
+        - '4.93'
+        - '-0.188'
+        - '-'
+      - - O
+        - 10^-8
+        - '5.13'
+        - '3.0'
+        - '-'
+        - '-'
+        - '0.233'
+      - - O
+        - 10^-9
+        - '5.13'
+        - '3.0'
+        - '-'
+        - '-'
+        - '0.233'
+      note: These rows continue Appendix XX from physical page 257. Dashes are unreported, not zero.
+    printed_condition: Slag O at 1600°C; pO2 values are printed in atm as powers of ten.
+  units: V3+, V4+ and V5+ columns are wt%; log ratios are base 10 and dimensionless; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_xx_slags_redox_page_234
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_appendix_xxi_na2o_2sio2_v2o5_redox
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 257
+    page: 258
+    published_page: 234
+    table: Appendix XXI
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and their log ratio. The ratio token
+      is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity
+      axis and would collapse V4+ and V5+ under species V. Equilibrium time is a printed condition but is not a stored redox
+      quantity.
+    printed_data:
+      composition: Na2O-2SiO2-V2O5
+      pO2_atm: 10^-2
+      columns:
+      - temperature_C
+      - equilibrium_time_h
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - log10_V5_over_V4
+      rows:
+      - - '1125'
+        - '2'
+        - '0.005'
+        - '1.525'
+        - '2.50'
+      - - '1125'
+        - '4'
+        - '0.04'
+        - '1.49'
+        - '1.60'
+      - - '1125'
+        - '6'
+        - '0.07'
+        - '1.46'
+        - '1.30'
+      - - '1125'
+        - '8'
+        - '0.07'
+        - '1.46'
+        - '1.30'
+      - - '1125'
+        - '10'
+        - '0.10'
+        - '1.43'
+        - '1.15'
+      - - '1125'
+        - '12'
+        - '0.15'
+        - '1.38'
+        - '1.15'
+      - - '1125'
+        - '14'
+        - '0.11'
+        - '1.42'
+        - '1.10'
+      - - '1125'
+        - '16'
+        - '0.17'
+        - '1.36'
+        - '0.90'
+      - - '1225'
+        - '2'
+        - '0.002'
+        - '1.528'
+        - '2.90'
+      - - '1225'
+        - '4'
+        - '0.073'
+        - '1.457'
+        - '1.30'
+      - - '1225'
+        - '6'
+        - '0.09'
+        - '1.44'
+        - '1.20'
+      - - '1225'
+        - '8'
+        - '0.10'
+        - '1.43'
+        - '1.15'
+      - - '1225'
+        - '10'
+        - '0.10'
+        - '1.43'
+        - '1.15'
+      - - '1225'
+        - '12'
+        - '0.11'
+        - '1.42'
+        - '1.10'
+      - - '1225'
+        - '14'
+        - '0.11'
+        - '1.42'
+        - '1.10'
+      - - '1225'
+        - '16'
+        - '0.11'
+        - '1.42'
+        - '1.10'
+  units: V4+ and V5+ columns are wt%; log(V5+/V4+) is base 10 and dimensionless; equilibrium time is hours; temperature is
+    °C; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_xxi_na2o_2sio2_v2o5_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_appendix_xxii_slags_g_o_redox
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 258
+    page: 259
+    published_page: 235
+    table: Appendix XXII
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    - equilibrium_phase_composition
+    reason_untyped: No listed quantity fits these vanadium oxidation-state concentrations and their ratio. The ratio token
+      is Fe-specific; ion_intensity_ratio stores signal ratios; equilibrium_phase_composition has no oxidation-state identity
+      axis and would collapse V4+ and V5+ under species V. Equilibrium time is a printed condition but is not a stored redox
+      quantity.
+    printed_data:
+      printed_condition: 1600°C and pO2 = 10^-2 atm
+      columns:
+      - slag
+      - equilibrium_time_h
+      - V4+_wt_percent
+      - V5+_wt_percent
+      - V4_over_V5
+      rows:
+      - - G
+        - '1'
+        - '2.54'
+        - '5.42'
+        - '0.468'
+      - - G
+        - '2'
+        - '2.25'
+        - '5.71'
+        - '0.393'
+      - - G
+        - '3.5'
+        - '2.12'
+        - '5.84'
+        - '0.363'
+      - - G
+        - '4'
+        - '2.17'
+        - '5.79'
+        - '0.376'
+      - - G
+        - '5'
+        - '2.02'
+        - '5.94'
+        - '0.341'
+      - - G
+        - '6'
+        - '2.13'
+        - '5.83'
+        - '0.366'
+      - - O
+        - '1'
+        - '7.99'
+        - '7.333'
+        - '0.109'
+      - - O
+        - '2'
+        - '7.37'
+        - '7.393'
+        - '0.099'
+      - - O
+        - '3.2'
+        - '7.35'
+        - '7.395'
+        - '0.09'
+      - - O
+        - '4'
+        - '6.89'
+        - '7.440'
+        - '0.093'
+      - - O
+        - '5'
+        - '7.36'
+        - '7.394'
+        - '0.09'
+  units: V4+ and V5+ columns are wt%; ratios are dimensionless; equilibrium time is hours; temperature is °C; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_appendix_xxii_slags_g_o_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_10_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 120
+    page: 121
+    published_page: 97
+    figure: '5.10'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C:
+        state:
+          tag: unknown
+          reason: the plotted series include multiple experimental temperatures or cited comparison data
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium oxidation state
+    caption: Comparison of average oxidation state of vanadium for Na2O-2SiO2-V2O5 (Melt A) with Johnston [1] and Mittelstadt
+      & Schwerdfeger [2].
+    panel: none
+    points: []
+    series:
+    - label: 'this work: Melt A'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Johnston [1]
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Mittelstadt & Schwerdfeger [2]
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_10_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_11_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 121
+    page: 122
+    published_page: 98
+    figure: '5.11'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C:
+        state:
+          tag: unknown
+          reason: the plotted series include multiple experimental temperatures or cited comparison data
+    axes:
+      x: log pO2 (atm)
+      y: log(V4+/V5+)
+    caption: Comparison of V4+/V5+ ratios as a function of oxygen partial pressures for Na2O-2SiO2-V2O5 (Melt A) at different
+      temperatures.
+    panel: none
+    points: []
+    series:
+    - label: Melt A, 1125°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt A, 1225°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt A, 1325°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_11_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_12_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 123
+    page: 124
+    published_page: 100
+    figure: '5.12'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C:
+        state:
+          tag: unknown
+          reason: the plotted series include multiple experimental temperatures or cited comparison data
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium oxidation state
+    caption: Comparison of average oxidation state of vanadium as a function of oxygen partial pressures for Melt A at different
+      temperatures.
+    panel: none
+    points: []
+    series:
+    - label: Melt A, 1125°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt A, 1225°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt A, 1325°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_12_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_13_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 125
+    page: 126
+    published_page: 102
+    figure: '5.13'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log(V4+/V5+)
+    caption: Effect of change in basicity on V4+/V5+ ratios (1225°C).
+    panel: none
+    points: []
+    series:
+    - label: Melt B, Na2O/SiO2=0.5
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt C, Na2O/SiO2=1.0
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_13_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_14_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 125
+    page: 126
+    published_page: 102
+    figure: '5.14'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium oxidation state
+    caption: Comparison of average oxidation state of vanadium as a function of oxygen partial pressures at different basicity
+      ratios (1225°C).
+    panel: none
+    points: []
+    series:
+    - label: Melt B, Na2O/SiO2=0.5
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt C, Na2O/SiO2=1.0
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_14_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_15_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 126
+    page: 127
+    published_page: 103
+    figure: '5.15'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratio
+    caption: Effect of change in total vanadium content on V4+/V5+ ratios (1225°C).
+    panel: none
+    points: []
+    series:
+    - label: Melt A, V2O5=1 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt B, V2O5=5 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt D, V2O5=10 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_15_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_16_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 128
+    page: 129
+    published_page: 105
+    figure: '5.16'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium valency
+    caption: Effect of change in total vanadium content on average valence of vanadium (1225°C).
+    panel: none
+    points: []
+    series:
+    - label: Melt A, V2O5=1 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt B, V2O5=5 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Melt D, V2O5=10 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_16_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_3_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 112
+    page: 113
+    published_page: 89
+    figure: '5.3'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1125
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system (Melt A, V2O5=1
+      mol%) at 1125°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt A: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'Melt A: V3+/V4+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_3_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_4_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 112
+    page: 113
+    published_page: 89
+    figure: '5.4'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system (Melt A, V2O5=1
+      mol%) at 1225°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt A: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'Melt A: V3+/V4+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_4_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_5_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 113
+    page: 114
+    published_page: 90
+    figure: '5.5'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1325
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system (Melt A, V2O5=1
+      mol%) at 1325°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt A: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'Melt A: V3+/V4+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_5_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_6_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 115
+    page: 116
+    published_page: 92
+    figure: '5.6'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system (Melt B, V2O5=5
+      mol%) at 1225°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt B: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'Melt B: V3+/V4+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_6_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_7_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 115
+    page: 116
+    published_page: 92
+    figure: '5.7'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-SiO2-V2O5 system (Melt C, V2O5=5
+      mol%) at 1225°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt C: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_7_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_8_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 116
+    page: 117
+    published_page: 93
+    figure: '5.8'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C: 1225
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for Na2O-2SiO2-V2O5 system (Melt D, V2O5=10
+      mol%) at 1225°C.
+    panel: none
+    points: []
+    series:
+    - label: 'Melt D: V4+/V5+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'Melt D: V3+/V4+'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_8_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_5_9_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 119
+    page: 120
+    published_page: 96
+    figure: '5.9'
+  values:
+    identity:
+      species: V
+      phase: glass
+      T_C:
+        state:
+          tag: unknown
+          reason: the plotted series include multiple experimental temperatures or cited comparison data
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Comparison of redox ratios of vanadium as a function of oxygen partial pressure between Na2O-2SiO2-V2O5 (Melt
+      A, 1125°C) and Johnston [1] (1085°C).
+    panel: none
+    points: []
+    series:
+    - label: 'this work: Melt A, 1125°C'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Johnston [1], 1085°C
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_5_9_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_10_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 166
+    page: 167
+    published_page: 143
+    figure: '7.10'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag M) with 7.87
+      wt% Al2O3 (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag M, Al2O3=7.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_10_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_12_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 168
+    page: 169
+    published_page: 145
+    figure: '7.12'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-MgO-SiO2-V2O5 (slag N) with 3.5 wt%
+      MgO (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag N, MgO=3.5 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_12_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_13_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 169
+    page: 170
+    published_page: 146
+    figure: '7.13'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-MgO-SiO2-V2O5 (slag O) with 4.87
+      wt% MgO (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag O, MgO=4.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_13_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_14_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 172
+    page: 173
+    published_page: 149
+    figure: '7.14'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: vanadium redox-species fractions
+    caption: 'Dependence of fraction of redox species of vanadium (CaO-SiO2-V2O5 system) on oxygen partial pressures at CaO/SiO2:
+      a=0.9 (slag F), b=1.23 (slag G), 1600°C.'
+    panel: a,b
+    points: []
+    series:
+    - label: 'panel a: slag F'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'panel b: slag G'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_14_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_15_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 173
+    page: 174
+    published_page: 150
+    figure: '7.15'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: 'panel a: log pO2 (atm); panel b: CaO/SiO2 molar ratio'
+      y: vanadium redox ratios
+    caption: Change in vanadium redox ratios (CaO-SiO2-V2O5 system) with log pO2 at basicity ratios F=0.9 and G=1.23; ratios
+      versus CaO/SiO2 for slags F-O (1600°C).
+    panel: a,b
+    points: []
+    series:
+    - label: 'panel a: slag F'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'panel a: slag G'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'panel b: slags F-O'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_15_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_16_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 175
+    page: 176
+    published_page: 152
+    figure: '7.16'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium valency
+    caption: Variation of average vanadium valency with basicity (CaO-SiO2-V2O5 system) over investigated oxygen pressures
+      (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag F, CaO/SiO2=0.9
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag G, CaO/SiO2=1.23
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_16_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_17_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 176
+    page: 177
+    published_page: 153
+    figure: '7.17'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: overall oxidation state x in VOx
+    caption: Comparison of overall oxidation state x in VOx in CaO-SiO2-V2O5 with Mittelstadt and Schwerdfeger [2] at basicities
+      1.0 and 1.36 (1600°C).
+    panel: a,b
+    points: []
+    series:
+    - label: 'present work: slag F, basicity 0.9'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Mittelstadt & Schwerdfeger [2], basicity 1.0
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: 'present work: slag G, basicity 1.23'
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: Mittelstadt & Schwerdfeger [2], basicity 1.36
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_17_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_18_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 178
+    page: 179
+    published_page: 155
+    figure: '7.18'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log(V3+/V4+)
+    caption: Change in redox ratios (V3+/V4+) in CaO-SiO2-Al2O3-V2O5 with oxygen pressures at different alumina levels (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag G, Al2O3=0 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag K, Al2O3=3.22 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag L, Al2O3=5.44 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag M, Al2O3=7.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_18_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_19_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 178
+    page: 179
+    published_page: 155
+    figure: '7.19'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium valency
+    caption: Average vanadium valency at different alumina levels (CaO-SiO2-Al2O3-V2O5 system) (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag K, Al2O3=3.22 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag L, Al2O3=5.44 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag M, Al2O3=7.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_19_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_20_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 180
+    page: 181
+    published_page: 157
+    figure: '7.20'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratio
+    caption: Effect of MgO addition on vanadium redox ratios over different oxygen pressures (CaO-MgO-SiO2-V2O5 system) (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag G, MgO=0 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag N, MgO=3.5 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag O, MgO=4.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_20_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_21_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 180
+    page: 181
+    published_page: 157
+    figure: '7.21'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: (CaO+MgO)/SiO2 molar ratio
+      y: log vanadium redox ratio
+    caption: Comparison of vanadium redox ratios between present work (slags G, N, O) and Inoue & Suito [6] (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: Inoue & Suito [6]
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: present work
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: extrapolation of Inoue & Suito [6]
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_21_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_22_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 182
+    page: 183
+    published_page: 159
+    figure: '7.22'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium valency
+    caption: Change in average vanadium valency with oxygen pressures at different magnesia contents for CaO-MgO-SiO2-V2O5
+      slags N and O (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag N, MgO=3.5 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag O, MgO=4.87 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_22_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_23_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 182
+    page: 183
+    published_page: 159
+    figure: '7.23'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: 'Effect of total vanadium content on vanadium redox ratios in CaO-SiO2-V2O5: 3 mol% V2O5 slag J and 5 mol% slag
+      G.'
+    panel: none
+    points: []
+    series:
+    - label: V3+/V4+, slag J
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: V3+/V4+, slag G
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: V4+/V5+, slag J
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: V4+/V5+, slag G
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_23_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_24_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 183
+    page: 184
+    published_page: 160
+    figure: '7.24'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: average vanadium valency
+    caption: 'Change in average vanadium valency in CaO-SiO2-V2O5 at different V2O5 contents: 3 mol% slag J and 5 mol% slag
+      G (1600°C).'
+    panel: none
+    points: []
+    series:
+    - label: slag J, V2O5=3 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag G, V2O5=5 mol%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_24_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_25_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 187
+    page: 188
+    published_page: 164
+    figure: '7.25'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: optical basicity
+      y: log(V4+/V5+) at pO2=10^-2 atm
+    caption: Variation of V4+/V5+ ratios as a function of optical basicity of slags.
+    panel: none
+    points: []
+    series:
+    - label: slags F,G,J,K,L,M,N,O
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_25_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_26_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 187
+    page: 188
+    published_page: 164
+    figure: '7.26'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: optical basicity
+      y: log(V3+/V4+) at pO2=10^-8 atm
+    caption: Change in V3+/V4+ ratios as a function of optical basicity of slags (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slags F,G,K,L,M,N,O
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_26_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_3_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 158
+    page: 159
+    published_page: 135
+    figure: '7.3'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag F), basicity=0.9
+      (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag F
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_3_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_4_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 160
+    page: 161
+    published_page: 137
+    figure: '7.4'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag G), basicity=1.23
+      (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag G
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_4_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_5_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 160
+    page: 161
+    published_page: 137
+    figure: '7.5'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: total vanadium (wt%)
+    caption: 'Trends in total vanadium content with respect to oxygen pressures at different basicity ratios: slag E=0.7,
+      F=0.9 and G=1.23 (1600°C).'
+    panel: none
+    points: []
+    series:
+    - label: slag E, CaO/SiO2=0.7
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag F, CaO/SiO2=0.9
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    - label: slag G, CaO/SiO2=1.23
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_5_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_7_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 163
+    page: 164
+    published_page: 140
+    figure: '7.7'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-V2O5 (slag J) (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag J
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_7_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_8_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 165
+    page: 166
+    published_page: 142
+    figure: '7.8'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag K) with 3.22
+      wt% Al2O3 (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag K, Al2O3=3.22 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_8_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_fig_7_9_vanadium_redox
+  type: figure_record
+  locator:
+    pdf_page_index: 165
+    page: 166
+    published_page: 142
+    figure: '7.9'
+  values:
+    identity:
+      species: V
+      phase: slag
+      T_C: 1600
+    axes:
+      x: log pO2 (atm)
+      y: log vanadium redox ratios
+    caption: Variation of redox ratios of vanadium with oxygen partial pressures for CaO-SiO2-Al2O3-V2O5 (slag L) with 5.44
+      wt% Al2O3 (1600°C).
+    panel: none
+    points: []
+    series:
+    - label: slag L, Al2O3=5.44 wt%
+      marker_count: null
+      marker_count_status: not counted; digitisation deferred
+    attribution: this work unless a cited source is named in the series label
+    digitisation: deferred to a figure pass
+    quantity_token: null
+    printed_quantity: vanadium redox ratio, fraction, total content, or average valency as specified by the caption and axes
+    schema_gap: The store has no general vanadium redox-ratio, vanadium valence-fraction, or average-valency quantity token.
+      Figure points were not digitised.
+  units: x/y units and printed oxygen reference are retained in axes; no figure values extracted
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_fig_7_9_vanadium_redox
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_table_4_1_master_melt_compositions
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 95
+    page: 96
+    published_page: 72
+    table: Table 4.1
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - equilibrium_phase_composition
+    - residue_component_composition
+    reason_untyped: 'This is a partial master-charge recipe table: it mixes molar ratios and oxide percentages, reports dashes
+      rather than a complete phase vector, and does not give a measured-phase temperature. The New Zealand Steel row is a
+      whole multiphase slag bulk analysis. No listed composition token matches all of these rows without changing their meaning.'
+    printed_data:
+      columns:
+      - melt
+      - Na2O/SiO2_molar_ratio
+      - CaO/SiO2_molar_ratio
+      - V2O5_mol_percent
+      - Al2O3_wt_percent
+      - MgO_wt_percent
+      - Fe2O3_mol_percent
+      rows:
+      - - A
+        - '0.5'
+        - '-'
+        - '1'
+        - '-'
+        - '-'
+        - '-'
+      - - B
+        - '0.5'
+        - '-'
+        - '5'
+        - '-'
+        - '-'
+        - '-'
+      - - C
+        - '1.0'
+        - '-'
+        - '5'
+        - '-'
+        - '-'
+        - '-'
+      - - D
+        - '0.5'
+        - '-'
+        - '10'
+        - '-'
+        - '-'
+        - '-'
+      - - E
+        - '-'
+        - '0.7'
+        - '5'
+        - '-'
+        - '-'
+        - '-'
+      - - F
+        - '-'
+        - '0.9'
+        - '5'
+        - '-'
+        - '-'
+        - '-'
+      - - G
+        - '-'
+        - '1.23'
+        - '5'
+        - '-'
+        - '-'
+        - '-'
+      - - H
+        - '-'
+        - '0.7'
+        - '1'
+        - '-'
+        - '-'
+        - '-'
+      - - I
+        - '-'
+        - '0.9'
+        - '1'
+        - '-'
+        - '-'
+        - '-'
+      - - J
+        - '-'
+        - '1.21'
+        - '3'
+        - '-'
+        - '-'
+        - '-'
+      - - K
+        - '-'
+        - '1.23'
+        - '5'
+        - '3.22'
+        - '-'
+        - '-'
+      - - L
+        - '-'
+        - '1.22'
+        - '5'
+        - '5.44'
+        - '-'
+        - '-'
+      - - M
+        - '-'
+        - '1.22'
+        - '5'
+        - '7.87'
+        - '-'
+        - '-'
+      - - N
+        - '-'
+        - '1.57'
+        - '5'
+        - '-'
+        - '3.50'
+        - '-'
+      - - O
+        - '-'
+        - '1.51'
+        - '5'
+        - '-'
+        - '4.87'
+        - '-'
+      - - P*
+        - '-'
+        - '0.71'
+        - '4'
+        - '-'
+        - '-'
+        - '-'
+      - - Q*
+        - '-'
+        - '0.71'
+        - '10'
+        - '-'
+        - '-'
+        - '-'
+      - - R*
+        - '-'
+        - '1.14'
+        - '10'
+        - '-'
+        - '-'
+        - '-'
+      - - S*
+        - '-'
+        - '1.66'
+        - '10'
+        - '-'
+        - '-'
+        - '-'
+      - - T*
+        - '-'
+        - '1.25'
+        - '10'
+        - '-'
+        - '-'
+        - '10'
+      - - U*
+        - '-'
+        - '1.56'
+        - '10'
+        - '-'
+        - '-'
+        - '10'
+      new_zealand_steel_slag_bulk_wt_percent:
+        Fe(total)_wt_percent: '12.72'
+        CaO_wt_percent: '51.41'
+        SiO2_wt_percent: '9.85'
+        Al2O3_wt_percent: '2.35'
+        MgO_wt_percent: '8.77'
+        V2O3_wt_percent: '4.11'
+        TiO2_wt_percent: '3.72'
+        Cr2O3_wt_percent: '0.324'
+        MnO_wt_percent: '2.16'
+        P2O5_wt_percent: '1.365'
+        S_wt_percent: '0.185'
+      note: Dashes are unreported cells, not zero. The table describes master melts prepared for experiments; it is not a
+        per-run equilibrated phase-composition table.
+  units: Na2O/SiO2 and CaO/SiO2 are molar ratios; V2O5 and Fe2O3 are mol%; Al2O3 and MgO are wt%; the New Zealand Steel bulk
+    analysis is wt%.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_table_4_1_master_melt_compositions
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_table_5_1_equilibrium_redox_ratios
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 117
+    page: 118
+    published_page: 94
+    table: Table 5.1
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio is Fe-specific
+      and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+    printed_data:
+      printed_condition: pO2 = 10^-10 atm
+      rows:
+      - sample: A
+        temperature_C: '1125'
+        V4+/V5+: '0.535'
+        V3+/V4+: '-'
+      - sample: A
+        temperature_C: '1225'
+        V4+/V5+: '1.138'
+        V3+/V4+: '0.355'
+      - sample: A
+        temperature_C: '1325'
+        V4+/V5+: '4.345'
+        V3+/V4+: '0.331'
+      - sample: B
+        temperature_C: '1225'
+        V4+/V5+: '3.926'
+        V3+/V4+: '-'
+      - sample: C
+        temperature_C: '1225'
+        V4+/V5+: '0.111'
+        V3+/V4+: '-'
+      - sample: D
+        temperature_C: '1225'
+        V4+/V5+: '2.911'
+        V3+/V4+: '0.344'
+      composition_binding: Melt A-D identities and compositions are given in Table 4.1; temperatures and ratio cells are reproduced
+        here. A dash is unreported, not zero.
+      printed_ratio_headers:
+      - V4+/V5+
+      - V3+/V4+
+  units: redox ratios are dimensionless; pO2 is atm; temperature is °C.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_table_5_1_equilibrium_redox_ratios
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_table_5_2_average_vanadium_valency
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 127
+    page: 128
+    published_page: 104
+    table: Table 5.2
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio is Fe-specific
+      and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+    printed_data:
+      printed_quantity: average vanadium valency (a of V^a+)
+      sample_columns:
+      - A_1125C
+      - A_1225C
+      - A_1325C
+      - B_1225C
+      - C_1225C
+      - D_1225C
+      rows:
+      - log10_pO2_atm: '-2'
+        values:
+        - '4.964'
+        - '4.948'
+        - '4.909'
+        - '4.969'
+        - '4.999'
+        - '4.957'
+      - log10_pO2_atm: '-4'
+        values:
+        - '4.942'
+        - '4.849'
+        - - '4.797'
+          - '4.714'
+        - '4.946'
+        - '4.998'
+        - '4.930'
+      - log10_pO2_atm: '-6'
+        values:
+        - '4.725'
+        - '4.804'
+        - '4.608'
+        - '4.881'
+        - - '4.993'
+          - '4.982'
+        - '4.851'
+      - log10_pO2_atm: '-8'
+        values:
+        - '4.804'
+        - '4.702'
+        - '4.412'
+        - '4.662'
+        - - '4.986'
+          - '4.981'
+        - '4.679'
+      - log10_pO2_atm: '-10'
+        values:
+        - '4.639'
+        - '4.243'
+        - - '3.935'
+          - '3.935'
+        - '4.203'
+        - - '4.90'
+          - '4.933'
+        - '4.00'
+      - log10_pO2_atm: '-12'
+        values:
+        - '4.421'
+        - '3.390'
+        - '3.485'
+        - '3.988'
+        - - '4.75'
+          - '4.602'
+        - '-'
+      - log10_pO2_atm: '-14'
+        values:
+        - '3.491'
+        - '3.365'
+        - '3.338'
+        - '-'
+        - '-'
+        - '-'
+      stacked_values: Where two values are printed vertically in one cell, both remain in that cell as an ordered list; the
+        table does not label them as separate conditions.
+  units: pO2 is atm; average valency is dimensionless; sample temperatures are part of the column headings.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_table_5_2_average_vanadium_valency
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_table_7_1_slag_redox_ratios
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 170
+    page: 171
+    published_page: 147
+    table: Table 7.1
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio is Fe-specific
+      and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+    printed_data:
+      printed_condition: 1600°C; the two ratio columns are at pO2 = 10^-2 atm and 10^-8 atm, respectively
+      rows:
+      - slag: F
+        CaO/SiO2_molar_ratio: '0.9'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '-'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.765'
+        V3+/V4+_at_log10_pO2_atm_-8: '2.71'
+      - slag: G
+        CaO/SiO2_molar_ratio: '1.23'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '-'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.573'
+        V3+/V4+_at_log10_pO2_atm_-8: '1.653'
+      - slag: J
+        CaO/SiO2_molar_ratio: '1.21'
+        V2O5_mol_percent: '3'
+        Al2O3_wt_percent: '-'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '1.005'
+        V3+/V4+_at_log10_pO2_atm_-8: '0.719'
+      - slag: K
+        CaO/SiO2_molar_ratio: '1.23'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '3.22'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.403'
+        V3+/V4+_at_log10_pO2_atm_-8: '1.500'
+      - slag: L
+        CaO/SiO2_molar_ratio: '1.22'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '5.44'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.444'
+        V3+/V4+_at_log10_pO2_atm_-8: '1.803'
+      - slag: M
+        CaO/SiO2_molar_ratio: '1.22'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '7.87'
+        MgO_wt_percent: '-'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.574'
+        V3+/V4+_at_log10_pO2_atm_-8: '2.072'
+      - slag: N
+        CaO/SiO2_molar_ratio: '1.57'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '-'
+        MgO_wt_percent: '3.50'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.140'
+        V3+/V4+_at_log10_pO2_atm_-8: '1.438'
+      - slag: O
+        CaO/SiO2_molar_ratio: '1.51'
+        V2O5_mol_percent: '5'
+        Al2O3_wt_percent: '-'
+        MgO_wt_percent: '4.87'
+        V4+/V5+_at_log10_pO2_atm_-2: '0.107'
+        V3+/V4+_at_log10_pO2_atm_-8: '2.769'
+      note: Each row is bound to the slag label and recipe printed in the table. Table 4.1 gives the master-melt identities.
+        Dashes are unreported, not zero.
+  units: CaO/SiO2 is molar ratio; V2O5 is mol%; Al2O3 and MgO are wt%; redox ratios are dimensionless; pO2 is atm.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_table_7_1_slag_redox_ratios
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_table_7_2_average_slag_vanadium_valency
+  type: measured_table_no_token
+  locator:
+    pdf_page_index: 184
+    page: 185
+    published_page: 161
+    table: Table 7.2
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio is Fe-specific
+      and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+    printed_data:
+      printed_condition: 1600°C
+      sample_columns:
+      - F
+      - G
+      - J
+      - K
+      - L
+      - M
+      - N
+      - O
+      rows:
+      - log10_pO2_atm: '-2'
+        values:
+        - '4.567'
+        - '4.636'
+        - '4.499'
+        - '4.693'
+        - '4.692'
+        - '4.635'
+        - '4.877'
+        - '4.903'
+      - log10_pO2_atm: '-4'
+        values:
+        - '4.000'
+        - '4.121'
+        - '4.398'
+        - '4.139'
+        - '4.139'
+        - '4.219'
+        - '4.692'
+        - '4.743'
+      - log10_pO2_atm: '-6'
+        values:
+        - '3.653'
+        - '4.000'
+        - '4.017'
+        - '4.016'
+        - '4.016'
+        - '4.000'
+        - '4.559'
+        - '4.606'
+      - log10_pO2_atm: '-8'
+        values:
+        - '3.264'
+        - '3.377'
+        - '3.582'
+        - '3.357'
+        - '3.357'
+        - '3.326'
+        - '3.410'
+        - '3.369'
+      - log10_pO2_atm: '-9'
+        values:
+        - '3.151'
+        - '3.251'
+        - '3.401'
+        - '3.234'
+        - '3.233'
+        - '3.195'
+        - '3.410'
+        - '3.369'
+      note: Each value is bound to its printed slag column and pO2 row. The final pressure is 10^-9 atm, verified on the page
+        render.
+  units: pO2 is atm; average valency is dimensionless.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_table_7_2_average_slag_vanadium_valency
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
+- observation_id: farah_1998_text_summary_fig_7_16_valency
+  type: measured_text_no_token
+  locator:
+    pdf_page_index: 174
+    page: 175
+    published_page: 151
+  values:
+    method_class: measured_tabulated
+    candidate_quantity_tokens:
+    - fe3_fe2_ratio
+    - ion_intensity_ratio
+    reason_untyped: No existing token represents vanadium redox ratios or average vanadium valency. fe3_fe2_ratio is Fe-specific
+      and ion_intensity_ratio represents signal intensity, not chemical valence ratios.
+    printed_summary: The overall oxidation state varied between 3.1 and 4.7 for slags F and G at 1600°C; it was slightly higher
+      for slag G.
+    figures:
+    - '7.16'
+  units: average vanadium oxidation state is dimensionless; temperature is °C.
+  context_id: farah-1998-vanadium-silicate-melts-thesis::context::farah_1998_text_summary_fig_7_16_valency
+  work_id: 10.26190/unsworks/11435
+  source_id: farah-1998-vanadium-silicate-melts-thesis
+  species: V
