@@ -197,7 +197,13 @@ CODE_INPUTS = (
 #     The landing train's full regen of b148 (tip 20a005ad5 on green 850a09e93,
 #     studio-3) was a fixed point: no store change. This acknowledges STORE
 #     outputs only; the new rows' scoring is covered by the commits' tests.
+#   6714bb105: b-985, the literature INDEX.yaml/INDEX.md row count for the
+#     sublimation-kinetics-2023-minerals extract (19 -> 18) after its LMS-1
+#     density row became quoted context. The store regen it follows (fa64337f3)
+#     already removed that observation; a full regen on the merged tree
+#     (c5873c736 on green 2e651d553, studio-2) was a fixed point: no store change.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "6714bb105",
     "037f97ff6", "5d46c88e1",
     "6f308879c", "82655ba66", "9c40ad728", "6444f432c",
     "80fad2bfa",
