@@ -18476,26 +18476,6 @@ entries:
       source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
 - work_id: 10.1016/j.chemgeo.2025.123018
   source: data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c
-    locator:
-      pdf_page_index: 20
-      section: 4. Conclusions
-      note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate calculation
-        table.
-      source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-  - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation
-    locator:
-      pdf_page_index: 16
-      section: 3.2 Fractional loss, speciation in the gas phase and comparisons with other measures of volatility; Table 3
-      note: Table 3 itself is not present as readable tabulated data in the supplied PDF; only the prose classification is
-        recorded.
-      source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
-- work_id: 10.1016/j.chemgeo.2025.123018
-  source: data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml
   why: derived_from 'boulliung_2025_ssas_apparatus_and_run_conditions' is prose, not a resolvable observation id; retained
     here, never minted as a pointer
   axes:
@@ -23316,17 +23296,6 @@ entries:
   why: derived evidence class with unstated ancestry; queued for page-grounding
   axes:
   - derived_from
-  observations:
-  - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
-    locator:
-      published_page: 24
-      section: 6 Conclusions
-      note: pdf_page=25
-- work_id: 10.1016/j.gca.2019.06.016
-  source: data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
   observations:
   - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
     locator:
@@ -121263,25 +121232,6 @@ entries:
       published_page: 87
       equation: '7'
       note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
-      source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
-- work_id: 10.2355/tetsutohagane1955.84.2_85
-  source: data/literature/extracts/itoh-hino-banya-1998-spinel.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_equilibrium_constants
-    locator:
-      published_page: 88
-      note: Printed equations and evaluated 1873 K values; do not treat these author calculations as direct measurements.;
-        equations=12-18, 21-24
-      source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
-  - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_interaction_parameters
-    locator:
-      published_page: 88
-      figure: '4'
-      note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure
-        4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
       source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - work_id: 10.2355/tetsutohagane1955.84.2_85
   source: data/literature/extracts/itoh-hino-banya-1998-spinel.yaml
@@ -363137,36 +363087,6 @@ entries:
   - derived_from
   observations:
   - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
-    locator:
-      page: PDF p. 6 / printed p. 722
-      table: '4'
-- work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
-  source: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
-    locator:
-      page: 723
-      table: '7'
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
-    locator:
-      page: PDF p. 6 / printed p. 722
-      table: '4'
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
-    locator:
-      page: 723
-      table: '7'
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
-    locator:
-      page: 723
-      table: '7'
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
-    locator:
-      page: 723
-      table: '7'
-  - observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_4_fit
     locator:
       page: PDF p. 6 / printed p. 722
       table: '4'
