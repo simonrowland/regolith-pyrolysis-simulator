@@ -19,7 +19,12 @@ from simulator.condensation import GAS_CONSTANT_J_MOL_K
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
-from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux
+from simulator.state import (
+    Atmosphere,
+    CampaignPhase,
+    CondensationTrain,
+    EvaporationFlux,
+)
 from simulator.subsolidus_bakeout import (
     CLEANED_MELT_ACCOUNT,
     FOULANT_ACCOUNT,
@@ -772,6 +777,44 @@ def test_joint_release_stays_within_pipe_capacity():
     assert sim._subsolidus_pending_release is None
     assert sim._last_subsolidus_bakeout["committed"] is True
     assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
+
+
+def test_c0_same_step_pipe_cap_numeric_pin():
+    """Pin the production C0 gas cap before sharing its capacity owner."""
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
+        yaml.safe_load((_DATA / "feedstocks.yaml").read_text()),
+        yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim._get_turbine_spec()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 950.0
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.background_gas_species = "Ar"
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    equilibrium = sim._get_equilibrium()
+    flux = sim._calculate_evaporation(equilibrium)
+    inlet = sim._subsolidus_transport_inlet_flux(flux)
+    transport = sim.overhead_model.estimate_transport_state(
+        inlet,
+        sim.melt,
+        p_downstream_bar=sim._headspace_downstream_pressure_bar(None),
+    )
+
+    assert inlet.total_kg_hr == pytest.approx(0.0009597869579047912)
+    assert transport["pipe_conductance_kg_hr"] == pytest.approx(
+        0.0004385903383104627
+    )
+    sim._cap_c0_joint_release_to_pipe_capacity(flux)
+    assert flux.total_kg_hr == pytest.approx(0.0004385903383104627)
+    assert flux.species_kg_hr["Na"] == pytest.approx(0.0004181400259280556)
+    assert flux.species_kg_hr["K"] == pytest.approx(0.000020450135762602575)
 
 
 def test_competing_branches_share_one_host_inventory():
