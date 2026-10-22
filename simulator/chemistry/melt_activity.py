@@ -11,6 +11,7 @@ import math
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 
@@ -704,6 +705,183 @@ def melt_oxide_activity(
         temperature_K=resolved_temperature_K,
         valid_range_K=coeff.valid_range_K,
         authority_status=activity_authority_status,
+    )
+
+
+@lru_cache(maxsize=1)
+def _na2o_janaf_liquid_source_data() -> tuple[
+    tuple[tuple[float, float], ...], float, float
+]:
+    """Load Na2O(l) Gibbs rows and its JANAF alpha/liquid fusion data."""
+
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    liquid_document = load_table_document(TABLES_DIR / "Na-013.yaml")["table"]
+    alpha_document = load_table_document(TABLES_DIR / "Na-014.yaml")["table"]
+
+    def numeric_cell(row: Mapping[str, Any], field: str) -> float:
+        cell = row.get(field)
+        if not isinstance(cell, Mapping) or cell.get("value") is None:
+            raise ValueError(f"JANAF Na2O row is missing {field}")
+        return float(cell["value"])
+
+    def row_at(
+        table: Mapping[str, Any], temperature_K: float
+    ) -> Mapping[str, Any]:
+        for row in table.get("values", ()):
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            if (
+                isinstance(temperature, Mapping)
+                and temperature.get("value") is not None
+                and float(temperature["value"]) == temperature_K
+            ):
+                return row
+        raise ValueError(
+            f"JANAF {table.get('table_id')} has no {temperature_K:g} K row"
+        )
+
+    def alpha_liquid_transition(
+        table: Mapping[str, Any],
+    ) -> tuple[float, float]:
+        matches: list[tuple[float, float]] = []
+        for ambiguity in table.get("parse_ambiguities", ()):
+            if not isinstance(ambiguity, Mapping):
+                continue
+            fields = str(ambiguity.get("raw_line", "")).split("\t")
+            if len(fields) == 6 and fields[-1].strip() == "ALPHA <--> LIQUID":
+                matches.append((float(fields[0]), float(fields[4])))
+        if len(matches) != 1:
+            raise ValueError(
+                f"JANAF {table.get('table_id')} needs one alpha/liquid row"
+            )
+        return matches[0]
+
+    liquid_points = tuple(
+        sorted(
+            (
+                numeric_cell(row, "temperature"),
+                numeric_cell(row, "formation_gibbs_energy"),
+            )
+            for row in liquid_document.get("values", ())
+            if isinstance(row, Mapping)
+            and isinstance(row.get("temperature"), Mapping)
+            and row["temperature"].get("value") is not None
+            and isinstance(row.get("formation_gibbs_energy"), Mapping)
+            and row["formation_gibbs_energy"].get("value") is not None
+        )
+    )
+    liquid_tm, liquid_h_increment_tm = alpha_liquid_transition(liquid_document)
+    alpha_tm, alpha_h_increment_tm = alpha_liquid_transition(alpha_document)
+    if liquid_tm != alpha_tm:
+        raise ValueError("JANAF Na2O tables disagree on the alpha/liquid Tm")
+
+    liquid_1400 = row_at(liquid_document, 1400.0)
+    alpha_1400 = row_at(alpha_document, 1400.0)
+    # Premise: fusion enthalpy is H_liquid(Tm)-H_alpha(Tm). Algebra: start
+    # with the JANAF formation-enthalpy difference at 1400 K, then add the
+    # difference of the printed H-H(Tr) increments from 1400 K to Tm; the
+    # elemental reference increments cancel. Units are kJ/mol Na2O.
+    delta_h_fus_kJ_per_mol_na2o = (
+        numeric_cell(liquid_1400, "formation_enthalpy")
+        - numeric_cell(alpha_1400, "formation_enthalpy")
+        + liquid_h_increment_tm
+        - numeric_cell(liquid_1400, "enthalpy_increment")
+        - alpha_h_increment_tm
+        + numeric_cell(alpha_1400, "enthalpy_increment")
+    )
+    if delta_h_fus_kJ_per_mol_na2o <= 0.0:
+        raise ValueError("JANAF Na2O fusion enthalpy must be positive")
+    return liquid_points, liquid_tm, delta_h_fus_kJ_per_mol_na2o
+
+
+def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+    temperature_K: float,
+) -> float:
+    """Resolve the Na standard Gibbs energy on the liquid NaO0.5 activity basis."""
+
+    T_K = float(temperature_K)
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
+
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_fit_segments,
+        ellingham_segment_for_temperature,
+    )
+
+    active = ellingham_segment_for_temperature("Na", T_K)
+    if "Na2O(l)" in active.phase_basis:
+        # At and above Tm, including fit extrapolation, preserve the existing
+        # Ellingham result and its caller-owned authority diagnostics exactly.
+        return active.delta_g_kJ_per_mol_O2(T_K)
+
+    liquid_points, melting_temperature_K, delta_h_fus_kJ_per_mol_na2o = (
+        _na2o_janaf_liquid_source_data()
+    )
+
+    def interpolate(
+        points: tuple[tuple[float, float], ...], target_K: float
+    ) -> float:
+        for (left_K, left_value), (right_K, right_value) in zip(
+            points, points[1:]
+        ):
+            if left_K <= target_K <= right_K:
+                fraction = (target_K - left_K) / (right_K - left_K)
+                return left_value + fraction * (right_value - left_value)
+        raise ValueError(
+            f"JANAF Na2O(l) does not cover {target_K:g} K"
+        )
+
+    submelt_points = tuple(
+        point for point in liquid_points if point[0] < melting_temperature_K
+    )
+    if (
+        submelt_points
+        and submelt_points[0][0] <= T_K <= submelt_points[-1][0]
+    ):
+        # Premise: the activity reference is pure-liquid NaO0.5. For
+        # 4 Na + O2 -> 2 Na2O(l) = 4 NaO0.5(l), algebra gives
+        # ΔG°/mol O2 = 2*ΔfG°(Na2O(l)). JANAF values are kJ/mol Na2O, so
+        # multiplying by 2 gives the required kJ/mol O2.
+        return 2.0 * interpolate(submelt_points, T_K)
+
+    segments = ellingham_fit_segments("Na")
+    alpha_gas = next(
+        segment
+        for segment in segments
+        if "Na(g)" in segment.phase_basis
+        and "Na2O(alpha)" in segment.phase_basis
+    )
+    if "Na2O(alpha)" in active.phase_basis:
+        alpha_on_active_metal_rail = active.delta_g_kJ_per_mol_O2(T_K)
+    else:
+        beta_gas = next(
+            segment
+            for segment in segments
+            if "Na(g)" in segment.phase_basis
+            and "Na2O(beta)" in segment.phase_basis
+        )
+        alpha_on_active_metal_rail = (
+            active.delta_g_kJ_per_mol_O2(T_K)
+            + alpha_gas.delta_g_kJ_per_mol_O2(T_K)
+            - beta_gas.delta_g_kJ_per_mol_O2(T_K)
+        )
+
+    # Premise: below the liquid table's coverage, the activity still uses
+    # pure-liquid NaO0.5 while the Ellingham rail uses Na2O(alpha) or beta.
+    # Algebra per mol Na2O: ΔG°_liq = ΔG°_alpha + ΔH_fus(1-T/Tm); two Na2O
+    # form per mol O2, so multiply the correction by 2. On a beta rail,
+    # (ΔG_alpha-ΔG_beta) on the common Na(g) rail converts oxide phase while
+    # preserving the active Na(g) or Na(l) reactant state.
+    # Units: both dG and ΔH_fus are kJ/mol Na2O before ×2, yielding kJ/mol O2.
+    # As T approaches the JANAF Tm=1405.2 K from below, the correction tends
+    # to 2*47.696*(1-1405.2/1405.2)=0.000 kJ/mol O2; the alpha rail is
+    # -381.50944 kJ/mol O2 there, so the limiting liquid value matches it
+    # within 1e-3 kJ/mol O2. The exact Tm itself keeps the existing liquid fit.
+    return alpha_on_active_metal_rail + 2.0 * (
+        delta_h_fus_kJ_per_mol_na2o
+        * (1.0 - T_K / melting_temperature_K)
     )
 
 
