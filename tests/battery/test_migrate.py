@@ -6000,6 +6000,11 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         return None
     if q_token == "activity":
         return _num(item["activity"]) if "activity" in item else None
+    if q_token == "fe3_fe2_ratio":
+        for key in ("fe3_fe2_ratio", "Fe3_over_Fe2"):
+            if key in item:
+                return _num(item.get(key))
+        return None
     if q_token == "evaporation_coefficient_alpha":
         if "alpha" in item:
             return _num(item["alpha"])
@@ -6462,7 +6467,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
-    assert n_numeric == 2225, (n_numeric, census, n_unavailable)
+    # Fourteen printed Bonnand Fe3/Fe2 cells now count from the declared ratio
+    # field, moving the numeric census 2225->2239; mismatches stays 0.
+    assert n_numeric == 2239, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:

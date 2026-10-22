@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 
 
@@ -178,15 +178,25 @@ def test_table3_migrates_every_component_with_temperature_and_conditions() -> No
         initial = observation.identity.composition
         assert initial is not None
         source_composition = values.get("composition_wt_pct")
-        assert "composition" not in observation.point_conditions
         if sample in INCOMPLETE_CHARGES:
             assert source_composition is None
             assert initial.is_unknown
+            assert "composition" not in observation.point_conditions
         else:
             assert source_composition is not None
             assert set(source_composition) == {"CaO", "Al2O3", "V2O5"}
-            assert initial.is_unknown
-            assert "unsupported" in initial.reason
+            expected_composition = wt_pct_to_mole_fraction(
+                {
+                    component: Decimal(str(weight))
+                    for component, weight in source_composition.items()
+                }
+            )
+            assert initial.is_value
+            assert initial.value.as_map() == expected_composition.as_map()
+            assert (
+                observation.point_conditions["composition"].state.value.as_map()
+                == expected_composition.as_map()
+            )
 
         printed = str(values["component_amount_as_published"])
         if printed == "-":
