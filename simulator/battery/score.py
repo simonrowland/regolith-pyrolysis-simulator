@@ -105,6 +105,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    phase_for_sample_form,
     source_filter_tokens,
     to_plain,
 )
@@ -676,6 +677,9 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
+        # Sample phase is not a quantity property. A typed non-melt sample
+        # is refused by melt_activity_sample_phase_refusal after source
+        # validity, and stays on this rail so the refusal is visible.
         return Rail.MELT_ACTIVITY
     if (
         quantity in FORMATION_QUANTITIES
@@ -727,6 +731,139 @@ def no_headline_rail_reason(
 # spelling; that detail stays a refusal payload, not a key field.
 NO_HEADLINE_RAIL_TOKEN = "none"
 MISSING_QUANTITY_KEY_TOKEN = "quantity_unknown"
+
+
+# Only a typed crystal. Liquid, glass, supercooled liquid, gas, and
+# aqueous stay on the melt-activity path. A psat template that leaves
+# phase "gas" on an activity row is not a solid solution.
+SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
+    "sample_phase_not_melt_activity_observable"
+)
+SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
+    "sample_phase_crystalline_vs_liquid_engine"
+)
+
+
+def crystalline_sample_detail(
+    phase: Phase | None,
+    *,
+    quantity: Quantity,
+    reason: str,
+) -> dict[str, object] | None:
+    """Detail when ``phase`` is a typed crystal. Otherwise None.
+
+    One owner for both rails. The caller names which phase it read and
+    which reason the refusal carries. Liquid, glass, supercooled liquid,
+    gas, aqueous, and an untyped phase stay on the path.
+    """
+
+    if phase is not Phase.CR:
+        return None
+    return {
+        "reason": reason,
+        "sample_phase": phase.value,
+        "quantity": quantity.value,
+    }
+
+
+def melt_activity_sample_phase_refusal(
+    identity: Identity,
+) -> dict[str, object] | None:
+    """Detail when a crystalline sample is not a melt-activity observable.
+
+    ``Phase.CR`` is the solid-solution sample, read from the activity
+    species. Unknown, not-applicable, liquid, glass, supercooled liquid,
+    gas, and aqueous are not that statement. ``None`` means score it.
+    """
+
+    quantity = quantity_token(identity)
+    if quantity not in MELT_ACTIVITY_QUANTITIES:
+        return None
+    return crystalline_sample_detail(
+        phase_token(identity.species),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE,
+    )
+
+
+def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
+    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+
+    The store does not carry a typed Phase on the experiment. A missing
+    form and untyped prose are None and stay on the scoring path.
+    """
+
+    if experiment is None:
+        return None
+    form = experiment.sample.form
+    if form is None or not form.state.is_value:
+        return None
+    value = form.state.value
+    if not isinstance(value, str):
+        return None
+    return phase_for_sample_form(value)
+
+
+def vapour_crystalline_sample_liquid_engine_refusal(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+) -> dict[str, object] | None:
+    """Detail when crystalline-sample vapour is outside a liquid engine.
+
+    The sample phase is the experiment form, not the gas species. A
+    liquid engine consumes that sample as one homogeneous liquid, so a
+    typed crystal is another phase. Non-liquid engines are not this
+    refusal. ``None`` means score it.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity is not Quantity.P_PARTIAL:
+        return None
+    detail = crystalline_sample_detail(
+        _experiment_sample_phase(experiment),
+        quantity=quantity,
+        reason=SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE,
+    )
+    if detail is None:
+        return None
+
+    reservoir = stated_pure_substance_reservoir(identity)
+    temperature_K = temperature_of(identity)
+    if reservoir is None or temperature_K is None:
+        return detail
+    compound = reservoir[0]
+
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+
+    try:
+        janaf_fusion_energy(compound, temperature_K)
+    except ValueError as exc:
+        if str(exc) != f"no JANAF fusion table pair for {compound}":
+            return detail
+        detail["fusion_data"] = {
+            "status": "not_available_to_simulator",
+            "compound": compound,
+        }
+    return detail
+
+
+def _sample_phase_not_observable_prediction(
+    engine: Engine, identity: Identity, detail: Mapping[str, object]
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail=detail,
+        identity=identity,
+    )
 
 
 def residual_key(
@@ -3904,6 +4041,42 @@ def _activity_contract_refusal(
     )
 
 
+def _activity_request_or_contract_refusal(
+    engine: Engine,
+    *,
+    experiment: Experiment,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> tuple[Any, EnginePrediction | None]:
+    """Ready melt-activity request, or the contract refusal when it is not.
+
+    One owner for both ``predict_with_engine`` and ``compile_residual``.
+    A malformed row composition is ``RefusalReason.INVALID_SOURCE``.
+    ``run_validity_gates`` does not read that composition.
+    """
+
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    generated = activity_request_for_engine(experiment, observation, engine.value)
+    if generated is not None and generated.payload is not None:
+        return generated, None
+    requested = (
+        identity.composition
+        if identity.composition is not None and identity.composition.is_value
+        else None
+    )
+    return None, _activity_contract_refusal(
+        engine,
+        channel=channel,
+        sources=sources,
+        identity=identity,
+        requested=requested,
+        generated=generated,
+    )
+
+
 def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
     return Notice(
         kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
@@ -5727,6 +5900,7 @@ def _predict_mass_loss_with_residue(
     channel: str,
     sources: tuple[str, ...],
     experiment: Experiment | None,
+    observation: Observation,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
@@ -5734,16 +5908,24 @@ def _predict_mass_loss_with_residue(
         predict_mass_loss_fraction,
     )
 
+    source_path = (
+        REPO_ROOT / "data/literature/extracts" / f"{observation.source_id}.yaml"
+    )
+    source_document = load_yaml(source_path) if source_path.is_file() else {}
     temperature = temperature_of(identity)
     try:
         result = predict_mass_loss_fraction(
             engine.value,
             experiment,
             temperature_K=None if temperature is None else float(temperature),
+            source_document=source_document,
+            observation=observation,
         )
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
-        if reason in {"engine_capability_unsupported", "residue_method_unsupported"}:
+        if reason in {
+            "engine_capability_unsupported", "residue_method_unsupported",
+        }:
             refusal = RefusalReason.UNSUPPORTED
             execution = ExecutionState.UNSUPPORTED
         elif reason.endswith("_not_stated"):
@@ -5755,7 +5937,10 @@ def _predict_mass_loss_with_residue(
         elif reason == "initial_composition_invalid":
             refusal = RefusalReason.METRIC_DOMAIN
             execution = ExecutionState.NOT_PROBED
-        elif reason == "evaporation_coefficients_not_sourced":
+        elif reason in {
+            "evaporation_coefficients_not_sourced", "alpha_not_sourced",
+            "area_shape_not_self_similar", "preheat_bound_not_negligible",
+        }:
             refusal = RefusalReason.UNDERDETERMINED_APPARATUS
             execution = ExecutionState.NOT_PROBED
         else:
@@ -5764,7 +5949,7 @@ def _predict_mass_loss_with_residue(
         detail: dict[str, object] = {"reason": reason, "detail": exc.detail}
         if reason.endswith("_not_stated"):
             detail["missing_input"] = exc.detail
-        elif reason == "evaporation_coefficients_not_sourced":
+        elif reason in {"evaporation_coefficients_not_sourced", "alpha_not_sourced"}:
             detail["missing_input"] = Quantity.EVAPORATION_COEFFICIENT_ALPHA
         if refusal is RefusalReason.UNSUPPORTED:
             detail.update({"engine": engine.value, "capability": exc.detail})
@@ -5794,16 +5979,21 @@ def _predict_mass_loss_with_residue(
             identity=identity,
         )
 
-    domain_notices = tuple(
+    notices = tuple(
         Notice(
-            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
+                "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+                or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.FALLBACK),
             affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
             reason=flag,
             origin=f"engine:{engine.value}",
         )
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
+        or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     )
+    domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -5814,13 +6004,13 @@ def _predict_mass_loss_with_residue(
         authority=(
             Authority.EXTRAPOLATED if domain_notices else Authority.BRIDGE
         ),
-        notices=domain_notices,
-        coefficient_sources=sources,
+        notices=notices,
+        coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
         version=(
             "method_class=calculated_residue_integrator; "
-            "alpha_common_unity_sensitivity; constant_printed_initial_area"
+            "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
         ),
     )
 
@@ -5837,6 +6027,12 @@ def predict_with_engine(
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
     _require_score_engine(engine)
+    identity = observation.identity
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(identity)
+        if isinstance(identity, Identity)
+        else None
+    )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
@@ -5860,7 +6056,6 @@ def predict_with_engine(
     quantity = quantity_token(observation.identity)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    identity = observation.identity
     if not isinstance(identity, Identity) or quantity is None:
         return EnginePrediction(
             engine=engine,
@@ -5878,6 +6073,7 @@ def predict_with_engine(
             channel,
             sources,
             experiment,
+            observation,
         )
     if quantity is Quantity.FE3_FE2_RATIO:
         return _predict_fe_redox(engine, observation, identity, channel)
@@ -5914,6 +6110,15 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
+        )
+    vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+        identity,
+        engine=engine,
+        experiment=experiment,
+    )
+    if vapour_phase_detail is not None:
+        return _sample_phase_not_observable_prediction(
+            engine, identity, vapour_phase_detail
         )
     static_equilibrium_pressure = (
         quantity is Quantity.P_SAT
@@ -6145,7 +6350,6 @@ def predict_with_engine(
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
         from simulator.battery.enums import AmountBasis
-        from simulator.battery.generators.bench import activity_request_for_engine
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -6186,15 +6390,22 @@ def predict_with_engine(
                 },
                 identity=identity,
             )
-        generated = activity_request_for_engine(experiment, observation, engine.value)
-        if generated is None or generated.payload is None:
-            return _activity_contract_refusal(
-                engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
-                generated=generated,
+        generated, contract_refusal = _activity_request_or_contract_refusal(
+            engine,
+            experiment=experiment,
+            observation=observation,
+            identity=identity,
+            channel=channel,
+            sources=sources,
+        )
+        if contract_refusal is not None:
+            return contract_refusal
+        assert generated is not None and generated.payload is not None
+        # Malformed composition is INVALID_SOURCE above. A crystal sample
+        # with a valid request is still not a melt observable.
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
             )
         activity_payload = generated.payload
         moles = dict(activity_payload.get("composition_mol") or {})
@@ -6332,6 +6543,10 @@ def predict_with_engine(
                 version=activity.activity_model,
             )
     elif identity.composition is not None and identity.composition.is_value:
+        if sample_phase_detail is not None:
+            return _sample_phase_not_observable_prediction(
+                engine, identity, sample_phase_detail
+            )
         requested = identity.composition
         assert identity.composition.value is not None
         composition_value = identity.composition.value
@@ -7829,7 +8044,15 @@ def compile_residual(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
-    reference = fusion_comparison_reference(reference, engine=engine)
+    sample_phase_detail = (
+        melt_activity_sample_phase_refusal(reference.identity)
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    # A crystalline sample is not converted onto a liquid reference. That
+    # conversion is a melt comparison, and this row is not one.
+    if sample_phase_detail is None:
+        reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -8069,12 +8292,61 @@ def compile_residual(
         if apparatus_flagged
         else gates
     )
+    if isinstance(identity, Identity):
+        vapour_phase_detail = vapour_crystalline_sample_liquid_engine_refusal(
+            identity,
+            engine=engine,
+            experiment=experiment,
+        )
+        if vapour_phase_detail is not None:
+            # Phase identity, not an apparatus or engine result. A typed
+            # crystal is out of domain for a liquid engine whether or not
+            # the effusion gate would also refuse. The row stays counted.
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                vapour_phase_detail,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+            )
     if not gates.passed and not apparatus_flagged:
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
             {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
+        )
+
+    if sample_phase_detail is not None:
+        # Validity gates do not read the row composition. The activity
+        # contract does. A malformed print is INVALID_SOURCE and wins.
+        # Any other contract gap stays behind this return: a crystalline
+        # sample is not a melt observable even when its reference also
+        # fails to match. The injected predictor is not the contract.
+        if experiment is not None and isinstance(identity, Identity):
+            contract_observation = implied_alpha_reference or reference
+            contract_identity = contract_observation.identity
+            if isinstance(contract_identity, Identity):
+                _generated, contract_refusal = _activity_request_or_contract_refusal(
+                    engine,
+                    experiment=experiment,
+                    observation=contract_observation,
+                    identity=contract_identity,
+                    channel=ENGINE_CHANNELS[engine],
+                    sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                )
+                if (
+                    contract_refusal is not None
+                    and contract_refusal.refusal_reason is RefusalReason.INVALID_SOURCE
+                ):
+                    return _refused(
+                        RefusalReason.INVALID_SOURCE,
+                        contract_refusal.refusal_detail
+                        or {"reason": RefusalReason.INVALID_SOURCE.value},
+                        execution=contract_refusal.execution,
+                    )
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            sample_phase_detail,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
 
     missing_fusion_input = next(
@@ -12304,6 +12576,17 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
 
     if not isinstance(refusal, Mapping):
         return True
+    if (
+        reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE
+    ):
+        return False
+    if (
+        rail == Rail.MELT_ACTIVITY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE
+    ):
+        return False
     if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
         return False
     if (

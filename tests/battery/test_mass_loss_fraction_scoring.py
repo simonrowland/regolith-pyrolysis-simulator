@@ -7,6 +7,7 @@ from decimal import Decimal
 import pytest
 
 import simulator.battery.migrate as migrate_module
+import simulator.battery.score as score_module
 from simulator.battery.enums import (
     Engine,
     MethodToken,
@@ -43,6 +44,26 @@ from simulator.battery.score import (
 )
 
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
+
+
+@pytest.fixture
+def without_sourced_alpha_context(monkeypatch):
+    """Exercise d-204 even when the extraction offer is overlaid by CI."""
+    original = score_module.load_yaml
+
+    def load_without_fits(path):
+        document = original(path)
+        if path.name == "kems-010-richter-2007.yaml":
+            document = deepcopy(document)
+            for block in document.get("species", {}).values():
+                block["context"] = [
+                    row for row in block.get("context", ())
+                    if not isinstance(row.get("values"), dict)
+                    or "alpha_form" not in row["values"]
+                ]
+        return document
+
+    monkeypatch.setattr(score_module, "load_yaml", load_without_fits)
 
 
 @pytest.fixture(scope="module")
@@ -307,6 +328,7 @@ def test_finalize_never_promotes_untyped_observation_map_to_initial(
 
 
 @pytest.mark.parametrize("sample_id", ("R-11", "R-14"))
+@pytest.mark.usefixtures("without_sourced_alpha_context")
 def test_richter_rows_refuse_unsourced_evaporation_coefficients(
     fresh_mass_loss_extracts, sample_id
 ) -> None:
@@ -365,6 +387,7 @@ def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_resi
     )
 
 
+@pytest.mark.usefixtures("without_sourced_alpha_context")
 def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     monkeypatch,
 ) -> None:
@@ -476,6 +499,7 @@ def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
     )
 
 
+@pytest.mark.usefixtures("without_sourced_alpha_context")
 def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
     mass_loss_rows,
 ) -> None:
