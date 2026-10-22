@@ -17,6 +17,9 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
+from simulator.gas_balance import (
+    NoColdTrain, FiniteCapacity, _finite_nonnegative, _finite_positive,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.accounting.formulas import resolve_species_formula
@@ -27,6 +30,7 @@ from simulator.condensation import (
 from simulator.condensation_routing import designated_stage_number
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.physical_constants import (
+    OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT,
     STEFAN_BOLTZMANN,
@@ -67,7 +71,6 @@ OXYGEN_TRIPLE_POINT_PA = 146.33
 OXYGEN_NORMAL_BOILING_POINT_K = 90.188
 OXYGEN_NORMAL_BOILING_PRESSURE_PA = 101325.0
 OXYGEN_FUSION_ENTHALPY_J_PER_MOL = 444.0
-OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL = 6820.0
 # NBSIR 77-859, Table 3 and section 6.1, solid O2 at the triple point.
 OXYGEN_SUBLIMATION_ENTHALPY_J_PER_MOL = 8199.5
 # Constant-Cp vapor model used by oxygen_cp_j_per_mol_k when
@@ -155,27 +158,6 @@ class DisplayPrices:
         object.__setattr__(self, "o2_storage_keeping_cost_per_kg", MappingProxyType(keeping))
         campaigns = _positive_integer(self.amortization_campaigns, "amortization_campaigns")
         object.__setattr__(self, "amortization_campaigns", campaigns)
-
-
-@dataclass(frozen=True)
-class NoColdTrain:
-    reason: str = "not_configured"
-
-
-@dataclass(frozen=True)
-class FiniteCapacity:
-    value_kg_hr: float
-    p_ref_Pa: float | None = None
-    T_ref_K: float | None = None
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "value_kg_hr", _finite_positive(self.value_kg_hr, "value_kg_hr")
-        )
-        for name in _COLD_TRAIN_RATING_REFERENCE_NAMES:
-            value = getattr(self, name)
-            if value is not None:
-                object.__setattr__(self, name, _finite_positive(value, name))
 
 
 @dataclass(frozen=True)
@@ -2170,25 +2152,6 @@ def _require_exact_keys(payload: Mapping[str, Any], expected: set[str] | frozens
     actual = {str(key) for key in payload}
     if actual != set(expected):
         raise ValueError(f"{label} keys must be exactly {sorted(expected)}; got {sorted(actual)}")
-
-
-def _finite_nonnegative(value: Any, name: str) -> float:
-    if isinstance(value, bool):
-        raise TypeError(f"{name} must be numeric")
-    try:
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise TypeError(f"{name} must be numeric") from exc
-    if not math.isfinite(number) or number < 0.0:
-        raise ValueError(f"{name} must be finite and non-negative")
-    return number
-
-
-def _finite_positive(value: Any, name: str) -> float:
-    number = _finite_nonnegative(value, name)
-    if number <= 0.0:
-        raise ValueError(f"{name} must be positive")
-    return number
 
 
 def _fraction(value: Any, name: str) -> float:

@@ -74,7 +74,7 @@ from simulator.state import (
 # Single-source the pipe-temperature default from condensation (canonical
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
 from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
-from engines.builtin.overhead_bleed import (
+from simulator.gas_balance import (
     EffectiveTransportCapacity,
     controlled_flow_capacity,
 )

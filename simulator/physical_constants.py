@@ -76,3 +76,6 @@ __all__ = (
     "STEFAN_BOLTZMANN",
     "TABLE_SELF_CHECK_FINDING_DEX",
 )
+
+# NIST Chemistry WebBook SRD 69, oxygen phase-change data.
+OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL = 6820.0

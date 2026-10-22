@@ -117,7 +117,7 @@ def _headspace_moles_at_pressure_pa(
     )
 
 
-def _capacity_partial_pressures_pa(
+def capacity_partial_pressures_pa(
     holdup_mol: Mapping[str, float], volume_m3: float, temperature_K: float,
 ) -> dict[str, float]:
     """Picard EOS with its existing full-precision R and multiplication order.

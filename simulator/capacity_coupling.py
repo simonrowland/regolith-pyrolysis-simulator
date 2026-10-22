@@ -7,11 +7,11 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from engines.builtin.overhead_bleed import (
-    BuiltinOverheadBleedProvider,
-    controlled_flow_capacity,
+from simulator.gas_balance import (
+    controlled_flow_capacity, bled_species_mol, invalid_destructive_control,
+    OxygenShadowPartition, external_oxygen_outlet_mol, partition_melt_oxygen,
 )
-from simulator.environment import _capacity_partial_pressures_pa
+from simulator.environment import capacity_partial_pressures_pa
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from simulator.transport_regime import (
     gas_dynamic_viscosity_Pa_s, pipe_mass_flow_kg_s,
@@ -23,24 +23,6 @@ OXYGEN_SPECIES = "O2"
 DEFAULT_REL_TOL = 1.0e-9
 DEFAULT_ABS_TOL_PA = 1.0e-6
 DEFAULT_MAX_ITERATIONS = 50
-
-
-@dataclass(frozen=True)
-class OxygenShadowPartition:
-    external_mol: float
-    admitted_mol: float
-    accumulated_mol: float
-    relieved_mol: float
-    held_mol: float
-
-    @property
-    def debited_mol(self) -> float:
-        return (
-            self.external_mol
-            + self.admitted_mol
-            + self.accumulated_mol
-            + self.relieved_mol
-        )
 
 
 @dataclass(frozen=True)
@@ -90,76 +72,6 @@ class CapacityCouplingRefusalError(RuntimeError):
     def __init__(self, refusal: CapacityShadowRefusal) -> None:
         self.refusal = refusal
         super().__init__(refusal.reason)
-
-
-def external_oxygen_outlet_mol(*, bled_o2_mol: float, overhead_o2_mol: float,
-                             external_o2_holdup_mol: float,
-                             integrated_external_o2_mol: float | None = None) -> float:
-    """Use a transport-derived outlet, or the legacy uniform batch split."""
-    if integrated_external_o2_mol is not None:
-        return integrated_external_o2_mol
-    external_holdup = min(max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol))
-    return (min(bled_o2_mol, bled_o2_mol * external_holdup / overhead_o2_mol)
-            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0 else 0.0)
-
-
-def partition_melt_oxygen(
-    *,
-    bled_o2_mol: float,
-    overhead_o2_mol: float,
-    external_o2_holdup_mol: float,
-    capacity: FiniteCapacity,
-    dt_hr: float,
-    p_o2_Pa: float,
-    k_relief_kg_hr_Pa: float,
-    p_open_Pa: float,
-    molar_mass_kg_mol: float,
-    accumulator_enabled: bool = False,
-    cistern_fill_kg: float = 0.0,
-    cavern_capacity_kg: float = 0.0,
-    integrated_external_o2_mol: float | None = None,
-) -> OxygenShadowPartition:
-    # Ordinary bleed preserves the HEAD provenance split. Admission acts on
-    # its melt-origin share. Relief is an additional debit from the full
-    # post-admission melt-origin inventory, independent of ordinary bleed.
-    # Unit check: (kg/hr)*hr/(kg/mol) and
-    # (kg/(hr Pa))*Pa*hr/(kg/mol) both reduce to mol. Sanity anchors: with no
-    # external holdup and ample capacity, all bled O2 is admitted; with zero
-    # admission and closed relief, all melt-origin bled O2 remains held.
-    external_holdup = min(
-        max(0.0, external_o2_holdup_mol), max(0.0, overhead_o2_mol)
-    )
-    external = external_oxygen_outlet_mol(
-        bled_o2_mol=bled_o2_mol, overhead_o2_mol=overhead_o2_mol,
-        external_o2_holdup_mol=external_holdup,
-        integrated_external_o2_mol=integrated_external_o2_mol,
-    )
-    melt_inventory = max(0.0, overhead_o2_mol - external_holdup)
-    melt_bled = min(melt_inventory, max(0.0, bled_o2_mol - external))
-    admitted = min(
-        melt_bled,
-        capacity.value_kg_hr * dt_hr / molar_mass_kg_mol,
-    )
-    remainder = max(0.0, melt_inventory - admitted)
-    accumulated = 0.0
-    if accumulator_enabled:
-        available_cistern_kg = max(0.0, cavern_capacity_kg - cistern_fill_kg)
-        accumulated = min(
-            remainder,
-            available_cistern_kg / molar_mass_kg_mol,
-        )
-        remainder = max(0.0, remainder - accumulated)
-    relief_law_mol = (
-        k_relief_kg_hr_Pa
-        * max(0.0, p_o2_Pa - p_open_Pa)
-        * dt_hr
-        / molar_mass_kg_mol
-    )
-    relieved = min(remainder, max(0.0, relief_law_mol))
-    held = max(0.0, remainder - relieved)
-    return OxygenShadowPartition(
-        external, admitted, accumulated, relieved, held
-    )
 
 
 def combined_saturation(
@@ -241,7 +153,7 @@ def solve_capacity_shadow(
                 "cistern_fill_kg": cistern_fill_kg,
                 "cavern_capacity_kg": cavern_capacity_kg,
             })
-    invalid = BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
+    invalid = invalid_destructive_control(controls)
     if invalid is not None:
         return CapacityShadowRefusal(invalid, 0)
     if bleed_conductance_kg_s is not None:
@@ -282,7 +194,7 @@ def solve_capacity_shadow(
         )
 
     species_order = tuple(sorted(set(pre_holdup_mol) | set(molar_mass_kg_mol)))
-    partials = _capacity_partial_pressures_pa(
+    partials = capacity_partial_pressures_pa(
         {species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
          for species in species_order}, volume_m3, temperature_K,
     )
@@ -414,7 +326,7 @@ def solve_capacity_shadow(
             bleed_controls["p_downstream_bar"] = (
                 final_flow_capacity.downstream_pressure_bar
             )
-        ordinary_bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        ordinary_bled = bled_species_mol(
             final_evolved,
             total_mol=total_mol,
             total_kg=total_kg,
@@ -458,7 +370,7 @@ def solve_capacity_shadow(
             )
             for species in species_order
         }
-        next_partials = _capacity_partial_pressures_pa(
+        next_partials = capacity_partial_pressures_pa(
             final_residual, volume_m3, temperature_K,
         )
         max_delta = max(

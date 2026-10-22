@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider, controlled_flow_capacity
+from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+from simulator.gas_balance import bled_species_mol, controlled_flow_capacity
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -66,7 +67,7 @@ def balance_outputs():
                             p_ref_Pa=610.0, k_relief_kg_hr_Pa=1e-5,
                             p_open_Pa=400.0, vessel_rating_Pa=1000.0)
         inventory = {"O2": 0.75, "Ar": 1.23456789}
-        preview = BuiltinOverheadBleedProvider._bled_species_mol(
+        preview = bled_species_mol(
             inventory, total_mol=sum(inventory.values()), total_kg=sum(n * resolve_species_formula(s).molar_mass_kg_per_mol()
                          for s, n in inventory.items()),
             controls=controls)
