@@ -5462,16 +5462,16 @@ def _safe_failure_value(
     try:
         return builder()
     except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
-        if failure_record is not None:
-            return dict(failure_record)
         failure = _safe_exception_text(exc)
         _, separator, message = failure.partition(": ")
-        return {
-            "status": "unavailable",
+        failure_details = {
             "section": section,
             "exception_type": type(exc).__name__,
             "reason": message if separator else failure,
         }
+        if failure_record is not None:
+            return {**dict(failure_record), **failure_details}
+        return {"status": "unavailable", **failure_details}
 
 
 def _unavailable_report_from_upstream(
