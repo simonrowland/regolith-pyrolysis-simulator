@@ -84,6 +84,42 @@ def test_integrated_pressure_projections_exact():
     assert projection_outputs() == EXPECTED
 
 
+def bleed_shortfall_outputs(conductance):
+    from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    result = BuiltinOverheadBleedProvider().dispatch(IntentRequest(
+        intent=ChemistryIntent.OVERHEAD_BLEED,
+        account_view=ProviderAccountView(
+            accounts={"process.overhead_gas": {"Ar": 1.23456789, "O2": 0.75}},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0, pressure_bar=0.0102,
+        control_inputs={
+            "sweep_outflow_species_mol": {"Ar": 0.9, "O2": 0.5},
+            "headspace_volume_m3": 0.137, "headspace_temperature_K": 1873.15,
+            "bleed_conductance_kg_s": conductance, "p_total_bar": 0.0102,
+            "dt_hr": 0.25,
+        },
+    ))
+    assert result.status == "ok"
+    assert result.diagnostic["capacity_shortfall"]["reason"] == "duct_capacity_shortfall"
+    return _hex({
+        "diagnostic": dict(result.diagnostic),
+        "debits": ({k: dict(v) for k, v in result.transition.debits.items()}
+                   if result.transition else None),
+        "credits": ({k: dict(v) for k, v in result.transition.credits.items()}
+                    if result.transition else None),
+    })
+
+
+@pytest.mark.parametrize("conductance", [0.0, 1.0e-5])
+def test_direct_bleed_shortfall_exact(conductance):
+    from tests.fixtures.pressure_projection_pin import BLEED_SHORTFALL
+    assert bleed_shortfall_outputs(conductance) == BLEED_SHORTFALL[conductance]
+
+
 @pytest.mark.parametrize("volume,temperature", [(0.0, 1800.0), (1.0, 0.0), (-1.0, 1800.0)])
 def test_eos_zero_shortcut(volume, temperature):
     assert OverheadGasModel._compute_partial_pressures({"O2": 1.0}, volume, temperature) == {}
