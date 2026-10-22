@@ -81,12 +81,21 @@ def test_ambiguous_ack_prefix_fails(
     (ack_dir / "eb850d2.txt").write_text("Reason.\n", encoding="utf-8")
     monkeypatch.setattr(freshness, "ROOT", tmp_path)
 
-    def resolve_in_repo(*args: str) -> str:
-        return subprocess.run(
-            ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=True
-        ).stdout
+    # Simulate git's response to an ambiguous short oid. Whether a real prefix
+    # is ambiguous depends on which objects the local clone holds, so the test
+    # must not depend on the repository's contents.
+    def ambiguous_rev_parse(*args: str) -> str:
+        if "rev-parse" in args:
+            raise subprocess.CalledProcessError(
+                128,
+                ["git", *args],
+                output="",
+                stderr="error: short object ID eb850d2 is ambiguous\n"
+                "fatal: Needed a single revision\n",
+            )
+        raise AssertionError(f"unexpected git call: {args}")
 
-    monkeypatch.setattr(freshness, "_git", resolve_in_repo)
+    monkeypatch.setattr(freshness, "_git", ambiguous_rev_parse)
     with pytest.raises(subprocess.CalledProcessError) as error:
         freshness._store_neutral_ack_commits()
     assert "ambiguous" in (error.value.stderr or "")
