@@ -251,6 +251,13 @@ def _assert_temperature_hold_notice(notice: dict) -> None:
     assert "uncertified" in message
     assert "t-1417" in message
     assert str(notice["authority"]) in message
+    # d-235 fiat ramp: owner-chosen, not a model bound. The number is the
+    # configured C0 ramp, not a second copy of the arithmetic.
+    assert notice["ramp_authority"] == "owner_fiat"
+    assert notice["ramp_model_bounded"] is False
+    assert notice["ramp_C_per_hr"] == float(
+        _setpoints()["campaigns"]["C0"]["dT_dt_C_per_hr"]
+    )
 
 
 def test_c0_temperature_hold_is_incomplete_and_max_hold_is_a_backstop():

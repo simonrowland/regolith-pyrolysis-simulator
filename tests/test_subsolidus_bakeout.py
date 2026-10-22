@@ -623,8 +623,9 @@ def test_joint_release_stays_within_pipe_capacity():
     salt_before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"]
     priced_temperature_C = temperature_K - 273.15
     _arm_c0(sim, temperature_C=priced_temperature_C)
-    # The C0 ramp adds 50 C this hour. Restore the temperature the area was
-    # priced at after that update so the Hertz-Knudsen extent stays 2 mol/h.
+    # The C0 ramp moves temperature this hour. Restore the temperature the
+    # area was priced at after that update so the Hertz-Knudsen extent stays
+    # 2 mol/h.
     original_update = sim._update_temperature
 
     def _hold_priced_temperature():

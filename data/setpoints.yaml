@@ -58,7 +58,14 @@ campaigns:
   C0:
     label: "Vacuum Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
-    dT_dt_C_per_hr: 50
+    # Owner's provisional fiat ramp under d-235 (owner, relayed by physics
+    # 2026-10-22). Not bounded by the model: fiat C0 gas is ledgered at load
+    # time, so transport has no load to bound, and there is no furnace
+    # heating-power model. Replace when t-1417's release curves exist (d-225).
+    # Continuous transit from the 25 C load temperature to the 940-950 C exit
+    # band: (940 - 25) / 200 = 4.575 h, (950 - 25) / 200 = 4.625 h, about
+    # 4.6 h. min_hold_hr stays 10.
+    dT_dt_C_per_hr: 200
     atmosphere: "hard_vacuum"
     pO2_mbar: null                       # deep vacuum
     target_species: ["H2O", "CO2", "S2", "CHNOPS"]

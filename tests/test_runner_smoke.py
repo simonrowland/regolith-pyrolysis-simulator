@@ -2222,8 +2222,8 @@ def test_runner_records_operator_decision_in_shadow_trace():
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         # Long enough to traverse C0 -> C0B -> C2 fork.  500h is well
-        # past the C0 endpoint (which fires around T~950C, ~18h on the
-        # default ramp) so the decision pause is reached.
+        # past the C0 endpoint (temperature hold near 950 C on the default
+        # ramp) so the decision pause is reached.
         hours=500,
         allow_fallback_vapor=True,
         allow_unmeasured_alpha_fallback=True,

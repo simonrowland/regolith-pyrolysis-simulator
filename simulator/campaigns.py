@@ -233,17 +233,32 @@ class _CampaignOverrideStore(dict):
             self[str(key)] = value
 
 
-def c0_temperature_hold_exit_record(kinetics: str) -> dict[str, object]:
+def c0_temperature_hold_exit_record(
+    kinetics: str,
+    *,
+    ramp_C_per_hr: float,
+) -> dict[str, object]:
     """One predict-and-flag record for a temperature-hold C0 exit.
 
     Owner ruling d-235. The release curves are fiat-ledgered and
     uncertified until t-1417. Authority level is the published
-    out-of-domain predict-and-flag level. Callers copy this record;
-    they do not build a second notice.
+    out-of-domain predict-and-flag level.
+
+    The same record carries the C0 ramp's authority. That ramp is the
+    owner's provisional fiat, not a model bound: fiat C0 gas is ledgered
+    at load time and there is no furnace heating-power model.
+    ``ramp_C_per_hr`` is the ramp resolved for this exit.
+
+    Callers copy this record; they do not build a second notice.
     """
     from engines.engine_commissioning import PUBLISHED_AUTHORITY_OUTSIDE
 
     authority = PUBLISHED_AUTHORITY_OUTSIDE
+    ramp = float(ramp_C_per_hr)
+    if not math.isfinite(ramp) or ramp <= 0.0:
+        raise ValueError(
+            f"C0 ramp must be finite and positive; got {ramp_C_per_hr!r}"
+        )
     return {
         "outcome": "incomplete",
         "backstop": "temperature_hold",
@@ -255,6 +270,9 @@ def c0_temperature_hold_exit_record(kinetics: str) -> dict[str, object]:
             "C0 release curves are fiat-ledgered and uncertified (t-1417); "
             f"authority level {authority}."
         ),
+        "ramp_C_per_hr": ramp,
+        "ramp_authority": "owner_fiat",
+        "ramp_model_bounded": False,
     }
 
 
@@ -2296,8 +2314,14 @@ class CampaignManager:
                     melt.temperature_C >= min_temperature_C
                     and melt.campaign_hour >= min_hold_hr
                 ):
+                    _target_T, ramp_C_per_hr = self.get_temp_target(
+                        campaign,
+                        int(melt.campaign_hour),
+                        melt,
+                    )
                     self.last_c0_exit = c0_temperature_hold_exit_record(
                         STAGE0_RELEASE_KINETICS,
+                        ramp_C_per_hr=ramp_C_per_hr,
                     )
                     return True
                 if completed_campaign_hour >= max_hold_hr:
