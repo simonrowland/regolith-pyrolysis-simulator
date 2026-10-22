@@ -1,0 +1,2873 @@
+schema_version: literature_extract.v1
+source_id: sugawara-akaogi-2003-ni-co-fusion
+source:
+  citation: Sugawara T. and Akaogi M. (2003). Calorimetric measurements of fusion enthalpies for Ni2SiO4 and Co2SiO4
+    olivines and application to olivine-liquid partitioning. Geochimica et Cosmochimica Acta 67(14):2683–2693.
+  doi: 10.1016/S0016-7037(03)00202-3
+  url: https://doi.org/10.1016/S0016-7037(03)00202-3
+  year: 2003
+extraction:
+  method: Manual transcription from born-digital pdftotext-layout, with every cell assignment checked against 600
+    dpi PDF renders of physical pages 3–6; figures deferred.
+  date: '2026-10-22'
+  worker: fam49-1022
+  provenance_path: text/sugawara-akaogi-2003-ni-co-fusion/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Co2SiO4.observations[suga03_t4_co2sio4_2_heat_fusion].values
+  value:
+    quantity: heat_of_fusion
+    method_class: quoted_attributed
+    delta_H_fus_kJ_mol-1: 97.9
+    sigma: null
+    T_fus_K: 1688
+    source_as_printed: Hirschmann and Ghiorso (1994)
+    attribution: Hirschmann and Ghiorso (1994)
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2688
+    table: '4'
+    row: Co2SiO4 row 2
+species:
+  Co2SiO4:
+    observations:
+    - observation_id: suga03_t4_co2sio4_2_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id002
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Co2SiO4 row 2
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 97.9
+        sigma: null
+        T_fus_K: 1688
+        source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Hirschmann and Ghiorso (1994)
+    - observation_id: suga03_t4_co2sio4_2_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id002
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 58
+        sigma: null
+        T_fus_K: 1688
+        source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Hirschmann and Ghiorso (1994)
+    context:
+    - observation_id: suga03_t4_co2sio4_1_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id001
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Co2SiO4 row 1
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 103
+        sigma: 15
+        melting_temperature_K: 1688
+        source: This study
+        note: Calculated from measured calorimetry and heat capacities; see Eq. (1) and text. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_co2sio4_1_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id001
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 61
+        sigma: 9
+        melting_temperature_K: 1688
+        source: This study
+        note: Calculated as fusion enthalpy divided by Tm. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_co2sio4_3_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id003
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Co2SiO4 row 3
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 138.0
+        sigma: 4.8
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t4_co2sio4_3_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id003
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 76.25
+        sigma: 2.49
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_figure_1_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        figure: '1'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: Co2SiO4 enthalpy increment H_T-H_298 vs temperature; axes T (K), enthalpy (kJ/mol).
+        axes_as_printed: Co2SiO4 enthalpy increment H_T-H_298 vs temperature; axes T (K), enthalpy (kJ/mol).
+        phase: as printed in caption
+        series: solid olivine and liquid Co2SiO4; study points, reference line and fitted liquid curve
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_figure_2_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        figure: '2'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: An50Di50-Ni2SiO4 enthalpy increment at 1773 K vs X(Ni2SiO4).
+        axes_as_printed: An50Di50-Ni2SiO4 enthalpy increment at 1773 K vs X(Ni2SiO4).
+        phase: as printed in caption
+        series: measured liquid compositions and enthalpies; starting materials and heating/quenching experiments;
+          fitted curves
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_figure_3_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        figure: '3'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: Entropy of fusion of M2SiO4 olivine at Tm vs ionic radius of six-coordinated cation.
+        axes_as_printed: Entropy of fusion of M2SiO4 olivine at Tm vs ionic radius of six-coordinated cation.
+        phase: as printed in caption
+        series: Mg, Fe, Ni, Co, Mn markers
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_figure_4_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 2689
+        figure: '4'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: Relationships between D_M^Ol/Liq and 1/T for M = Mg, Fe, Ni, Co, Mn.
+        axes_as_printed: Relationships between D_M^Ol/Liq and 1/T for M = Mg, Fe, Ni, Co, Mn.
+        phase: as printed in caption
+        series: panel series as caption; fitted thermodynamic relationships
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_figure_5_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2691
+        figure: '5'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: Temperature dependence of h1, h2, and (h1+h2)/RT.
+        axes_as_printed: Temperature dependence of h1, h2, and (h1+h2)/RT.
+        phase: as printed in caption
+        series: panel a h1; panel b h2; panel c sum over RT
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_figure_6_deferred
+      type: figure_record
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 2692
+        figure: '6'
+      units: axes and values as printed; no digitized values
+      values:
+        quantity_as_printed: thermochemistry / partitioning plot
+        caption: Variation of best-fit Delta W_M (M = Mg, Fe, Ni, Co, Mn) calculated by Eq. 13 and A_M/B_M values.
+        axes_as_printed: Variation of best-fit Delta W_M (M = Mg, Fe, Ni, Co, Mn) calculated by Eq. 13 and A_M/B_M
+          values.
+        phase: as printed in caption
+        series: panel a Delta W_M vs T; panel b fitted D_M^Ol; caption as published
+        marker_count_per_series: not counted in this pass
+        attribution: Sugawara and Akaogi (2003)
+        digitisation: deferred to a figure pass
+    - observation_id: suga03_t1_co2sio4_01
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_01
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1373
+        enthalpy_increment: 194.7
+        sigma: 15.5
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.3 wt%
+      uncertainty:
+        reported_status: printed
+        value: 15.5
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_02
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_02
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1473
+        enthalpy_increment: 223.3
+        sigma: 8.3
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 8.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_03
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_03
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1473
+        enthalpy_increment: 236.3
+        sigma: 10.9
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule Pt; XCo cell blank
+      uncertainty:
+        reported_status: printed
+        value: 10.9
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_04
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_04
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1573
+        enthalpy_increment: 240.3
+        sigma: 6.2
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=1.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 6.2
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_05
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_05
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1573
+        enthalpy_increment: 251.2
+        sigma: 20.4
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule Pt; XCo cell blank
+      uncertainty:
+        reported_status: printed
+        value: 20.4
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_06
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_06
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1612
+        enthalpy_increment: 241.3
+        sigma: 18.9
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=0.7 wt%
+      uncertainty:
+        reported_status: printed
+        value: 18.9
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_07
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_07
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1652
+        enthalpy_increment: 257.7
+        sigma: 13.5
+        state: Solid
+        atmosphere: Ar
+        note: N=4; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 13.5
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_08
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_08
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1673
+        enthalpy_increment: 278.2
+        sigma: 19.0
+        state: Solid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 19.0
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_09
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_09
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1693
+        enthalpy_increment: 340.3
+        sigma: 36.0
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=2.4 wt%
+      uncertainty:
+        reported_status: printed
+        value: 36.0
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_10
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_10
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1713
+        enthalpy_increment: 363.0
+        sigma: 14.6
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=3.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 14.6
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_11
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_11
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1731
+        enthalpy_increment: 373.5
+        sigma: 17.2
+        state: Liquid
+        atmosphere: Ar
+        note: N=5; capsule PtCo; XCo=5.6 wt%
+      uncertainty:
+        reported_status: printed
+        value: 17.2
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_12
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_12
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1754
+        enthalpy_increment: 388.1
+        sigma: 10.6
+        state: Liquid
+        atmosphere: Ar
+        note: N=6; capsule PtCo; XCo=4.8 wt%
+      uncertainty:
+        reported_status: printed
+        value: 10.6
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t1_co2sio4_13
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 2
+        page: 3
+        published_page: 2685
+        table: '1'
+        row: suga03_t1_co2sio4_13
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 393.0
+        sigma: 18.7
+        state: Liquid
+        atmosphere: Ar
+        note: N=13; capsule PtCo; XCo=6.1 wt%
+      uncertainty:
+        reported_status: printed
+        value: 18.7
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+  CaAl2Si2O8:
+    observations: []
+    context:
+    - observation_id: suga03_t2_anorthite_ar
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_anorthite_ar
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 462.9
+        sigma: 22.5
+        state: Solid
+        atmosphere: Ar
+        note: N=8; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 22.5
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+  CaMgSi2O6:
+    observations: []
+    context:
+    - observation_id: suga03_t2_diopside_ar
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_diopside_ar
+      phase: l
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 493.3
+        sigma: 14.6
+        state: Liquid
+        atmosphere: Ar
+        note: N=8; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 14.6
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+  Ni2SiO4:
+    observations:
+    - observation_id: suga03_t4_ni2sio4_2_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id005
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Ni2SiO4 row 2
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 111.5
+        sigma: null
+        T_fus_K: 1923
+        source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Hirschmann and Ghiorso (1994)
+    - observation_id: suga03_t4_ni2sio4_2_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id005
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 58
+        sigma: null
+        T_fus_K: 1923
+        source_as_printed: Hirschmann and Ghiorso (1994)
+        attribution: Hirschmann and Ghiorso (1994)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Hirschmann and Ghiorso (1994)
+    context:
+    - observation_id: suga03_t4_ni2sio4_1_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id004
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Ni2SiO4 row 1
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 221
+        sigma: 26
+        melting_temperature_K: 1923
+        source: This study
+        note: Calculated using Eq. (3) from calorimetry and estimated heat capacities. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_ni2sio4_1_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id004
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 115
+        sigma: 13
+        melting_temperature_K: 1923
+        source: This study
+        note: Calculated as fusion enthalpy divided by Tm. Derivation pending a corpus table asset because the heat-capacity inputs have no store token.
+    - observation_id: suga03_t4_ni2sio4_3_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id006
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Ni2SiO4 row 3
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 205.8
+        sigma: 5.7
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t4_ni2sio4_3_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id006
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 98.44
+        sigma: 3.05
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t2_nisio4_ar
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_nisio4_ar
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 308.8
+        sigma: 22.3
+        state: Solid
+        atmosphere: Ar
+        note: N=4; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 22.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+    - observation_id: suga03_t2_nisio4_air
+      type: calorimetric_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+        row: suga03_t2_nisio4_air
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        T_K: 1773
+        enthalpy_increment: 271.8
+        sigma: 11.3
+        state: Solid
+        atmosphere: Air
+        note: N=9; capsule Pt
+      uncertainty:
+        reported_status: printed
+        value: 11.3
+        units: kJ/mol
+        value_semantics: two standard deviations of the mean
+  SiO2:
+    observations: []
+    context:
+    - observation_id: suga03_t3_starting_composition_x12.5
+      type: bulk_charge_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+      units: wt%
+      values:
+        quantity_candidates:
+        - equilibrium_phase_composition
+        - bulk_property
+        reason: Starting material is a multiphase anorthite-diopside-Ni2SiO4 mixture, not a single phase; no bulk-charge
+          composition token applies.
+        starting_material_mol_percent:
+          anorthite: 46.67
+          diopside: 46.67
+          Ni2SiO4: 6.67
+        starting_material_join_fraction:
+          join: An50Di50-Ni2SiO4
+          Ni2SiO4: 12.5
+        starting_composition_wt_percent:
+          SiO2: 47.44
+          Al2O3: 19.43
+          MgO: 7.68
+          NiO: 4.07
+          CaO: 21.38
+          total: 100.00
+        sampled_glass_rows:
+          center:
+            components_wt_percent:
+              SiO2: 47.13
+              Al2O3: 19.18
+              MgO: 7.47
+              NiO: 3.56
+              CaO: 23.81
+            total: 101.15
+            analyses: 3
+          adjacent_to_Pt:
+            components_wt_percent:
+              SiO2: 46.86
+              Al2O3: 19.72
+              MgO: 7.56
+              NiO: 3.24
+              CaO: 23.28
+            total: 100.66
+            analyses: 3
+    - observation_id: suga03_t3_starting_composition_x25
+      type: bulk_charge_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+      units: wt%
+      values:
+        quantity_candidates:
+        - equilibrium_phase_composition
+        - bulk_property
+        reason: Starting material is a multiphase anorthite-diopside-Ni2SiO4 mixture, not a single phase; no bulk-charge
+          composition token applies.
+        starting_material_mol_percent:
+          anorthite: 42.86
+          diopside: 42.86
+          Ni2SiO4: 14.29
+        starting_material_join_fraction:
+          join: An50Di50-Ni2SiO4
+          Ni2SiO4: 25.0
+        starting_composition_wt_percent:
+          SiO2: 46.12
+          Al2O3: 18.06
+          MgO: 7.14
+          NiO: 8.82
+          CaO: 19.87
+          total: 100.00
+        sampled_glass_rows:
+          center:
+            components_wt_percent:
+              SiO2: 45.81
+              Al2O3: 18.06
+              MgO: 7.12
+              NiO: 7.63
+              CaO: 20.93
+            total: 99.55
+            analyses: 3
+          adjacent_to_Pt:
+            components_wt_percent:
+              SiO2: 45.65
+              Al2O3: 18.41
+              MgO: 7.2
+              NiO: 7.69
+              CaO: 21.66
+            total: 100.62
+            analyses: 2
+    - observation_id: suga03_t3_starting_composition_x37.5
+      type: bulk_charge_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+      units: wt%
+      values:
+        quantity_candidates:
+        - equilibrium_phase_composition
+        - bulk_property
+        reason: Starting material is a multiphase anorthite-diopside-Ni2SiO4 mixture, not a single phase; no bulk-charge
+          composition token applies.
+        starting_material_mol_percent:
+          anorthite: 38.46
+          diopside: 38.46
+          Ni2SiO4: 23.08
+        starting_material_join_fraction:
+          join: An50Di50-Ni2SiO4
+          Ni2SiO4: 37.5
+        starting_composition_wt_percent:
+          SiO2: 44.55
+          Al2O3: 16.43
+          MgO: 6.50
+          NiO: 14.45
+          CaO: 18.08
+          total: 100.00
+        sampled_glass_rows:
+          center:
+            components_wt_percent:
+              SiO2: 44.37
+              Al2O3: 16.5
+              MgO: 6.55
+              NiO: 12.25
+              CaO: 19.29
+            total: 98.96
+            analyses: 3
+          adjacent_to_Pt:
+            components_wt_percent:
+              SiO2: 44.4
+              Al2O3: 16.7
+              MgO: 6.67
+              NiO: 12.33
+              CaO: 19.33
+            total: 99.43
+            analyses: 3
+    - observation_id: suga03_t3_starting_composition_x50
+      type: bulk_charge_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+      units: wt%
+      values:
+        quantity_candidates:
+        - equilibrium_phase_composition
+        - bulk_property
+        reason: Starting material is a multiphase anorthite-diopside-Ni2SiO4 mixture, not a single phase; no bulk-charge
+          composition token applies.
+        starting_material_mol_percent:
+          anorthite: 33.33
+          diopside: 33.33
+          Ni2SiO4: 33.33
+        starting_material_join_fraction:
+          join: An50Di50-Ni2SiO4
+          Ni2SiO4: 50.0
+        starting_composition_wt_percent:
+          SiO2: 42.66
+          Al2O3: 14.48
+          MgO: 5.72
+          NiO: 21.21
+          CaO: 15.93
+          total: 100.00
+        sampled_glass_rows:
+          center:
+            components_wt_percent:
+              SiO2: 43.2
+              Al2O3: 15.03
+              MgO: 5.75
+              NiO: 18.57
+              CaO: 16.77
+            total: 99.33
+            analyses: 4
+          adjacent_to_Pt:
+            components_wt_percent:
+              SiO2: 43.22
+              Al2O3: 14.9
+              MgO: 6.09
+              NiO: 17.65
+              CaO: 17.66
+            total: 99.52
+            analyses: 3
+    - observation_id: suga03_t2_mixed_compositions
+      type: calorimetric_mixture_heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+      units: kJ/mol
+      values:
+        quantity_as_printed: H_T-H_298
+        candidate_token: H_minus_H298
+        reason: The H_minus_H298 identity has no composition axis; mixed Di-An-Ni2SiO4 heat contents stay context-only.
+        rows:
+        - composition:
+            CaMgSi2O6: 0.5
+            CaAl2Si2O8: 0.5
+            Ni2SiO4: 0
+          T_K: 1773
+          state: Liquid
+          atmosphere: Ar
+          H: 540.5
+          sigma: 20.4
+          N: 14
+        - composition:
+            CaMgSi2O6: 0.467
+            CaAl2Si2O8: 0.467
+            Ni2SiO4: 0.067
+          T_K: 1773
+          state: Liquid
+          atmosphere: Air
+          H: 524.2
+          sigma: 23.4
+          N: 12
+        - composition:
+            CaMgSi2O6: 0.429
+            CaAl2Si2O8: 0.429
+            Ni2SiO4: 0.143
+          T_K: 1773
+          state: Liquid
+          atmosphere: Air
+          H: 522.8
+          sigma: 31.2
+          N: 8
+        - composition:
+            CaMgSi2O6: 0.385
+            CaAl2Si2O8: 0.385
+            Ni2SiO4: 0.231
+          T_K: 1773
+          state: Liquid
+          atmosphere: Air
+          H: 516.8
+          sigma: 25.7
+          N: 9
+        - composition:
+            CaMgSi2O6: 0.333
+            CaAl2Si2O8: 0.333
+            Ni2SiO4: 0.333
+          T_K: 1773
+          state: Liquid
+          atmosphere: Air
+          H: 514.1
+          sigma: 14.9
+          N: 15
+    - observation_id: suga03_t3_x12.5_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 47.13
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.09
+        sigma: 0.09
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.09
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 46.86
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.44
+        sigma: 0.44
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.44
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 45.81
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.03
+        sigma: 0.03
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.03
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 45.65
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.3
+        sigma: 0.3
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.3
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 44.37
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.87
+        sigma: 0.87
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.87
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 44.4
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.97
+        sigma: 0.97
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.97
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 43.2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.23
+        sigma: 0.23
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.23
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_sio2
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 43.22
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: SiO2
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.63
+        sigma: 0.63
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.63
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+  Al2O3:
+    observations: []
+    context:
+    - observation_id: suga03_t3_x12.5_center_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 19.18
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.67
+        sigma: 0.67
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.67
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 19.72
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.11
+        sigma: 0.11
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.11
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 18.06
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.48
+        sigma: 0.48
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.48
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 18.41
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.17
+        sigma: 0.17
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.17
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 16.5
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.57
+        sigma: 0.57
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.57
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 16.7
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.1
+        sigma: 0.1
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.1
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 15.03
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.13
+        sigma: 0.13
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.13
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_al2o3
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 14.9
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: Al2O3
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.42
+        sigma: 0.42
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.42
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+  MgO:
+    observations: []
+    context:
+    - observation_id: suga03_t3_x12.5_center_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.47
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.22
+        sigma: 0.22
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.22
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.56
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.27
+        sigma: 0.27
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.27
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.12
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.18
+        sigma: 0.18
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.18
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.2
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.05
+        sigma: 0.05
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.05
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 6.55
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.06
+        sigma: 0.06
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.06
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 6.67
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.11
+        sigma: 0.11
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.11
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 5.75
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.25
+        sigma: 0.25
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.25
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_mgo
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 6.09
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: MgO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.19
+        sigma: 0.19
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.19
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+  NiO:
+    observations: []
+    context:
+    - observation_id: suga03_nio_heat_content_context
+      type: heat_content_context
+      locator:
+        pdf_page_index: 3
+        page: 4
+        published_page: 2686
+        table: '2'
+      units: kJ/mol, H_T-H_298; temperature in K
+      values:
+        quantity_as_printed: heat content
+        reference_temperature_K: 298
+        rows:
+        - atmosphere: Ar
+          capsule: Pt
+          phase: Solid
+          temperature_K: 1773
+          value: 100.6
+          sigma: 9.0
+          N: 5
+        - atmosphere: Air
+          capsule: Pt
+          phase: Solid
+          temperature_K: 1773
+          value: 87.9
+          sigma: 5.2
+          N: 10
+    - observation_id: suga03_t3_x12.5_center_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 3.56
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.1
+        sigma: 0.1
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.1
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 3.24
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.34
+        sigma: 0.34
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.34
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.63
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.18
+        sigma: 0.18
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.18
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 7.69
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.03
+        sigma: 0.03
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.03
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 12.25
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.29
+        sigma: 0.29
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.29
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 12.33
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.19
+        sigma: 0.19
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.19
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 18.57
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.68
+        sigma: 0.68
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.68
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_nio
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 17.65
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: NiO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=1.81
+        sigma: 1.81
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 1.81
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+  CaO:
+    observations: []
+    context:
+    - observation_id: suga03_t3_x12.5_center_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 23.81
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 101.15
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.28
+        sigma: 0.28
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 101.15
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.28
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x12.5_adjacent_pt_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 23.28
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.66
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=12.5 mol%; N=3; printed 1 sigma=0.64
+        sigma: 0.64
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.66
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.64
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_center_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 20.93
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.55
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=25 mol%; N=3; printed 1 sigma=0.25
+        sigma: 0.25
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.55
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.25
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x25_adjacent_pt_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 21.66
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 100.62
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=25 mol%; N=2; printed 1 sigma=0.52
+        sigma: 0.52
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 100.62
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.52
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_center_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 19.29
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 98.96
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.73
+        sigma: 0.73
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 98.96
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.73
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x37.5_adjacent_pt_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 19.33
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.43
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=37.5 mol%; N=3; printed 1 sigma=0.48
+        sigma: 0.48
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.43
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.48
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_center_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: center
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 16.77
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.33
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass center; XNi2SiO4=50 mol%; N=4; printed 1 sigma=0.43
+        sigma: 0.43
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.33
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.43
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+    - observation_id: suga03_t3_x50_adjacent_pt_cao
+      type: glass_analysis_context
+      locator:
+        pdf_page_index: 4
+        page: 5
+        published_page: 2687
+        table: '3'
+        row: adjacent_pt
+      phase: glass
+      units: wt%
+      values:
+        quantity: equilibrium_phase_composition
+        component_amount: 17.66
+        phase_label: glass
+        basis: wt_percent
+        T_C: 1499.85
+        method_class: measured_direct
+        printed_sum: 99.52
+        printed_component: CaO
+        printed_T: 1773 K
+        note: Table 3; quenched glass adjacent_pt; XNi2SiO4=50 mol%; N=3; printed 1 sigma=0.73
+        sigma: 0.73
+        point_conditions:
+          printed_sum:
+            state:
+              tag: value
+              value: 99.52
+            locator:
+              pdf_page_index: 4
+              page: 5
+              published_page: 2687
+              table: '3'
+      uncertainty:
+        reported_status: printed
+        value: 0.73
+        units: wt%
+        value_semantics: one standard deviation as stated in Table 3
+  Mg2SiO4:
+    observations:
+    - observation_id: suga03_t4_mg2sio4_1_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id007
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mg2SiO4 row 1
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 142
+        sigma: 14
+        T_fus_K: 2174
+        source_as_printed: Richet et al. (1993)
+        attribution: Richet et al. (1993)
+      uncertainty:
+        reported_status: printed
+        value: 14
+        units: kJ/mol
+      attribution: Richet et al. (1993)
+    - observation_id: suga03_t4_mg2sio4_1_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id007
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 65.3
+        sigma: 6.4
+        T_fus_K: 2174
+        source_as_printed: Richet et al. (1993)
+        attribution: Richet et al. (1993)
+      uncertainty:
+        reported_status: printed
+        value: 6.4
+        units: J/mol/K
+      attribution: Richet et al. (1993)
+    - observation_id: suga03_t4_mg2sio4_2_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id008
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mg2SiO4 row 2
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 114
+        sigma: 20
+        T_fus_K: 2163
+        source_as_printed: Navrotsky et al. (1989)
+        attribution: Navrotsky et al. (1989)
+      uncertainty:
+        reported_status: printed
+        value: 20
+        units: kJ/mol
+      attribution: Navrotsky et al. (1989)
+    - observation_id: suga03_t4_mg2sio4_2_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id008
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 52.7
+        sigma: 9.2
+        T_fus_K: 2163
+        source_as_printed: Navrotsky et al. (1989)
+        attribution: Navrotsky et al. (1989)
+      uncertainty:
+        reported_status: printed
+        value: 9.2
+        units: J/mol/K
+      attribution: Navrotsky et al. (1989)
+    - observation_id: suga03_t4_mg2sio4_3_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id009
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mg2SiO4 row 3
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 102.8
+        sigma: null
+        T_fus_K: 2163
+        source_as_printed: Tangeman et al. (2001)
+        attribution: Tangeman et al. (2001)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Tangeman et al. (2001)
+    - observation_id: suga03_t4_mg2sio4_3_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id009
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 47.5
+        sigma: null
+        T_fus_K: 2163
+        source_as_printed: Tangeman et al. (2001)
+        attribution: Tangeman et al. (2001)
+      uncertainty:
+        reported_status: not_reported
+      attribution: Tangeman et al. (2001)
+    - observation_id: suga03_t4_mg2sio4_4_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id010
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mg2SiO4 row 4
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 130
+        sigma: 13
+        T_fus_K: 2163
+        source_as_printed: Stebbins et al. (1984)
+        attribution: Stebbins et al. (1984)
+      uncertainty:
+        reported_status: printed
+        value: 13
+        units: kJ/mol
+      attribution: Stebbins et al. (1984)
+    - observation_id: suga03_t4_mg2sio4_4_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id010
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 60.1
+        sigma: 6.0
+        T_fus_K: 2163
+        source_as_printed: Stebbins et al. (1984)
+        attribution: Stebbins et al. (1984)
+      uncertainty:
+        reported_status: printed
+        value: 6.0
+        units: J/mol/K
+      attribution: Stebbins et al. (1984)
+    context:
+    - observation_id: suga03_t4_mg2sio4_5_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id011
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mg2SiO4 row 5
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 113.1
+        sigma: 0.5
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t4_mg2sio4_5_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id011
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 52.05
+        sigma: 0.57
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+  Fe2SiO4:
+    observations:
+    - observation_id: suga03_t4_fe2sio4_1_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id012
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Fe2SiO4 row 1
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 89.3
+        sigma: 1.1
+        T_fus_K: 1490
+        source_as_printed: Stebbins and Carmichael (1984)
+        attribution: Stebbins and Carmichael (1984)
+      uncertainty:
+        reported_status: printed
+        value: 1.1
+        units: kJ/mol
+      attribution: Stebbins and Carmichael (1984)
+    - observation_id: suga03_t4_fe2sio4_1_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id012
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 59.9
+        sigma: 0.7
+        T_fus_K: 1490
+        source_as_printed: Stebbins and Carmichael (1984)
+        attribution: Stebbins and Carmichael (1984)
+      uncertainty:
+        reported_status: printed
+        value: 0.7
+        units: J/mol/K
+      attribution: Stebbins and Carmichael (1984)
+    - observation_id: suga03_t4_fe2sio4_2_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id013
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Fe2SiO4 row 2
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 92.2
+        sigma: 0.3
+        T_fus_K: 1490
+        source_as_printed: Orr (1953)
+        attribution: Orr (1953)
+      uncertainty:
+        reported_status: printed
+        value: 0.3
+        units: kJ/mol
+      attribution: Orr (1953)
+    - observation_id: suga03_t4_fe2sio4_2_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id013
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 61.9
+        sigma: 0.2
+        T_fus_K: 1490
+        source_as_printed: Orr (1953)
+        attribution: Orr (1953)
+      uncertainty:
+        reported_status: printed
+        value: 0.2
+        units: J/mol/K
+      attribution: Orr (1953)
+    context:
+    - observation_id: suga03_t4_fe2sio4_3_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id014
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Fe2SiO4 row 3
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 109.9
+        sigma: 0.6
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t4_fe2sio4_3_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id014
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 69.6
+        sigma: 0.4
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+  Mn2SiO4:
+    observations:
+    - observation_id: suga03_t4_mn2sio4_1_heat_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id015
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mn2SiO4 row 1
+      phase: cr
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        delta_H_fus_kJ_mol-1: 89.0
+        sigma: 0.5
+        T_fus_K: 1620
+        source_as_printed: Mah (1960)
+        attribution: Mah (1960)
+      uncertainty:
+        reported_status: printed
+        value: 0.5
+        units: kJ/mol
+      attribution: Mah (1960)
+    - observation_id: suga03_t4_mn2sio4_1_entropy_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: *id015
+      phase: cr
+      units: J/mol/K
+      values:
+        quantity: entropy_of_fusion
+        method_class: quoted_attributed
+        delta_S_fus_J_mol-1_K-1: 55.2
+        sigma: 0.3
+        T_fus_K: 1620
+        source_as_printed: Mah (1960)
+        attribution: Mah (1960)
+      uncertainty:
+        reported_status: printed
+        value: 0.3
+        units: J/mol/K
+      attribution: Mah (1960)
+    context:
+    - observation_id: suga03_t4_mn2sio4_2_heat_fusion
+      type: fusion_enthalpy_context
+      locator: &id016
+        pdf_page_index: 5
+        page: 6
+        published_page: 2688
+        table: '4'
+        row: Mn2SiO4 row 2
+      units: kJ/mol
+      values:
+        quantity_as_printed: heat of fusion
+        value: 136.0
+        sigma: 1.3
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.
+    - observation_id: suga03_t4_mn2sio4_2_entropy_fusion
+      type: fusion_entropy_context
+      locator: *id016
+      units: J/mol/K
+      values:
+        quantity_as_printed: entropy of fusion
+        value: 91.43
+        sigma: 0.89
+        source: Beattie (1993)
+        note: Table 4 Tm cell is blank; do not backfill from adjacent rows.

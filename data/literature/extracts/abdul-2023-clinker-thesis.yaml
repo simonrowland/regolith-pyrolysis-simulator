@@ -1,0 +1,2011 @@
+schema_version: literature_extract.v1
+source_id: abdul-2023-clinker-thesis
+source:
+  citation: 'Abdul, W. (2023). Thermodynamic Modelling of Portland Cement Clinker Production. PhD thesis, University of Aberdeen.'
+  url: https://www.marcusbannerman.co.uk/wahab_abdul_thesis.pdf
+  year: 2023
+extraction:
+  method: Born-digital PDF transcription; Table 4.1-4.3 row assignments checked against 600 dpi renders, Tables 5.3-5.4 checked against 600 dpi renders, and appendix B transcribed from the PDF text layer.
+  date: '2026-10-22'
+  worker: fam49-1022
+  provenance_path: text/abdul-2023-clinker-thesis/pdftotext-layout.txt
+review_status: draft
+species:
+  CaO:
+    observations: []
+    context:
+    - observation_id: abdul_thesis_figure4_2_cao_mgo_phase_diagram
+      type: figure_context
+      locator: {pdf_page_index: 71, page: 72, published_page: 72, figure: '4.2'}
+      units: phase fields and temperature as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: sequential optimized CaO-MgO phase diagrams
+        species_formula: CaO-MgO system
+        x_axis_as_printed: X(CaO)
+        y_axis_as_printed: Temperature (K)
+        series_list_as_printed: ideal mixing and sequential fitted diagrams
+        marker_count_per_series: no point markers reported in caption; deferred with digitisation
+        caption: 'Sequential CaO-MgO phase diagrams, optimised using the developed automatic approach. The first phase diagram is ideally-mixed, with zero terms; monoxide terms were added in subsequent fits.'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_figure4_3_cao_mgo_phase_diagram
+      type: figure_context
+      locator: {pdf_page_index: 72, page: 73, published_page: 73, figure: '4.3'}
+      units: phase fields and temperature as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: optimized CaO-MgO phase diagram compared with Hillert and Wang
+        species_formula: CaO-MgO system
+        x_axis_as_printed: X(CaO) in present-work panel; w(CaO) in Hillert and Wang panel
+        y_axis_as_printed: Temperature (K)
+        series_list_as_printed: ['present work', 'Hillert and Wang [11]']
+        marker_count_per_series: experimental markers not counted; deferred with digitisation
+        caption: 'Optimised phase diagram of the CaO-MgO from the present work compared against the phase diagram of Hillert and Wang (right).'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_table4_1_solid_cao_mgo_parameters
+      type: model_parameter_table
+      locator:
+        pdf_page_index: 70
+        page: 71
+        published_page: 71
+        table: '4.1'
+      units: 'α and θ dimensionless and K; H and H′ J/mol; a J/mol/K²; b J/mol/K; c J/mol/K²; S′ J/mol/K; A J/mol/K; B K; C dimensionless'
+      values:
+        quantity_as_printed: parameters for the solid MgO and CaO functions
+        method_class: model_derived
+        equation_references_as_printed: '4.4.1 and 4.4.2'
+        CaO_solid:
+          alpha_theta_pairs:
+            - [0.9465361807, 314.8272896]
+            - [0.05193351134, 125.12812657]
+            - [1.001522312, 598.37301449]
+          H: -652625.815
+          a: -0.00174450265
+          b: -14.85294988
+          c: 0.00298095
+          H_prime: -727925.76111
+          S_prime: -486.19356495
+          A: 80.5
+          B: -281.8126077
+          C: 0.09083109344
+        MgO_solid:
+          alpha_theta_pairs:
+            - [1.04609077, 475.5615692]
+            - [0.831024371, 775.50257671]
+            - [0.122996143, 259.55358863]
+          H: -621095.005
+          a: -0.00184931485
+          b: -15.81600803
+          c: 0.00327218470
+          H_prime: -683262.3811
+          S_prime: -467.52323656
+          A: 76.5
+          B: -70.973453808
+          C: 0.025713125847
+        note: Table reports fitted functions; these are model parameters rather than measured thermodynamic points.
+    - observation_id: abdul_thesis_table4_2_liquid_cao_mgo_parameters
+      type: model_parameter_table
+      locator:
+        pdf_page_index: 70
+        page: 71
+        published_page: 71
+        table: '4.2'
+      units: 'α dimensionless; θ K; H J/mol; a J/mol/K²; A J/mol; B dimensionless; C dimensionless'
+      values:
+        quantity_as_printed: parameters for the liquid MgO and CaO functions
+        method_class: model_derived
+        equation_reference_as_printed: '3.1.9'
+        CaO_liquid:
+          alpha_theta_pairs:
+            - [1.002336891, 629.27558]
+            - [0.9976541127, 234.0578]
+          H: -652625.815
+          a: -0.00184186045
+          Gdiff_parameters_as_printed:
+            A: '2*63019.5887'
+            B: '2*-6.2358'
+            C: '2*-0.997138715'
+        MgO_liquid:
+          alpha_theta_pairs:
+            - [1.066915801, 802.97139]
+            - [0.9330752028, 316.655056]
+          H: -583817.9035
+          a: -0.002702806
+          Gdiff_parameters_as_printed:
+            A: '2*57951.4061'
+            B: '2*-6.2358'
+            C: '2*-0.62402962815'
+    - observation_id: abdul_thesis_table4_3_cao_mgo_melt_and_monoxide_model
+      type: model_parameter_table
+      locator:
+        pdf_page_index: 72
+        page: 73
+        published_page: 73
+        table: '4.3'
+      units: 'L0 J/mol; L1 J/mol/K; T K'
+      values:
+        quantity_as_printed: Gibbs energy expression for the liquid and monoxide solid solution
+        method_class: model_derived
+        liquid_endmember_relations:
+          - 'G_CaO^Melt = G_CaO^Liquid'
+          - 'G_MgO^Melt = G_MgO^Liquid'
+        liquid_excess:
+          - 'L1(CaO,MgO) = -10.415*T'
+        monoxide_endmember_relations:
+          - 'G_CaO^Monoxide = G_CaO^Monoxide'
+          - 'G_MgO^Monoxide = G_MgO^Monoxide'
+        monoxide_excess:
+          - 'L0(CaO,MgO) = 119445 - 24.2*T'
+          - 'L1(CaO,MgO) = -9.13*T'
+        note: Table 4.3 model coefficients were checked against the rendered table. The printed formulas are preserved; no fitted values are promoted to scored measurements.
+  Ca3Si2O7:
+    observations: []
+    context:
+    - observation_id: abdul_thesis_figure5_2_rankinite_heat_content
+      type: figure_context
+      locator:
+        pdf_page_index: 83
+        page: 84
+        published_page: 84
+        figure: '5.2'
+      units: 'heat content J/mol; temperature K'
+      values:
+        method_class: figure_only
+        quantity_as_printed: rankinite heat content compared with FTOX and Haas et al.
+        species_formula: Ca3Si2O7
+        phase: rankinite
+        x_axis_as_printed: temperature, K
+        y_axis_as_printed: heat content, J/mol
+        series_list_as_printed: ['Haas et al. [2]', 'This work', 'FTPs']
+        marker_count_per_series: {'Haas et al. [2]': continuous line, 'This work': 7, FTPs: continuous line}
+        caption: 'Heat content measurements for the rankinite compound compared to the values extrapolated from the FTOX database [4] and Haas et al. [2].'
+        digitisation: deferred to a figure pass
+        note: The measured values are also tabulated and linked to the published article; plotted coordinates are not digitized.
+    - observation_id: abdul_thesis_table5_3_rankinite_heat_contents
+      type: heat_content_table_context
+      locator:
+        pdf_page_index: 82
+        page: 83
+        published_page: 83
+        table: '5.3'
+      units: 'T_C °C; T_K K; H_T−H_298.15 and uncertainty J mol−1 as printed; uncertainty_percent %'
+      values:
+        quantity_as_printed: measured rankinite heat contents
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_rankinite_heat_content
+        method_class: measured_direct
+        confidence_interval: 95%
+        formula_as_printed: Ca3Si2O7 (C3S2)
+        molar_weight_g_mol: 288.42
+        heat_content_header_as_printed: J mol−1
+        published_article_heat_content_header_as_printed: J mol−1 K−1, as retained in the linked article extract
+        rows:
+          - {T_C: 599.3, T_K: 872.45, H_T_minus_H_298.15_J_mol: 147433, uncertainty_J_mol: 3570.3, uncertainty_percent: 2.4}
+          - {T_C: 699.8, T_K: 972.95, H_T_minus_H_298.15_J_mol: 180036.6, uncertainty_J_mol: 4109.9, uncertainty_percent: 2.3}
+          - {T_C: 799.2, T_K: 1072.35, H_T_minus_H_298.15_J_mol: 206085.9, uncertainty_J_mol: 5517.3, uncertainty_percent: 2.7}
+          - {T_C: 899.0, T_K: 1172.15, H_T_minus_H_298.15_J_mol: 233439.6, uncertainty_J_mol: 6032.1, uncertainty_percent: 2.6}
+          - {T_C: 998.8, T_K: 1271.95, H_T_minus_H_298.15_J_mol: 264146.9, uncertainty_J_mol: 6983.6, uncertainty_percent: 2.6}
+          - {T_C: 1097.7, T_K: 1370.85, H_T_minus_H_298.15_J_mol: 293304.5, uncertainty_J_mol: 7690.3, uncertainty_percent: 2.6}
+          - {T_C: 1198.5, T_K: 1471.65, H_T_minus_H_298.15_J_mol: 322841.2, uncertainty_J_mol: 6913.1, uncertainty_percent: 2.2}
+        note: The render confirms all seven table rows and cells. These values duplicate the published article's measured series; the thesis row is retained as linked context and is not scored a second time.
+    - observation_id: abdul_thesis_rankinite_dsc_melting_temperature
+      type: melting_temperature_context
+      locator:
+        pdf_page_index: 82
+        page: 83
+        published_page: 83
+        section: 5.5.1
+      units: K
+      values:
+        quantity_as_printed: measured melting temperature of rankinite
+        value: 1737
+        uncertainty: 5
+        source: This thesis
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_rankinite_melting_dsc_context
+        note: The thesis states 1737±5 K and describes incomplete conversion on cooling; the linked journal article carries the same measurement.
+  Ca2SiO4:
+    observations: []
+    context:
+    - observation_id: abdul_thesis_figure5_3_belite_heat_content
+      type: figure_context
+      locator:
+        pdf_page_index: 84
+        page: 85
+        published_page: 85
+        figure: '5.3'
+      units: 'heat content J/mol; temperature K'
+      values:
+        method_class: figure_only
+        quantity_as_printed: gamma and alpha-prime Ca2SiO4 heat contents compared with experimental and calculated values
+        species_formula: Ca2SiO4
+        phase: gamma and alpha-prime Ca2SiO4
+        x_axis_as_printed: temperature, K
+        y_axis_as_printed: heat content, J/mol
+        series_list_as_printed: ['Coughlin 1957 (γ)', 'Coughlin 1957 (α′)', 'This work (γ)', 'This work (α′)', 'FTPs (γ)', 'FTPs (α′)', 'Haas 1981 (γ)', 'Haas 1981 (α′)', 'This work_Fit (γ)', 'This work_Fit (α′)']
+        marker_count_per_series: 'Coughlin 1957 series marker counts not separately distinguishable in the render; This work has 6 tabulated markers (2 γ, 4 α′); remaining series are curves.'
+        caption: 'γ- and α′-Ca2SiO4 heat content measurements, compared against the experimental values of Coughlin [37] and calculated values of the present work, FTOX [4] and Haas et al. [2].'
+        digitisation: deferred to a figure pass
+        note: The measured values are also tabulated and linked to the published article; plotted coordinates are not digitized.
+    - observation_id: abdul_thesis_table5_4_belite_heat_contents
+      type: heat_content_table_context
+      locator:
+        pdf_page_index: 83
+        page: 84
+        published_page: 84
+        table: '5.4'
+      units: 'T_C °C; T_K K; H_T−H_298.15 and uncertainty J mol−1 as printed; uncertainty_percent %'
+      values:
+        quantity_as_printed: measured γ/α′-Ca2SiO4 heat contents
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_belite_heat_content
+        method_class: measured_direct
+        transition_temperature_K_as_printed: 1170
+        printed_table_range_K: [972.86, 1471.05]
+        printed_prose_range_K: [972.86, 1471.65]
+        formula_as_printed: Ca2SiO4
+        molar_weight_g_mol: 172.24
+        heat_content_header_as_printed: J mol−1
+        published_article_heat_content_header_as_printed: J mol−1 K−1, as retained in the linked article extract
+        confidence_interval: 95%
+        rows:
+          - {T_C: 699.7, T_K: 972.86, H_T_minus_H_298.15_J_mol: 108430.8, uncertainty_J_mol: 3617.9, uncertainty_percent: 3.3}
+          - {T_C: 798.9, T_K: 1072.09, H_T_minus_H_298.15_J_mol: 123306.7, uncertainty_J_mol: 3251.5, uncertainty_percent: 2.6}
+          - {T_C: 898.2, T_K: 1171.39, H_T_minus_H_298.15_J_mol: 148801.8, uncertainty_J_mol: 3879.2, uncertainty_percent: 2.6}
+          - {T_C: 998.5, T_K: 1271.67, H_T_minus_H_298.15_J_mol: 171305.2, uncertainty_J_mol: 4185.5, uncertainty_percent: 2.4}
+          - {T_C: 1097.9, T_K: 1371.05, H_T_minus_H_298.15_J_mol: 187889.9, uncertainty_J_mol: 4479.1, uncertainty_percent: 2.4}
+          - {T_C: 1197.9, T_K: 1471.05, H_T_minus_H_298.15_J_mol: 212360.1, uncertainty_J_mol: 6444.6, uncertainty_percent: 3.0}
+        note: The render confirms six measured rows. The table title and prose disagree on the upper range (1471.05 K in the title and final row; 1471.65 K in prose). These values duplicate the linked published article series and are not scored twice.
+  SiO2:
+    observations: []
+    context:
+    - observation_id: abdul_thesis_figure5_4_formation_enthalpy
+      type: figure_context
+      locator: {pdf_page_index: 86, page: 87, published_page: 87, figure: '5.4'}
+      units: 'enthalpy relative to oxides at 298 K, units as plotted'
+      values:
+        method_class: figure_only
+        quantity_as_printed: formation enthalpy of stable and metastable CaO-SiO2 phases
+        species_formula: CaO-SiO2 system
+        phase: solid compounds
+        x_axis_as_printed: X(SiO2)
+        y_axis_as_printed: H_form, J/mol
+        series_list_as_printed: ['Calculated', 'King 1951', 'Kelley 1962', 'Wilford 1956', 'Torgesen 1948', 'DFT']
+        marker_count_per_series: 'Calculated is a curve; experimental marker counts not transcribed.'
+        caption: 'Enthalpy of formation at 298 K of the stable phases at room temperature, with C3S metastable at room temperature, relative to the single oxides and compared against experimental data.'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_figure5_5_cao_sio2_phase_diagram
+      type: figure_context
+      locator: {pdf_page_index: 87, page: 88, published_page: 88, figure: '5.5'}
+      units: phase fields and temperature as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: calculated CaO-SiO2 phase diagram and experimental points
+        species_formula: CaO-SiO2 system
+        x_axis_as_printed: X(SiO2)
+        y_axis_as_printed: Temperature (K)
+        series_list_as_printed: calculated phase diagram and experimental points [55]
+        marker_count_per_series: experimental markers not counted; deferred with digitisation
+        caption: 'CaO-SiO2 phase diagram calculated in this assessment plotted with experimental points obtained from Ref. [55].'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_figure5_6_silica_activity
+      type: figure_context
+      locator: {pdf_page_index: 88, page: 89, published_page: 89, figure: '5.6'}
+      units: log activity and composition as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: silica activity at 1823 K
+        component_as_printed: SiO2
+        species_formula: SiO2
+        phase: liquid, reference cristobalite
+        temperature_K: 1823
+        x_axis_as_printed: x(CaO)
+        y_axis_as_printed: Activity of SiO2
+        series_list_as_printed: ['Calculated', 'Kay and Taylor', 'Rein and Chipman', 'Baird and Taylor']
+        marker_count_per_series: {'Calculated': curve, 'Kay and Taylor': 4, 'Rein and Chipman': 8, 'Baird and Taylor': 4}
+        caption: 'Activity of SiO2 (at 1823 K, reference: cristobalite) calculated from the model compared with experimental data.'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_figure5_7_cao_activity
+      type: figure_context
+      locator: {pdf_page_index: 88, page: 89, published_page: 89, figure: '5.7'}
+      units: activity and composition as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: calcium oxide activity at 1773 K
+        component_as_printed: CaO
+        species_formula: CaO
+        phase: liquid, reference solid CaO
+        temperature_K: 1773
+        x_axis_as_printed: x(CaO)
+        y_axis_as_printed: Activity of CaO
+        series_list_as_printed: ['Calculated', 'Carter and Macfarlane', 'Sharma and Richardson']
+        marker_count_per_series: {'Calculated': curve, 'Carter and Macfarlane': 6, 'Sharma and Richardson': 6}
+        caption: 'Activity of CaO (1773 K, reference: solid CaO) calculated from the model compared with experimental data.'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_figure5_8_melt_species_abundance
+      type: figure_context
+      locator: {pdf_page_index: 89, page: 90, published_page: 90, figure: '5.8'}
+      units: abundance as plotted
+      values:
+        method_class: figure_only
+        quantity_as_printed: C2S and CS species abundance in the melt compared with spectroscopy
+        species_formula: CaO-SiO2 melt species
+        phase: melt
+        x_axis_as_printed: Non Bridging Oxygen
+        y_axis_as_printed: Abundance / Mole Frac.
+        series_list_as_printed: ['CS Expt', 'CS Calc', 'C2S calc', 'C2S Expt', 'SiO2 calc', 'SiO2 Expt']
+        marker_count_per_series: {'CS Expt': 3, 'CS Calc': 3, 'C2S calc': 3, 'C2S Expt': 3, 'SiO2 calc': 3, 'SiO2 Expt': 1}
+        caption: 'Abundance of C2S and CS species in the melt compared against spectroscopic data from [66].'
+        digitisation: deferred to a figure pass
+    - observation_id: abdul_thesis_table5_2_transition_context
+      type: thermodynamic_transition_table_context
+      locator:
+        pdf_page_index: 80
+        page: 81
+        published_page: 81
+        table: '5.2'
+      units: 'transition temperature °C; transition heat kJ/mol'
+      values:
+        quantity_as_printed: literature transition temperatures and enthalpies for CaO-SiO2 compounds
+        method_class: quoted_attributed
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table2_solid_transitions
+        rows:
+          - {compound: Ca3SiO5, reaction: 'TI → TII', temperature_C: 620, transition_heat_kJ_mol: 0.57, technique: DTA, reference: '[25]'}
+          - {compound: Ca3SiO5, reaction: 'TII → TIII', temperature_C: 920, transition_heat_kJ_mol: 0.96, technique: DTA, reference: '[25]'}
+          - {compound: Ca3SiO5, reaction: 'TIII → MI', temperature_C: 980, transition_heat_kJ_mol: 0.48, technique: DTA, reference: '[25]'}
+          - {compound: Ca3SiO5, reaction: 'MI → MII', temperature_C: 990, transition_heat_kJ_mol: 0.05, technique: DTA, reference: '[25]'}
+          - {compound: Ca3SiO5, reaction: 'MII → R', temperature_C: 1050, transition_heat_kJ_mol: 0.048, technique: DTA, reference: '[8, 25]'}
+          - {compound: Ca2SiO4, reaction: 'γ → α′L', temperature_C: 847, transition_heat_kJ_mol_as_printed: '7.757–15.460', technique: DTA, reference: '[27]'}
+          - {compound: Ca2SiO4, reaction: 'γ → α′L', transition_heat_kJ_mol: 14.393, technique: drop calorimetry, reference: '[37]'}
+          - {compound: Ca2SiO4, reaction: 'γ → α′L', temperature_C: 711, transition_heat_kJ_mol: 13.020, technique: DTA at 0.34 GPa, reference: '[29]'}
+          - {compound: Ca2SiO4, reaction: 'β → α′L', temperature_C: 680, transition_heat_kJ_mol: 1.439, technique: DTA, reference: '[26]'}
+          - {compound: Ca2SiO4, reaction: 'β → α′L', transition_heat_kJ_mol: 1.841, technique: drop calorimetry, reference: '[26]'}
+          - {compound: Ca2SiO4, reaction: 'β → α′L', temperature_C: 711, transition_heat_kJ_mol: 1.780, technique: DTA at 0.34 GPa, reference: '[29]'}
+          - {compound: Ca2SiO4, reaction: 'γ → β', transition_heat_kJ_mol: 4.678, technique: DTA, reference: '[27]'}
+          - {compound: Ca2SiO4, reaction: 'γ → β', transition_heat_kJ_mol: 4.48, technique: solution calorimetry at 20 °C, reference: '[28]'}
+          - {compound: Ca2SiO4, reaction: 'γ → β', temperature_C: 711, transition_heat_kJ_mol: 11.250, technique: DTA at 0.34 GPa, reference: '[29]'}
+          - {compound: Ca2SiO4, reaction: 'α′H → α′L', temperature_C: 1160, transition_heat_kJ_mol: 0.720, technique: DTA, reference: '[27]'}
+          - {compound: Ca2SiO4, reaction: 'α′H → α', temperature_C: 1425, transition_heat_kJ_mol: 13.305, technique: DTA, reference: '[27]'}
+          - {compound: Ca2SiO4, reaction: 'α′H → α', transition_heat_kJ_mol: 14.184, technique: drop calorimetry, reference: '[37]'}
+          - {compound: Ca3Si2O7, reaction: 'kilchoanite → rankinite', temperature_C_range: [954, 1090], transition_heat_as_printed: '—', technique: '—', reference: '[29]'}
+          - {compound: CaSiO3, reaction: 'wollastonite → pseudo-wollastonite', temperature_C: 1125, transition_heat_as_printed: '—', technique: '—', reference: '[35]'}
+        note: Thesis reference numbers differ from the linked article; all numeric rows are repeated literature values rather than new measurements.
+    - observation_id: abdul_thesis_table5_5_dft_energies
+      type: model_calculated_energy_table_context
+      locator:
+        pdf_page_index: 84
+        page: 85
+        published_page: 85
+        table: '5.5'
+      units: eV per formula unit
+      values:
+        quantity_as_printed: calculated ground state energies at 0 K
+        method_class: model_derived
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table5_dft_ground_state_energies
+        rows:
+          - {compound: CaO, E0_eV: -27.36219, transition_energy_eV: ground_state}
+          - {compound: alpha_quartz-SiO2, E0_eV: -31.66647, transition_energy_eV: ground_state}
+          - {compound: monoclinic-Ca3SiO5, E0_eV: -114.97448, transition_energy_eV: ground_state}
+          - {compound: gamma-Ca2SiO4, E0_eV: -87.74651, transition_energy_eV: ground_state}
+          - {compound: beta-Ca2SiO4, E0_eV: -87.65976, transition_energy_eV: 0.08675}
+          - {compound: alpha_prime-Ca2SiO4, E0_eV: -87.63451, transition_energy_eV: 0.112}
+          - {compound: Ca3Si2O7, E0_eV: -147.61658, transition_energy_eV: ground_state}
+          - {compound: wollastonite-CaSiO3, E0_eV: -59.91709, transition_energy_eV: ground_state}
+          - {compound: cyclowollastonite-CaSiO3, E0_eV: -59.8318, transition_energy_eV: 0.085}
+    - observation_id: abdul_thesis_table5_6_formation_and_transition_energies
+      type: model_calculated_energy_table_context
+      locator:
+        pdf_page_index: 85
+        page: 86
+        published_page: 86
+        table: '5.6'
+      units: kJ/mol relative to CaO and alpha-quartz SiO2
+      values:
+        quantity_as_printed: calculated formation and transition energies at 0 K
+        method_class: model_derived
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table6_formation_and_transition_energies
+        rows:
+          - {compound: monoclinic-Ca3SiO5, formation_energy_kJ_mol: -117.9, transition_energy_kJ_mol: '—'}
+          - {compound: gamma-Ca2SiO4, formation_energy_kJ_mol: -131.2, transition_energy_kJ_mol: '—'}
+          - {compound: beta-Ca2SiO4, formation_energy_kJ_mol: -124.8, transition_energy_kJ_mol: 6.2}
+          - {compound: alpha_prime-Ca2SiO4, formation_energy_kJ_mol: -122.4, transition_energy_kJ_mol: 8.8}
+          - {compound: Ca3Si2O7, formation_energy_kJ_mol: -212, transition_energy_kJ_mol: '—'}
+          - {compound: wollastonite-CaSiO3, formation_energy_kJ_mol: -85.7, transition_energy_kJ_mol: '—'}
+          - {compound: cyclowollastonite-CaSiO3, formation_energy_kJ_mol: -77.5, transition_energy_kJ_mol: 8.2}
+        note: Ca2SiO4 formation energies include zero-point corrections of −0.4 kJ/mol for gamma and −2.5 kJ/mol for beta and alpha-prime, as stated in the text.
+    - observation_id: abdul_thesis_table5_7_h298_s298_model_comparison
+      type: model_thermochemistry_table_context
+      locator:
+        pdf_page_index: 85
+        page: 86
+        published_page: 86
+        table: '5.7'
+      units: 'H298 kJ/mol; S298 J/mol/K'
+      values:
+        quantity_as_printed: calculated H298 and S298 compared with Haas et al.
+        method_class: model_derived
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table7_model_and_haas_thermodynamics
+        rows:
+          - {compound: monoclinic-Ca3SiO5, H298_calculated: -2932, H298_Haas: '—', S298_calculated: 166.4, S298_Haas: '—'}
+          - {compound: triclinic-Ca3SiO5, H298_calculated: -2933, H298_Haas: -2933, S298_calculated: 166.5, S298_Haas: 168.6}
+          - {compound: rhombohedral-Ca3SiO5, H298_calculated: -2932, H298_Haas: '—', S298_calculated: 166.4, S298_Haas: '—'}
+          - {compound: rankinite-Ca3Si2O7, H298_calculated: -3951, H298_Haas: -3973, S298_calculated: 207.6, S298_Haas: 210.6}
+          - {compound: wollastonite-CaSiO3, H298_calculated: -1634, H298_Haas: -1634, S298_calculated: 79.6, S298_Haas: 81}
+          - {compound: cyclowollastonite-CaSiO3, H298_calculated: -1627, H298_Haas: -1627, S298_calculated: 87.6, S298_Haas: 87.2}
+          - {compound: alpha-Ca2SiO4, H298_calculated: -2293, H298_Haas: '-2548*', S298_calculated: 132.7, S298_Haas: '84.91*'}
+          - {compound: alpha_prime-Ca2SiO4, H298_calculated: -2304, H298_Haas: -2198, S298_calculated: 130.4, S298_Haas: 116}
+          - {compound: beta-Ca2SiO4, H298_calculated: -2307, H298_Haas: -2306, S298_calculated: 126.1, S298_Haas: 126.7}
+          - {compound: gamma-Ca2SiO4, H298_calculated: -2316, H298_Haas: -2316, S298_calculated: 119, S298_Haas: 120.5}
+        note: Asterisks mark Haas values extrapolated beyond the temperature limits of the curve.
+    - observation_id: abdul_thesis_table5_8_melt_model_coefficients
+      type: model_parameter_table
+      locator:
+        pdf_page_index: 86
+        page: 87
+        published_page: 87
+        table: '5.8'
+      units: 'G and L coefficients kJ/mol and J/mol/K as printed; T K'
+      values:
+        quantity_as_printed: optimized associate model functions for the CaO-SiO2 melt
+        method_class: model_derived
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table8_liquid_associate_model
+        endmembers_as_printed:
+          - GC = GCaO,Liquid [6]
+          - GS = GSiO2,Liquid [7]
+        associates:
+          - 'GC2S = 2GCaO,Liquid + GSiO2,Liquid − 183422.297315552 − 2.28483183782731*T'
+          - 'GCS = GCaO,Liquid + GSiO2,Liquid − 116624.5108961 + 3.86841542916429*T'
+        interaction_terms:
+          - 'LCS,S,0 = 251273.138042155 − 132.4131763105*T'
+          - 'LCS,S,1 = −76026.8593265931 + 22.9753135769968*T'
+          - 'LCS,S,2 = 117268.159674298 − 40.3850726577932*T'
+          - 'LC,C2S,2 = 8.99637059634927*T'
+          - 'LC2S,S,0 = 9.04086951648876*T'
+    - observation_id: abdul_thesis_table5_9_transitions_invariants_and_fusion
+      type: model_phase_diagram_table_context
+      locator:
+        pdf_page_index: 87
+        page: 88
+        published_page: 88
+        table: '5.9'
+      units: 'T K; Htransition and Hfusion kJ/mol; X(SiO2) mole fraction'
+      values:
+        quantity_as_printed: transitions, invariant reactions, and compound fusion data from calculated phase diagram
+        method_class: model_derived
+        linked_source_id: abdul-2023-cao-sio2-calphad
+        linked_observation_id: abdul_2023_table9_assessment_transitions_and_invariants
+        transitions:
+          - {reaction: 'gamma-Ca2SiO4 → alpha_prime-Ca2SiO4', T_K: 1120, comparison_T_K: 1120, Htransition_kJ_mol: 14.3, comparison_Htransition_kJ_mol: 14.3, attribution: '[63], [37]'}
+          - {reaction: 'beta-Ca2SiO4 → alpha_prime-Ca2SiO4', T_K: 970, comparison_T_K: 970, Htransition_kJ_mol: 2.17, comparison_Htransition_kJ_mol: 1.84, attribution: '[63], [37]'}
+          - {reaction: 'alpha_prime-Ca2SiO4 → alpha-Ca2SiO4', T_K: 1710, comparison_T_K: 1710, Htransition_kJ_mol: 16.2, comparison_Htransition_kJ_mol: 14.1, attribution: '[63], [37]'}
+          - {reaction: 'wollastonite → cyclo-CaSiO3', T_K: 1397, comparison_T_K: 1398, Htransition_kJ_mol: 8.68, comparison_Htransition_kJ_mol: 5.85, attribution: '[35], [49]'}
+          - {reaction: 'triclinic → monoclinic-Ca3SiO5', T_K: 1254, comparison_T_K: 1253, Htransition_kJ_mol: 0.477, comparison_Htransition_kJ_mol: -0.477, attribution: '[8]'}
+          - {reaction: 'monoclinic → rhombohedral-Ca3SiO5', T_K: 1317, comparison_T_K: 1323, Htransition_kJ_mol: 0.047, comparison_Htransition_kJ_mol: -0.047, attribution: '[8]'}
+        invariants:
+          - {reaction: 'liquid + CaO → Ca3SiO5', T_K: 2423, comparison_T_K: 2423, X_SiO2_liquid: 0.27, comparison_X_SiO2_liquid: 0.27, attribution: '[55]'}
+          - {reaction: 'liquid → Ca3SiO5 + alpha-Ca2SiO4', T_K: 2305, comparison_T_K: 2323, X_SiO2_liquid: 0.3, comparison_X_SiO2_liquid: 0.29, attribution: '[55]'}
+          - {reaction: 'liquid + alpha-Ca2SiO4 → Ca3Si2O7', T_K: 1746, comparison_T_K: 1737, X_SiO2_liquid: 0.41, comparison_X_SiO2_liquid: 0.43, attribution: '[55]'}
+          - {reaction: 'liquid → Ca3Si2O7 + CaSiO3', T_K: 1739, comparison_T_K: 1733, X_SiO2_liquid: 0.43, comparison_X_SiO2_liquid: 0.44, attribution: '[55]'}
+          - {reaction: 'liquid → SiO2 + CaSiO3', T_K: 1709, comparison_T_K: 1709, X_SiO2_liquid: 0.62, comparison_X_SiO2_liquid: 0.61, attribution: '[55]'}
+        compound_fusion:
+          - {compound: alpha-Ca2SiO4, Tm_K: '2390 (2403)', Hfusion_kJ_mol: '62.1 (61.0)', attribution: '[56], [64]'}
+          - {compound: cyclo-CaSiO3, Tm_K_as_printed: '1822 -1817', Hfusion_kJ_mol_as_printed: '61.3 (57.3)', attribution: '[65]'}
+        note: Model and comparison values are retained exactly as printed in context; no calculated curve was digitized.
+    - observation_id: abdul_thesis_appendix_b_tdb_context
+      type: assessed_calphad_database_context
+      locator:
+        pdf_page_index: 184
+        page: 185
+        published_page: 185
+        appendix: B
+        note: Full printed TDB continues through PDF pages 185-218.
+      units: As printed in the TDB file; parameter unit conventions are embedded in the source.
+      values:
+        quantity_as_printed: complete assessed CaO-Al2O3-SiO2-MgO-Fe-O thermodynamic database
+        method_class: model_derived
+        pseudo_element_definitions_as_printed: 'A=Al2O3; Q=SiO2; L=CaO; M=MgO'
+        tdb_file_as_printed: |2
+                                                                                   APPENDIX
+                                                                                            B
+          
+                                                             APPENDIX: TDB FILE
+          
+          
+              Provided here is a copy of the TDB (Thermodynamic database file) for the CaO-
+          Al2 O3 -SiO2 -MgO-Fe-O system that was developed in the present work. This file has
+          been tested to be compatible with the Pycalphad thermodynamic package for python, but
+          should also be compatible with Thermo-calc and PANDAT.
+          
+          $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          $ TDB File for the CAO-AL2O3-SIO2-FE-O-MGO SYSTEM
+          $ FOR OPC CLINKERS
+          $ PRODUCED AS PART OF THESIS:
+          $ "THERMODYNAMIC MODELLING OF PORTLAND CEMENT CLINKERS"
+          $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          $ ELEMENT DEFINITIONS
+          $ A=AL2O3, Q=SIO2
+          $ L = CAO M=MGO
+          $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          ELEMENT A CORUNDUM 101.96 0.0000E+00 0.0000E+00!
+          ELEMENT /- ELECTRON_GAS 0.0000E+00 0.0000E+00 0.0000E+00!
+          ELEMENT VA VACUUM 0.0000E+00 0.0000E+00 0.0000E+00!
+          ELEMENT FE BCC_A2 5.5847E+01 4.4890E+03 2.7280E+01!
+          ELEMENT O 1/2_MOLE_O2(G) 1.5999E+01 4.3410E+03 1.0252E+02!
+          ELEMENT L BLANK 56.07 0.0 0.0 !
+          ELEMENT Q BLANK 60.08 0.0 0.0 !
+          ELEMENT M BLANK 40.3 0.0 0.0 !
+          $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          SPECIES ALL A0.5 !
+          SPECIES C3AL L3A1 !
+          SPECIES CAOL L1 !
+          SPECIES ASL A0.6666666666666666Q1 !
+          SPECIES C2A L2.0A1.0 !
+          SPECIES C2F L2.0FE2O3 !
+          
+                                                  185
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          SPECIES SIL A1Q1 !
+          SPECIES COR A1.5 !
+          SPECIES FE+2                           FE1/+2!
+          SPECIES FE+3                           FE1/+3!
+          SPECIES FEO                            FE1O1!
+          SPECIES FEO3/2                         FE1O1.5!
+          SPECIES FE2O3                          FE2O3 !
+          SPECIES M2SL M2Q1 !
+          SPECIES MGOL M1 !
+          SPECIES O-2                            O1/-2!
+          SPECIES O2                             O2!
+          SPECIES O1                             O1!
+          SPECIES O3                             O3!
+          
+          SPECIES C2SL L2Q1 !
+          SPECIES CSL L1Q1 !
+          SPECIES SIO2L Q1 !
+          SPECIES CAS2L A0.5L0.5Q1 !
+          
+          FUNCTION TEMP      0.1 +T**(-1); 6000 N !
+          FUNCTION RTEMP     0.1 +R#**(-1)*TEMP#; 6000 N !
+          FUNCTION TMLN      0.1 +1-LN(T); 6000 N !
+          FUNCTION TLNT      0.1 +T*LN(T); 6000 N !
+          $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+          $-----------------------------------------------
+          $              SOLID PHASE FUNCTIONS           $
+          $ solid functions use the 3rd generation function
+          $ function is split apart to implement maximum
+          $ compatability with software.
+          $-----------------------------------------------
+          $                 ALPHA C2S                    $
+          $-----------------------------------------------
+          $ Einstein Terms $
+          FUNCTION AC2S0 1 (1 - EXP(-427.508038/T)); 10000 N !
+          FUNCTION AC2S1 1 (1 - EXP(-174.273816/T)); 10000 N !
+          FUNCTION AC2S2 1 (1 - EXP(-1235.840109/T)); 10000 N !
+          
+          FUNCTION GAC2S 1 -2316104.80639131
+          + 50.6232292353224 * T *
+          LN(AC2S2)-0.008061 * T**(2)
+          
+          
+                                           186
+          
+          + 82.5742623603897 * T * LN(AC2S0) +
+          41.4017086323043 * T * LN(AC2S1); 3000 N !
+          $-----------------------------------------------
+          $                 ALPHA PRIME C2S              $
+          $-----------------------------------------------
+          FUNCTION APC2S0 1 (1 - EXP(-1092.028025/T)); 10000 N !
+          FUNCTION APC2S1 1 (1 - EXP(-315.618264/T)); 10000 N !
+          FUNCTION APC2S2 1 (1 - EXP(-122.320053/T)); 10000 N !
+          
+          FUNCTION GAPC2S 1 -2324937.35232995
+          -0.005737 * T**(2) + 15.631497357245 * T *
+          LN(APC2S2) + 68.7466957561671 * T * LN(APC2S0)
+          + 90.0024531502235 * T * LN(APC2S1); 3000 N !
+          $-----------------------------------------------
+          $                 BETA C2S                     $
+          $-----------------------------------------------
+          FUNCTION BC2S0 1 (1 - EXP(-2585.222081/T)); 10000 N !
+          FUNCTION BC2S1 1 (1 - EXP(-835.357211/T)); 10000 N !
+          FUNCTION BC2S2 1 (1 - EXP(-259.231418/T)); 10000 N !
+          
+          FUNCTION GBC2S 1 -2328266.62444862
+          -0.008614 * T**(2) + 87.5281189618368 * T *
+          LN(BC2S2) + 11.2908490028119 * T * LN(BC2S0)
+          + 75.7757673969417 * T * LN(BC2S1); 3000 N !
+          
+          $-----------------------------------------------
+          $                GAMMA C2S                     $
+          $-----------------------------------------------
+          FUNCTION GC2S0 1 (1 - EXP(-88.647382/T)); 10000 N !
+          FUNCTION GC2S1 1 (1 - EXP(-257.3199/T)); 10000 N !
+          FUNCTION GC2S2 1 (1 - EXP(-759.369678/T)); 10000 N !
+          
+          FUNCTION GGC2S 1 -2336268.1787659
+          + 103.720069300784 * T * LN(GC2S2)-0.001096 * T**(2)
+          + 3.7837123904187 * T * LN(GC2S0)
+          + 67.0926997075379 * T * LN(GC2S1); 3000 N !
+          $-----------------------------------------------
+          $             ALPHA CRISTOBALITE               $
+          $-----------------------------------------------
+          FUNCTION ACRIS0 1 (1 - EXP(-100.17/T)); 10000 N !
+          
+          
+                                      187
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          FUNCTION ACRIS1 1 (1 - EXP(-374.45/T)); 10000 N !
+          FUNCTION ACRIS2 1 (1 - EXP(-1134/T)); 10000 N !
+          
+          FUNCTION GACRIS 1 -914067.250936864
+          + 38.9116850529572 * T * LN(ACRIS2)
+          + 7.23358247779332 * T * LN(ACRIS0)
+          + 28.6848960326287 * T * LN(ACRIS1); 6000 N !
+          $-----------------------------------------------
+          $             BETA CRISTOBALITE                $
+          $-----------------------------------------------
+          FUNCTION BCRIS0 1 (1 - EXP(-125.65/T)); 10000 N !
+          FUNCTION BCRIS1 1 (1 - EXP(-966.5/T)); 10000 N !
+          
+          FUNCTION GBCRIS 1 -912412.146717818
+          + 55.2052048672473 * T * LN(BCRIS1)
+          + 19.6249586961318 * T * LN(BCRIS0); 6000 N !
+          $-----------------------------------------------
+          $             ALPHA QUARTZ                     $
+          $-----------------------------------------------
+          FUNCTION AQUARTZ0 1 (1 - EXP(-159.2/T)); 10000 N !
+          FUNCTION AQUARTZ1 1 (1 - EXP(-524/T)); 10000 N !
+          FUNCTION AQUARTZ2 1 (1 - EXP(-1421/T)); 10000 N !
+          FUNCTION AQUARTZ3 1 (1 - EXP(-159.2/T)); 10000 N !
+          FUNCTION AQUARTZ4 1 (1 - EXP(-524/T)); 10000 N !
+          FUNCTION AQUARTZ5 1 (1 - EXP(-1421/T)); 10000 N !
+          
+          FUNCTION GAQUARTZ 1 -917661.326977757
+          -1.076E-12 * T**(5) + 13.3696558899904 * T * LN(AQUARTZ0)
+          + 29.0341034625911 * T * LN(AQUARTZ2)
+          + 32.4264042107976 * T * LN(AQUARTZ1); 847.1 Y
+          -914725.826977757
+          -9.16882E+33 * T**(-11)
+          + 32.4264042107976 * T * LN(AQUARTZ1)
+          + 13.3696558899904 * T * LN(AQUARTZ0)
+          + 29.0341034625911 * T * LN(AQUARTZ2)
+          -2.72959E+16 * T**(-5)-3.87837 * T; 6000 N !
+          $-----------------------------------------------
+          $             BETA QUARTZ                      $
+          $-----------------------------------------------
+          FUNCTION BQUARTZ0 1 (1 - EXP(-66.518134/T)); 10000 N !
+          
+          
+                                           188
+          
+          FUNCTION BQUARTZ1 1 (1 - EXP(-1024.54773/T)); 10000 N !
+          
+          FUNCTION GBQUARTZ 1 -913771.02970493
+          + 59.8851830700525 * T * LN(BQUARTZ1)
+          + 14.9449804933267 * T * LN(BQUARTZ0); 6000 N !
+          $-----------------------------------------------
+          $             WOLLOSTONITE                      $
+          $-----------------------------------------------
+          FUNCTION WCS0 1 (1 - EXP(-39.983404/T)); 10000 N !
+          FUNCTION WCS1 1 (1 - EXP(-180.16112/T)); 10000 N !
+          FUNCTION WCS2 1 (1 - EXP(-777.592204/T)); 10000 N !
+          
+          FUNCTION GWCS 1 -1647683.13184533
+          -0.00094 * T**(2)
+          + 90.0829704062177 * T * LN(WCS2)
+          + 0.546908722096884 * T * LN(WCS0)
+          + 34.0286926164046 * T * LN(WCS1); 6000 N !
+          $-----------------------------------------------
+          $             p-WOLLOSTONITE                   $
+          $-----------------------------------------------
+          FUNCTION PCS0 1 (1 - EXP(-398.726519/T)); 10000 N !
+          FUNCTION PCS1 1 (1 - EXP(-113.639538/T)); 10000 N !
+          FUNCTION PCS2 1 (1 - EXP(-1779.149444/T)); 10000 N !
+          
+          FUNCTION GPCS 1 -1640676.04549942
+          -0.004177 * T**(2)
+          + 33.3722325348509 * T * LN(PCS2)
+          + 80.0515629429532 * T * LN(PCS0)
+          + 11.1874337167673 * T * LN(PCS1); 6000 N !
+          $-----------------------------------------------
+          $             m-C3S                            $
+          $-----------------------------------------------
+          FUNCTION MC3S0 1 (1 - EXP(-216.554568/T)); 10000 N !
+          FUNCTION MC3S1 1 (1 - EXP(-502.02771/T)); 10000 N !
+          FUNCTION MC3S2 1 (1 - EXP(-1253.079747/T)); 10000 N !
+          
+          FUNCTION GMC3S 1 -2961033.87273599
+          -0.013441 * T**(2)
+          + 48.7852008711029 * T * LN(MC3S2)
+          + 67.8853008000012 * T * LN(MC3S0)
+          
+          
+                                      189
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          + 107.81956498144 * T * LN(MC3S1); 6000 N !
+          $-----------------------------------------------
+          $             t-C3S                            $
+          $-----------------------------------------------
+          FUNCTION TC3S0 1 (1 - EXP(-217.322399/T)); 10000 N !
+          FUNCTION TC3S1 1 (1 - EXP(-511.911036/T)); 10000 N !
+          FUNCTION TC3S2 1 (1 - EXP(-1306.969635/T)); 10000 N !
+          
+          FUNCTION GTC3S 1 -2961247.66744604
+          + 69.1013907314575 * T * LN(TC3S0)
+          -0.013446 * T**(2)
+          + 45.7162163162659 * T * LN(TC3S2)
+          + 109.67630088655 * T * LN(TC3S1); 6000 N !
+          $-----------------------------------------------
+          $             r-C3S                            $
+          $-----------------------------------------------
+          FUNCTION RC3S0 1 (1 - EXP(-216.897351/T)); 10000 N !
+          FUNCTION RC3S1 1 (1 - EXP(-502.823393/T)); 10000 N !
+          FUNCTION RC3S2 1 (1 - EXP(-1257.541676/T)); 10000 N !
+          
+          FUNCTION GRC3S 1 -2961047.88690192
+          -0.013504 * T**(2)
+          + 48.6141141738092 * T * LN(RC3S2)
+          + 68.0676369652173 * T * LN(RC3S0)
+          + 107.809587626298 * T * LN(RC3S1); 6000 N !
+          $-----------------------------------------------
+          $             r-C3S2                           $
+          $-----------------------------------------------
+          FUNCTION RC3S20 1 (1 - EXP(-201.04871/T)); 10000 N !
+          FUNCTION RC3S21 1 (1 - EXP(-471.7589/T)); 10000 N !
+          FUNCTION RC3S22 1 (1 - EXP(-1114.2092/T)); 10000 N !
+          
+          FUNCTION GRC3S2 1 -3.9933593273921650E6
+          + 0.001345157705172196 * T**(2)
+          + 87.52997635528091 * T * LN(RC3S22)
+          + 81.382016522242722 * T * LN(RC3S20)
+          + 130.4109304207976 * T * LN(RC3S21); 6000 N !
+          $-----------------------------------------------
+          $             CAO                              $
+          $-----------------------------------------------
+          
+          
+                                           190
+          
+          FUNCTION CAO0 1 (1 - EXP(-314.8272896/T)); 10000 N !
+          FUNCTION CAO1 1 (1 - EXP(-125.12812657/T)); 10000 N !
+          FUNCTION CAO2 1 (1 - EXP(-598.37301449/T)); 10000 N !
+          
+          FUNCTION GCAO 1 (-641354.1762949
+          + 23.6098190734791*T*LN(CAO0)
+          + 1.2953977159976*T*LN(CAO1)
+          + 24.9813594731112*T*LN(CAO2)
+          - 0.00174450265*T**2
+          - 112535.777764825*EXP(-14.85294988 + 0.00298095*T));
+          3222 Y (-727925.76111
+          + 486.19356495*T
+          + 80.5*T*(1 - LN(T))
+          + 60.6039483894586*(-281.8126077 + 0.09083109344*T)**(-1))
+          ; 6000 N !
+          $-----------------------------------------------
+          $             C2F                              $
+          $-----------------------------------------------
+          FUNCTION C2F0 1 (1 - EXP(-170155.53632209363/T)); 10000 N !
+          FUNCTION C2F1 1 (1 - EXP(-215.33754004091622/T)); 10000 N !
+          FUNCTION C2F2 1 (1 - EXP(-569.493275432429/T)); 10000 N !
+          
+          FUNCTION GC2F 1.0 (-2.1550282235185245E6
+          + 9.265379709115280E-11*T*LN(C2F0)
+          + 81.07276569312136*T*LN(C2F1)
+          + 143.42315186788068*T*LN(C2F2)
+          - 0.009779319700444069*T**2); 3000.0 N !
+          $-----------------------------------------------
+          $             CF                              $
+          $-----------------------------------------------
+          FUNCTION CF0 1 (1 - EXP(-401.0761361736441/T)); 10000 N !
+          
+          FUNCTION GCF 1 (-1.506467891684749E6
+          + 174.5590006453247*T*LN(CF0)
+          - 0.006385582537395782*T**2); 3000.0 N !
+          $-----------------------------------------------
+          $           LIQUID PHASE FUNCTIONS             $
+          $ two-state function for liquid
+          $----------------------------------------------$
+          $-----------------------------------------------
+          
+          
+                                      191
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          $              SiO2                            $
+          $----------------------------------------------$
+          FUNCTION SIO2L0 1 (1 - EXP(-1308.6/T)); 10000 N !
+          FUNCTION SIO2L1 1 (1 - EXP(-441.14/T)); 10000 N !
+          FUNCTION SIO2L2 1 (1 - EXP(-105.58/T)); 10000 N !
+          
+          FUNCTION ZSIO2L0 1
+          (1 + EXP(0.120272355042726*(-33226 + 11.184*T)/T))
+          ; 10000 N !
+          
+          FUNCTION GSIO2L 1
+          -913715.638421418
+          -8.31446261815324 * T * LN(ZSIO2L0)
+          + 33.5987434399572 * T * LN(SIO2L0)
+          + 9.12927995473226 * T * LN(SIO2L2)
+          + 32.1021401686897 * T * LN(SIO2L1); 6000 N !
+          $-----------------------------------------------
+          $              CaO                            $
+          $----------------------------------------------$
+          FUNCTION CAOL0 1 (1 - EXP(-629.27558/T)); 10000 N !
+          FUNCTION CAOL1 1 (1 - EXP(-234.0578/T)); 10000 N !
+          
+          FUNCTION GCAOL 1 (-602797.126970587
+          + 25.0016778330463*T*LN(CAOL0)
+          + 24.884873477673*T*LN(CAOL1)
+          - 16.6289252363065*T*LN(ZCAOL0)
+          - 0.00184186045*T**2); 6000 N !
+          
+          FUNCTION ZCAOL0 1
+          (1 + EXP(0.120272355042726*(-63019.5887 + 6.2358*T
+          + 0.997138715*T*LN(T))/T)); 10000 N !
+          
+          $-----------------------------------------------
+          $           GAS PHASE FUNCTIONS                $
+          $----------------------------------------------$
+          FUNCTION GO2GAS 298.15 -6961.74451
+          -76729.7484*T**(-1)
+          -51.0057202*T-22.2710136*T*LN(T)
+          -0.0101977469*T**2+1.3236921E-06*T**3; 1000 Y
+          -13137.5203+525809.556*T**(-1)
+          
+          
+                                           192
+          
+          +25.3200332*T-33.627603*T*LN(T)
+          -0.00119159274*T**2+1.3561111E-08*T**3; 3300 Y
+          -27973.4908+8766421.4*T**(-1)
+          +62.5195726*T-37.9072074*T*LN(T)
+          -8.50483772E-04*T**2+2.14409777E-08*T**3; 6000 N !
+          
+          FUNCTION GO1GAS 298.15 243206.529
+          -42897.0876*T**(-1)
+          -20.7513421*T
+          -21.0155542*T*LN(T)+1.26870532E-4*T**2
+          -1.2313129E-8*T**3; 2950 Y
+          +252301.473
+          -3973170.33*T**(-1)
+          -51.974853*T-17.2118798*T*LN(T)
+          -5.41356254E-4*T**2+7.64520703E-9*T**3; 6000     N !
+          
+          FUNCTION GO3GAS 298.15 133772.042
+          -11328.9959*T**(-1)
+          -84.8602165*T-19.8314069*T*LN(T)
+          -0.0392015696*T**2 + 7.90727187E-6*T**3; 600 Y
+          120765.524
+          + 997137.156*T**(-1)
+          + 120.113376*T
+          - 51.841015*T*LN(T)
+          -0.0035398314*T**2+3.2064014E-7*T**3; 1500 Y
+          115412.196
+          + 1878139.02*T**(-1)
+          +164.67966*T-58.06974*T*LN(T)
+          -2.8439903E-4*T**2+5.9565028E-10*T**3; 6000 N !
+          
+          FUNCTION GFEOGAS 298.15 241501.965
+          + 57679.3688*T**(-1)-46.1742716*T
+          - 28.411703*T*LN(T)
+          -0.00855192864*T**2 + 1.5099707E-6*T**3; 800 Y
+          237160.413+446016.49*T**(-1)
+          + 14.348854*T - 37.647297*T*LN(T)
+          +2.5380772E-4*T**2-7.0014359E-8*T**3; 3200 Y
+          247039.926
+          -1074034.89*T**(-1)
+          -45.0126518*T
+          
+          
+                                      193
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          -29.8873162*T*LN(T)
+          -0.00207289167*T**2+5.0880159E-8*T**3; 6000   N !
+          
+          FUNCTION GFEGAS 298.15 405624.097
+          + 112881.768*T**(-1) + 36.7995658*T
+          - 33.007881*T*LN(T)
+          +0.0092758129*T**2
+          -1.3799585E-6*T**3; 950 Y
+          414289.373
+          -996891.764*T**(-1)
+          - 53.3825193*T
+          -19.9029533*T*LN(T)
+          + 1.3565310E-4*T**2-1.38830908E-7*T**3; 2350 Y
+          406336.639 + 2445907.82*T**(-1) - 32.8404885*T
+          -22.1593719*T*LN(T)
+          - 1.41918414E-4*T**2
+          -6.8989725E-8*T**3; 6000 N !
+          
+          FUNCTION GOSOL 298.15 +GO2GAS +RLNP*T; 6000   N !
+          FUNCTION RLNP 298.15 +130; 6000 N !
+          
+          $-----------------------------------------
+          $ Fe-O solid functions
+          $-----------------------------------------
+           FUNCTION GHSERFE 298.15
+          +1225.7+124.134*T-23.5143*T*LN(T)
+          -0.00439752*T**2
+          -5.89269E-08*T**3+77358.5*T**(-1); 1811 Y
+          -25383.581+
+          299.31255*T-46*T*LN(T)
+          +2.2960305E+31*T**(-9); 6000 N !
+          
+          FUNCTION GFELIQ 298.15
+          +12040.17-6.55843*T-3.6751551E-21*T**7+GHSERFE; 1811   Y
+          -10839.7 + 291.302*T - 46*T*LN(T); 6000 N !
+          
+          FUNCTION GFEFCC 298.15
+          -1462.4+8.282*T-1.15*T*LN(T)+6.4E-04*T**2+GHSERFE; 1811    Y
+          -27098.26+300.25256*T-46*T*LN(T)
+          +2.7885E+31*T**(-9); 6000 N !
+          
+          
+                                           194
+          
+          FUNCTION GFE3O2 298.15
+          -858683+827.946*T
+          -137.0089*T*LN(T)+1453810*T**(-1); 3000     N !
+          
+          FUNCTION GFEO 298.15
+          -279318+252.848*T
+          -46.12826*T*LN(T)-5.7402984E-3*T**2; 3000     N !
+          
+          FUNCTION GFE2O3 298.15 +GFE3O2; 6000    N !
+          
+          FUNCTION GWUSTITE   298.15
+          -279318+252.848*T-46.12826*T*LN(T)-
+          .0057402984*T**2; 3000 N !
+          FUNCTION AWUSTITE 298.15 -55384+27.888*T; 3000      N !
+          
+          FUNCTION BFE3O4 298.15 +46826-27.266*T; 3000 N !
+          FUNCTION CFE3O4 298.15 +120730-20.102*T; 3000 N !
+          FUNCTION DFE3O4 298.15 +402520-30.529*T; 3000 N !
+          
+          FUNCTION GFE3O4 298.15 -161731+144.873*T-24.9879*T*LN(T)
+          -.0011952256*T**2+206520*T**(-1); 3000 N !
+          FUNCTION RFE3O4 298.15 +156000-3.37*T; 3000 N !
+          FUNCTION SFE3O4 298.15 +46028.95
+          +38.73173*T-11.58574*T*LN(T)
+          +.006411774*T**2; 3000 N !
+          
+          FUNCTION RR 298.15 +8.31451; 6000 N !
+          FUNCTION FLN6 298.15 +1.791759; 6000 N !
+          FUNCTION FLN5 298.15 +1.609438; 6000 N !
+          FUNCTION FLN3 298.15 +1.098612; 6000 N !
+          FUNCTION FLN2 298.15 +0.693147; 6000 N !
+          
+          FUNCTION UN_ASS 298.15   0.0; 300 N !
+          
+          $--------------------------------------------
+          $ Al2O3
+          $ new assessment
+          $--------------------------------------------
+          FUNCTION ALL0 1 (1 - EXP(-443.38125/T)); 10000 N !
+          
+          
+                                       195
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          FUNCTION ALL1 1 (1 - EXP(-165.9763/T)); 10000 N !
+          FUNCTION ALL2 1 (1 - EXP(-1092.388/T)); 10000 N !
+          
+          FUNCTION ZALL0 1
+          (1 + EXP(0.120272355042726*(-43735.7183
+          + 6.2358*T
+          + 0.2962085013*T*LN(T))/T)); 10000 N !
+          
+          FUNCTION GALL 1
+          (-1.6252622037652672E6 + 47.2689970856593*T*LN(ALL0)
+          + 17.0909636655054*T*LN(ALL1)
+          + 60.356978521133852*T*LN(ALL2)
+          - 41.5723130907662*T*LN(ZALL0) - 0.00369223705*T**2
+          + 1.3242320350000002E-7*T**3); 6000 N !
+          
+          FUNCTION COR0 1 (1 - EXP(-1067.3396/T)); 10000 N !
+          FUNCTION COR1 1 (1 - EXP(-636.19021/T)); 10000 N !
+          FUNCTION COR2 1 (1 - EXP(-312.67623/T)); 10000 N !
+          
+          FUNCTION GCOR 1
+          (-1.690780842821017E6
+          + 39.3927282650856*T*LN(COR0)
+          + 69.7003662813618*T*LN(COR1)
+          + 15.62384472585121*T*LN(COR2)
+          - 0.0024049175*T**2 - 1.925204165E-07*T**3); 3000 N !
+          
+          $--------------------------------------------
+          $ Binary CaO-Al2O3 compounds
+          $
+          $ Ca3Al2O6 = C3A
+          $--------------------------------------------
+          
+          FUNCTION C3A0 1 (1 - EXP(-1020.13119/T)); 10000 N !
+          FUNCTION C3A1 1 (1 - EXP(-480.050423/T)); 10000 N !
+          FUNCTION C3A2 1 (1 - EXP(-195.44252/T)); 10000 N !
+          
+          FUNCTION GC3A 1
+          (-3.6265529844279119E6
+          + 68.264428571996837*T*LN(C3A0)
+          + 132.4040773488046*T*LN(C3A1)
+          
+          
+                                           196
+          
+          + 73.70876047825546*T*LN(C3A2)
+          - 0.0057734380100000005*T**2); 6000 N !
+          
+          
+          
+          $--------------------------------------------
+          $ C12A7
+          $--------------------------------------------
+          FUNCTION FEC12A7S1 0.1 +0.26784991; 6000 N !
+          FUNCTION TEC12A7S1 0.1 +1156.48654; 6000 N !
+          FUNCTION FEC12A7S2 0.1 +0.45839024; 6000 N !
+          FUNCTION TEC12A7S2 0.1 +502.7385460; 6000 N !
+          FUNCTION FEC12A7S3 0.1 +0.27375985; 6000 N !
+          FUNCTION TEC12A7S3 0.1 +206.200874; 6000 N !
+          
+          FUNCTION TEC12A7S 0.1
+          +FEC12A7S1#*TEC12A7S1#+FEC12A7S2#*TEC12A7S2#
+          +FEC12A7S3#*TEC12A7S3#; 6000 N !
+          
+           FUNCTION GC12A7S11 0.1
+          +1-1*EXP(-TEC12A7S1#*T**(-1)); 6000 N !
+           FUNCTION GC12A7S12 0.1
+          +1-1*EXP(-TEC12A7S2#*T**(-1)); 6000 N !
+           FUNCTION GC12A7S13 0.1
+          +1-1*EXP(-TEC12A7S3#*T**(-1)); 6000 N !
+          
+          FUNCTION GEC12A7S2 0.1
+          +FEC12A7S1#*LN(GC12A7S11#)
+          +FEC12A7S2#*LN(GC12A7S12#)
+          +FEC12A7S3#*LN(GC12A7S13#); 6000 N   !
+          
+          FUNCTION G0C12A7S 0.1 -340246.7522; 6000 N !
+          FUNCTION GEC12A7S3 0.1 +3*R#*T*GEC12A7S2#; 6000 N !
+          FUNCTION GEC12A7S 0.1 +1.5*R#*TEC12A7S#+GEC12A7S3#;
+           6000 N !
+          FUNCTION GTC12A7S 0.1 -9.731079847457630E-04*T**2;
+           6000 N !
+          FUNCTION GHC12A7S 0.1
+          +G0C12A7S#+GEC12A7S#+GTC12A7S#; 6000 N !
+          
+          $--------------------------------------------
+          
+          
+                                      197
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          $ CaAl2O4 = CA
+          $--------------------------------------------
+          
+          FUNCTION CA0 1 (1 - EXP(-1047.38873/T)); 10000 N !
+          FUNCTION CA1 1 (1 - EXP(-458.837521/T)); 10000 N !
+          FUNCTION CA2 1 (1 - EXP(-178.6963/T)); 10000 N !
+          
+          FUNCTION GCA 1 (-2.349750735736110E6
+          + 68.6331374908854*T*LN(CA0)
+          + 68.17219790106598*T*LN(CA1)
+          + 37.79837958926666*T*LN(CA2)
+          - 0.0006602887929999997*T**2
+          - 7.06344541E-07*T**3); 6000 N !
+          
+          $--------------------------------------------
+          $ CaAl4O7 = CA2
+          $--------------------------------------------
+          
+          FUNCTION CA20 1 (1 - EXP(-1109.65247/T)); 10000 N !
+          FUNCTION CA21 1 (1 - EXP(-508.764148/T)); 10000 N !
+          FUNCTION CA22 1 (1 - EXP(-209.974186/T)); 10000 N !
+          
+          
+          
+          FUNCTION GCA2 1 (-4.0392333170626090E6
+          + 116.99454471479561*T*LN(CA20)
+          + 115.9414882584303*T*LN(CA21)
+          + 66.38462128029035*T*LN(CA22)
+          - 0.005173192760000004*T**2); 6000 N !
+          
+          $--------------------------------------------
+          $ CaAl12O19 = CA6
+          $--------------------------------------------
+          FUNCTION CA60 1 (1 - EXP(-420.6218761876267/T)); 10000 N !
+          FUNCTION CA61 1 (1 - EXP(-3359.6658182832766/T)); 10000 N !
+          FUNCTION CA62 1 (1 - EXP(-1101.1852843648976/T)); 10000 N !
+          
+          FUNCTION GCA6 1 (-1.0812591475462691E7
+          + 450.3133250660283*T*LN(CA60) +
+          26.02792788344765*T*LN(CA61)
+          + 321.84737776464585*T*LN(CA62) -
+          
+          
+                                           198
+          
+          0.02480194952447252*T**2); 6000 N !
+          $--------------------------------------------
+          $              CAS2
+          $--------------------------------------------
+          FUNCTION CAS20 1 (1 - EXP(-658.274391945986/T)); 10000 N !
+          FUNCTION CAS21 1 (1 - EXP(-1550.57097920/T)); 10000 N !
+          FUNCTION CAS22 1 (1 - EXP(-218.71174550/T)); 10000 N !
+          
+          FUNCTION GCAS2 1 (-4.2642398308864581E6
+          + 148.8058523578853*T*LN(CAS20) +
+          77.225227444567193*T*LN(CAS21)
+          + 98.232082012479691*T*LN(CAS22) -
+          0.006150786253147202*T**2); 3000 N !
+          
+          $--------------------------------------------
+          $              C2AS
+          $--------------------------------------------
+          
+          FUNCTION C2AS0 1 (1 - EXP(-202.647055790/T)); 10000 N !
+          FUNCTION C2AS1 1 (1 - EXP(-505.519980529/T)); 10000 N !
+          FUNCTION C2AS2 1 (1 - EXP(-1197.96796582/T)); 10000 N !
+          
+          FUNCTION GC2AS 1 (-4.0184623119067852E6
+          + 80.712983752394474*T*LN(C2AS0) +
+          119.3772222870370*T*LN(C2AS1)
+          + 99.22999860142122*T*LN(C2AS2) -
+          0.005751138264637631*T**2); 3000 N !
+          
+          $----------------------------------------------
+          $               SIL
+          $----------------------------------------------
+          FUNCTION SIL0 1 (1 - EXP(-153.06149123803786/T)); 10000 N !
+          FUNCTION SIL1 1 (1 - EXP(-411.0126080405844/T)); 10000 N !
+          FUNCTION SIL2 1 (1 - EXP(-1030.5334157523516/T)); 10000 N !
+          
+          FUNCTION GSIL 1 (-2.6118305016655323E6
+          + 10.2038161601145*T*LN(SIL0) +
+          83.2867203476766*T*LN(SIL1)
+          + 106.018727208511*T*LN(SIL2) -
+          0.00026505572690566217*T**2); 3000 N !
+          
+          
+                                      199
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          
+          $------------------------------------------------
+          $                MGO
+          $------------------------------------------------
+          FUNCTION MGO0 1 (1 - EXP(-475.5615692/T)); 10000 N !
+          FUNCTION MGO1 1 (1 - EXP(-775.50257671/T)); 10000 N !
+          FUNCTION MGO2 1 (1 - EXP(-259.55358863/T)); 10000 N !
+          
+          FUNCTION LMGO0 1.0
+          1 - EXP(-802.97139*T**(-1)); 10000.0 N !
+          FUNCTION LMGO1 1.0
+          1 - EXP(-316.655056*T**(-1)); 10000.0 N !
+          FUNCTION ZLMGO0 1.0
+          EXP((0.0750535129940371*T*LN(T)
+          + 0.749994351575431*T -
+          6969.9520896844)*T**(-1)) + 1; 10000.0 N !
+          
+          FUNCTION GMGO 1.0
+          -0.00184931485*T**2
+          + 26.0930478070804*T*LN(MGO0#) +
+          20.7285632023614*T*LN(MGO1#)
+          + 3.06794049945159*T*LN(MGO2#) -
+          0.0126333744160015*EXP(0.0032721847*T)
+          - 606454.905049196; 3098.0 Y
+          76.5*T*(1 - LN(T)) + 467.52323656*T
+          - 683262.3811 + (3.4001229515421E-5*T
+          - 0.0938503045793433)**(-1); 6000.0 N !
+          FUNCTION GMGOL 1.0
+          -0.002702806*T**2
+          + 26.6124946323946*T*LN(LMGO0#) +
+          23.2740566808191*T*LN(LMGO1#)
+          - 16.6289252363065*T*LN(ZLMGO0#) -
+          569448.443736023; 6000.0 N !
+          
+          $-------------------------------------------------------
+          $               M2S
+          $-------------------------------------------------------
+          FUNCTION M2S0 1 (1 - EXP(-242.33544682642355/T)); 10000 N !
+          FUNCTION M2S1 1 (1 - EXP(-521.0055871316241/T)); 10000 N !
+          FUNCTION M2S2 1 (1 - EXP(-1146.8921615705249/T)); 10000 N !
+          
+          
+                                           200
+          
+          FUNCTION GM2S 1
+          (-2.1894694547503009E6 + 27.917791527833063*T*LN(M2S0) +
+          91.895489221328484*T*LN(M2S1)
+          + 54.773668005547061*T*LN(M2S2) -
+          0.0039796137052090595*T**2); 2170 N !
+          
+          $---------------------------------------------------------
+          $               MS
+          $---------------------------------------------------------
+          FUNCTION CMS0 1 (1 - EXP(-436.68607089282295/T)); 10000 N !
+          FUNCTION CMS1 1 (1 - EXP(-1934.0948767977611/T)); 10000 N !
+          
+          FUNCTION OMS0 1 (1 - EXP(-294.36130457004157/T)); 10000 N !
+          FUNCTION OMS1 1 (1 - EXP(-281.1818681281586/T)); 10000 N !
+          FUNCTION OMS2 1 (1 - EXP(-995.1560351249022/T)); 10000 N !
+          
+          FUNCTION PMS0 1 (1 - EXP(-587.941408967336/T)); 10000 N !
+          FUNCTION PMS1 1 (1 - EXP(-0.0227303680778/T)); 10000 N !
+          FUNCTION PMS2 1 (1 - EXP(-2956.3805608988832/T)); 10000 N !
+          
+          
+          
+          FUNCTION GCLMGSIO 298.15
+          (-1584678 + 544.9199*T + 104.3011*T*(1 - LN(T)) +
+          1287726*T**(-1) - 0.009291338*T**2); 3000 N !
+          
+          FUNCTION GCMS 1
+          (-1.5573200148785093E6 + 92.741911826035484*T*LN(CMS0) +
+          31.974491948419917*T*LN(CMS1)
+          - 0.0038364494166432546*T**2); 3000 N !
+          
+          FUNCTION GOMS 1
+          (-1.5564437638799032E6
+          + 49.405882892834079*T*LN(OMS0) +
+          9.503439739060052E-6*T*LN(OMS1)
+          + 75.305714024248420*T*LN(OMS2) -
+          0.0038853173054983477*T**2); 3000 N !
+          
+          FUNCTION GPMS 1
+          (-1.5425518874130727E6
+          
+          
+                                      201
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          + 102.020640125967*T*LN(PMS0) +
+          3.1298114477056090*T*LN(PMS1)
+          + 19.56676914813782*T*LN(PMS2) -
+          0.0017363618331370015*T**2); 3000 N !
+          
+          $----------------------------------------------------
+          $               DIOP, AKER, MER
+          $----------------------------------------------------
+          FUNCTION GDIOP
+          298.15 (-3282503
+          + 1095.5238*T + 210.1692*T*(1 - LN(T)) +
+          2517588*T**(-1) - 0.022135662*T**2); 3000 N !
+          
+          FUNCTION GAKER 1 +(-4009964.8637490207)
+          +(3.0/2)*8.31446261815324*
+          (1.718214012820375)*(1803.4822162315852)
+          +3*8.31446261815324*T*
+          (1.718214012820375)*ln(1-exp(-(1803.4822162315852)/T))
+          +(3.0/2)*8.31446261815324*
+          (5.8715282086640945)*(676.0432747418508)
+          +3*8.31446261815324*T*
+          (5.8715282086640945)*ln(1-exp(-(676.0432747418508)/T))
+          +(3.0/2)*8.31446261815324*
+          (4.410228317926463)*(220.33507085331422)
+          +3*8.31446261815324*T*
+          (4.410228317926463)*ln(1-exp(-(220.33507085331422)/T))
+          +(-0.006461012014427301)*T**(2); 3000 N !
+          
+          FUNCTION GMER 1 (-4795630.118828734)
+          +(3.0/2)*8.31446261815324*
+          (5.963982025706537)*(858.7549774936704)
+          +3*8.31446261815324*T*
+          (5.963982025706537)*ln(1-exp(-(858.7549774936704)/T))
+          +(3.0/2)*8.31446261815324*
+          (0.995844162605323)*(8200.60360461208)
+          +3*8.31446261815324*T*
+          (0.995844162605323)*ln(1-exp(-(8200.60360461208)/T))
+          +(3.0/2)*8.31446261815324*
+          (7.040296106185939)*(260.61640988898563)
+          +3*8.31446261815324*T*
+          
+          
+                                           202
+          
+          (7.040296106185939)*ln(1-exp(-(260.61640988898563)/T))
+          +(-0.01723427125059624)*T**(2); 3000 N !
+          
+          $ ----------------------------------
+          $ Define phases - pure components
+          $ ----------------------------------
+          
+          PHASE AC2S % 2 2 1 !
+          CONSTITUENT AC2S :L:Q: !
+          
+          PHASE ACRIS % 1 1 !
+          CONSTITUENT ACRIS :Q: !
+          
+          PHASE APC2S % 2 2 1 !
+          CONSTITUENT APC2S :L:Q: !
+          
+          PHASE AQUARTZ % 1 1 !
+          CONSTITUENT AQUARTZ :Q: !
+          
+          PHASE BC2S % 2 2 1 !
+          CONSTITUENT BC2S :L:Q: !
+          
+          PHASE BCRIS % 1 1 !
+          CONSTITUENT BCRIS :Q: !
+          
+          PHASE BQUARTZ % 1 1 !
+          CONSTITUENT BQUARTZ :Q: !
+          
+          PHASE GC2S % 2 2 1 !
+          CONSTITUENT GC2S :L:Q: !
+          
+          PHASE MC3S % 2 3 1 !
+          CONSTITUENT MC3S :L:Q: !
+          
+          PHASE PCS % 2 1 1 !
+          CONSTITUENT PCS :L:Q: !
+          
+          PHASE RC3S % 2 3 1 !
+          CONSTITUENT RC3S :L:Q: !
+          
+          
+          
+          
+                                      203
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          PHASE RC3S2 % 2 3 2 !
+          CONSTITUENT RC3S2 :L:Q: !
+          
+          PHASE TC3S % 2 3 1 !
+          CONSTITUENT TC3S :L:Q: !
+          
+          PHASE WCS % 2 1 1 !
+          CONSTITUENT WCS :L:Q: !
+          
+          PHASE CAS2 % 3 1 1 2 !
+          CONSTITUENT CAS2 :L:A:Q: !
+          
+          PHASE C2AS % 3 2 1 1 !
+          CONSTITUENT C2AS :L:A:Q: !
+          
+          PHASE PMS % 2 1 1 !
+          CONSTITUENT PMS :M:Q: !
+          PARAMETER G(PMS,M:Q;0) 1 GPMS#; 10000 N !
+          
+          PHASE OMS % 2 1 1 !
+          CONSTITUENT OMS :M:Q: !
+          PARAMETER G(OMS,M:Q;0) 1 GOMS#; 10000 N !
+          
+          PHASE CMS % 2 1 1 !
+          CONSTITUENT CMS :M:Q: !
+          PARAMETER G(CMS,M:Q;0) 1 GCMS#; 10000 N !
+          
+          PHASE M2S % 2 2 1 !
+          CONSTITUENT M2S :M:Q: !
+          PARAMETER G(M2S,M:Q;0) 1 GM2S#; 10000 N !
+          
+          PHASE AKER % 3 2.0 1.0 2.0 !
+          CONSTITUENT AKER :L:M:Q: !
+          PARAMETER G(AKER,L:M:Q;0) 298.15 GAKER ; 3000 N !
+          
+          PHASE MER % 3 3.0 1.0 2.0 !
+          CONSTITUENT MER :L:M:Q: !
+          PARAMETER G(MER,L:M:Q;0) 0.1 GMER ; 6000 N !
+          
+          FUNCTION ALPHA_H 1 83680; 10000 N !
+          
+          
+                                           204
+          
+          FUNCTION ALPHA_L0 1 -35564; 10000 N !
+          FUNCTION ALPHA_L0T 1 0; 10000 N !
+          
+          PHASE ALPHA % 2 2.0 1.0 !
+          CONSTITUENT ALPHA :L,M:Q: !
+          PARAMETER G(ALPHA,L:Q;0) 298.15
+          +GAC2S ; 6000 N !
+          PARAMETER G(ALPHA,M:Q;0) 298.15
+          +GM2S+ALPHA_H   ; 6000 N !
+          PARAMETER L(ALPHA,L,M:Q;0) 298.15
+          ALPHA_L0 + ALPHA_L0T*T ; 6000 N !
+          
+          FUNCTION ALPHA_PRIME_H 1 85772; 10000 N !
+          FUNCTION ALPHA_PRIME_L0 1 -35564; 10000 N !
+          FUNCTION ALPHA_PRIME_L0T 1 0; 10000 N !
+          
+          PHASE ALPHA_PRIME % 2 2.0 1.0 !
+          CONSTITUENT ALPHA_PRIME :L,M:Q: !
+          PARAMETER G(ALPHA_PRIME,L:Q;0) 298.15 +GAPC2S ; 6000 N !
+          PARAMETER G(ALPHA_PRIME,M:Q;0) 298.15
+          +GM2S+ALPHA_PRIME_H ; 6000 N !
+          PARAMETER L(ALPHA_PRIME,L,M:Q;0) 298.15
+          ALPHA_PRIME_L0+ALPHA_PRIME_L0T*T ; 6000 N !
+          
+          PHASE WOLL % 2 1.0 1.0 !
+          CONSTITUENT WOLL :L,M:Q: !
+          PARAMETER G(WOLL,L:Q;0) 298.15 +GWCS ; 6000 N !
+          PARAMETER G(WOLL,M:Q;0) 298.15
+          +GCLMGSIO+42443-12.523*T ; 6000 N !
+          PARAMETER G(WOLL,L,M:Q;0)298.15 -10000 ; 6000 N !
+          
+          FUNCTION MONOXIDE_L_M_L0 1 119445.732404441; 10000 N !
+          FUNCTION MONOXIDE_L_M_L0T 1 -24.2429471085131; 10000 N !
+          FUNCTION MONOXIDE_L_M_L1T 1 -9.13219667432677; 10000 N !
+          
+          PHASE MONOXIDE % 1 1.0 !
+          CONSTITUENT MONOXIDE :L,M: !
+          PARAMETER G(MONOXIDE,L;0) 1 +GCAO; 5000 N !
+          PARAMETER G(MONOXIDE,M;0) 1 +GMGO; 5000 N !
+          PARAMETER L(MONOXIDE,L,M;0) 1
+          
+          
+                                      205
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          T * MONOXIDE_L_M_L0T + MONOXIDE_L_M_L0; 10000 N !
+          PARAMETER L(MONOXIDE,L,M;1) 1
+          T * MONOXIDE_L_M_L1T; 10000 N !
+          
+          PHASE CLINO % 3 1 1 2 !
+          CONSTITUENT CLINO :L,M:M:Q: !
+          PARAMETER G(CLINO,M:M:Q;0) 298.15
+          +2*GCLMGSIO+9389-7.3925*T ; 6000 N !
+          PARAMETER G(CLINO,L:M:Q;0) 298.15
+          +GDIOP ; 6000 N !
+          PARAMETER L(CLINO,L,M:M:Q;0) 298.15
+          25304 +2.358*T ; 6000 N !
+          PARAMETER L(CLINO,L,M:M:Q;1) 298.15
+          -3437 ; 6000 N !
+          
+          PHASE ORTHO % 3 1 1 2 !
+          CONSTITUENT ORTHO :L,M:M:Q: !
+          PARAMETER G(ORTHO,M:M:Q;0) 298.15
+          2*GCLMGSIO-4103+50.186*T
+          -6.6828*T*LN(T) ; 6000 N !
+          PARAMETER G(ORTHO,L:M:Q;0) 298.15
+          GDIOP + 19740 + 0.02*T ; 6000 N !
+          PARAMETER L(ORTHO,L,M:M:Q;0) 298.15
+          26411-8.484*T ; 6000 N !
+          
+          
+          
+          PHASE PROTO % 2 1.0 1.0 !
+          CONSTITUENT PROTO :L,M:Q: !
+          PARAMETER G(PROTO,M:Q;0) 298.15
+          +GCLMGSIO+11831-34.218*T
+          +3.1114*T*LN(T)+0.0017629728*T**2      ; 6000 N !
+          PARAMETER G(PROTO,L:Q;0) 298.15
+          +GWCS +31920 ; 6000 N !
+          PARAMETER L(PROTO,L,M:Q;0) 298.15
+          26411 - 8.484*T ; 6000 N !
+          
+          PHASE LOW_CLINO % 3 1 1 2 !
+          CONSTITUENT LOW_CLINO :L,M:M:Q: !
+          PARAMETER G(LOW_CLINO,M:M:Q;0) 298.15
+          +2*GCLMGSIO ; 6000 N !
+          
+          
+                                           206
+          
+          PARAMETER G(LOW_CLINO,L:M:Q;0) 298.15
+          GDIOP + 20000 ; 6000 N !
+          PARAMETER L(LOW_CLINO,L,M:M:Q;0) 298.15
+          (25304) +(2.358)*T ; 6000 N !
+          PARAMETER L(LOW_CLINO,L,M:M:Q;1) 298.15
+          -(3437) ; 6000 N !
+          
+          FUNCTION GMONT 1
+          +(-2333950.0776404175)
+          +(3.0/2)*8.31446261815324
+          *(0.6288886419963274)*(153.35140646512613)
+          +3*8.31446261815324*T
+          *(0.6288886419963274)*ln(1-exp(-(153.35140646512613)/T))
+          +(3.0/2)*8.31446261815324
+          *(3.4392430255122903)*(385.6626614286263)
+          +3*8.31446261815324*T
+          *(3.4392430255122903)*ln(1-exp(-(385.6626614286263)/T))
+          +(3.0/2)*8.31446261815324
+          *(2.9302087654155162)*(962.1653157086014)
+          +3*8.31446261815324*T
+          *(2.9302087654155162)*ln(1-exp(-(962.1653157086014)/T))
+          +(-0.0014936167775075617)*T**(2); 3000 N !
+          
+          PHASE OLIVINE % 3 1 1 1 !
+          CONSTITUENT OLIVINE :L,M:L,M:Q: !
+          PARAMETER G(OLIVINE,L:L:Q;0) 0.1 GGC2S; 3000 N !
+          PARAMETER G(OLIVINE,M:M:Q;0) 0.1 GM2S; 3000 N !
+          
+          PARAMETER G(OLIVINE,M:L:Q;0) 0.1
+          GMONT+146440+(1.9806+0.3576+0.0756+0.023)*T ; 3000 N !
+          PARAMETER G(OLIVINE,L:M:Q;0) 0.1
+          GMONT+(1.9806+0.3576+0.0756+0.023)*T ; 3000 N !
+          
+          
+          
+          PARAMETER G(OLIVINE,L,M:M:Q;0)     298.15 +32235.53; 6000 N !
+          PARAMETER G(OLIVINE,L,M:M:Q;1)     298.15 -4079.92; 6000 N !
+          PARAMETER G(OLIVINE,L:L,M:Q;0)     298.15 +28032.8; 6000 N !
+          
+          PHASE MULLITE % 1 1 !
+          CONSTITUENT MULLITE :COR, SIL: !
+          
+          
+                                      207
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          
+          FUNCTION MULLITE_COR_SIL_L0 1 10573.0559222137; 10000 N !
+          FUNCTION MULLITE_COR_SIL_L1 1 85373.0647139828; 10000 N !
+          FUNCTION MULLITE_COR_SIL_L2T 1 21.4338330628626; 10000 N !
+          
+          PARAMETER G(MULLITE,COR;0) 1
+          1.5*GCOR+4998.5299011052; 10000 N !
+          PARAMETER G(MULLITE,SIL;0) 1 GSIL; 10000 N !
+          PARAMETER L(MULLITE,COR,SIL;0) 1
+          MULLITE_COR_SIL_L0; 10000 N !
+          PARAMETER L(MULLITE,COR,SIL;1) 1
+          MULLITE_COR_SIL_L1; 10000 N !
+          PARAMETER L(MULLITE,COR,SIL;2) 1
+          T * MULLITE_COR_SIL_L2T; 10000 N !
+          
+          PARAMETER G(ACRIS,Q;0) 1 GACRIS; 10000 N !
+          PARAMETER G(AQUARTZ,Q;0) 1 GAQUARTZ; 10000 N !
+          PARAMETER G(BCRIS,Q;0) 1 GBCRIS; 10000 N !
+          PARAMETER G(BQUARTZ,Q;0) 1 GBQUARTZ; 10000 N !
+          
+          PARAMETER G(AC2S,L:Q;0) 1 GAC2S; 10000 N !
+          PARAMETER G(APC2S,L:Q;0) 1 GAPC2S; 10000 N !
+          PARAMETER G(BC2S,L:Q;0) 1 GBC2S; 10000 N !
+          PARAMETER G(GC2S,L:Q;0) 1 GGC2S; 10000 N !
+          
+          PARAMETER G(MC3S,L:Q;0) 1 GMC3S; 10000 N !
+          PARAMETER G(RC3S,L:Q;0) 1 GRC3S; 10000 N !
+          
+          PARAMETER G(RC3S2,L:Q;0) 1 GRC3S2; 10000 N !
+          
+          PARAMETER G(WCS,L:Q;0) 1 GWCS; 10000 N !
+          PARAMETER G(PCS,L:Q;0) 1 GPCS; 10000 N !
+          
+          PARAMETER G(C2AS,L:A:Q;0) 1 GC2AS; 10000 N !
+          PARAMETER G(CAS2,L:A:Q;0) 1 GCAS2; 10000 N !
+          
+          PHASE C3A % 2 3 1 !
+          CONSTITUENT C3A :L:A: !
+          PARAMETER G(C3A,L:A;0) 1 GC3A; 10000 N !
+          
+          
+          
+          
+                                           208
+          
+          PHASE CA % 2 1 1 !
+          CONSTITUENT CA :L:A: !
+          PARAMETER G(CA,L:A;0) 1 GCA; 10000 N !
+          
+          PHASE CA2 % 2 1 2 !
+          CONSTITUENT CA2 :L:A: !
+          PARAMETER G(CA2,L:A;0) 1 GCA2; 10000 N !
+          
+          PHASE CA6 % 2 1 6 !
+          CONSTITUENT CA6 :L:A: !
+          PARAMETER G(CA6,L:A;0) 1 GCA6; 10000 N !
+          
+          PHASE C12A7 % 2 12 7 !
+          CONSTITUENT C12A7 :L:A: !
+          PARAMETER G(C12A7,L:A;0) 0.1 +59*GHC12A7S; 6000 N !
+          
+          PHASE C2F % 2 2 1 !
+          CONSTITUENT C2F :L:FE2O3: !
+          PARAMETER G(C2F,L:FE2O3;0) 1 GC2F; 10000 N !
+          
+          PHASE CAO % 1 1 !
+          CONSTITUENT CAO :L: !
+          PARAMETER G(CAO,L;0) 1 GCAO; 10000 N !
+          
+          PHASE CF % 2 1 1 !
+          CONSTITUENT CF :L:FE2O3: !
+          PARAMETER G(CF,L:FE2O3;0) 1 GCF; 10000 N !
+          
+          
+          
+          PHASE CF2 % 2 1 2 !
+          CONSTITUENT CF2 :L:FE2O3: !
+          FUNCTION A 1 -30; 10000 N !
+          FUNCTION B 1 12500; 10000 N !
+          PARAMETER G(CF2,L:FE2O3;0) 298.0
+          T*A# + B# + GCAO# + 2*GFE2O3#; 6000.0 N !
+          
+          
+          
+          PHASE GAS:G % 1 1.0 !
+          CONSTITUENT GAS:G :O1,O2,O3,FE,FEO : !
+          PARAMETER G(GAS,O2;0) 298.15 +GO2GAS; 6000 N !
+          
+          
+                                      209
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          PARAMETER G(GAS,O1;0) 298.15 +GO1GAS; 6000 N !
+          PARAMETER G(GAS,O3;0) 298.15 +GO3GAS; 6000 N !
+          PARAMETER G(GAS,FE;0) 298.15 +GFEGAS; 6000 N !
+          PARAMETER G(GAS,FEO;0) 298.15 +GFEOGAS; 6000 N !
+          
+          PHASE LIQUID % 1 1    !
+          CONSTITUENT LIQUID :CAOL, MGOL, M2SL, CAS2L,
+          ALL, ASL, C3AL, FE, FEO, FEO3/2, C2SL, CSL, SIO2L :    !
+          
+          PARAMETER G(LIQUID,SIO2L;0) 1 GSIO2L; 10000 N !
+          PARAMETER G(LIQUID,CAOL;0) 1 GCAOL; 10000 N !
+          PARAMETER G(LIQUID,MGOL;0) 298.15 GMGOL#; 6000 N !
+          PARAMETER G(LIQUID,FE;0)   298.15 +GFELIQ; 6000 N !
+          
+          PARAMETER G(LIQUID,FEO;0) 298.15
+          +GFEO+34008-20.969*T; 6000 N !
+          
+          PARAMETER G(LIQUID ,FEO3/2;0)
+          298.15 0.5*GFE2O3+39712-20.007*T; 6000 N !
+          PARAMETER G(LIQUID,ALL;0) 1 0.5 * GALL; 10000 N !
+          
+          FUNCTION ASL_H 1 545197.227605748; 10000 N !
+          FUNCTION ASL_S 1 -3.51484617476168; 10000 N !
+          PARAMETER G(LIQUID,ASL;0) 1 -1 * T * ASL_S +
+          ASL_H + 0.666666666666667 * GALL
+          + GSIO2L; 10000 N !
+          
+          FUNCTION ALL_SIO2L_L0 1 6952.81065916526; 10000 N !
+          FUNCTION ALL_SIO2L_L0T 1 7.45929355884341; 10000 N !
+          FUNCTION ALL_SIO2L_L1 1 -9798.44151926753; 10000 N !
+          FUNCTION ALL_SIO2L_L2 1 2893.01383248282; 10000 N !
+          PARAMETER L(LIQUID,ALL,SIO2L;0) 1
+          T * ALL_SIO2L_L0T + ALL_SIO2L_L0; 10000 N !
+          PARAMETER L(LIQUID,ALL,SIO2L;1) 1
+          ALL_SIO2L_L1; 10000 N !
+          PARAMETER L(LIQUID,ALL,SIO2L;2) 1
+          ALL_SIO2L_L2; 10000 N !
+          
+          FUNCTION C3AL_CAOL_L0 1 -73232.4694701268; 10000 N !
+          FUNCTION C3AL_CAOL_L0T 1 45.9571438918422; 10000 N !
+          
+          
+                                           210
+          
+          FUNCTION C3AL_H 1 -150837.716392695; 10000 N !
+          FUNCTION ALL_C3AL_L1 1 -267094.165327997; 10000 N !
+          FUNCTION ALL_C3AL_L1T 1 55.6830981222739; 10000 N !
+          FUNCTION ALL_CAOL_L0 1 -108365.449831167; 10000 N !
+          FUNCTION ALL_CAOL_L0T 1 2.99851122675031; 10000 N !
+          
+          PARAMETER G(LIQUID,C3AL;0) 1
+          C3AL_H + 3 * GCAOL + GALL; 10000 N !
+          PARAMETER L(LIQUID,ALL,C3AL;1) 1
+          T * ALL_C3AL_L1T + ALL_C3AL_L1; 10000 N !
+          PARAMETER L(LIQUID,ALL,CAOL;0) 1
+          T * ALL_CAOL_L0T + ALL_CAOL_L0; 10000 N !
+          PARAMETER L(LIQUID,C3AL,CAOL;0) 1
+          T * C3AL_CAOL_L0T + C3AL_CAOL_L0; 10000 N !
+          
+          FUNCTION CAS2L_H 1 -85250; 10000 N !
+          FUNCTION CAS2L_S 1 -15; 10000 N !
+          PARAMETER G(LIQUID,CAS2L;0) 1
+          CAS2L_H + -CAS2L_S*T + GSIO2L + 0.5 * GCAOL
+          + 0.5 * GALL; 10000 N !
+          
+          FUNCTION C2SL_H 1 -183422.297315552; 10000 N !
+          FUNCTION C2SL_S 1 2.28483183782731; 10000 N !
+          PARAMETER G(LIQUID,C2SL;0) 1
+          -1 * T * C2SL_S + 2 * GCAOL + C2SL_H + GSIO2L;
+          10000 N !
+          
+          FUNCTION CSL_H 1 -116624.5108961; 10000 N !
+          FUNCTION CSL_S 1 -3.86841542916429; 10000 N !
+          PARAMETER G(LIQUID,CSL;0) 1
+          CSL_H + GCAOL-1 * T * CSL_S + GSIO2L; 10000 N !
+          
+          FUNCTION C2SL_SIO2L_L0T 1 9.04086951648876; 10000 N !
+          FUNCTION C2SL_CAOL_L2T 1 8.99637059634927; 10000 N !
+          FUNCTION CSL_SIO2L_L0 1 251273.138042155; 10000 N !
+          FUNCTION CSL_SIO2L_L0T 1 -132.4131763105; 10000 N !
+          FUNCTION CSL_SIO2L_L1 1 -76026.8593265931; 10000 N !
+          FUNCTION CSL_SIO2L_L1T 1 22.9753135769968; 10000 N !
+          FUNCTION CSL_SIO2L_L2 1 117268.159674298; 10000 N !
+          FUNCTION CSL_SIO2L_L2T 1 -40.3850726577932; 10000 N !
+          
+          
+                                      211
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          
+          PARAMETER L(LIQUID,C2SL,CAOL;2) 1
+          T * C2SL_CAOL_L2T; 6000 N !
+          PARAMETER L(LIQUID,C2SL,SIO2L;0) 1
+          T * C2SL_SIO2L_L0T; 6000 N !
+          PARAMETER L(LIQUID,CSL,SIO2L;0) 1
+          T * CSL_SIO2L_L0T + CSL_SIO2L_L0; 6000 N !
+          PARAMETER L(LIQUID,CSL,SIO2L;1) 1
+          T * CSL_SIO2L_L1T + CSL_SIO2L_L1; 6000 N !
+          PARAMETER L(LIQUID,CSL,SIO2L;2) 1
+          T * CSL_SIO2L_L2T + CSL_SIO2L_L2; 6000 N !
+          
+          
+          
+          PARAMETER G(LIQUID,FE,FEO;0) 298.15
+          +109625.2-20.050*T; 3000 N !
+          PARAMETER G(LIQUID,FE,FEO;1) 298.15
+          -26317.9+11.072*T; 3000 N !
+          PARAMETER G(LIQUID,FE,FEO3/2;0) 298.15
+          81541.2; 3000 N !
+          PARAMETER G(LIQUID,FEO,FEO3/2;0) 298.15
+          -13353.8; 3000 N !
+          PARAMETER G(LIQUID,FEO,FEO3/2;1) 298.15
+          6707.07;   3000 N !
+          
+          PARAMETER G(LIQUID,CAOL,FEO;0) 298.15
+          -119593+26.125*T; 3000 N !
+          PARAMETER G(LIQUID,CAOL,FEO;1) 298.15
+           -38729+25.427*T; 3000 N !
+          PARAMETER G(LIQUID,CAOL,FEO;2) 298.15
+           5370; 3000 N !
+          
+          PARAMETER G(LIQUID,CAOL,FEO,FEO3/2;0) 298.15
+           91713; 3000 N !
+          
+          FUNCTION L0 298.15 -62800; 10000 N !
+          FUNCTION L0T 298.15 -8.4; 10000 N !
+          FUNCTION L2 298.15 -30000; 10000 N !
+          
+          PARAMETER L(LIQUID,CAOL,FEO3/2;0) 1.0
+          T*L0T# + L0#; 6000.0 N !
+          
+          
+                                           212
+          
+          PARAMETER L(LIQUID,CAOL,FEO3/2;2) 1.0
+          L2#; 6000.0 N !
+          
+          FUNCTION SL0 1 34642; 10000 N !
+          FUNCTION SL0T 1 0; 10000 N !
+          FUNCTION SL1 1 -7766; 10000 N !
+          FUNCTION SL1T 1 0; 10000 N !
+          FUNCTION SL2 1 9992; 10000 N !
+          FUNCTION SL2T 1 0; 10000 N !
+          
+          PARAMETER L(LIQUID,FEO3/2,SIO2L;0) 1
+          T * SL0T + SL0; 10000 N !
+          PARAMETER L(LIQUID,FEO3/2,SIO2L;1) 1
+          T * SL1T + SL1; 10000 N !
+          PARAMETER L(LIQUID,FEO3/2,SIO2L;2) 1
+          T * SL2T + SL2; 10000 N !
+          
+          FUNCTION CAOL_MGOL_L1T 1 -10.4155436539951; 10000 N !
+          FUNCTION M2SL_H 1 -111578.217113669; 10000 N !
+          FUNCTION M2SL_S 1 -13.8504048423601; 10000 N !
+          FUNCTION M2SL_SIO2L_L0 1 43199.4342511078; 10000 N !
+          FUNCTION M2SL_SIO2L_L0T 1 -22.7544714005804; 10000 N !
+          FUNCTION M2SL_SIO2L_L1 1 8428.95059316569; 10000 N !
+          FUNCTION M2SL_SIO2L_L2 1 455254.927413284; 10000 N !
+          FUNCTION M2SL_SIO2L_L2T 1 -186.680283524485; 10000 N !
+          FUNCTION M2SL_SIO2L_L3 1 -4993.17777002718; 10000 N !
+          
+          PARAMETER G(LIQUID,M2SL;0) 1
+          -1 * T * M2SL_S + M2SL_H
+          + 2 * GMGOL + GSIO2L; 10000 N !
+          PARAMETER L(LIQUID,M2SL,SIO2L;0) 1
+          T * M2SL_SIO2L_L0T
+          + M2SL_SIO2L_L0; 10000 N !
+          PARAMETER L(LIQUID,M2SL,SIO2L;1) 1
+          M2SL_SIO2L_L1; 10000 N !
+          PARAMETER L(LIQUID,M2SL,SIO2L;2) 1
+          T * M2SL_SIO2L_L2T
+          + M2SL_SIO2L_L2; 10000 N !
+          PARAMETER L(LIQUID,M2SL,SIO2L;3) 1
+          M2SL_SIO2L_L3; 10000 N !
+          
+          
+                                      213
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          PARAMETER L(LIQUID,CAOL,MGOL;1) 1
+          T * CAOL_MGOL_L1T; 10000 N !
+          
+          TYPE_DEFINITION & GES A_P_D BCC_A2 MAGNETIC -1.0 0.4 !
+          PHASE BCC_A2 %& 2 1 3 !
+          CONSTITUENT BCC_A2 :FE,O : VA : !
+          PARAMETER G(BCC_A2,FE:VA;0) 298.15 +GHSERFE; 6000 N !
+          PARAMETER TC(BCC_A2,FE:VA;0) 298.15 +1043; 6000 N !
+          PARAMETER BMAGN(BCC_A2,FE:VA;0) 298.15 +2.22; 6000 N !
+          PARAMETER G(BCC_A2,O:VA;0) 298.15
+          +0.5*GO2GAS+30000; 6000 N !
+          PARAMETER G(BCC_A2,FE,O:VA;0) 298.15
+          -209794+84*T; 6000 N !
+          
+          
+          
+          TYPE_DEFINITION ( GES A_P_D FCC_A1 MAGNETIC -3.0 0.28 !
+          PHASE FCC_A1 %( 2 1      1 !
+          CONSTITUENT FCC_A1 :FE,O : VA : !
+          PARAMETER G(FCC_A1,FE:VA;0)      298.15 +GFEFCC; 6000 N !
+          PARAMETER TC(FCC_A1,FE:VA;0)     298.15 -201; 6000 N !
+          PARAMETER BMAGN(FCC_A1,FE:VA;0) 298.15 -2.1; 6000 N !
+          PARAMETER G(FCC_A1,O:VA;0)       298.15
+          +0.5*GO2GAS+30000; 6000 N !
+          PARAMETER G(FCC_A1,FE,O:VA;0)    298.15
+          -199345.5+84*T; 6000 N !
+          
+          
+          
+          PHASE HALITE % 2 1    1 !
+          CONSTITUENT HALITE :FE+2,FE+3,VA : O-2 : !
+          PARAMETER G(HALITE,FE+2:O-2;0) 298.15
+          +GWUSTITE; 3000 N !
+          PARAMETER G(HALITE,FE+3:O-2;0) 298.15
+          +1.25*AWUSTITE+1.25*GWUSTITE; 3000 N !
+          PARAMETER G(HALITE,VA:O-2;0) 298.15 +0; 6000 N !
+          PARAMETER G(HALITE,FE+2,FE+3:O-2;0) 298.15
+          -12324; 3000 N !
+          PARAMETER G(HALITE,FE+2,FE+3:O-2;1) 298.15
+          +20070; 3000 N !
+          
+          FUNCTION GSPCA 298.15 -561218 -51.606*T ; 3000 N !
+          
+          
+                                           214
+          
+          TYPE_DEFINITION ) GES A_P_D SPINEL MAGNETIC -3.0 0.28 !
+          PHASE SPINEL %) 4    1    2  2    4 !
+          CONSTITUENT SPINEL :FE+2,FE+3 : FE+2,FE+3,VA : FE+2,VA : O-2 :   !
+          PARAMETER G(SPINEL,FE+2:FE+2:FE+2:O-2;0) 298.15
+          +9*GFE3O4+DFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+3:FE+2:FE+2:O-2;0) 298.15
+          +9*GFE3O4+DFE3O4-BFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+2:FE+3:FE+2:O-2;0) 298.15
+          +9*GFE3O4+DFE3O4-BFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+3:FE+3:FE+2:O-2;0) 298.15
+          +9*GFE3O4+DFE3O4-2*BFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+2:VA:FE+2:O-2;0)    298.15
+          +7*GFE3O4+DFE3O4+CFE3O4-BFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+3:VA:FE+2:O-2;0)    298.15
+          +7*GFE3O4+DFE3O4+CFE3O4-2*BFE3O4;      3000 N !
+          PARAMETER G(SPINEL,FE+2:FE+2:VA:O-2;0)    298.15
+          +7*GFE3O4-BFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+3:FE+2:VA:O-2;0)    298.15
+          +7*GFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+2:FE+3:VA:O-2;0)    298.15
+          +7*GFE3O4; 3000 N !
+          PARAMETER G(SPINEL,FE+3:FE+3:VA:O-2;0)    298.15
+          +7*GFE3O4-BFE3O4;3000 N !
+          PARAMETER G(SPINEL,FE+2:VA:VA:O-2;0)      298.15
+          +5*GFE3O4+CFE3O4;3000 N !
+          PARAMETER G(SPINEL,FE+3:VA:VA:O-2;0)      298.15
+          +5*GFE3O4+CFE3O4-BFE3O4;3000 N !
+          PARAMETER TC(SPINEL,FE+2:FE+2:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:FE+2:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+2:FE+3:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:FE+3:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+2:VA:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:VA:FE+2:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+2:FE+2:VA:O-2;0) 298.15
+          
+          
+                                      215
+          
+          APPENDIX B. APPENDIX: TDB FILE
+          
+          
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:FE+2:VA:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+2:FE+3:VA:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:FE+3:VA:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+2:VA:VA:O-2;0) 298.15
+          848; 3000 N !
+          PARAMETER TC(SPINEL,FE+3:VA:VA:O-2;0) 298.15
+          848; 3000 N !
+          
+          PARAMETER BMAGN(SPINEL,FE+2:FE+2:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:FE+2:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+2:FE+3:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:FE+3:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+2:VA:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:VA:FE+2:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+2:FE+2:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:FE+2:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+2:FE+3:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:FE+3:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+2:VA:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          PARAMETER BMAGN(SPINEL,FE+3:VA:VA:O-2;0) 298.15
+          44.54; 3000 N !
+          
+          
+          
+          TYPE_DEFINITION % SEQ * !
+          
+          
+          
+          
+                                           216
+          
+          PHASE FERRITE % 1 1.0 !
+          CONSTITUENT FERRITE :C2F,C2A: !
+          PARAMETER G(FERRITE,C2F;0) 298.15
+          GC2F; 3000.0 N !
+          PARAMETER G(FERRITE,C2A;0) 298.15
+          2*GCAO + 1*GCOR;10000.0 N !
+          FUNCTION FERRA 298.15
+          -130000; 10000.0 N !
+          FUNCTION FERRAT 1 0; 10000 N !
+          FUNCTION FERRB 1 -25000; 10000 N !
+          FUNCTION FERRBT 1 0; 10000 N !
+          PARAMETER G(FERRITE,C2A,C2F;0) 298.15
+          FERRA+FERRAT*T ;10000 N !
+          PARAMETER G(FERRITE,C2A,C2F;1) 298.15
+          FERRB+FERRBT*T ;10000 N !
+          
+          TYPE_DEFINITION ^ GES A_P_D CORUNDUM MAGNETIC -3.0 0.28 !
+          PHASE CORUNDUM %^ 1 1 !
+          CONSTITUENT CORUNDUM :A,FE2O3: !
+          PARAMETER G(CORUNDUM,FE2O3;0) 298.15
+          +GFE2O3    ;6000 N !
+          PARAMETER G(CORUNDUM,A;0) 298.15
+          +GCOR   ;6000 N !
+          PARAMETER TC(CORUNDUM,FE2O3;0) 298.15
+          -2867;   6000 N !
+          PARAMETER BMAGN(CORUNDUM,FE2O3;0) 298.15
+          -25.1;   6000 N !
+          
+          $ END
+          
+          
+          
+          
+                                      217
+          
+          218

@@ -1,0 +1,1150 @@
+schema_version: literature_extract.v1
+source_id: farmer-oneill-2023-mgo-zno-miscibility
+source:
+  citation: Farmer, N. and O’Neill, H. St. C. (2023). The miscibility gap between the rock salt and wurtzite phases
+    in the MgO–ZnO binary system to 3.5 GPa. European Journal of Mineralogy 35:1051–1071.
+  doi: 10.5194/ejm-35-1051-2023
+  url: https://doi.org/10.5194/ejm-35-1051-2023
+  year: 2023
+extraction:
+  method: MinerU table drafts cross-checked against born-digital pdftotext-layout; physical page renders checked
+    at 600 dpi for table layout and flagged cells. Unsupported solid-solution compositions, molar volumes/lattice
+    dimensions, and fitted/model tables are preserved in context.
+  date: '2026-10-22'
+  worker: fam49-1022
+  provenance_path: text/farmer-oneill-2023-mgo-zno-miscibility/pdftotext-layout.txt
+review_status: draft
+species:
+  ZnO:
+    observations: []
+    context:
+    - observation_id: farmer_table1_ambient_1atm_epma
+      type: measured_table_context
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 1056
+        table: '1'
+      units: T in °C; duration in h; XZn mole fraction; listed at 1 atm
+      values:
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap: Candidate token equilibrium_phase_composition does not support the printed rock-salt and wurtzite
+          crystalline phase roles; the source prints the same table in the PDF. The linked XLSX could not be fetched
+          in this offline lane.
+        column_headers_as_printed:
+        - Experiment no.
+        - T (°C)
+        - Duration (h)
+        - Furnace
+        - Flux
+        - Container
+        - XZn rock salt
+        - XZn wurtzite
+        rows_as_published:
+        - row_label: B6-170719
+          cells_as_printed:
+          - B6-170719
+          - '941'
+          - '20'
+          - Box
+          - $PbF_2$
+          - Pt crucible
+          - 0.247(9)
+          - 0.884(7)
+        - row_label: B6-160719
+          cells_as_printed:
+          - B6-160719
+          - '1036'
+          - '20'
+          - Box
+          - $PbF_2$
+          - Pt crucible
+          - 0.289(10)
+          - 0.881(5)
+        - row_label: D20170516
+          cells_as_printed:
+          - D20170516
+          - '1097'
+          - '52'
+          - Tube
+          - None
+          - Pellet
+          - 0.287(20)
+          - 0.906(20)
+        - row_label: B6-091019
+          cells_as_printed:
+          - B6-091019
+          - '1132'
+          - '20'
+          - Box
+          - $PbF_2$
+          - Pt crucible
+          - 0.326(3)
+          - 0.893(14)
+        - row_label: 202011-4-5
+          cells_as_printed:
+          - 202011-4-5
+          - '1150'
+          - '122'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.327(3)
+          - 0.865(4)
+        - row_label: 202111-5-2
+          cells_as_printed:
+          - 202111-5-2
+          - '1168'
+          - '161'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.350(6)
+          - 0.858(2)
+        - row_label: D20170512
+          cells_as_printed:
+          - D20170512
+          - '1197'
+          - '24'
+          - Tube
+          - None
+          - Pellet
+          - 0.335(3)
+          - 0.855(7)
+        - row_label: 202011-4-2
+          cells_as_printed:
+          - 202011-4-2
+          - '1225'
+          - '46'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.340(4)
+          - 0.855(2)
+        - row_label: 202011-4-3
+          cells_as_printed:
+          - 202011-4-3
+          - '1250'
+          - '66'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.360(5)
+          - 0.852(5)
+        - row_label: 202011-4-4
+          cells_as_printed:
+          - 202011-4-4
+          - '1274'
+          - '30'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.369(1)
+          - 0.854(3)
+        - row_label: D20170519
+          cells_as_printed:
+          - D20170519
+          - '1298'
+          - '45'
+          - Tube
+          - None
+          - Pellet
+          - 0.364(5)
+          - 0.831(5)
+        - row_label: 202011-5-4
+          cells_as_printed:
+          - 202011-5-4
+          - '1329'
+          - '66'
+          - Tube
+          - None
+          - Pt capsule, sealed
+          - 0.383(2)
+          - 0.848(3)
+        - row_label: 202011-5-3
+          cells_as_printed:
+          - 202011-5-3
+          - '1358'
+          - '22'
+          - Tube
+          - None
+          - Pt capsule, sealed
+          - 0.391(4)
+          - 0.844(2)
+        - row_label: D20170511
+          cells_as_printed:
+          - D20170511
+          - '1401'
+          - '24'
+          - Tube
+          - None
+          - Pellet
+          - 0.388(6)
+          - 0.827(5)
+        - row_label: 202011-4-1
+          cells_as_printed:
+          - 202011-4-1
+          - '1433'
+          - '26'
+          - Tube
+          - None
+          - Pt capsule, open
+          - 0.405(5)
+          - 0.840(2)
+        - row_label: 202011-5-1
+          cells_as_printed:
+          - 202011-5-1
+          - '1434'
+          - '22'
+          - Tube
+          - None
+          - Pt capsule, sealed
+          - 0.411(2)
+          - 0.837(1)
+        - row_label: 202011-5-5
+          cells_as_printed:
+          - 202011-5-5
+          - '1499'
+          - '6'
+          - Tube
+          - None
+          - Pt capsule, sealed
+          - 0.428(1)
+          - 0.834(1)
+        dataset_locator_note: 'Table 1 XLSX mirror: sheet/cell range unavailable locally; values preserved from
+          the source PDF Table 1.'
+    - observation_id: farmer_table2_high_pressure_epma
+      type: measured_table_context
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 1057
+        table: '2'
+      units: T in °C; P_nominal in GPa; duration in h; XZn mole fraction
+      values:
+        method_class: measured_direct
+        candidate_tokens:
+        - equilibrium_phase_composition
+        schema_gap: 'Candidate token equilibrium_phase_composition does not support crystalline rock-salt/wurtzite
+          roles. The two numeric liquid analyses are also retained here: equilibrium_phase_composition requires
+          total_pressure identity, while the table reports P_nominal and the paper models sample pressure as P_sample
+          = P_nominal + P_nominal·f.'
+        column_headers_as_printed:
+        - Experiment no.
+        - T (°C)
+        - P_nominal (GPa)
+        - Assembly
+        - Diameter
+        - Duration (h)
+        - Routine
+        - XZn rock salt
+        - XZn wurtzite or liquid
+        rows_as_published:
+        - row_label: D2731
+          cells_as_printed:
+          - D2731
+          - '800'
+          - '3.00'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - In
+          - 0.507(4)
+          - 0.971(10)
+        - row_label: D2706
+          cells_as_printed:
+          - D2706
+          - '800'
+          - '3.025'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - In
+          - 0.508(4)
+          - 0.973(5)
+        - row_label: D2684
+          cells_as_printed:
+          - D2684
+          - '800'
+          - '3.05'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - In
+          - 0.516(4)
+          - 0.974(2)
+        - row_label: D2798
+          cells_as_printed:
+          - D2798
+          - '800'
+          - '3.00'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - Out
+          - 0.573(5)
+          - 0.980(2)
+        - row_label: D2807
+          cells_as_printed:
+          - D2807
+          - '800'
+          - '2.90'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - Out
+          - 0.499(6)
+          - 0.972(2)
+        - row_label: D2813
+          cells_as_printed:
+          - D2813
+          - '800'
+          - '2.80'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - Out
+          - 0.547(3)
+          - 0.975(3)
+        - row_label: D2860
+          cells_as_printed:
+          - D2860
+          - '800'
+          - '2.60'
+          - NaCl
+          - 1/2 in.
+          - '72'
+          - Out
+          - 0.523(5)
+          - 0.977(1)
+        - row_label: D2581
+          cells_as_printed:
+          - D2581
+          - '1000'
+          - '3.25'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.658(4)
+          - 0.972(3)
+        - row_label: D2584
+          cells_as_printed:
+          - D2584
+          - '1000'
+          - '3.20'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.646(5)
+          - 0.969(2)
+        - row_label: D2571
+          cells_as_printed:
+          - D2571
+          - '1000'
+          - '3.15'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.632(4)
+          - 0.969(2)
+        - row_label: D2564
+          cells_as_printed:
+          - D2564
+          - '1000'
+          - '3.10'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.625(7)
+          - 0.967(2)
+        - row_label: D2853
+          cells_as_printed:
+          - D2853
+          - '1000'
+          - '2.90'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - Out
+          - 0.635(2)
+          - 0.967(4)
+        - row_label: D2785
+          cells_as_printed:
+          - D2785
+          - '1200'
+          - '3.42'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.745(3)
+          - 0.966(1)
+        - row_label: D2705
+          cells_as_printed:
+          - D2705
+          - '1200'
+          - '3.47'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.759(3)
+          - 0.969(3)
+        - row_label: D2790
+          cells_as_printed:
+          - D2790
+          - '1200'
+          - '3.42'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - Out
+          - 0.801(5)
+          - 0.975(1)
+        - row_label: D2806
+          cells_as_printed:
+          - D2806
+          - '1200'
+          - '3.20'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - Out
+          - 0.787(5)
+          - 0.979(1)
+        - row_label: D2809
+          cells_as_printed:
+          - D2809
+          - '1200'
+          - '3.10'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - Out
+          - 0.763(2)
+          - 0.969(1)
+        - row_label: D2786
+          cells_as_printed:
+          - D2786
+          - '1200'
+          - '3.42'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.751(3)
+          - 0.968(1)
+        - row_label: D3031
+          cells_as_printed:
+          - D3031
+          - '1200'
+          - '1.80'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.537(3)
+          - 0.923(2)
+        - row_label: D2974
+          cells_as_printed:
+          - D2974
+          - '1400'
+          - '2.60'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.724(3)
+          - 0.946(2)
+        - row_label: D2981
+          cells_as_printed:
+          - D2981
+          - '1400'
+          - '2.50'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.719(3)
+          - 0.944(2)
+        - row_label: D2980
+          cells_as_printed:
+          - D2980
+          - '1400'
+          - '2.70'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.727(2)
+          - 0.945(1)
+        - row_label: D2986
+          cells_as_printed:
+          - D2986
+          - '1400'
+          - '2.80'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.741(3)
+          - 0.950(2)
+        - row_label: D2987
+          cells_as_printed:
+          - D2987
+          - '1400'
+          - '2.40'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.703(3)
+          - 0.938(1)
+        - row_label: D2995
+          cells_as_printed:
+          - D2995
+          - '1400'
+          - '2.30'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.681(2)
+          - 0.930(1)
+        - row_label: D2998
+          cells_as_printed:
+          - D2998
+          - '1400'
+          - '2.20'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.672(2)
+          - 0.932(1)
+        - row_label: D3007
+          cells_as_printed:
+          - D3007
+          - '1400'
+          - '2.10'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.659(3)
+          - 0.925(3)
+        - row_label: D3006
+          cells_as_printed:
+          - D3006
+          - '1400'
+          - '2.00'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.645(4)
+          - 0.924(2)
+        - row_label: C5894
+          cells_as_printed:
+          - C5894
+          - '1200'
+          - '1.90'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.541(4)
+          - 0.927(1)
+        - row_label: D3023
+          cells_as_printed:
+          - D3023
+          - '1200'
+          - '2.00'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.552(3)
+          - 0.925(4)
+        - row_label: D3024
+          cells_as_printed:
+          - D3024
+          - '1200'
+          - '2.20'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.583(4)
+          - 0.937(2)
+        - row_label: D3033
+          cells_as_printed:
+          - D3033
+          - '1200'
+          - '2.30'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.608(3)
+          - 0.942(1)
+        - row_label: D3028
+          cells_as_printed:
+          - D3028
+          - '1200'
+          - '2.40'
+          - Pyrex
+          - 5/8 in.
+          - '48'
+          - In
+          - 0.623(5)
+          - 0.944(2)
+        - row_label: D2775
+          cells_as_printed:
+          - D2775
+          - '1400'
+          - '2.50'
+          - Pyrex
+          - 1/2 in.
+          - '24'
+          - In
+          - 0.694(2)
+          - 0.938(1)
+        - row_label: D2984
+          cells_as_printed:
+          - D2984
+          - '1200'
+          - '3.00'
+          - NaCl
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.684(7)
+          - 0.958(1)
+        - row_label: D3018*
+          cells_as_printed:
+          - D3018*
+          - '1400'
+          - '3.00'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - N/A
+          - Wz N/A
+        - row_label: D2766*
+          cells_as_printed:
+          - D2766*
+          - '1400'
+          - '3.80'
+          - Pyrex
+          - 1/2 in.
+          - '48'
+          - In
+          - 0.826(3)
+          - Liq N/A
+        - row_label: D2783*
+          cells_as_printed:
+          - D2783*
+          - '1500'
+          - '3.00'
+          - Pyrex
+          - 1/2 in.
+          - '24'
+          - In
+          - 0.080(5)
+          - Liq 0.958(6)
+        - row_label: D2778*
+          cells_as_printed:
+          - D2778*
+          - '1600'
+          - '3.00'
+          - Pyrex
+          - 1/2 in.
+          - '6'
+          - Out
+          - 0.806(3)
+          - Liq 0.949a
+        pressure_note: P_nominal is retained as printed; it is not silently equated to corrected sample pressure.
+    - observation_id: farmer_table3_xrd_volumes_and_lattice_dimensions
+      type: measured_table_context
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 1060
+        table: '3'
+      units: XZn mole fraction; V in cm³ mol−1 as titled; a and c in Å
+      values:
+        method_class: measured_direct
+        candidate_tokens:
+        - density
+        - equilibrium_phase_composition
+        schema_gap: The table reports molar volume and lattice dimensions, which have no matching quantity token.
+          Candidate density is not equivalent to molar volume; XZn is a crystalline solid-solution composition,
+          whose phase roles are unsupported.
+        column_headers_as_printed:
+        - Sample
+        - XZn (rs)
+        - V (rs) (cm³)
+        - XZn (wz)
+        - a (wz) (Å)
+        - c (wz) (Å)
+        - V (wz) (cm³)
+        rows_as_published:
+        - row_label: 202011-5-2
+          cells_as_printed:
+          - 202011-5-2
+          - 0.350(6)
+          - 11.4383(4)
+          - 0.858(2)
+          - 3.25295(10)
+          - 5.18931(10)
+          - 14.3191(1)
+        - row_label: 202011-4-5
+          cells_as_printed:
+          - 202011-4-5
+          - 0.327(3)
+          - 11.4277(4)
+          - 0.865(4)
+          - 3.25324(7)
+          - 5.19064(9)
+          - 14.3252(3)
+        - row_label: 202011-4-3
+          cells_as_printed:
+          - 202011-4-3
+          - 0.360(5)
+          - 11.4433(4)
+          - 0.852(5)
+          - 3.25316(9)
+          - 5.18817(12)
+          - 14.3179(3)
+        - row_label: 202011-5-4
+          cells_as_printed:
+          - 202011-5-4
+          - 0.383(2)
+          - 11.4503(5)
+          - 0.848(3)
+          - 3.25381(10)
+          - 5.18874(14)
+          - 14.3252(6)
+        - row_label: 202011-4-1
+          cells_as_printed:
+          - 202011-4-1
+          - 0.405(5)
+          - 11.4275(11)
+          - 0.840(2)
+          - 3.25361(24)
+          - 5.18746(37)
+          - 14.3197(15)
+        - row_label: 202011-4-2
+          cells_as_printed:
+          - 202011-4-2
+          - 0.340(4)
+          - 11.4306(3)
+          - 0.855(2)
+          - 3.25316(7)
+          - 5.19040(8)
+          - 14.3240(3)
+        - row_label: 202011-5-3
+          cells_as_printed:
+          - 202011-5-3
+          - 0.391(4)
+          - 11.4657(16)
+          - 0.844(2)
+          - 3.25360(58)
+          - 5.18889(59)
+          - 14.3237(4)
+        - row_label: 202011-5-5
+          cells_as_printed:
+          - 202011-5-5
+          - 0.428(1)
+          - 11.4852(4)
+          - 0.834(1)
+          - 3.25388(10)
+          - 5.18680(15)
+          - 14.3203(1)
+        - row_label: 202011-5-1
+          cells_as_printed:
+          - 202011-5-1
+          - 0.411(2)
+          - 11.4842(4)
+          - 0.837(1)
+          - 3.25398(10)
+          - 5.18703(15)
+          - 14.3218(1)
+        - row_label: 202011-4-4
+          cells_as_printed:
+          - 202011-4-4
+          - 0.369(1)
+          - 11.4466(36)
+          - 0.854(3)
+          - 3.25391(10)
+          - 5.18949(14)
+          - 14.3282(1)
+        - row_label: $D2793^a$
+          cells_as_printed:
+          - $D2793^a$
+          - 0.745(3)
+          - 11.630(25)
+          - 0.922(1)
+          - 3.24911(23)
+          - 5.19996(50)
+          - 14.3137(15)
+        - row_label: $C5894^a$
+          cells_as_printed:
+          - $C5894^a$
+          - 0.541(4)
+          - 11.531(11)
+          - 0.927(1)
+          - 3.24867(77)
+          - 5.19895(131)
+          - 14.3080(39)
+        - row_label: $B6-160719^b$
+          cells_as_printed:
+          - $B6-160719^b$
+          - 0.289(1)
+          - '11.3999'
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+        - row_label: $B6-091019^b$
+          cells_as_printed:
+          - $B6-091019^b$
+          - 0.326(3)
+          - '11.4375'
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+        - row_label: $D20170619^b$
+          cells_as_printed:
+          - $D20170619^b$
+          - 0.364(5)
+          - '11.4466'
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+        - row_label: $D20170511^b$
+          cells_as_printed:
+          - $D20170511^b$
+          - 0.388(6)
+          - '11.4586'
+          - '-'
+          - '-'
+          - '-'
+          - '-'
+        - row_label: MgO
+          cells_as_printed:
+          - MgO
+          - '0.0'
+          - $11.245^c$
+          - ''
+          - ''
+          - ''
+          - ''
+        - row_label: ZnO
+          cells_as_printed:
+          - ZnO
+          - '1.0'
+          - $11.790^d$
+          - '1.0'
+          - $3.2497(3)^e$
+          - $5.2061(12)^e$
+          - $14.336(4)^e$
+    - observation_id: farmer_table4_thermodynamic_model_inputs
+      type: model_table_context
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 1060
+        table: '4'
+      units: as printed
+      values:
+        method_class: model_derived
+        candidate_tokens:
+        - delta_fH
+        - S
+        - cp
+        schema_gap: The table combines literature starting values and bold parameters fit in the thermodynamic model;
+          it is not a table of new direct measurements. Fitted values and cited inputs remain in context with their
+          printed source letters.
+        column_headers_as_printed:
+        - Parameter
+        - Units as printed
+        - rs-MgO
+        - wz-MgO*
+        - wz-ZnO
+        - rs-ZnO
+        rows_as_published:
+        - - ΔfH°
+          - kJ mol−1
+          - −601.55A
+          - −578.19 (50)
+          - −350.5A
+          - −335.93 (5)
+        - - S°
+          - J mol K−1
+          - 26.5A
+          - 29.11(30)
+          - 43.16A
+          - 44.57(4)
+        - - V°
+          - J bar−1
+          - 1.125A
+          - 1.293(4)
+          - 1.434A
+          - 1.179J
+        - - CPa
+          - as labelled
+          - 0.0605B
+          - 0.0631E
+          - 0.0435G
+          - 0.0614K
+        - - CPb
+          - as labelled
+          - 3.62 × 10−7 B
+          - 9.73 × 10−7 E
+          - 7.66 × 10−6 G
+          - 7.22 × 10−6 K
+        - - CPc
+          - as labelled
+          - −535.8B
+          - −260E
+          - −757.3G
+          - −17.09K
+        - - CPd
+          - as labelled
+          - −0.2992B
+          - −0.381E
+          - 0.05456G
+          - −0.3983K
+        - - α0
+          - as labelled
+          - 3.11 × 10−5 C
+          - 3.78 × 10−5 E
+          - 4.45 × 10−5 H
+          - 5.20 × 10−5 L
+        - - κ0
+          - kbar
+          - 1616D
+          - 1521E
+          - 1426I
+          - 1910L
+        - - κ′
+          - as labelled
+          - 3.95D
+          - 3.775E
+          - 3.6I
+          - 3.54L
+        - - κ″
+          - as labelled
+          - −0.0024D
+          - −0.00248F
+          - −0.00252F
+          - −0.00185L
+        source_legend_as_printed: A Robie and Hemingway (1995); B Richet and Fiquet (1991); C Dubrovinsky and Saxena
+          (1997); D Hazen (1976) and Fei (1999); E average of rs-MgO and wz-ZnO; F Holland and Powell (2011); G
+          Robie et al. (1989); H Gadzhiev (2003); I Desgreniers (1998); J extrapolated from measured rock-salt volume
+          assuming ideality; K Seko et al. (2005) corrected using wz-ZnO Cp; L Decremps et al. (2000).
+    - observation_id: farmer_table5_model_correlations
+      type: model_table_context
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 1063
+        table: '5'
+      units: correlation coefficients dimensionless; parameter values/units in row labels
+      values:
+        method_class: model_derived
+        candidate_tokens:
+        - delta_fH
+        - S
+        - molar-volume token absent
+        - interaction_parameter
+        schema_gap: This is the MCMC model-parameter correlation matrix and best-fit values; it is model output,
+          not a measured thermochemical table.
+        column_headers_as_printed:
+        - Parameter row
+        - Lower-triangle correlations as printed
+        - Best fit and 1σ where printed
+        rows_as_published:
+        - - wz-MgO ΔfH° (kJ mol−1)
+          - −578.19 (50)
+        - - wz-MgO S° (J mol K−1)
+          - '0.993'
+          - 29.11(30)
+        - - wz-MgO V° (J bar−1)
+          - −0.313
+          - −0.264
+          - 1.293(4)
+        - - rs-ZnO ΔfH° (kJ mol−1)
+          - '0.176'
+          - '0.195'
+          - −0.033
+          - −335.93 (5)
+        - - rs-ZnO S° (J mol K−1)
+          - '0.190'
+          - '0.223'
+          - −0.029
+          - '0.962'
+          - 44.57(4)
+        - - fin, 1/2 in.
+          - −0.062
+          - −0.097
+          - '0.138'
+          - −0.082
+          - '0.099'
+          - 0.053(3)
+        - - fout
+          - '0.075'
+          - −0.101
+          - '0.110'
+          - −0.071
+          - '0.061'
+          - '0.325'
+          - −0.061 (1)
+        footnote_as_printed: f_in for 5/8 and 3/4 in. assemblies is constrained to be 0.
+    - observation_id: farmer_figure1_t_x_1atm_phase_relations
+      type: figure_context
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 1056
+        figure: '1'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: rock salt and wurtzite solid solutions
+        axes_as_printed: 'x: XZn mole fraction; y: temperature, °C'
+        series_list_as_printed: present-work EPMA points; calculated relations at 1 atm and 3 GPa
+        marker_count_per_series: measured markers not counted; lines are calculated; digitisation deferred
+        caption: Plot of temperature against composition measured by EPMA for rock salt and wurtzite synthesized
+          in 1 atm experiments, with T–X relations calculated at 1 atm and 3 GPa.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure2_rock_salt_limb
+      type: figure_context
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 1057
+        figure: '2'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: rock-salt solid solution
+        axes_as_printed: 'x: XZn in rock salt; y: temperature, °C'
+        series_list_as_printed: Xia et al. (2016); present-work EPMA; model curves
+        marker_count_per_series: markers not counted; digitisation deferred
+        caption: Detailed view of the rock-salt limb from Fig. 1, showing discrepancy between Xia et al. (2016)
+          data and model, with experimental data from this study; symbols as in Fig. 1, 1σ error bars.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure3_pressure_composition
+      type: figure_context
+      locator:
+        pdf_page_index: 5
+        page: 6
+        published_page: 1056
+        figure: '3'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: rock-salt and wurtzite solid solutions
+        axes_as_printed: 'x: XZn; y: nominal pressure, GPa; present-work runs at 1200 °C'
+        series_list_as_printed: present-work EPMA runs by press routine/assembly; model lines at 1200 °C and 800
+          °C
+        marker_count_per_series: markers not counted; digitisation deferred
+        caption: Nominal experimental pressure against composition measured by EPMA in rock salt and wurtzite synthesized
+          in piston–cylinder experiments at 1200 °C up to approximately 3.7 GPa, with modelled P–X relations at
+          1200 °C and 800 °C.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure4_quench_textures
+      type: figure_context
+      locator:
+        pdf_page_index: 6
+        page: 7
+        published_page: 1057
+        figure: '4'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: D3031 rock salt + wurtzite; D2786 reverted rock salt
+        axes_as_printed: photomicrograph panels (no plotted axes)
+        series_list_as_printed: two sample panels; no plotted series
+        marker_count_per_series: not applicable; digitisation deferred
+        caption: Backscattered-electron photomicrographs of intact rock salt plus wurtzite assemblage in D3031 and
+          reverted rock salt in D2786.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure5_melting_relations
+      type: figure_context
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 1058
+        figure: '5'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: rock salt, wurtzite, liquid
+        axes_as_printed: 'x: composition; y: temperature; pressure annotations 3 GPa and 1 bar'
+        series_list_as_printed: present-work experimental points and sketched boundaries; cited ambient-pressure
+          relations
+        marker_count_per_series: markers not counted; digitisation deferred
+        caption: Sketch of temperature–composition relations in MgO–ZnO at 3 GPa, contrasted with ambient-pressure
+          relations after Segnit and Holland (1965).
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure6_rock_salt_volume
+      type: figure_context
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 1060
+        figure: '6'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: rock-salt solid solution
+        axes_as_printed: 'x: XZn in rock salt; y: molar volume, cm³ mol−1'
+        series_list_as_printed: present-work XRD and EPMA; least-squares fit
+        marker_count_per_series: markers not counted; digitisation deferred
+        caption: Rock-salt unit-cell volume measured by XRD against composition measured by EPMA, with least-squares
+          fit; error bars are 1σ.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
+    - observation_id: farmer_figure7_mcmc_corner_plot
+      type: figure_context
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 1063
+        figure: '7'
+      units: as printed on axes/caption
+      values:
+        method_class: figure_only
+        species_formula: MgO–ZnO system; ZnO component
+        phase_as_printed: MgO–ZnO thermodynamic model parameters
+        axes_as_printed: pairwise model-parameter axes; no T/P axes
+        series_list_as_printed: MCMC posterior histograms and scatter/gradient plots
+        marker_count_per_series: continuous posterior samples; no point markers; digitisation deferred
+        caption: Corner plot of posterior distributions and parameter correlations; dashed lines mark 16th, 50th
+          and 84th percentiles; best-fit values and 68% intervals are printed above histograms.
+        attribution: Farmer and O’Neill (2023); cited series named in the caption/text
+        digitisation: deferred to a figure pass
