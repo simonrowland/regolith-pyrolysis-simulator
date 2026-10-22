@@ -163,6 +163,14 @@ def test_sourced_channels_close_oxygen_with_declared_unity_escape(
         (expected_mg + expected_sio) / 2.0, rel=1e-10, abs=0.0
     )
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1e-14
+    # Binary pins captured at 64a59b4f5 before sharing the residue-channel DTO
+    # construction; the independent physical expectations above remain in force.
+    assert result.pO2_bar_by_step[0].hex() == (
+        "0x1.88b2597f2ed39p-20" if with_sio else "0x1.b4883fbd20146p-21"
+    )
+    assert result.evaporated_mol["Mg"].hex() == (
+        "0x1.ba44fd84636a8p-23" if with_sio else "0x1.289d524472f78p-22"
+    )
 
 
 def test_r11_isolated_mgo_bound_has_zero_coproduct_oxygen(monkeypatch):
