@@ -3029,6 +3029,16 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
+        # One core serves every cell. Certificates, held gammas, the
+        # previous-temperature clock and the fallback-step log are the
+        # previous cell's trajectory. Clear them here, before this cell's
+        # own refresh. Callers that walk one cell's trajectory (the
+        # adapter, residue integration) do not re-enter here between
+        # steps, so that history stays.
+        core = self._core
+        core._last_high_t_melt_activity = {}
+        core._last_high_t_melt_activity_temperature_K = None
+        core._high_t_melt_activity_fallback_steps = []
         if (
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION

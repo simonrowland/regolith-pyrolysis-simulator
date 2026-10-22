@@ -1033,6 +1033,172 @@ def test_reused_battery_core_preserves_certified_activity_on_refusal(
     )
 
 
+# Two independent battery cells. A solves above the 1950 K vapour cap and
+# would certify a continuation. B is a different melt at another temperature.
+_INDEPENDENT_CELL_A_MOL = dict(BASE_MELT_MOL)
+_INDEPENDENT_CELL_B_MOL = {**BASE_MELT_MOL, "SiO2": 4.0, "MgO": 2.0}
+_INDEPENDENT_CELL_A_T_K = 2400.65
+_INDEPENDENT_CELL_B_T_K = 2200.0
+
+
+def _independent_cell_backend():
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _InternalAnalyticalBatteryBackend,
+    )
+
+    return _InternalAnalyticalBatteryBackend()
+
+
+def _equilibrate_independent_cell(backend, composition, temperature_K):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+    )
+
+    return backend.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg=None,
+        composition_mol=dict(composition),
+        fO2_log=-9.0,
+        pressure_bar=1.0e-6,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-9),
+    )
+
+
+def _high_t_authority(result):
+    diagnostic = result.diagnostics["vapor_pressure_diagnostic"]
+    authority = diagnostic.get("high_t_melt_activity")
+    assert isinstance(authority, dict)
+    return authority
+
+
+def _independent_cell_record(result):
+    """Prediction and notice surface a reused core must not reorder."""
+
+    authority = _high_t_authority(result)
+    return {
+        "status": result.status,
+        "pressures_hex": {
+            str(species): float(pressure).hex()
+            for species, pressure in sorted(result.vapor_pressures_Pa.items())
+        },
+        "diagnostics_authority": result.diagnostics.get("authority"),
+        "imcc_notices": result.diagnostics.get("imcc_notices"),
+        "provider": authority.get("provider"),
+        "authority": authority.get("authority"),
+        "fallback_reason": authority.get("fallback_reason"),
+        "held_effective_gamma_by_parent": authority.get(
+            "held_effective_gamma_by_parent"
+        ),
+        "notices": authority.get("notices"),
+        "temperature_bridge": authority.get("temperature_bridge"),
+    }
+
+
+def _refuse_openimcc_near_cell_b(monkeypatch, *, include_bridge_probes: bool):
+    """Refuse cell B's temperature. Optionally refuse its bridge probes too."""
+
+    real_evaluate = openimcc_bridge_module.evaluate
+    span = (
+        float(vapor_pressure_module._TEMPERATURE_BRIDGE_CAP_K)
+        if include_bridge_probes
+        else 0.0
+    )
+
+    def evaluate(*args, **kwargs):
+        temperature_K = kwargs.get("temperature_K")
+        if temperature_K is None and len(args) >= 2:
+            temperature_K = args[1]
+        if (
+            temperature_K is not None
+            and abs(float(temperature_K) - _INDEPENDENT_CELL_B_T_K) <= span + 1e-6
+        ):
+            raise ImccNonconvergenceError(
+                "independent cell has no continuation of its own", {}
+            )
+        return real_evaluate(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", evaluate)
+
+
+def _score_independent_cells(order):
+    cells = {
+        "A": (_INDEPENDENT_CELL_A_MOL, _INDEPENDENT_CELL_A_T_K),
+        "B": (_INDEPENDENT_CELL_B_MOL, _INDEPENDENT_CELL_B_T_K),
+    }
+    backend = _independent_cell_backend()
+    records = {}
+    for name in order:
+        composition, temperature_K = cells[name]
+        records[name] = _independent_cell_record(
+            _equilibrate_independent_cell(backend, composition, temperature_K)
+        )
+    return records
+
+
+def test_independent_battery_cells_match_in_either_order(monkeypatch) -> None:
+    """A then B and B then A return the same pressures and notices.
+
+    Cell B does not solve at its own temperature. Its same-composition
+    probes do. The bridge is extrapolated and does not carry cell A's
+    certificate.
+    """
+
+    _refuse_openimcc_near_cell_b(monkeypatch, include_bridge_probes=False)
+    forward = _score_independent_cells(("A", "B"))
+    reverse = _score_independent_cells(("B", "A"))
+    assert forward == reverse
+
+    refused = forward["B"]
+    assert refused["status"] == "ok"
+    assert refused["temperature_bridge"]["call_count"] > 0
+    silica = refused["held_effective_gamma_by_parent"]["SiO2"]
+    assert silica["code"] == "hold_last_certified_effective_gamma"
+    assert silica["method"] == "same_composition_T_bridge"
+    assert silica["authority"] == "extrapolated"
+    assert "gamma_last" not in silica
+    assert "hour_gap" not in silica
+    assert "composition_distance_L1" not in silica
+    assert any(
+        notice.get("parent") == "SiO2"
+        and notice.get("method") == "same_composition_T_bridge"
+        for notice in refused["notices"]
+    )
+
+
+def test_cell_without_same_composition_bridge_keeps_typed_fallback(
+    monkeypatch,
+) -> None:
+    """No two probe points: the typed constant-gamma fallback stays.
+
+    A prior certified cell on the same core must not supply the gamma.
+    """
+
+    _refuse_openimcc_near_cell_b(monkeypatch, include_bridge_probes=True)
+    forward = _score_independent_cells(("A", "B"))
+    reverse = _score_independent_cells(("B", "A"))
+    assert forward == reverse
+
+    lone = _independent_cell_record(
+        _equilibrate_independent_cell(
+            _independent_cell_backend(),
+            _INDEPENDENT_CELL_B_MOL,
+            _INDEPENDENT_CELL_B_T_K,
+        )
+    )
+    assert forward["B"] == lone
+    authority = forward["B"]
+    assert authority["provider"] == "constant_gamma"
+    assert authority["authority"] == "extrapolated"
+    assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert authority["held_effective_gamma_by_parent"] == {}
+    assert authority["temperature_bridge"]["call_count"] > 0
+    assert not any(
+        notice.get("method") == "same_composition_T_bridge"
+        for notice in authority["notices"]
+    )
+
+
 @pytest.mark.parametrize("silica_factor", [1.0, 0.99])
 def test_first_high_t_certificate_without_previous_temperature_can_hold(
     monkeypatch, silica_factor,
