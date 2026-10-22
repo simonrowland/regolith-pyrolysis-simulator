@@ -486,6 +486,25 @@ def _atom_totals(
     return dict(totals)
 
 
+def _residue_oxygen_channels(
+    terms: Sequence[_ChannelTerms], inventory: Mapping[str, float],
+) -> tuple[_VacuumOxygenChannel, ...]:
+    return tuple(
+        _VacuumOxygenChannel(
+            species=term.source.species,
+            molar_mass_kg_per_mol=term.molar_mass_kg_mol,
+            oxygen_atoms=term.atom_counts.get("O", 0.0),
+            parent_oxygen_demand=term.parent_oxygen_demand,
+            pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
+            alpha=float(term.source.alpha),
+            alpha_source=term.source.alpha_source,
+            active=(term.parent_moles_per_product == 0.0
+                    or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0),
+        )
+        for term in terms
+    )
+
+
 def _finite_step_fluxes(
     terms: Sequence[_ChannelTerms],
     inventory_mol: Mapping[str, float],
@@ -668,26 +687,7 @@ def integrate_residue_inventory(
             try:
                 balance = _solve_vacuum_oxygen_balance(
                 pressure_at,
-                tuple(
-                    _VacuumOxygenChannel(
-                        species=term.source.species,
-                        molar_mass_kg_per_mol=term.molar_mass_kg_mol,
-                        oxygen_atoms=term.atom_counts.get("O", 0.0),
-                        parent_oxygen_demand=term.parent_oxygen_demand,
-                        pO2_exponent=(
-                            term.atom_counts.get("O", 0.0)
-                            - term.parent_oxygen_demand
-                        )
-                        / 2.0,
-                        alpha=float(term.source.alpha),
-                        alpha_source=term.source.alpha_source,
-                        active=(
-                            term.parent_moles_per_product == 0.0
-                            or inventory.get(term.source.parent_oxide or "", 0.0) > 0.0
-                        ),
-                    )
-                    for term in terms
-                ),
+                _residue_oxygen_channels(terms, inventory),
                 temperature_K=temperature,
                 **({"background_pressure_Pa": background_pressure_Pa}
                    if background_pressure_Pa else {}),
