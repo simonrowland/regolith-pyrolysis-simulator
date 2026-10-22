@@ -13,6 +13,7 @@ from simulator.battery.enums import (
     Authority,
     Engine,
     NoticeKind,
+    Quantity,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -42,7 +43,7 @@ def test_kress91_calibration_scope_migrates_as_model_work():
     result = migrator.result
     work_id = "10.1007/bf00307328"
     assert not result.validation.hard_issues
-    assert result.observations == {}
+    assert len(result.observations) == 33
     assert result.works[work_id].doi == work_id
     assert (
         "kress-carmichael-1991-iron-redox-calibration"
@@ -53,9 +54,70 @@ def test_kress91_calibration_scope_migrates_as_model_work():
     fit_scope = context["values"]["fit_data_scope"]
     assert fit_scope["data_count"] == 228
     assert len(fit_scope["sources"]) == 7
+    assert all(source.get("work_id") for source in fit_scope["sources"])
+    assert "COMPLETENESS assertion" in fit_scope["note"]
+    assert "weighted step-wise-linear regression of 228 quench data" in fit_scope["note"]
     assert fit_scope["sources"][-1]["source_id"] == (
         "kress-carmichael-1991-iron-redox-calibration"
     )
+
+
+def test_kress91_table4_migrates_conditions_and_unknown_source_per_row():
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts/kress-carmichael-1991-iron-redox-calibration.yaml"
+    )
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+
+    result = migrator.result
+    assert not result.validation.hard_issues
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == extract.stem
+        and observation.locator is not None
+        and observation.locator.table == "4"
+        and observation.locator.record is not None
+    ]
+    assert len(points) == 33
+    for observation in points:
+        assert observation.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        assert observation.derived_from == (
+            "unknown:kress-carmichael-1991-iron-redox-calibration",
+        )
+        temperature = (observation.point_conditions or {})["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.locator is not None
+        assert temperature.locator.published_page == 86
+        assert temperature.locator.record == observation.locator.record
+        composition = (observation.point_conditions or {})["composition"]
+        assert composition.state.is_value
+        assert composition.locator is not None
+        fo2 = (observation.point_conditions or {})["fO2_log"]
+        assert fo2.state.is_unknown
+        assert fo2.locator is not None
+        assert fo2.locator.published_page == 86
+        assert fo2.locator.record == observation.locator.record
+
+
+def test_kress91_fit_sources_are_registered_as_work_only_extracts():
+    root = Path(__file__).resolve().parents[2]
+    extract_dir = root / "data/literature/extracts"
+    sources = {
+        "fudali-1965-oxygen-fugacities-basalt-andesite": "ab9a41eda79eb05efce4a44727038279dad4d2e5d03b6b32a41ebc4974a2ab09",
+        "kennedy-1948-oxygen-volatiles-iron-oxides": "89fbf42cb1045f1ab8801cc1830202d26d6b7f67eb4e4c7ba2a77d220cedb72d",
+        "kilinc-carmichael-rivers-sack-1983-natural-liquid-redox": "fec8fa96ccf0cc31760efff3664f47d218d524fbbe5db5cae44421271029452f",
+        "sack-carmichael-rivers-ghiorso-1980-natural-silicate-redox": "b77e0ff25deb0fc9b4ba06d37745e0eabb36ad9af6c4a3154e4058b0fb6d63a6",
+        "thornber-roeder-foster-1980-basaltic-liquid-redox": "121e74bd9516561563c2672c96b9fb534100975aa82eb538e65d08460e630ce7",
+    }
+    for source_id, work_id in sources.items():
+        migrator = migrate_one_extract(root, extract_dir / f"{source_id}.yaml")
+        migrator.finalize()
+        assert not migrator.result.validation.hard_issues
+        assert migrator.result.observations == {}
+        assert migrator.result.works[work_id].source_ids == (source_id,)
 
 
 def test_borisov_2018_rows_reach_redox_scoring_population():

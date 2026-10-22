@@ -368,3 +368,243 @@ species:
             The authors caution that FeO1.464 may not represent a discrete species;
             they interpret it as a probable stoichiometry from a distribution of
             configurations involving other melt cations.
+      - observation_id: kress_1988_table5_1991_reanalysis
+        type: thermodynamic_example
+        locator:
+          published_page: 86
+          pdf_page_index: 4
+          table: '5'
+        units: wt% oxide; T in °C; log10 fO2 as printed
+        derived_from:
+          - kress_1988_table1_measured_redox_series
+        values:
+          quantity: kress_1988_experiments_reanalyzed_in_kress_1991
+          method_class: measured_reduced
+          evidence_class: measured_tabulated
+          source_citation: 'Kress, V. C., and Carmichael, I. S. E. (1991). Contributions to Mineralogy and Petrology 108:82–92.'
+          source_wording: 'Table 5. Re-analysis of experiments from Kress and Carmichael (1988) (wt%)'
+          link_note: >-
+            This is a context record, not a second scored observation set. Run labels link the re-analyses to the Kress88 Table 1
+            measured series; revised values are held here once, under their original work.
+          rows:
+            - experiment_id: B27
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B27}
+              T_C: '1437'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '9.54'
+              FeO_wt_pct: '3.42'
+              composition_wt_pct:
+                SiO2: '50.46'
+                TiO2: '1.88'
+                Al2O3: '13.87'
+                Fe2O3: '9.54'
+                FeO: '3.42'
+                MnO: '0.17'
+                MgO: '6.84'
+                CaO: '10.65'
+                Na2O: '2.68'
+                K2O: '0.19'
+            - experiment_id: B34
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B34}
+              T_C: '1388'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '10.01'
+              FeO_wt_pct: '2.83'
+              composition_wt_pct:
+                SiO2: '50.64'
+                TiO2: '1.89'
+                Al2O3: '13.93'
+                Fe2O3: '10.01'
+                FeO: '2.83'
+                MnO: '0.17'
+                MgO: '6.76'
+                CaO: '10.66'
+                Na2O: '2.66'
+                K2O: '0.19'
+            - experiment_id: B44
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B44}
+              T_C: '1485'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '8.39'
+              FeO_wt_pct: '4.45'
+              composition_wt_pct:
+                SiO2: '50.61'
+                TiO2: '1.90'
+                Al2O3: '14.03'
+                Fe2O3: '8.39'
+                FeO: '4.45'
+                MnO: '0.17'
+                MgO: '6.66'
+                CaO: '10.61'
+                Na2O: '2.43'
+                K2O: '0.17'
+            - experiment_id: B54
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B54}
+              T_C: '1535'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '8.41'
+              FeO_wt_pct: '4.43'
+              composition_wt_pct:
+                SiO2: '51.09'
+                TiO2: '1.89'
+                Al2O3: '13.94'
+                Fe2O3: '8.41'
+                FeO: '4.43'
+                MnO: '0.17'
+                MgO: '6.77'
+                CaO: '10.67'
+                Na2O: '2.43'
+                K2O: '0.17'
+            - experiment_id: B64
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B64}
+              T_C: '1584'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '7.59'
+              FeO_wt_pct: '5.13'
+              composition_wt_pct:
+                SiO2: '51.00'
+                TiO2: '1.92'
+                Al2O3: '13.96'
+                Fe2O3: '7.59'
+                FeO: '5.13'
+                MnO: '0.17'
+                MgO: '6.86'
+                CaO: '10.69'
+                Na2O: '2.32'
+                K2O: '0.16'
+            - experiment_id: B74
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B74}
+              T_C: '1635'
+              log_fO2: '-0.68'
+              Fe2O3_wt_pct: '6.82'
+              FeO_wt_pct: '5.56'
+              composition_wt_pct:
+                SiO2: '50.85'
+                TiO2: '1.89'
+                Al2O3: '13.73'
+                Fe2O3: '6.82'
+                FeO: '5.56'
+                MnO: '0.17'
+                MgO: '6.75'
+                CaO: '10.78'
+                Na2O: '2.20'
+                K2O: '0.16'
+            - experiment_id: B76
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B76}
+              T_C: '1342'
+              log_fO2: '-2.88'
+              Fe2O3_wt_pct: '7.56'
+              FeO_wt_pct: '5.14'
+              composition_wt_pct:
+                SiO2: '51.24'
+                TiO2: '1.91'
+                Al2O3: '13.81'
+                Fe2O3: '7.56'
+                FeO: '5.14'
+                MnO: '0.17'
+                MgO: '6.78'
+                CaO: '10.52'
+                Na2O: '2.67'
+                K2O: '0.21'
+            - experiment_id: B79
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B79}
+              T_C: '1296'
+              log_fO2: '-3.06'
+              Fe2O3_wt_pct: '8.18'
+              FeO_wt_pct: '4.71'
+              composition_wt_pct:
+                SiO2: '50.90'
+                TiO2: '1.91'
+                Al2O3: '13.85'
+                Fe2O3: '8.18'
+                FeO: '4.71'
+                MnO: '0.17'
+                MgO: '6.82'
+                CaO: '10.61'
+                Na2O: '2.69'
+                K2O: '0.20'
+            - experiment_id: B82
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B82}
+              T_C: '1249'
+              log_fO2: '-3.26'
+              Fe2O3_wt_pct: '8.91'
+              FeO_wt_pct: '3.99'
+              composition_wt_pct:
+                SiO2: '50.38'
+                TiO2: '1.93'
+                Al2O3: '13.70'
+                Fe2O3: '8.91'
+                FeO: '3.99'
+                MnO: '0.17'
+                MgO: '6.93'
+                CaO: '10.54'
+                Na2O: '2.70'
+                K2O: '0.20'
+            - experiment_id: B105
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B105}
+              T_C: '1636'
+              log_fO2: '-6.29'
+              Fe2O3_wt_pct: '0.52'
+              FeO_wt_pct: '10.89'
+              composition_wt_pct:
+                SiO2: '52.41'
+                TiO2: '2.00'
+                Al2O3: '14.26'
+                Fe2O3: '0.52'
+                FeO: '10.89'
+                MnO: '0.22'
+                MgO: '6.79'
+                CaO: '11.17'
+                Na2O: '0.56'
+                K2O: '0.13'
+            - experiment_id: B108
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B108}
+              T_C: '1548'
+              log_fO2: '-5.40'
+              Fe2O3_wt_pct: '2.11'
+              FeO_wt_pct: '12.61'
+              composition_wt_pct:
+                SiO2: '50.19'
+                TiO2: '1.89'
+                Al2O3: '13.50'
+                Fe2O3: '2.11'
+                FeO: '12.61'
+                MnO: '0.22'
+                MgO: '6.54'
+                CaO: '10.53'
+                Na2O: '1.48'
+                K2O: '0.15'
+            - experiment_id: B118
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B118}
+              T_C: '1544'
+              log_fO2: '-5.42'
+              Fe2O3_wt_pct: '1.82'
+              FeO_wt_pct: '10.39'
+              composition_wt_pct:
+                SiO2: '52.27'
+                TiO2: '1.95'
+                Al2O3: '13.95'
+                Fe2O3: '1.82'
+                FeO: '10.39'
+                MnO: '0.21'
+                MgO: '6.69'
+                CaO: '10.90'
+                Na2O: '1.23'
+                K2O: '0.14'
+            - experiment_id: B120
+              locator: {published_page: 86, pdf_page_index: 4, table: '5', record: B120}
+              T_C: '1632'
+              log_fO2: '-4.74'
+              Fe2O3_wt_pct: '1.80'
+              FeO_wt_pct: '10.38'
+              composition_wt_pct:
+                SiO2: '52.83'
+                TiO2: '1.95'
+                Al2O3: '13.95'
+                Fe2O3: '1.80'
+                FeO: '10.38'
+                MnO: '0.23'
+                MgO: '6.87'
+                CaO: '10.93'
+                Na2O: '0.87'
+                K2O: '0.13'

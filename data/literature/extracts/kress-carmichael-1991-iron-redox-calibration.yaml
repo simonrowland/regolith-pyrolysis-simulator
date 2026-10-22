@@ -1,106 +1,1187 @@
 schema_version: literature_extract.v1
 source_id: kress-carmichael-1991-iron-redox-calibration
 source:
-  citation: 'Kress, V. C., and Carmichael, I. S. E. (1991). The compressibility of silicate liquids containing Fe2O3 and the effect of composition, temperature, oxygen fugacity and pressure on their redox states. Contributions to Mineralogy and Petrology 108:82–92.'
+  citation: Kress, V. C., and Carmichael, I. S. E. (1991). The compressibility of silicate liquids containing Fe2O3 and the
+    effect of composition, temperature, oxygen fugacity and pressure on their redox states. Contributions to Mineralogy and
+    Petrology 108:82–92.
   doi: 10.1007/BF00307328
   url: https://doi.org/10.1007/BF00307328
   year: 1991
   sha256: b83bae1fc83450a2d0cb3b4e21a38da5f50c462a7a422fd2abe4b046ef6279cf
 extraction:
-  method: >-
-    Registered the Kress91 model and transcribed the stated natural-liquid
-    regression scope. The source data tables need row-level extraction before
-    they can enter the redox observation rail.
+  method: Transcribed the Kress91 Eq. 7 natural-liquid regression scope and all 33 Table 4 redox rows from the supplied PDF.
+    Table 4 fO2 is left unknown because no per-run log fO2 is printed. Table 5 is retained once as context under the Kress88
+    work.
   date: '2026-10-22'
   worker: codex-kc91-1022
 review_status: draft
 species:
   Fe:
     context:
-      - observation_id: kress_1991_equation7_fit_scope
-        type: thermodynamic_example
-        locator:
-          published_page: 87
-          pdf_page_index: 5
-          section: Equation 7 natural-liquid regression
-          table: '7'
-        units: 'quench-data count; source citations and fit scope as printed'
-        values:
-          quantity: authors_fit_calibration_source_scope
-          method_class: model_derived
-          evidence_class: model_derived
-          model_id: REF-001-kress-carmichael-1991
-          engine_citation: 'Kress and Carmichael 1991, doi:10.1007/BF00307328'
-          source_wording: >-
-            The values for a, b, c and d_i in Eq. 7 for natural liquids were
-            estimated by weighted stepwise-linear regression of 228 quench data.
-          fit_data_scope:
-            data_count: 228
-            regression: weighted stepwise-linear
-            equation: 7
-            sources:
-              - citation: 'Kennedy, G. C. (1948). Equilibrium between volatiles and iron oxides in igneous rocks. American Journal of Science 246:529–549.'
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 91
-                  pdf_page_index: 9
-              - citation: 'Fudali, R. F. (1965). Oxygen fugacities of basaltic and andesitic magmas. Geochimica et Cosmochimica Acta 29:1063–1075.'
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 91
-                  pdf_page_index: 9
-              - citation: 'Thornber, C. R., Roeder, P. L., and Foster, J. R. (1980). The effect of composition on the ferric-ferrous ratio in basaltic liquids at atmospheric pressure. Geochimica et Cosmochimica Acta 44:525–532.'
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 92
-                  pdf_page_index: 10
-              - citation: 'Sack, R. O., Carmichael, I. S. E., Rivers, M., and Ghiorso, M. S. (1980). Ferric-ferrous equilibria in natural silicate liquids at 1 bar. Contributions to Mineralogy and Petrology 75:369–376.'
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 92
-                  pdf_page_index: 10
-              - citation: 'Kilinc, A., Carmichael, I. S. E., Rivers, M. L., and Sack, R. O. (1983). The ferric-ferrous ratio of natural silicate liquids equilibrated in air. Contributions to Mineralogy and Petrology 83:136–140.'
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 92
-                  pdf_page_index: 10
-              - citation: 'Kress, V. C., and Carmichael, I. S. E. (1988). Stoichiometry of the iron oxidation reaction in silicate melts. American Mineralogist 73:1267–1274.'
-                source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-                reference_locator:
-                  published_page: 92
-                  pdf_page_index: 10
-              - citation: this study
-                source_id: kress-carmichael-1991-iron-redox-calibration
-                fit_locator:
-                  published_page: 87
-                  pdf_page_index: 5
-            fixed_parameter:
-              citation: 'Stebbins, J. F., Carmichael, I. S. E., and Moret, L. K. (1984). Heat capacities and entropies of silicate liquids and glasses. Contributions to Mineralogy and Petrology 86:131–148.'
-              locator:
-                published_page: 87
-                pdf_page_index: 5
-              note: The paper says the Eq. 7 value for e was adopted from this source; it is not among the 228 quench data.
-          own_experiment_rows:
-            table4:
+    - observation_id: kress_1991_equation7_fit_scope
+      type: thermodynamic_example
+      locator:
+        published_page: 87
+        pdf_page_index: 5
+        section: Equation 7 natural-liquid regression
+        table: '7'
+      units: quench-data count; source citations and fit scope as printed
+      values:
+        quantity: authors_fit_calibration_source_scope
+        method_class: model_derived
+        evidence_class: model_derived
+        model_id: REF-001-kress-carmichael-1991
+        engine_citation: Kress and Carmichael 1991, doi:10.1007/BF00307328
+        source_wording: The values for a, b, c and d_i in Eq. 7 for natural liquids were estimated by weighted stepwise-linear
+          regression of 228 quench data.
+        fit_data_scope:
+          data_count: 228
+          regression: weighted stepwise-linear
+          equation: 7
+          sources:
+          - citation: Kennedy, G. C. (1948). Equilibrium between volatiles and iron oxides in igneous rocks. American Journal
+              of Science 246:529–549.
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 91
+              pdf_page_index: 9
+            source_id: kennedy-1948-oxygen-volatiles-iron-oxides
+            work_id: 89fbf42cb1045f1ab8801cc1830202d26d6b7f67eb4e4c7ba2a77d220cedb72d
+          - citation: Fudali, R. F. (1965). Oxygen fugacities of basaltic and andesitic magmas. Geochimica et Cosmochimica
+              Acta 29:1063–1075.
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 91
+              pdf_page_index: 9
+            source_id: fudali-1965-oxygen-fugacities-basalt-andesite
+            work_id: ab9a41eda79eb05efce4a44727038279dad4d2e5d03b6b32a41ebc4974a2ab09
+          - citation: Thornber, C. R., Roeder, P. L., and Foster, J. R. (1980). The effect of composition on the ferric-ferrous
+              ratio in basaltic liquids at atmospheric pressure. Geochimica et Cosmochimica Acta 44:525–532.
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 92
+              pdf_page_index: 10
+            source_id: thornber-roeder-foster-1980-basaltic-liquid-redox
+            work_id: 121e74bd9516561563c2672c96b9fb534100975aa82eb538e65d08460e630ce7
+          - citation: Sack, R. O., Carmichael, I. S. E., Rivers, M., and Ghiorso, M. S. (1980). Ferric-ferrous equilibria
+              in natural silicate liquids at 1 bar. Contributions to Mineralogy and Petrology 75:369–376.
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 92
+              pdf_page_index: 10
+            source_id: sack-carmichael-rivers-ghiorso-1980-natural-silicate-redox
+            work_id: b77e0ff25deb0fc9b4ba06d37745e0eabb36ad9af6c4a3154e4058b0fb6d63a6
+          - citation: Kilinc, A., Carmichael, I. S. E., Rivers, M. L., and Sack, R. O. (1983). The ferric-ferrous ratio of
+              natural silicate liquids equilibrated in air. Contributions to Mineralogy and Petrology 83:136–140.
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 92
+              pdf_page_index: 10
+            source_id: kilinc-carmichael-rivers-sack-1983-natural-liquid-redox
+            work_id: fec8fa96ccf0cc31760efff3664f47d218d524fbbe5db5cae44421271029452f
+          - citation: Kress, V. C., and Carmichael, I. S. E. (1988). Stoichiometry of the iron oxidation reaction in silicate
+              melts. American Mineralogist 73:1267–1274.
+            source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            reference_locator:
+              published_page: 92
+              pdf_page_index: 10
+            work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+          - citation: this study
+            source_id: kress-carmichael-1991-iron-redox-calibration
+            fit_locator:
+              published_page: 87
+              pdf_page_index: 5
+            work_id: 10.1007/bf00307328
+          fixed_parameter:
+            citation: Stebbins, J. F., Carmichael, I. S. E., and Moret, L. K. (1984). Heat capacities and entropies of silicate
+              liquids and glasses. Contributions to Mineralogy and Petrology 86:131–148.
+            locator:
+              published_page: 87
+              pdf_page_index: 5
+            note: The paper says the Eq. 7 value for e was adopted from this source; it is not among the 228 quench data.
+          note: 'COMPLETENESS assertion (record schema has no completeness field): the six prior fit sources are exactly the
+            six works enumerated below; the fit sentence also includes this study''s own data. Locator: Equation 7 natural-liquid
+            regression, published p. 87, PDF page index 5; reference list pp. 91–92, PDF page indices 9–10. The paper states:
+            "For natural liquids, values for the a, b, c and d_i in Eq. (7) were estimated on the basis of a weighted step-wise-linear
+            regression of 228 quench data from Kennedy (1948), Fudali (1965), Thornber et al. (1980), Sack et al. (1980),
+            Kilinc et al. (1983), Kress and Carmichael (1988), and this study, representing compositions from ugandite to
+            andesite, equilibrated at oxygen fugacities between IW and air, at temperatures between 1200 and 1630 °C."'
+        own_experiment_rows:
+          table4:
+            locator:
+              published_page: 86
+              pdf_page_index: 4
+            note: All 33 Table 4 rows are transcribed as fe3_fe2_ratio observations from the printed Fe2O3 and FeO wt% columns
+              using the existing oxide-to-ratio migration rule. Temperature and complete oxide composition are retained per
+              row. The table does not report per-run log fO2, which remains unknown on every point.
+          table5:
+            locator:
+              published_page: 86
+              pdf_page_index: 4
+            note: Table 5 re-analyzes Kress and Carmichael (1988) experiments and is retained once as context linked to that
+              work's kress_1988_table1_measured_redox_series observation; it is not entered as a second scored observation
+              set.
+    observations:
+    - observation_id: kress_1991_table4_redox_series
+      experiment: kress_1991_table4_drop_quench
+      type: concentration_series
+      locator:
+        published_page: 86
+        pdf_page_index: 4
+        table: '4'
+      phase: quenched_silicate_glass
+      units: dimensionless Fe3+/Fe2+ mole ratio; input oxide columns in wt% as printed
+      admission_status: admitted
+      values:
+        quantity: fe3_fe2_ratio
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derived_from: [unknown:kress-carmichael-1991-iron-redox-calibration]
+        analytical_method: Ferrous iron by colorimetric wet-chemical method; ferric iron estimated by subtracting FeO from
+          total iron.
+        ratio_basis: Derived from the printed Fe2O3 and FeO oxide wt% columns by the existing battery migrator rule.
+        rows:
+        - experiment_id: Q01
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q01
+          T_C: '1448'
+          Fe2O3_wt_pct: '16.93'
+          FeO_wt_pct: '5.41'
+          composition_wt_pct:
+            SiO2: '38.86'
+            TiO2: '0.00'
+            Al2O3: '17.00'
+            Fe2O3: '16.93'
+            FeO: '5.41'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '20.89'
+            Na2O: '0.00'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
               locator:
                 published_page: 86
                 pdf_page_index: 4
-              note: Table 4 gives temperature and oxide composition, but no row-level log fO2; no fe3_fe2_ratio observations were inferred from it.
-            table5:
+                table: '4'
+                record: Q01
+        - experiment_id: Q02
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q02
+          T_C: '1448'
+          Fe2O3_wt_pct: '16.81'
+          FeO_wt_pct: '5.41'
+          composition_wt_pct:
+            SiO2: '38.94'
+            TiO2: '0.00'
+            Al2O3: '17.02'
+            Fe2O3: '16.81'
+            FeO: '5.41'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '20.82'
+            Na2O: '0.00'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
               locator:
                 published_page: 86
                 pdf_page_index: 4
-              note: Table 5 prints log fO2 and oxide composition but explicitly re-analyzes experiments from Kress and Carmichael (1988), so it is not entered as a second set of independent experiments.
+                table: '4'
+                record: Q02
+        - experiment_id: Q03
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q03
+          T_C: '1448'
+          Fe2O3_wt_pct: '16.73'
+          FeO_wt_pct: '5.29'
+          composition_wt_pct:
+            SiO2: '37.73'
+            TiO2: '0.00'
+            Al2O3: '17.67'
+            Fe2O3: '16.73'
+            FeO: '5.29'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '21.09'
+            Na2O: '0.00'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q03
+        - experiment_id: Q04
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q04
+          T_C: '1448'
+          Fe2O3_wt_pct: '16.61'
+          FeO_wt_pct: '5.29'
+          composition_wt_pct:
+            SiO2: '39.20'
+            TiO2: '0.00'
+            Al2O3: '17.60'
+            Fe2O3: '16.61'
+            FeO: '5.29'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '20.95'
+            Na2O: '0.00'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q04
+        - experiment_id: Q05
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q05
+          T_C: '1300'
+          Fe2O3_wt_pct: '20.45'
+          FeO_wt_pct: '1.58'
+          composition_wt_pct:
+            SiO2: '68.61'
+            TiO2: '0.00'
+            Al2O3: '0.00'
+            Fe2O3: '20.45'
+            FeO: '1.58'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.03'
+            Na2O: '8.30'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q05
+        - experiment_id: Q06
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q06
+          T_C: '1300'
+          Fe2O3_wt_pct: '20.08'
+          FeO_wt_pct: '1.83'
+          composition_wt_pct:
+            SiO2: '66.02'
+            TiO2: '0.00'
+            Al2O3: '1.83'
+            Fe2O3: '20.08'
+            FeO: '1.83'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '8.87'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q06
+        - experiment_id: Q11
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q11
+          T_C: '1435'
+          Fe2O3_wt_pct: '19.46'
+          FeO_wt_pct: '2.70'
+          composition_wt_pct:
+            SiO2: '66.97'
+            TiO2: '0.00'
+            Al2O3: '0.01'
+            Fe2O3: '19.46'
+            FeO: '2.70'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '9.98'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q11
+        - experiment_id: Q12
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q12
+          T_C: '1435'
+          Fe2O3_wt_pct: '19.07'
+          FeO_wt_pct: '2.69'
+          composition_wt_pct:
+            SiO2: '68.44'
+            TiO2: '0.00'
+            Al2O3: '0.00'
+            Fe2O3: '19.07'
+            FeO: '2.69'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '9.87'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q12
+        - experiment_id: Q13
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q13
+          T_C: '1435'
+          Fe2O3_wt_pct: '19.06'
+          FeO_wt_pct: '2.87'
+          composition_wt_pct:
+            SiO2: '66.38'
+            TiO2: '0.00'
+            Al2O3: '0.00'
+            Fe2O3: '19.06'
+            FeO: '2.87'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '10.60'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q13
+        - experiment_id: Q14
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q14
+          T_C: '1435'
+          Fe2O3_wt_pct: '17.45'
+          FeO_wt_pct: '2.84'
+          composition_wt_pct:
+            SiO2: '62.32'
+            TiO2: '0.00'
+            Al2O3: '5.93'
+            Fe2O3: '17.45'
+            FeO: '2.84'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.02'
+            Na2O: '10.65'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q14
+        - experiment_id: Q15
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q15
+          T_C: '1435'
+          Fe2O3_wt_pct: '19.40'
+          FeO_wt_pct: '2.89'
+          composition_wt_pct:
+            SiO2: '67.72'
+            TiO2: '0.00'
+            Al2O3: '0.02'
+            Fe2O3: '19.40'
+            FeO: '2.89'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.00'
+            Na2O: '9.09'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q15
+        - experiment_id: Q18
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q18
+          T_C: '1435'
+          Fe2O3_wt_pct: '22.08'
+          FeO_wt_pct: '3.39'
+          composition_wt_pct:
+            SiO2: '55.79'
+            TiO2: '0.00'
+            Al2O3: '1.13'
+            Fe2O3: '22.08'
+            FeO: '3.39'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '16.88'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q18
+        - experiment_id: Q19
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q19
+          T_C: '1435'
+          Fe2O3_wt_pct: '19.63'
+          FeO_wt_pct: '2.45'
+          composition_wt_pct:
+            SiO2: '52.17'
+            TiO2: '0.00'
+            Al2O3: '4.02'
+            Fe2O3: '19.63'
+            FeO: '2.45'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.02'
+            Na2O: '18.44'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q19
+        - experiment_id: Q21
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q21
+          T_C: '996'
+          Fe2O3_wt_pct: '22.10'
+          FeO_wt_pct: '0.14'
+          composition_wt_pct:
+            SiO2: '66.87'
+            TiO2: '0.00'
+            Al2O3: '0.04'
+            Fe2O3: '22.10'
+            FeO: '0.14'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.04'
+            Na2O: '9.56'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q21
+        - experiment_id: Q22
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q22
+          T_C: '996'
+          Fe2O3_wt_pct: '21.99'
+          FeO_wt_pct: '0.23'
+          composition_wt_pct:
+            SiO2: '65.80'
+            TiO2: '0.00'
+            Al2O3: '0.00'
+            Fe2O3: '21.99'
+            FeO: '0.23'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '10.27'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q22
+        - experiment_id: Q23
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q23
+          T_C: '996'
+          Fe2O3_wt_pct: '21.44'
+          FeO_wt_pct: '0.34'
+          composition_wt_pct:
+            SiO2: '66.19'
+            TiO2: '0.00'
+            Al2O3: '0.00'
+            Fe2O3: '21.44'
+            FeO: '0.34'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.01'
+            Na2O: '10.69'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q23
+        - experiment_id: Q27
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q27
+          T_C: '996'
+          Fe2O3_wt_pct: '37.58'
+          FeO_wt_pct: '0.28'
+          composition_wt_pct:
+            SiO2: '33.16'
+            TiO2: '0.00'
+            Al2O3: '2.71'
+            Fe2O3: '37.58'
+            FeO: '0.28'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.04'
+            Na2O: '24.55'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q27
+        - experiment_id: Q29
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q29
+          T_C: '996'
+          Fe2O3_wt_pct: '22.06'
+          FeO_wt_pct: '0.27'
+          composition_wt_pct:
+            SiO2: '47.98'
+            TiO2: '0.00'
+            Al2O3: '3.92'
+            Fe2O3: '22.06'
+            FeO: '0.27'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '0.02'
+            Na2O: '24.76'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q29
+        - experiment_id: Q31
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q31
+          T_C: '1288'
+          Fe2O3_wt_pct: '33.31'
+          FeO_wt_pct: '1.98'
+          composition_wt_pct:
+            SiO2: '27.97'
+            TiO2: '0.00'
+            Al2O3: '1.83'
+            Fe2O3: '33.31'
+            FeO: '1.98'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '33.64'
+            Na2O: '0.09'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q31
+        - experiment_id: Q32
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q32
+          T_C: '1288'
+          Fe2O3_wt_pct: '19.38'
+          FeO_wt_pct: '2.77'
+          composition_wt_pct:
+            SiO2: '42.32'
+            TiO2: '0.00'
+            Al2O3: '11.91'
+            Fe2O3: '19.38'
+            FeO: '2.77'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '22.48'
+            Na2O: '0.09'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q32
+        - experiment_id: Q34
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q34
+          T_C: '1288'
+          Fe2O3_wt_pct: '22.58'
+          FeO_wt_pct: '2.91'
+          composition_wt_pct:
+            SiO2: '42.86'
+            TiO2: '0.00'
+            Al2O3: '6.66'
+            Fe2O3: '22.58'
+            FeO: '2.91'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '23.45'
+            Na2O: '0.05'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q34
+        - experiment_id: Q41
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q41
+          T_C: '1541'
+          Fe2O3_wt_pct: '28.73'
+          FeO_wt_pct: '5.98'
+          composition_wt_pct:
+            SiO2: '28.74'
+            TiO2: '0.00'
+            Al2O3: '1.63'
+            Fe2O3: '28.73'
+            FeO: '5.98'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '34.18'
+            Na2O: '0.01'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q41
+        - experiment_id: Q42
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q42
+          T_C: '1541'
+          Fe2O3_wt_pct: '16.46'
+          FeO_wt_pct: '7.20'
+          composition_wt_pct:
+            SiO2: '40.04'
+            TiO2: '0.00'
+            Al2O3: '12.09'
+            Fe2O3: '16.46'
+            FeO: '7.20'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '22.40'
+            Na2O: '0.08'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q42
+        - experiment_id: Q43
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q43
+          T_C: '1541'
+          Fe2O3_wt_pct: '14.84'
+          FeO_wt_pct: '6.69'
+          composition_wt_pct:
+            SiO2: '38.54'
+            TiO2: '0.00'
+            Al2O3: '18.77'
+            Fe2O3: '14.84'
+            FeO: '6.69'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '20.85'
+            Na2O: '0.07'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q43
+        - experiment_id: Q44
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q44
+          T_C: '1541'
+          Fe2O3_wt_pct: '17.34'
+          FeO_wt_pct: '7.69'
+          composition_wt_pct:
+            SiO2: '43.23'
+            TiO2: '0.00'
+            Al2O3: '6.75'
+            Fe2O3: '17.34'
+            FeO: '7.69'
+            MnO: '0.00'
+            MgO: '0.00'
+            CaO: '23.82'
+            Na2O: '0.04'
+            K2O: '0.00'
+            P2O5: '0.00'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q44
+        - experiment_id: Q51
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q51
+          T_C: '1354'
+          Fe2O3_wt_pct: '17.05'
+          FeO_wt_pct: '5.10'
+          composition_wt_pct:
+            SiO2: '44.71'
+            TiO2: '3.00'
+            Al2O3: '13.00'
+            Fe2O3: '17.05'
+            FeO: '5.10'
+            MnO: '0.18'
+            MgO: '5.46'
+            CaO: '9.06'
+            Na2O: '0.68'
+            K2O: '0.54'
+            P2O5: '0.31'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q51
+        - experiment_id: Q52
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q52
+          T_C: '1354'
+          Fe2O3_wt_pct: '13.75'
+          FeO_wt_pct: '5.05'
+          composition_wt_pct:
+            SiO2: '46.56'
+            TiO2: '3.56'
+            Al2O3: '15.25'
+            Fe2O3: '13.75'
+            FeO: '5.05'
+            MnO: '0.25'
+            MgO: '4.65'
+            CaO: '7.48'
+            Na2O: '1.10'
+            K2O: '0.85'
+            P2O5: '0.38'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q52
+        - experiment_id: Q53
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q53
+          T_C: '1354'
+          Fe2O3_wt_pct: '16.72'
+          FeO_wt_pct: '5.00'
+          composition_wt_pct:
+            SiO2: '45.56'
+            TiO2: '2.95'
+            Al2O3: '13.02'
+            Fe2O3: '16.72'
+            FeO: '5.00'
+            MnO: '0.16'
+            MgO: '5.45'
+            CaO: '9.11'
+            Na2O: '0.70'
+            K2O: '0.57'
+            P2O5: '0.31'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q53
+        - experiment_id: Q61
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q61
+          T_C: '1451'
+          Fe2O3_wt_pct: '15.50'
+          FeO_wt_pct: '6.97'
+          composition_wt_pct:
+            SiO2: '45.36'
+            TiO2: '2.98'
+            Al2O3: '12.77'
+            Fe2O3: '15.50'
+            FeO: '6.97'
+            MnO: '0.16'
+            MgO: '5.47'
+            CaO: '9.09'
+            Na2O: '0.74'
+            K2O: '0.46'
+            P2O5: '0.32'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q61
+        - experiment_id: Q62
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q62
+          T_C: '1451'
+          Fe2O3_wt_pct: '11.89'
+          FeO_wt_pct: '6.33'
+          composition_wt_pct:
+            SiO2: '47.91'
+            TiO2: '3.60'
+            Al2O3: '15.23'
+            Fe2O3: '11.89'
+            FeO: '6.33'
+            MnO: '0.22'
+            MgO: '4.59'
+            CaO: '7.45'
+            Na2O: '1.31'
+            K2O: '0.74'
+            P2O5: '0.26'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q62
+        - experiment_id: Q64
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q64
+          T_C: '1451'
+          Fe2O3_wt_pct: '12.44'
+          FeO_wt_pct: '6.36'
+          composition_wt_pct:
+            SiO2: '46.66'
+            TiO2: '3.51'
+            Al2O3: '15.35'
+            Fe2O3: '12.44'
+            FeO: '6.36'
+            MnO: '0.26'
+            MgO: '4.69'
+            CaO: '7.52'
+            Na2O: '1.36'
+            K2O: '0.70'
+            P2O5: '0.26'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q64
+        - experiment_id: Q65
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q65
+          T_C: '1451'
+          Fe2O3_wt_pct: '11.30'
+          FeO_wt_pct: '5.82'
+          composition_wt_pct:
+            SiO2: '46.86'
+            TiO2: '3.40'
+            Al2O3: '18.19'
+            Fe2O3: '11.30'
+            FeO: '5.82'
+            MnO: '0.21'
+            MgO: '4.17'
+            CaO: '7.01'
+            Na2O: '2.06'
+            K2O: '0.79'
+            P2O5: '0.24'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q65
+        - experiment_id: Q66
+          locator:
+            published_page: 86
+            pdf_page_index: 4
+            table: '4'
+            record: Q66
+          T_C: '1451'
+          Fe2O3_wt_pct: '10.59'
+          FeO_wt_pct: '5.83'
+          composition_wt_pct:
+            SiO2: '46.66'
+            TiO2: '3.29'
+            Al2O3: '19.32'
+            Fe2O3: '10.59'
+            FeO: '5.83'
+            MnO: '0.21'
+            MgO: '4.11'
+            CaO: '6.91'
+            Na2O: '1.98'
+            K2O: '0.80'
+            P2O5: '0.26'
+          point_conditions:
+            fO2_log:
+              state:
+                tag: unknown
+                reason: Kress and Carmichael (1991) Table 4 does not report per-run log fO2.
+              locator:
+                published_page: 86
+                pdf_page_index: 4
+                table: '4'
+                record: Q66
+experiments:
+- experiment_id: kress_1991_table4_drop_quench
+  method: quench_equilibration
+  method_as_printed: Pt-loop drop-quench experiments
+  locator:
+    published_page: 86
+    pdf_page_index: 4
+    table: '4'
