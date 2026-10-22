@@ -1032,6 +1032,44 @@ def _pure_phase_attempt(
 _JANAF_TABLE_NOTICE = (
     "Shomate segment does not cover T; JANAF tabulated values used"
 )
+_VAPOROCK_GAS_NOT_ADMISSIBLE = "vaporock-gas-thermo-not-admissible"
+
+
+def _vaporock_gas_thermo_admissible(
+    heat_capacity: Decimal,
+    entropy: Decimal,
+    enthalpy: Decimal,
+) -> bool:
+    """Cp > 0, S > 0, and a finite H−H298.
+
+    One gate for the in-band Shomate row and the tabulated gas read.
+    A negative enthalpy increment below 298.15 K is finite and is kept.
+    """
+
+    return (
+        heat_capacity.is_finite()
+        and heat_capacity > 0
+        and entropy.is_finite()
+        and entropy > 0
+        and enthalpy.is_finite()
+    )
+
+
+def _refuse_inadmissible_vaporock_gas(
+    quantity: Quantity,
+    *,
+    origin: str,
+    species_name: str,
+    call_evidence: str,
+) -> ThermoAttempt:
+    return _refuse(
+        RefusalReason.METRIC_DOMAIN,
+        _VAPOROCK_GAS_NOT_ADMISSIBLE,
+        quantity=quantity,
+        origin=origin,
+        extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+        call_evidence=call_evidence,
+    )
 
 
 def _vaporock_tabulated_gas_attempt(
@@ -1043,13 +1081,14 @@ def _vaporock_tabulated_gas_attempt(
     species_name: str,
     call_evidence: str,
 ) -> ThermoAttempt:
-    """Outside every Shomate row, read the phase-g JANAF table or refuse.
+    """Outside every Shomate row, read the neutral gas JANAF table or refuse.
 
     The table's in-grid value is BRIDGE, the same authority as an in-range
     JANAF fusion read in this module. The table document has no separate
     authority field. This is not an extrapolated Shomate continuation.
-    Cp > 0, S > 0, and a finite H−H298 are required together, so a request
-    for one quantity cannot return a number from a branch the others reject.
+    The gas may be a phase-g table or a reference-phase gas already marked
+    by `_FIXED_REFERENCE_PHASES` (O2 is O-029). `_vaporock_gas_thermo_admissible`
+    is the same gate as the in-band Shomate row.
     """
 
     from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
@@ -1104,20 +1143,11 @@ def _vaporock_tabulated_gas_attempt(
     heat_capacity = sample.heat_capacity
     entropy = sample.entropy
     enthalpy = sample.enthalpy_increment
-    admissible = (
-        heat_capacity.is_finite()
-        and heat_capacity > 0
-        and entropy.is_finite()
-        and entropy > 0
-        and enthalpy.is_finite()
-    )
-    if not admissible:
-        return _refuse(
-            RefusalReason.METRIC_DOMAIN,
-            "vaporock-janaf-table-thermo-not-admissible",
-            quantity=quantity,
+    if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
+        return _refuse_inadmissible_vaporock_gas(
+            quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            species_name=species_name,
             call_evidence=call_evidence,
         )
     value = {
@@ -1287,21 +1317,25 @@ def _vaporock_gas_attempt(
     # remains kJ/mol.
     # Sanity: K(g), 1200 K gives 18.7461926 kJ/mol vs printed JANAF
     # K-005 H−H298 = 18.746 kJ/mol.
+    # All three are evaluated before any one is returned. The shared gate
+    # refuses the row when Cp <= 0, S <= 0, or H is not finite, so a
+    # request for S cannot admit a row whose heat capacity is not positive.
+    # An admissible value is still as_decimal(str(float(raw))), the pin's
+    # conversion.
     try:
         t = temperature / 1000.0
-        if quantity is Quantity.CP:
-            raw = (
-                row["A"]
-                + row["B"] * t
-                + row["C"] * t**2
-                + row["D"] * t**3
-                + row["E"] / t**2
-            )
-        elif quantity is Quantity.S:
-            raw = vapor._janaf_S(temperature, row)
-        else:
-            raw = vapor._janaf_dH(temperature, row) - row["H"]
-        value = as_decimal(str(float(raw)))
+        raw_cp = (
+            row["A"]
+            + row["B"] * t
+            + row["C"] * t**2
+            + row["D"] * t**3
+            + row["E"] / t**2
+        )
+        raw_s = vapor._janaf_S(temperature, row)
+        raw_h = vapor._janaf_dH(temperature, row) - row["H"]
+        heat_capacity = as_decimal(str(float(raw_cp)))
+        entropy = as_decimal(str(float(raw_s)))
+        enthalpy = as_decimal(str(float(raw_h)))
     except Exception as exc:  # noqa: BLE001 - optional engine evaluator boundary
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -1311,15 +1345,18 @@ def _vaporock_gas_attempt(
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
             call_evidence=call_evidence,
         )
-    if not value.is_finite():
-        return _refuse(
-            RefusalReason.METRIC_DOMAIN,
-            "nonfinite-engine-value",
-            quantity=quantity,
+    if not _vaporock_gas_thermo_admissible(heat_capacity, entropy, enthalpy):
+        return _refuse_inadmissible_vaporock_gas(
+            quantity,
             origin=origin,
-            extra={"engine": Engine.VAPOROCK.value},
+            species_name=species_name,
             call_evidence=call_evidence,
         )
+    value = {
+        Quantity.CP: heat_capacity,
+        Quantity.S: entropy,
+        Quantity.H_MINUS_H298: enthalpy,
+    }[quantity]
     return ThermoAttempt(
         value=value,
         unit=QUANTITY_UNITS[quantity],

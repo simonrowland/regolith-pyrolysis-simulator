@@ -2569,12 +2569,17 @@ def test_janaf_tabulated_gas_thermo_matches_printed_nodes() -> None:
 
     Cr, CaO, Na2, and MgO are the rows whose Shomate continuation is
     physically invalid. 1050 K sits between CaO's printed 1000 K and
-    1100 K nodes. 6500 K is past every gas table's last node.
+    1100 K nodes. 6500 K is past every gas table's last node. O2's
+    neutral table is the reference-phase gas O-029, not a phase-g row.
+    Carbon's reference table stays crystal, so the gas id is C-003.
     """
 
     import pytest
 
-    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+    from simulator.battery.generators.janaf import (
+        _janaf_gas_table_ids,
+        janaf_tabulated_gas_thermo,
+    )
 
     nodes = (
         ("Cr", Decimal("500"), "Cr-005"),
@@ -2614,10 +2619,28 @@ def test_janaf_tabulated_gas_thermo_matches_printed_nodes() -> None:
     assert zero.heat_capacity == 0
     assert zero.entropy == 0
 
+    oxygen = janaf_tabulated_gas_thermo("O2", Decimal("500"))
+    assert oxygen.table_id == "O-029"
+    assert oxygen.bracket_width_K == 0
+    assert oxygen.heat_capacity == Decimal("31.091")
+    assert oxygen.entropy == Decimal("220.693")
+    assert oxygen.enthalpy_increment == Decimal("6.084")
+    assert oxygen.heat_capacity == _printed_janaf_node(
+        "O-029", Decimal("500"), "heat_capacity"
+    )
+    assert oxygen.entropy == _printed_janaf_node("O-029", Decimal("500"), "entropy")
+    assert oxygen.enthalpy_increment == _printed_janaf_node(
+        "O-029", Decimal("500"), "enthalpy_increment"
+    )
+
+    gas_ids = _janaf_gas_table_ids()
+    assert gas_ids["O2"] == ("O-029",)
+    assert gas_ids["C"] == ("C-003",)
+
     with pytest.raises(ValueError, match="outside the JANAF table range"):
         janaf_tabulated_gas_thermo("Cr", Decimal("6500"))
     with pytest.raises(ValueError, match="no JANAF gas table"):
-        janaf_tabulated_gas_thermo("O2", Decimal("500"))
+        janaf_tabulated_gas_thermo("NiO", Decimal("500"))
     with pytest.raises(ValueError, match="ambiguous JANAF gas tables"):
         janaf_tabulated_gas_thermo("HONO", Decimal("500"))
 
@@ -2699,6 +2722,7 @@ _OUTSIDE_SHOMATE_TABLE_CASES = (
     ("MgO", Decimal("100"), "Mg-011"),
     ("K", Decimal("1000"), "K-005"),
     ("Fe", Decimal("2200"), "Fe-008"),
+    ("O2", Decimal("500"), "O-029"),
 )
 
 
@@ -2708,8 +2732,9 @@ def test_vaporock_gas_outside_shomate_uses_janaf_table() -> None:
     Cr 500 K, CaO 1000 K, Na2 500 K, and MgO 100 K are the continuations
     that go non-positive on the polynomial. K 1000 K is 39.54 K below its
     first Shomate row. Fe 2200 K is the lunar shape, below its only row.
-    Each temperature is a printed JANAF node, so the interpolation
-    remainder is 0.
+    O2 at 500 K is below its first coefficient row and on O-029, the
+    reference-phase gas table. Each temperature is a printed JANAF node,
+    so the interpolation remainder is 0.
     """
 
     import pytest
@@ -2816,8 +2841,117 @@ def test_tabulated_gas_attempt_refuses_nonpositive_heat_capacity(monkeypatch) ->
         assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
         assert (
             attempt.refusal_detail["reason"]
-            == "vaporock-janaf-table-thermo-not-admissible"
+            == "vaporock-gas-thermo-not-admissible"
         )
+
+
+def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(
+    monkeypatch,
+) -> None:
+    """A containing Shomate row uses the same Cp/S/H gate as the gas table.
+
+    Cp <= 0, S <= 0, or a non-finite H refuses every quantity, including
+    a request for a quantity that would otherwise be finite. An admissible
+    row still returns that quantity at BRIDGE with no notice. The
+    admissible numbers are the stubbed evaluator outputs after
+    as_decimal(str(float(raw))), not a second formula.
+    """
+
+    import sys
+    import types
+
+    from simulator.battery import compilation_tier
+
+    equil = types.ModuleType("vaporock.equil")
+    equil.__file__ = "vaporock/equil.py"
+    package = types.ModuleType("vaporock")
+    package.equil = equil
+    monkeypatch.setitem(sys.modules, "vaporock", package)
+    monkeypatch.setitem(sys.modules, "vaporock.equil", equil)
+    monkeypatch.setattr(
+        compilation_tier,
+        "_vaporock_gas_provenance",
+        lambda _module: "test-provenance",
+    )
+
+    class _Coefs:
+        def __init__(self, row: dict[str, float]) -> None:
+            self.loc = {"Xx(g)": row}
+
+    class _Vapor:
+        def __init__(self, row: dict[str, float], entropy: float, enthalpy: float) -> None:
+            self.vapor_coefs = _Coefs(row)
+            self.entropy = entropy
+            self.enthalpy = enthalpy
+
+        def _janaf_S(self, _temperature: float, _row: dict[str, float]) -> float:
+            return self.entropy
+
+        def _janaf_dH(self, _temperature: float, _row: dict[str, float]) -> float:
+            return self.enthalpy + _row["H"]
+
+    def install(heat_capacity: float, entropy: float, enthalpy: float) -> None:
+        row = {
+            "A": heat_capacity,
+            "B": 0.0,
+            "C": 0.0,
+            "D": 0.0,
+            "E": 0.0,
+            "H": 0.0,
+            "T_min": 100.0,
+            "T_max": 2000.0,
+        }
+        monkeypatch.setattr(
+            compilation_tier._vaporock_gas_attempt,
+            "_janaf_vapor",
+            _Vapor(row, entropy, enthalpy),
+            raising=False,
+        )
+
+    refused = (
+        (-1.0, 180.0, 10.0),
+        (20.0, -1.0, 10.0),
+        (20.0, 180.0, float("nan")),
+    )
+    for index, (heat_capacity, entropy, enthalpy) in enumerate(refused):
+        install(heat_capacity, entropy, enthalpy)
+        for quantity in (Quantity.CP, Quantity.S, Quantity.H_MINUS_H298):
+            attempt = predict_thermo_attempt(
+                Engine.VAPOROCK,
+                F.observation(
+                    f"xx-inadmissible-{index}-{quantity.value}",
+                    "exp-1",
+                    _gas_thermo("Xx", quantity, Decimal("1000")),
+                    Decimal("0"),
+                ),
+            )
+            assert attempt.value is None
+            assert attempt.refusal_reason is RefusalReason.METRIC_DOMAIN
+            assert (
+                attempt.refusal_detail["reason"]
+                == "vaporock-gas-thermo-not-admissible"
+            )
+
+    install(20.5, 100.25, 1.5)
+    expected = {
+        Quantity.CP: Decimal("20.5"),
+        Quantity.S: Decimal("100.25"),
+        Quantity.H_MINUS_H298: Decimal("1.5"),
+    }
+    for quantity, pinned in expected.items():
+        attempt = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            F.observation(
+                f"xx-admissible-{quantity.value}",
+                "exp-1",
+                _gas_thermo("Xx", quantity, Decimal("1000")),
+                pinned,
+            ),
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value == pinned
+        assert attempt.authority is Authority.BRIDGE
+        assert attempt.notices == ()
 
 
 def test_vaporock_import_failure_is_a_typed_unavailable_refusal(monkeypatch) -> None:

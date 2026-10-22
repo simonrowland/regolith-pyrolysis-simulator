@@ -3084,7 +3084,7 @@ def _missing_node_for_interpolation(
 
 @dataclass(frozen=True)
 class JANAFTabulatedGas:
-    """Cp, S, and H−H298 from one phase-g JANAF table at one temperature."""
+    """Cp, S, and H−H298 from one neutral gas JANAF table at one temperature."""
 
     table_id: str
     heat_capacity: Decimal
@@ -3100,21 +3100,34 @@ _GAS_THERMO_COLUMNS = ("heat_capacity", "entropy", "enthalpy_increment")
 
 @lru_cache(maxsize=1)
 def _janaf_gas_table_ids() -> dict[str, tuple[str, ...]]:
-    """Neutral phase-g table ids keyed by formula_normalised."""
+    """Neutral gas table ids keyed by formula_normalised.
+
+    Phase ``g`` and charge 0 is a gas table. Phase ``ref`` is a gas table
+    only when `_FIXED_REFERENCE_PHASES` already assigns that formula
+    `Phase.G`. That is the generator's own rule for a reference table
+    with no printed phase: O2, H2, N2, F2, Cl2, and the noble gases are
+    ideal gas. Carbon's reference table is `Phase.CR` and is omitted.
+    Charged ions stay out.
+    """
 
     manifest = load_manifest()
     grouped: dict[str, list[str]] = {}
     for entry in manifest.get("entries") or ():
         if not isinstance(entry, Mapping):
             continue
-        if str(entry.get("phase") or "") != "g":
-            continue
         if entry.get("charge") not in (0, "0"):
             continue
         formula = str(entry.get("formula_normalised") or "")
         table_id = str(entry.get("table_id") or "")
-        if formula and table_id:
-            grouped.setdefault(formula, []).append(table_id)
+        phase = str(entry.get("phase") or "")
+        if not formula or not table_id:
+            continue
+        reference_gas = (
+            phase == "ref" and _FIXED_REFERENCE_PHASES.get(formula) is Phase.G
+        )
+        if phase != "g" and not reference_gas:
+            continue
+        grouped.setdefault(formula, []).append(table_id)
     return {formula: tuple(table_ids) for formula, table_ids in grouped.items()}
 
 
