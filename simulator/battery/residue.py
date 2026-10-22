@@ -482,6 +482,24 @@ def _atom_totals(
     return dict(totals)
 
 
+def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_mol=0.0):
+    """One scale-aware atom-closure check for both residue paths."""
+    closure = {
+        element: initial_totals.get(element, 0.0)
+        - final_totals.get(element, 0.0)
+        + (buffer_oxygen_exchange_mol if element == "O" else 0.0)
+        for element in sorted(set(initial_totals) | set(final_totals))
+    }
+    for element, residual in closure.items():
+        scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
+        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
+            raise ResidueInventoryRefusal(
+                "residue_atom_balance_failed",
+                f"{element} atom residual {residual:.17g} mol exceeds scale-aware tolerance",
+            )
+    return closure
+
+
 def _finite_step_fluxes(
     terms: Sequence[_ChannelTerms],
     inventory_mol: Mapping[str, float],
@@ -805,19 +823,9 @@ def integrate_residue_inventory(
 
     initial_totals = _atom_totals(initial_inventory_mol, {})
     final_totals = _atom_totals(inventory, evaporated)
-    closure = {
-        element: initial_totals.get(element, 0.0)
-        - final_totals.get(element, 0.0)
-        + (buffer_oxygen_exchange_mol if element == "O" else 0.0)
-        for element in sorted(set(initial_totals) | set(final_totals))
-    }
-    for element, residual in closure.items():
-        scale = max(abs(initial_totals.get(element, 0.0)), abs(final_totals.get(element, 0.0)), 1.0e-300)
-        if abs(residual) > max(1.0e-15, 5.0e-12 * scale):
-            raise ResidueInventoryRefusal(
-                "residue_atom_balance_failed",
-                f"{element} atom residual {residual:.17g} mol exceeds scale-aware tolerance",
-            )
+    closure = _residue_atom_closure(
+        initial_totals, final_totals, buffer_oxygen_exchange_mol
+    )
     return ResidueInventoryResult(
         residue_mol=dict(inventory),
         evaporated_mol=dict(evaporated),
