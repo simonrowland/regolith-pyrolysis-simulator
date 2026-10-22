@@ -2884,6 +2884,101 @@ def test_out_of_range_reaction_is_not_formation_gibbs() -> None:
     assert past_end.refusal_detail["reason"] == "ellingham-formation-outside-segment"
 
 
+# t-1468 pin of the pre-extension refusal. Every row below is
+# ellingham-formation-outside-segment on this tree. The same-phase
+# candidates are marked so the behaviour change can move only those.
+_OUTSIDE_SEGMENT_PIN = (
+    # formula, phase, T, polymorph, metal, range, phase fragment, same_phase
+    ("CaO", Phase.CR, "1000", None, "Ca", (1100.0, 1115.0), "Ca(s)", True),
+    ("CaO", Phase.CR, "3100", None, "Ca", (2400.0, 2600.0), "Ca(g)", True),
+    ("CaO", Phase.CR, "800", None, "Ca", (1100.0, 1115.0), "Ca(s)", True),
+    ("Al2O3", Phase.CR, "1000", "alpha", "Al", (1100.0, 2100.0), "Al(l)", True),
+    ("Al2O3", Phase.L, "2700", None, "Al", (2327.0, 2600.0), "Al2O3(l)", True),
+    ("FeO", Phase.L, "3100", None, "Fe", (1809.0, 2600.0), "Fe(l)", True),
+    ("MgO", Phase.CR, "1000", None, "Mg", (1100.0, 1300.0), "Mg(l)", True),
+    ("MgO", Phase.CR, "3100", None, "Mg", (2000.0, 2600.0), "Mg(g)", True),
+    ("TiO2", Phase.CR, "1000", "rutile", "Ti", (1100.0, 1166.0), "Ti(alpha)", True),
+    ("TiO2", Phase.L, "3600", None, "Ti", (2130.0, 2600.0), "TiO2(l)", True),
+    ("SiO2", Phase.L, "3500", None, "Si", (2500.0, 2600.0), "Si(l)", True),
+    ("Na2O", Phase.L, "3000", None, "Na", (2200.0, 2600.0), "Na(g)", True),
+    ("Cr2O3", Phase.CR, "400", None, "Cr", (1100.0, 2130.0), "Cr(s)", True),
+    ("NiO", Phase.CR, "700", None, "Ni", (1100.0, 1728.0), "Ni(s)", True),
+    ("MnO", Phase.CR, "1000", None, "Mn", (1100.0, 1360.0), "Mn(beta,s)", True),
+    # Crossing a transition, or the CaO melting endpoint, stays refused.
+    ("CaO", Phase.CR, "3200", None, "Ca", (2400.0, 2600.0), "Ca(g)", False),
+    ("CaO", Phase.CR, "700", None, "Ca", (1100.0, 1115.0), "Ca(s)", False),
+    ("Al2O3", Phase.CR, "900", "alpha", "Al", (1100.0, 2100.0), "Al(l)", False),
+    ("Al2O3", Phase.L, "2800", None, "Al", (2327.0, 2600.0), "Al2O3(l)", False),
+    ("FeO", Phase.CR, "1000", None, "Fe", (1100.0, 1184.0), "Fe(alpha)", False),
+    ("MgO", Phase.CR, "900", None, "Mg", (1100.0, 1300.0), "Mg(l)", False),
+    ("MgO", Phase.CR, "3200", None, "Mg", (2000.0, 2600.0), "Mg(g)", False),
+    ("K2O", Phase.CR, "1000", None, "K", (1100.0, 1300.0), "K(g)", False),
+    ("Cr2O3", Phase.CR, "300", None, "Cr", (1100.0, 2130.0), "Cr(s)", False),
+    ("NiO", Phase.CR, "600", None, "Ni", (1100.0, 1728.0), "Ni(s)", False),
+    ("MnO", Phase.CR, "900", None, "Mn", (1100.0, 1360.0), "Mn(beta,s)", False),
+    ("SiO2", Phase.L, "3600", None, "Si", (2500.0, 2600.0), "Si(l)", False),
+    ("TiO2", Phase.L, "3700", None, "Ti", (2130.0, 2600.0), "TiO2(l)", False),
+    ("ZrO2", Phase.CR, "2700", "ii", "Zr", (2125.0, 2600.0), "Zr(L)", False),
+)
+
+
+@pytest.mark.parametrize(
+    ("formula", "phase", "temperature", "polymorph", "metal", "segment", "fragment", "same_phase"),
+    _OUTSIDE_SEGMENT_PIN,
+    ids=[
+        f"{formula}-{temperature}-{'same' if same else 'cross'}"
+        for formula, _phase, temperature, _poly, _metal, _segment, _fragment, same in _OUTSIDE_SEGMENT_PIN
+    ],
+)
+def test_outside_segment_refusals_are_pinned(
+    formula: str,
+    phase: Phase,
+    temperature: str,
+    polymorph: str | None,
+    metal: str,
+    segment: tuple[float, float],
+    fragment: str,
+    same_phase: bool,
+) -> None:
+    """Current output: outside a certified segment the formation value is refused.
+
+    ``same_phase`` records the later extension class. It does not change
+    this pin: both classes refuse, with the clamped segment's band.
+    """
+
+    del same_phase
+    # Generic crystal products match any identity polymorph. The factory
+    # requires a value on a crystal polymorph axis.
+    crystal_polymorph = polymorph
+    if phase is Phase.CR and crystal_polymorph is None:
+        crystal_polymorph = "crystalline"
+    identity = F.oxide_identity(
+        formula,
+        phase,
+        T_K=Decimal(temperature),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula=metal,
+        polymorph=crystal_polymorph,
+    )
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            f"{formula}-{temperature}",
+            "exp-1",
+            identity,
+            Decimal("0"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id="nist-janaf-4th",
+        ),
+    )
+    assert attempt.value is None
+    assert attempt.notices == ()
+    assert attempt.authority is Authority.REFUSED
+    assert attempt.refusal_detail["reason"] == "ellingham-formation-outside-segment"
+    assert attempt.refusal_detail["segment_range_K"] == [segment[0], segment[1]]
+    assert fragment in str(attempt.refusal_detail["phase_basis"])
+
+
 def test_quoted_compilation_row_is_not_omitted() -> None:
     identity = replace(_na2o_liquid(), quantity=Quantity.DELTA_FH)
     quoted = F.observation(
