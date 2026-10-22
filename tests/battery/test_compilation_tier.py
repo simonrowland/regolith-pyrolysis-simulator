@@ -2941,14 +2941,25 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     )
     assert near_boiling_attempt.refusal_detail["gas_table"] == "Mg-005"
 
+    from simulator.battery.generators.usgs_b1259 import (
+        STANDARD_PRESSURE_PA as b1259_pressure,
+    )
+    from simulator.battery.generators.usgs_b1452 import (
+        STANDARD_PRESSURE_PA as b1452_pressure,
+    )
+
     oxygen_printed = _printed_janaf_node(
         "O-029", Decimal("500"), "enthalpy_increment"
     )
+    # B1259's standard pressure is 1 atm. H−H298 does not depend on it.
     oxygen = replace(
         F.observation(
             "b1259-oxygen-enthalpy",
             "exp-1",
-            _gas_thermo("O2", Quantity.H_MINUS_H298, Decimal("500")),
+            replace(
+                _gas_thermo("O2", Quantity.H_MINUS_H298, Decimal("500")),
+                standard_pressure_Pa=State.of(b1259_pressure),
+            ),
             oxygen_printed,
             source_id="robie-waldbaum-1968-usgs-b1259",
         ),
@@ -2963,11 +2974,15 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert oxygen_attempt.authority is Authority.BRIDGE
 
     oxygen_entropy = _printed_janaf_node("O-029", Decimal("298.15"), "entropy")
+    # B1452's standard pressure is 1 bar, the JANAF gas-table pressure.
     b1452_oxygen = replace(
         F.observation(
             "b1452-oxygen-entropy",
             "exp-1",
-            _gas_thermo("O2", Quantity.S, Decimal("298.15")),
+            replace(
+                _gas_thermo("O2", Quantity.S, Decimal("298.15")),
+                standard_pressure_Pa=State.of(b1452_pressure),
+            ),
             oxygen_entropy,
             source_id="robie-hemingway-fisher-1978-usgs-b1452",
         ),
@@ -2977,6 +2992,71 @@ def test_vaporock_gas_table_refuses_a_different_reference_basis() -> None:
     assert b1452_attempt.refusal_reason is None
     assert b1452_attempt.value == oxygen_entropy
     assert b1452_attempt.authority is Authority.BRIDGE
+    assert b1452_pressure == Decimal("100000")
+    assert b1259_pressure == Decimal("101325")
+    assert b1259_pressure != b1452_pressure
+
+
+def test_vaporock_gas_entropy_refuses_one_atmosphere_against_janaf() -> None:
+    """The stored B1259 oxygen entropy is 1 atm. JANAF's gas table is 0.1 MPa.
+
+    b1259-298k-0060-oxygen S at 298.15 K is 204.999264 J/(mol·K) with
+    standard_pressure_Pa 101325. O-029's entropy is the 1 bar value.
+    S refuses and the detail carries both pressures. Cp at that same
+    declared pressure still returns the printed O-029 node.
+    """
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    from pathlib import Path
+
+    from simulator.battery.generators.janaf import STANDARD_PRESSURE_PA
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+    from simulator.battery.records import as_decimal
+
+    root = Path(__file__).resolve().parents[2]
+    document = load_yaml(
+        root
+        / "data/literature/observations-v2"
+        / "compilations-robie-waldbaum-1968-usgs-b1259"
+        / "b1259-298k-0060-oxygen.yaml"
+    )
+    raw = next(
+        row
+        for row in document["observations"]
+        if row["identity"]["quantity"]["value"] == "S"
+    )
+    observation = observation_from_plain(raw)
+    declared = as_decimal(observation.identity.standard_pressure_Pa.value)
+    assert declared == Decimal("101325")
+    assert observation.value.point == Decimal("204.999264")
+
+    attempt = predict_thermo_attempt(Engine.VAPOROCK, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "tabulated_table_basis_mismatch"
+    assert attempt.refusal_detail["observation_pressure_Pa"] == "101325"
+    assert attempt.refusal_detail["gas_pressure_Pa"] == "100000"
+    assert attempt.refusal_detail["gas_pressure_Pa"] == format(STANDARD_PRESSURE_PA, "f")
+    assert attempt.refusal_detail["gas_table"] == "O-029"
+
+    printed_cp = _printed_janaf_node("O-029", Decimal("500"), "heat_capacity")
+    heat_capacity = replace(
+        observation,
+        observation_id=f"{observation.observation_id}:cp-500",
+        identity=replace(
+            observation.identity,
+            quantity=Quantity.CP,
+            temperature_K=State.of(Decimal("500")),
+        ),
+        value=Value.point_of(printed_cp),
+    )
+    heat_attempt = predict_thermo_attempt(Engine.VAPOROCK, heat_capacity)
+    assert heat_attempt.refusal_reason is None
+    assert heat_attempt.value == printed_cp
+    assert heat_attempt.authority is Authority.BRIDGE
 
 
 def test_vaporock_in_band_shomate_uses_the_shared_admissibility_guard(

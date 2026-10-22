@@ -1080,6 +1080,21 @@ def _locator_table_id(observation: Observation) -> str:
     return "" if table is None else str(table).strip()
 
 
+def _declared_standard_pressure_Pa(observation: Observation) -> Decimal | None:
+    """The identity's standard_pressure_Pa when that axis is a value.
+
+    Same field the Ellingham shift reads. This path does not transform it.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    state = identity.standard_pressure_Pa
+    if not isinstance(state, State) or not state.is_value or state.value is None:
+        return None
+    return as_decimal(state.value)
+
+
 def _tabulated_gas_basis_matches(
     observation: Observation, formula: str, table_id: str
 ) -> bool:
@@ -1132,7 +1147,10 @@ def _vaporock_tabulated_gas_attempt(
     is the same gate as the in-band Shomate row.
     """
 
-    from simulator.battery.generators.janaf import janaf_tabulated_gas_thermo
+    from simulator.battery.generators.janaf import (
+        STANDARD_PRESSURE_PA as janaf_standard_pressure,
+        janaf_tabulated_gas_thermo,
+    )
 
     table_formula = formula[:-3] if formula.endswith("(g)") else formula
     try:
@@ -1203,6 +1221,40 @@ def _vaporock_tabulated_gas_attempt(
             },
             call_evidence=call_evidence,
         )
+
+    # Ideal gas: H and Cp have no pressure term; S has −R ln(p/p°).
+    # This path answers Cp, S, and H−H298, so only S is compared.
+    # G is not answered here. The table is JANAF's declared 0.1 MPa.
+    # Do not relabel 1 atm as 1 bar and do not convert the value.
+    if quantity is Quantity.S:
+        declared_pressure = _declared_standard_pressure_Pa(observation)
+        if declared_pressure != janaf_standard_pressure:
+            declared_phase = None
+            if isinstance(observation.identity, Identity):
+                declared_phase = phase_token(observation.identity.species)
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "tabulated_table_basis_mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": Engine.VAPOROCK.value,
+                    "species": species_name,
+                    "observation_table": _locator_table_id(observation),
+                    "observation_phase": (
+                        None if declared_phase is None else declared_phase.value
+                    ),
+                    "gas_table": sample.table_id,
+                    "gas_phase": Phase.G.value,
+                    "observation_pressure_Pa": (
+                        None
+                        if declared_pressure is None
+                        else _decimal_token(declared_pressure)
+                    ),
+                    "gas_pressure_Pa": _decimal_token(janaf_standard_pressure),
+                },
+                call_evidence=call_evidence,
+            )
 
     heat_capacity = sample.heat_capacity
     entropy = sample.entropy
