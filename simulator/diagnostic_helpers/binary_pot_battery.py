@@ -4055,6 +4055,11 @@ def equilibrate_cell(
         parameters = {}
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
+    if po2.mode == PO2_COMMANDED:
+        if "vapor_transport_pO2_bar" in parameters:
+            kwargs["vapor_transport_pO2_bar"] = po2.po2_bar
+        if "vapor_transport_pO2_admission" in parameters:
+            kwargs["vapor_transport_pO2_admission"] = "observation"
     if "redox_mode" in parameters and po2.mode == PO2_NOT_AN_INPUT:
         from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
         from simulator.melt_backend.base import multivalent_components
