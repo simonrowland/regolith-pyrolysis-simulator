@@ -613,7 +613,9 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
         yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
         {"feed": {
             "label": "joint",
-            "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
+            # FeO is the melt parent, so the real condensation route can
+            # commit Fe. SO2 and O2 are not in that flux.
+            "composition_wt_pct": {"SiO2": 82.0, "FeO": 10.0, "CaSO4": 8.0},
         }},
         yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
     )
@@ -633,19 +635,38 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
 
     def _evaporate(_equilibrium, overhead_partials_override_Pa=None):
         return EvaporationFlux(
-            species_kg_hr={"Na": admitted},
+            species_kg_hr={"Fe": admitted},
             total_kg_hr=admitted,
         )
 
     sim._calculate_evaporation = _evaporate
     seen = {}
+    transport_calls = []
+    real_estimate = sim.overhead_model.estimate_transport_state
+
+    def _estimate(flux, melt, *args, **kwargs):
+        transport_calls.append({
+            "species": {
+                str(name): float(rate)
+                for name, rate in flux.species_kg_hr.items()
+                if float(rate) > 0.0
+            },
+            "salt_mol": sim.atom_ledger.mol_by_account(
+                SALT_FEED_ACCOUNT
+            ).get("CaSO4"),
+        })
+        return real_estimate(flux, melt, *args, **kwargs)
+
+    sim.overhead_model.estimate_transport_state = _estimate
+    real_route = sim._route_to_condensation
 
     def _route(flux):
-        seen["na_kg_hr"] = flux.species_kg_hr.get("Na")
+        seen["species"] = set(flux.species_kg_hr)
+        seen["fe_kg_hr"] = flux.species_kg_hr.get("Fe")
         seen["salt_mol"] = sim.atom_ledger.mol_by_account(
             SALT_FEED_ACCOUNT
         ).get("CaSO4")
-        return flux
+        return real_route(flux)
 
     sim._route_to_condensation = _route
     original = sim._apply_c0_bakeout
@@ -673,9 +694,70 @@ def test_joint_admission_scales_ordinary_gas_before_routing():
     sim._apply_c0_bakeout = _bakeout
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
     sim.step()
-    assert seen["na_kg_hr"] == pytest.approx(admitted * scale)
-    assert seen["salt_mol"] == pytest.approx(salt_before - 2.0 * scale)
+    accepted = 2.0 * scale
+    fe_kg_hr = admitted * scale
+    so2_kg_hr = accepted * _molar("SO2")
+    o2_kg_hr = accepted * 0.5 * _molar("O2")
+    assert seen["fe_kg_hr"] == pytest.approx(fe_kg_hr)
+    assert "SO2" not in seen["species"]
+    assert "O2" not in seen["species"]
+    assert seen["salt_mol"] == pytest.approx(salt_before - accepted)
     assert seen["salt_mol"] < salt_before
+    combined_before_commit = [
+        call for call in transport_calls
+        if set(call["species"]) >= {"Fe", "SO2", "O2"}
+        and call["salt_mol"] == pytest.approx(salt_before)
+    ]
+    assert combined_before_commit
+    assert combined_before_commit[0]["species"]["Fe"] == pytest.approx(fe_kg_hr)
+    assert combined_before_commit[0]["species"]["SO2"] == pytest.approx(so2_kg_hr)
+    assert combined_before_commit[0]["species"]["O2"] == pytest.approx(o2_kg_hr)
+    ordinary = EvaporationFlux(species_kg_hr={"Fe": fe_kg_hr})
+    ordinary.update_totals()
+    combined = EvaporationFlux(species_kg_hr={
+        "Fe": fe_kg_hr,
+        "SO2": so2_kg_hr,
+        "O2": o2_kg_hr,
+    })
+    combined.update_totals()
+    capacity = sim._effective_transport_capacity_this_tick
+    downstream = sim._headspace_downstream_pressure_bar(capacity)
+    ordinary_state = real_estimate(
+        ordinary,
+        sim.melt,
+        p_downstream_bar=downstream,
+        effective_transport_capacity=capacity,
+    )
+    combined_state = real_estimate(
+        combined,
+        sim.melt,
+        p_downstream_bar=downstream,
+        effective_transport_capacity=capacity,
+    )
+    headspace = sim._melt_headspace_composition_mbar
+    assert set(headspace) >= {"Fe", "SO2", "O2"}
+    assert headspace["SO2"] > 0.0
+    assert headspace["O2"] > 0.0
+    assert sum(headspace.values()) == pytest.approx(
+        combined_state["vapor_pressure_mbar"]
+    )
+    assert combined_state["vapor_pressure_mbar"] != pytest.approx(
+        ordinary_state["vapor_pressure_mbar"]
+    )
+    assert sim.overhead.pipe_conductance_kg_hr == pytest.approx(
+        combined_state["pipe_conductance_kg_hr"]
+    )
+    assert combined_state["pipe_conductance_kg_hr"] != pytest.approx(
+        ordinary_state["pipe_conductance_kg_hr"]
+    )
+    assert sim.overhead.transport_saturation_pct == pytest.approx(
+        combined.total_kg_hr / combined_state["pipe_conductance_kg_hr"] * 100.0
+    )
+    assert sim.overhead.transport_saturation_pct > 100.0
+    assert sim.overhead.evap_exceeds_transport is True
+    assert sim._subsolidus_pending_release is None
+    assert sim._last_subsolidus_bakeout["committed"] is True
+    assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
 
 
 def test_competing_branches_share_one_host_inventory():

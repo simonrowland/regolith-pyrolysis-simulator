@@ -1259,7 +1259,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_depletion_hour: int | str | None = None
         self._stage0_bakeout_reserved_carbon_kg = 0.0
         self._subsolidus_committed_kg_hr_by_species: Dict[str, float] = {}
-        self._subsolidus_joint_gas_kg_hr = 0.0
+        self._subsolidus_pending_release = None
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout: Dict[str, Any] = {}
         self._subsolidus_bakeout_by_hour: list[Dict[str, Any]] = []
@@ -1625,7 +1625,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
         self._subsolidus_committed_kg_hr_by_species = {}
-        self._subsolidus_joint_gas_kg_hr = 0.0
+        self._subsolidus_pending_release = None
         self._subsolidus_handed_off = False
         self._last_subsolidus_bakeout = {}
         self._subsolidus_bakeout_by_hour = []
@@ -13427,6 +13427,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         admitted_gas_kg_hr: Mapping[str, Any] | None = None,
         solid_host_area_m2: Any = None,
         alpha: Mapping[str, Any] | None = None,
+        commit_release: bool = True,
     ) -> Dict[str, Any]:
         """Price C0 subsolidus hosts and commit only an admitted extent.
 
@@ -13457,7 +13458,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_notice_for_feedstock,
         )
 
-        self._subsolidus_joint_gas_kg_hr = 0.0
+        self._subsolidus_pending_release = None
         if temperature_K is None:
             temperature_K = float(self.melt.temperature_C) + 273.15
         feedstock_key = str(
@@ -13611,24 +13612,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 debits, credits = mol_maps_for_extents(selected)
                 if debits or credits:
-                    self._dispatch_and_commit(
-                        ChemistryIntent.STAGE0_PRETREATMENT,
-                        control_inputs={
-                            "reaction_family": REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
-                            "mol_debits": debits,
-                            "mol_credits": credits,
-                        },
-                        transition_source="subsolidus_bakeout",
-                    )
-                    committed = True
+                    if commit_release:
+                        self._dispatch_and_commit(
+                            ChemistryIntent.STAGE0_PRETREATMENT,
+                            control_inputs={
+                                "reaction_family": REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+                                "mol_debits": debits,
+                                "mol_credits": credits,
+                            },
+                            transition_source="subsolidus_bakeout",
+                        )
+                        committed = True
+                    else:
+                        # The step commits this after the combined-species
+                        # transport decision, and not before it.
+                        self._subsolidus_pending_release = (debits, credits)
 
         released_kg = {}
-        if committed:
+        if committed or self._subsolidus_pending_release is not None:
             released_kg = dict(
                 provider_diagnostic.get("released_kg_hr_by_species") or {}
-            )
-            self._subsolidus_joint_gas_kg_hr = sum(
-                float(rate) for rate in released_kg.values()
             )
         self._subsolidus_committed_kg_hr_by_species = released_kg
 
@@ -13659,6 +13662,56 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if key in provider_diagnostic:
                     diagnostic[key] = provider_diagnostic[key]
         return self._record_subsolidus_bakeout(diagnostic)
+
+    def _subsolidus_transport_inlet_flux(self, evap_flux: EvaporationFlux) -> EvaporationFlux:
+        """Ordinary gas plus admitted solid-host gas, for transport only.
+
+        The returned object is not a condensation or melt-debit flux.
+        With no solid-host gas it is the ordinary flux itself.
+        """
+        solid = getattr(self, "_subsolidus_committed_kg_hr_by_species", None) or {}
+        extra: Dict[str, float] = {}
+        for species, rate in solid.items():
+            if isinstance(rate, bool) or not isinstance(rate, (int, float)):
+                continue
+            number = float(rate)
+            if number > 0.0:
+                extra[str(species)] = number
+        if not extra:
+            return evap_flux
+        species_kg_hr = {
+            str(species): float(rate)
+            for species, rate in evap_flux.species_kg_hr.items()
+        }
+        for species, rate in extra.items():
+            species_kg_hr[species] = species_kg_hr.get(species, 0.0) + rate
+        inlet = EvaporationFlux(species_kg_hr=species_kg_hr)
+        inlet.update_totals()
+        return inlet
+
+    def _commit_pending_subsolidus_release(self) -> bool:
+        pending = getattr(self, "_subsolidus_pending_release", None)
+        self._subsolidus_pending_release = None
+        if not pending:
+            return False
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+        )
+
+        debits, credits = pending
+        self._dispatch_and_commit(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_SUBSOLIDUS_BAKEOUT,
+                "mol_debits": debits,
+                "mol_credits": credits,
+            },
+            transition_source="subsolidus_bakeout",
+        )
+        last = getattr(self, "_last_subsolidus_bakeout", None)
+        if isinstance(last, dict):
+            last["committed"] = True
+        return True
 
     def _update_target_inventory_diagnostic(self) -> None:
         inventory = getattr(getattr(self, "record", None), "initial_inventory", None)
@@ -14488,22 +14541,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
-        headspace_for_bakeout = None
-        if evaporation_campaign:
-            provisional_transport = self.overhead_model.estimate_transport_state(
-                evap_flux,
-                self.melt,
-                p_downstream_bar=self._headspace_downstream_pressure_bar(None),
-            )
-            headspace_for_bakeout = self.overhead_model.species_partial_pressures(
-                evap_flux,
-                float(provisional_transport["vapor_pressure_mbar"]),
-                self.species_formula_registry,
-            )
+        # Hertz-Knudsen reads the headspace persisted last step. A same-step
+        # ordinary-only provisional would replace that combined basis.
         bakeout_diag = self._apply_c0_bakeout(
             liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
-            headspace_mbar=headspace_for_bakeout,
+            headspace_mbar=None,
             admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
+            commit_release=False,
         )
         if bakeout_diag.get("provider_status") == "ok":
             joint_scale = bakeout_diag.get("pump_scale")
@@ -14521,8 +14565,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 }
                 evap_flux.update_totals()
         overhead_flux = evap_flux
+        inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
+        if inlet_flux is not evap_flux:
+            # Existing transport decision, before either release commits.
+            # Ordinary evaporation does not clip this hour to pipe kg/h.
+            self.overhead_model.estimate_transport_state(
+                inlet_flux,
+                self.melt,
+                p_downstream_bar=self._headspace_downstream_pressure_bar(None),
+            )
+        self._commit_pending_subsolidus_release()
         effective_transport_capacity = (
-            self._controlled_o2_transport_capacity(evap_flux)
+            self._controlled_o2_transport_capacity(inlet_flux)
         )
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
@@ -14540,8 +14594,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
             overhead_flux = self._route_to_condensation(evap_flux)
             evap_flux = self._ledger_committed_evap_flux_this_tick
+            inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
             effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(evap_flux)
+                self._controlled_o2_transport_capacity(inlet_flux)
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity
@@ -14628,15 +14683,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # so m_dot_pipe = sum(m_dot_evolved); downstream reporting instead
             # uses y_i = m_dot_residual_i / sum(m_dot_residual). Both fluxes are
             # kg/hr, and near-total capture must not erase the upstream load.
-            transport_inlet_kg_hr=(
-                evap_flux.total_kg_hr
-                + float(getattr(self, "_subsolidus_joint_gas_kg_hr", 0.0) or 0.0)
-            ),
-            transport_inlet_flux=evap_flux,
+            transport_inlet_kg_hr=inlet_flux.total_kg_hr,
+            transport_inlet_flux=inlet_flux,
             effective_transport_capacity=effective_transport_capacity,
         )
         upstream_transport = self.overhead_model.estimate_transport_state(
-            evap_flux,
+            inlet_flux,
             self.melt,
             p_downstream_bar=self._headspace_downstream_pressure_bar(
                 effective_transport_capacity
@@ -14645,7 +14697,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._melt_headspace_composition_mbar = (
             self.overhead_model.species_partial_pressures(
-                evap_flux,
+                inlet_flux,
                 upstream_transport['vapor_pressure_mbar'],
                 self.species_formula_registry,
             )
