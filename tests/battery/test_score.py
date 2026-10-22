@@ -2466,6 +2466,23 @@ def test_species_formula_unparsed_never_string_matched() -> None:
     assert parse_species_formula("O2") == (("O", 2.0),)
 
 
+def test_species_formula_parser_preserves_200_existing_parses() -> None:
+    """Pin established formula results before extending the parser grammar."""
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "species_formula_parse_golden_200.json"
+    )
+    rows = json.loads(fixture.read_text(encoding="utf-8"))
+    assert len(rows) == 200
+    for row in rows:
+        expected = tuple(
+            (str(symbol), float(count)) for symbol, count in row["elements"]
+        )
+        assert parse_species_formula(row["formula"]) == expected
+
+
 def test_compile_mutates_each_conjunct_off() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
