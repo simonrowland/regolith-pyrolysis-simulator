@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import os
 import subprocess
 from decimal import Decimal
 from pathlib import Path
@@ -11,13 +10,12 @@ import yaml
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "shilov-2025-sro-al2o3-sio2-kems-supplement"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SID / f"{SID}.pdf"
 
 # Independent transcription of every Table S1 row from the held supplement.

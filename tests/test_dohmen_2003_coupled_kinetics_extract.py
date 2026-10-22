@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 from decimal import Decimal
-import os
 from pathlib import Path
 import subprocess
 
@@ -11,13 +10,12 @@ import yaml
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.helpers.corpus_paths import regolith_corpus_root
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "dohmen-2003-coupled-kinetics"
 EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
-CORPUS_ROOT = Path(
-    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
-)
+CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SID / f"{SID}.pdf"
 
 # Independent transcription from the 600-dpi physical-page-3 render.
