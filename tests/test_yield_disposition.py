@@ -1437,6 +1437,7 @@ def _refusal_sequence_session(
 ):
     from simulator.campaigns import CampaignHoldTargetRefusal
     from simulator.core import PyrolysisSimulator
+    from simulator.state import CondensationTrain
     from simulator.session import SimSession
 
     ledger = AtomLedger()
@@ -1447,6 +1448,18 @@ def _refusal_sequence_session(
         material_origin="feedstock",
     )
     sim = object.__new__(PyrolysisSimulator)
+    # A terminal refusal reads the lazy condensation model after rollback.
+    # Supply its construction inputs while leaving both models unbuilt.
+    sim.setpoints = {}
+    sim.vapor_pressure_catalog_data = {}
+    sim.materials = None
+    sim.species_formula_registry = {}
+    sim.lab_geometry = None
+    sim.train = CondensationTrain.create_default()
+    sim._overhead_headspace_config = {}
+    sim._overhead_condenser_geometry_config = {}
+    sim._overhead_model = None
+    sim._condensation_model = None
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim._chem_registry = {}
