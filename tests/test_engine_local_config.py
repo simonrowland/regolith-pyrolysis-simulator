@@ -2,23 +2,23 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import warnings
 from pathlib import Path
 
 import pytest
 
+from engine_install_config import load_engine_lock, thermoengine_artifact_names
 from simulator.engine_local_config import (
     EngineIdentity,
-    EngineInstallRequiredError,
     EngineLocalConfig,
     EnginePaths,
     cache_version_for,
     config_path,
     is_legacy_cache_version,
-    load_engine_lock,
     load_config,
     render_toml,
     setup_thermoengine_dylib_path,
-    thermoengine_artifact_names,
+    warn_legacy_once,
     write_config,
 )
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -99,37 +99,34 @@ def test_identity_derived_from_config_for_alphamelts_subprocess(
     assert backend.get_engine_version() == "alphaMELTS 9.9.9 (digest=sha256:abc111)"
 
 
-def test_alpha_backend_discovers_checkout_binary_without_local_config(
+def test_config_absent_legacy_fallback_emits_warning(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import simulator.melt_backend.alphamelts as alphamelts_module
-
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "engine_install_config.config_path",
         lambda: missing,
     )
-    legacy = tmp_path / "alphamelts2"
-    legacy.write_bytes(b"legacy binary")
-
-    class UnavailableVapoRock:
-        def initialize(self, _config: dict) -> bool:
-            return False
-
-        def is_available(self) -> bool:
-            return False
-
-    monkeypatch.setattr(
-        alphamelts_module,
-        "VapoRockBackend",
-        UnavailableVapoRock,
-    )
     backend = AlphaMELTSBackend()
-    monkeypatch.setattr(backend, "_find_project_binary", lambda _root: legacy)
+    backend._mode = "subprocess"
+    backend._binary_path = tmp_path / "alphamelts2"
+    backend._engine_path = backend._binary_path
 
-    assert backend.initialize({"mode": "subprocess"}) is True
-    assert backend._binary_path == legacy
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        version = backend.get_engine_version()
+
+    assert version == f"alphaMELTS subprocess ({backend._binary_path})"
+    assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
+
+
+def test_warn_legacy_once_is_single_shot() -> None:
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        warn_legacy_once("test-warn-legacy-once", "legacy once")
+        warn_legacy_once("test-warn-legacy-once", "legacy once")
+    assert len(caught) == 1
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(
@@ -148,7 +145,7 @@ def test_thermoengine_dylib_dir_fail_loud_when_missing(
     )
     write_config(config)
 
-    with pytest.raises(EngineInstallRequiredError, match="ThermoEngine dylibs missing"):
+    with pytest.raises(ImportError, match="ThermoEngine dylibs missing"):
         setup_thermoengine_dylib_path()
 
 
@@ -175,24 +172,6 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
     resolved = setup_thermoengine_dylib_path()
     assert resolved == dylib_dir
     assert str(dylib_dir) in __import__("os").environ["DYLD_FALLBACK_LIBRARY_PATH"]
-
-
-def test_thermoengine_uses_home_lib_without_local_config(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    home_lib = tmp_path / "home" / "lib"
-    home_lib.mkdir(parents=True)
-    for name in thermoengine_artifact_names(load_engine_lock()):
-        (home_lib / name).write_bytes(b"legacy dylib")
-    monkeypatch.setenv("HOME", str(home_lib.parent))
-    monkeypatch.setattr(
-        "engine_install_config.config_path",
-        lambda: tmp_path / "missing" / "engines.local.toml",
-    )
-    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
-
-    assert setup_thermoengine_dylib_path() == home_lib
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:

@@ -4,16 +4,27 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import platform
 import re
 import socket
 import subprocess
 import tomllib
+import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 from pathlib import PurePosixPath
 from typing import Any, Mapping
+
+logger = logging.getLogger(__name__)
+_LEGACY_WARNED: set[str] = set()
+_ALPHAMELTS_BINARY_NAMES = (
+    "alphamelts2",
+    "alphamelts_macos",
+    "alphamelts_linux",
+    "alphamelts_win64.exe",
+)
 
 _CONFIG_FILENAME = "engines.local.toml"
 _LOCK_FILENAME = "engines.lock.toml"
@@ -897,36 +908,45 @@ def is_legacy_cache_version(version: str) -> bool:
     return False
 
 
-def find_alphamelts_binary() -> Path:
+def warn_legacy_once(engine: str, message: str) -> None:
+    key = str(engine).strip().lower()
+    if key in _LEGACY_WARNED:
+        return
+    _LEGACY_WARNED.add(key)
+    warnings.warn(message, stacklevel=3)
+    logger.warning(message)
+
+
+def find_alphamelts_binary(engine_root: Path | None = None) -> Path | None:
     config = load_config()
-    if config is None:
-        raise EngineInstallRequiredError(
-            f"engine local config missing: {config_path()}; "
-            "run install-dependencies.py"
-        )
-    path = config.paths.alphamelts_binary_path
-    if path is None or not path.is_file():
-        raise EngineInstallRequiredError(
-            f"locked alphaMELTS binary is missing from {config_path()}; "
-            "run install-dependencies.py"
-        )
-    return path.expanduser()
+    if config is not None and config.paths.alphamelts_binary_path is not None:
+        path = config.paths.alphamelts_binary_path.expanduser()
+        if path.exists():
+            return path
+
+    root = engine_root or (repo_root() / "engines" / "alphamelts")
+    if not root.exists():
+        return None
+    for name in _ALPHAMELTS_BINARY_NAMES:
+        direct = root / name
+        if direct.exists():
+            return direct
+    for child in sorted(root.iterdir()):
+        if not child.is_dir():
+            continue
+        for name in _ALPHAMELTS_BINARY_NAMES:
+            candidate = child / name
+            if candidate.exists():
+                return candidate
+    return None
 
 
-def configured_magemin_binary_path() -> Path:
-    config = load_config(required=True)
-    assert config is not None
-    if config.paths.magemin_binary_path is None:
-        raise EngineInstallRequiredError(
-            f"locked MAGEMin path is missing from {config_path()}; "
-            "run install-engines.py"
-        )
+def configured_magemin_binary_path() -> Path | None:
+    config = load_config()
+    if config is None or config.paths.magemin_binary_path is None:
+        return None
     path = config.paths.magemin_binary_path.expanduser()
-    if not path.is_file():
-        raise EngineInstallRequiredError(
-            f"locked MAGEMin binary is missing at {path}; run install-engines.py"
-        )
-    return path
+    return path if path.exists() else None
 
 
 def resolve_magemin_binary_path(explicit: Any = None) -> Path | None:
@@ -948,10 +968,10 @@ def setup_thermoengine_dylib_path() -> Path:
         if home_lib.is_dir():
             dylib_dir = home_lib
     if dylib_dir is None or not dylib_dir.is_dir():
-        raise EngineInstallRequiredError(
-            "ThermoEngine dylib directory is unavailable; configure "
-            f"{config_path()} [paths].thermoengine_dylib_dir or run "
-            "install-engines.py"
+        raise ImportError(
+            "ThermoEngine dylibs not found: configure "
+            f"{config_path()} [paths].thermoengine_dylib_dir "
+            "or run install-engines.py"
         )
     dylib_names = thermoengine_artifact_names(load_engine_lock())
 
@@ -961,7 +981,7 @@ def setup_thermoengine_dylib_path() -> Path:
         if not (dylib_dir / name).is_file()
     ]
     if missing:
-        raise EngineInstallRequiredError(
+        raise ImportError(
             "ThermoEngine dylibs missing in "
             f"{dylib_dir}: {', '.join(missing)}. "
             "Run install-engines.py to build and stage them."
@@ -1049,6 +1069,7 @@ __all__ = (
     "thermoengine_artifact_names",
     "sha256_combined",
     "sha256_file",
+    "warn_legacy_once",
     "write_config",
     "write_locked_config",
 )

@@ -27,7 +27,6 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from engine_install_config import EngineInstallRequiredError
 
 import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
@@ -2125,32 +2124,6 @@ def test_magemin_absent_binary_marks_backend_unavailable(monkeypatch):
     assert backend.is_available() is False
 
 
-def test_magemin_discovers_legacy_checkout_binary_without_local_config(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    import engine_install_config
-    import simulator.melt_backend.magemin as magemin_module
-
-    project = tmp_path / "project"
-    module_file = project / "simulator" / "melt_backend" / "magemin.py"
-    module_file.parent.mkdir(parents=True)
-    monkeypatch.setattr(magemin_module, "__file__", str(module_file))
-    monkeypatch.setattr(
-        engine_install_config,
-        "config_path",
-        lambda: tmp_path / "missing" / "engines.local.toml",
-    )
-    binary = project / "engines" / "magemin" / "MAGEMin"
-    binary.parent.mkdir(parents=True)
-    binary.write_bytes(b"legacy MAGEMin")
-    binary.chmod(0o755)
-
-    backend = MAGEMinBackend()
-
-    assert backend._resolve_binary_path() == binary
-
-
 def test_magemin_absent_equilibrate_returns_empty_result_with_warning(
     monkeypatch,
 ):
@@ -3262,17 +3235,16 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
 # Skipif-guarded so CI without a built MAGEMin still passes.
 # ----------------------------------------------------------------------
 
-# Resolve the configured binary at collection time so the guard is a true
-# pytest.mark.skipif rather than a runtime branch.
-try:
-    _LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
-except EngineInstallRequiredError:
-    _LIVE_MAGEMIN_BINARY = None
+# Resolve a real binary at collection time so the guard is a true
+# pytest.mark.skipif rather than a runtime branch. MAGEMin v1.9.3 is built
+# locally as a sibling clone (../MAGEMin/MAGEMin); _locate_binary also
+# checks engines/magemin/{,bin/}MAGEMin and PATH.
+_LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
 
 
 @pytest.mark.skipif(
     _LIVE_MAGEMIN_BINARY is None,
-    reason="No configured MAGEMin binary (run install-engines.py)",
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
 def test_magemin_live_smoke_runs_real_binary(request):
     # End-to-end against the real MAGEMin binary: a basalt analog at

@@ -30,6 +30,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.engine_local_config import (
     cache_version_for,
     setup_thermoengine_dylib_path,
+    warn_legacy_once,
 )
 from simulator.engine_pool import (
     EngineWorkerRemoteError,
@@ -1108,8 +1109,10 @@ class ThermoEngineTransport:
         self._liq_phase = liq_phase
         self._melts_version = melts_version
         self._liq_model = liq_model
-        native_identity = cache_version_for('thermoengine')
-        if native_identity is None:
+        config_version = cache_version_for('thermoengine')
+        if config_version is not None:
+            native_identity = config_version
+        else:
             module_path = getattr(thermoengine, '__file__', 'unknown')
             native_identity = (
                 f'thermoengine MELTS {melts_version} '

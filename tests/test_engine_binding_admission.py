@@ -106,54 +106,6 @@ def test_install_provenance_repeats_equal_mapping_and_fingerprint(
     ) == admission.admission_fingerprint(identity, second)
 
 
-def test_replay_only_install_provenance_resolves_configured_alpha_binary(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    identity, binary = _configured_alphamelts_identity(
-        tmp_path, monkeypatch, b"configured replay-only alphaMELTS"
-    )
-
-    provenance = install_provenance(identity)
-
-    assert provenance["resolved_paths"]["alphamelts_selected_binary"] == str(binary)
-    assert provenance["runtime_artifacts"]["alphamelts_selected_binary"]["sha256"] == (
-        hashlib.sha256(binary.read_bytes()).hexdigest()
-    )
-
-
-def test_replay_only_install_provenance_discovers_alpha_without_local_config(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    import engine_install_config
-
-    repo = tmp_path / "repo"
-    monkeypatch.setattr(
-        admission,
-        "__file__",
-        str(repo / "simulator" / "engine_binding_admission.py"),
-    )
-    monkeypatch.setattr(
-        engine_install_config,
-        "config_path",
-        lambda: tmp_path / "missing" / "engines.local.toml",
-    )
-    binary = repo / "engines" / "alphamelts" / "alphamelts2"
-    binary.parent.mkdir(parents=True)
-    binary.write_bytes(b"legacy replay-only alphaMELTS")
-    identity = BindingIdentity(
-        "alphamelts", "MELTSv1.0.2", "fixture-r1", "subprocess"
-    )
-
-    provenance = install_provenance(identity)
-
-    assert provenance["resolved_paths"]["alphamelts_selected_binary"] == str(binary)
-    assert provenance["runtime_artifacts"]["alphamelts_selected_binary"]["sha256"] == (
-        hashlib.sha256(binary.read_bytes()).hexdigest()
-    )
-
-
 @pytest.mark.parametrize(
     ("change", "initial", "replacement"),
     [

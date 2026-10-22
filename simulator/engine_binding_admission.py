@@ -117,7 +117,7 @@ _SELECTED_PRODUCER_IDENTITIES = {
 
 def binding_receipt_path(config_path: str | Path | None = None) -> Path:
     if config_path is None:
-        from engine_install_config import config_path as local_config_path
+        from simulator.engine_local_config import config_path as local_config_path
 
         config_path = local_config_path()
     return Path(config_path).with_name(RECEIPT_FILENAME)
@@ -1672,12 +1672,7 @@ def install_provenance(
     simulator: Any | None = None,
 ) -> dict[str, Any]:
     """Return host-local evidence used to detect a changed assessed install."""
-    from engine_install_config import (
-        EngineInstallRequiredError,
-        config_path,
-        find_alphamelts_binary,
-        load_config,
-    )
+    from simulator.engine_local_config import config_path, load_config
 
     repo_root = Path(__file__).resolve().parent.parent
 
@@ -1783,11 +1778,10 @@ def install_provenance(
         if identity.transport == "subprocess":
             binary = getattr(runtime_backend, "_binary_path", None)
             if binary is None:
+                from simulator.engine_local_config import find_alphamelts_binary
+
                 engine_root = repo_root / "engines" / "alphamelts"
-                try:
-                    binary = find_alphamelts_binary()
-                except EngineInstallRequiredError:
-                    binary = None
+                binary = find_alphamelts_binary(engine_root)
                 if binary is None:
                     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
@@ -1805,12 +1799,7 @@ def install_provenance(
             )
             launcher = getattr(runtime_backend, "_engine_path", None)
             if launcher is None:
-                candidate = (
-                    repo_root
-                    / "engines"
-                    / "alphamelts"
-                    / "run_alphamelts.command"
-                )
+                candidate = repo_root / "engines" / "alphamelts" / "run_alphamelts.command"
                 launcher = candidate if candidate.is_file() else None
             launcher_path = selected_path(launcher)
             resolved_paths["alphamelts_selected_launcher"] = (

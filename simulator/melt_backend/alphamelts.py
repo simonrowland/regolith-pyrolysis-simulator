@@ -1103,8 +1103,9 @@ class _MELTSBackendSupport(MeltBackend):
         Detect available alphaMELTS interfaces.
 
         Checks in order unless ``mode`` pins a transport:
-        1. alphaMELTS binary configured by engines.local.toml
-        2. PetThermoTools Python package
+        1. alphaMELTS binary in engines/alphamelts/
+        2. alphaMELTS on system PATH
+        3. PetThermoTools Python package
         """
         config = self._alphamelts_config(config)
         self.close()
@@ -1185,15 +1186,12 @@ class _MELTSBackendSupport(MeltBackend):
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
-            from simulator.engine_local_config import EngineInstallRequiredError
+            from simulator.engine_local_config import find_alphamelts_binary
 
             project_root = Path(__file__).parent.parent.parent
             engine_root = project_root / 'engines' / 'alphamelts'
             engine_path = engine_root / 'run_alphamelts.command'
-            try:
-                binary_path = self._configured_alphamelts_binary()
-            except EngineInstallRequiredError:
-                binary_path = None
+            binary_path = find_alphamelts_binary(engine_root)
             if binary_path is None:
                 binary_path = self._find_project_binary(engine_root)
             if engine_path.exists() or binary_path is not None:
@@ -1201,13 +1199,11 @@ class _MELTSBackendSupport(MeltBackend):
                 self._binary_path = binary_path
                 self._mode = 'subprocess'
             else:
+                # Check system PATH
                 try:
                     result = _run_alphamelts_subprocess(
                         ['alphamelts', '--version'],
-                        capture_output=True,
-                        text=True,
-                        timeout=5,
-                    )
+                        capture_output=True, text=True, timeout=5)
                     if result.returncode == 0:
                         self._engine_path = Path('alphamelts')
                         self._binary_path = Path('alphamelts')
@@ -1374,11 +1370,27 @@ class _MELTSBackendSupport(MeltBackend):
             )
         return self._python_api_model
 
-    def _configured_alphamelts_binary(self) -> Path:
-        """Resolve the locked binary from engines.local.toml."""
-        from simulator.engine_local_config import find_alphamelts_binary
-
-        return find_alphamelts_binary()
+    def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
+        if not engine_root.exists():
+            return None
+        binary_names = (
+            'alphamelts2',
+            'alphamelts_macos',
+            'alphamelts_linux',
+            'alphamelts_win64.exe',
+        )
+        for name in binary_names:
+            direct = engine_root / name
+            if direct.exists():
+                return direct
+        for child in sorted(engine_root.iterdir()):
+            if not child.is_dir():
+                continue
+            for name in binary_names:
+                candidate = child / name
+                if candidate.exists():
+                    return candidate
+        return None
 
     def is_available(self) -> bool:
         return self._mode is not None

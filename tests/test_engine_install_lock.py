@@ -502,6 +502,44 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
         encoding="utf-8",
     )
     fake_git.chmod(0o755)
+
+    env = os.environ.copy()
+    env.update({"HOME": str(home), "PATH": str(bin_dir)})
+
+    def run_check(entrypoint: Path):
+        return subprocess.run(
+            [sys.executable, "-I", "-S", str(entrypoint), "--check"],
+            cwd=fixture_repo,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    installed_entrypoint = fixture_repo / "install-engines.py"
+    bytecode_enabled_entrypoint = fixture_repo / "install-engines-bytecode-enabled.py"
+    installed_text = installed_entrypoint.read_text(encoding="utf-8")
+    suppression = "sys.dont_write_bytecode = True"
+    assert suppression in installed_text
+    enabled_text = installed_text.replace(
+        suppression,
+        "sys.dont_write_bytecode = False",
+        1,
+    )
+    bytecode_enabled_entrypoint.write_text(enabled_text, encoding="utf-8")
+    bytecode_enabled = run_check(bytecode_enabled_entrypoint)
+    assert bytecode_enabled.returncode == 0, (
+        bytecode_enabled.stdout + bytecode_enabled.stderr
+    )
+    bytecode_cache = fixture_repo / "__pycache__"
+    assert bytecode_cache.is_dir()
+    assert any(
+        path.name.startswith("engine_install_config.") and path.suffix == ".pyc"
+        for path in bytecode_cache.iterdir()
+    )
+    shutil.rmtree(bytecode_cache)
+    bytecode_enabled_entrypoint.unlink()
+
     def tree_contents(root: Path) -> dict[str, tuple[str, object]]:
         contents: dict[str, tuple[str, object]] = {}
         for current, directories, files in os.walk(root):
@@ -519,6 +557,15 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
 
     home_before = tree_contents(home)
     repo_before = tree_contents(fixture_repo)
+
+    writable_check = run_check(installed_entrypoint)
+    assert writable_check.returncode == 0, (
+        writable_check.stdout + writable_check.stderr
+    )
+    assert not (fixture_repo / "__pycache__").exists()
+    assert tree_contents(home) == home_before
+    assert tree_contents(fixture_repo) == repo_before
+
     for readonly_root in (home, fixture_repo):
         for current, directories, files in os.walk(readonly_root):
             Path(current).chmod(0o555)
@@ -527,22 +574,7 @@ def test_stdlib_bootstrap_and_check_entrypoint_are_read_only(tmp_path: Path) -> 
                 if not path.is_symlink():
                     path.chmod(0o444)
 
-    env = os.environ.copy()
-    env.update({"HOME": str(home), "PATH": str(bin_dir)})
-    checked = subprocess.run(
-        [
-            sys.executable,
-            "-I",
-            "-S",
-            str(fixture_repo / "install-engines.py"),
-            "--check",
-        ],
-        cwd=fixture_repo,
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    checked = run_check(installed_entrypoint)
     home_after = tree_contents(home)
     repo_after = tree_contents(fixture_repo)
     for readonly_root in (home, fixture_repo):
