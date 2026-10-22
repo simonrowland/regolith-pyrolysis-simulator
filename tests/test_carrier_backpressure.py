@@ -2,8 +2,8 @@
 import pytest
 
 from engines.builtin.overhead_bleed import controlled_flow_capacity
-from simulator.overhead import OverheadConfigurationError, OverheadGasModel
-from simulator.state import Atmosphere, CondensationTrain, EvaporationFlux, MeltState
+from simulator.overhead import OverheadGasModel, continuous_sweep_balance
+from simulator.state import Atmosphere, CondensationTrain, EvaporationFlux, MeltState, MOLAR_MASS
 
 
 def _boundary(carrier, fraction=1.0, *, atmosphere=Atmosphere.CONTROLLED_O2):
@@ -22,20 +22,38 @@ def _boundary(carrier, fraction=1.0, *, atmosphere=Atmosphere.CONTROLLED_O2):
     return model, melt, flux, capacity
 
 
-@pytest.mark.xfail(strict=True, reason="b-1016: achieved carrier composition unavailable; scope blocked")
 @pytest.mark.parametrize("carrier", ["Kr", "N2"])
 def test_carrier_full_pressure_requires_achieved_composition(carrier):
     model, melt, flux, capacity = _boundary(carrier)
-    assert melt.sweep_mol_per_s is None
-    # A pure carrier feed/declared pressure floor is not an achieved gas mole
-    # fraction after vapour enters. No carrier inventory or removal closure is
-    # supplied here. Reserving all nominal carrier/O2 pressure and assigning
-    # zero vapour would merely replace one unsupported split with another.
-    # The missing achieved-mixture input needs a typed refusal or an authorized
-    # flow/inventory closure, rather than a guessed numerical back-pressure.
-    with pytest.raises(OverheadConfigurationError, match="carrier"):
-        model.update(flux, melt, CondensationTrain.create_default(),
-                     effective_transport_capacity=capacity)
+    melt.sweep_mol_per_s = 0.01
+    expected = _owner_steady_partials(melt, flux, carrier)
+    transport = model.estimate_transport_state(flux, melt, effective_transport_capacity=capacity)
+    partials = model.backpressure_partials(flux, melt, transport)
+    assert partials['Fe'] == pytest.approx(expected['Fe'])
+    assert partials == pytest.approx(expected)
+    gas = model.update(flux, melt, CondensationTrain.create_default(),
+                       effective_transport_capacity=capacity)
+    assert gas.composition['Fe'] == pytest.approx(expected['Fe'])
+    assert 0.0 < gas.composition['Fe'] < 10.2
+    assert gas.composition['O2'] == 0.2  # C9 still owns this controlled floor.
+    assert model.last_backpressure_notice is None
+
+
+def _owner_steady_partials(melt, flux, carrier, oxygen_mol_hr=0.0):
+    generated = {s: mass / (MOLAR_MASS[s] / 1000.0)
+                 for s, mass in flux.species_kg_hr.items()}
+    if oxygen_mol_hr:
+        generated['O2'] = max(generated.get('O2', 0.0), oxygen_mol_hr)
+    plan = continuous_sweep_balance(
+        {}, generated, carrier=carrier, sweep_mol_per_s=melt.sweep_mol_per_s,
+        dt_s=3600.0, pressure_bar=melt.p_total_mbar / 1000.0,
+        volume_m3=0.001, temperature_K=melt.temperature_C + 273.15,
+    )
+    # The small chamber undergoes many residence times, so the integrated
+    # production owner reaches its steady mixture within floating precision.
+    partials_bar = OverheadGasModel._compute_partial_pressures(
+        plan['final_species_mol'], 0.001, melt.temperature_C + 273.15)
+    return {s: partials_bar.get(s, 0.0) * 1000.0 for s in plan['final_species_mol']}
 
 
 def test_carrier_absent_controlled_split_is_bit_identical():
@@ -49,6 +67,7 @@ def test_carrier_absent_controlled_split_is_bit_identical():
         "Fe": "0x1.4666666666666p+3", "O2": "0x1.999999999999ap-3",
     }
     assert gas.pressure_mbar.hex() == "0x1.4ccccccccccccp+3"
+    assert 'underspecified carrier boundary' in model.last_backpressure_notice
 
 
 @pytest.mark.parametrize("carrier", ["Kr", "N2"])
@@ -62,6 +81,7 @@ def test_open_inert_pipe_keeps_source_only_pressure(carrier):
     )
     assert transport["vapor_pressure_mbar"].hex() == expected.hex()
     assert model.species_partial_pressures(flux, expected)["Fe"].hex() == expected.hex()
+    assert model.backpressure_partials(flux, melt, transport)['Fe'].hex() == expected.hex()
 
 
 @pytest.mark.parametrize("carrier", ["Kr", "N2"])
@@ -97,6 +117,9 @@ def test_lab_schedule_argon_legacy_pin():
     transport = model.estimate_transport_state(flux, melt)
     assert transport["vapor_pressure_mbar"].hex() == "0x1.a000000000000p+3"
     assert model.species_partial_pressures(flux, transport["vapor_pressure_mbar"])["SiO"].hex() == "0x1.a000000000000p+3"
+    achieved = model.backpressure_partials(flux, melt, transport)
+    assert achieved == pytest.approx(_owner_steady_partials(melt, flux, 'Ar'))
+    assert 0.0 < achieved['SiO'] < 13.0
 
 
 @pytest.mark.parametrize("requested_o2", [0.0, 0.2])
@@ -140,3 +163,86 @@ def test_lab_flow_declaration_survives_repeated_sweep_assignment(flow):
         else:
             assert melt.sweep_mol_per_s == pytest.approx(
                 {0.0: 0.0, 0.3: 0.00022307516702922367}[flow])
+
+
+@pytest.mark.parametrize('flow', [0.0, 0.01])
+def test_sweep_projection_matches_cstr_owner_and_zero_flow_limit(flow):
+    model, melt, flux, capacity = _boundary('Kr')
+    melt.sweep_mol_per_s = flow
+    transport = model.estimate_transport_state(flux, melt, effective_transport_capacity=capacity)
+    actual = model.backpressure_partials(flux, melt, transport)
+    assert actual == pytest.approx(_owner_steady_partials(melt, flux, 'Kr'))
+    if flow == 0.0:
+        assert actual['Fe'].hex() == '0x1.4666666666666p+3'
+
+
+def test_no_vapour_has_carrier_only_total():
+    model, melt, _, _ = _boundary('Kr')
+    melt.sweep_mol_per_s = 0.01
+    flux = EvaporationFlux()
+    transport = model.estimate_transport_state(flux, melt)
+    assert model.backpressure_partials(flux, melt, transport) == {'Kr': 10.2}
+
+
+def test_oxygen_source_is_in_cstr_denominator_once():
+    model, melt, _, capacity = _boundary('N2')
+    melt.sweep_mol_per_s = 0.01
+    flux = EvaporationFlux(species_kg_hr={'Fe': 0.1, 'O2': MOLAR_MASS['O2'] / 1000.0})
+    flux.update_totals()
+    transport = model.estimate_transport_state(flux, melt, effective_transport_capacity=capacity)
+    expected = _owner_steady_partials(melt, flux, 'N2', oxygen_mol_hr=1.0)
+    assert model.backpressure_partials(flux, melt, transport, oxygen_mol_hr=1.0) == pytest.approx(expected)
+    flux_without_o2 = EvaporationFlux(total_kg_hr=0.1, species_kg_hr={'Fe': 0.1})
+    assert model.backpressure_partials(flux_without_o2, melt, transport, oxygen_mol_hr=1.0) == pytest.approx(expected)
+
+
+def test_open_declared_sweep_uses_chamber_total_and_evaporation_reads_own_partial():
+    from simulator.evaporation import EvaporationMixin
+    from types import SimpleNamespace
+
+    model, melt, flux, _ = _boundary('N2', atmosphere=Atmosphere.PN2_SWEEP)
+    melt.sweep_mol_per_s = 0.01
+    transport = model.estimate_transport_state(flux, melt)
+    assert transport['vapor_pressure_mbar'] < transport['pressure_mbar']
+    actual = model.backpressure_partials(flux, melt, transport)
+    assert actual == pytest.approx(_owner_steady_partials(melt, flux, 'N2'))
+    host = SimpleNamespace(_melt_headspace_composition_mbar=actual)
+    assert EvaporationMixin._evaporation_bulk_partial_pressure_pa(host, 'Fe') == pytest.approx(actual['Fe'] * 100.0)
+
+
+def test_legacy_upper_bound_notice_reaches_snapshot_warning_path():
+    from simulator.core import PyrolysisSimulator
+    from types import SimpleNamespace
+
+    model, melt, flux, capacity = _boundary('Kr')
+    transport = model.estimate_transport_state(flux, melt, effective_transport_capacity=capacity)
+    actual = model.backpressure_partials(flux, melt, transport)
+    assert actual['Fe'].hex() == '0x1.4666666666666p+3'
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._process_pressure_diagnostic = {}
+    sim._overhead_model = model
+    sim._condensation_model = SimpleNamespace(last_knudsen_regime_diagnostic={})
+    assert model.last_backpressure_notice in sim._latest_knudsen_summary()['warnings']
+
+
+def test_legacy_notice_is_exported_and_cleared_without_mutating_retained_report():
+    from simulator.runner import PyrolysisRun
+
+    run = PyrolysisRun(
+        feedstock_id='lunar_mare_low_ti', campaign='C2A', hours=1,
+        backend_name='internal-analytical', force_builtin_vapor_pressure=True,
+        sio_start_temperature_c=1450.0, allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    payload = run._run_session(session)
+    assert payload['status'] == 'ok'
+    notice = payload['per_hour_summary'][0]['vapour_batch_summary']['metadata']['backpressure_notice']
+    assert 'underspecified carrier boundary' in notice
+    assert 'UPPER BOUND' in notice
+    sim = session.simulator
+    retained = sim._last_vapour_batch_report
+    sim.overhead_model.last_backpressure_notice = None
+    sim._make_snapshot()
+    assert 'backpressure_notice' not in sim._last_vapour_batch_report['metadata']
+    assert retained['metadata']['backpressure_notice'] == notice

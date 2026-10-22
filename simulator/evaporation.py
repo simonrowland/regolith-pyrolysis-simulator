@@ -3947,10 +3947,14 @@ class EvaporationMixin:
             self.condensation_model.configure_operating_conditions(
                 overhead_pressure_mbar=transport['pressure_mbar'],
                 species_partial_pressures_mbar=(
-                    self.overhead_model.species_partial_pressures(
+                    self.overhead_model.backpressure_partials(
                         evap_flux,
-                        transport['vapor_pressure_mbar'],
+                        self.melt,
+                        transport,
                         self.species_formula_registry,
+                        oxygen_mol_hr=(self._project_evaporation_overhead_source_mol_hr(
+                            evap_flux.species_kg_hr, {}).get('O2', 0.0)
+                            if self.melt.sweep_mol_per_s is not None else 0.0),
                     )
                 ),
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,

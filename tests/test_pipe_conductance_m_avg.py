@@ -58,8 +58,8 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
             "vapor_pressure_mbar": 1.0,
             "stage_area_m2_by_stage": {},
         },
-        species_partial_pressures=lambda _flux, vapor_pressure_mbar: {
-            "SiO": vapor_pressure_mbar
+        backpressure_partials=lambda _flux, _melt, transport, _registry, **_kwargs: {
+            "SiO": transport['vapor_pressure_mbar']
         },
         resolve_pipe_segment_temperatures_C=lambda names, _melt: {
             name: 850.0 + index * 25.0
@@ -74,6 +74,7 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
         overhead_model=overhead,
         condensation_model=condensation,
         melt=SimpleNamespace(
+            sweep_mol_per_s=None,
             stir_state=SimpleNamespace(radial=1.0),
             campaign=None,
             campaign_hour=0.0,

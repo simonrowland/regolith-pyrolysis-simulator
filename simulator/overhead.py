@@ -1498,19 +1498,17 @@ class OverheadGasModel:
                 effective_transport_capacity=effective_transport_capacity,
             )
         )
-        vapor_pressure_mbar = report_transport_state['vapor_pressure_mbar']  # mbar (nominal) — downstream proxy pressure
         gas.pressure_mbar = report_transport_state['pressure_mbar']  # mbar — reported downstream total pressure
 
-        # ── Product partial pressures (proportional to molar flow) ──
-        # Premise: ideal-gas partial pressure follows mole fraction. Algebra:
-        # ṅ_i=ṁ_i/M_i, y_i=ṅ_i/Σṅ, and p_i=y_i*P_vapor. Unit check:
-        # (kg/hr)/(kg/mol)=mol/hr and y_i is dimensionless. Sanity: equal
-        # 1 kg/hr Fe and O2 flows give p_Fe/p_O2=M_O2/M_Fe≈0.573, not 1.
-        if total_evap_kg_hr > 0:
-            gas.composition.update(self.species_partial_pressures(
+        # The owner chooses the CSTR mixture or the flagged legacy bound.
+        # A supplied finite inventory below retains its achieved projection.
+        if total_evap_kg_hr > 0 or melt.sweep_mol_per_s is not None:
+            gas.composition.update(self.backpressure_partials(
                 evap_flux,
-                vapor_pressure_mbar,
+                melt,
+                report_transport_state,
                 self.species_formula_registry,
+                oxygen_mol_hr=O2_flow_mol_hr + gas.mre_anode_O2_mol_hr,
             ))
 
         # Controlled/background atmosphere partial pressures.
@@ -1522,13 +1520,15 @@ class OverheadGasModel:
         } and melt.pO2_mbar > 0.0:
             self.apply_commanded_o2_floor(gas.composition, melt.pO2_mbar)
 
-        if melt.sweep_mol_per_s is not None:
+        if melt.sweep_mol_per_s is not None and overhead_holdup_mol is not None:
             boundary = self.sweep_boundary(
                 overhead_holdup_mol, volume_m3=gas.headspace_volume_m3,
                 temperature_K=gas.headspace_temperature_K,
             )
             gas.composition = {s: p * 1000.0 for s, p in boundary['partials_bar'].items()}
-        else:
+            if atmosphere_name in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'} and melt.pO2_mbar > 0.0:
+                self.apply_commanded_o2_floor(gas.composition, melt.pO2_mbar)
+        elif melt.sweep_mol_per_s is None:
             if atmosphere_name in {
                 'PN2_SWEEP', 'ARGON_FLOW',
                 'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE',
@@ -1554,15 +1554,38 @@ class OverheadGasModel:
 
         return gas
 
+    def backpressure_partials(
+        self, evap_flux: EvaporationFlux, melt: MeltState, transport: Mapping,
+        species_formula_registry: Optional[Mapping[str, Any]] = None,
+        *, oxygen_mol_hr: float = 0.0,
+    ) -> dict[str, float]:
+        """Use the achieved CSTR source mixture, or flag the legacy bound."""
+        self.last_backpressure_notice = None
+        if melt.sweep_mol_per_s is None:
+            if melt.p_total_mbar > 0.0:
+                self.last_backpressure_notice = (
+                    'underspecified carrier boundary: vapour-only back-pressure UPPER BOUND'
+                )
+            return self.species_partial_pressures(
+                evap_flux, transport['vapor_pressure_mbar'], species_formula_registry)
+        carrier = next(iter(self._background_partial_pressures_mbar(melt)), 'N2')
+        return self.species_partial_pressures(
+            evap_flux, transport['pressure_mbar'], species_formula_registry,
+            carrier=carrier, sweep_mol_per_s=melt.sweep_mol_per_s,
+            oxygen_mol_hr=oxygen_mol_hr,
+        )
+
     @staticmethod
     def species_partial_pressures(
         evap_flux: EvaporationFlux,
         vapor_pressure_mbar: float,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
+        *, carrier: Optional[str] = None, sweep_mol_per_s: Optional[float] = None,
+        oxygen_mol_hr: float = 0.0,
     ) -> dict[str, float]:
         """Project a species mass-flow mixture onto mole-fraction partials."""
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
-        if total_evap_kg_hr <= 0.0:
+        if total_evap_kg_hr <= 0.0 and sweep_mol_per_s is None:
             return {}
         molar_flow_by_species: dict[str, float] = {}
         for species, rate in evap_flux.species_kg_hr.items():
@@ -1580,6 +1603,23 @@ class OverheadGasModel:
             molar_flow_by_species[species] = max(0.0, float(rate)) / (
                 molar_mass_g_mol / 1000.0
             )
+        if sweep_mol_per_s is not None:
+            flow = _required_finite_nonnegative_float(sweep_mol_per_s, 'sweep_mol_per_s')
+            if oxygen_mol_hr > 0.0:
+                # The explicit O2 source may already be in the supplied flux.
+                molar_flow_by_species['O2'] = max(
+                    molar_flow_by_species.get('O2', 0.0), oxygen_mol_hr)
+            # Dalton/CSTR: p_i=y_i P, y_i=g_i/(F+sum_j g_j), including O2.
+            # Reuse continuous_sweep_balance's source dose: g_i is mol/hr,
+            # F [mol/s]*3600 [s/hr] is mol/hr; the ratio is dimensionless
+            # and P supplies mbar. F->0 recovers the vapour-only split;
+            # no vapour leaves carrier-only total P, including startup at F=0.
+            molar_flow_by_species = _continuous_sweep_source_mol(
+                molar_flow_by_species, carrier=carrier, flow=flow, duration=3600.0)
+            total_molar_flow = sum(molar_flow_by_species.values())
+            return (_molar_flow_partial_pressures(
+                molar_flow_by_species, total_molar_flow, vapor_pressure_mbar,
+            ) if total_molar_flow else {carrier: vapor_pressure_mbar})
         # Unknown-only mixtures retain the legacy mass-fraction fallback.
         total_molar_flow = sum(molar_flow_by_species.values())
         if total_molar_flow > 0.0:

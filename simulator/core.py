@@ -3732,16 +3732,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         species_formula_registry = getattr(
             self, "species_formula_registry", {}
         )
-        partial_pressure_args = (
-            (inlet_flux, transport['vapor_pressure_mbar'], species_formula_registry)
-            if species_formula_registry
-            else (inlet_flux, transport['vapor_pressure_mbar'])
-        )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
             species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(*partial_pressure_args)
+                self.overhead_model.backpressure_partials(
+                    inlet_flux, self.melt, transport, species_formula_registry,
+                    oxygen_mol_hr=(self._project_evaporation_overhead_source_mol_hr(
+                        evap_flux.species_kg_hr, {}).get('O2', 0.0)
+                        if self.melt.sweep_mol_per_s is not None else 0.0),
+                )
             ),
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used
@@ -14639,10 +14639,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             effective_transport_capacity=effective_transport_capacity,
         )
         self._melt_headspace_composition_mbar = (
-            self.overhead_model.species_partial_pressures(
+            self.overhead_model.backpressure_partials(
                 transport_inlet_flux,
-                upstream_transport['vapor_pressure_mbar'],
+                self.melt,
+                upstream_transport,
                 self.species_formula_registry,
+                oxygen_mol_hr=(self._project_evaporation_overhead_source_mol_hr(
+                    evap_flux.species_kg_hr, {}).get('O2', 0.0)
+                    if self.melt.sweep_mol_per_s is not None else 0.0),
             )
         )
         if sweep_plan is not None:
@@ -15267,6 +15271,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         notice = getattr(self._overhead_model, "last_pipe_conductance_authority_notice", None)
         if notice:
             transport_notices = tuple(dict.fromkeys(transport_notices + (notice,)))
+        backpressure_notice = getattr(self._overhead_model, 'last_backpressure_notice', None)
+        if backpressure_notice:
+            transport_notices += (backpressure_notice,)
         marker = getattr(self, '_pending_knudsen_zero_overhead_flow_marker', None)
         if isinstance(marker, Mapping):
             summary = dict(marker)
@@ -15315,6 +15322,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             summary['warnings'] += (notice,)
         summary['warnings'] = tuple(dict.fromkeys(summary['warnings'] + tuple(
             self._process_pressure_diagnostic.get("transport_notices", ()))))
+        if backpressure_notice:
+            summary['warnings'] = tuple(dict.fromkeys(summary['warnings'] + (backpressure_notice,)))
         return summary
 
     @staticmethod
@@ -15422,6 +15431,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif mass_out > 0:
             error_pct = None
             error_category = 'zero_input_basis_breach'
+
+        batch_report = getattr(self, '_last_vapour_batch_report', None)
+        if isinstance(batch_report, Mapping):
+            metadata = dict(batch_report.get('metadata') or {})
+            notice = getattr(self._overhead_model, 'last_backpressure_notice', None)
+            if notice or 'backpressure_notice' in metadata:
+                if notice:
+                    metadata['backpressure_notice'] = notice
+                else:
+                    metadata.pop('backpressure_notice', None)
+                self._last_vapour_batch_report = {**batch_report, 'metadata': metadata}
 
         snapshot = HourSnapshot(
             hour=self.melt.hour,
