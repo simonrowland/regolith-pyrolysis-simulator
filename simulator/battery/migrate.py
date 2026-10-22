@@ -383,6 +383,23 @@ PHASE_MAP: dict[str, Phase] = {
     "(c)": Phase.CR,
 }
 
+
+def phase_for_sample_form(form: str | None) -> Phase | None:
+    """Closed phase for a sample form token. Untyped prose is None.
+
+    Same lookup the p_sat reservoir fill uses: strip, casefold, then
+    PHASE_MAP. A miss is not a phase. ``map_phase`` stays separate: it
+    records the original species-phase spelling on an unknown.
+    """
+
+    if form is None:
+        return None
+    token = form.strip().casefold()
+    if not token:
+        return None
+    return PHASE_MAP.get(token)
+
+
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
     "fugacity_series": Quantity.FUGACITY,
@@ -12600,11 +12617,11 @@ class Migrator:
             # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
-                sample.form.state.value.strip().casefold()
+                sample.form.state.value
                 if sample.form is not None and sample.form.state.is_value
                 else None
             )
-            sample_phase = PHASE_MAP.get(form) if form is not None else None
+            sample_phase = phase_for_sample_form(form)
             initial = sample.initial_composition
             pure_sample = has_pure_component_composition(
                 initial.state if initial is not None else None
