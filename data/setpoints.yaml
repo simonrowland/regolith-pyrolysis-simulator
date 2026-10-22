@@ -1166,12 +1166,9 @@ condensation_train:
 # ============================================================================
 condenser_geometry:
 
-  # BH-063 user-exposed knob candidate. Default is pi * (0.06 m)^2,
-  # which reproduces the historical 12 cm hot-wall throat diameter:
-  # sqrt(4 * initial_throat_area_m2 / pi) = 0.12 m.
-  initial_throat_area_m2: 0.011309733552923255
-  initial_throat_area_source: "BH-063 owner-approved back-compat anchor; 12 cm pipe throat, 2026-07-08"
-  initial_throat_area_knob_candidate: true
+  # Throat area is derived by EquipmentDesigner from campaign throughput.
+  # An operator/recipe may declare initial_throat_area_m2 to fix the duct;
+  # known undersizing then accumulates inventory and reports a shortfall.
 
   # Physical stage area = initial_throat_area_m2 * ratio. The throat is
   # the constriction; downstream condenser and terminal capture areas stay

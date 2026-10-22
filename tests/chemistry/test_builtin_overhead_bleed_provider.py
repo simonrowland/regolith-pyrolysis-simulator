@@ -1137,7 +1137,7 @@ def test_integrated_sweep_rejects_invalid_outlet(
     assert result.transition is None
 
 
-def test_integrated_sweep_cannot_bypass_zero_line_conductance(
+def test_integrated_sweep_zero_line_conductance_retains_inventory_and_flags(
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -1147,10 +1147,12 @@ def test_integrated_sweep_cannot_bypass_zero_line_conductance(
         "sweep_outflow_species_mol": {"Ar": 0.5}, "headspace_volume_m3": 1.0,
         "headspace_temperature_K": 300.0, "bleed_conductance_kg_s": 0.0, "p_total_bar": 0.006,
     })
-    assert result.status == "unsupported"
-    assert "line capacity" in result.diagnostic["reason"]
-    assert result.diagnostic["achieved_pressure_pa"] > 600.0
+    assert result.status == "ok"
+    assert result.diagnostic["capacity_shortfall"]["reason"] == "duct_capacity_shortfall"
+    assert result.diagnostic["capacity_shortfall"]["achieved_pressure_pa"] > 600.0
     assert result.transition is None
+
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas") == {"Ar": 1.0}
 
 
 def test_steady_sweep_committed_inventory_does_not_round_up(
@@ -1254,3 +1256,35 @@ def test_sweep_rejects_missing_or_unavailable_external_source_outlet(
     assert result.status == 'unsupported'
     assert result.transition is None
     assert sim.atom_ledger.mol_by_account() == before
+
+
+def test_physical_sweep_plan_is_not_clipped_to_final_instantaneous_capacity(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.overhead import continuous_sweep_balance
+    from simulator.state import GAS_CONSTANT
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints_data)
+    plan = continuous_sweep_balance(
+        {'Ar': 100.0}, {}, carrier='Ar', sweep_mol_per_s=1.0, dt_s=1.0,
+        pressure_bar=GAS_CONSTANT * 300.0 / 1e5, volume_m3=1.0, temperature_K=300.0,
+        outlet_capacity_mol_per_s=lambda inventory, pressure: sum(inventory.values()),
+    )
+    sim.atom_ledger.load_external_mol('process.overhead_gas', {'Ar': 100.0},
+                                    material_origin='reagent', source='pressurized carrier')
+    sim.atom_ledger.load_external_mol('reservoir.reagent.sweep_gas', plan['inlet_species_mol'],
+                                    material_origin='reagent', source='commanded carrier')
+    from simulator.transport_constants import CARRIER_GAS_PROPERTIES
+    final_capacity = plan['final_species_mol']['Ar'] * CARRIER_GAS_PROPERTIES['Ar'].molar_mass_kg_mol
+    result = sim._dispatch_and_commit(ChemistryIntent.OVERHEAD_BLEED, control_inputs={
+        'sweep_outflow_species_mol': plan['outflow_species_mol'],
+        'sweep_capacity_integrated': True,
+        'sweep_capacity_shortfall': plan['capacity_shortfall'],
+        'headspace_volume_m3': 1.0, 'headspace_temperature_K': 300.0,
+        'p_total_bar': plan['pressure_bar'], 'dt_hr': 1.0 / 3600.0,
+        'bleed_conductance_kg_s': final_capacity,
+    })
+    assert result.status == 'ok'
+    assert result.diagnostic['bled_species_mol'] == pytest.approx(plan['outflow_species_mol'])
+    assert sim.atom_ledger.mol_by_account('process.overhead_gas')['Ar'] == pytest.approx(
+        1.0 + 99.0 * math.exp(-1.0), rel=1e-8)
+    sim.atom_ledger.assert_balanced()

@@ -494,7 +494,7 @@ def test_pressure_coating_pareto_diagnostic_uses_actual_kn_gate_and_length():
     assert gate["hard_refusal_knudsen_threshold"] == pytest.approx(
         condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
     )
-    assert gate["controlling_characteristic_length_m"] == pytest.approx(0.12)
+    assert gate["controlling_characteristic_length_m"] == pytest.approx(session.simulator.overhead_model.pipe_diameter_m)
     assert gate["characteristic_length_source"] == (
         "knudsen_regime_diagnostic.segments[*].characteristic_length_m"
     )

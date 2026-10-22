@@ -216,7 +216,7 @@ class EquipmentDesigner:
         design.concentrator = self.size_solar_concentrator(
             mass_kg, peak_T_C)
 
-        self.resize_collection_pipe(design)
+        self.resize_collection_pipe(design, peak_T_C=peak_T_C)
 
         design.turbine = self.size_turbine(mass_kg)
         design.volatiles_train = self.size_volatiles_train(mass_kg, feedstock)
@@ -353,84 +353,101 @@ class EquipmentDesigner:
             efficiency=eff,
         )
 
-    def resize_collection_pipe(self, design: PlantDesign) -> None:
-        # Estimate peak evaporation rate from batch size
-        # ~10 g/s per tonne at peak SiO window
+    # Nominal circular duct design sizes, m; this is the preferred-size series,
+    # not an assertion that the interpolated flow law is certified hardware.
+    STANDARD_DUCT_DIAMETERS_M = (
+        0.05, 0.063, 0.08, 0.1, 0.125, 0.16, 0.2, 0.25, 0.315,
+        0.4, 0.5, 0.63, 0.8, 1.0, 1.25, 1.6, 2.0,
+    )
+    DUCT_DESIGN_MARGIN = 1.25
+
+    def resize_collection_pipe(
+        self, design: PlantDesign, *, peak_T_C: float = 1700.0,
+        pressure_mbar: float = 10.0, sweep_mol_per_s: float = 0.0,
+        carrier_molar_mass_kg_mol: float = 0.040,
+        downstream_pressure_Pa: float = 0.0,
+    ) -> None:
+        # Existing provisional peak estimate: 10 g/s per tonne at the SiO
+        # window. The 40 g/mol generated-gas design mixture is not a measured
+        # campaign peak. Runtime transport always uses its actual mixture.
         peak_evap_kg_s = design.batch_mass_kg * 10e-3 / 1000.0
-        design.pipe = self.size_collection_pipe(peak_evap_kg_s)
-        pipe_volume_m3 = (
-            math.pi * design.pipe.diameter_m**2 / 4.0
-            * design.pipe.length_m
+        design.pipe = self.size_collection_pipe(
+            # A hard-vacuum command supplies no finite pressure design point;
+            # retain the nominal 10 mbar equipment rating there. Runtime
+            # vacuum pressure is still solved from the actual source and pipe.
+            peak_evap_kg_s, pressure_mbar=pressure_mbar if pressure_mbar > 0.0 else 10.0,
+            sweep_mol_per_s=sweep_mol_per_s,
+            temperature_K=peak_T_C + CELSIUS_TO_KELVIN_OFFSET,
+            carrier_molar_mass_kg_mol=carrier_molar_mass_kg_mol,
+            downstream_pressure_Pa=downstream_pressure_Pa,
         )
-        crucible_freeboard_m3 = self._crucible_freeboard_volume_m3(
-            design.crucible
+        design.headspace_volume_m3 = (
+            self._crucible_freeboard_volume_m3(design.crucible)
+            + math.pi * design.pipe.diameter_m**2 / 4.0 * design.pipe.length_m
         )
-        design.headspace_volume_m3 = crucible_freeboard_m3 + pipe_volume_m3
         design.condensers = self._condenser_specs(design.pipe)
 
-    def size_collection_pipe(self, peak_evap_rate_kg_s: float,
-                              pressure_mbar: float = 10.0) -> PipeSpec:
-        """
-        Size the collection pipe.
-
-        Compressible Poiseuille mass-flow capacity:             [EQ-3]
-            ṁ = π × d⁴ × M × (P₁²-P₂²) / (256 × η × L × R × T)
-
-        The shared transport owner adds Knudsen/Clausing rarefied transport;
-        this Poiseuille expression is its high-pressure limit.
-        Require C ≥ peak_evap_rate / acceptable_pressure_drop.
-        Reference: 12 cm pipe handles 7-16 g/s SiO at 10 mbar.
-        """
-        # EQ-3 uses absolute upstream pressure against vacuum; a signed gauge
-        # value cannot be squared without destroying its physical meaning.
-        pressure_mbar = float(pressure_mbar)
-        if not math.isfinite(pressure_mbar) or pressure_mbar <= 0.0:
-            raise ValueError("pressure_mbar must be a positive finite value")
-
-        # Scale pipe diameter with batch size
-        # Reference: 12 cm for 1 tonne
-        scale = (peak_evap_rate_kg_s / 0.010) ** 0.25
-        throat_area_m2 = self._configured_initial_throat_area_m2()
-        if throat_area_m2 is not None:
-            anchor_d = math.sqrt(4.0 * throat_area_m2 / math.pi)
-            d = anchor_d * max(scale, 1.0)
-            throat_area_m2 = math.pi * (d / 2.0) ** 2
-        else:
-            d = 0.12 * max(scale, 1.0)
-            throat_area_m2 = math.pi * (d / 2.0) ** 2
-        L = 1.0  # m (crucible to first condenser)
-
-        # Calculate actual conductance
-        p_Pa = pressure_mbar * 100.0
-        T_K = 1773.15  # 1500°C pipe temperature
+    def size_collection_pipe(
+        self, peak_evap_rate_kg_s: float, pressure_mbar: float = 10.0, *,
+        sweep_mol_per_s: float = 0.0, temperature_K: float = 1773.15,
+        carrier_molar_mass_kg_mol: float = 0.040,
+        downstream_pressure_Pa: float = 0.0,
+    ) -> PipeSpec:
+        """Smallest catalog duct carrying the margined design load."""
         from simulator.transport_regime import (
-            pipe_mass_flow_kg_s,
+            pipe_mass_flow_kg_s, pipe_pressure_pa_for_mass_flow,
             gas_dynamic_viscosity_Pa_s,
         )
 
-        eta = gas_dynamic_viscosity_Pa_s(T_K)
-
-        M_avg = 0.040  # kg/mol
-        # Apply the shared integrated compressible law derived at
-        # simulator.transport_regime; equipment capacity is P1 against vacuum.
-        C_mass = pipe_mass_flow_kg_s(
-            d,
-            L,
-            M_avg,
-            eta,
-            T_K,
-            p_Pa,
-            0.0,
+        pressure_mbar = float(pressure_mbar)
+        if not math.isfinite(pressure_mbar) or pressure_mbar <= 0.0:
+            raise ValueError("pressure_mbar must be a positive finite value")
+        L = 1.0
+        p_Pa = pressure_mbar * 100.0
+        eta = gas_dynamic_viscosity_Pa_s(temperature_K)
+        generated_mol_s = peak_evap_rate_kg_s / 0.040
+        design_mass_kg_s = peak_evap_rate_kg_s + sweep_mol_per_s * carrier_molar_mass_kg_mol
+        total_mol_s = generated_mol_s + sweep_mol_per_s
+        M_avg = design_mass_kg_s / total_mol_s if total_mol_s else 0.040
+        # Premise: inlet sweep + generated peak must fit at process pressure.
+        # kg/s = (mol/(m2 s))*area*(kg/mol) + generated kg/s. A 25% load
+        # margin covers design-peak uncertainty; it is a hardware allowance,
+        # never a reduction of the inlet command or a change to the flow law.
+        # Discrete inversion: select the first diameter for which the shared
+        # inverse requires P_up <= P_process, Pa on both sides. Zero source
+        # selects the smallest catalog size; a declaration bypasses sizing.
+        required_mass_kg_s = self.DUCT_DESIGN_MARGIN * design_mass_kg_s
+        throat_area_m2 = self._configured_initial_throat_area_m2()
+        if throat_area_m2 is not None:
+            d = math.sqrt(4.0 * throat_area_m2 / math.pi)
+        else:
+            if required_mass_kg_s > 0.0 and downstream_pressure_Pa >= p_Pa:
+                raise ValueError(
+                    'no finite duct can carry positive design flow without a positive pressure drop; '
+                    'declare duct geometry to predict inventory accumulation')
+            sizes = self.STANDARD_DUCT_DIAMETERS_M
+            d = None
+            while d is None:
+                d = next((diameter for diameter in sizes
+                          if pipe_pressure_pa_for_mass_flow(
+                              diameter, L, M_avg, eta, temperature_K,
+                              required_mass_kg_s, downstream_pressure_Pa,
+                          ) <= p_Pa), None)
+                # No procurement/vessel maximum was declared. Continue the
+                # same nominal metric series by decades, rather than refusing
+                # a low-pressure design at an invented 2 m hardware ceiling.
+                # Extremely large/short ducts retain the shared transport
+                # owner's short-tube/engineering-extension authority notices.
+                sizes = tuple(diameter * 10.0 for diameter in sizes[-10:])
+            throat_area_m2 = math.pi * (d / 2.0) ** 2
+        capacity = pipe_mass_flow_kg_s(
+            d, L, M_avg, eta, temperature_K, p_Pa, downstream_pressure_Pa,
         )
-
         return PipeSpec(
-            diameter_m=d,
-            length_m=L,
-            surface_area_m2=math.pi * d * L,
+            diameter_m=d, length_m=L, surface_area_m2=math.pi * d * L,
             initial_throat_area_m2=throat_area_m2,
             stage_area_ratios=self._condenser_stage_area_ratios(),
-            conductance_kg_s=C_mass,
-            max_transport_g_s=C_mass * 1000.0,
+            conductance_kg_s=capacity, max_transport_g_s=capacity * 1000.0,
         )
 
     def _condenser_geometry_config(self) -> Mapping[str, Any]:

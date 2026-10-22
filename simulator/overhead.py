@@ -239,8 +239,9 @@ def continuous_sweep_balance(
     *, carrier: str, sweep_mol_per_s: float, dt_s: float,
     pressure_bar: float, volume_m3: float, temperature_K: float,
     initial_external_o2_mol: float = 0.0, generated_external_o2_mol: float = 0.0,
+    outlet_capacity_mol_per_s: Optional[Callable] = None,
 ) -> dict[str, Any]:
-    """Integrated well-mixed, constant-pressure overhead balance (mol/step)."""
+    """Integrated CSTR balance; finite outlet capacity permits accumulation."""
     flow = _required_finite_nonnegative_float(sweep_mol_per_s, 'sweep_mol_per_s')
     duration = _required_finite_nonnegative_float(dt_s, 'dt_s')
     pressure = _required_positive_finite_float(pressure_bar, 'pressure_bar')
@@ -279,6 +280,110 @@ def continuous_sweep_balance(
         + (target * (dose.get(s, 0.0) / total_dose) * replaced if total_dose else 0.0)
         for s in species
     }
+    capacity_shortfall = None
+    external_final_limited = None
+    if outlet_capacity_mol_per_s is not None and duration > 0.0:
+        # At fixed total inventory, the analytic mixture interpolates between
+        # prepared carry-in and the source mixture. For the shared pipe law,
+        # molar viscous capacity is M-independent and the rarefied term falls
+        # with M. Endpoints therefore bound capacity during this interpolation.
+        capacities = tuple(_required_finite_nonnegative_float(
+            outlet_capacity_mol_per_s(mixture, pressure), 'outlet capacity mol/s')
+            for mixture in (prepared, final))
+        capacity = min(capacities)
+        demand = total_dose / duration
+        if demand > capacity or initial_total > target * (1.0 + 1e-12):
+            from scipy.integrate import solve_ivp
+
+            source = {s: dose.get(s, 0.0) / duration for s in species}
+            # No unlimited purge of carried inventory. Startup carrier remains
+            # an explicitly delivered supply, as on the analytic path.
+            start = dict(initial)
+            start[carrier] = start.get(carrier, 0.0) + startup
+            # Premise: dn_i/dt = s_i - k(t)n_i, k=B(P(n),mixture)/N.
+            # With constant sources, n_i=n_i0*exp(-A)+s_i*H, where
+            # A'=k [1/s] and H'=1-kH [s/s]. This positive superposition
+            # integrates all species AND external O2 with two shared states.
+            # EOS P=NRT/V is evaluated inside the RHS; the duct thus gains
+            # capacity as pressure rises, rather than freezing a whole hour's
+            # capacity at the request. B=0 gives A=0,H=t (sealed balance).
+            # For constant N,B it recovers the analytic CSTR above exactly.
+            def inventory_at(survival, residence_s):
+                return {s: start.get(s, 0.0) * survival + source[s] * residence_s
+                        for s in species}
+
+            def rhs(_time, state):
+                # Radau's uncommitted Newton trials can leave A>=0,
+                # 0<=H<=dt. Extend the RHS at those mathematical bounds so
+                # exp(-A) and the pipe P^2 law do not overflow during a trial.
+                # Accepted states below are validated, never clipped.
+                survival = math.exp(-max(0.0, state[0]))
+                trial_residence_s = min(duration, max(0.0, state[1]))
+                inventory = inventory_at(survival, trial_residence_s)
+                total = sum(inventory.values())
+                actual_pressure = sum(OverheadGasModel._compute_partial_pressures(
+                    inventory, volume, temperature).values())
+                outlet = outlet_capacity_mol_per_s(inventory, actual_pressure)
+                if total <= target:
+                    outlet = min(outlet, demand)
+                removal_rate = outlet / total if total > 0.0 else 0.0
+                return (removal_rate, 1.0 - removal_rate * state[1])
+
+            def requested_inventory(_time, state):
+                return sum(inventory_at(math.exp(-max(0.0, state[0])), state[1]).values()) - target
+
+            requested_inventory.terminal = True
+            requested_inventory.direction = -1
+            # With a feasible pressure-hold outlet, excess inventory drains
+            # until N=PV/RT, then the valve holds N there. Stop at this physical
+            # boundary instead of integrating the discontinuous valve switch;
+            # the existing balance owns the remaining constant-P residence.
+            # Initially deficient heavy carry-in may first accumulate, then
+            # drain as lighter carrier replaces it. Direction=-1 ignores its
+            # initial upward departure from N=target and catches the return.
+            drain_to_hold = (initial_total > target * (1.0 + 1e-12)
+                             or demand > capacities[0])
+            solution = solve_ivp(rhs, (0.0, duration), (0.0, 0.0), method='Radau',
+                                 events=requested_inventory if drain_to_hold else None,
+                                 rtol=1e-9, atol=(1e-9, 1e-12))
+            if (not solution.success or not all(math.isfinite(x) and x >= 0.0
+                                                for x in solution.y[:, -1])
+                    or solution.y[1, -1] > duration * (1.0 + 1e-9)):
+                raise OverheadConfigurationError('solver_nonconvergence: finite sweep transport')
+            survival = math.exp(-solution.y[0, -1])
+            residence_integral_s = float(solution.y[1, -1])
+            final = inventory_at(survival, residence_integral_s)
+            external_final_limited = (external_initial * survival
+                                      + external_generated / duration * residence_integral_s)
+            remaining_s = duration - float(solution.t[-1])
+            if solution.status == 1 and remaining_s > 0.0:
+                remaining_external = external_generated * remaining_s / duration
+                continued = continuous_sweep_balance(
+                    final, {s: n * remaining_s / duration for s, n in generated.items()},
+                    carrier=carrier, sweep_mol_per_s=flow, dt_s=remaining_s,
+                    pressure_bar=pressure, volume_m3=volume, temperature_K=temperature,
+                    initial_external_o2_mol=external_final_limited,
+                    generated_external_o2_mol=remaining_external,
+                    outlet_capacity_mol_per_s=outlet_capacity_mol_per_s,
+                )
+                # Account even for an ULP-sized startup fill at the event.
+                inlet[carrier] += continued['inlet_species_mol'][carrier] - flow * remaining_s
+                final = continued['final_species_mol']
+                external_final_limited += remaining_external - continued['external_o2_outflow_mol']
+            from simulator.pumping_cost import _process_transport_pressure_admitted
+
+            achieved_pressure_pa = sum(OverheadGasModel._compute_partial_pressures(
+                final, volume, temperature).values()) * 1e5
+            if demand > capacity or not _process_transport_pressure_admitted(
+                    achieved_pressure_pa, pressure * 1e5):
+                capacity_shortfall = {
+                    'reason': 'duct_capacity_shortfall',
+                    'requested_outlet_mol_per_s': demand,
+                    'capacity_at_request_mol_per_s': capacity,
+                    'requested_pressure_pa': pressure * 1e5,
+                    'achieved_pressure_pa': achieved_pressure_pa,
+                    'source_model': 'constant_generation_over_transport_step',
+                }
     outlet = {}
     for s in species:
         inventory = initial.get(s, 0.0) + generated.get(s, 0.0)
@@ -303,13 +408,18 @@ def continuous_sweep_balance(
     external_final = external_initial * (min(1.0, target / initial_total) if initial_total else 0.0) * survival
     if total_dose:
         external_final += target * (external_generated / total_dose) * replaced
+    if external_final_limited is not None:
+        external_final = external_final_limited
     external_outlet = min(outlet.get('O2', 0.0), max(0.0, external_initial + external_generated - external_final))
     if external_initial == initial.get('O2', 0.0) and external_generated == generated.get('O2', 0.0):
         # An exact source identity must survive the outlet's ULP correction:
         # rounding cannot turn wholly external O2 into a melt product.
         external_outlet = outlet.get('O2', 0.0)
     return {'inlet_species_mol': inlet, 'outflow_species_mol': outlet, 'final_species_mol': final,
-            'external_o2_outflow_mol': external_outlet}
+            'external_o2_outflow_mol': external_outlet,
+            'capacity_shortfall': capacity_shortfall,
+            'pressure_bar': sum(OverheadGasModel._compute_partial_pressures(
+                final, volume, temperature).values())}
 
 
 def sweep_source_split(initial_species_mol, transitions, registry, *, initial_external_o2_mol=0.0):

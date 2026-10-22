@@ -510,6 +510,7 @@ def process_pressure_state(
     diagnostic.update({
         "achieved_pressure_pa": max(requested_pressure_pa, minimum_pa, transport_pressure_pa),
         "required_pump_speed_m3_s": result.required_pump_speed_m3_s,
+        "pump_feasible": result.feasible,
         "effective_speed_ceiling_m3_s": _effective_pump_speed_m3_s(
             float(pumping['max_pump_speed_m3_s']),
             float(pumping['validated_line_conductance_m3_s']),

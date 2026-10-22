@@ -1667,6 +1667,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._c7_product_report = {}
         self._c7_aluminothermic_applied = False
         self._c7_ca_shuttle_applied = False
+        # Establish derived geometry before any caller reads pipe capacity.
+        self._get_turbine_spec()
 
     @staticmethod
     def _load_species_formula_registry() -> dict:
@@ -3415,7 +3417,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return config
 
     def _admit_process_pressure(self, source_mol_hr=None, *, evap_flux=None, actual_pressure_pa=None,
-                                chamber_mol_per_s=None) -> None:
+                                chamber_mol_per_s=None, duct_capacity_shortfall=None) -> None:
         from simulator.pumping_cost import process_pressure_state
         from simulator.campaigns import CampaignPressureSetpointRefusal
 
@@ -3457,7 +3459,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         diagnostic['pumping'] = dict(pumping)
         self._process_pressure_diagnostic = diagnostic
-        if diagnostic['status'] != 'ok':
+        if (duct_capacity_shortfall is not None and actual_pressure_pa is not None
+                and diagnostic.get('pump_feasible', True) is True
+                and diagnostic.get('reason') == 'finite_inventory_or_pipe_pressure_exceeds_request'):
+            diagnostic['status'] = 'ok'
+            diagnostic['capacity_shortfall'] = {
+                'reason': 'duct_capacity_shortfall',
+                'requested_pressure_pa': diagnostic['requested_pressure_pa'],
+                'achieved_pressure_pa': diagnostic['achieved_pressure_pa'],
+            }
+        elif diagnostic['status'] != 'ok':
             raise CampaignPressureSetpointRefusal({
                 **diagnostic, 'reason': diagnostic['status'],
                 'detail': diagnostic.get('reason'),
@@ -4318,8 +4329,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return float(store.quantized_pO2_bar(self, pO2_bar=pO2_bar))
         return pO2_bar
 
+    def _continuous_sweep_plan(self, initial, generated, *, dt_s,
+                               initial_external_o2_mol=0.0, generated_external_o2_mol=0.0):
+        from simulator.overhead import continuous_sweep_balance, OverheadConfigurationError
+        from simulator.campaigns import CampaignPressureSetpointRefusal
+
+        def outlet_capacity(inventory, pressure_bar):
+            masses = self._overhead_holdup_species_kg(inventory)
+            total_mol = sum(inventory.values())
+            mean_mass = sum(masses.values()) / total_mol if total_mol else 0.0
+            capacity = self._headspace_bleed_conductance_kg_s(
+                species_kg_for_M_avg=masses, p_upstream_bar=pressure_bar,
+                p_downstream_bar=self._headspace_downstream_pressure_bar(),
+            )
+            return capacity / mean_mass if mean_mass else 0.0
+
+        try:
+            return continuous_sweep_balance(
+                initial, generated, carrier=self._resolve_condensation_carrier_gas(),
+                sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=dt_s,
+                pressure_bar=self.melt.p_total_mbar / 1000.0,
+                volume_m3=self._headspace_volume_m3(), temperature_K=self._headspace_temperature_K(),
+                initial_external_o2_mol=initial_external_o2_mol,
+                generated_external_o2_mol=generated_external_o2_mol,
+                outlet_capacity_mol_per_s=outlet_capacity,
+            )
+        except OverheadConfigurationError as exc:
+            raise CampaignPressureSetpointRefusal({
+                'status': 'missing_input', 'reason': 'missing_input', 'detail': str(exc),
+                'requested_pressure_pa': self.melt.p_total_mbar * 100.0,
+            }) from exc
+
     def _physical_sweep_boundary(self):
-        from simulator.overhead import continuous_sweep_balance, sweep_source_split, OverheadConfigurationError
+        from simulator.overhead import sweep_source_split, OverheadConfigurationError
 
         holdup = self._overhead_holdup_mol()
         temperature = self._headspace_temperature_K()
@@ -4330,11 +4372,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 step['initial_species_mol'], self.atom_ledger.transitions[step['transition_start']:],
                 self.atom_ledger.registry,
             )
-            plan = continuous_sweep_balance(
-                initial, generated, carrier=self._resolve_condensation_carrier_gas(),
-                sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=3600.0,
-                pressure_bar=self.melt.p_total_mbar / 1000.0, volume_m3=volume, temperature_K=temperature,
-            )
+            plan = self._continuous_sweep_plan(initial, generated, dt_s=3600.0)
             holdup = plan['final_species_mol']
             pressure = self.melt.p_total_mbar / 1000.0
         elif sum(holdup.values()) > 0.0:
@@ -4342,12 +4380,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             # Preview the declared startup fill; the bleed transition alone
             # admits its delivered molecules into the chamber later this tick.
-            plan = continuous_sweep_balance(
-                holdup, {}, carrier=self._resolve_condensation_carrier_gas(),
-                sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=0.0,
-                pressure_bar=self.melt.p_total_mbar / 1000.0,
-                volume_m3=volume, temperature_K=temperature,
-            )
+            plan = self._continuous_sweep_plan(holdup, {}, dt_s=0.0)
             holdup = plan['final_species_mol']
             pressure = self.melt.p_total_mbar / 1000.0
         try:
@@ -6941,6 +6974,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         effective_transport_capacity=None,
         sweep_outflow_species_mol=None,
         sweep_external_o2_outflow_mol=None,
+        sweep_pressure_bar=None,
+        sweep_capacity_shortfall=None,
+        sweep_capacity_integrated=False,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -6961,9 +6997,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else diagnostic.get('p_total_bar')
         )
         if sweep_outflow_species_mol is not None:
-            # The sweep owner integrates a constant-pressure boundary, including
-            # startup fill. Evaluate pipe capacity at that same boundary.
-            upstream_pressure_bar = self.melt.p_total_mbar / 1000.0
+            # The same owner supplies the achieved inventory pressure for its
+            # integrated outlet, including capacity-limited accumulation.
+            upstream_pressure_bar = (sweep_pressure_bar if sweep_pressure_bar is not None
+                                     else self.melt.p_total_mbar / 1000.0)
         controls: Dict[str, Any] = {
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
@@ -6998,6 +7035,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         if sweep_outflow_species_mol is not None:
             controls['sweep_outflow_species_mol'] = sweep_outflow_species_mol
+            controls['sweep_capacity_shortfall'] = sweep_capacity_shortfall
+            controls['sweep_capacity_integrated'] = sweep_capacity_integrated
             if sweep_external_o2_outflow_mol is not None:
                 controls['sweep_external_o2_outflow_mol'] = sweep_external_o2_outflow_mol
         if effective_transport_capacity is not None:
@@ -12975,11 +13014,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _apply_sweep_flow_control(self) -> None:
         self.campaign_mgr.apply_sweep_flow_control(self.melt)
+        # Resolve campaign duct geometry before source/transport previews,
+        # including a declared headspace volume that bypasses lazy sizing.
+        self._get_turbine_spec()
         if self.melt.sweep_mol_per_s is not None:
-            # Explicit headspace volume can bypass lazy geometry sizing.
-            # This also covers the first live/staged activation of a flow.
-            self._get_turbine_spec()
             self.campaign_mgr.apply_sweep_flow_control(self.melt)
+            self._get_turbine_spec()
 
     def start_campaign(self, campaign: CampaignPhase):
         """Begin a campaign phase.  Sets atmosphere, temp targets, etc."""
@@ -14410,18 +14450,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bleed_result = None
         sweep_plan = None
         if sweep_initial_mol is not None:
-            from simulator.overhead import continuous_sweep_balance, sweep_source_split
+            from simulator.overhead import sweep_source_split
 
             initial, generated, external_initial, external_generated = sweep_source_split(
                 sweep_initial_mol, self.atom_ledger.transitions[sweep_transition_start:],
                 self.atom_ledger.registry,
                 initial_external_o2_mol=self._sweep_transport_step['initial_external_o2_mol'],
             )
-            sweep_plan = continuous_sweep_balance(
-                initial, generated, carrier=self._resolve_condensation_carrier_gas(),
-                sweep_mol_per_s=self.melt.sweep_mol_per_s, dt_s=3600.0,
-                pressure_bar=self.melt.p_total_mbar / 1000.0,
-                volume_m3=self._headspace_volume_m3(), temperature_K=self._headspace_temperature_K(),
+            sweep_plan = self._continuous_sweep_plan(
+                initial, generated, dt_s=3600.0,
                 initial_external_o2_mol=external_initial, generated_external_o2_mol=external_generated,
             )
             self._admit_process_pressure(chamber_mol_per_s=max(
@@ -14445,6 +14482,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 effective_transport_capacity=effective_transport_capacity,
                 sweep_outflow_species_mol=sweep_plan['outflow_species_mol'] if sweep_plan else None,
                 sweep_external_o2_outflow_mol=sweep_plan['external_o2_outflow_mol'] if sweep_plan else None,
+                sweep_pressure_bar=sweep_plan['pressure_bar'] if sweep_plan else None,
+                sweep_capacity_shortfall=sweep_plan['capacity_shortfall'] if sweep_plan else None,
+                sweep_capacity_integrated=sweep_plan is not None,
             )
             self._sweep_transport_step = None
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
@@ -14529,7 +14569,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._project_overhead_bleed_partition(bleed_result)
         self._sync_oxygen_kg_counters()
         if self.melt.ambient_pressure_mbar > 0.0 or sweep_plan is not None:
-            self._admit_process_pressure(actual_pressure_pa=self.overhead.pressure_mbar * 100.0)
+            self._admit_process_pressure(
+                actual_pressure_pa=self.overhead.pressure_mbar * 100.0,
+                duct_capacity_shortfall=sweep_plan['capacity_shortfall'] if sweep_plan else None,
+            )
         # Only the residual gas reaches this pump. Captured O2 is billed by
         # its existing compressor; it was nevertheless part of chamber load.
         bleed_diagnostic = dict(bleed_result.diagnostic or {})
@@ -14886,6 +14929,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             # Also store volatiles train spec for Loop 4 throttle
             self._volatiles_train_spec = self._equipment.volatiles_train
+        if (self.melt.campaign != CampaignPhase.IDLE
+                and (self.lab_geometry is None or self.lab_geometry.scale != 'gram_lab')):
+            from simulator.equipment import EquipmentDesigner
+            from simulator.transport_constants import CARRIER_GAS_PROPERTIES
+
+            requested_geometry = self._resolve_condenser_geometry_config(self.melt.campaign)
+            designer = EquipmentDesigner({**self.setpoints, 'condenser_geometry': requested_geometry})
+            designer.resize_collection_pipe(
+                self._equipment, peak_T_C=self.campaign_mgr.furnace_max_T_C,
+                pressure_mbar=self.melt.p_total_mbar,
+                sweep_mol_per_s=self.melt.sweep_mol_per_s or 0.0,
+                carrier_molar_mass_kg_mol=CARRIER_GAS_PROPERTIES[
+                    self._resolve_condensation_carrier_gas()].molar_mass_kg_mol,
+                # Controlled-O2's undeclared P2=P1 is a zero-flow diagnostic,
+                # not an outlet design boundary; its live owner inverts P2
+                # from flux. Only an actual downstream declaration sizes here.
+                downstream_pressure_Pa=(
+                    self._headspace_downstream_pressure_bar() * 1e5
+                    if self._overhead_headspace_config.get('downstream_pressure_bar') is not None
+                    else 0.0
+                ),
+            )
         self._apply_equipment_runtime_geometry()
         return self._equipment.turbine
 

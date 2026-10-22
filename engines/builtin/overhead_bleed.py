@@ -259,6 +259,8 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 diagnostic={"bled_species_mol": {}},
             )
 
+        capacity_shortfall = controls.get('sweep_capacity_shortfall')
+        outlet_fraction = 1.0
         if 'sweep_outflow_species_mol' in controls:
             candidate_bled_mol = dict(controls['sweep_outflow_species_mol'])
             if any(n > holdup_mol.get(s, 0.0) + 1e-12 * max(1.0, holdup_mol.get(s, 0.0))
@@ -267,21 +269,31 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                                     diagnostic={'reason': 'sweep outflow exceeds available species inventory plus inlet'})
             candidate_bled_mol = {s: min(n, holdup_mol.get(s, 0.0))
                                   for s, n in candidate_bled_mol.items() if n > 0.0}
+            requested_outlet_o2_mol = candidate_bled_mol.get(OXYGEN_SPECIES, 0.0)
             allowed = self._bled_species_mol(
                 holdup_mol, total_mol=total_mol, total_kg=total_kg, controls=controls,
             )
             allowed_mass = sum(n * molar_mass[s] for s, n in allowed.items())
             requested_mass = sum(n * molar_mass[s] for s, n in candidate_bled_mol.items())
-            if requested_mass > allowed_mass + 1e-12 * max(1.0, requested_mass):
-                # Capacity failure is reported, never converted into a fictitious
-                # constant-pressure outlet. nRT/V gives the undrained boundary.
-                # mol * (Pa m3/mol/K) * K / m3 = Pa; full drainage gives zero.
-                residual_mol = sum(holdup_mol.values()) - sum(allowed.values())
-                achieved = (residual_mol * GAS_CONSTANT * float(controls['headspace_temperature_K'])
-                            / float(controls['headspace_volume_m3']))
-                return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
-                                    diagnostic={'reason': 'integrated sweep outlet exceeds line capacity',
-                                                'achieved_pressure_pa': achieved})
+            # A changing-pressure plan can discharge more than its FINAL
+            # instantaneous capacity times dt during depressurization. Its
+            # owner already integrated the physical rate; do not clip it again.
+            if (controls.get('sweep_capacity_integrated') is not True
+                    and requested_mass > allowed_mass + 1e-12 * max(1.0, requested_mass)):
+                # Direct provider callers may still request an unachievable
+                # integrated outlet. Saturate the OUTLET, never the admitted
+                # carrier. Live sweep callers already integrate changing P and
+                # source-separated residence in the overhead balance owner.
+                outlet_fraction = allowed_mass / requested_mass
+                candidate_bled_mol = {s: n * outlet_fraction
+                                      for s, n in candidate_bled_mol.items() if n * outlet_fraction > 0.0}
+                residual_mol = sum(holdup_mol.values()) - sum(candidate_bled_mol.values())
+                capacity_shortfall = {
+                    'reason': 'duct_capacity_shortfall',
+                    'requested_outlet_kg': requested_mass, 'allowed_outlet_kg': allowed_mass,
+                    'achieved_pressure_pa': residual_mol * GAS_CONSTANT
+                    * float(controls['headspace_temperature_K']) / float(controls['headspace_volume_m3']),
+                }
         else:
             candidate_bled_mol = self._bled_species_mol(
                 holdup_mol,
@@ -305,12 +317,14 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
                                     diagnostic={'reason': 'missing_input: source-separated external O2 sweep outlet'})
             if integrated_external is not None and (
-                integrated_external > bled_o2_mol or integrated_external > external_o2_holdup_mol
-                or bled_o2_mol - integrated_external > overhead_o2_mol - external_o2_holdup_mol
+                integrated_external > requested_outlet_o2_mol or integrated_external > external_o2_holdup_mol
+                or requested_outlet_o2_mol - integrated_external > overhead_o2_mol - external_o2_holdup_mol
                 + 1e-12 * max(1.0, overhead_o2_mol)
             ):
                 return IntentResult(intent=ChemistryIntent.OVERHEAD_BLEED, status='unsupported',
                                     diagnostic={'reason': 'source-separated sweep outlet exceeds available O2 class'})
+        if integrated_external is not None:
+            integrated_external *= outlet_fraction
         from simulator.capacity_coupling import external_oxygen_outlet_mol
 
         external_o2_bled_mol = external_oxygen_outlet_mol(
@@ -440,6 +454,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     "bled_species_mol": {},
                     "candidate_bled_species_mol": dict(candidate_bled_mol),
                     "o2_held_mol": o2_held_mol,
+                    **({"capacity_shortfall": capacity_shortfall} if capacity_shortfall else {}),
                 },
             )
         # Only this transition admits delivered carrier into the chamber and
@@ -471,6 +486,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "bled_species_mol": dict(debited_mol),
+                **({"capacity_shortfall": capacity_shortfall} if capacity_shortfall else {}),
                 "candidate_bled_species_mol": dict(candidate_bled_mol),
                 "bled_total_kg": sum(
                     mol * molar_mass[species]

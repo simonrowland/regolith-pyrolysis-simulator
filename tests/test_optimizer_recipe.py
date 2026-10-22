@@ -134,8 +134,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
     # d-210: regenerated from resolved setpoints with C6 Kr default and floor metadata.
+    # d-231: production-resolved digest after removing exactly the three
+    # historical fixed-throat keys; remaining resolved values are identical.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "b52c16ac8c003c9a108e1b64b6440ed9f8b7ca35f2b17fa840c365d5b4a3ec67"
+        "0ed1d88bb7ddc5a1dd335870aa174a597229931a21f1d0334ebfb71981b4ac2e"
     )
     # d-215: regenerated with the production schema/search identity producers;
     # sweep is now area-normalized, and the Mars fallback is resolved setpoints data.

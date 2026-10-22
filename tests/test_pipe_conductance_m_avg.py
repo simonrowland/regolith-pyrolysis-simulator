@@ -619,15 +619,17 @@ def test_stage_area_m2_uses_throat_area_ratios():
         assert model.stage_area_m2(stage) == pytest.approx(0.02 * ratio)
 
 
-def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
+def test_setpoint_condenser_geometry_derives_throat_and_retains_stage_ratios():
     setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
     geometry = setpoints["condenser_geometry"]
-    throat_area_m2 = float(geometry["initial_throat_area_m2"])
+    assert 'initial_throat_area_m2' not in geometry
+    pipe = EquipmentDesigner(setpoints).size_collection_pipe(0.01)
+    throat_area_m2 = pipe.initial_throat_area_m2
     ratios = geometry["stage_area_ratios"]
-    model = OverheadGasModel({}, condenser_geometry_config=geometry)
+    model = OverheadGasModel({}, condenser_geometry_config={
+        **geometry, 'initial_throat_area_m2': throat_area_m2})
 
-    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
-    assert model.pipe_diameter_m == pytest.approx(0.12)
+    assert model.pipe_diameter_m == pipe.diameter_m
     for stage, ratio in ratios.items():
         assert float(ratio) >= 1.0
         assert model.stage_area_m2(stage) == pytest.approx(
@@ -635,16 +637,19 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
         )
 
 
-def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():
+def test_default_condenser_throat_uses_a_standard_size_for_batch_load():
     config = load_config_bundle(DEFAULT_DATA_DIR)
     design = EquipmentDesigner(config.setpoints).design_for_batch(
         16000.0,
         config.feedstocks["lunar_mare_low_ti"],
     )
 
-    assert design.pipe.diameter_m == pytest.approx(0.24)
+    # d-231 production sizing: 16 t requires nominal 160 mm at this design
+    # pressure/temperature, replacing the historical fourth-root 240 mm.
+    assert design.pipe.diameter_m == pytest.approx(0.16)
+    assert design.pipe.conductance_kg_s >= EquipmentDesigner.DUCT_DESIGN_MARGIN * 0.16
     assert design.pipe.initial_throat_area_m2 == pytest.approx(
-        math.pi * 0.12**2
+        math.pi * (design.pipe.diameter_m / 2.0)**2
     )
 
 
@@ -948,10 +953,8 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
         actual = OverheadGasModel._gas_dynamic_viscosity_Pa_s(temperature_K)
         assert actual.hex() == expected_hex
 
-    equipment_conductance = EquipmentDesigner({}).size_collection_pipe(
-        0.010,
-        10.0,
-    ).conductance_kg_s
+    pipe = EquipmentDesigner({}).size_collection_pipe(0.010, 10.0)
+    equipment_conductance = pipe.conductance_kg_s
     overhead_conductance = OverheadGasModel({})._pipe_conductance(
         1000.0,
         1500.0,
@@ -959,9 +962,13 @@ def test_sc333_equipment_overhead_pipe_transport_numeric_pins():
     expected_conductance_hex = "0x1.c4f75c42aeb21p-4"
 
     viscous = float.fromhex(expected_conductance_hex)
-    assert viscous < equipment_conductance < viscous * 1.01
+    # The shared viscosity/standalone 120 mm transport pin is unchanged;
+    # automatic equipment now selects nominal 80 mm from its design load.
+    assert pipe.diameter_m == 0.08
+    assert equipment_conductance == pipe_mass_flow_kg_s(
+        pipe.diameter_m, pipe.length_m, DEFAULT_PIPE_M_AVG_KG_MOL,
+        gas_dynamic_viscosity_Pa_s(1773.15), 1773.15, 1000.0, 0.0)
     assert viscous < overhead_conductance < viscous * 1.01
-    assert equipment_conductance == overhead_conductance
 
 
 @pytest.mark.parametrize("pressure_pa, capacity_hex, inverse_hex", [
