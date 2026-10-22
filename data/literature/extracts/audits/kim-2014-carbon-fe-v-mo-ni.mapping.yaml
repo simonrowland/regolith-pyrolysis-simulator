@@ -1,0 +1,41 @@
+source_id: kim-2014-carbon-fe-v-mo-ni
+source:
+  citation: 'Kim, D.-H., Paek, M.-K., Kim, T.-J., Won, S.-Y. and Pak, J.-J. (2014), “Carbon Solubility in Liquid Iron Containing V, Mo and Ni”, Materials Transactions, 55(3), 610–615.'
+  doi: 10.2320/matertrans.M2013392
+  year: 2014
+extraction:
+  method: MinerU table draft mapping; Table 1 and Table 2 parsed as 49 and 17 printed rows; all cells checked against pdftotext and 600 dpi page 3 render
+  date: '2026-10-22'
+  worker: fam47-1022
+review_status: draft
+tables:
+- page: 3
+  table_index: 1
+  published_page: 612
+  type: composition_series
+  quantity: equilibrium_phase_composition
+  unit: wt_percent
+  evidence_class: measured_direct
+  phase: l
+  values:
+  - column: 2
+    species: V
+  - column: 3
+    species: Mo
+  - column: 4
+    species: Ni
+  - column: 5
+    species: C
+- page: 3
+  table_index: 2
+  published_page: 612
+  type: composition_series
+  quantity: equilibrium_phase_composition
+  unit: wt_percent
+  evidence_class: measured_direct
+  phase: l
+  values:
+  - column: 2
+    species: V
+  - column: 3
+    species: C
