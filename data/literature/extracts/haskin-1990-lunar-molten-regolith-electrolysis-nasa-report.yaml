@@ -1,0 +1,1808 @@
+schema_version: literature_extract.v1
+source_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+source:
+  citation: Haskin LA (1990). “Oxygen Production by Electrolysis of Molten Lunar Regolith,”
+    Annual Progress Report 1989–90, NASA Space Engineering Research Center for Utilization
+    of Local Planetary Resources, University of Arizona, report N9125/8 (NASA NTRS
+    19910015909).
+  year: 1990
+extraction:
+  method: MinerU table drafts and pdftotext-layout; Table 1.8 transcribed from scanned
+    report and checked against a 600 dpi render of physical PDF page 66.
+  date: '2026-10-22'
+  worker: codex-fam50-1022
+review_status: draft
+experiments:
+- experiment_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+  sample:
+    sample_id: A12_1
+    description: electrolysis experiment label as printed in Table 1.8
+- experiment_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+  sample:
+    sample_id: A12_1cb
+    description: electrolysis experiment label as printed in Table 1.8
+fidelity_samples:
+- path: species.Fe.observations[haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_fe].values.component_amount
+  value: '92.13'
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+    published_page: I-56
+species:
+  Si:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_si
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.024'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_si
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '2.471'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_si
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '6.999'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_si
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '7.389'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Ti:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_ti
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.040'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_ti
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.142'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_ti
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.464'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_ti
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.581'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Fe:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_fe
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '92.13'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_fe
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '33.12'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_fe
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '29.28'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_fe
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '30.06'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Ir:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_metal-1_ir
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.000'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_ir
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '56.40'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_ir
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '56.50'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_ir
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '56.40'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Cr:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_cr
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.567'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_cr
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.370'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_cr
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.356'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Mn:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-1_mn
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.231'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-2_mn
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.041'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_metal-analysis-3_mn
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: metal
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.037'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  SiO2:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_sio2
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '49.48'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_sio2
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '49.21'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_table1_8_mixed_phase_and_negative_values
+      type: mixed_phase_and_refused_microprobe_composition_values
+      units: wt.%
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        S+G_measured_components:
+        - component: SiO2
+          A12_1_S+G_wt_percent: '0.13'
+          A12_1cb_S+G_wt_percent: '48.07'
+        - component: TiO2
+          A12_1_S+G_wt_percent: '1.16'
+          A12_1cb_S+G_wt_percent: '2.78'
+        - component: Al2O3
+          A12_1_S+G_wt_percent: '9.10'
+          A12_1cb_S+G_wt_percent: '19.31'
+        - component: FeO
+          A12_1_S+G_wt_percent: '42.37'
+          A12_1cb_S+G_wt_percent: '0.41'
+        - component: MgO
+          A12_1_S+G_wt_percent: '12.63'
+          A12_1cb_S+G_wt_percent: '14.69'
+        - component: CaO
+          A12_1_S+G_wt_percent: '0.31'
+          A12_1cb_S+G_wt_percent: '11.99'
+        - component: Na2O
+          A12_1_S+G_wt_percent: '-0.01'
+          A12_1cb_S+G_wt_percent: '0.70'
+        - component: K2O
+          A12_1_S+G_wt_percent: '0.00'
+          A12_1cb_S+G_wt_percent: '0.08'
+        negative_metal_readings:
+        - analysis: metal-1
+          component: Cr
+          value_as_printed: '-0.007'
+          units: wt.%
+          locator:
+            page: 66
+            pdf_page_index: 65
+            table: '1.8'
+          reason_not_typed: The printed microprobe result is negative for a composition
+            amount, outside its physical range; preserved verbatim as a refused analytical
+            result.
+        - analysis: metal-1
+          component: Mn
+          value_as_printed: '-0.037'
+          units: wt.%
+          locator:
+            page: 66
+            pdf_page_index: 65
+            table: '1.8'
+          reason_not_typed: The printed microprobe result is negative for a composition
+            amount, outside its physical range; preserved verbatim as a refused analytical
+            result.
+        - analysis: metal-1
+          component: Pt
+          value_as_printed: '-0.021'
+          units: wt.%
+          locator:
+            page: 66
+            pdf_page_index: 65
+            table: '1.8'
+          reason_not_typed: The printed microprobe result is negative for a composition
+            amount, outside its physical range; preserved verbatim as a refused analytical
+            result.
+        reason_not_typed: S+G analyses combine spinel and glass and cannot be represented
+          as a single phase; negative component amounts are physically out of range
+          and remain preserved as refusals. The paper reports spinel grains too small
+          to analyze, so the S+G values include glass.
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_21_deferred
+      type: figure_record
+      units: figure axes as printed
+      locator:
+        page: 61
+        pdf_page_index: 60
+        figure: '1.21'
+      values:
+        caption: Dependence of oxygen production efficiency on concentration of ferrous
+          iron in the melt.
+        caption_locator:
+          page: 61
+          pdf_page_index: 60
+          figure: '1.21'
+        panel: as printed
+        typed_quantity: oxygen production, redox/electrochemical response, instrument
+          setup, or metal microstructure; figure-only values deferred
+        identity:
+          species: FeO, NiO, or Pt as caption states
+          phase: melt, metal, or apparatus as caption states
+          T: as printed or not stated
+          axes: oxygen production efficiency vs. 1/XFeO (mole fraction)
+        series: Haskin et al. (1990)
+        marker_count_per_series:
+          oxygen production efficiency: 1
+        attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+        digitisation: deferred to a figure pass
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_22_deferred
+      type: figure_record
+      units: figure axes as printed
+      locator:
+        page: 62
+        pdf_page_index: 61
+        figure: '1.22'
+      values:
+        caption: Dependence of Ni reduction potential on polymerization of the melt.
+        caption_locator:
+          page: 62
+          pdf_page_index: 61
+          figure: '1.22'
+        panel: as printed
+        typed_quantity: oxygen production, redox/electrochemical response, instrument
+          setup, or metal microstructure; figure-only values deferred
+        identity:
+          species: FeO, NiO, or Pt as caption states
+          phase: melt, metal, or apparatus as caption states
+          T: as printed or not stated
+          axes: Ni reduction potential vs. non-bridging/bridging oxygen fractions
+        series: preliminary experiments
+        marker_count_per_series:
+          Ni reduction potential series: 1
+        attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+        digitisation: deferred to a figure pass
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_23_deferred
+      type: figure_record
+      units: figure axes as printed
+      locator:
+        page: 64
+        pdf_page_index: 63
+        figure: '1.23'
+      values:
+        caption: Diagram of circuit designed to measure cell resistance and control
+          the DC potential.
+        caption_locator:
+          page: 64
+          pdf_page_index: 63
+          figure: '1.23'
+        panel: as printed
+        typed_quantity: oxygen production, redox/electrochemical response, instrument
+          setup, or metal microstructure; figure-only values deferred
+        identity:
+          species: FeO, NiO, or Pt as caption states
+          phase: melt, metal, or apparatus as caption states
+          T: as printed or not stated
+          axes: electrolysis measurement/control circuit schematic
+        series: schematic
+        marker_count_per_series:
+          circuit schematic: 0
+        attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+        digitisation: deferred to a figure pass
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_24_deferred
+      type: figure_record
+      units: figure axes as printed
+      locator:
+        page: 65
+        pdf_page_index: 64
+        figure: '1.24'
+      values:
+        caption: Backscattered electron image of the three metal phases in Al21cb
+          showing differences in density and the mixed nature of the phases.
+        caption_locator:
+          page: 65
+          pdf_page_index: 64
+          figure: '1.24'
+        panel: as printed
+        typed_quantity: oxygen production, redox/electrochemical response, instrument
+          setup, or metal microstructure; figure-only values deferred
+        identity:
+          species: FeO, NiO, or Pt as caption states
+          phase: melt, metal, or apparatus as caption states
+          T: as printed or not stated
+          axes: backscattered-electron image
+        series: image
+        marker_count_per_series:
+          micrograph: 0
+        attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+        digitisation: deferred to a figure pass
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_25_deferred
+      type: figure_record
+      units: figure axes as printed
+      locator:
+        page: 65
+        pdf_page_index: 64
+        figure: '1.25'
+      values:
+        caption: Microprobe profile across the Pt L-alpha peak illustrating the absence
+          of Pt in the glass of experiment Al21.
+        caption_locator:
+          page: 65
+          pdf_page_index: 64
+          figure: '1.25'
+        panel: as printed
+        typed_quantity: oxygen production, redox/electrochemical response, instrument
+          setup, or metal microstructure; figure-only values deferred
+        identity:
+          species: FeO, NiO, or Pt as caption states
+          phase: melt, metal, or apparatus as caption states
+          T: as printed or not stated
+          axes: Pt microprobe profile vs. spectrometer position (LIF)
+        series: one profile
+        marker_count_per_series:
+          Pt L-alpha profile: 1
+        attribution: Haskin (1990), unless figure caption cites Haskin et al. (1990)
+        digitisation: deferred to a figure pass
+  TiO2:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_tio2
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '2.34'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_tio2
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '2.76'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Al2O3:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_al2o3
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '10.78'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_al2o3
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '18.92'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  FeO:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_feo
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '13.23'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_feo
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.69'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  MgO:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_mgo
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '10.09'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_mgo
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '14.23'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  CaO:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_cao
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '9.96'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_cao
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '12.48'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  Na2O:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_na2o
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '1.12'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_na2o
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.82'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
+  K2O:
+    observations:
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1_glass_k2o
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.10'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_a12_1cb_glass_k2o
+      experiment: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb
+      type: concentration_series
+      units: wt.%
+      method: electron microprobe analysis
+      locator:
+        page: 66
+        pdf_page_index: 65
+        table: '1.8'
+        published_page: I-56
+      values:
+        quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
+        T_C: '1350'
+        T_C_approximate: true
+        component_amount: '0.08'
+        method_class: measured_direct
+        admission_status: admitted
+        method: electron microprobe analysis
+        point_conditions:
+          atmosphere:
+            state:
+              tag: unknown
+              reason: not stated for these analyses
+            locator:
+              page: 66
+              pdf_page_index: 65
+              table: '1.8'
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1623.15'
+                approximate: true
+            locator:
+              page: 65
+              pdf_page_index: 64
+              note: Text describes the electrolysis experiments at approximately 1350°C
+    context: []
