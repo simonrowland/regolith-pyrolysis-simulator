@@ -622,7 +622,8 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    assert ratio == pytest.approx(0.22444037883428292, abs=1e-8)
+    # 2064476 changes the coupled melt/gas root; production 1500 K solve.
+    assert ratio == pytest.approx(0.22446220359938002, abs=1e-8)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
     assert notice["cell_material"] is None
