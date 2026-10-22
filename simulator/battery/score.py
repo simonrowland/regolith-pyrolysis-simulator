@@ -6468,7 +6468,8 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
-            refusal_detail={"reason": exc.reason, "detail": exc.detail}, identity=reference.identity,
+            refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
+            notices=getattr(exc, "notices", ()), identity=reference.identity,
         )
 
 

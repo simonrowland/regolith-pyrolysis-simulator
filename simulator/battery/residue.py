@@ -708,6 +708,8 @@ def integrate_residue_inventory(
                 balance = _residue_oxygen_balance(
                     terms, inventory, pressure_at, temperature
                 )
+            except ResidueInventoryRefusal:
+                raise
             except ValueError as exc:
                 # No positive parent pressure is the zero-flux limit, not a
                 # fabricated zero oxygen root. Other missing roots remain typed.
@@ -941,6 +943,8 @@ def integrate_knudsen_residue_inventory(
             if logp is None:
                 try:
                     balance = _residue_oxygen_balance(terms, current, pressure_at, current_temperature)
+                except ResidueInventoryRefusal:
+                    raise
                 except ValueError as exc:
                     raise ResidueInventoryRefusal("residue_oxygen_balance_failed", str(exc)) from exc
                 pressures = balance.pressures_Pa
@@ -1132,29 +1136,58 @@ def _make_residue_pressure_model(
         from simulator.diagnostic_helpers.binary_pot_battery import (
             PO2_COMMANDED,
             Po2Request,
+            _InternalAnalyticalInputRefusal,
+            _OxygenBalanceRefusal,
+            _gas_formula_for_oxygen_balance,
             _internal_analytical_vapor_pressure_adapter,
             _new_internal_analytical_core,
         )
+        from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
+        from simulator.physical_constants import PA_PER_BAR
+        from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
 
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
         ) -> Mapping[str, float]:
-            response = _internal_analytical_vapor_pressure_adapter(
-                core=analytical_core,
-                temperature_C=temperature_K - 273.15,
-                pressure_bar=total_pressure_Pa / 100_000.0,
-                composition_kg=None,
-                composition_mol=inventory,
-                fO2_log=log10_pO2_bar,
-                po2_request=Po2Request(
-                    mode=PO2_COMMANDED,
-                    po2_bar=10.0**float(log10_pO2_bar),
-                ),
-                include_diagnostic_shadows=False,
-            )
-            pressures = response.vapor_pressures_Pa
+            try:
+                response = _internal_analytical_vapor_pressure_adapter(
+                    core=analytical_core,
+                    temperature_C=temperature_K - 273.15,
+                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    composition_kg=None,
+                    composition_mol=inventory,
+                    fO2_log=log10_pO2_bar,
+                    po2_request=Po2Request(
+                        mode=PO2_COMMANDED,
+                        po2_bar=10.0**float(log10_pO2_bar),
+                    ),
+                    include_diagnostic_shadows=False,
+                )
+            except _InternalAnalyticalInputRefusal as exc:
+                raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
+            pressures = {}
+            for channel, pressure in response.vapor_pressures_Pa.items():
+                try:
+                    formula = _gas_formula_for_oxygen_balance(channel)
+                except _OxygenBalanceRefusal as exc:
+                    raise ResidueInventoryRefusal(exc.reason_code, str(exc)) from exc
+                if formula in pressures:
+                    raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
+                pressures[formula] = float(pressure)
+            required = {str(species) for species, _reaction in gas_channels}
+            pO2_bar = 10.0**float(log10_pO2_bar)
+            if "O2" in required and "O2" not in pressures:
+                pressures["O2"] = pO2_bar * PA_PER_BAR
+            if "O" in required and "O" not in pressures:
+                try:
+                    pressures["O"] = _oxygen_atom_partial_pressure_bar(
+                        temperature_K, pO2_bar,
+                        extract_path=Path(__file__).resolve().parents[2] / "data/literature/extracts/nasa-cea-thermo.yaml",
+                    ) * PA_PER_BAR
+                except (OffgasFO2Unavailable, NasaCeaError, OSError) as exc:
+                    raise ResidueInventoryRefusal("residue_oxygen_pressure_unavailable", str(exc)) from exc
             missing = [
                 str(species)
                 for species, _reaction in gas_channels
@@ -1234,7 +1267,7 @@ def predict_knudsen_residue_composition(
     from simulator.battery.identity import quantity_token
     from simulator.battery.records import Notice
     from simulator.battery.source_oxygen import (
-        SourceOxygenCondition, printed_source_pressure, resolve_source_oxygen,
+        SourceOxygenCondition, SourceOxygenFallback, _printed_source_oxygen_at_point, resolve_source_oxygen,
         source_oxygen_closure_notice,
     )
     from simulator.battery.validity import effusion_regime_unverified
@@ -1326,11 +1359,12 @@ def predict_knudsen_residue_composition(
         # The current residue row may carry a directly printed oxygen condition;
         # its composition value is never consumed by the prediction.
         condition_row = reference if t == target_temperature else anchor
-        pressure = printed_source_pressure(condition_row)
+        printed = _printed_source_oxygen_at_point(condition_row, rows)
+        pressure = printed[0] if isinstance(printed, tuple) else None
         source = "source_printed"
-        used = ()
+        used = printed[1] if isinstance(printed, tuple) else ()
         if pressure is None:
-            oxygen = resolve_source_oxygen(condition_row, rows, bench)
+            oxygen = printed if isinstance(printed, SourceOxygenFallback) else resolve_source_oxygen(condition_row, rows, bench)
             if isinstance(oxygen, SourceOxygenCondition):
                 pressure = oxygen.observation.value.point
                 source = "cell_material_gas_ratio" if "cell-metal activity" in oxygen.observation.derivation.relation else "source_printed"
@@ -1346,54 +1380,63 @@ def predict_knudsen_residue_composition(
                     notices.append(notice)
         source_logs.append(None if pressure is None else math.log10(float(pressure) / 100000.0))
         oxygen_sources.append({"mass_loss_fraction": x, "temperature_K": t, "source": source, "used_observations": used})
-    try:
-        from openimcc import load_gas_datapack
-    except ImportError as exc:
-        raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
-    from simulator.diagnostic_helpers.binary_pot_battery import _openimcc_gas_channels_and_omission_notices
-
-    gas_pack = load_gas_datapack()
-    gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(tuple(initial), gas_pack)
-    if omissions:
-        raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
-    channels = tuple(ResidueChannel(str(s), str(s), parent, 1.0,
-                    "near-saturated molecular effusion; common orifice factor cancels")
-                     for s, (parent, _, _) in gas_channels)
-    flags, metadata = set(), {}
-    pressure_callbacks = {}
-
-    def pressure_model(inventory, logp, temperature_K):
-        if temperature_K not in pressure_callbacks:
-            pressure_callbacks[temperature_K] = _make_residue_pressure_model(
-                engine, gas_channels, gas_pack, temperature_K=temperature_K,
-                total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
-                engine_metadata=metadata, engine_flags=flags,
-                missing_channels_reason="residue_pressure_channels_missing",
-                caller="Knudsen residue prediction",
-            )
-        return pressure_callbacks[temperature_K](inventory, logp)
-
-    kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
-                  near_saturated=True, source_fO2_log_by_interval=source_logs)
-    primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
-    composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
-    diagnostic = {}
-    try:
-        linear = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs, linear_temperature=True)
-        linear_composition = _hashimoto_project_oxide_wt_pct(linear.residue_mol)
-        diagnostic = {"composition_wt_pct": linear_composition,
-                      "difference_from_step_hold_wt_pct": {k: linear_composition[k] - v for k, v in composition.items()}}
-    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
-        diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
-    return {
-        "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
+    provenance = {
         "measured_mass_loss_fraction": target, "temperature_path": path,
-        "oxygen_sources": oxygen_sources, "notices": tuple(notices),
-        "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
-        "atom_closure_mol": dict(primary.atom_closure_mol),
-        "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
-        "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
+        "oxygen_sources": oxygen_sources,
     }
+    try:
+        try:
+            from openimcc import load_gas_datapack
+        except ImportError as exc:
+            raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+        from simulator.diagnostic_helpers.binary_pot_battery import _openimcc_gas_channels_and_omission_notices
+
+        gas_pack = load_gas_datapack()
+        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(tuple(initial), gas_pack)
+        if omissions:
+            raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
+        channels = tuple(ResidueChannel(str(s), str(s), parent, 1.0,
+                        "near-saturated molecular effusion; common orifice factor cancels")
+                         for s, (parent, _, _) in gas_channels)
+        flags, metadata = set(), {}
+        pressure_callbacks = {}
+
+        def pressure_model(inventory, logp, temperature_K):
+            if temperature_K not in pressure_callbacks:
+                pressure_callbacks[temperature_K] = _make_residue_pressure_model(
+                    engine, gas_channels, gas_pack, temperature_K=temperature_K,
+                    total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
+                    engine_metadata=metadata, engine_flags=flags,
+                    missing_channels_reason="residue_pressure_channels_missing",
+                    caller="Knudsen residue prediction",
+                )
+            return pressure_callbacks[temperature_K](inventory, logp)
+
+        kwargs = dict(temperature_path=path, measured_mass_loss_fraction=target,
+                      near_saturated=True, source_fO2_log_by_interval=source_logs)
+        primary = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs)
+        composition = _hashimoto_project_oxide_wt_pct(primary.residue_mol)
+        diagnostic = {}
+        try:
+            linear = integrate_knudsen_residue_inventory(initial, channels, pressure_model, **kwargs, linear_temperature=True)
+            linear_composition = _hashimoto_project_oxide_wt_pct(linear.residue_mol)
+            diagnostic = {"composition_wt_pct": linear_composition,
+                          "difference_from_step_hold_wt_pct": {k: linear_composition[k] - v for k, v in composition.items()}}
+        except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+            diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
+        return {
+            "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
+            "measured_mass_loss_fraction": target, "temperature_path": path,
+            "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
+            "atom_closure_mol": dict(primary.atom_closure_mol),
+            "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
+            "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
+        }
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        exc.provenance = provenance
+        exc.notices = tuple(notices)
+        raise
 
 
 def predict_mass_loss_fraction(
