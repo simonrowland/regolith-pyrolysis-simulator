@@ -16784,20 +16784,6 @@ class Migrator:
             value_sel = select_declared_source(q_token, units, selection_payload)
             val = value_sel.amount
             trail = value_sel.unit_trail
-            if not value_sel.available:
-                self.result.add_queue(
-                    work.work_id,
-                    point_locator,
-                    ["value"],
-                    value_sel.reason
-                    or (
-                        "series P is not grounded in a source pressure unit"
-                        if value_sel.field_name in {"P", "p"}
-                        else "point source value is unavailable"
-                    ),
-                    source=source_key,
-                    observation_id=point_id,
-                )
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
                     work.work_id,
@@ -17062,7 +17048,7 @@ class Migrator:
                 work.work_id,
                 point_locator,
                 ["value"],
-                f"series point {index} stored with unknown value",
+                value_sel.reason or f"series point {index} stored with unknown value",
                 source=source_key,
                 observation_id=point_id,
             )
