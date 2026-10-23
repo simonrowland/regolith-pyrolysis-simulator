@@ -3733,9 +3733,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         return 'N2'
 
-    def _pipe_transport_inlet_flux(self, evap_flux: EvaporationFlux) -> EvaporationFlux:
-        """Full evolved gas for the hard-vacuum source-pressure balance."""
-        if float(self.melt.p_total_mbar) != 0.0:
+    def _pipe_transport_inlet_flux(
+        self, evap_flux: EvaporationFlux, *,
+        additional_source_mol_hr: Mapping[str, float] | None = None,
+    ) -> EvaporationFlux:
+        """Full upstream source gas, including any separately committed stream."""
+        if float(self.melt.p_total_mbar) != 0.0 and additional_source_mol_hr is None:
             return evap_flux
         # Reuse the canonical stoichiometric source projection: free O2 from
         # oxide dissociation occupies the pipe alongside the product vapour.
@@ -3744,6 +3747,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         source = self._project_evaporation_overhead_source_mol_hr(
             evap_flux.species_kg_hr, {},
         )
+        for species, mol_hr in (additional_source_mol_hr or {}).items():
+            source[species] = source.get(species, 0.0) + mol_hr
         inlet = EvaporationFlux(species_kg_hr={
             species: mol_hr * resolve_species_formula(
                 species, self.species_formula_registry,
@@ -8546,7 +8551,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_event_status': 'ok',
             }
         self._last_native_fe_saturation_event = dict(event)
-        return {**split, 'native_fe_partition': dict(partition), **event}
+        return {
+            **split, 'native_fe_partition': dict(partition), **event,
+            'overhead_source_mol': {'Fe': committed_vapor_mol, 'O2': emitted_o2_mol},
+        }
 
     def _stage0_foulant_transition_plan(
         self,
@@ -14424,7 +14432,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             CampaignPhase.C3_NA, CampaignPhase.C4,
         )
         self._apply_fe_redox_respeciation()
-        self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
+        native_fe_split = self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
+        native_fe_source_mol = (native_fe_split or {}).get('overhead_source_mol', {})
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
         # --- 4. Thermodynamic equilibrium ---
@@ -14675,8 +14684,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transport_inlet_flux=transport_inlet_flux,
             effective_transport_capacity=effective_transport_capacity,
         )
+        # Native partition's committed one-hour moles are mol/hr on this
+        # hourly step. Add them to ordinary evaporation before C5 appends the
+        # carrier dose: a separate dispatch is still a source to the same gas.
+        # Include emitted O2 once, without inferring it from Fe stoichiometry
+        # or from the depleted post-capture inventory. A zero native source
+        # recovers the ordinary source projection.
+        upstream_source_flux = (
+            self._pipe_transport_inlet_flux(
+                evap_flux, additional_source_mol_hr=native_fe_source_mol,
+            ) if self.melt.sweep_mol_per_s is not None else transport_inlet_flux
+        )
         upstream_transport = self.overhead_model.estimate_transport_state(
-            transport_inlet_flux,
+            upstream_source_flux,
             self.melt,
             p_downstream_bar=self._headspace_downstream_pressure_bar(
                 effective_transport_capacity
@@ -14685,13 +14705,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._melt_headspace_composition_mbar = (
             self.overhead_model.backpressure_partials(
-                transport_inlet_flux,
+                upstream_source_flux,
                 self.melt,
                 upstream_transport,
                 self.species_formula_registry,
-                oxygen_mol_hr=(self._project_evaporation_overhead_source_mol_hr(
-                    evap_flux.species_kg_hr, {}).get('O2', 0.0)
-                    if self.melt.sweep_mol_per_s is not None else 0.0),
             )
         )
         # b-1012: retain the C5 source-mixture plane for upstream P_bulk.
