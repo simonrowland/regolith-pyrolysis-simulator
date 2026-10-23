@@ -2983,5 +2983,337 @@
         "native_fe_vapor_mol": "0x0.0p+0"
       }
     ]
+  },
+  "alternate_consumers": {
+    "True:False:0.0": {
+      "raw": "0x0.0p+0",
+      "transport": "0x0.0p+0",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "True:False:1.23456789123e-12": {
+      "raw": "0x1.5b7ffdee5f21dp-40",
+      "transport": "0x0.0p+0",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "True:False:1.23456789123e-06": {
+      "raw": "0x1.4b66dc06e831ap-20",
+      "transport": "0x0.0p+0",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "False:True:0.0": {
+      "raw": "0x0.0p+0",
+      "transport": "0x0.0p+0",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.3c669598f7997p+0",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "False:True:1.23456789123e-12": {
+      "raw": "0x1.5b7ffdee5f21ep-40",
+      "transport": "0x1.5b7ffdee5f21ep-40",
+      "dispatch": "0x1.12e0be826d695p-30",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.12e0be826d695p-30",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.12e0be826d695p-30"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.196761124c599p+5",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.4802959425504p+3",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.12e0be826d695p-30",
+            "transport_fO2_log": "-0x1.2000000000000p+3"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.12e0be826d695p-30",
+      "intrinsic": "-0x1.2000000000000p+3"
+    },
+    "False:True:1.23456789123e-06": {
+      "raw": "0x1.4b66dc06e831ap-20",
+      "transport": "0x1.4b66dc06e831ap-20",
+      "dispatch": "0x1.4b6910e3f39d0p-20",
+      "requests": [
+        {
+          "controls": {
+            "pO2_bar": "0x1.4b6910e3f39d0p-20",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "vacuum_floor_bar": "0x1.12e0be826d695p-30",
+            "body": "mars",
+            "process_phase": "hot_train",
+            "ambient_pressure_bar": "0x1.89374bc6a7efap-8",
+            "high_t_melt_activity": "openimcc",
+            "high_t_melt_activity_previous_temperature_K": null,
+            "high_t_melt_activity_previous": {},
+            "simulation_hour": 1
+          },
+          "resolved": "0x1.4b6910e3f39d0p-20"
+        }
+      ],
+      "legacy_pressures_Pa": [
+        {
+          "SiO": "0x1.2028530466c22p-5",
+          "Na": "0x1.a5c80851f5ca9p+7",
+          "K": "0x1.b2cb498f69d44p+1",
+          "Fe": "0x1.2abb0811c621dp-2",
+          "Mg": "0x1.77b3acd0aac37p-4"
+        }
+      ],
+      "vaporock_transport_audit": [
+        {
+          "requested": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.2000000000000p+3",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.4b6910e3f39d0p-20"
+          },
+          "applied": {
+            "temperature_C": "0x1.9000000000000p+10",
+            "pressure_bar": "0x1.47ae147ae147bp-7",
+            "fO2_log": "-0x1.7a246efd14c7ap+2",
+            "intrinsic_fO2_log": "-0x1.2000000000000p+3",
+            "transport_pO2_bar": "0x1.4b6910e3f39d0p-20",
+            "transport_fO2_log": "-0x1.7a246efd14c7ap+2"
+          },
+          "notes": [
+            "VapoRock vapor pressure applies transport gas fO2 from transport_pO2_bar; intrinsic_fO2_log is retained as melt redox provenance."
+          ]
+        }
+      ],
+      "flux_oxygen": "0x1.4b6910e3f39d0p-20",
+      "intrinsic": "-0x1.2000000000000p+3"
+    }
   }
 }

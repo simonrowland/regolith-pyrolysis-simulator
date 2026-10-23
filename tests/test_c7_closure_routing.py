@@ -37,10 +37,17 @@ def simulation(feed="lunar_mare_low_ti", campaign="C2A"):
     return sim
 
 
-def consumer_receipt(oxygen):
+def consumer_receipt(oxygen, *, legacy_sweep=False, quantized=False):
     sim = simulation("mars_basalt")
     try:
         sim.melt.temperature_C = 1600.0
+        if legacy_sweep:
+            from simulator.state import Atmosphere
+            sim.melt.sweep_mol_per_s = None
+            sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+        if quantized:
+            from simulator.reduced_real_determinism import PT0DeterminismStore
+            sim.configure_pt0_determinism_store(PT0DeterminismStore("capture"))
         # Admit actual molecules. A swept boundary reads the ledger rather than
         # a manually assigned reservoir mirror. Ar is not an oxygen source.
         o2_mol = sim._headspace_o2_mol_for_pO2_bar(oxygen)
@@ -49,7 +56,8 @@ def consumer_receipt(oxygen):
             "process.overhead_gas", {"O2": o2_mol, "Ar": total_mol - o2_mol},
             material_origin="reagent", source="C7 routing initial gas",
         )
-        raw = sim._physical_sweep_boundary()["partials_bar"].get("O2", 0.0)
+        raw = (sim._headspace_ledger_pO2_bar_from_o2_mol(o2_mol)
+               if legacy_sweep else sim._physical_sweep_boundary()["partials_bar"].get("O2", 0.0))
         assert raw == pytest.approx(oxygen, rel=1e-12, abs=0.0)
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         requests = []
@@ -180,6 +188,13 @@ def lunar_trajectory(request):
 @pytest.mark.parametrize("oxygen", (0.0, 1.3e-12, 1e-9, 1e-6))
 def test_real_controls_oxygen_receipt(oxygen):
     assert consumer_receipt(oxygen) == json.loads(PINS.read_text())["consumers"][str(oxygen)]
+
+
+@pytest.mark.parametrize("legacy_sweep,quantized", ((True, False), (False, True)))
+@pytest.mark.parametrize("oxygen", (0.0, 1.23456789123e-12, 1.23456789123e-6))
+def test_real_controls_alternate_routing_receipt(oxygen, legacy_sweep, quantized):
+    key = f"{legacy_sweep}:{quantized}:{oxygen}"
+    assert consumer_receipt(oxygen, legacy_sweep=legacy_sweep, quantized=quantized) == json.loads(PINS.read_text())["alternate_consumers"][key]
 
 
 @pytest.mark.parametrize("hour", range(1, 25))
