@@ -5269,6 +5269,18 @@ def test_g03_blank_pressure_unit_is_unknown() -> None:
     assert mass is None and why_m is not None
 
 
+def test_fahrenheit_temperature_conversion_uses_printed_unit() -> None:
+    t_212, trail_212 = convert_temperature_to_k("212", "°F")
+    t_32, trail_32 = convert_temperature_to_k("32", "F")
+    assert t_212 == Decimal("373.15")
+    assert t_32 == Decimal("273.15")
+    assert trail_212 == trail_32 == "fahrenheit_to_kelvin"
+    selected = select_declared_source("temperature_K", None, {"T_F": "212"})
+    assert selected.amount == Decimal("373.15")
+    assert selected.field_name == "T_F"
+    assert selected.unit_trail == "fahrenheit_to_kelvin"
+
+
 def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
     from simulator.battery.migrate import PHASE_MAP
 
