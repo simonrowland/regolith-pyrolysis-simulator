@@ -6663,24 +6663,30 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     )
     (root / "data" / "literature" / "extracts" / "fixture-source.yaml").unlink()
     result = migrate(root, write=False)
-    alpha_points = [
-        o
-        for o in result.observations.values()
-        if "_table3::T=" in o.observation_id
-        or "sio_hashimoto_table3_complete_b1::T=" in o.observation_id
-    ]
-    assert len(alpha_points) == 12
-    for obs in alpha_points:
-        assert quantity_token(obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
-        assert quantity_token(obs.identity) is not Quantity.MASS_LOSS_RATE
-        assert obs.value.kind is ValueKind.POINT
-    fe0 = next(
-        o
-        for o in alpha_points
-        if "fe_hashimoto_langmuir_table3::T=1973" in o.observation_id
+    # 7baaf334b keeps Table 3 fit outputs as context. They are not mass-loss
+    # observations, and they are not exploded _table3::T= points.
+    assert not any(
+        "_table3::T=" in observation.observation_id
+        or "sio_hashimoto_table3_complete_b1::T=" in observation.observation_id
+        for observation in result.observations.values()
     )
-    assert fe0.value.point == as_decimal("0.23")
-    assert float(fe0.identity.temperature_K.value) == 1973.0
+    assert not any(
+        quantity_token(observation.identity) is Quantity.MASS_LOSS_RATE
+        for observation in result.observations.values()
+    )
+    table3 = next(
+        context
+        for records in result.context_by_work.values()
+        for context in records
+        if context.get("table") == "3"
+    )
+    assert table3["type"] == "evaporation_coefficient_table_context"
+    fe = next(row for row in table3["values"] if row["element"] == "Fe")
+    fe_1973 = next(
+        item for item in fe["temperature_values"] if item["T_K"] == 1973.0
+    )
+    assert as_decimal(str(fe_1973["alpha"])) == as_decimal("0.23")
+    assert "mass_loss" not in table3["type"]
 
 
 # Source-contract tables for the series census. Duplicated here on purpose:
@@ -7638,28 +7644,26 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         pytest.skip("migrated store not generated yet")
     dest = tmp_path / "extracts-v2"
     shutil.copytree(extracts_v2, dest)
-    fedkin = dest / "kems-005-fedkin-2006.yaml"
-    stored = yaml.safe_load(fedkin.read_text(encoding="utf-8"))
+    # 7baaf334b keeps Fedkin Table 3 alphas as context, so that store file has
+    # no evaporation_coefficient_alpha points to corrupt. Shirai 2000's six
+    # printed alpha* cells are still series points the census checks. They sit
+    # at 1573.15 K and 1673.15 K, so the old T>1973 Fedkin filter matches none
+    # of them.
+    shirai = dest / "ta-shirai-2000-lpsc.yaml"
+    stored = yaml.safe_load(shirai.read_text(encoding="utf-8"))
     n_mutated = 0
     for obs in stored.get("observations") or []:
         ident = obs.get("identity") or {}
         q = ident.get("quantity") or {}
         if q.get("value") != "evaporation_coefficient_alpha":
             continue
-        t_state = ident.get("temperature_K") or {}
-        try:
-            t = Decimal(str(t_state.get("value")))
-        except Exception:
-            continue
-        if t <= Decimal("1973"):
-            continue
         val = obs.get("value") or {}
         if val.get("kind") != "point":
             continue
         val["point"] = str(Decimal(str(val["point"])) + 1)
         n_mutated += 1
-    assert n_mutated == 9, n_mutated
-    fedkin.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
+    assert n_mutated == 6, n_mutated
+    shirai.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
     _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
         extracts, dest
     )
