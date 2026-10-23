@@ -64,16 +64,37 @@ def hex_leaves(value):
     return value
 
 
+def source_partials_mbar(gas_deltas, flow, pressure_mbar):
+    sources = {'Ar': flow * 3600.0}
+    for transition in gas_deltas:
+        if transition['name'] == 'overhead_bleed':
+            continue
+        for credit in transition['credits']:
+            for species, mol in credit.items():
+                sources[species] = sources.get(species, 0.0) + mol
+    # Independent steady, well-mixed balance: g_i = y_i * F_out and
+    # sum(y_i)=1 give p_i=P*g_i/sum(g). One-hour source moles have a
+    # dimensionless ratio; P supplies mbar. No gas source gives no partial.
+    return {species: pressure_mbar * mol / sum(sources.values())
+            for species, mol in sources.items()}
+
+
 @pytest.mark.parametrize('flow', [0.01, 0.1])
 def test_frozen_mars_plane_pins(monkeypatch, flow):
     sim, upstream = frozen_mars(monkeypatch, flow)
-    actual = hex_leaves(pressure_receipt(sim, upstream))
+    receipt = pressure_receipt(sim, upstream)
+    actual = hex_leaves(receipt)
     pins = json.loads((Path(__file__).parent / 'fixtures' / 'pressure_planes_pins.json').read_text())
     expected = pins[str(flow)]
-    # Only the consumed plane changes in C6's value step. Keep the original
-    # fixture intact so every old -> new pressure leaf remains auditable.
-    expected['upstream_mbar'] = expected['source_plane_mbar']
+    # Preserve the original pin bytes and exact non-pressure receipts. R2
+    # corrects both the C5 input source set and its consumed upstream map.
+    for field in ('source_plane_mbar', 'upstream_mbar'):
+        actual.pop(field)
+        expected.pop(field)
     assert actual == expected
+    reference = source_partials_mbar(receipt['gas_deltas_mol'], flow, sim.melt.p_total_mbar)
+    assert receipt['source_plane_mbar'] == receipt['upstream_mbar']
+    assert receipt['upstream_mbar'] == pytest.approx(reference, rel=1e-12, abs=1e-15)
 
 
 @pytest.mark.parametrize('flow', [0.01, 0.1])
@@ -119,3 +140,33 @@ def test_named_views_preserve_lumped_volume_and_zero_storage_stages(monkeypatch)
     with pytest.raises(TypeError):
         volumes[0].species_mol['Ar'] = 0.0
     assert sim.atom_ledger.mol_by_account() == before
+
+
+@pytest.mark.parametrize('flow', [0.01, 0.1])
+def test_native_fe_and_oxygen_reach_second_tick_evaporation(monkeypatch, flow):
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.physical_constants import PA_PER_MBAR
+
+    sim, upstream = frozen_mars(monkeypatch, flow)
+    receipt = pressure_receipt(sim, upstream)
+    expected = source_partials_mbar(receipt['gas_deltas_mol'], flow, sim.melt.p_total_mbar)
+    assert expected['Fe'] > 0.01
+    assert expected['O2'] > 1.0
+
+    consumed_fe_Pa = []
+    dispatch = sim._dispatch_only
+
+    def observe(intent, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            consumed_fe_Pa.append(kwargs['control_inputs']['overhead_partials_Pa']['Fe'])
+        return dispatch(intent, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', observe)
+    snapshot = sim.step()
+    assert snapshot.hour == 2
+    assert consumed_fe_Pa
+    assert consumed_fe_Pa == pytest.approx(
+        [expected['Fe'] * PA_PER_MBAR] * len(consumed_fe_Pa), rel=1e-12,
+    )
+    assert receipt['upstream_mbar'].get('Fe', 0.0) == pytest.approx(expected['Fe'], rel=1e-12)
+    assert receipt['upstream_mbar']['O2'] == pytest.approx(expected['O2'], rel=1e-12)
