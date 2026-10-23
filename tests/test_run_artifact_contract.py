@@ -157,6 +157,30 @@ def test_zero_timestep_failure_artifact_is_valid() -> None:
     }
 
 
+def test_c0_exit_forecast_engine_is_optional_run_metadata():
+    old_payload = _runner_payload()
+    old_payload["run_metadata"]["c0_exit"] = {
+        "backstop": "computed_exit",
+        "T_exit_C": 900.0,
+    }
+    old_artifact = build_run_artifact(old_payload, run_id="old-c0-record")
+    assert old_artifact["terminal"]["run_metadata"]["c0_exit"] == {
+        "backstop": "computed_exit",
+        "T_exit_C": 900.0,
+    }
+
+    new_payload = _runner_payload()
+    new_payload["run_metadata"]["c0_exit"] = {
+        "backstop": "computed_exit",
+        "T_exit_C": 900.0,
+        "forecast_engine": "internal-analytical",
+    }
+    new_artifact = build_run_artifact(new_payload, run_id="new-c0-record")
+    assert new_artifact["terminal"]["run_metadata"]["c0_exit"][
+        "forecast_engine"
+    ] == "internal-analytical"
+
+
 def test_timestep_summary_is_the_verbatim_input_mapping() -> None:
     summary = {
         "hour": 7,

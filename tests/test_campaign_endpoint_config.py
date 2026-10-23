@@ -16,6 +16,7 @@ from simulator.campaigns import (
     CampaignHoldAcquisitionRefusal,
     CampaignHoldTargetRefusal,
     CampaignManager,
+    c0_exit_record,
     c0_exit_run_notice,
 )
 from simulator.core import PyrolysisSimulator
@@ -267,6 +268,7 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
         "T_exit_C": 900.0,
         "T_exit_reached_hr": 4.375,
         "t_evac_hr": 8.0,
+        "forecast_engine": "internal-analytical",
         "requested_exit_window_hr": 8.0,
         "runtime_exit_window_hr": 8.0,
         "alkali_retention_budget_fraction": 1.0e-3,
@@ -312,6 +314,7 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     ) is True
     notice = manager.last_c0_exit
     _assert_computed_c0_exit_notice(notice)
+    assert notice["forecast_engine"] == "internal-analytical"
     assert notice["T_exit_C"] == 900.0
     assert notice["t_evac_hr"] == 8.0
     assert notice["unreleased_inventory_at_exit"] == {
@@ -364,6 +367,34 @@ def test_c0_computed_exit_uses_temperature_and_evacuation_bound():
     assert c0_exit_run_notice(SimpleNamespace(campaign_mgr=backstop)) == (
         backstop.last_c0_exit
     )
+
+
+def test_c0_exit_forecast_engine_is_optional_and_closed():
+    prediction = {
+        "T_exit_C": 900.0,
+        "t_evac_hr": 8.0,
+        "prediction_status": "ok",
+    }
+    kwargs = {
+        "kinetics": STAGE0_RELEASE_KINETICS,
+        "backstop": "computed_exit",
+        "ramp_C_per_hr": 200.0,
+    }
+
+    legacy_notice = c0_exit_record(prediction=prediction, **kwargs)
+    assert "forecast_engine" not in legacy_notice
+
+    recorded_notice = c0_exit_record(
+        prediction={**prediction, "forecast_engine": "internal-analytical"},
+        **kwargs,
+    )
+    assert recorded_notice["forecast_engine"] == "internal-analytical"
+
+    with pytest.raises(ValueError, match="unknown C0 forecast engine"):
+        c0_exit_record(
+            prediction={**prediction, "forecast_engine": "free-text-engine"},
+            **kwargs,
+        )
 
 
 def test_c0_exit_forecast_does_not_raise_for_scalar_temperature_range():

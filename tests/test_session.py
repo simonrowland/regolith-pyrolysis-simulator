@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,6 +13,7 @@ import simulator.session as session_module
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.feedstock_guard import is_blocked_feedstock
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -41,6 +43,43 @@ def _config(**overrides) -> SimSessionConfig:
     }
     values.update(overrides)
     return SimSessionConfig(**values)
+
+
+def _pt0_store_state_bytes(store) -> bytes:
+    memory_state = {
+        name: getattr(store, name)
+        for name in (
+            "mode",
+            "entries",
+            "physics_bucket_entries",
+            "capture_sequence",
+            "replay_sequence",
+            "misses",
+            "cache_events",
+            "hits",
+            "live_fills",
+            "last_cache_state",
+            "quantize_live_controls",
+            "cache_tier_ceiling",
+            "cached_real_miss_policy",
+            "strict_vapor_gate",
+            "_control_quantization",
+        )
+    }
+    memory_bytes = json.dumps(
+        memory_state, sort_keys=True, separators=(",", ":"), default=str
+    ).encode("utf-8")
+    backing_bytes = bytearray()
+    if store.persistent_path is not None:
+        for suffix in ("", "-wal", "-shm"):
+            path = Path(f"{store.persistent_path}{suffix}")
+            backing_bytes.extend(suffix.encode("ascii"))
+            backing_bytes.extend(b"\0")
+            backing_bytes.extend(
+                path.read_bytes() if path.exists() else b"<absent>"
+            )
+            backing_bytes.extend(b"\0")
+    return memory_bytes + b"\0" + bytes(backing_bytes)
 
 
 def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
@@ -103,6 +142,66 @@ def test_cached_real_python_api_model_session_reaches_build_simulator(
         )
 
     assert reached == [model]
+
+
+def test_cached_real_capture_session_c0_forecast_computes_without_pt0_writes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    class CachedRealForecastBackend(InternalAnalyticalBackend):
+        backend_name = "cached-real"
+
+    def resolve_cached_real(*_args, **_kwargs):
+        backend = CachedRealForecastBackend()
+        assert backend.initialize({})
+        return backend
+
+    monkeypatch.setattr(session_module, "resolve_backend", resolve_cached_real)
+    original_build_simulator = session_module.build_simulator
+    store_state: list[tuple[bytes, bytes]] = []
+    forecast_results: list[dict] = []
+
+    def build_simulator_with_pt0_guard(build_config):
+        sim = original_build_simulator(build_config)
+        original_predict = sim._predict_c0_exit
+
+        def predict_with_pt0_guard(*args, **kwargs):
+            store = sim._pt0_determinism_store
+            before = _pt0_store_state_bytes(store)
+            prediction = original_predict(*args, **kwargs)
+            after = _pt0_store_state_bytes(store)
+            store_state.append((before, after))
+            forecast_results.append(prediction)
+            return prediction
+
+        sim._predict_c0_exit = predict_with_pt0_guard
+        return sim
+
+    monkeypatch.setattr(
+        session_module, "build_simulator", build_simulator_with_pt0_guard
+    )
+    session = SimSession().start(
+        _config(
+            backend_name="cached-real",
+            reduced_real_cache={
+                "db_path": str(tmp_path / "cached-real-forecast.db"),
+                "miss_policy": "live-fill",
+                "authorized_backend_name": "alphamelts",
+                "authorized_mode": "python_api",
+                "authorized_model": "MELTSv1.0.2",
+            },
+        )
+    )
+
+    prediction = session.simulator.campaign_mgr.c0_exit_prediction
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["T_exit_C"] is not None
+    assert prediction["forecast_engine"] == "cached-real"
+    assert session.simulator._pt0_determinism_store.mode == "capture"
+    assert forecast_results
+    assert forecast_results[-1]["T_exit_C"] is not None
+    assert store_state
+    assert all(before == after for before, after in store_state)
 
 
 def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):

@@ -111,6 +111,7 @@ def test_c0_forecast_reports_internal_analytical_when_live_backend_is_none():
 
     prediction = sim.campaign_mgr.c0_exit_prediction
     assert prediction["prediction_status"] == "ok"
+    assert prediction["forecast_engine"] == "internal-analytical"
     context, status = sim._build_c0_forecast_context()
     assert status == ""
     assert context._c0_forecast_engine == "internal-analytical"
