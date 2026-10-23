@@ -1542,6 +1542,10 @@ def _identity_from_plain(payload: object) -> Identity:
         kwargs["counter_phase_role"] = _state_from_plain(
             payload["counter_phase_role"], lambda value: PhaseRole(str(value))
         )
+    if payload.get("normalising_element") is not None:
+        kwargs["normalising_element"] = _state_from_plain(
+            payload["normalising_element"], str
+        )
     return Identity(**kwargs)
 
 
@@ -2888,6 +2892,58 @@ def convert_mass_to_kg(
     if lowered in {"mg"}:
         return amount / Decimal("1000000"), "mg_to_kg"
     return None, f"unmapped mass unit {units!r}"
+
+
+def convert_duration_to_s(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Seconds from a printed s, min, or h. No other unit is guessed."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "duration value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing duration unit"
+    lowered = str(units).strip().lower().replace(" ", "")
+    if lowered in {"s", "sec", "second", "seconds"}:
+        return amount, "identity:s"
+    if lowered in {"min", "minute", "minutes"}:
+        # Premise: 1 min = 60 s exactly.
+        return amount * Decimal("60"), "min_to_s"
+    if lowered in {"h", "hr", "hour", "hours"}:
+        # Premise: 1 h = 3600 s exactly.
+        return amount * Decimal("3600"), "h_to_s"
+    return None, f"unmapped duration unit {units!r}"
+
+
+def convert_flow_to_sccm(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """sccm from a printed volume flow. Does not invent a standard T or P.
+
+    1 sccm = 1 cm³/min. 1 mL = 1 cm³. 1 L/min = 1000 sccm.
+    """
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "flow value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing flow unit"
+    lowered = (
+        str(units)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("³", "3")
+        .replace("^", "")
+    )
+    if lowered in {"sccm"}:
+        return amount, "identity:sccm"
+    if lowered in {"cm3/min", "cm3min", "ml/min", "mlmin"}:
+        return amount, "cm3_per_min_to_sccm"
+    if lowered in {"l/min", "lmin"}:
+        return amount * Decimal("1000"), "L_per_min_to_sccm"
+    return None, f"unmapped flow unit {units!r}"
 
 
 def convert_length_to_m(
@@ -4938,6 +4994,8 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "gamma": Quantity.ACTIVITY_COEFFICIENT,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "evaporation_flux": Quantity.EVAPORATION_FLUX,
+    "fraction_remaining": Quantity.ELEMENT_FRACTION_REMAINING,
     "delta_fG": Quantity.DELTA_FG,
     "delta_fG_298_kJ_mol": Quantity.DELTA_FG,
     "Delta_f_G_298_kJ_mol": Quantity.DELTA_FG,
@@ -5227,6 +5285,7 @@ def _quantity_contradiction(
     if semantics in {"bound_not_point_ordering", "bound_not_point"} and candidate not in {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.CONDENSATION_COEFFICIENT,
     }:
         if not (candidate is Quantity.P_PARTIAL and _bulk_composition_pressure_fence(values)):
             return f"source semantics {semantics} is ordering/categorical, not {candidate.value}"
@@ -8126,6 +8185,16 @@ def fill_identity(
         changed = False
         for name in profile.required:
             state = payload.get(name)
+            if name in profile.permitted_not_applicable:
+                # Printed value and explicit not_applicable are different
+                # identities. A hole becomes not_applicable; neither is
+                # rewritten to unknown.
+                if state is None:
+                    payload[name] = State.not_applicable(
+                        f"profile {token.value} permits omitted {name}"
+                    )
+                    changed = True
+                continue
             if state is None or (isinstance(state, State) and state.is_not_applicable):
                 payload[name] = State.unknown(
                     "no single temperature_K mapped from source" if name == "temperature_K"
@@ -8133,6 +8202,8 @@ def fill_identity(
                 )
                 changed = True
         for name in profile.permitted_not_applicable:
+            if name in profile.required:
+                continue
             state = payload.get(name)
             if state is None:
                 payload[name] = State.not_applicable(
@@ -8197,6 +8268,9 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha", "alpha_times_Gamma"),
+    Quantity.CONDENSATION_COEFFICIENT: ("alpha",),
+    Quantity.EVAPORATION_FLUX: ("evaporation_flux",),
+    Quantity.ELEMENT_FRACTION_REMAINING: ("fraction_remaining",),
     Quantity.CP: (
         "cp",
         "heat_capacity",
@@ -9033,12 +9107,503 @@ def fe3_fe2_ratio_parent_lineage(
     return derived_from
 
 
+T1473_FLOW_AXES = (
+    "flow_rate",
+    "velocity",
+    "geometry",
+    "crucible_or_sample_area",
+)
+_T1473_QUANTITIES = frozenset(
+    {
+        Quantity.CONDENSATION_COEFFICIENT,
+        Quantity.EVAPORATION_FLUX,
+        Quantity.ELEMENT_FRACTION_REMAINING,
+    }
+)
+_NUMBER_THEN_UNIT_RE = re.compile(
+    r"^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s+(\S.*?)\s*$"
+)
+
+
+def flow_member_is_printed(member: object) -> bool:
+    """True when the source printed the member. Omission is not a zero."""
+
+    if member in (None, ""):
+        return False
+    if isinstance(member, Mapping):
+        if member.get("state") == "not_printed":
+            return False
+        return member.get("value") not in (None, "")
+    return True
+
+
+def _flow_member_as_printed(member: object) -> dict[str, Any]:
+    if not flow_member_is_printed(member):
+        return {"state": "not_printed"}
+    if isinstance(member, Mapping):
+        return {str(key): value for key, value in member.items()}
+    return {"value": member}
+
+
+def t1473_flow_block(raw: object) -> dict[str, Any]:
+    source = raw if isinstance(raw, Mapping) else {}
+    return {name: _flow_member_as_printed(source.get(name)) for name in T1473_FLOW_AXES}
+
+
+def _member_value_and_unit(member: object) -> tuple[object, str | None]:
+    if isinstance(member, Mapping):
+        unit = member.get("unit") or member.get("units")
+        return member.get("value"), (str(unit) if unit not in (None, "") else None)
+    return member, None
+
+
+def _split_number_unit(raw: object) -> tuple[str, str] | None:
+    if not isinstance(raw, str):
+        return None
+    match = _NUMBER_THEN_UNIT_RE.match(raw.strip())
+    if match is None:
+        return None
+    return match.group(1), match.group(2).strip()
+
+
+def _flux_unit_family(unit: str | None) -> str | None:
+    """Printed flux unit family. The number is not converted."""
+
+    if unit is None or not str(unit).strip():
+        return None
+    text = str(unit).strip().lower()
+    text = (
+        text.replace("⁻", "-")
+        .replace("−", "-")
+        .replace("–", "-")
+        .replace("²", "2")
+        .replace("^", "")
+        .replace("·", "")
+        .replace("*", "")
+    )
+    text = re.sub(r"\s+", "", text).replace("/", "")
+    if text in {"molm-2s-1", "molm2-1s-1"}:
+        return "mol_m-2_s-1"
+    if text in {"kgm-2s-1", "kgm2-1s-1"}:
+        return "kg_m-2_s-1"
+    return None
+
+
+def _pressure_state_from_printed(raw: object, unit: str | None = None) -> State[Decimal]:
+    if isinstance(raw, Mapping):
+        if raw.get("state") == "not_printed":
+            return State.unknown("pressure not_printed")
+        amount, trail = convert_pressure_to_pa(
+            raw.get("value"), str(raw.get("unit") or raw.get("units") or unit or "")
+        )
+    else:
+        split = _split_number_unit(raw)
+        if split is not None:
+            amount, trail = convert_pressure_to_pa(split[0], split[1])
+        else:
+            amount, trail = convert_pressure_to_pa(raw, unit)
+    if amount is None:
+        shown = raw if not isinstance(raw, Mapping) else raw.get("value")
+        return State.unknown(trail or f"pressure {shown!r} did not convert")
+    return State.of(amount)
+
+
+def _t1473_total_pressure(values: Mapping[str, Any]) -> State[Decimal]:
+    if values.get("P_total") not in (None, ""):
+        return _pressure_state_from_printed(
+            values.get("P_total"),
+            str(values.get("P_total_unit") or values.get("pressure_unit") or ""),
+        )
+    for key in ("vacuum", "pressure"):
+        raw = values.get(key)
+        if raw in (None, ""):
+            continue
+        return _pressure_state_from_printed(raw)
+    return State.unknown("source does not state a numeric total pressure")
+
+
+def _element_amount_composition(raw: object) -> Composition | None:
+    if not isinstance(raw, Mapping) or raw.get("state") == "not_printed":
+        return None
+    components: list[tuple[str, Decimal]] = []
+    for key, value in raw.items():
+        if key in {"state", "locator", "unit", "units", "basis", "note"}:
+            continue
+        amount = _as_dec_or_none(value)
+        if amount is None and isinstance(value, Mapping):
+            amount = _as_dec_or_none(value.get("value"))
+        if amount is None:
+            return None
+        components.append((str(key), amount))
+    if not components:
+        return None
+    return Composition(
+        basis="printed_element_amount",
+        components=tuple(components),
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+
+
+def _composition_state_from_printed(raw: object, *, absent: str) -> State[Composition]:
+    if raw in (None, ""):
+        return State.unknown(absent)
+    if isinstance(raw, Mapping) and raw.get("state") == "not_printed":
+        return State.unknown(absent)
+    composition = _element_amount_composition(raw)
+    if composition is not None:
+        return State.of(composition)
+    text = raw if isinstance(raw, str) else None
+    if text is None and isinstance(raw, Mapping):
+        text = str(raw.get("value") or raw.get("text") or "")
+    if text:
+        return State.unknown(f"printed composition is not a component map: {text}")
+    return State.unknown(absent)
+
+
+def _area_state_from_member(member: object, *, absent: str) -> State[Decimal]:
+    if not flow_member_is_printed(member):
+        return State.unknown(absent)
+    value, unit = _member_value_and_unit(member)
+    amount, trail = convert_area_to_m2(value, unit)
+    if amount is None:
+        return State.unknown(trail or absent)
+    return State.of(amount)
+
+
+def _duration_state_from_printed(raw: object) -> State[Decimal]:
+    if raw in (None, "") or (isinstance(raw, Mapping) and raw.get("state") == "not_printed"):
+        return State.unknown("duration not_printed")
+    value, unit = _member_value_and_unit(raw) if isinstance(raw, Mapping) else (raw, None)
+    if isinstance(raw, Mapping) and unit is None:
+        unit_text = raw.get("unit") or raw.get("units")
+        unit = str(unit_text) if unit_text not in (None, "") else None
+    amount, trail = convert_duration_to_s(value, unit)
+    if amount is None:
+        return State.unknown(trail or "duration did not convert")
+    return State.of(amount)
+
+
+def _mass_state_from_printed(raw: object) -> State[Decimal]:
+    if raw in (None, "") or (isinstance(raw, Mapping) and raw.get("state") == "not_printed"):
+        return State.unknown("sample_mass not_printed")
+    value, unit = _member_value_and_unit(raw) if isinstance(raw, Mapping) else (raw, None)
+    amount, trail = convert_mass_to_kg(value, unit)
+    if amount is None:
+        return State.unknown(trail or "sample_mass did not convert")
+    return State.of(amount)
+
+
+def _flow_sccm_state(member: object) -> State[Decimal]:
+    if not flow_member_is_printed(member):
+        return State.unknown("flow_rate not_printed")
+    value, unit = _member_value_and_unit(member)
+    amount, trail = convert_flow_to_sccm(value, unit)
+    if amount is None:
+        return State.unknown(trail or "flow_rate did not convert to sccm")
+    return State.of(amount)
+
+
+def _sweep_from_atmosphere(values: Mapping[str, Any], flow: Mapping[str, Any]) -> State[SweepIdentity]:
+    atmosphere = values.get("atmosphere")
+    if atmosphere in (None, ""):
+        atmosphere = values.get("carrier")
+    if atmosphere in (None, ""):
+        return State.unknown("atmosphere/carrier not printed")
+    return State.of(
+        SweepIdentity(
+            species=str(atmosphere).strip(),
+            flow_sccm=_flow_sccm_state(flow.get("flow_rate")),
+            partial_pressure_Pa=State.unknown("species partial pressure not printed"),
+        )
+    )
+
+
+def _bound_operator_from_printed(printed: object, *, lower: bool) -> str:
+    text = str(printed or "").strip()
+    if lower:
+        if text.startswith(">") and not text.startswith(">="):
+            return ">"
+        return ">="
+    if text.startswith("<") and not text.startswith("<="):
+        return "<"
+    return "<="
+
+
+def _bound_selection(
+    operator: str,
+    amount: Decimal,
+    field_name: str,
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    return SourceSelection(
+        value=Value(
+            ValueKind.BOUND,
+            bound_operator=operator,
+            bound_value=amount,
+            approximate=bool(payload.get("approximate")),
+        ),
+        field_name=field_name,
+        unit_trail="dimensionless",
+        amount=amount,
+        unused_ancillary=_unused_ancillary(payload, field_name),
+        condition_ranges=condition_ranges,
+    )
+
+
+def _condensation_coefficient_selection(
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    semantics = str(payload.get("semantics") or "")
+    if semantics in {"bound_not_point", "bound_not_point_ordering"}:
+        lower = _numeric_field(payload, "alpha_lower_bound")
+        upper = _numeric_field(payload, "alpha_upper_bound")
+        printed = payload.get("printed")
+        if lower is not None:
+            return _bound_selection(
+                _bound_operator_from_printed(printed, lower=True),
+                lower,
+                "alpha_lower_bound",
+                payload,
+                condition_ranges,
+            )
+        if upper is not None:
+            return _bound_selection(
+                _bound_operator_from_printed(printed, lower=False),
+                upper,
+                "alpha_upper_bound",
+                payload,
+                condition_ranges,
+            )
+        return _unavailable_selection(
+            "condensation bound has no alpha_lower_bound or alpha_upper_bound",
+            condition_ranges=condition_ranges,
+            field_name="alpha_lower_bound",
+        )
+    amount = _numeric_field(payload, "alpha")
+    if amount is None:
+        return _unavailable_selection(
+            "condensation_coefficient has no values.alpha",
+            condition_ranges=condition_ranges,
+            field_name="alpha",
+        )
+    return _point_selection(
+        amount, "alpha", "dimensionless", payload, condition_ranges
+    )
+
+
+def _evaporation_flux_selection(
+    payload: Mapping[str, Any],
+    units: str | None,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    if "evaporation_flux" not in payload:
+        return _unavailable_selection(
+            "source does not print evaporation_flux",
+            condition_ranges=condition_ranges,
+            field_name="evaporation_flux",
+        )
+    amount = _numeric_field(payload, "evaporation_flux")
+    unit = _printed_unit_for_field(payload, "evaporation_flux") or units
+    if amount is None:
+        return _unavailable_selection(
+            "evaporation_flux is not numeric",
+            condition_ranges=condition_ranges,
+            field_name="evaporation_flux",
+        )
+    if _flux_unit_family(unit) is None:
+        return _unavailable_selection(
+            f"printed unit {unit!r} is not mol m-2 s-1 or kg m-2 s-1",
+            condition_ranges=condition_ranges,
+            field_name="evaporation_flux",
+        )
+    return _point_selection(
+        amount, "evaporation_flux", "as_published", payload, condition_ranges
+    )
+
+
+def _element_fraction_selection(
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    if "fraction_remaining" not in payload:
+        return _unavailable_selection(
+            "source does not print fraction_remaining",
+            condition_ranges=condition_ranges,
+            field_name="fraction_remaining",
+        )
+    amount = _numeric_field(payload, "fraction_remaining")
+    if amount is None:
+        return _unavailable_selection(
+            "fraction_remaining is not numeric",
+            condition_ranges=condition_ranges,
+            field_name="fraction_remaining",
+        )
+    return _point_selection(
+        amount, "fraction_remaining", "dimensionless", payload, condition_ranges
+    )
+
+
+def t1473_species(quantity: Quantity, species: Species, values: Mapping[str, Any]) -> Species:
+    if quantity in {Quantity.CONDENSATION_COEFFICIENT, Quantity.EVAPORATION_FLUX}:
+        gas = _extract_formula_token(values.get("gas_species"))
+        if gas:
+            return make_species(gas, Phase.G)
+        return species
+    if quantity is Quantity.ELEMENT_FRACTION_REMAINING:
+        element = _extract_formula_token(values.get("element"))
+        if element:
+            return make_species(element, species.phase)
+    return species
+
+
+def t1473_provenance(
+    quantity: Quantity | None,
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+) -> dict[str, Any]:
+    if quantity not in _T1473_QUANTITIES:
+        return {}
+    extra: dict[str, Any] = {}
+    if quantity is Quantity.CONDENSATION_COEFFICIENT:
+        phase = obs.get("phase")
+        if phase not in (None, ""):
+            extra["substrate_phase"] = phase
+        technique = values.get("technique") or values.get("method")
+        if technique not in (None, ""):
+            extra["technique"] = technique
+        vapour: dict[str, Any] = {}
+        for key in ("vapour_source_T_K", "vapour_source_T_C"):
+            if values.get(key) not in (None, ""):
+                vapour[key] = values.get(key)
+        if vapour:
+            extra["vapour_source_T"] = vapour
+        if obs.get("regime") not in (None, ""):
+            extra["pressure_regime"] = obs.get("regime")
+    if quantity is Quantity.EVAPORATION_FLUX:
+        extra["flow"] = t1473_flow_block(values.get("flow"))
+        unit = obs.get("units")
+        if unit not in (None, ""):
+            extra["printed_unit"] = unit
+    if quantity is Quantity.ELEMENT_FRACTION_REMAINING:
+        printed_basis = values.get("basis_as_printed")
+        extra["basis_as_printed"] = (
+            printed_basis if printed_basis not in (None, "") else "not_printed"
+        )
+        assumption = values.get("retention_assumption")
+        if assumption not in (None, ""):
+            extra["retention_assumption"] = assumption
+        geometry = values.get("sample_geometry")
+        extra["sample_geometry"] = _flow_member_as_printed(geometry)
+    return extra
+
+
+def t1473_identity_kwargs(
+    quantity: Quantity,
+    values: Mapping[str, Any],
+    obs: Mapping[str, Any],
+    *,
+    temperature_K: State[Decimal] | None,
+) -> dict[str, Any]:
+    """Identity axes for the three t-1473 quantities. No number is recomputed."""
+
+    kwargs: dict[str, Any] = {}
+    if quantity is Quantity.CONDENSATION_COEFFICIENT:
+        material = values.get("substrate") or values.get("material")
+        wall_temperature = (
+            temperature_K
+            if temperature_K is not None
+            else State.unknown("no surface temperature")
+        )
+        kwargs["wall"] = State.of(
+            WallIdentity(
+                temperature_K=wall_temperature,
+                material=(
+                    State.of(str(material))
+                    if material not in (None, "")
+                    else State.unknown("substrate not printed")
+                ),
+            )
+        )
+        kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
+        return kwargs
+    if quantity is Quantity.EVAPORATION_FLUX:
+        family = _flux_unit_family(
+            str(obs.get("units")) if obs.get("units") not in (None, "") else None
+        )
+        kwargs["subtype"] = (
+            State.of(family)
+            if family is not None
+            else State.unknown("printed unit is not mol m-2 s-1 or kg m-2 s-1")
+        )
+        kwargs["composition"] = _composition_state_from_printed(
+            values.get("composition_as_printed"),
+            absent="melt composition not printed",
+        )
+        kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
+        flow = t1473_flow_block(values.get("flow"))
+        kwargs["sweep_gas"] = _sweep_from_atmosphere(values, flow)
+        kwargs["exposure"] = State.of(
+            Exposure(
+                area_m2=_area_state_from_member(
+                    flow.get("crucible_or_sample_area"),
+                    absent="crucible_or_sample_area not_printed",
+                ),
+                duration_s=State.unknown("duration is not an evaporation_flux identity"),
+            )
+        )
+        return kwargs
+    basis = values.get("basis")
+    if basis in {"atom", "mass"}:
+        kwargs["subtype"] = State.of(str(basis))
+    elif basis in (None, ""):
+        kwargs["subtype"] = State.not_applicable("basis omitted; basis_as_printed retained")
+    else:
+        kwargs["subtype"] = State.unknown(f"basis {basis!r} is not atom or mass")
+    normaliser = values.get("normalising_element")
+    if isinstance(normaliser, str) and normaliser.strip():
+        kwargs["normalising_element"] = State.of(normaliser.strip())
+    else:
+        kwargs["normalising_element"] = State.not_applicable(
+            "source does not print a normalised ratio"
+        )
+    kwargs["composition"] = _composition_state_from_printed(
+        values.get("starting_composition"),
+        absent="starting composition not printed",
+    )
+    kwargs["total_pressure_Pa"] = _t1473_total_pressure(values)
+    kwargs["sample_mass_kg"] = _mass_state_from_printed(values.get("sample_mass"))
+    flow = t1473_flow_block(values.get("flow"))
+    kwargs["sweep_gas"] = _sweep_from_atmosphere(values, flow)
+    kwargs["exposure"] = State.of(
+        Exposure(
+            area_m2=_area_state_from_member(
+                values.get("sample_geometry"),
+                absent="sample_geometry not_printed",
+            ),
+            duration_s=_duration_state_from_printed(
+                values.get("duration")
+                if values.get("duration") not in (None, "")
+                else values.get("time_point")
+            ),
+        )
+    )
+    return kwargs
+
+
 def _selection_from_named_field(
     payload: Mapping[str, Any],
     q_token: Quantity,
     units: str | None,
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection | None:
+    if q_token is Quantity.CONDENSATION_COEFFICIENT:
+        return _condensation_coefficient_selection(payload, condition_ranges)
+    if q_token is Quantity.EVAPORATION_FLUX:
+        return _evaporation_flux_selection(payload, units, condition_ranges)
+    if q_token is Quantity.ELEMENT_FRACTION_REMAINING:
+        return _element_fraction_selection(payload, condition_ranges)
     if q_token in {
         Quantity.ACTIVITY,
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
@@ -13698,6 +14263,18 @@ class Migrator:
         observation_provenance = _provenance_from_extract(
             obs, values, provenance, quantity=q_token
         )
+        if isinstance(observation_provenance, dict):
+            observation_provenance.pop("predicted_residue_amount", None)
+        t1473_extra = t1473_provenance(
+            q_token,
+            obs,
+            values if isinstance(values, Mapping) else {},
+        )
+        if t1473_extra:
+            observation_provenance = {
+                **(observation_provenance or {}),
+                **t1473_extra,
+            }
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
@@ -13879,6 +14456,10 @@ class Migrator:
                 phase,
                 polymorph=polymorph_from_extract(obs, species_formula),
             )
+        if isinstance(q_token, Quantity) and q_token in _T1473_QUANTITIES:
+            species = t1473_species(
+                q_token, species, values if isinstance(values, Mapping) else {}
+            )
 
         t_payload = dict(values)
         if (
@@ -13888,6 +14469,8 @@ class Migrator:
             t_payload.setdefault("temperature_K", t_payload["reference_temperature_K"])
         if obs.get("T_K") is not None:
             t_payload.setdefault("T_K", obs.get("T_K"))
+        if obs.get("T_C") is not None and q_token in _T1473_QUANTITIES:
+            t_payload.setdefault("T_C", obs.get("T_C"))
         if obs.get("T_range_K") is not None:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
@@ -14368,6 +14951,15 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.unknown(
                 f"source {name} [{lo}, {hi}]; no midpoint invented"
             )
+        if isinstance(q_token, Quantity) and q_token in _T1473_QUANTITIES:
+            ident_kwargs.update(
+                t1473_identity_kwargs(
+                    q_token,
+                    values if isinstance(values, Mapping) else {},
+                    obs,
+                    temperature_K=ident_kwargs.get("temperature_K"),
+                )
+            )
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
         if (
@@ -14744,6 +15336,17 @@ class Migrator:
                         atmosphere_note, fo2_locator
                     )
             point_conditions = residue_conditions or None
+        if q_token in _T1473_QUANTITIES:
+            explicit_t1473 = {}
+            explicit_t1473.update(_explicit_point_conditions(obs.get("point_conditions")))
+            explicit_t1473.update(
+                _explicit_point_conditions(values.get("point_conditions"))
+            )
+            if explicit_t1473:
+                point_conditions = {
+                    **(point_conditions or {}),
+                    **explicit_t1473,
+                }
         if q_token in PHASE_ROW_QUANTITIES:
             # Parent rows do not otherwise ingest point_conditions. These
             # four quantities do: the printed atmosphere and the printed sum

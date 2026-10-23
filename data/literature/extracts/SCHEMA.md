@@ -366,6 +366,7 @@ Required printed identity:
 | `values.element` | Element, as printed |
 | `values.basis` | `atom` or `mass`, and only when the source states that basis |
 | `values.basis_as_printed` | The source's basis words, always, verbatim |
+| `values.normalising_element` | The element of a printed normalised ratio, such as Ca in `(K/Ca)/(K/Ca)_0`. Omit when the source prints an absolute fraction |
 | `T_C` or `T_K` | Temperature |
 | `values.duration` or `values.time_point` | Duration or time point, with its unit |
 | `values.atmosphere` or `values.pressure` | Atmosphere or pressure, as printed |
@@ -382,9 +383,13 @@ evidence-class token.
 
 A basis that is neither `atom` nor `mass` stays in `basis_as_printed` and
 `basis` is omitted. Do not coerce it. Neuman 2021 Table 2 prints
-`(K/Ca)/(K/Ca)0` (and the Cu and Zn analogues), which is a Ca-normalised
-ratio. Whether those rows use this token is a sign-off question; this diff
-does not rewrite them onto `atom` or `mass`.
+`(K/Ca)/(K/Ca)0` (and the Cu and Zn analogues). Those rows stay
+`element_fraction_remaining`. `basis` is omitted, `basis_as_printed` keeps
+the source words, and `normalising_element` is Ca. Do not convert the ratio
+to an absolute fraction at extraction. When the source prints a retention
+assumption, copy it to `values.retention_assumption`. That note is not a
+scorer input. A row with a normaliser and a row without one are different
+identities and are not pooled.
 
 `mass_loss_fraction` is the fraction of sample mass lost. `yield_fraction`
 is a pyrolysis yield. `residue_component_composition` is a residue amount

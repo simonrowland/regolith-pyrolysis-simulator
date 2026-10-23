@@ -336,6 +336,9 @@ _AXIS_NAMES = (
     "wall",
     "phase_role",
     "counter_phase_role",
+    # Element-fraction rows only. Other profiles leave it absent so stored
+    # group keys and equality of existing quantities do not grow an axis.
+    "normalising_element",
 )
 
 # These printed axes can be retained on p_partial rows but do not describe the
@@ -395,6 +398,7 @@ class Identity:
     wall: State[WallIdentity] | None = None
     phase_role: State[PhaseRole] | None = None
     counter_phase_role: State[PhaseRole] | None = None
+    normalising_element: State[str] | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.quantity, Quantity):
@@ -852,6 +856,77 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "wall",
             "reservoir",
         )
+    elif q is Quantity.CONDENSATION_COEFFICIENT:
+        # Surface temperature, substrate wall, and total pressure. Species is
+        # the condensing gas. Vapour temperature and substrate phase stay on
+        # provenance; normalising_element is not this quantity's axis.
+        req("temperature_K", "wall", "total_pressure_Pa")
+        na(
+            "subtype",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "phase_role",
+            "counter_phase_role",
+        )
+    elif q is Quantity.EVAPORATION_FLUX:
+        req(
+            "temperature_K",
+            "composition",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "subtype",
+        )
+        na(
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "sample_mass_kg",
+            "wall",
+            "phase_role",
+            "counter_phase_role",
+        )
+    elif q is Quantity.ELEMENT_FRACTION_REMAINING:
+        # subtype and normalising_element are required and permitted-n/a:
+        # a printed atom/mass or normaliser is kept, and an omitted one is
+        # not_applicable. Those two states do not compare equal.
+        req(
+            "temperature_K",
+            "subtype",
+            "composition",
+            "exposure",
+            "total_pressure_Pa",
+            "sample_mass_kg",
+            "sweep_gas",
+            "normalising_element",
+        )
+        na(
+            "subtype",
+            "normalising_element",
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "wall",
+            "phase_role",
+            "counter_phase_role",
+        )
     else:  # pragma: no cover — closed enum
         req("temperature_K")
 
@@ -859,7 +934,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
-        exposure_area_required=q in KINETIC_YIELD_QUANTITIES,
+        exposure_area_required=(
+            q in KINETIC_YIELD_QUANTITIES
+            or q in {Quantity.EVAPORATION_FLUX, Quantity.ELEMENT_FRACTION_REMAINING}
+        ),
     )
 
 
