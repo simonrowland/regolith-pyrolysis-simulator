@@ -2247,6 +2247,39 @@ def test_repo_extracts_validate_green():
     assert errors == [], "\n".join(errors[:20])
 
 
+def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
+    path = EXTRACTS / "kems-026-markova-1984.yaml"
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    assert len(migrator.result.validation.hard_issues) == 8
+
+    for panel, experiment_suffix in (
+        ("VI_lherzolite", "VI"),
+        ("V_alumina_basalt", "V"),
+    ):
+        experiment = next(
+            item
+            for item in migrator.result.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{experiment_suffix}")
+        )
+        assert experiment.sample.mass_kg.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
+        assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
+        assert experiment.thermal_schedule.method.state.value == (
+            "Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps"
+        )
+        assert experiment.thermal_schedule.total_duration_s.state.tag == "unknown"
+        rows = [
+            item
+            for item in migrator.result.observations.values()
+            if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+        ]
+        assert rows
+        assert all(item.experiment_id == experiment.experiment_id for item in rows)
+
+
 def test_richter_2007_table1_residues_link_to_their_runs() -> None:
     from simulator.battery.enums import Quantity
     from simulator.battery.migrate import Migrator

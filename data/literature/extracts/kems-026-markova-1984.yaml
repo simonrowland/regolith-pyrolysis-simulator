@@ -137,6 +137,100 @@ benches:
       pdf_page_index: 1
       section: experimental method
       note: The abstract does not print the cell material; no material is inferred from Yakovlev 1983.
+experiments:
+- experiment_id: VI
+  bench_id: markova-1984-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    section: experimental method
+    note: Stepwise-heating run for sample VI (lherzolite), reported in Table 2.
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: The abstract names the samples but gives no charge mass.
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 44.02, Al2O3: 4.56, FeO: 8.04, MgO: 36.44, CaO: 6.95}
+      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample VI (lherzolite), wt%'}
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 509
+          pdf_page_index: 1
+          section: experimental method
+          note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps}
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        section: experimental method
+        note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
+- experiment_id: V
+  bench_id: markova-1984-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    section: experimental method
+    note: Stepwise-heating run for sample V (alumina basalt), reported in Table 2.
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names the samples but gives no charge mass.}
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 52.32, Al2O3: 19.13, FeO: 9.37, MgO: 6.25, CaO: 12.93}
+      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample V (alumina basalt), wt%'}
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps}
+      locator: {published_page: 509, pdf_page_index: 1, section: experimental method}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: 'A duration is printed for each temperature step, but the number of steps and total duration are not printed.'}
 species:
   SiO2:
     observations:
@@ -278,6 +372,7 @@ species:
         note: No per-cell uncertainty printed. Column totals are printed under the table (100.05, 99.9,
           99.25, 96.30, 100.10, 95.9, 97.17) and are not recomputed here.
     - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
+      experiment: VI
       type: rate_series
       locator:
         table: '2'
@@ -461,6 +556,7 @@ species:
       uncertainty:
         note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
     - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
+      experiment: V
       type: rate_series
       locator:
         table: '2'
