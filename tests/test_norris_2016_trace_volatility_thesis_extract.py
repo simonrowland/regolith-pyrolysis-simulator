@@ -25,7 +25,10 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         for item in source["species"].values()
         for row in item.get("observations", [])
     }
-    for row in source_observations.values():
+    for row in (
+        row for row in source_observations.values()
+        if row["values"].get("quantity") == "residue_component_composition"
+    ):
         oxygen = row["values"]["log10_fO2"]
         assert oxygen["units"] == "log10(atm)"
         assert oxygen["locator"]["page"] == 224
@@ -41,20 +44,39 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         assert row["values"]["residue_ppm"] == value
         assert row["uncertainty"]["sigma_ppm"] == sigma
 
-    assert sum(
-        len(item.get("observations", [])) for item in source["species"].values()
-    ) == 160
+    all_source_rows = [
+        row
+        for item in source["species"].values()
+        for row in item.get("observations", [])
+    ]
+    assert len(all_source_rows) == 224
     assert len(source["experiments"]) == 10
-    table57 = next(
-        row for row in source["species"]["basaltic_silicate_melt"]["context"]
-        if row["observation_id"] == "norris_2016_table57_volatility_factors"
+    table57_rows = [
+        row for row in all_source_rows
+        if row["values"].get("quantity") == "element_fraction_remaining"
+    ]
+    assert len(table57_rows) == 64
+    assert not any(
+        row["observation_id"] == "norris_2016_table57_volatility_factors"
+        for row in source["species"]["basaltic_silicate_melt"]["context"]
     )
-    assert table57["values"]["admission_status"] == "typed_refusal"
-    assert len(table57["values"]["values_by_log_fO2"]) == 4
-    assert sum(
-        len(elements)
-        for elements in table57["values"]["values_by_log_fO2"].values()
-    ) == 64
+    assert all(row["admission_status"] == "admitted" for row in table57_rows)
+    assert all("basis" not in row["values"] for row in table57_rows)
+    assert all("normalising_element" not in row["values"] for row in table57_rows)
+    assert all(row["values"]["method_class"] == "model_derived" for row in table57_rows)
+    expected_table57 = {
+        "norris_2016_ag_f008_table57_fraction_remaining": ("0.646", "0.117"),
+        "norris_2016_cr_f014_table57_fraction_remaining": ("1.192", "0.179"),
+        "norris_2016_w_f018_table57_fraction_remaining": ("2.223", "0.365"),
+        "norris_2016_zn_f019_table57_fraction_remaining": ("0.130", "0.087"),
+    }
+    rows_by_id = {row["observation_id"]: row for row in table57_rows}
+    for observation_id, (ratio, sigma) in expected_table57.items():
+        row = rows_by_id[observation_id]
+        assert row["values"]["fraction_remaining"] == ratio
+        assert row["uncertainty"]["sigma"] == sigma
+        assert row["locator"]["page"] == 232
+        assert row["locator"]["table"] == "5.7"
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -89,6 +111,36 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
             Decimal("-13"),
         }
         assert row.point_conditions["starting_composition"].locator.page == 220
+
+    migrated_table57 = [
+        row for row in result.observations.values()
+        if row.source_id == source["source_id"]
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "element_fraction_remaining"
+    ]
+    assert len(migrated_table57) == 64
+    assert all(row.admission.status.value == "admitted" for row in migrated_table57)
+    for row in migrated_table57:
+        assert row.identity.species.phase.value is Phase.GLASS
+        assert row.identity.normalising_element.is_not_applicable
+        assert row.identity.temperature_K.value == Decimal("1573.15")
+        assert row.identity.composition.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        assert row.identity.exposure.value.duration_s.value == Decimal("3600")
+        assert row.point_conditions["temperature_K"].state.value == Decimal("1573.15")
+        assert row.point_conditions["fO2_log"].state.value in {
+            Decimal("-7"), Decimal("-9"), Decimal("-11"), Decimal("-13")
+        }
+        assert row.point_conditions["fO2_log"].locator.table == "5.4"
+        assert row.point_conditions["atmosphere"].state.value == "CO/CO2"
+        assert row.point_conditions["total_pressure_Pa"].locator.section == "5.2"
+    for observation_id, (ratio, sigma) in expected_table57.items():
+        row = next(
+            row for row in migrated_table57
+            if row.observation_id.endswith(f"::{observation_id}")
+        )
+        assert row.value.point == Decimal(ratio)
+        assert row.uncertainty.verbatim["sigma"] == sigma
 
     migrated_by_id = {row.observation_id: row for row in residue_rows}
     for observation_id, (value, _) in expected.items():

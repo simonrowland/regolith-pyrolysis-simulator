@@ -9243,6 +9243,8 @@ def _composition_state_from_printed(raw: object, *, absent: str) -> State[Compos
         return State.unknown(absent)
     if isinstance(raw, Mapping) and raw.get("state") == "not_printed":
         return State.unknown(absent)
+    if _mass_percent_components(raw) is not None:
+        return _composition_located_from_plain(raw).state
     composition = _element_amount_composition(raw)
     if composition is not None:
         return State.of(composition)

@@ -28,6 +28,7 @@ from simulator.battery.migrate import (
     fill_identity,
     make_species,
     map_quantity,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Composition, State
 from simulator.battery.score import (
@@ -263,6 +264,39 @@ def test_temperature_and_point_conditions_reach_the_observation(tmp_path: Path) 
         assert located.state.value == "H2/CO2"
         assert located.locator.table == "1"
         assert located.locator.page == 4
+
+
+def test_fraction_remaining_converts_labelled_starting_oxide_wt_pct(
+    tmp_path: Path,
+) -> None:
+    wt_pct = {"SiO2": Decimal("70"), "Al2O3": Decimal("30")}
+    extract = _scalar_extract(
+        quantity="element_fraction_remaining",
+        units="dimensionless",
+        values={
+            "quantity": "element_fraction_remaining",
+            "element": "Mg",
+            "fraction_remaining": "0.8",
+            "basis_as_printed": "mole fraction single cation oxide",
+            "starting_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mass_percent",
+                        "components": [[name, str(amount)] for name, amount in wt_pct.items()],
+                    },
+                },
+                "locator": {"page": 220, "table": "5.2"},
+            },
+            "method_class": "model_derived",
+        },
+        obs_type="concentration_series",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observations = list(result.observations.values())
+    assert len(observations) == 1
+    assert observations[0].identity.composition.value == wt_pct_to_mole_fraction(wt_pct)
 
 
 def _fraction_identity(*, normaliser: State[str]) -> object:

@@ -2066,6 +2066,271 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_ag_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ag at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.117'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ag
+        fraction_remaining: '0.646'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: &norris_t1473_002
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '50.66'
+              - - TiO2
+                - '0.96'
+              - - Al2O3
+                - '15.11'
+              - - FeO
+                - '9.69'
+              - - MnO
+                - '0.20'
+              - - MgO
+                - '8.90'
+              - - CaO
+                - '12.28'
+              - - Na2O
+                - '1.96'
+              - - K2O
+                - '0.07'
+          locator:
+            page: 220
+            pdf_page_index: 219
+            table: '5.2'
+            note: EBT1 starting-material composition measured on glass produced in a 1.5 GPa piston-cylinder run; values kept as printed.
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: &norris_t1473_001
+            page: 224
+            pdf_page_index: 223
+            table: '5.4'
+            note: Successful stirred-furnace run conditions; source states the furnace experiments are at one atmosphere.
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: &norris_t1473_003
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
+            note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
+      admission_status: admitted
+    - observation_id: norris_2016_ag_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ag at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.017'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ag
+        fraction_remaining: '0.198'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: &norris_t1473_004
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
+            note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
+      admission_status: admitted
+    - observation_id: norris_2016_ag_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ag at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.007'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ag
+        fraction_remaining: '0.127'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: &norris_t1473_005
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
+            note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
+      admission_status: admitted
+    - observation_id: norris_2016_ag_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ag at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.019'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ag
+        fraction_remaining: '0.022'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: &norris_t1473_006
+            page: 196
+            pdf_page_index: 195
+            section: '5.2'
+            note: One-atmosphere gas-mixing furnace, Chapter 5 volatile-loss setup.
+      admission_status: admitted
   Bi:
     observations:
     - observation_id: norris_2016_bi_f006_table56_residue
@@ -3077,6 +3342,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_bi_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Bi at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.080'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Bi
+        fraction_remaining: '0.227'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_bi_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Bi at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.078'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Bi
+        fraction_remaining: '0.170'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_bi_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Bi at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.007'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Bi
+        fraction_remaining: '0.074'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_bi_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Bi at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.007'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Bi
+        fraction_remaining: '0.008'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Cd:
     observations:
@@ -4090,6 +4571,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_cd_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cd at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.057'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cd
+        fraction_remaining: '0.228'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_cd_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cd at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.014'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cd
+        fraction_remaining: '0.071'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_cd_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cd at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.003'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cd
+        fraction_remaining: '0.019'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_cd_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cd at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.009'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cd
+        fraction_remaining: '0.019'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   Cr:
     observations:
     - observation_id: norris_2016_cr_f006_table56_residue
@@ -5101,6 +5798,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_cr_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cr at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.179'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cr
+        fraction_remaining: '1.021'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_cr_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cr at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.179'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cr
+        fraction_remaining: '1.192'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_cr_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cr at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.150'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cr
+        fraction_remaining: '0.998'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_cr_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cr at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.265'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cr
+        fraction_remaining: '1.171'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Cu:
     observations:
@@ -6114,6 +7027,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_cu_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cu at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.072'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cu
+        fraction_remaining: '0.618'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_cu_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cu at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.030'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cu
+        fraction_remaining: '0.331'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_cu_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cu at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.030'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cu
+        fraction_remaining: '0.367'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_cu_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Cu at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.138'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Cu
+        fraction_remaining: '0.176'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   Ga:
     observations:
     - observation_id: norris_2016_ga_f006_table56_residue
@@ -7125,6 +8254,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_ga_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ga at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.432'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ga
+        fraction_remaining: '1.454'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_ga_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ga at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.361'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ga
+        fraction_remaining: '1.217'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_ga_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ga at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.388'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ga
+        fraction_remaining: '1.314'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_ga_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ga at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.380'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ga
+        fraction_remaining: '0.669'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Ge:
     observations:
@@ -8138,6 +9483,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_ge_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ge at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.090'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ge
+        fraction_remaining: '0.315'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_ge_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ge at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.050'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ge
+        fraction_remaining: '0.168'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_ge_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ge at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.013'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ge
+        fraction_remaining: '0.045'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_ge_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Ge at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.005'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Ge
+        fraction_remaining: '0.014'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   In:
     observations:
     - observation_id: norris_2016_in_f006_table56_residue
@@ -9149,6 +10710,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_in_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for In at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.095'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: In
+        fraction_remaining: '0.816'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_in_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for In at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.074'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: In
+        fraction_remaining: '0.622'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_in_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for In at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.068'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: In
+        fraction_remaining: '0.621'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_in_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for In at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.142'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: In
+        fraction_remaining: '0.192'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Mo:
     observations:
@@ -10162,6 +11939,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_mo_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Mo at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.144'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Mo
+        fraction_remaining: '1.260'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_mo_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Mo at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.125'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Mo
+        fraction_remaining: '1.168'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_mo_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Mo at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.120'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Mo
+        fraction_remaining: '1.130'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_mo_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Mo at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.349'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Mo
+        fraction_remaining: '0.624'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   Pb:
     observations:
     - observation_id: norris_2016_pb_f006_table56_residue
@@ -11173,6 +13166,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_pb_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Pb at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.087'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Pb
+        fraction_remaining: '1.030'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_pb_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Pb at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.069'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Pb
+        fraction_remaining: '0.646'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_pb_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Pb at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.022'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Pb
+        fraction_remaining: '0.365'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_pb_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Pb at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.099'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Pb
+        fraction_remaining: '0.116'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Sb:
     observations:
@@ -12186,6 +14395,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_sb_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sb at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.084'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sb
+        fraction_remaining: '0.457'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_sb_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sb at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.071'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sb
+        fraction_remaining: '0.210'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_sb_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sb at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.001'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sb
+        fraction_remaining: '0.012'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_sb_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sb at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.001'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sb
+        fraction_remaining: '0.002'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   Sn:
     observations:
     - observation_id: norris_2016_sn_f006_table56_residue
@@ -13197,6 +15622,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_sn_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sn at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.031'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sn
+        fraction_remaining: '0.471'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_sn_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sn at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.017'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sn
+        fraction_remaining: '0.194'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_sn_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sn at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.009'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sn
+        fraction_remaining: '0.201'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_sn_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Sn at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.035'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Sn
+        fraction_remaining: '0.038'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   Tl:
     observations:
@@ -14210,6 +16851,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_tl_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Tl at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.052'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Tl
+        fraction_remaining: '0.525'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_tl_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Tl at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.040'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Tl
+        fraction_remaining: '0.397'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_tl_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Tl at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.007'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Tl
+        fraction_remaining: '0.125'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_tl_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Tl at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.057'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Tl
+        fraction_remaining: '0.069'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   V:
     observations:
     - observation_id: norris_2016_v_f006_table56_residue
@@ -15221,6 +18078,222 @@ species:
             value: CO/CO2
           locator: *id002
       experiment: F019
+      admission_status: admitted
+    - observation_id: norris_2016_v_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for V at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.141'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: V
+        fraction_remaining: '1.219'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_v_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for V at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.139'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: V
+        fraction_remaining: '1.226'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_v_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for V at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.134'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: V
+        fraction_remaining: '1.179'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_v_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for V at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.125'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: V
+        fraction_remaining: '1.112'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
       admission_status: admitted
   W:
     observations:
@@ -16234,6 +19307,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_w_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for W at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.416'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: W
+        fraction_remaining: '2.508'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_w_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for W at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.383'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: W
+        fraction_remaining: '2.347'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_w_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for W at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.365'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: W
+        fraction_remaining: '2.223'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_w_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for W at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.405'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: W
+        fraction_remaining: '1.975'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   Zn:
     observations:
     - observation_id: norris_2016_zn_f006_table56_residue
@@ -17246,6 +20535,222 @@ species:
           locator: *id002
       experiment: F019
       admission_status: admitted
+    - observation_id: norris_2016_zn_f008_table57_fraction_remaining
+      experiment: F008
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Zn at log(fO2) -7; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.069'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Zn
+        fraction_remaining: '1.038'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-7'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_003
+      admission_status: admitted
+    - observation_id: norris_2016_zn_f014_table57_fraction_remaining
+      experiment: F014
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Zn at log(fO2) -9; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.053'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Zn
+        fraction_remaining: '0.617'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-9'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_004
+      admission_status: admitted
+    - observation_id: norris_2016_zn_f018_table57_fraction_remaining
+      experiment: F018
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Zn at log(fO2) -11; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.021'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Zn
+        fraction_remaining: '0.488'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-11'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_005
+      admission_status: admitted
+    - observation_id: norris_2016_zn_f019_table57_fraction_remaining
+      experiment: F019
+      type: concentration_series
+      locator:
+        page: 232
+        pdf_page_index: 231
+        table: '5.7'
+        note: Computed volatility factor X_final/X_initial for Zn at log(fO2) -13; concentrations are mole fraction single cation oxide. Authors state Cr, V and Mo are within error of starting composition, W is likely contaminated by tungsten-rich tool steel, and Ga shows essentially no volatile loss (text following Table 5.7).
+      phase: glass
+      units: dimensionless
+      uncertainty:
+        sigma: '0.087'
+        note: Printed σ; the table gives no further interpretation.
+      values:
+        quantity: element_fraction_remaining
+        element: Zn
+        fraction_remaining: '0.130'
+        basis_as_printed: mole fraction single cation oxide
+        duration:
+          value: '60'
+          unit: min
+        atmosphere: CO/CO2
+        pressure: 1 atm
+        starting_composition: *norris_t1473_002
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+        method_class: model_derived
+      T_C: '1300'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1300'
+          locator: *norris_t1473_001
+        fO2_log:
+          state:
+            tag: value
+            value: '-13'
+          locator: *norris_t1473_001
+        atmosphere:
+          state:
+            tag: value
+            value: CO/CO2
+          locator: *norris_t1473_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator: *norris_t1473_006
+      admission_status: admitted
   basaltic_silicate_melt:
     observations: []
     context:
@@ -17301,243 +20806,6 @@ species:
             sigma: '1.02'
             RSD_percent: '2.0'
         normalisation: Variable Ni2O content normalised away; no per-run values or binding.
-    - observation_id: norris_2016_table57_volatility_factors
-      type: context
-      locator:
-        page: 232
-        pdf_page_index: 231
-        table: '5.7'
-        note: Computed volatility factors for 60-minute experiments; printed form X_final/X_initial, concentrations
-          expressed as mole fraction single-cation oxide.
-      units: dimensionless ratio as printed
-      values:
-        quantity: volatility_factor_schema_gap
-        admission_status: typed_refusal
-        reason: No quantity token represents the printed retained-concentration ratio X_final/X_initial; preserve it as context pending the fraction-remaining ruling.
-        definition: X_final/X_initial; concentration ratio, not a mass-loss fraction. Pending fraction-remaining
-          physics ruling t-1473.
-        evidence_class: model_derived
-        values_by_log_fO2:
-          '-7':
-            Ag:
-              ratio: '0.646'
-              sigma: '0.117'
-            Bi:
-              ratio: '0.227'
-              sigma: '0.080'
-            Cd:
-              ratio: '0.228'
-              sigma: '0.057'
-            Cr:
-              ratio: '1.021'
-              sigma: '0.179'
-            Cu:
-              ratio: '0.618'
-              sigma: '0.072'
-            Ga:
-              ratio: '1.454'
-              sigma: '0.432'
-            Ge:
-              ratio: '0.315'
-              sigma: '0.090'
-            In:
-              ratio: '0.816'
-              sigma: '0.095'
-            Mo:
-              ratio: '1.260'
-              sigma: '0.144'
-            Pb:
-              ratio: '1.030'
-              sigma: '0.087'
-            Sb:
-              ratio: '0.457'
-              sigma: '0.084'
-            Sn:
-              ratio: '0.471'
-              sigma: '0.031'
-            Tl:
-              ratio: '0.525'
-              sigma: '0.052'
-            V:
-              ratio: '1.219'
-              sigma: '0.141'
-            W:
-              ratio: '2.508'
-              sigma: '0.416'
-            Zn:
-              ratio: '1.038'
-              sigma: '0.069'
-          '-9':
-            Ag:
-              ratio: '0.198'
-              sigma: '0.017'
-            Bi:
-              ratio: '0.170'
-              sigma: '0.078'
-            Cd:
-              ratio: '0.071'
-              sigma: '0.014'
-            Cr:
-              ratio: '1.192'
-              sigma: '0.179'
-            Cu:
-              ratio: '0.331'
-              sigma: '0.030'
-            Ga:
-              ratio: '1.217'
-              sigma: '0.361'
-            Ge:
-              ratio: '0.168'
-              sigma: '0.050'
-            In:
-              ratio: '0.622'
-              sigma: '0.074'
-            Mo:
-              ratio: '1.168'
-              sigma: '0.125'
-            Pb:
-              ratio: '0.646'
-              sigma: '0.069'
-            Sb:
-              ratio: '0.210'
-              sigma: '0.071'
-            Sn:
-              ratio: '0.194'
-              sigma: '0.017'
-            Tl:
-              ratio: '0.397'
-              sigma: '0.040'
-            V:
-              ratio: '1.226'
-              sigma: '0.139'
-            W:
-              ratio: '2.347'
-              sigma: '0.383'
-            Zn:
-              ratio: '0.617'
-              sigma: '0.053'
-          '-11':
-            Ag:
-              ratio: '0.127'
-              sigma: '0.007'
-            Bi:
-              ratio: '0.074'
-              sigma: '0.007'
-            Cd:
-              ratio: '0.019'
-              sigma: '0.003'
-            Cr:
-              ratio: '0.998'
-              sigma: '0.150'
-            Cu:
-              ratio: '0.367'
-              sigma: '0.030'
-            Ga:
-              ratio: '1.314'
-              sigma: '0.388'
-            Ge:
-              ratio: '0.045'
-              sigma: '0.013'
-            In:
-              ratio: '0.621'
-              sigma: '0.068'
-            Mo:
-              ratio: '1.130'
-              sigma: '0.120'
-            Pb:
-              ratio: '0.365'
-              sigma: '0.022'
-            Sb:
-              ratio: '0.012'
-              sigma: '0.001'
-            Sn:
-              ratio: '0.201'
-              sigma: '0.009'
-            Tl:
-              ratio: '0.125'
-              sigma: '0.007'
-            V:
-              ratio: '1.179'
-              sigma: '0.134'
-            W:
-              ratio: '2.223'
-              sigma: '0.365'
-            Zn:
-              ratio: '0.488'
-              sigma: '0.021'
-          '-13':
-            Ag:
-              ratio: '0.022'
-              sigma: '0.019'
-            Bi:
-              ratio: '0.008'
-              sigma: '0.007'
-            Cd:
-              ratio: '0.019'
-              sigma: '0.009'
-            Cr:
-              ratio: '1.171'
-              sigma: '0.265'
-            Cu:
-              ratio: '0.176'
-              sigma: '0.138'
-            Ga:
-              ratio: '0.669'
-              sigma: '0.380'
-            Ge:
-              ratio: '0.014'
-              sigma: '0.005'
-            In:
-              ratio: '0.192'
-              sigma: '0.142'
-            Mo:
-              ratio: '0.624'
-              sigma: '0.349'
-            Pb:
-              ratio: '0.116'
-              sigma: '0.099'
-            Sb:
-              ratio: '0.002'
-              sigma: '0.001'
-            Sn:
-              ratio: '0.038'
-              sigma: '0.035'
-            Tl:
-              ratio: '0.069'
-              sigma: '0.057'
-            V:
-              ratio: '1.112'
-              sigma: '0.125'
-            W:
-              ratio: '1.975'
-              sigma: '0.405'
-            Zn:
-              ratio: '0.130'
-              sigma: '0.087'
-        elements:
-        - Ag
-        - Bi
-        - Cd
-        - Cr
-        - Cu
-        - Ga
-        - Ge
-        - In
-        - Mo
-        - Pb
-        - Sb
-        - Sn
-        - Tl
-        - V
-        - W
-        - Zn
-        run_duration_min: 60
-        conditions:
-          T_C: '1300'
-          log_fO2: '-7, -9, -11, -13'
-          pressure: 1 atm
-          furnace_gas: CO/CO2
-        row_count: 64
     - observation_id: norris_2016_related_2017_nature_experiments
       type: context
       locator:
