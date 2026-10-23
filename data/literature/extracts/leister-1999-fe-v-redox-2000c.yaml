@@ -1,0 +1,5016 @@
+schema_version: literature_extract.v1
+source_id: leister-1999-fe-v-redox-2000c
+source:
+  citation: Leister, M. and Ehrt, D. (1999). Redox behavior of iron and vanadium ions in silicate melts at temperatures
+    up to 2000°C. Glass Science and Technology 72(5), 153–160.
+  year: 1999
+  corpus_asset: raw/leister-1999-fe-v-redox-2000c/leister-1999-fe-v-redox-2000c.pdf
+  sha256: a34f12ea0e9c4efef6a219fb06937e77bfa89ead9bfea861429e9b8b4822bec5
+extraction:
+  method: MinerU table draft plus authoritative pdftotext-layout transcription for Tables 2 and 3; each table grid
+    and row-to-column binding checked against a 600 dpi render. Table 1 is retained as context because its redox
+    reaction ΔH°/ΔS° values have no matching store token. Figures 1–12 are recorded without digitized points.
+  date: '2026-10-19'
+  worker: fam17-1019
+  table_disposition:
+    Table 1: 'context-model: calculated redox reaction ΔH° and ΔS°; candidate tokens considered, none fits.'
+    Table 2: 'typed: all 12 glass-condition rows, Fe3+ and Fe2+ valence fractions.'
+    Table 3: 'typed: all 10 glass-condition rows, V5+, V4+, and V3+ valence fractions; n.d. is unavailable and <0.5
+      remains a bound.'
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[leister_1999_table2_fe3_valence_fraction].values.points[0].value
+  value: '97'
+  note: Table 2 render, physical PDF page 3, row 2, Fe3+.
+- path: species.V.observations[leister_1999_table3_v5_valence_fraction].values.points[0].value
+  value: '95'
+  note: Table 3 render, physical PDF page 5, row 2, V5+.
+- path: species.V.observations[leister_1999_table3_v3_valence_fraction].values.points[4].value
+  value: '72'
+  note: Table 3 render, physical PDF page 5, row 6, V3+.
+species:
+  Fe:
+    observations:
+    - observation_id: leister_1999_table2_fe3_valence_fraction
+      type: concentration_series
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 155
+        table: '2'
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Optical absorption spectroscopy
+      units: '%'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from
+            wet-chemically determined total iron. The paper does not tabulate the spectral inputs.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 155
+              table: '2'
+              note: Numerical optical absorption measurements used for this row series are not tabulated; spectra
+                are shown in figures 2–5.
+          output_unit: fraction of total element; printed percentages retained
+        points:
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row02
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; air; 30 min
+          T_C: '1600'
+          value: '97'
+          value_as_printed: '97'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '2'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: &id002
+                page: 2
+                pdf_page_index: 1
+                published_page: 154
+                section: Experimental procedure
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id001
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id001
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row03
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; argon; 30 min
+          T_C: '1600'
+          value: '94'
+          value_as_printed: '94'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '3'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id003
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id003
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row04
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 30 min
+          T_C: '1800'
+          value: '86'
+          value_as_printed: '86'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '4'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id004
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id004
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row05
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 160 min
+          T_C: '1800'
+          value: '70'
+          value_as_printed: '70'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '5'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '160'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id005
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id005
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row06
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 2000°C; argon; 30 min
+          T_C: '2000'
+          value: '80'
+          value_as_printed: '80'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '6'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id006
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id006
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row07
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1500°C; air; 960 min
+          T_C: '1500'
+          value: '89'
+          value_as_printed: '89'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '7'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1500'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '960'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id007
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id007
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row08
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1550°C; air; 960 min
+          T_C: '1550'
+          value: '87'
+          value_as_printed: '87'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '8'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1550'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '960'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id008
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id008
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row09
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; air; 720 min
+          T_C: '1600'
+          value: '86'
+          value_as_printed: '86'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '9'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '720'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id009
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id009
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row10
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1700°C; air; 360 min
+          T_C: '1700'
+          value: '82'
+          value_as_printed: '82'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '10'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1700'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '360'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id010
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id010
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row11
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 300 min
+          T_C: '1600'
+          value: '73'
+          value_as_printed: '73'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '11'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '300'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id011
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id011
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row12
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1800°C; argon; 145 min
+          T_C: '1800'
+          value: '65'
+          value_as_printed: '65'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '12'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '145'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id012
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id012
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row13
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 2000°C; argon; 35 min
+          T_C: '2000'
+          value: '52'
+          value_as_printed: '52'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '13'
+            column: Fe3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id013
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id013
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+    - observation_id: leister_1999_table2_fe2_valence_fraction
+      type: concentration_series
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 155
+        table: '2'
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Optical absorption spectroscopy
+      units: '%'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 2
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: Fe2+ was quantified from its optical absorption band; Fe3+ was calculated by difference from
+            wet-chemically determined total iron. The paper does not tabulate the spectral inputs.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 155
+              table: '2'
+              note: Numerical optical absorption measurements used for this row series are not tabulated; spectra
+                are shown in figures 2–5.
+          output_unit: fraction of total element; printed percentages retained
+        points:
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row02
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; air; 30 min
+          T_C: '1600'
+          value: '3'
+          value_as_printed: '3'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '2'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id014
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id014
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row03
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; argon; 30 min
+          T_C: '1600'
+          value: '6'
+          value_as_printed: '6'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '3'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id015
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id015
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row04
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 30 min
+          T_C: '1800'
+          value: '14'
+          value_as_printed: '14'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '4'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id016
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id016
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row05
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 160 min
+          T_C: '1800'
+          value: '30'
+          value_as_printed: '30'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '5'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '160'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id017
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '5'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id017
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row06
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 33Na2O · 67SiO2; 2000°C; argon; 30 min
+          T_C: '2000'
+          value: '20'
+          value_as_printed: '20'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '6'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '30'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id018
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '6'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id018
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row07
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1500°C; air; 960 min
+          T_C: '1500'
+          value: '11'
+          value_as_printed: '11'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '7'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1500'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '960'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id019
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '7'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id019
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row08
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1550°C; air; 960 min
+          T_C: '1550'
+          value: '13'
+          value_as_printed: '13'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '8'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1550'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '960'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id020
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '8'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id020
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row09
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; air; 720 min
+          T_C: '1600'
+          value: '14'
+          value_as_printed: '14'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '9'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '720'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id021
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '9'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id021
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row10
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1700°C; air; 360 min
+          T_C: '1700'
+          value: '17'
+          value_as_printed: '17'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '10'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1700'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '360'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id022
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '10'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id022
+          quench_statement:
+            text: To freeze the redox ratios, the melts were quenched by casting on a copper block; the glasses
+              were then annealed.
+            preservation: asserted_preserved
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row11
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 300 min
+          T_C: '1600'
+          value: '27'
+          value_as_printed: '27'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '11'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '300'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id023
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '11'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id023
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row12
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 1800°C; argon; 145 min
+          T_C: '1800'
+          value: '35'
+          value_as_printed: '35'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '12'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '145'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id024
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '12'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id024
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+        - sample_id: leister-1999-fe-v-redox-2000c_table2_row13
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) Fe2O3 (0.27 mol%)
+          label: 15Na2O · 85SiO2; 2000°C; argon; 35 min
+          T_C: '2000'
+          value: '48'
+          value_as_printed: '48'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '2'
+            row: '13'
+            column: Fe2+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '35'
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id025
+                page: 3
+                pdf_page_index: 2
+                published_page: 155
+                table: '2'
+                row: '13'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id025
+          quench_statement:
+            text: The paper reports that the 1600–2000°C melts were quenched by centrifugal casting in a cold graphite
+              mould; preservation of the row-specific Fe redox ratio is not stated.
+            preservation: not_stated
+            quench_direction: not_stated
+            locator: *id002
+    context:
+    - observation_id: leister_1999_table1_fe_redox_reaction_thermodynamics_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 155
+        table: '1'
+      units: ΔH° kJ·mol−1; ΔS° J·mol−1·K−1
+      attribution: Leister and Ehrt (1999), calculated from square-wave voltammetric standard potentials and temperature
+        dependence.
+      values:
+        quantity_as_printed: standard reaction enthalpy ΔH° and standard reaction entropy ΔS° for the listed redox
+          transitions, assuming equilibrium with air
+        quantity: unavailable
+        candidate_tokens_considered:
+        - delta_fH
+        - H_minus_H298
+        - S
+        - entropy_of_fusion
+        schema_gap: No token represents standard reaction enthalpy/entropy for these redox reactions. delta_fH means
+          formation from elements, and S is absolute entropy; neither is the printed reaction quantity.
+        method_class: model_derived
+        admission_status: typed_unavailable
+        p_O2_as_printed:
+          value: '21'
+          units: kPa
+          condition: equilibrium with air
+        rows:
+        - glass: 33Na2O · 67SiO2
+          redox_transition: Fe3+/Fe2+
+          delta_H_kJ_mol: '158'
+          delta_S_J_mol_K: '60'
+        - glass: 15Na2O · 85SiO2
+          redox_transition: Fe3+/Fe2+
+          delta_H_kJ_mol: '128'
+          delta_S_J_mol_K: '49'
+    - observation_id: leister_1999_figure1_deferred
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 154
+        section: Experimental procedure
+        figure: '1'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: ΔI in mA; E in mV
+      values:
+        method_class: measured_direct
+        quantity: unavailable
+        species:
+        - Fe
+        phase: 33Na2O · 67SiO2 melt
+        temperature_as_printed: 1400°C
+        axes_as_printed:
+          x: E (mV)
+          y: ΔI (mA)
+        caption: Square-wave voltammograms of iron and vanadium in a 33Na2O · 67SiO2 melt at 1400°C (τ = 5 ms, ΔE
+          = 100 mV).
+        series:
+        - name: iron-doped 33Na2O · 67SiO2
+          marker: continuous curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: vanadium-doped 33Na2O · 67SiO2
+          marker: dashed curve
+          marker_count: 0
+          evidence_class: measured_direct
+        numeric_points: none
+        digitisation: deferred to a figure pass
+        schema_gap: No store token represents the square-wave voltammetric current-versus-potential curve.
+    - observation_id: leister_1999_figure2_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 155
+        figure: '2'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: α in cm−1; ν in cm−1; λ in nm
+      values:
+        method_class: measured_direct
+        quantity: unavailable
+        species:
+        - Fe
+        phase: glass
+        temperature_as_printed: 1600–2000°C as shown by series
+        axes_as_printed:
+          x: ν (cm−1)
+          top_x: λ (nm)
+          y: Eλ/d = α (cm−1)
+        caption: Optical absorption spectra of 33Na2O · 67SiO2 glass doped with 5000 ppm iron and melted under various
+          conditions.
+        series:
+        - name: 2000°C, argon
+          marker: dashed curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1800°C, argon
+          marker: solid curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1600°C, argon
+          marker: dotted curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1600°C, air
+          marker: dash-dot curve
+          marker_count: 0
+          evidence_class: measured_direct
+        numeric_points: none
+        digitisation: deferred to a figure pass
+        schema_gap: The store has no quantity token for optical absorption coefficient spectra.
+    - observation_id: leister_1999_figure3_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 156
+        figure: '3'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: α in cm−1; ν in cm−1; λ in nm
+      values:
+        method_class: measured_direct
+        quantity: unavailable
+        species:
+        - Fe
+        phase: glass
+        temperature_as_printed: 1500, 1550, 1600 and 1700°C
+        axes_as_printed:
+          x: ν (cm−1)
+          top_x: λ (nm)
+          y: Eλ/d = α (cm−1)
+        caption: Optical absorption spectra of 15Na2O · 85SiO2 glass doped with 5000 ppm iron and melted at various
+          temperatures under air atmosphere for long periods.
+        series:
+        - name: 1700°C
+          marker: dashed curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1600°C
+          marker: solid curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1550°C
+          marker: dash-dot curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1500°C
+          marker: dotted curve
+          marker_count: 0
+          evidence_class: measured_direct
+        numeric_points: none
+        digitisation: deferred to a figure pass
+        schema_gap: The store has no quantity token for optical absorption coefficient spectra.
+    - observation_id: leister_1999_figure6_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 157
+        figure: '6'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: log ratio; percent of total Fe
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - Fe
+        phase: silicate melt equilibrium
+        temperature_as_printed: 1200–2000°C as plotted; regression extrapolated to 2000°C
+        axes_as_printed:
+          x: 1/T in 10−4 K−1
+          top_x: θ (°C)
+          y: log([Fe3+]/[Fe2+])
+          right_y: '[Fe3+]/[Fe2+] in %'
+        caption: Temperature dependences of iron redox equilibria in 33Na2O · 67SiO2 and 15Na2O · 85SiO2 in air
+          (regression line extrapolated up to 2000°C).
+        series:
+        - name: 33Na2O · 67SiO2, square-wave voltammetry
+          marker: open circle
+          marker_count: 7
+          evidence_class: measured_direct
+        - name: 15Na2O · 85SiO2, square-wave voltammetry
+          marker: filled circle
+          marker_count: 6
+          evidence_class: measured_direct
+        - name: regression relations
+          marker: solid line
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: leister_1999_figure7_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 157
+        figure: '7'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: percent of total Fe; holding time in min
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - Fe
+        phase: glass
+        temperature_as_printed: 1600, 1800 and 2000°C
+        axes_as_printed:
+          x: Holding time in min
+          y: '[Fe2+]/[ΣFe] in %'
+        caption: Holding time dependence of Fe2+ content in 15Na2O · 85SiO2 at 1600, 1800 and 2000°C under argon
+          atmosphere.
+        series:
+        - name: 2000°C
+          marker: filled circle
+          marker_count: 4
+          evidence_class: measured_direct
+        - name: 1800°C
+          marker: open square
+          marker_count: 5
+          evidence_class: measured_direct
+        - name: 1600°C
+          marker: filled diamond
+          marker_count: 7
+          evidence_class: measured_direct
+        - name: kinetic trend fits
+          marker: solid curve
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: leister_1999_figure9_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 158
+        figure: '9'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: log ratio; percent of total Fe
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - Fe
+        phase: silicate melt equilibrium and quenched glass
+        temperature_as_printed: approximately 1300–1700°C
+        axes_as_printed:
+          x: 1/T in 10−4 K−1
+          top_x: θ (°C)
+          y: log([Fe3+]/[Fe2+])
+          right_y: '[Fe3+]/[Fe2+] in %'
+        caption: Temperature dependences of iron redox equilibrium in 15Na2O · 85SiO2 in air obtained by square-wave
+          voltammetry and of [Fe3+]/[Fe2+] redox ratios obtained by optical absorption spectroscopy after long melting
+          periods.
+        series:
+        - name: square-wave voltammetry
+          marker: filled circle
+          marker_count: 7
+          evidence_class: measured_direct
+        - name: optical absorption spectroscopy
+          marker: open square
+          marker_count: 4
+          evidence_class: measured_reduced
+        - name: equilibrium regression
+          marker: solid line
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: leister_1999_figure10_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 158
+        figure: '10'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: log10 ratio; 1/T in 10−4 K−1
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - V
+        phase: silicate melt equilibrium
+        temperature_as_printed: 1200–1600°C as plotted
+        axes_as_printed:
+          x: 1/T in 10−4 K−1
+          top_x: θ (°C)
+          y: log([M(x+1)+]/[Mx+])
+        caption: Temperature dependence of vanadium redox equilibria in 33Na2O · 67SiO2 and in air.
+        series:
+        - name: V4+/V3+ equilibrium
+          marker: filled circle
+          marker_count: 8
+          evidence_class: measured_direct
+        - name: V5+/V4+ equilibrium
+          marker: open circle
+          marker_count: 8
+          evidence_class: measured_direct
+        - name: equilibrium regression lines
+          marker: solid line
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+  V:
+    observations:
+    - observation_id: leister_1999_table3_v5_valence_fraction
+      type: concentration_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 157
+        table: '3'
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Optical absorption spectroscopy
+      units: '%'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 5
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis.
+            ESR-constrained V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the
+            numerical spectral inputs are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 157
+              table: '3'
+              note: Numerical optical absorption measurements used for this row series are not tabulated; spectra
+                are shown in figures 2–5.
+          output_unit: fraction of total element; printed percentages retained
+        points:
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row02
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value: '95'
+          value_as_printed: '95'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '2'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id026
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id026
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: &id028
+              page: 7
+              pdf_page_index: 6
+              published_page: 159
+              section: Discussion, 4.2 Vanadium
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row03
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value: '64'
+          value_as_printed: '64'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '3'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id027
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id027
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row04
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 45 min
+          T_C: '1800'
+          value: '44'
+          value_as_printed: '44'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '4'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id029
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id029
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row05
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 2000°C; argon; 45 min
+          T_C: '2000'
+          value: '39'
+          value_as_printed: '39'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '5'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id030
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id030
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row06
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; reduced; 60 min
+          T_C: '1600'
+          value:
+            kind: bound
+            bound_operator: <
+            bound_value: '0.5'
+          value_as_printed: <0.5
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '6'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: reduced
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '60'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id031
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id031
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row07
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value: '84'
+          value_as_printed: '84'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '7'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id032
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id032
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row08
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value: '70'
+          value_as_printed: '70'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '8'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id033
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id033
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row09
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 245 min
+          T_C: '1600'
+          value: '54'
+          value_as_printed: '54'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '9'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '245'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id034
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id034
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row10
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1800°C; argon; 145 min
+          T_C: '1800'
+          value: '51'
+          value_as_printed: '51'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '10'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '145'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id035
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id035
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row11
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 2000°C; argon; 40 min
+          T_C: '2000'
+          value: '22'
+          value_as_printed: '22'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '11'
+            column: V5+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '40'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id036
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id036
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+    - observation_id: leister_1999_table3_v4_valence_fraction
+      type: concentration_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 157
+        table: '3'
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Optical absorption spectroscopy
+      units: '%'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis.
+            ESR-constrained V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the
+            numerical spectral inputs are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 157
+              table: '3'
+              note: Numerical optical absorption measurements used for this row series are not tabulated; spectra
+                are shown in figures 2–5.
+          output_unit: fraction of total element; printed percentages retained
+        points:
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row02
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value: '5'
+          value_as_printed: '5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '2'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id037
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id037
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row03
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value: '36'
+          value_as_printed: '36'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '3'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id038
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id038
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row04
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 45 min
+          T_C: '1800'
+          value: '56'
+          value_as_printed: '56'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '4'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id039
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id039
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row05
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 2000°C; argon; 45 min
+          T_C: '2000'
+          value: '61'
+          value_as_printed: '61'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '5'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id040
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id040
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row06
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; reduced; 60 min
+          T_C: '1600'
+          value: '28'
+          value_as_printed: '28'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '6'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: reduced
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '60'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id041
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id041
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row07
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value: '14'
+          value_as_printed: '14'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '7'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id042
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id042
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row08
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value: '30'
+          value_as_printed: '30'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '8'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id043
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id043
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row09
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 245 min
+          T_C: '1600'
+          value: '46'
+          value_as_printed: '46'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '9'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '245'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id044
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id044
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row10
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1800°C; argon; 145 min
+          T_C: '1800'
+          value: '49'
+          value_as_printed: '49'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '10'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '145'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id045
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id045
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row11
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 2000°C; argon; 40 min
+          T_C: '2000'
+          value: '78'
+          value_as_printed: '78'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '11'
+            column: V4+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '40'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id046
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id046
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+    - observation_id: leister_1999_table3_v3_valence_fraction
+      type: concentration_series
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 157
+        table: '3'
+      phase: glass
+      regime: quench_equilibration
+      method_as_printed: Optical absorption spectroscopy
+      units: '%'
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        admission_status: admitted
+        derivation:
+          relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis.
+            ESR-constrained V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the
+            numerical spectral inputs are not tabulated.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 157
+              table: '3'
+              note: Numerical optical absorption measurements used for this row series are not tabulated; spectra
+                are shown in figures 2–5.
+          output_unit: fraction of total element; printed percentages retained
+        points:
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row02
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '2'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id047
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '2'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id047
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row03
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '3'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id048
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '3'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id048
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row04
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 1800°C; argon; 45 min
+          T_C: '1800'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '4'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id049
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '4'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id049
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row05
+          sample_as_published: 33Na2O · 67SiO2
+          glass_as_published: 33Na2O · 67SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 33Na2O · 67SiO2; 2000°C; argon; 45 min
+          T_C: '2000'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '5'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id050
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '5'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id050
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row06
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; reduced; 60 min
+          T_C: '1600'
+          value: '72'
+          value_as_printed: '72'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '6'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: reduced
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '60'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id051
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '6'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id051
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row07
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; air; 45 min
+          T_C: '1600'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '7'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: air
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id052
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '7'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id052
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row08
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 45 min
+          T_C: '1600'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '8'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '45'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id053
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '8'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id053
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row09
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1600°C; argon; 245 min
+          T_C: '1600'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '9'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '245'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id054
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '9'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id054
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row10
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 1800°C; argon; 145 min
+          T_C: '1800'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '10'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '1800'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '145'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id055
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '10'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id055
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+        - sample_id: leister-1999-fe-v-redox-2000c_table3_row11
+          sample_as_published: 15Na2O · 85SiO2
+          glass_as_published: 15Na2O · 85SiO2
+          dopant_as_published: 0.5 wt% (5000 ppm) V2O5 (0.30 mol%)
+          label: 15Na2O · 85SiO2; 2000°C; argon; 40 min
+          T_C: '2000'
+          value:
+            kind: unavailable
+            unavailable_reason: not_detected
+          value_as_printed: n.d.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 157
+            table: '3'
+            row: '11'
+            column: V3+ (%)
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: '2000'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: temperature (°C)
+            composition:
+              state:
+                tag: unknown
+                reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete
+                  normalized doped-glass composition; the oxide components are not reconstructed.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: argon
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: atmosphere
+            holding_time_min:
+              state:
+                tag: value
+                value: '40'
+              locator:
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+                column: holding time (min)
+            oxygen_partial_pressure:
+              state:
+                tag: unknown
+                reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen
+                  pressures for calculated equilibrium data separately.
+              locator: &id056
+                page: 5
+                pdf_page_index: 4
+                published_page: 157
+                table: '3'
+                row: '11'
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: The paper does not report total pressure for this sample.
+              locator: *id056
+          quench_statement:
+            text: The authors explain that V5+ and V3+ react during cooling to form V4+, changing the valence distribution
+              measured in quenched glass.
+            preservation: asserted_altered
+            quench_direction: not_stated
+            locator: *id028
+          omission_as_printed: n.d. (not detected)
+    context:
+    - observation_id: leister_1999_table1_v_redox_reaction_thermodynamics_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 155
+        table: '1'
+      units: ΔH° kJ·mol−1; ΔS° J·mol−1·K−1
+      attribution: Leister and Ehrt (1999), calculated from square-wave voltammetric standard potentials and temperature
+        dependence.
+      values:
+        quantity_as_printed: standard reaction enthalpy ΔH° and standard reaction entropy ΔS° for the listed redox
+          transitions, assuming equilibrium with air
+        quantity: unavailable
+        candidate_tokens_considered:
+        - delta_fH
+        - H_minus_H298
+        - S
+        - entropy_of_fusion
+        schema_gap: No token represents standard reaction enthalpy/entropy for these redox reactions. delta_fH means
+          formation from elements, and S is absolute entropy; neither is the printed reaction quantity.
+        method_class: model_derived
+        admission_status: typed_unavailable
+        p_O2_as_printed:
+          value: '21'
+          units: kPa
+          condition: equilibrium with air
+        rows:
+        - glass: 33Na2O · 67SiO2
+          redox_transition: V5+/V4+
+          delta_H_kJ_mol: '138'
+          delta_S_J_mol_K: '58'
+        - glass: 33Na2O · 67SiO2
+          redox_transition: V4+/V3+
+          delta_H_kJ_mol: '152'
+          delta_S_J_mol_K: '45'
+        - glass: 15Na2O · 85SiO2
+          redox_transition: V5+/V4+
+          delta_H_kJ_mol: '100'
+          delta_S_J_mol_K: '36'
+        - glass: 15Na2O · 85SiO2
+          redox_transition: V4+/V3+
+          delta_H_kJ_mol: '158'
+          delta_S_J_mol_K: '52'
+    - observation_id: leister_1999_printed_oxygen_pressure_context
+      type: text_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 159
+        section: Discussion, 4.2 Vanadium
+      units: kPa
+      values:
+        quantity: unavailable
+        printed_quantity: oxygen partial pressure p(O2)
+        method_class: measured_tabulated
+        admission_status: typed_unavailable
+        schema_gap: The printed p(O2) values in the discussion apply to calculated redox equilibria in figures 10
+          and 12, not as row-specific conditions for Table 2/3 quenched samples.
+        rows:
+        - application: air equilibrium calculation
+          p_O2_as_printed: '21'
+          units: kPa
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 155
+            table: '1'
+        - application: inert-condition V equilibrium calculation for 15Na2O · 85SiO2
+          p_O2_range_as_printed: 0.5–1.5
+          units: kPa
+          locator: *id028
+        - application: V equilibrium calculation in 33Na2O · 67SiO2
+          p_O2_as_printed: '21'
+          units: kPa
+          locator: *id028
+    - observation_id: leister_1999_figure4_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 156
+        figure: '4'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: α in cm−1; ν in cm−1; λ in nm
+      values:
+        method_class: measured_direct
+        quantity: unavailable
+        species:
+        - V
+        phase: glass
+        temperature_as_printed: 1600–2000°C as shown by series
+        axes_as_printed:
+          x: ν (cm−1)
+          top_x: λ (nm)
+          y: Eλ/d = α (cm−1)
+        caption: Optical absorption spectra of 15Na2O · 85SiO2 glass doped with 5000 ppm vanadium and melted under
+          various conditions.
+        series:
+        - name: 2000°C, argon
+          marker: solid curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1800°C, argon
+          marker: solid curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1600°C, argon
+          marker: dotted curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: 1600°C, air
+          marker: dash-dot curve
+          marker_count: 0
+          evidence_class: measured_direct
+        numeric_points: none
+        digitisation: deferred to a figure pass
+        schema_gap: The store has no quantity token for optical absorption coefficient spectra.
+    - observation_id: leister_1999_figure5_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 156
+        figure: '5'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: α in cm−1; ν in cm−1; λ in nm
+      values:
+        method_class: measured_direct
+        quantity: unavailable
+        species:
+        - V
+        phase: glass
+        temperature_as_printed: 1600°C
+        axes_as_printed:
+          x: ν (cm−1)
+          top_x: λ (nm)
+          y: Eλ/d = α (cm−1)
+        caption: Optical absorption spectra of 15Na2O · 85SiO2 glass doped with 5000 ppm vanadium and melted at
+          1600°C under air, argon and reducing conditions.
+        series:
+        - name: argon
+          marker: dotted curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: reduced
+          marker: dashed curve
+          marker_count: 0
+          evidence_class: measured_direct
+        - name: air
+          marker: solid curve
+          marker_count: 0
+          evidence_class: measured_direct
+        numeric_points: none
+        digitisation: deferred to a figure pass
+        schema_gap: The store has no quantity token for optical absorption coefficient spectra.
+    - observation_id: leister_1999_figure8_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 158
+        figure: '8'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: percent of total Fe; holding time in min
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - Fe
+        phase: glass
+        temperature_as_printed: 1800°C
+        axes_as_printed:
+          x: Holding time in min
+          y: '[Fe2+]/[ΣFe] in %'
+        caption: Holding time dependence of Fe2+ content in 33Na2O · 67SiO2 and 15Na2O · 85SiO2 at 1800°C under
+          argon atmosphere.
+        series:
+        - name: 15Na2O · 85SiO2
+          marker: open square
+          marker_count: 6
+          evidence_class: measured_direct
+        - name: 33Na2O · 67SiO2
+          marker: filled diamond
+          marker_count: 7
+          evidence_class: measured_direct
+        - name: kinetic trend fits
+          marker: solid and dashed curves
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: leister_1999_figure11_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 159
+        figure: '11'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: percent of total V; holding time in min
+      values:
+        method_class: measured_direct
+        quantity: valence_ratio
+        species:
+        - V
+        phase: glass
+        temperature_as_printed: 1600, 1800 and 2000°C
+        axes_as_printed:
+          x: Holding time in min
+          y: '[V4+]/[ΣV] in %'
+        caption: Holding time dependence of V4+ content in 15Na2O · 85SiO2 at 1600, 1800 and 2000°C under argon
+          atmosphere.
+        series:
+        - name: 2000°C
+          marker: filled circle
+          marker_count: 5
+          evidence_class: measured_direct
+        - name: 1800°C
+          marker: open square
+          marker_count: 6
+          evidence_class: measured_direct
+        - name: 1600°C
+          marker: filled diamond
+          marker_count: 6
+          evidence_class: measured_direct
+        - name: kinetic trend fits
+          marker: solid curves
+          marker_count: 0
+          evidence_class: model_derived
+        numeric_points: none
+        digitisation: deferred to a figure pass
+    - observation_id: leister_1999_figure12_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 159
+        figure: '12'
+      panel: whole_figure
+      attribution: Leister and Ehrt (1999), present study
+      units: log10 ratio; percent of total V; p(O2) as printed in kPa
+      values:
+        method_class: measured_reduced
+        quantity: valence_ratio
+        species:
+        - V
+        phase: quenched glass and calculated silicate melt equilibrium
+        temperature_as_printed: 1600–2000°C for quenched values; equilibrium curves across the plotted temperature
+          range
+        axes_as_printed:
+          x: 1/T in 10−4 K−1
+          top_x: θ (°C)
+          y: log([V5+]/[V4+])
+          right_y: '[V5+]/[V4+] in %'
+        caption: Temperature dependence of [V5+]/[V4+] redox ratios at equilibrium calculated for p(O2) = 0.5, 1.5
+          and 21 kPa from SWV data and of [V5+]/[V4+] redox ratios obtained by optical absorption spectroscopy from
+          quenched samples after melting times of 40 min (2000°C) to 245 min (1600°C).
+        series:
+        - name: equilibrium at p(O2) = 0.5 kPa
+          marker: dotted curve
+          marker_count: 0
+          evidence_class: model_derived
+        - name: equilibrium at p(O2) = 1.5 kPa
+          marker: solid curve
+          marker_count: 0
+          evidence_class: model_derived
+        - name: equilibrium at p(O2) = 21 kPa
+          marker: dashed curve
+          marker_count: 0
+          evidence_class: model_derived
+        - name: quenched-sample optical absorption values
+          marker: filled circle
+          marker_count: 3
+          evidence_class: measured_reduced
+        numeric_points: none
+        digitisation: deferred to a figure pass
