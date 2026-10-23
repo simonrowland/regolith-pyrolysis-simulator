@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.builtin.vapor_pressure import VaporPressureComputationError
 import simulator.diagnostic_helpers.alphamelts_volatility as volatility_module
 from simulator.alphamelts_reference_pressure import (
     alphamelts_condensed_phase_pressure_bar,
@@ -153,6 +154,48 @@ def test_antoine_A_refusal_or_finite_nonpositive_compute_in_volatility_diagnosti
         )
         for warning in diagnostic["warnings"]
     )
+
+
+@pytest.mark.parametrize(
+    ("a_value", "error_type"),
+    (
+        (float("inf"), VaporPressureComputationError),
+        ("not-a-number", ValueError),
+    ),
+    ids=("nonfinite", "malformed"),
+)
+@pytest.mark.parametrize(
+    ("section", "species", "parent_oxide"),
+    (("metals", "Na", "Na2O"), ("oxide_vapors", "SiO", "SiO2")),
+    ids=("metal-site", "oxide-vapor-site"),
+)
+def test_invalid_antoine_coefficients_raise_in_volatility_diagnostic(
+    a_value, error_type, section, species, parent_oxide
+) -> None:
+    row = {
+        "parent_oxide": parent_oxide,
+        "antoine": {"A": a_value, "B": 0.0, "C": 0.0},
+    }
+    if section == "metals":
+        row["fit_target"] = "pure_component_psat"
+    else:
+        row["valid_range_K"] = [1000.0, 2500.0]
+    vapor_data = {
+        "metals": {species: row} if section == "metals" else {},
+        "oxide_vapors": {species: row} if section == "oxide_vapors" else {},
+    }
+    activities = {"Na2O": 0.25, "SiO2": 0.25}
+
+    with pytest.raises(error_type):
+        alphamelts_activity_volatility_diagnostic(
+            composition_wt_pct=_domain_composition(),
+            pO2_grid_bar=[1e-9],
+            temperature_C=1500.0,
+            activity_source=StubActivitySource(
+                {1.0: activities, 10.0: activities}
+            ),
+            vapor_pressure_data=vapor_data,
+        )
 
 
 def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):

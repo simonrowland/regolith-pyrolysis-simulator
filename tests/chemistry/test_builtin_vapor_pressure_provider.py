@@ -2168,6 +2168,43 @@ def test_equilibrium_reports_skipped_oxide_vapor_antoine_A(
     )
 
 
+@pytest.mark.parametrize(
+    "rail",
+    ("metal", "liquid_oxide", "gas_rail", "oxide_vapor"),
+)
+def test_equilibrium_raises_public_error_for_invalid_antoine_coefficients(
+    vapor_pressure_data, rail
+) -> None:
+    data = copy.deepcopy(vapor_pressure_data)
+    coefficients = {"A": float("inf"), "B": 0.0, "C": 0.0}
+    if rail == "metal":
+        row = data["metals"]["Fe"]
+        row["fit_target"] = "pure_component_psat"
+        row["interval_required"] = False
+        row.pop("liquid_oxide_standard_reaction", None)
+        row.pop("gas_rail_standard_reaction", None)
+        row["pure_component_antoine"] = coefficients
+        row["antoine"] = dict(coefficients)
+        model = _LegacyInternalAnalyticalModel(data, melt=_FeOnlyHighTMelt())
+    elif rail == "liquid_oxide":
+        data["metals"]["Al"]["liquid_oxide_standard_reaction"][
+            "antoine"
+        ] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_AlOnlyMelt())
+    elif rail == "gas_rail":
+        block = data["metals"]["Mg"]["gas_rail_standard_reaction"]
+        block["status"] = "active"
+        block["authoritative"] = True
+        block["antoine"] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_MgOnlyMelt(1800.0))
+    else:
+        data["oxide_vapors"]["SiO"]["antoine"] = coefficients
+        model = _LegacyInternalAnalyticalModel(data, melt=_SiOnlyMelt())
+
+    with pytest.raises(VaporPressureComputationError):
+        model._internal_analytical_equilibrium()
+
+
 def test_legacy_sio_continues_below_reference(vapor_pressure_data, monkeypatch):
     model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_SiOnlyMelt())
     monkeypatch.setattr(model, "_vacuum_floor_bar", lambda: 1.3e-12)
