@@ -7411,7 +7411,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # stays 0.
     # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
     # Wang 2001 (d2143313b, same F22 merge) adds 432 printed residue cells: 1518->1950.
-    assert census.get("residue_component_composition") == 1950
+    # Neuman 2026 (2751617f2, merge d357e86db) adds 2160 printed residue cells: 1950->4110.
+    assert census.get("residue_component_composition") == 4110
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -7445,8 +7446,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # 3114->3136. mismatches stays 0; the count moved because those rows
     # became visible, not because a check was relaxed.
     # F22 also adds Wang 2001's 90 canonical isotope_delta cells and Ozawa's 6.
-    # Sossi remains 22, so this pin is 118 before Neuman's decorated columns.
-    assert census.get("isotope_delta") == 118
+    # Sossi remains 22. Neuman's 96 single decorated columns (the oracle above)
+    # bring the pin 118->214.
+    assert census.get("isotope_delta") == 214
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
