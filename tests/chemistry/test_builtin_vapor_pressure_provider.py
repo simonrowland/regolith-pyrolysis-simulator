@@ -502,6 +502,31 @@ def test_builtin_provider_reports_skipped_oxide_vapor_antoine_A(
     assert "SiO" not in result.diagnostic["vapor_pressures_Pa"]
 
 
+def test_builtin_provider_skips_three_parameter_oxide_vapor_missing_C(
+    vapor_pressure_data,
+) -> None:
+    data = copy.deepcopy(vapor_pressure_data)
+    row = data["oxide_vapors"]["SiO"]
+    row["antoine"] = {
+        "A": 5.0,
+        "B": 1000.0,
+        "runtime_form": "log10(P_Pa) = A - B / (T_K + C)",
+    }
+
+    provider = BuiltinVaporPressureProvider(data)
+    provider._vapour_rail_catalog = None
+    result = provider.dispatch(_request_for_oxide_at_T_K("SiO2", 1900.0))
+
+    _assert_antoine_skip_notice(
+        result.warnings,
+        species="SiO",
+        site="builtin_vapor_pressure.oxide_vapor_antoine",
+        reason="missing_antoine_C",
+        temperature_K=1900.0,
+    )
+    assert "SiO" not in result.diagnostic["vapor_pressures_Pa"]
+
+
 def test_builtin_provider_deduplicates_repeated_antoine_skip_in_one_result(
     vapor_pressure_data,
 ) -> None:
