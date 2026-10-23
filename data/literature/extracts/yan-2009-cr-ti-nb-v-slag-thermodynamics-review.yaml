@@ -1,0 +1,275 @@
+schema_version: literature_extract.v1
+source_id: yan-2009-cr-ti-nb-v-slag-thermodynamics-review
+source:
+  citation: Yan, Baijun, Jiayun Zhang, and Qing Song (2009). Thermodynamic Behavior of Transition Metal (Cr, Ti,
+    Nb, V) Oxides in Molten Slags. Proceedings of MOLTEN2009, Santiago, pp. 309–315.
+  year: 2009
+  corpus_asset: raw/yan-2009-cr-ti-nb-v-slag-thermodynamics-review/yan-2009-cr-ti-nb-v-slag-thermodynamics-review.pdf
+extraction:
+  method: Born-digital pdftotext-layout review text; no numeric tables or figures in the review body; cited ranges
+    and changes are retained as attributed context because the store has no interval value form for these quantities.
+    PDF checked from the sidecar holding copy.
+  date: '2026-10-20'
+  worker: codex-resume-89514-1792530821
+review_status: draft
+species:
+  Cr:
+    observations: []
+    context:
+    - observation_id: yan09_ref2_cr6_cr3_ratio_context
+      type: quoted_attributed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 310
+        paragraph: Existing Forms of Chromium in Molten Slags
+      units: dimensionless
+      attribution: Morita, Shibuya & Sano (1988) [2]
+      values:
+        quantity_as_published: valence_ratio
+        printed_values_as_published: 0.15–0.95 dimensionless; Cr6+/Cr3+ as basicity index rises from 2 to 11. The
+          review does not print a temperature or oxygen pressure for this cited range.
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: The store has no interval value form for valence_ratio.
+    - observation_id: yan09_ref13_cr3_cr2_ratio_context
+      type: quoted_attributed
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 312
+        paragraph: Effects of MgO and Al2O3 Addition
+      units: dimensionless
+      attribution: Morita et al. (2005) [13]
+      values:
+        quantity_as_published: valence_ratio
+        printed_values_as_published: '14–26 dimensionless; Cr3+/Cr2+ in 41% CaO–41% SiO2–10% Al2O3–8% CrOx slag
+          as MgO rises to 15 wt.%; conditions: T=1873 K, pO2=7.04×10−6 Pa. The review states the ratio decreases
+          continuously from 26 to 14.'
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: The store has no interval value form for valence_ratio.
+    - observation_id: yan09_cr_activity_coefficient_change_context
+      type: quoted_attributed
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 311
+        paragraph: Thermodynamic Behavior of (CrO) and (CrO1.5) in Slag
+      units: multiplicative factors; wt.% total Cr; Pa
+      attribution: Morita et al. (1999) [4] and Xiao & Holappa (1993) [7], as distinguished in the review.
+      values:
+        quantity_as_published: activity-coefficient changes with basicity, not absolute activity-coefficient values
+        printed_values_as_published: 'At 1873 K and pO2 7.04×10−6 Pa, γCrO increases 6–10 times and γCrO1.5 increases
+          2–3 times as basicity rises from 0.6 to 1.5. Total chromium ranges reported: 3.5–4.9%, 9.1–9.9%, 15.0–16.6%.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The review reports multiplicative changes, not absolute activity-coefficient values; no change-factor
+          quantity token fits.
+    - observation_id: yan09_cr_redox_pressure_change_context
+      type: quoted_attributed
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 312
+        paragraph: Cr redox pressure effect
+      units: percent; Pa; K
+      attribution: Pretorius et al. (1992) [12].
+      values:
+        quantity_as_published: change in Cr2+ content with oxygen pressure
+        printed_values_as_published: Cr2+ content decreases about 30% as oxygen partial pressure decreases from
+          1.01×10−4.56 to 1.01×10−7.50 Pa at 1773 K.
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: Only a relative percent change is reported; no absolute Cr2+/Cr3+ value is printed.
+  TiO1.5:
+    observations: []
+    context:
+    - observation_id: yan09_ref19_tio15_gamma_context
+      type: quoted_attributed
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 313
+        paragraph: In CaO-SiO2 Based Slags
+      units: dimensionless
+      attribution: Morizane, Ozturk & Fruehan (1999) [19]
+      values:
+        quantity_as_published: activity_coefficient
+        printed_values_as_published: '2.3–8.6 dimensionless; TiO1.5 activity coefficient in 35–50% CaO–7–22% Al2O3–25–45%
+          SiO2 blast-furnace-type slags, in pure CO; conditions: T=1773 K. The review does not state the activity-coefficient
+          reference state.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The store maps activity coefficients only as scalar gamma values; this cited interval has no
+          supported interval value form.
+    - observation_id: yan09_ref21_tio15_gamma_context
+      type: quoted_attributed
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 314
+        paragraph: In High Basicity CaO-SiO2 Based Slags for Ladle Treatment
+      units: dimensionless
+      attribution: Jung & Fruehan (2001) [21]
+      values:
+        quantity_as_published: activity_coefficient
+        printed_values_as_published: '54–132 dimensionless; TiO1.5 activity coefficient in Al-deoxidized-steel ladle
+          slags at high basicity; conditions: T=1873 K. The review does not state the activity-coefficient reference
+          state.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The store maps activity coefficients only as scalar gamma values; this cited interval has no
+          supported interval value form.
+  TiO2:
+    observations: []
+    context:
+    - observation_id: yan09_ref19_tio2_gamma_context
+      type: quoted_attributed
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 313
+        paragraph: In CaO-SiO2 Based Slags
+      units: dimensionless
+      attribution: Morizane, Ozturk & Fruehan (1999) [19]
+      values:
+        quantity_as_published: activity_coefficient
+        printed_values_as_published: '0.1–0.3 dimensionless; TiO2 activity coefficient in 35–50% CaO–7–22% Al2O3–25–45%
+          SiO2 blast-furnace-type slags, in pure CO; conditions: T=1773 K. The review does not state the activity-coefficient
+          reference state.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The store maps activity coefficients only as scalar gamma values; this cited interval has no
+          supported interval value form.
+    - observation_id: yan09_ref21_tio2_gamma_context
+      type: quoted_attributed
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 314
+        paragraph: In High Basicity CaO-SiO2 Based Slags for Ladle Treatment
+      units: dimensionless
+      attribution: Jung & Fruehan (2001) [21]
+      values:
+        quantity_as_published: activity_coefficient
+        printed_values_as_published: '0.6–3.5 dimensionless; TiO2 activity coefficient in ferritic stainless-steel
+          ladle slags at high basicity; conditions: T=1873 K. The review does not state the activity-coefficient
+          reference state.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The store maps activity coefficients only as scalar gamma values; this cited interval has no
+          supported interval value form.
+    - observation_id: yan09_ref21_tio2_activity_context
+      type: quoted_attributed
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 314
+        paragraph: High-basicity ladle slags
+      units: dimensionless activity
+      attribution: Jung & Fruehan (2001) [21].
+      values:
+        quantity_as_published: TiO2 activity
+        printed_values_as_published: For Al-deoxidized steel slags, TiO2 activity ranges 2–7; the review does not
+          state its reference state.
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The stored quantity enum has activity_coefficient but no activity quantity token.
+  Ti:
+    observations: []
+    context:
+    - observation_id: yan09_ref17_ti3_ti4_ratio_context
+      type: quoted_attributed
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 313
+        paragraph: In CaO-SiO2 Based Slags
+      units: dimensionless
+      attribution: Ariyo, Gonzales & Holappa (2005) [17]
+      values:
+        quantity_as_published: valence_ratio
+        printed_values_as_published: '7.9–91.2 dimensionless; Ti3+/Ti4+ at 25 wt.% TiOx in 25–53% CaO–27–46% SiO2–10–55%
+          TiOx slag; conditions: T=1873 K, pO2=4.1×10−7 Pa.'
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: The store has no interval value form for valence_ratio.
+  TiO1.67:
+    observations: []
+    context:
+    - observation_id: yan09_ref22_tio167_gamma_context
+      type: quoted_attributed
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 313
+        paragraph: In CaO-SiO2 Based Slags
+      units: dimensionless
+      attribution: Ariyo & Holappa (2002) [22]
+      values:
+        quantity_as_published: activity_coefficient
+        printed_values_as_published: '0.39–1.68 dimensionless; TiO1.67 activity coefficient in 25–44% CaO–30–46%
+          SiO2–10–39% TiO1.67 slag; increases with basicity; conditions: T=1873 K. The review does not state the
+          activity-coefficient reference state.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The store maps activity coefficients only as scalar gamma values; this cited interval has no
+          supported interval value form.
+  Nb:
+    observations: []
+    context:
+    - observation_id: yan09_ref28_nb_average_valence_context
+      type: quoted_attributed
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 315
+        paragraph: In Na2O-SiO2 and CaO-CaF2-SiO2 Systems
+      units: average oxidation state
+      attribution: Tsukihashi et al. (1985) [28]
+      values:
+        quantity_as_published: valence_ratio
+        printed_values_as_published: '4.8–5.0 average oxidation state; average Nb oxidation state as basicity rises
+          from 0.5 to 1.3; conditions: pO2=8.59×10−8 Pa. The cited measurements span 1473–1623 K; the review reports
+          a temperature range, not a single point.'
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: The store has no interval value form for valence_ratio.
+    - observation_id: yan09_nb_v_power_of_ten_activity_coefficients_context
+      type: quoted_attributed
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 315
+        paragraph: Nb and V in Na2O-SiO2 slags
+      units: dimensionless as powers of ten
+      attribution: Tsukihashi et al. (1985) [28].
+      values:
+        quantity_as_published: Nb and V oxide activity coefficients
+        printed_values_as_published: 'γNbO2: 10−2 to 10−2.3; γNbO2.5: 10−3 to 10−4; γVO2: 10−4 to 10−6; γVO2.5:
+          10−7 to 10−10. With 2% Na2O addition the relevant coefficients decrease by about 1–1.5 orders of magnitude.'
+        candidate_tokens:
+        - activity_coefficient
+        schema_gap: The source prints powers-of-ten values and order changes; the extract value schema has no printed-power
+          form for these coefficients.
+  V:
+    observations: []
+    context:
+    - observation_id: yan09_ref28_v_average_valence_context
+      type: quoted_attributed
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 315
+        paragraph: In Na2O-SiO2 and CaO-CaF2-SiO2 Systems
+      units: average oxidation state
+      attribution: Tsukihashi et al. (1985) [28]
+      values:
+        quantity_as_published: valence_ratio
+        printed_values_as_published: '2.2–4.8 average oxidation state; average V oxidation state as basicity rises
+          from 0.5 to 1.3; conditions: pO2=8.59×10−8 Pa. The cited measurements span 1473–1623 K; the review reports
+          a temperature range, not a single point.'
+        candidate_tokens:
+        - valence_ratio
+        schema_gap: The store has no interval value form for valence_ratio.
