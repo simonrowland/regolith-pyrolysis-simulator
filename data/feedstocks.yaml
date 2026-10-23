@@ -12,6 +12,7 @@
 # ---------------------------------------------------------------------------
 
 lunar_mare_low_ti:
+  body: moon
   label: "Lunar Mare Basalt (Low-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
@@ -231,6 +232,7 @@ lunar_mare_low_ti:
       diluted by bulk oxygen; the cryo stage sees a clean, low-O2 feed.
 
 lunar_mare_high_ti:
+  body: moon
   label: "Lunar Mare Basalt (High-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 11/17 high-Ti basaltic soils"
   confidence: "High"
@@ -442,6 +444,7 @@ lunar_mare_high_ti:
       source: "Gibson & Johnson 1971; corroborates matchett-2006 Table 1 (in-house OCR capture)"
 
 lunar_highland:
+  body: moon
   label: "Lunar Highland Anorthosite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 16 anorthositic soils"
   confidence: "High"
@@ -649,6 +652,7 @@ lunar_highland:
       source: "Gibson & Johnson 1971; corroborates matchett-2006 Table 1 (in-house OCR capture)"
 
 lunar_pkt_kreep_average:
+  body: moon
   label: "Procellarum KREEP Terrane (PKT) Average"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
   confidence: "High"
@@ -838,6 +842,7 @@ lunar_pkt_kreep_average:
   process_notes: "K2O 3-30x mare baseline; P2O5 requires extended C0 or Phase 0b P volatilisation"
 
 lunar_spa_kreep_influenced:
+  body: moon
   label: "South Pole-Aitken KREEP-Influenced"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
   confidence: "Medium"
@@ -1027,6 +1032,7 @@ lunar_spa_kreep_influenced:
   process_notes: "Intermediate KREEP enrichment; K2O 2-8x mare"
 
 targeted_super_kreep_ore:
+  body: moon
   label: "Targeted Super-KREEP Ore (Modeled Enriched Blend)"
   source: "MODELED ENRICHED BLEND (synthetic targeted-ore scenario; not a measured table); component basis: major oxides from Apollo 15386-type KREEP basalt analog, K/P/REE/Zr enrichment from VHK clasts + urKREEP immiscible fractions, Cr/Mn trace estimates"
   confidence: "Medium-High"
@@ -1233,6 +1239,7 @@ targeted_super_kreep_ore:
 # buy: https://spaceresourcetech.com/collections/regolith-simulants
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 fused-bead XRF; SRT/Exolith LHS-1.
 lunar_highlands_lhs1:
+  body: moon
   name: "LHS-1 lunar highlands simulant"
   label: "LHS-1 Lunar Highlands Simulant (SRT/Exolith)"
   class: lunar_simulant
@@ -1286,6 +1293,7 @@ lunar_highlands_lhs1:
   process_notes: "Standard C0-C6 flowsheet applicable; lower Fe yield than mare material."
 
 lunar_highlands_lhs1_yu_2025_reference:
+  body: moon
   name: "LHS-1 composition reported by Yu et al. 2025"
   label: "LHS-1 Yu 2025 Hollow-Anode Reference"
   class: lunar_simulant
@@ -1349,6 +1357,7 @@ lunar_highlands_lhs1_yu_2025_reference:
 # buy: https://spaceresourcetech.com/products/lms-1-lunar-mare-simulant
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF; SRT/Exolith LMS-1, with vendor factsheet minors captured in catalog.
 lunar_mare_lms1:
+  body: moon
   name: "LMS-1 lunar mare simulant"
   label: "LMS-1 Lunar Mare Simulant (SRT/Exolith)"
   class: lunar_simulant
@@ -1403,6 +1412,7 @@ lunar_mare_lms1:
 # buy: https://www.offplanetresearch.com/ (contact for quote; simulants-feedstocks-and-additives)
 # source: Off Planet Research OPR General Lunar Regolith Simulants Data Sheet references; 2022 LSIC Lunar Simulant Assessment; 2025 LPSC feedstock tables. Full current-lot XRF not public in captured research.
 lunar_mare_oprl2n:
+  body: moon
   name: "OPRL2N lunar mare simulant"
   label: "OPRL2N Lunar Mare Simulant (Off Planet Research)"
   class: lunar_simulant
@@ -1456,6 +1466,7 @@ lunar_mare_oprl2n:
 # buy: https://www.washingtonmills.com/products/duraluna
 # source: Rickman et al. 2024 NASA NTRS 20240007991; LPSC 2022 1146; NASA/USGS NU-LHT lineage. Exact oxide table not extracted in captured research.
 lunar_highlands_nuw_lht_5m:
+  body: moon
   name: "NUW-LHT-5M / DURALUNA lunar highlands simulant"
   label: "NUW-LHT-5M / DURALUNA Lunar Highlands Simulant (Washington Mills)"
   class: lunar_simulant
@@ -1510,6 +1521,7 @@ lunar_highlands_nuw_lht_5m:
 # buy: not_available (legacy_discontinued)
 # source: McKay et al. 1993/1994 JSC characterization and ORBITEC production notes cited in catalog; no citable composition table captured in this chunk.
 lunar_mare_jsc_1a_legacy:
+  body: moon
   name: "JSC-1A legacy lunar mare simulant"
   label: "JSC-1A Legacy Lunar Mare Simulant (NASA/ORBITEC, discontinued)"
   class: lunar_simulant
@@ -1554,6 +1566,7 @@ lunar_mare_jsc_1a_legacy:
 # buy: not_available (legacy_or_paper_stock)
 # source: Engelschiøn et al. 2020 Scientific Reports XRF table for EAC-1A; Robinot et al. 2026 Fig. 5 elementals retained as extraction-suspect cross-check.
 lunar_eac_1a:
+  body: moon
   name: "EAC-1/EAC-1A lunar simulant"
   label: "EAC-1A Lunar Simulant (Engelschiøn XRF)"
   class: lunar_simulant
@@ -1634,6 +1647,7 @@ lunar_eac_1a:
 # buy: not_available (legacy_or_paper_stock)
 # source: Hill et al. 2007 JGR Planets Table 1, DOI 10.1029/2006JE002767.
 lunar_mls_1a:
+  body: moon
   name: "MLS-1A lunar simulant"
   label: "MLS-1A Lunar Simulant (Weiblen/Hill major oxides)"
   class: lunar_simulant
@@ -1694,6 +1708,7 @@ lunar_mls_1a:
 # buy: not_available (legacy_not_currently_stocked)
 # source: USGS/NASA NU-LHT lineage noted in 2022 LSIC assessment and captured catalog; NU-LHT-2M exact composition not captured in this chunk.
 lunar_highlands_nu_lht_2m:
+  body: moon
   name: "NU-LHT-2M lunar highlands simulant"
   label: "NU-LHT-2M Lunar Highlands Simulant (legacy, blocked)"
   class: lunar_simulant
@@ -2421,6 +2436,7 @@ comet_nucleus:
 # buy: https://spaceresourcetech.com/collections/regolith-simulants
 # source: Long-Fox et al. 2023 Frontiers in Space Technologies Table 2 XRF for MGS-1 base; Costa et al. 2024 TiO2 cross-check.
 mars_global_mgs1:
+  body: mars
   name: "MGS-1 Mars global simulant"
   label: "MGS-1 Mars Global Simulant (SRT/Exolith)"
   class: mars_simulant
@@ -2487,6 +2503,7 @@ mars_global_mgs1:
   process_notes: "Loadable for oxide-only comparisons; not experiment-grade for Mars volatile chemistry without sidecar salts/perchlorates."
 
 mars_basalt:
+  body: mars
   label: "Mars Basalt (General)"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
@@ -2589,6 +2606,7 @@ mars_basalt:
     HCl/HF scrubber (200-350C), CO2/CO separator.
 
 mars_sulfate_rich:
+  body: mars
   label: "Mars Sulfate-Rich Soil"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
@@ -2682,6 +2700,7 @@ mars_sulfate_rich:
     C1-C6 identical to baseline. Ideal early chemical production site.
 
 mars_phyllosilicate_clay:
+  body: mars
   label: "Mars Phyllosilicate Clay"
   stage0_profile: "mars_carbon_cleanup"
   stage0_carrier_keys:
@@ -2755,6 +2774,7 @@ mars_phyllosilicate_clay:
     baseline due to lower SiO2 activity.
 
 mars_perchlorate_rich:
+  body: mars
   label: "Mars Perchlorate-Rich Soil"
   stage0_carrier_keys:
     carbonate:
