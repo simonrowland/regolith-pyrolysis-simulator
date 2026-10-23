@@ -203,7 +203,9 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
 
 
 def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
-    sim = _sim()
+    feedstocks = _load_yaml("feedstocks.yaml")
+    feedstocks["lunar_mare_low_ti"].pop("body", None)
+    sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
     default_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
