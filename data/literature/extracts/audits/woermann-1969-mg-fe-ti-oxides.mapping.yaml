@@ -1,0 +1,16 @@
+source_id: woermann-1969-mg-fe-ti-oxides
+source:
+  citation: "E. Woermann, B. Brežný, and A. Muan (1969), ‘Phase Equilibria in the System MgO-Iron Oxide-TiO2 in Air’, American Journal of Science, Schairer Volume 267-A, 463–479. doi:10.2475/001c.125318."
+extraction:
+  method: >-
+    MinerU table audit; no scalar mapping is applicable. Tables 1–3 report bulk charge compositions,
+    run temperatures and phase assemblages, which remain context under ruling 1. Invariant liquid
+    compositions are embedded in a phase-description cell rather than separate numeric cells, so
+    the table tool cannot emit their scalar components. These values were transcribed from and
+    checked against 600 dpi page renders. The page 7, 1596 °C line reads Fe3O2, but its footnote
+    defines total iron oxide as Fe2O3; the stored component uses that footnote basis and its locator
+    note preserves the discrepancy.
+  date: '2026-10-22'
+  worker: Codex
+review_status: draft
+tables: []
