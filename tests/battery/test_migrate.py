@@ -7412,7 +7412,10 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
     # Wang 2001 (d2143313b, same F22 merge) adds 432 printed residue cells: 1518->1950.
     # Neuman 2026 (2751617f2, merge d357e86db) adds 2160 printed residue cells: 1950->4110.
-    assert census.get("residue_component_composition") == 4110
+    # F15 merge 2544107c9 adds Mendybaev 2013 (4e07bd649, 96), Florin 2025
+    # (0f4e598e4, 50), Renggli 2022 (7a90bab6a, 36), and Lu 2024 (21d1ee8d7, 27):
+    # 4110->4319.
+    assert census.get("residue_component_composition") == 4319
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
