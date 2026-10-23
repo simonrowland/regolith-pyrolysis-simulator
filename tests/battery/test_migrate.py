@@ -112,6 +112,9 @@ from simulator.battery.migrate import (
 from simulator.battery.stable_ids import series_row_extra
 
 
+_FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
 def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
     from simulator.battery.validity import comparison_method_cell_constant_cancels
     from simulator.battery.migrate import (
@@ -11929,14 +11932,15 @@ def test_f1_store_usgs_reasons_do_not_deny_printed_gibbs() -> None:
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     bad: list[str] = []
-    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for source_id in _USGS_F1_FAMILIES:
         paths = iter_observation_store_paths(obs_dir, f"compilations-{source_id}.yaml")
         records_dir = (
             REPO_ROOT / "data" / "literature" / "compilations" / source_id / "records"
         )
         for path in paths:
-            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader) or {}
+            stored = yaml.load(
+                path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+            ) or {}
             for obs in stored.get("observations") or []:
                 q = ((obs.get("identity") or {}).get("quantity") or {}).get("value")
                 if q != "delta_fG":
@@ -12093,9 +12097,10 @@ def test_f3_store_every_compilation_observation_has_existing_source_path() -> No
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     missing: list[str] = []
-    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
     for path in iter_observation_store_paths(obs_dir, "compilations-*.yaml"):
-        stored = yaml.load(path.read_text(encoding="utf-8"), Loader=loader)
+        stored = yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
         for obs in stored.get("observations") or []:
             loc = obs.get("locator") or {}
             rel = loc.get("source_path")
