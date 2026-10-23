@@ -5981,6 +5981,28 @@ def _antoine_psat_pa(
     source_band = vapor_pressure_source_equation_range_K(
         data, coefficient_block, T_K,
     ) or vapor_pressure_valid_range_K(data, coefficient_block, T_K)
+    # A phase-boundary gap is a typed selector refusal, not a coefficient
+    # block. It has no A/B/C. Reading them hands None to the numeric owner
+    # (DepositionInputRefusal) and aborts the hour. The battery scorer
+    # already refuses this marker before evaluating A; wall Psat does the
+    # same, with the wall-saturation refusal the deposition path already
+    # records and continues past.
+    selection_refusal = (
+        antoine.get("selection_refusal") if isinstance(antoine, Mapping) else None
+    )
+    if selection_refusal:
+        refusal = WallSaturationPressureRefusal(
+            species,
+            T_K,
+            "no extrapolation available: "
+            f"{selection_refusal}; "
+            f"left_segment={antoine.get('left_segment')}({antoine.get('left_phase')}) "
+            f"right_segment={antoine.get('right_segment')}({antoine.get('right_phase')}); "
+            f"valid_range_K={source_band}",
+        )
+        refusal.valid_range_K = source_band
+        refusal.band_scope = str(selection_refusal)
+        raise refusal
     if not antoine:
         declared = _coefficient_mapping(data, coefficient_block, temperature_K=T_K)
         if declared:

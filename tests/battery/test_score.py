@@ -3047,6 +3047,24 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
         assert crystal["name"] == "crystal_janaf"
         assert liquid["name"] == "liquid_janaf"
 
+    # The gap marker has no A/B/C. Wall deposition must record that typed
+    # refusal and continue. It must not raise DepositionInputRefusal by
+    # coercing the missing coefficient.
+    from simulator.condensation import _try_antoine_psat_pa
+
+    extrapolations: dict = {}
+    pressure, refused = _try_antoine_psat_pa(
+        "Si",
+        1690.0,
+        vapor_pressure_data=load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+        antoine_extrapolations=extrapolations,
+    )
+    assert pressure is None and refused is True
+    record = extrapolations["Si#wall:1690.0"]
+    assert record["refusal_type"] == "WallSaturationPressureRefusal"
+    assert record["band_scope"] == "antoine-gap-crosses-phase-boundary"
+    assert "antoine-gap-crosses-phase-boundary" in record["reason"]
+
 
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
 
