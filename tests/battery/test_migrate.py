@@ -7084,6 +7084,21 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     for field in QUANTITY_SOURCE_FIELDS.get(quantity, ()):
         if field in item:
             return _num(item.get(field))
+    if q_token == "isotope_delta":
+        # 82e127173 stores exactly one "<quantity>_*" column when the canonical
+        # field is absent. Neuman 2026 (2751617f2, merge d357e86db) prints
+        # isotope_delta_delta41K_NIST_SRM_3141a_permil, and the relative series
+        # prints isotope_delta_Delta41K_sample_minus_starting_permil. Two such
+        # columns stay unselected, matching select_declared_source.
+        decorated = [
+            parsed
+            for key, value in item.items()
+            if isinstance(key, str)
+            and key.startswith("isotope_delta_")
+            and (parsed := _num(value)) is not None
+        ]
+        if len(decorated) == 1:
+            return decorated[0]
     return None
 
 
@@ -7437,6 +7452,24 @@ def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
     assert _census_expected_point(
         item, Quantity.ISOTOPE_DELTA.value, "per mil"
     ) == selected.amount
+    # 82e127173: one decorated column is the point. Neuman prints this name.
+    printed = {"isotope_delta_delta41K_NIST_SRM_3141a_permil": "-0.49"}
+    selected_printed = select_declared_source(
+        Quantity.ISOTOPE_DELTA, "per mil", printed
+    )
+    assert _census_expected_point(
+        printed, Quantity.ISOTOPE_DELTA.value, "per mil"
+    ) == selected_printed.amount
+    both = {
+        "isotope_delta_delta66": "5.54",
+        "isotope_delta_delta68": "10.79",
+    }
+    assert select_declared_source(
+        Quantity.ISOTOPE_DELTA, "per mil", both
+    ).amount is None
+    assert _census_expected_point(
+        both, Quantity.ISOTOPE_DELTA.value, "per mil"
+    ) is None
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
