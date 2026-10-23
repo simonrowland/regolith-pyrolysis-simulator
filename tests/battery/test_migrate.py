@@ -15210,6 +15210,210 @@ def test_markova_residue_default_admission_survives_printed_composition_maps(
     assert len(stored_mass_loss) == 24
     assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
 
+def test_residue_series_oxide_columns_are_migrated_or_documented() -> None:
+    residue_fields = set(
+        QUANTITY_SOURCE_FIELDS[Quantity.RESIDUE_COMPONENT_COMPOSITION]
+    )
+    non_component_reasons = {
+        "VF_wt_pct": "vaporized mass fraction, not a residue oxide component"
+    }
+    suffixes = ("_wt_pct", "_mol_pct", "_mole_pct", "_mol_percent")
+
+    def visit(node: object, seen: set[int]) -> None:
+        if isinstance(node, dict):
+            if id(node) in seen:
+                return
+            seen.add(id(node))
+            values = node.get("values")
+            if isinstance(values, dict):
+                quantity, _ = map_quantity(
+                    str(node.get("type") or "rate_series"),
+                    values,
+                    units=str(node.get("units") or ""),
+                )
+                if (
+                    quantity.is_value
+                    and quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                ):
+                    rows = [values]
+                    series = values.get("series")
+                    if isinstance(series, list):
+                        rows.extend(row for row in series if isinstance(row, dict))
+                    for row in rows:
+                        for field, value in row.items():
+                            if not str(field).lower().endswith(suffixes):
+                                continue
+                            if isinstance(value, (dict, list)):
+                                continue
+                            # These keys pin examples in the extract; they are not table columns.
+                            if str(field).startswith("pin_"):
+                                continue
+                            if field not in residue_fields:
+                                assert non_component_reasons.get(field), (
+                                    f"unmapped residue column {field!r}"
+                                )
+            for child in node.values():
+                visit(child, seen)
+        elif isinstance(node, list):
+            if id(node) in seen:
+                return
+            seen.add(id(node))
+            for child in node:
+                visit(child, seen)
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    for path in extracts.glob("*.yaml"):
+        text = path.read_text(encoding="utf-8")
+        if "residue_composition" not in text:
+            continue
+        visit(yaml.safe_load(text), set())
+
+
+def _wang_residue_cell_extract(field: str, value: str, observation_id: str) -> dict:
+    source_id = "wang-2001-solar-melt-evaporation-residues"
+    sample_locator = {
+        "page": 4,
+        "published_page": 482,
+        "table": "1",
+        "row": "SC12",
+    }
+    temperature_locator = {
+        "page": 6,
+        "published_page": 484,
+        "table": "2",
+        "row": "SC12",
+    }
+    return {
+        "source_id": source_id,
+        "source": {
+            "citation": "Wang et al. (2001), Geochimica et Cosmochimica Acta 65(3)",
+            "doi": "10.1016/S0016-7037(00)00529-9",
+        },
+        "species": {
+            "SiO2": {
+                "observations": [
+                    {
+                        "observation_id": observation_id,
+                        "type": "composition_series",
+                        "locator": sample_locator,
+                        "phase": "l",
+                        "units": "wt%",
+                        "values": {
+                            "quantity": "residue_composition_vs_time",
+                            "method_class": "measured_direct",
+                            "series": [
+                                {
+                                    "sample": "SC12",
+                                    "T_C": "1400",
+                                    "t_min": "0",
+                                    "VF_wt_pct": "0.38",
+                                    field: value,
+                                    "locator": sample_locator,
+                                    "point_conditions": {
+                                        "temperature_K": {
+                                            "state": {
+                                                "tag": "value",
+                                                "value": "1673.15",
+                                            },
+                                            "locator": temperature_locator,
+                                        },
+                                        "time_min": {
+                                            "state": {"tag": "value", "value": "0"},
+                                            "locator": temperature_locator,
+                                        },
+                                    },
+                                }
+                            ],
+                        },
+                    }
+                ]
+            }
+        },
+    }
+
+
+def _migrate_wang_residue_cell(
+    tmp_path: Path,
+    *,
+    field: str,
+    formula: str,
+    value: Decimal,
+    observation_id: str,
+) -> None:
+    source_id = "wang-2001-solar-melt-evaporation-residues"
+    result = _migrate_real_extract(
+        tmp_path / field,
+        f"{source_id}.yaml",
+        extract_doc=_wang_residue_cell_extract(field, str(value), observation_id),
+    )
+    matching = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == formula
+    ]
+    assert len(matching) == 1
+    observation = matching[0]
+    assert observation.value.point == value
+    assert observation.identity.temperature_K.is_value
+    assert observation.identity.temperature_K.value == Decimal("1673.15")
+    assert observation.point_conditions is not None
+    for key in ("temperature_K", "time_min"):
+        condition = observation.point_conditions[key]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page == 6
+        assert condition.locator.table == "2"
+    assert observation.point_conditions["temperature_K"].state.value == Decimal(
+        "1673.15"
+    )
+    assert observation.point_conditions["time_min"].state.value == Decimal("0")
+
+
+def test_wang_tio2_residue_cell_migrates_with_temperature_and_conditions(
+    tmp_path: Path,
+) -> None:
+    # Wang et al. (2001), Table 1, SC12 electron-microprobe TiO2 cell: 0.097 wt%.
+    _migrate_wang_residue_cell(
+        tmp_path,
+        field="TiO2_wt_pct",
+        formula="TiO2",
+        value=Decimal("0.097"),
+        observation_id="wang_2001_table1_electron_microprobe_residue_compositions",
+    )
+
+
+def test_wang_wo3_residue_cell_migrates_with_temperature_and_conditions(
+    tmp_path: Path,
+) -> None:
+    # Wang et al. (2001), Table 1, SC12 ion-microprobe WO3 cell: 0.010 wt%.
+    _migrate_wang_residue_cell(
+        tmp_path,
+        field="WO3_wt_pct",
+        formula="WO3",
+        value=Decimal("0.010"),
+        observation_id="wang_2001_table1_ion_microprobe_residue_compositions",
+    )
+
+
+def test_residue_series_keeps_legacy_no_temperature_point_ids(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    result = _migrate_real_extract(
+        tmp_path / source_id,
+        f"{source_id}.yaml",
+    )
+    observation = result.observations[
+        f"{source_id}::ivanova_2018_table1_residue_composition::point:6"
+    ]
+
+    assert observation.identity.quantity.is_value
+    assert observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    assert observation.identity.species.formula == "SiO2"
+    assert observation.value.point == Decimal("27.17")
+
 
 def test_hashimoto_row_left_live_diagnostics_are_final(
     tmp_path: Path,
