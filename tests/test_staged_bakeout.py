@@ -289,7 +289,10 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
     # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). These pins
     # are rerun from the current 62d9d561a green.
-    assert staged_silica == pytest.approx(0.06888507997517511, rel=1e-9)
+    # t-1494 extends staged C3_NA from 3 to 6 h, so this 30 h probe now
+    # includes three bakeout ticks. Studio-2 measured stage-3 silica
+    # +5.603047e-5 kg (+0.08133905%).
+    assert staged_silica == pytest.approx(0.06894111044529383, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
