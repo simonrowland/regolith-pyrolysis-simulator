@@ -80,6 +80,7 @@ from simulator.battery.identity import (
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     _AXIS_NAMES,
+    _composition_is_fixed_valence,
     identity_equal,
     _identity_equal,
     _same_row_redox_identity_equal,
@@ -106,6 +107,7 @@ from simulator.battery.migrate import (
     load_migrated_store,
     load_yaml,
     _convert_compilation_amount,
+    _is_engine_oxide_component,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
     observation_matches_source_tokens,
@@ -7331,6 +7333,278 @@ def _resolve_battery_engine_handle(
     return handle
 
 
+def _predict_transition_temperature(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    handles: Mapping[str, object] | None,
+    opener,
+) -> EnginePrediction:
+    def refused(
+        reason: RefusalReason,
+        detail: Mapping[str, object],
+        *,
+        execution: ExecutionState = ExecutionState.NOT_PROBED,
+        call_evidence: str | None = None,
+    ) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=execution, call_evidence=call_evidence),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail=detail,
+            identity=identity,
+        )
+
+    if engine not in MELTS_ENGINES:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            _quantity_not_predicted_detail(Quantity.TRANSITION_TEMPERATURE),
+            execution=ExecutionState.UNSUPPORTED,
+        )
+
+    subtype_state = identity.subtype
+    if subtype_state is None or not subtype_state.is_value or not subtype_state.value:
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "transition_kind_unknown"},
+        )
+    subtype = str(subtype_state.value)
+    if subtype not in {"liquidus", "solidus"}:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "transition_kind_not_melt_boundary",
+                "subtype": subtype,
+            },
+            execution=ExecutionState.UNSUPPORTED,
+        )
+
+    composition_state = identity.composition
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or not isinstance(composition_state.value, Composition)
+    ):
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "composition_unknown"},
+        )
+    composition = composition_state.value
+    if composition.proxy_flag is not None or composition.basis == "sample_catalog_proxy":
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "composition_not_printed"},
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    positive_components = tuple(
+        (name, amount) for name, amount in composition.components if amount > 0
+    )
+    unsupported_components = sorted(
+        name
+        for name, _amount in positive_components
+        if not _is_engine_oxide_component(name)
+    )
+    if unsupported_components:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "composition_not_engine_oxides",
+                "components": unsupported_components,
+            },
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    if len(positive_components) < 2 or not any(
+        name == "SiO2" for name, _amount in positive_components
+    ):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "composition_not_multicomponent_silicate_melt"},
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    composition_wt = composition_wt_pct(composition)
+    if composition_wt is None:
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "composition_unavailable"},
+        )
+
+    pressure_state = identity.total_pressure_Pa
+    if (
+        pressure_state is None
+        or not pressure_state.is_value
+        or pressure_state.value is None
+    ):
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "total_pressure_unknown"},
+        )
+    pressure_pa = as_decimal(pressure_state.value)
+    if not pressure_pa.is_finite() or pressure_pa <= 0:
+        return refused(
+            RefusalReason.INVALID_IDENTITY,
+            {"reason": "total_pressure_invalid", "value": str(pressure_pa)},
+        )
+    pressure_bar = float(pressure_pa / PA_PER_BAR_DEC)
+
+    fO2_log = _printed_fo2_log10_bar(identity)
+    if fO2_log is None:
+        fO2_pa = _printed_point_pa(observation, "fO2_Pa")
+        if fO2_pa is not None:
+            fO2_log = float(fO2_pa.log10() - Decimal("5"))
+    if fO2_log is None and not _composition_is_fixed_valence(identity):
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "fO2_not_printed"},
+        )
+
+    handle = _resolve_battery_engine_handle(engine, handles, opener)
+    name = str(getattr(handle, "name", engine.value))
+    call_evidence = f"find_liquidus_solidus:{name}"
+    if not getattr(handle, "available", False) or getattr(handle, "backend", None) is None:
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "unavailable",
+                "engine": engine.value,
+                "detail": str(getattr(handle, "unavailable_reason", None) or ""),
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=f"open_battery_engine:{name}",
+        )
+    finder = getattr(handle.backend, "find_liquidus_solidus", None)
+    if not callable(finder):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "liquidus_finder_not_available", "engine": engine.value},
+            execution=ExecutionState.UNSUPPORTED,
+        )
+    try:
+        result = finder(
+            composition_kg={
+                oxide: amount / 1000.0 for oxide, amount in composition_wt.items()
+            },
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+        )
+    except Exception as exc:  # noqa: BLE001 - optional engine boundary
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "liquidus_finder_failed",
+                "engine": engine.value,
+                "detail": f"{type(exc).__name__}: {exc}",
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=call_evidence,
+        )
+
+    diagnostics = getattr(result, "diagnostics", {}) or {}
+    status = str(getattr(result, "status", "unavailable"))
+    if diagnostics.get("composition_projected_notice") is not None:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "composition_projected", "engine": engine.value},
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=call_evidence,
+        )
+    if subtype == "liquidus":
+        raw_temperature_K = getattr(result, "liquidus_T_K", None)
+    else:
+        solidus_T_C = getattr(result, "solidus_T_C", None)
+        raw_temperature_K = (
+            None
+            if solidus_T_C is None
+            else Decimal(str(solidus_T_C)) + Decimal("273.15")
+        )
+    if raw_temperature_K is None:
+        if subtype == "solidus" and status == "ok":
+            return refused(
+                RefusalReason.UNSUPPORTED,
+                {"reason": "solidus_not_reported", "engine": engine.value},
+                execution=ExecutionState.UNSUPPORTED,
+            )
+        reason = "out_of_domain" if status == "out_of_domain" else status
+        return refused(
+            RefusalReason.METRIC_DOMAIN
+            if status == "out_of_domain"
+            else RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": reason,
+                "engine": engine.value,
+                "warnings": tuple(getattr(result, "warnings", ()) or ()),
+            },
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=call_evidence,
+        )
+    value = as_decimal(raw_temperature_K)
+    if not value.is_finite() or value <= 0:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {"reason": "transition_temperature_invalid", "engine": engine.value},
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=call_evidence,
+        )
+    if status not in {"ok", "out_of_domain"}:
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {"reason": status, "engine": engine.value},
+            execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            call_evidence=call_evidence,
+        )
+
+    diagnostic_authority = diagnostics.get("authority")
+    extrapolated = status == "out_of_domain" or diagnostic_authority == Authority.EXTRAPOLATED.value
+    notices: tuple[Notice, ...] = ()
+    authority = Authority.BRIDGE
+    if extrapolated:
+        authority = Authority.EXTRAPOLATED
+        commissioning = diagnostics.get("commissioning_notice")
+        certified_band = diagnostics.get("certified_band")
+        if certified_band is None and isinstance(commissioning, Mapping):
+            certified_band = commissioning.get("certified_band")
+        band = (
+            json.dumps(certified_band, sort_keys=True, default=str)
+            if isinstance(certified_band, Mapping)
+            else str(certified_band or f"{engine.value} finder domain")
+        )
+        reason = (
+            commissioning.get("reason")
+            if isinstance(commissioning, Mapping)
+            else None
+        ) or str(diagnostics.get("backend_status_reason") or status)
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.TRANSITION_TEMPERATURE,),
+                reason=str(reason),
+                origin=f"engine:{engine.value}",
+                band=band,
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence=call_evidence,
+        ),
+        value=value,
+        unit=QUANTITY_UNITS[Quantity.TRANSITION_TEMPERATURE],
+        authority=authority,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -7381,6 +7655,16 @@ def predict_with_engine(
             lineage_complete=False,
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
+        )
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        return _predict_transition_temperature(
+            engine,
+            observation,
+            identity,
+            channel,
+            sources,
+            handles,
+            open_battery_engine,
         )
     if quantity in _SPECIES_FORMULA_INDEPENDENT_QUANTITIES:
         return _predict_mass_loss_with_residue(

@@ -65,6 +65,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    _identity_equal,
     identity_equal,
     profile_for,
     quantity_token,
@@ -322,6 +323,57 @@ def _table_pair_payload(delta_obs: Observation, log_obs: Observation) -> dict | 
         "reaction_id": ident.species.formula,
         "printed_log10_Kf": log_obs.observation_id,
     }
+
+
+def _transition_temperature_identity_conflicts(
+    observations: Iterable[Observation],
+) -> list[ValidationIssue]:
+    by_species: dict[str, list[Observation]] = {}
+    for observation in observations:
+        identity = observation.identity
+        if (
+            not isinstance(identity, Identity)
+            or quantity_token(identity) is not Quantity.TRANSITION_TEMPERATURE
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+            or observation.value.kind is not ValueKind.POINT
+            or observation.value.point is None
+        ):
+            continue
+        by_species.setdefault(identity.species.formula, []).append(observation)
+
+    issues: list[ValidationIssue] = []
+    for rows in by_species.values():
+        for index, left in enumerate(rows):
+            for right in rows[index + 1 :]:
+                if left.value.point == right.value.point:
+                    continue
+                # The species here is the bulk sample. Its phase is not
+                # printed, so ignore that one unknown axis while comparing
+                # the transition identity and its required conditions.
+                equal = _identity_equal(
+                    left.identity,
+                    right.identity,
+                    allow_unknown_species_phase=True,
+                )
+                if equal.kind is not IdentityEqualKind.EQUAL:
+                    continue
+                first, second = sorted(
+                    (
+                        (left.observation_id, left.value.point),
+                        (right.observation_id, right.value.point),
+                    ),
+                    key=lambda item: item[0],
+                )
+                issues.append(
+                    _issue(
+                        f"transition_temperature[{first[0]}|{second[0]}]",
+                        RefusalReason.IDENTITY_MISMATCH,
+                        "admitted transition_temperature observations share an equal "
+                        f"identity but print conflicting point values: {first[0]}="
+                        f"{first[1]}, {second[0]}={second[1]}",
+                    )
+                )
+    return issues
 
 
 def build_printed_thermo_index(
@@ -2063,6 +2115,7 @@ def validate_corpus(
                 source_owners,
             )
         )
+    issues.extend(_transition_temperature_identity_conflicts(obs_map.values()))
     for cycle in _ancestry_cycles(obs_map):
         issues.append(
             _issue(
