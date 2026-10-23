@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from simulator.battery import migrate
+from simulator.battery.enums import Quantity
+from simulator.battery.identity import quantity_token
 from simulator.battery.score import parse_species_formula
 
 
@@ -30,6 +32,16 @@ _CHEMICAL_FORMULA = re.compile(
 )
 _TABLE_CELL_NUMBER = re.compile(
     r"(?<![A-Za-z])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
+)
+_SCORED_SPECIES_QUANTITIES = frozenset(
+    {
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+        Quantity.P_REFERENCE,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    }
 )
 _COMPOSITION_META_KEYS = migrate._COMPOSITION_MOL_META_KEYS
 _LEGACY_LOCATOR_INDEX_CUTOFF = date(2026, 10, 18)
@@ -956,6 +968,7 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
         return [report.migration_error]
 
     result = migrator.result
+    species_issues = _species_container_issues(doc, result.observations)
     kinds = Counter(
         observation.value.kind.value
         for observation in result.observations.values()
@@ -976,12 +989,148 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
         () if result.validation is None else result.validation.hard_issues
     )
     report.migration_hard_issues = len(hard_issues)
+    issues = []
     if hard_issues:
-        return [
+        issues.append(
             f"{len(hard_issues)} hard migration issue(s): "
             f"{hard_issues[0].path} {hard_issues[0].reason.value}"
-        ]
-    return []
+        )
+    issues.extend(species_issues)
+    return issues
+
+
+def _species_container_issues(doc: object, observations: Mapping[str, Any]) -> list[str]:
+    """Reject scored rows whose printed component differs from migrated identity."""
+    if not isinstance(doc, Mapping):
+        return []
+    species_blocks = doc.get("species")
+    if not isinstance(species_blocks, Mapping):
+        return []
+
+    container_formulas = {
+        str(formula)
+        for formula in species_blocks
+        if parse_species_formula(str(formula)) is not None
+    }
+    issues: list[str] = []
+    for container, observation in migrate.iter_extract_observations(doc):
+        raw_id = str(observation.get("observation_id") or "")
+        migrated = observations.get(f"{doc.get('source_id', '')}::{raw_id}")
+        if migrated is None:
+            migrated = next(
+                (item for key, item in observations.items() if key.endswith(f"::{raw_id}")),
+                None,
+            )
+        if migrated is None:
+            continue
+        identity_formula = migrated.identity.species.formula
+        values = observation.get("values")
+        if not isinstance(values, Mapping):
+            continue
+        quantity = quantity_token(migrated.identity)
+        if quantity not in _SCORED_SPECIES_QUANTITIES:
+            continue
+        row_species = _scored_row_species(
+            raw_id,
+            values,
+            quantity,
+            container_formulas,
+        )
+        if row_species is not None and identity_formula != row_species:
+            issues.append(
+                f"species.{container}.observations[{raw_id}] migrated as "
+                f"{identity_formula}, while row names {row_species}"
+            )
+    return issues
+
+
+def _scored_row_species(
+    observation_id: str,
+    values: Mapping[str, Any],
+    quantity: Quantity,
+    known_formulas: set[str],
+) -> str | None:
+    """Read one component only from fields that name a scored quantity's species."""
+    explicit = values.get("formula")
+    if isinstance(explicit, str) and explicit.strip():
+        return explicit.strip()
+    for key in ("oxide_formula_as_published", "component_as_published"):
+        explicit = values.get(key)
+        if isinstance(explicit, str) and parse_species_formula(explicit) is not None:
+            return explicit
+
+    candidates = set(known_formulas)
+    for key in values:
+        match = re.fullmatch(
+            r"(?:a|gamma|activity|p_partial|p_sat|p_reference)_"
+            r"([A-Za-z][A-Za-z0-9.]*)",
+            str(key),
+        )
+        if match and parse_species_formula(match.group(1)) is not None:
+            candidates.add(match.group(1))
+
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        component = values.get("component_as_published")
+        if isinstance(component, str) and parse_species_formula(component) is not None:
+            return component
+        primary_oxide = values.get("primary_oxide_wt_pct")
+        if isinstance(primary_oxide, Mapping) and len(primary_oxide) == 1:
+            formula = str(next(iter(primary_oxide)))
+            if parse_species_formula(formula) is not None:
+                return formula
+        return None
+
+    # `values.quantity` and component-bearing value keys describe the measured
+    # activity/gas species. A caption or bulk composition is deliberately ignored.
+    quantity_text = values.get("quantity")
+    text_matches: set[str] = set()
+    if isinstance(quantity_text, str):
+        match = re.fullmatch(
+            r"(?:a|gamma|activity(?: coefficient)?(?: of)?|"
+            r"partial pressure(?: of)?|p_(?:partial|sat|reference))"
+            r"\s*[_(:]?\s*([A-Z][A-Za-z0-9.]*)\)?",
+            quantity_text.strip(),
+            re.I,
+        )
+        if match and parse_species_formula(match.group(1)) is not None:
+            text_matches.add(match.group(1))
+    component_keys = {
+        match.group(1)
+        for key in values
+        if (match := re.fullmatch(
+            r"(?:a|gamma|activity|p_partial|p_sat|p_reference)_([A-Za-z][A-Za-z0-9.]*)",
+            str(key),
+        ))
+        and parse_species_formula(match.group(1)) is not None
+    }
+    text_matches.update(component_keys)
+
+    marker = re.compile(
+        r"(?:^|_)(?:a|gamma|activity|p_partial|p_sat|p_reference)_", re.I
+    )
+    if marker.search(observation_id):
+        text_matches.update(
+            formula
+            for formula in candidates
+            if re.search(
+                rf"(?:^|_)(?:a|gamma|activity|p_partial|p_sat|p_reference)_"
+                rf"{re.escape(formula)}(?:_|$)",
+                observation_id,
+                re.I,
+            )
+        )
+    else:
+        text_matches.update(
+            formula
+            for formula in candidates
+            if re.search(
+                rf"(?:^|_){re.escape(formula)}_"
+                r"(?:activity|gamma|p_partial|p_sat|p_reference)(?:_|$)",
+                observation_id,
+                re.I,
+            )
+        )
+    return next(iter(text_matches)) if len(text_matches) == 1 else None
 
 
 def evaluate_extract(
