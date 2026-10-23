@@ -11542,6 +11542,18 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     ]
     if not roots[0].is_dir():
         pytest.skip("migrated store not generated yet")
+    alpha_over_one_allowlist = {
+        "neumann-1954-liquid-k-evaporation-coefficient::"
+        "neumann_1954_k_alpha_table2::T=377.65:h=4b2e20e3e417": {
+            "source_id": "neumann-1954-liquid-k-evaporation-coefficient",
+            "page": 13,
+            "value": Decimal("1.01"),
+            "printed_uncertainty": "No numerical uncertainty for alpha is printed.",
+            "reason": "authors print alpha > 1; not a transcription error",
+            "page_quote": "104,5 … 1,01",
+        }
+    }
+    allowed_alpha_seen: set[str] = set()
     bad = []
     summary = load_observation_store_summary(REPO_ROOT)
     needle = b"evaporation_coefficient_alpha"
@@ -11559,8 +11571,30 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
                     continue
                 amount = as_decimal(val.get("point"))
                 if not (as_decimal("0") < amount <= as_decimal("1")):
-                    bad.append(f"{obs.get('observation_id')} alpha={amount}")
+                    observation_id = str(obs.get("observation_id") or "")
+                    exception = alpha_over_one_allowlist.get(observation_id)
+                    uncertainty = obs.get("uncertainty") or {}
+                    verbatim_uncertainty = uncertainty.get("verbatim")
+                    printed_uncertainty = (
+                        verbatim_uncertainty.get("note")
+                        if isinstance(verbatim_uncertainty, dict)
+                        else None
+                    )
+                    locator = obs.get("locator") or {}
+                    if (
+                        exception is not None
+                        and obs.get("source_id") == exception["source_id"]
+                        and locator.get("page") == exception["page"]
+                        and amount == exception["value"]
+                        and printed_uncertainty == exception["printed_uncertainty"]
+                        and exception["reason"]
+                        == "authors print alpha > 1; not a transcription error"
+                    ):
+                        allowed_alpha_seen.add(observation_id)
+                    else:
+                        bad.append(f"{observation_id} alpha={amount}")
     assert not bad, bad[:20]
+    assert allowed_alpha_seen == set(alpha_over_one_allowlist)
 
 
 def test_l05c5_store_unavailable_values_are_queued() -> None:
