@@ -17087,6 +17087,33 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
+        relative_sd_percent = (
+            values.get("RSD_percent_as_printed")
+            if isinstance(values, Mapping)
+            else None
+        )
+        numeric_relative_sd_percent = _as_dec_or_none(relative_sd_percent)
+        if (
+            numeric_relative_sd_percent is not None
+            and numeric_relative_sd_percent.is_finite()
+            and numeric_relative_sd_percent >= 0
+        ):
+            verbatim = (
+                dict(uncertainty.verbatim)
+                if isinstance(uncertainty.verbatim, Mapping)
+                else {}
+            )
+            if uncertainty.verbatim is not None and not isinstance(
+                uncertainty.verbatim, Mapping
+            ):
+                verbatim["source_uncertainty"] = uncertainty.verbatim
+            verbatim["RSD_percent_as_printed"] = relative_sd_percent
+            uncertainty = Uncertainty(
+                kind=UncertaintyKind.PRINTED,
+                verbatim=verbatim,
+                value=numeric_relative_sd_percent / Decimal(100),
+                basis="relative_sd",
+            )
         observation_notices: list[Notice] = []
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)

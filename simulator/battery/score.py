@@ -316,6 +316,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: MetricOperation.ABSOLUTE,
     Quantity.MASS_LOSS_FRACTION: MetricOperation.ABSOLUTE,
     Quantity.MASS_LOSS_FRACTION_VS_T: MetricOperation.RELATIVE,
+    Quantity.ELEMENT_FRACTION_REMAINING: MetricOperation.ABSOLUTE,
     Quantity.YIELD_FRACTION: MetricOperation.RELATIVE,
     Quantity.O2_YIELD: MetricOperation.RELATIVE,
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
@@ -3786,7 +3787,8 @@ def _printed_uncertainty_source(
     basis = uncertainty.basis or ""
     unit = (
         "dex" if "dex" in basis.casefold()
-        else "fraction" if basis.casefold() in {"relative", "fraction"}
+        else "fraction"
+        if basis.casefold() in {"relative", "fraction", "relative_sd"}
         else None
     )
     value: object | None = uncertainty.value
@@ -4021,6 +4023,8 @@ def _metric_uncertainty_width(
         return amount if operation is MetricOperation.DEX else None
     if amount_unit == "fraction":
         if operation is MetricOperation.ABSOLUTE:
+            # RSD = sigma / |x| x 100% -> sigma = (RSD / 100%) |x|;
+            # sigma has x's units. For x=0.959 and RSD=1.03%, sigma=0.00988.
             amount = abs(reference) * amount
     if operation is MetricOperation.ABSOLUTE:
         return abs(amount)
