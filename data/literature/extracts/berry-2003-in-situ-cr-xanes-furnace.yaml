@@ -1,0 +1,120 @@
+schema_version: literature_extract.v1
+source_id: berry-2003-in-situ-cr-xanes-furnace
+source:
+  citation: Berry, A. J., Shelley, J. M. G., Foran, G. J., O'Neill, H. St. C. and Scott, D. R. (2003), “A furnace design for XANES spectroscopy of silicate melts under controlled oxygen fugacities and temperatures to 1773 K,” Journal of Synchrotron Radiation 10:332–336.
+  doi: 10.1107/S0909049503007556
+  year: 2003
+extraction:
+  method: Born-digital pdftotext-layout; no measured-value tables. The paper's own Cr K-edge spectra are in Figure 3 and deferred without digitisation. One quoted, approximate Cr2+/total-Cr estimate is typed from the discussion.
+  date: '2026-10-21'
+  worker: fam38-1021
+  figure_read_candidates: Figures 3(a)–(c) show XANES spectra; no numeric valence-ratio points are plotted.
+review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[berry_2003_quoted_morb_cr2_fraction].values.points[0].value
+  value: '0.5'
+  note: approximate quoted Cr2+/total-Cr fraction at 1673 K and log fO2 = -8
+  locator: {page: 4, published_page: 335, pdf_page_index: 3, section: Discussion}
+scope_assessment:
+  document_type: in-situ XANES spectroscopy of chromium in basaltic silicate melt
+  scored_observations: 1
+  note: The source has no numeric measured-result table. The sole typed value is an approximate ratio quoted from Berry & O'Neill (2003); Figure 3 contains spectral curves, not numerical ratios, and remains deferred.
+species:
+  Cr:
+    observations:
+    - observation_id: berry_2003_quoted_morb_cr2_fraction
+      type: concentration_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 335
+        section: Discussion
+        record: Estimate that at 1673 K and log fO2 = -8 around half of total Cr is Cr2+
+      phase: l
+      units: fraction Cr2+/total Cr, as printed
+      values:
+        quantity: Cr2plus_over_total_Cr
+        valence_basis:
+          numerator_oxidation_states: [2]
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: quoted_attributed
+        attribution: Berry & O'Neill (2003), as cited in the source.
+        points:
+        - label: MORB at log fO2 = -8
+          value: '0.5'
+          approximate: true
+          as_printed: around half of total Cr is present as Cr2+
+          T_K: '1673'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 335
+            section: Discussion
+            record: It is estimated that at 1673 K and log fO2 = -8 around half the total Cr is present as Cr2+
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1673'}
+              as_printed: 1673 K
+              locator: &quoted_conditions
+                page: 4
+                pdf_page_index: 3
+                published_page: 335
+                section: Discussion
+                record: estimate at 1673 K and log fO2 = -8
+            fO2_log:
+              state: {tag: value, value: '-8'}
+              as_printed: log fO2 = -8; reference unit not stated, retained on the log-bar convention
+              locator: *quoted_conditions
+    context:
+    - observation_id: berry_2003_figure1_furnace_schematic_deferred
+      type: figure_record
+      locator: {page: 2, pdf_page_index: 1, published_page: 333, figure: '1'}
+      panel: whole_figure
+      phase: not applicable; furnace schematic
+      units: schematic; no plotted numeric data
+      values:
+        quantity: unavailable
+        schema_gap: Furnace cross-section schematic; no measured quantity is plotted.
+        species: not applicable
+        temperature_as_printed: furnace operable to at least 1773 K, described in text
+        axes_as_printed: none; schematic diagram
+        caption: Cross section through the controlled oxygen fugacity X-ray spectroscopy furnace. The incident X-ray beam is perpendicular to the page.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: berry_2003_figure2_system_schematic_deferred
+      type: figure_record
+      locator: {page: 3, pdf_page_index: 2, published_page: 334, figure: '2'}
+      panel: whole_figure
+      phase: not applicable; furnace-system schematic
+      units: schematic; no plotted numeric data
+      values:
+        quantity: unavailable
+        schema_gap: Furnace-system schematic; no measured quantity is plotted.
+        species: not applicable
+        temperature_as_printed: not applicable
+        axes_as_printed: none; schematic diagram
+        caption: Schematic representation of the conceptual design and integration of the furnace system.
+        series: []
+        digitisation: deferred to a figure pass
+    - observation_id: berry_2003_figure3_xanes_spectra_deferred
+      type: figure_record
+      locator: {page: 4, pdf_page_index: 3, published_page: 335, figure: '3'}
+      panel: (a)–(c)
+      phase: Fe-free quenched silicate glasses (a); in-situ basaltic silicate melt (b); basaltic silicate melt and quenched glass (c)
+      units: normalized intensity; energy in eV
+      values:
+        quantity: unavailable
+        schema_gap: Figure 3 plots normalized Cr K-edge XANES spectra; it does not plot numeric valence ratios. The valence_ratio token cannot represent the spectra themselves.
+        candidate_tokens: [valence_ratio]
+        species: Cr
+        temperature_as_printed: panel (a), reference glasses equilibrated at 1673 K; panel (b), 1673 K; panel (c), 1473 K, 1673 K and 298 K quenched glass
+        fO2_as_printed: panel (a), log fO2 = -2 and -14; panel (b), -6, -7, -8, -9 and -10; panel (c), CO/CO2 ratio corresponding to log fO2 = -8 at 1673 K
+        axes_as_printed: {x: Energy (eV), y: Normalised intensity}
+        caption: Cr K-edge XANES spectra for (a) anorthite-diopside glasses containing either Cr2+ or Cr3+; (b) basaltic melt at 1673 K and the oxygen fugacity values indicated; and (c) basaltic melt as a function of temperature for a constant CO/CO2 ratio, equal to log fO2 = -8 at 1673 K.
+        series:
+        - {name: panel a, marker: XANES spectrum line, marker_count: 0, attribution: Berry et al. (2003), evidence_class: measured_direct}
+        - {name: panel b, marker: XANES spectrum line, marker_count: 0, attribution: Berry et al. (2003), evidence_class: measured_direct}
+        - {name: panel c, marker: XANES spectrum line, marker_count: 0, attribution: Berry et al. (2003), evidence_class: measured_direct}
+        digitisation: deferred to a figure pass
