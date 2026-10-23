@@ -3182,13 +3182,18 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
         "below_crash_floor": bool(gate.get("below_crash_floor")),
         "sio2_wt_pct": gate.get("sio2_wt_pct"),
         "run_anyway": True,
-        "bypassable_from_harness": [
-            "AlphaMELTSBackend._domain_gate / engines.alphamelts.domain.AlphaMELTSDomainGate (SiO2 band, major-oxide sum, oxide basis)"
-        ],
+        # t-894 left _domain_gate as invalid-input refusals only. The
+        # certified SiO2/T band is notice+run, so qualification has
+        # nothing in that gate to skip. Bypassing it launched SiO2-free
+        # melts (t-1469) that the basis gate already refuses.
+        "bypassable_from_harness": [],
         "not_bypassable_from_harness": [
-            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
+            "AlphaMELTSBackend._domain_gate (SiO2<=0 basis, major-oxide sum, forbidden or unrecognised species)",
+            "certified SiO2/T band is notice+run in _apply_engine_commissioning, not a skipped refusal",
             "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
-            "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
+            "subprocess_fe_free_absolute_fo2_crash (two-component Na2O/K2O-SiO2, imposed absolute fO2)",
+            "subprocess_cao_sio2_binary_crash (two-component CaO-SiO2, with or without imposed fO2)",
+            "subprocess_fe_free_silicate_absolute_fo2_crash (measured Al2O3-CaO-SiO2, Al2O3-SiO2, CaO-Na2O-SiO2, imposed absolute fO2)",
         ],
     }
 
@@ -3289,16 +3294,6 @@ def load_engine_blocks_from_report(path: Path) -> dict[str, dict[str, Any]]:
     }
 
 
-def _bypass_melts_domain_gate(backend: Any) -> None:
-    """Qualification: record-and-run. Do not change gate VALUES."""
-
-    def _pass(*_args: Any, **_kwargs: Any) -> None:
-        return None
-
-    if hasattr(backend, "_domain_gate"):
-        backend._domain_gate = _pass  # type: ignore[method-assign]
-
-
 def run_isolated_cell_worker(
     payload: Mapping[str, Any],
     *,
@@ -3340,12 +3335,6 @@ def run_isolated_cell_worker(
             and handle.backend is not None
         ):
             handles[engine_name] = handle
-    if (
-        bool(payload.get("qualification"))
-        and handle.name in MELTS_FAMILY_ENGINES
-        and handle.backend is not None
-    ):
-        _bypass_melts_domain_gate(handle.backend)
     if handle.name == "alphamelts" and handle.backend is not None:
         # A fresh per-cell backend used to start with an empty warning set.
         # Keep that output behavior while the native transport is reused.
@@ -4039,9 +4028,10 @@ def equilibrate_cell(
             liquid_fraction=None,
         )
 
-    if qualification and handle.name in MELTS_FAMILY_ENGINES:
-        _bypass_melts_domain_gate(handle.backend)
-
+    # Qualification records a certified-band miss and still calls the
+    # engine. It does not replace _domain_gate. After t-894 that method
+    # only refuses invalid input (SiO2<=0, major-oxide sum, forbidden
+    # or unrecognised species); skipping it launched those melts.
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
