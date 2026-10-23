@@ -147,6 +147,8 @@ def test_production_series_resistance_exports_rate_decomposition() -> None:
 def test_cold_wall_below_certified_antoine_range_deposits() -> None:
     vapor_pressure_data = copy.deepcopy(VAPOR_PRESSURE_DATA)
     fe_antoine = vapor_pressure_data["metals"]["Fe"]["pure_component_antoine"]
+    # This synthetic flat-fit guard supplies its own range and policy.
+    fe_antoine.pop("segments", None)
     fe_antoine["source_certified_range_K"] = [1800.0, 3100.0]
     fe_antoine["extrapolation_policy"] = "refuse"
     diagnostic: dict[str, object] = {}
@@ -204,6 +206,7 @@ def test_cold_wall_below_certified_antoine_range_deposits() -> None:
 def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
     vapor_pressure_data = copy.deepcopy(VAPOR_PRESSURE_DATA)
     fe_antoine = vapor_pressure_data["metals"]["Fe"]["pure_component_antoine"]
+    fe_antoine.pop("segments", None)
     fe_antoine["source_certified_range_K"] = [1800.0, 3100.0]
     fe_antoine["extrapolation_policy"] = "refuse"
     diagnostic: dict[str, object] = {}
@@ -347,6 +350,8 @@ def test_unavailable_wall_saturation_does_not_hide_invalid_input(field, value) -
     from simulator.condensation import DepositionInputRefusal
 
     data = copy.deepcopy(VAPOR_PRESSURE_DATA)
+    # Corrupt the relation actually selected by this synthetic input.
+    data["metals"]["Fe"]["pure_component_antoine"].pop("segments", None)
     data["metals"]["Fe"]["pure_component_antoine"].update(
         source_certified_range_K=[1800.0, 3100.0], extrapolation_policy="refuse"
     )
