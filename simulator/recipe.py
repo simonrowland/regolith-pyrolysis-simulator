@@ -925,12 +925,13 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2A_staged.na_shuttle_stage.duration_hr",
-            low=1,
+            low=4,
             high=6,
             units="hr",
-            # Duration search spans under-hold through the configured six-hour window.
+            # Four hours includes one bakeout tick; six is the configured window.
             bounds_source=(
-                "engineering_envelope through setpoints.yaml nominal "
+                "engineering_envelope from the one-bakeout-tick minimum through "
+                "setpoints.yaml nominal "
                 "campaigns.C2A_staged.na_shuttle_stage.duration_h=6"
             ),
         ),

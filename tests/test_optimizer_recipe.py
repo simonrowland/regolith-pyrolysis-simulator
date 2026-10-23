@@ -99,8 +99,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # Recomputed 2026-10-23 (t-1494): staged Na duration floor 1 -> 4 h.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "a5b28f1d07a3238d56d71b2315b4b5e57e6123bf32a9111ed8abaf7faee5bf5e"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -108,8 +109,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # t-1494 changes this derived identity with the staged-duration floor.
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "b85f1a46f534306cd20e221dff5c716de83668b0d8c9bc8837f8538d013c5936"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -122,7 +124,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "d23a4a199032f00dbdcd30d9738415cae5d94b47058e6abf787cc7c21286e42f"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
