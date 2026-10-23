@@ -17924,6 +17924,112 @@ species:
             as_published: '-4,74'
             note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     context:
+    - observation_id: kress_1991_equation7_fit_scope
+      type: thermodynamic_example
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 87
+        section: Equation 7 natural-liquid regression
+      units: quench-data count; source citations and fit scope as printed
+      values:
+        quantity: authors_fit_calibration_source_scope
+        method_class: model_derived
+        evidence_class: model_derived
+        model_id: REF-001-kress-carmichael-1991
+        engine_citation: Kress and Carmichael 1991, doi:10.1007/BF00307328
+        source_wording: >-
+          For natural liquids, values for the a, b, c and d_i in Eq. (7) were estimated on the basis
+          of a weighted stepwise-linear regression of 228 quench data from Kennedy (1948), Fudali
+          (1965), Thornber et al. (1980), Sack et al. (1980), Kilinc et al. (1983), Kress and
+          Carmichael (1988), and this study, representing compositions from ugandite to andesite,
+          equilibrated at oxygen fugacities between IW and air, at temperatures between 1200 and
+          1630 °C.
+        fit_data_scope:
+          data_count: 228
+          regression: weighted stepwise-linear
+          equation: 7
+          sources:
+          - citation: Kennedy, G. C. (1948). Equilibrium between volatiles and iron oxides in igneous rocks. American Journal
+              of Science 246:529–549.
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: Fudali, R. F. (1965). Oxygen fugacities of basaltic and andesitic magmas. Geochimica et Cosmochimica
+              Acta 29:1063–1075.
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: Thornber, C. R., Roeder, P. L., and Foster, J. R. (1980). The effect of composition on the ferric-ferrous
+              ratio in basaltic liquids at atmospheric pressure. Geochimica et Cosmochimica Acta 44:525–532.
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: Sack, R. O., Carmichael, I. S. E., Rivers, M., and Ghiorso, M. S. (1980). Ferric-ferrous equilibria
+              in natural silicate liquids at 1 bar. Contributions to Mineralogy and Petrology 75:369–376.
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: Kilinc, A., Carmichael, I. S. E., Rivers, M. L., and Sack, R. O. (1983). The ferric-ferrous ratio of
+              natural silicate liquids equilibrated in air. Contributions to Mineralogy and Petrology 83:136–140.
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: Kress, V. C., and Carmichael, I. S. E. (1988). Stoichiometry of the iron oxidation reaction in silicate
+              melts. American Mineralogist 73:1267–1274.
+            source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            reference_locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 92
+          - citation: this study
+            source_id: kress-carmichael-1991-iron-redox-calibration
+            fit_locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+          fixed_parameter:
+            citation: Stebbins, J. F., Carmichael, I. S. E., and Moret, L. K. (1984). Heat capacities and entropies of silicate
+              liquids and glasses. Contributions to Mineralogy and Petrology 86:131–148.
+            locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 87
+            note: The paper says the Eq. 7 value for e was adopted from this source; it is not among the 228 quench data.
+        note: >-
+          Completeness assertion: the six prior fit sources are exactly the six works enumerated above; the fit sentence
+          also includes this study's own data. Equation 7 natural-liquid regression, published p. 87, PDF page index 5;
+          reference list pp. 91–92, PDF page indices 9–10. The source reports compositions from ugandite to andesite,
+          oxygen fugacities between IW and air, and temperatures between 1200 and 1630 °C.
     - observation_id: kc91_t6_a
       type: fit_coefficient_row
       locator:
