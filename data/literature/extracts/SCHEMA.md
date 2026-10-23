@@ -352,26 +352,27 @@ rhodium rows in the same table are lower bounds (`alpha_lower_bound`,
 Area-normalised flux from the evaporation law. `type: rate_series`.
 `values.quantity` is `evaporation_flux`. The number is
 `values.evaporation_flux`. Keep the printed unit. Allowed printed units are
-`mol m^-2 s^-1` and `kg m^-2 s^-1`. Do not convert at extraction. The
-canonical store unit is `subtype_defined` so both printed units survive; the
-scorer converts.
+`mol m^-2 s^-1`, `kg m^-2 s^-1`, and `μg cm^-2 s^-1`. Do not convert at
+extraction. The migrator converts `μg cm^-2 s^-1` to `kg m^-2 s^-1` using
+`1 μg cm^-2 s^-1 = 1e-5 kg m^-2 s^-1`. The canonical store unit is
+`subtype_defined` so molar and mass flux families remain distinct; the scorer
+converts between those families when a prediction path supports them.
 
-Required printed identity:
+Printed identity and conditions:
 
 | Field | Meaning |
 |-------|---------|
-| `values.gas_species` | Evaporating species, as printed. Do not rewrite an oxide gas to the element |
+| `values.gas_species` | Vapour species, when the source identifies it. Do not rewrite an oxide gas to the element. If the source names only the condensed material, retain that material under the outer `species` key and omit `gas_species`; scoring then refuses the missing vapour species. |
 | `values.composition_as_printed` | Melt composition |
 | `T_C` or `T_K` | Temperature |
 | `values.P_total` with `values.P_total_unit` | Total pressure, as printed |
 | `values.atmosphere` or `values.carrier` | Atmosphere or carrier gas |
-| `values.flow` | Gas-flow conditions. The block is required even when the source omits a member |
+| `values.flow` | Gas-flow conditions, when printed. If no complete flow/geometry block is printed, omit this field; the row refuses `missing_input` when scored. |
 
-`values.flow` has four members: `flow_rate`, `velocity`, `geometry`,
-`crucible_or_sample_area`. A member the source prints is copied with its
-unit. A member the source omits is `{state: not_printed}` plus the locator
-of the place that was checked. Never write velocity 0, a still-gas flag, or
-an invented area.
+When `values.flow` is printed, it has four members: `flow_rate`, `velocity`,
+`geometry`, `crucible_or_sample_area`. A printed member is copied with its
+unit. If the source gives no complete flow/geometry block, omit `values.flow`;
+never write velocity 0, a still-gas flag, or an invented area.
 
 `mass_loss_rate` and `evaporation_rate` stay extensive rates (`kg s^-1`).
 A row that prints those tokens is not an evaporation flux.
