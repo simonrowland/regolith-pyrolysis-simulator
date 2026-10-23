@@ -1,0 +1,561 @@
+schema_version: literature_extract.v1
+source_id: itoh-1985-beta-alumina-na2o-emf
+source:
+  citation: 'Itoh, M., Kimura, K. and Kozuka, Z. (1985), "Measurement of Na2O Activity in Beta-Alumina by EMF Method", Transactions of the Japan Institute of Metals 26(5), 353–361.'
+  doi: 10.2320/matertrans1960.26.353
+  year: 1985
+  version: complete English publisher journal scan; nine physical pages
+extraction:
+  method: >-
+    MinerU table drafts were mapped and emitted for the two present-work
+    Table 1 activity rows. Table 1 and Table 2 were render-checked at 600 dpi;
+    cited activity rows and context data were transcribed from those renders.
+    Figures 3–9 are recorded without digitized points. Table 2 values are
+    author-calculated from cited thermochemical data and equations (7)–(8).
+  date: '2026-10-20'
+  worker: codex-fam28-1020
+  provenance_path: corpus/raw/itoh-1985-beta-alumina-na2o-emf/itoh-1985-beta-alumina-na2o-emf.pdf
+review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observation_id: itoh_1985_table1_alpha_beta_this_work_activity_1000k
+    field: value
+    value: 2.82e-13
+    locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: 'This work'}
+  - species: Na2O
+    observation_id: itoh_1985_table1_beta_beta_prime_this_work_activity_1000k
+    field: value
+    value: 2.95e-11
+    locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: 'This work'}
+experiments:
+  - experiment_id: itoh_1985_beta_alumina_emf
+    method: emf
+    method_as_printed: galvanic-cell EMF measurements using beta-alumina solid electrolyte
+    locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 353
+      section: Abstract
+    conditions:
+      atmosphere_as_printed:
+        state: {tag: value, value: air at the oxygen electrode}
+        locator: {page: 1, pdf_page_index: 0, published_page: 353}
+      fO2_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, pdf_page_index: 0, published_page: 353, note: Air is named but its oxygen partial pressure is not printed for the activity measurement.}
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, pdf_page_index: 0, published_page: 353, note: Total pressure is not reported for the activity measurement.}
+species:
+  Na2O:
+    observations:
+      - observation_id: itoh_1985_table1_alpha_beta_ref3_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '1'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1000'}
+            locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '1'}
+          composition:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '1', note: Phase assemblage is printed but its composition is not given.}
+        units: dimensionless activity
+        values:
+          quantity: activity
+          phase_as_printed: solid assemblage (alpha+beta)-alumina
+          method_class: quoted_attributed
+          value: 1.25e-13
+          activity: 1.25e-13
+          value_as_printed: 1.25 × 10⁻¹³
+          attribution: '(3)'
+          T_K: '1000'
+          standard_state_as_printed: not stated
+      - observation_id: itoh_1985_table1_alpha_beta_ref6_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '2'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '2'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '2', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (alpha+beta)-alumina, method_class: quoted_attributed, value: 1.62e-14, activity: 1.62e-14, value_as_printed: 1.62 × 10⁻¹⁴, attribution: '(6)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_alpha_beta_ref22_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '3'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '3'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '3', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (alpha+beta)-alumina, method_class: quoted_attributed, value: 1.52e-17, activity: 1.52e-17, value_as_printed: 1.52 × 10⁻¹⁷, attribution: '(22)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_alpha_beta_ref23_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '4'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '4'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '4', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (alpha+beta)-alumina, method_class: quoted_attributed, value: 3.23e-12, activity: 3.23e-12, value_as_printed: 3.23 × 10⁻¹², attribution: '(23)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_alpha_beta_ref24_25_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '5'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '5'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '5', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (alpha+beta)-alumina, method_class: quoted_attributed, value: 1.58e-13, activity: 1.58e-13, value_as_printed: 1.58 × 10⁻¹³, attribution: '(24)(25)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_alpha_beta_ref26_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '6'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '6'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '6', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (alpha+beta)-alumina, method_class: quoted_attributed, value: 2.00e-13, activity: 2.00e-13, value_as_printed: 2.00 × 10⁻¹³, attribution: '(26)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_alpha_beta_this_work_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '7'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '7'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '7', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values:
+          quantity: activity
+          phase_as_printed: solid assemblage (alpha+beta)-alumina
+          method_class: measured_reduced
+          value: 2.82e-13
+          activity: 2.82e-13
+          value_as_printed: 2.82 × 10⁻¹³
+          T_K: '1000'
+          derivation:
+            relation: Equation (6) reduction from the galvanic-cell EMF and the standard Gibbs energy of Na2O
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 3, pdf_page_index: 2, published_page: 355, figure: '3'}
+          standard_state_as_printed: not stated
+      - observation_id: itoh_1985_table1_beta_beta_prime_ref25_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '8'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '8'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '8', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values: {quantity: activity, phase_as_printed: solid assemblage (beta+beta-double-prime)-alumina, method_class: quoted_attributed, value: 1.00e-9, activity: 1.00e-9, value_as_printed: 1.00 × 10⁻⁹, attribution: '(25)', T_K: '1000', standard_state_as_printed: not stated}
+      - observation_id: itoh_1985_table1_beta_beta_prime_this_work_activity_1000k
+        admission_status: admitted
+        type: activity_coefficient
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '9'}
+        experiment: itoh_1985_beta_alumina_emf
+        phase: cr
+        per: dimensionless
+        T_range_K: [1000, 1000]
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: alpha}
+              component_basis: Na2O
+          inferred: true
+          note: Equation (6) uses the Na2O standard Gibbs energy and equation (14) names Na2O(s); at 1000 K the pure oxide is alpha crystalline Na2O, below the JANAF Na-014 melting point of 1405.200 K.
+          locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        point_conditions:
+          temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '9'}}
+          composition: {state: {tag: unknown, reason: not_published}, locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '9', note: Phase assemblage is printed but its composition is not given.}}
+        units: dimensionless activity
+        values:
+          quantity: activity
+          phase_as_printed: solid assemblage (beta+beta-double-prime)-alumina
+          method_class: measured_reduced
+          value: 2.95e-11
+          activity: 2.95e-11
+          value_as_printed: 2.95 × 10⁻¹¹
+          T_K: '1000'
+          derivation:
+            relation: Equation (6) reduction from the galvanic-cell EMF and the standard Gibbs energy of Na2O
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 3, pdf_page_index: 2, published_page: 355, figure: '3'}
+          standard_state_as_printed: not stated
+    context:
+      - observation_id: itoh_1985_table1_delta_g_formation_from_oxides
+        type: thermochemical_context
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1'}
+        phase: Na2O·11Al2O3 in alpha+beta alumina
+        units: kJ per printed reaction
+        values:
+          quantity: reaction Gibbs energy from oxides
+          reason_no_quantity_token: The printed delta G formation column is for formation from oxides, not formation from elements or absolute Gibbs energy.
+          reaction_as_printed: Na2O(s) + 11Al2O3(s) = Na2O·11Al2O3
+          values_as_printed:
+            - {row: '(3)', value: -247}
+            - {row: '(6)', value: -264}
+            - {row: '(22)', value: -322}
+            - {row: '(23)', value: -220}
+            - {row: '(24)(25)', value: -245}
+            - {row: '(26)', value: -243}
+            - {row: This work, value: -240}
+      - observation_id: itoh_1985_table1_beta_beta_prime_delta_g_blank
+        type: thermochemical_context
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, table: '1', row: '8–9'}
+        phase: beta+beta-double-prime alumina
+        units: as printed
+        values:
+          quantity: reaction Gibbs energy from oxides
+          value_as_printed: em dash
+          reason: Table 1 leaves this column blank for the beta+beta-double-prime rows; no ditto or zero is inferred.
+      - observation_id: itoh_1985_table2_calculated_partial_pressures
+        type: model_derived
+        locator: {page: 7, pdf_page_index: 6, published_page: 359, table: '2'}
+        phase: solid assemblage alpha+beta or beta+beta-double-prime alumina
+        units: ratios to standard pressure P°
+        values:
+          quantity: equilibrium SO2 SO3 and CO2 partial-pressure ratios
+          method_class: model_derived
+          reason: Calculated from thermochemical data (29) and equations (7), (8), (16), and (17); no table asset can be registered in this run.
+          derivation_note: derivation pending a corpus table asset (controller, t-1382)
+          inputs_csv: .agent-scratch/F28-tables/itoh-1985-beta-alumina-na2o-emf/table-2-inputs.csv
+          inputs_as_printed:
+            - equation 7: log aNa2O = -0.40 - 12140(K/T) for alpha+beta alumina
+            - equation 8: log aNa2O = 0.85 - 11380(K/T) for beta+beta-double-prime alumina
+            - thermochemical data source (29): JANAF Thermochemical Tables
+            - SO2/SO3 condition: P_O2/P° = 0.21
+          data_csv: .agent-scratch/F28-tables/itoh-1985-beta-alumina-na2o-emf/table-2-values.csv
+          rows_as_printed:
+            - {T_K: 500, alpha_beta: {SO2: '1.41e-31', SO3: '1.66e-26', CO2: '1.32e-1'}, beta_beta_prime: {SO2: '2.40e-34', SO3: '2.82e-29', CO2: '2.24e-4'}}
+            - {T_K: 600, alpha_beta: {SO2: '4.07e-24', SO3: '9.12e-21', CO2: '3.84e0'}, beta_beta_prime: {SO2: '1.26e-26', SO3: '2.82e-23', CO2: '1.17e-2'}}
+            - {T_K: 700, alpha_beta: {SO2: '7.41e-19', SO3: '1.00e-16', CO2: '3.92e1'}, beta_beta_prime: {SO2: '3.47e-21', SO3: '4.68e-19', CO2: '1.81e-1'}}
+            - {T_K: 800, alpha_beta: {SO2: '6.46e-15', SO3: '1.02e-13', CO2: '2.06e2'}, beta_beta_prime: {SO2: '4.07e-17', SO3: '6.46e-16', CO2: '1.30e0'}}
+            - {T_K: 900, alpha_beta: {SO2: '6.92e-12', SO3: '2.12e-11', CO2: '7.28e2'}, beta_beta_prime: {SO2: '5.57e-14', SO3: '1.71e-13', CO2: '5.86e0'}}
+            - {T_K: 1000, alpha_beta: {SO2: '1.78e-9', SO3: '1.48e-9', CO2: '1.95e3'}, beta_beta_prime: {SO2: '2.59e-11', SO3: '1.32e-11', CO2: '1.91e1'}}
+            - {T_K: 1100, alpha_beta: {SO2: '1.61e-7', SO3: '4.63e-8', CO2: '4.30e3'}, beta_beta_prime: {SO2: '1.87e-9', SO3: '5.36e-10', CO2: '4.92e1'}}
+            - {T_K: 1200, alpha_beta: {SO2: '6.19e-6', SO3: '7.35e-7', CO2: '6.64e3'}, beta_beta_prime: {SO2: '8.09e-8', SO3: '9.59e-9', CO2: '8.67e1'}}
+      - observation_id: itoh_1985_activity_temperature_fit_alpha_beta
+        type: model_derived
+        locator: {page: 4, pdf_page_index: 3, published_page: 356, equation: '7'}
+        phase: solid assemblage alpha+beta alumina
+        T_range_K: [874, 1055]
+        units: log10 activity
+        values:
+          quantity: activity versus temperature least-squares fit
+          method_class: model_derived
+          equation_as_printed: log aNa2O = -0.40 - 12140(K/T); fit uncertainty ±0.05
+          standard_state_as_printed: not stated
+          note: The abstract gives the interval as 874–1054 K, while the body equation (7) prints 874–1055 K; the body interval is retained here.
+      - observation_id: itoh_1985_activity_temperature_fit_beta_beta_prime
+        type: model_derived
+        locator: {page: 4, pdf_page_index: 3, published_page: 356, equation: '8'}
+        phase: solid assemblage beta+beta-double-prime alumina
+        T_range_K: [823, 1073]
+        units: log10 activity
+        values:
+          quantity: activity versus temperature least-squares fit
+          method_class: model_derived
+          equation_as_printed: log aNa2O = 0.85 - 11380(K/T); fit uncertainty ±0.09
+          standard_state_as_printed: not stated
+          note: The abstract gives the interval as 823–1075 K, while the body equation (8) prints 823–1073 K; the body interval is retained here.
+      - observation_id: itoh_1985_fig3_emf_deferred
+        type: figure_record
+        locator: {page: 3, pdf_page_index: 2, published_page: 355, figure: '3'}
+        phase: galvanic cells I and II
+        units: V
+        values:
+          quantity: cell electromotive force
+          method_class: measured_direct
+          species_formula: Na2O cell-reaction product
+          panel: whole figure
+          caption: Emf of the cells (I) and (II) as a function of temperature.
+          axes_as_printed: E/V versus T/K
+          temperature_as_printed: 874–1055 K for cell I and 823–1075 K for cell II
+          series: cells I and II, including runs 1–4 described in the text
+          attribution_as_printed: this work
+          marker_count_per_series: deferred; no digitisation or point count was made
+          digitisation: deferred to a figure pass
+      - observation_id: itoh_1985_emf_fit_equation_2_context
+        type: model_derived
+        locator: {page: 4, pdf_page_index: 3, published_page: 356, equation: '2'}
+        phase: galvanic cell II
+        units: V
+        values:
+          quantity: fitted cell electromotive force versus temperature
+          method_class: model_derived
+          equation_as_printed: E/V = 2.450(±0.018) − 5.57(±0.18)×10⁻⁴ T/K (±0.009), 823–1075 K
+          note: Fit retained as printed; it is not a new set of activity observations.
+      - observation_id: itoh_1985_thermochemical_equations_12_13_14_15_context
+        type: thermochemical_context
+        locator: {page: 6, pdf_page_index: 5, published_page: 358}
+        phase: beta-alumina and the printed Na2O·11Al2O3 compounds
+        units: J per printed equation
+        values:
+          quantity: standard Gibbs-energy equations and reaction printed on physical page 6
+          equations_as_printed:
+            - 'ΔG°f,β/J = −19056000 + 3542.9 T/K, 874–933 K (12); this is the standard Gibbs energy of formation of Na2O·11Al2O3 from oxides.'
+            - 'ΔG°f,β/J = −19274100 + 3778.2 T/K, 933–1055 K (13); the paper distinguishes the formation-from-elements quantity in the following definition.'
+            - 'Na2O(s) + c/(b−c)(Na2O·bAl2O3) = b/(b−c)(Na2O·cAl2O3) (14).'
+            - 'ΔG°/J = RT ln aNa2O(in (β+β″)-alumina) = −217900 + 16.3 T/K (15).'
+          note: These are printed equations, not independently scored formation values. Equation (14) names Na2O(s), which with the 1000 K activity measurements and JANAF Na-014 Tm=1405.200 K supports the crystalline Na2O activity reference.
+      - observation_id: itoh_1985_sodium_vapor_pressure_equations_19_20_context
+        type: model_derived
+        locator: {page: 8, pdf_page_index: 7, published_page: 360}
+        phase: sodium gas over beta-alumina assemblages
+        units: log(P_Na/P)
+        values:
+          quantity: sodium vapor-pressure fit equations
+          method_class: model_derived
+          pressure_as_printed: P = 101325 Pa
+          equations_as_printed:
+            - 'log(P_Na/P) = −22050(K/T) + 7.68 − ¼log(P_O2/P), for (α+β)-alumina (19).'
+            - 'log(P_Na/P) = −21670(K/T) + 8.31 − ¼log(P_O2/P), for (β+β″)-alumina (20).'
+          note: Equations retained as printed; no vapor-pressure values were computed.
+      - observation_id: itoh_1985_fig4_emf_deferred
+        type: figure_record
+        locator: {page: 4, pdf_page_index: 3, published_page: 356, figure: '4'}
+        phase: cell III
+        units: V
+        values:
+          quantity: cell electromotive force
+          method_class: measured_direct
+          species_formula: Na2O cell-reaction product
+          panel: whole figure
+          caption: Emf of the cell (III) as a function of temperature; P = 101325 Pa.
+          axes_as_printed: E/V versus T/K
+          temperature_as_printed: 925–1125 K
+          series: cell III
+          attribution_as_printed: this work
+          marker_count_per_series: deferred; no digitisation or point count was made
+          digitisation: deferred to a figure pass
+      - observation_id: itoh_1985_fig5_activity_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, published_page: 357, figure: '5'}
+        phase: solid alpha+beta and beta+beta-double-prime alumina assemblages
+        T_range_K: [874, 1075]
+        units: log10 activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          species_formula: Na2O
+          panel: whole figure
+          caption: Relation between logarithm activity of Na2O in (alpha+beta)- and (beta+beta-double-prime)-alumina and reciprocal temperature.
+          axes_as_printed: log aNa2O versus 1/T
+          series: alpha+beta alumina; beta+beta-double-prime alumina
+          attribution_as_printed: this work
+          marker_count_per_series: deferred; no digitisation or point count was made
+          digitisation: deferred to a figure pass
+      - observation_id: itoh_1985_fig6_activity_comparison_deferred
+        type: figure_record
+        locator: {page: 5, pdf_page_index: 4, published_page: 357, figure: '6'}
+        phase: alpha-alumina system and beta-alumina solid assemblages
+        T_range_K: [1000, 1173]
+        units: activity
+        values:
+          quantity: Na2O activity comparison
+          method_class: quoted_attributed
+          species_formula: Na2O
+          panel: whole figure
+          caption: Comparison of the Na2O activity in the NaAlO2–Al2O3 system between measurements by various authors.
+          axes_as_printed: log aNa2O versus 1/T
+          series: this work; literature measurements identified in the caption and text
+          attribution_as_printed: various authors; see legend
+          marker_count_per_series: deferred; no digitisation or point count was made
+          digitisation: deferred to a figure pass
+      - observation_id: itoh_1985_fig7_nas_phase_diagram_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, figure: '7'}
+        phase: Na-S-O potential phase diagram
+        T_range_K: [900, 900]
+        units: log pressure ratio to P°
+        values:
+          quantity: equilibrium phase-boundary diagram
+          method_class: model_derived
+          species_formulae_as_printed: [Na2SO4, Na2S, Na2O, Na]
+          gas_species_axes_as_printed: [O2, S2]
+          panel: whole figure
+          caption: Na-S-O potential phase diagram at 900 K.
+          axes_as_printed: log(P_O2/P°) versus log(P_S2/P°)
+          series: phase fields Na2SO4(s), Na2S(s), Na2O(s), and Na(l)
+          attribution_as_printed: calculated using thermochemical data (29) and equations (7) and (8)
+          marker_count_per_series: 0
+          digitisation: deferred to a figure pass
+      - observation_id: itoh_1985_fig8_nas_phase_diagram_deferred
+        type: figure_record
+        locator: {page: 6, pdf_page_index: 5, published_page: 358, figure: '8'}
+        phase: Na-S-O potential phase diagram
+        T_range_K: [1100, 1100]
+        units: log pressure ratio to P°
+        values:
+          quantity: equilibrium phase-boundary diagram
+          method_class: model_derived
+          species_formulae_as_printed: [Na2SO4, Na2S, Na2O, Na]
+          gas_species_axes_as_printed: [O2, S2]
+          panel: whole figure
+          caption: Na-S-O potential phase diagram at 1100 K.
+          axes_as_printed: log(P_O2/P°) versus log(P_S2/P°)
+          series: phase fields Na2SO4(s), Na2S(s), Na2O(s), and Na(l)
+          attribution_as_printed: calculated using thermochemical data (29) and equations (7) and (8)
+          marker_count_per_series: 0
+          digitisation: deferred to a figure pass
+  Na:
+    observations: []
+    context:
+      - observation_id: itoh_1985_fig9_sodium_vapor_pressure_deferred
+        type: figure_record
+        locator: {page: 8, pdf_page_index: 7, published_page: 360, figure: '9'}
+        phase: g
+        T_range_K: [800, 2000]
+        units: log(P_Na/P°)
+        values:
+          quantity: sodium vapor pressure
+          species_formula: Na
+          panel: whole figure
+          method_class: model_derived
+          caption: Relation between logarithm sodium-vapor-pressure over the beta-alumina and reciprocal temperature.
+          axes_as_printed: log(P_Na/P°) versus 1/T
+          phase_as_printed: sodium gas over alpha+beta and beta+beta-double-prime alumina assemblages
+          series: calculated alpha+beta; calculated beta+beta-double-prime; Weber; NaAlO2-beta-double-prime Jacob; beta+beta-double-prime Jacob; alpha+beta Jacob
+          marker_count_per_series: {calculated_alpha_beta: 0, calculated_beta_beta_prime: 0, Weber: 8, NaAlO2_beta_beta_prime_Jacob: 1, beta_beta_prime_Jacob: 2, alpha_beta_Jacob: 2}
+          digitisation: deferred to a figure pass

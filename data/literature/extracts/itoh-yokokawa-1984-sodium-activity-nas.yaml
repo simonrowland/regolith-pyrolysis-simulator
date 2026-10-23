@@ -1,0 +1,1330 @@
+schema_version: literature_extract.v1
+source_id: itoh-yokokawa-1984-sodium-activity-nas
+source:
+  citation: Itoh, H. and Yokokawa, T. (1984), "Thermodynamic Activity of Na2O in Na2O-SiO2-Al2O3 Melt", Transactions of the
+    Japan Institute of Metals 25(12), 879–884.
+  doi: 10.2320/matertrans1960.25.879
+  year: 1984
+extraction:
+  method: 'MinerU tables retained in context: the cell EMF lacks a quantity token, and Table 2 is reduced from those untyped
+    inputs.'
+  date: '2026-10-20'
+  worker: codex-fam28-1020
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 3
+    table_index: 3
+    count: 0
+species:
+  Na2O:
+    observations: []
+    context:
+    - observation_id: itoh_yokokawa_1984_table2_relative_gibbs_entropy
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+        table: '2'
+      units: kJ/mol as printed; entropy column is printed with kJ/mol units
+      values:
+        quantity: relative partial molar Gibbs energy and entropy of Na2O
+        table_2_header_as_printed: 'ΔG*(Na2O), kJ/mol; ΔH*(Na2O), kJ/mol; ΔS*(Na2O), kJ/mol'
+        entropy_unit_note: The printed ΔS header says kJ/mol, but the row closure ΔG=ΔH−TΔS at 1400 K works only if ΔS is interpreted as J/(mol·K); for row 3, 38.4 + 1400×12.8/1000 = 56.32 kJ/mol, near the printed 56.27 kJ/mol. Values and printed unit are retained without correction.
+        method_class: measured_reduced
+        reference_melt_as_printed: 40Na2O·60SiO2 melt
+        temperature_K: 1400
+        schema_gap: No store quantity token represents relative partial molar Gibbs energy or relative partial molar entropy.
+        derivation_note: The Table 2 values are reduced from the Table 1 cell-EMF series; derivation pending a corpus table
+          asset (controller, t-1382).
+        input_csvs:
+        - .agent-scratch/F28-tables/itoh-yokokawa-1984-sodium-activity-nas/p002-t01.csv
+        - .agent-scratch/F28-tables/itoh-yokokawa-1984-sodium-activity-nas/p002-t02.csv
+        rows_as_printed:
+        - row: '3'
+          composition_as_printed: 55 Na2O, 45 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 56.27±0.08
+          delta_H_relative_kJ_per_mol: 38.4±1.4
+          delta_S_relative_as_printed_kJ_per_mol: -12.8±1.0
+        - row: '4'
+          composition_as_printed: 50 Na2O, 50 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 36.28±0.21
+          delta_H_relative_kJ_per_mol: 24.9±4.0
+          delta_S_relative_as_printed_kJ_per_mol: -8.1±2.8
+        - row: '5'
+          composition_as_printed: 45 Na2O, 55 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 17.78±0.04
+          delta_H_relative_kJ_per_mol: 13.6±0.6
+          delta_S_relative_as_printed_kJ_per_mol: -3.0±0.4
+        - row: '6'
+          composition_as_printed: 40 Na2O, 60 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: '0'
+          delta_H_relative_kJ_per_mol: '0'
+          delta_S_relative_as_printed_kJ_per_mol: '0'
+        - row: '7'
+          composition_as_printed: 35 Na2O, 65 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -14.81±0.29
+          delta_H_relative_kJ_per_mol: -13.1±4.8
+          delta_S_relative_as_printed_kJ_per_mol: 1.5±3.3
+        - row: '8'
+          composition_as_printed: 30 Na2O, 70 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -32.51±0.21
+          delta_H_relative_kJ_per_mol: -17.9±3.7
+          delta_S_relative_as_printed_kJ_per_mol: 10.4±2.6
+        - row: '9'
+          composition_as_printed: 27.5 Na2O, 72.5 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -39.58±0.08
+          delta_H_relative_kJ_per_mol: -30.0±1.6
+          delta_S_relative_as_printed_kJ_per_mol: 6.8±1.1
+        - row: '10'
+          composition_as_printed: 25 Na2O, 75 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -46.94±0.17
+          delta_H_relative_kJ_per_mol: -28.9±3.0
+          delta_S_relative_as_printed_kJ_per_mol: 12.8±2.1
+        - row: '11'
+          composition_as_printed: 22.5 Na2O, 77.5 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -48.91±0.29
+          delta_H_relative_kJ_per_mol: -20.7±4.2
+          delta_S_relative_as_printed_kJ_per_mol: 20.2±2.1
+        - row: '12'
+          composition_as_printed: not printed in this row
+          delta_G_relative_kJ_per_mol: -52.71±0.13
+          delta_H_relative_kJ_per_mol: -31.7±2.5
+          delta_S_relative_as_printed_kJ_per_mol: 15.0±1.7
+        - row: '13'
+          composition_as_printed: 20 Na2O, 80 SiO2, 0 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -54.68±0.13
+          delta_H_relative_kJ_per_mol: -18.8±1.8
+          delta_S_relative_as_printed_kJ_per_mol: 25.6±1.2
+        - row: '14'
+          composition_as_printed: not printed in this row
+          delta_G_relative_kJ_per_mol: -52.51±0.29
+          delta_H_relative_kJ_per_mol: -24.4±5.6
+          delta_S_relative_as_printed_kJ_per_mol: 20.0±3.9
+        - row: '15'
+          composition_as_printed: 50 Na2O, 45 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 44.89±0.04
+          delta_H_relative_kJ_per_mol: 38.3±0.7
+          delta_S_relative_as_printed_kJ_per_mol: -4.7±0.5
+        - row: '16'
+          composition_as_printed: 45 Na2O, 50 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 22.43±0.08
+          delta_H_relative_kJ_per_mol: 16.1±1.9
+          delta_S_relative_as_printed_kJ_per_mol: -5.3±1.3
+        - row: '17'
+          composition_as_printed: 40 Na2O, 55 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 7.49±0.04
+          delta_H_relative_kJ_per_mol: 9.2±0.7
+          delta_S_relative_as_printed_kJ_per_mol: 1.3±0.5
+        - row: '18'
+          composition_as_printed: 35 Na2O, 60 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -7.95±0.04
+          delta_H_relative_kJ_per_mol: -7.4±0.3
+          delta_S_relative_as_printed_kJ_per_mol: 0.4±0.3
+        - row: '19'
+          composition_as_printed: 30 Na2O, 65 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -21.59±0.17
+          delta_H_relative_kJ_per_mol: -13.7±2.8
+          delta_S_relative_as_printed_kJ_per_mol: 5.6±2.0
+        - row: '20'
+          composition_as_printed: 25 Na2O, 70 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -37.90±0.13
+          delta_H_relative_kJ_per_mol: -22.5±2.7
+          delta_S_relative_as_printed_kJ_per_mol: 11.0±1.9
+        - row: '21'
+          composition_as_printed: 20 Na2O, 75 SiO2, 5 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -45.94±0.13
+          delta_H_relative_kJ_per_mol: -23.6±2.4
+          delta_S_relative_as_printed_kJ_per_mol: 15.9±1.7
+        - row: '22'
+          composition_as_printed: 45 Na2O, 45 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 31.46±0.29
+          delta_H_relative_kJ_per_mol: 24.8±4.9
+          delta_S_relative_as_printed_kJ_per_mol: -4.9±3.4
+        - row: '23'
+          composition_as_printed: 40 Na2O, 50 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 16.48±0.13
+          delta_H_relative_kJ_per_mol: 12.1±2.6
+          delta_S_relative_as_printed_kJ_per_mol: -3.1±1.8
+        - row: '24'
+          composition_as_printed: 35 Na2O, 55 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -0.58±0.08
+          delta_H_relative_kJ_per_mol: 3.1±1.3
+          delta_S_relative_as_printed_kJ_per_mol: 2.6±0.9
+        - row: '25'
+          composition_as_printed: 30 Na2O, 60 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -14.90±0.04
+          delta_H_relative_kJ_per_mol: -9.0±0.7
+          delta_S_relative_as_printed_kJ_per_mol: 4.3±0.5
+        - row: '26'
+          composition_as_printed: 25 Na2O, 65 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -27.15±0.25
+          delta_H_relative_kJ_per_mol: -13.9±5.6
+          delta_S_relative_as_printed_kJ_per_mol: 9.5±3.8
+        - row: '27'
+          composition_as_printed: 20 Na2O, 70 SiO2, 10 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -40.54±0.10
+          delta_H_relative_kJ_per_mol: -15.8±1.6
+          delta_S_relative_as_printed_kJ_per_mol: 17.7±1.1
+        - row: '28'
+          composition_as_printed: 40 Na2O, 45 SiO2, 15 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 24.39±0.13
+          delta_H_relative_kJ_per_mol: 28.7±1.7
+          delta_S_relative_as_printed_kJ_per_mol: 3.1±1.2
+        - row: '29'
+          composition_as_printed: 35 Na2O, 50 SiO2, 15 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: 8.41±0.07
+          delta_H_relative_kJ_per_mol: 15.7±1.0
+          delta_S_relative_as_printed_kJ_per_mol: 5.2±0.7
+        - row: '30'
+          composition_as_printed: 30 Na2O, 55 SiO2, 15 Al2O3 mol %
+          delta_G_relative_kJ_per_mol: -8.54±0.13
+          delta_H_relative_kJ_per_mol: 2.6±1.6
+          delta_S_relative_as_printed_kJ_per_mol: 7.9±1.1
+    - observation_id: itoh_yokokawa_1984_equation_2_formation_from_oxides
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: kJ/mol
+      values:
+        quantity: reaction Gibbs energy for formation of sodium disilicate from oxides
+        reaction_as_printed: Na2O(s) + 2SiO2(s) = Na2O·2SiO2(l)
+        reaction_delta_G_kJ_per_mol: -244.5
+        temperature_K: 1300
+        composition_as_printed: Na2O·2SiO2
+        reference: formation from the mother oxides, as stated in the paper
+        note: Reaction Gibbs energy from oxides is not delta_fG (formation from elements).
+    - observation_id: itoh_yokokawa_1984_equation_3_partial_molar_gibbs_relation
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: kJ/mol
+      values:
+        quantity: weighted relation between partial molar Gibbs energies
+        relation_as_printed: 0.33ΔG*(Na2O) + 0.67ΔG*(SiO2) = -81.5 kJ/mol
+        right_hand_side_kJ_per_mol: -81.5
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in the Na2O-SiO2 binary melt
+        reference: pure Na2O and pure SiO2; the SiO2 reference is tridymite
+    - observation_id: itoh_yokokawa_1984_equation_4_log_activity_silica
+      type: context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 881
+      units: log10(activity)
+      values:
+        quantity: log activity of SiO2
+        printed_value: -0.43
+        printed_form: log10
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in Na2O-SiO2 binary melt
+        reference: pure solid SiO2, tridymite
+        schema_gap: No existing scalar printed_form field supports this logged activity in a context record that can migrate as the required unavailable value; retained in context and not converted to activity.
+    - observation_id: itoh_yokokawa_1984_equation_5_log_activity_sodium_oxide
+      type: context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 882
+      units: log10(activity)
+      values:
+        quantity: log activity of Na2O
+        printed_value: -9.0
+        printed_form: log10
+        temperature_K: 1300
+        composition_as_printed: X_Na2O=0.33 in Na2O-SiO2 binary melt
+        reference: pure solid Na2O
+        schema_gap: No existing scalar printed_form field supports this logged activity in a context record that can migrate as the required unavailable value; retained in context and not converted to activity.
+    - observation_id: itoh_yokokawa_1984_table1_emf_candidate
+      type: context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 880
+        table: '1'
+      units: mV
+      values:
+        quantity_as_printed: cell electromotive force
+        candidate_tokens_checked:
+        - activity
+        - partial_molar_enthalpy
+        schema_gap: The quantity enum has no cell-EMF token; EMF_CELL is only an ion-intensity-ratio denominator kind, not
+          a measured-quantity token.
+        method_class: measured_direct
+        disposition: context-only because the store has no cell-EMF quantity token; raw voltage is not converted into activity
+          here
+        tables_as_printed:
+        - table_key: p002-t01
+          rows_as_printed:
+          - row: '3'
+            cells:
+            - '1469'
+            - '-297'
+            - '1442'
+            - '-294'
+            - '1409'
+            - '-292'
+          - row: '4'
+            cells:
+            - '1383'
+            - '-291'
+            - '1420'
+            - '-293'
+            - '1466'
+            - '-294'
+          - row: '5'
+            cells:
+            - '1440'
+            - '-294'
+            - '1415'
+            - '-293'
+            - ''
+            - ''
+          - row: '6'
+            cells:
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2}$
+          - row: '7'
+            cells:
+            - '1455'
+            - '-191'
+            - '1476'
+            - '-189'
+            - '1442'
+            - '-188'
+          - row: '8'
+            cells:
+            - '1397'
+            - '-187'
+            - '1411'
+            - '-189'
+            - '1449'
+            - '-192'
+          - row: '9'
+            cells:
+            - '1464'
+            - '-192'
+            - '1433'
+            - '-189'
+            - '1395'
+            - '-188'
+          - row: '10'
+            cells:
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2}$
+          - row: '11'
+            cells:
+            - '1469'
+            - '-93'
+            - '1441'
+            - '-93'
+            - '1382'
+            - '-92'
+          - row: '12'
+            cells:
+            - '1393'
+            - '-92'
+            - '1408'
+            - '-92'
+            - '1424'
+            - '-92'
+          - row: '13'
+            cells:
+            - '1457'
+            - '-93'
+            - '1476'
+            - '-93'
+            - '1455'
+            - '-93'
+          - row: '14'
+            cells:
+            - '1437'
+            - '-93'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '15'
+            cells:
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+            - $35\mathrm{Na}_{2}\mathrm{O} \cdot 65\mathrm{SiO}_{2}$
+          - row: '16'
+            cells:
+            - '1476'
+            - '82'
+            - '1495'
+            - '78'
+            - '1461'
+            - '78'
+          - row: '17'
+            cells:
+            - '1416'
+            - '78'
+            - '1466'
+            - '80'
+            - '1434'
+            - '80'
+          - row: '18'
+            cells:
+            - '1390'
+            - '79'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '19'
+            cells:
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+            - $30\mathrm{Na}_{2}\mathrm{O} \cdot 70\mathrm{SiO}_{2}$
+          - row: '20'
+            cells:
+            - '1408'
+            - '170'
+            - '1463'
+            - '173'
+            - '1442'
+            - '170'
+          - row: '21'
+            cells:
+            - '1423'
+            - '168'
+            - '1388'
+            - '167'
+            - '1422'
+            - '170'
+          - row: '22'
+            cells:
+            - '1457'
+            - '173'
+            - '1493'
+            - '172'
+            - ''
+            - ''
+          - row: '23'
+            cells:
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+            - $27.5\mathrm{Na}_{2}\mathrm{O} \cdot 72.5\mathrm{SiO}_{2}$
+          - row: '24'
+            cells:
+            - '1450'
+            - '207'
+            - '1444'
+            - '206'
+            - '1466'
+            - '208'
+          - row: '25'
+            cells:
+            - '1442'
+            - '206'
+            - '1427'
+            - '205'
+            - '1392'
+            - '205'
+          - row: '26'
+            cells:
+            - '1382'
+            - '204'
+            - '1399'
+            - '206'
+            - '1419'
+            - '206'
+          - row: '27'
+            cells:
+            - '1444'
+            - '207'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '28'
+            cells:
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+            - $25\mathrm{Na}_{2}\mathrm{O} \cdot 75\mathrm{SiO}_{2}$
+          - row: '29'
+            cells:
+            - '1423'
+            - '247'
+            - '1450'
+            - '248'
+            - '1485'
+            - '249'
+          - row: '30'
+            cells:
+            - '1453'
+            - '245'
+            - '1424'
+            - '243'
+            - '1385'
+            - '242'
+          - row: '31'
+            cells:
+            - '1397'
+            - '243'
+            - '1414'
+            - '244'
+            - '1443'
+            - '246'
+          - row: '32'
+            cells:
+            - '1427'
+            - '245'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '33'
+            cells:
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (1)
+          - row: '34'
+            cells:
+            - '1465'
+            - '279'
+            - '1433'
+            - '275'
+            - '1390'
+            - '272'
+          - row: '35'
+            cells:
+            - '1398'
+            - '274'
+            - '1428'
+            - '276'
+            - '1470'
+            - '278'
+          - row: '36'
+            cells:
+            - '1424'
+            - '275'
+            - '1405'
+            - '273'
+            - ''
+            - ''
+          - row: '37'
+            cells:
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+            - $22.5\mathrm{Na}_{2}\mathrm{O} \cdot 77.5\mathrm{SiO}_{2}$  (2)
+          - row: '38'
+            cells:
+            - '1475'
+            - '261'
+            - '1423'
+            - '253'
+            - '1372'
+            - '250'
+          - row: '39'
+            cells:
+            - '1418'
+            - '256'
+            - '1472'
+            - '262'
+            - '1431'
+            - '257'
+          - row: '40'
+            cells:
+            - '1382'
+            - '253'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '41'
+            cells:
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (1)
+          - row: '42'
+            cells:
+            - '1435'
+            - '276'
+            - '1459'
+            - '278'
+            - '1411'
+            - '272'
+          - row: '43'
+            cells:
+            - '1385'
+            - '270'
+            - '1422'
+            - '274'
+            - '1476'
+            - '279'
+          - row: '44'
+            cells:
+            - '1428'
+            - '278'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '45'
+            cells:
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+            - $20\mathrm{Na}_{2}\mathrm{O} \cdot 80\mathrm{SiO}_{2}$  (2)
+          - row: '46'
+            cells:
+            - '1406'
+            - '284'
+            - '1449'
+            - '291'
+            - '1435'
+            - '288'
+          - row: '47'
+            cells:
+            - '1403'
+            - '284'
+            - '1362'
+            - '278'
+            - '1416'
+            - '286'
+          - row: '48'
+            cells:
+            - '1479'
+            - '294'
+            - '1454'
+            - '290'
+            - '1446'
+            - '288'
+          - row: '49'
+            cells:
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $50\mathrm{Na}_{2}\mathrm{O} \cdot 45\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+          - row: '50'
+            cells:
+            - '1433'
+            - '-235'
+            - '1458'
+            - '-235'
+            - '1431'
+            - '-233'
+          - row: '51'
+            cells:
+            - '1413'
+            - '-233'
+            - '1372'
+            - '-232'
+            - '1399'
+            - '-233'
+          - row: '52'
+            cells:
+            - '1414'
+            - '-233'
+            - '1443'
+            - '-234'
+            - '1426'
+            - '-233'
+          - row: '53'
+            cells:
+            - '1462'
+            - '-234'
+            - '1481'
+            - '-235'
+            - ''
+            - ''
+          - row: '54'
+            cells:
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $45\mathrm{Na}_{2}\mathrm{O} \cdot 50\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+          - row: '55'
+            cells:
+            - '1447'
+            - '-123'
+            - '1425'
+            - '-123'
+            - '1397'
+            - '-122'
+          - row: '56'
+            cells:
+            - '1417'
+            - '-122'
+            - '1470'
+            - '-123'
+            - '1447'
+            - '-123'
+          - row: '57'
+            cells:
+            - '1412'
+            - '-122'
+            - '1386'
+            - '-120'
+            - '1443'
+            - '-122'
+          - row: '58'
+            cells:
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+            - $40\mathrm{Na}_{2}\mathrm{O} \cdot 55\mathrm{SiO}_{2} \cdot 5\mathrm{Al}_{2}\mathrm{O}_{3}$
+          - row: '59'
+            cells:
+            - '1465'
+            - '-38.6'
+            - '1463'
+            - '-38.5'
+            - '1438'
+            - '-39.0'
+          - row: '60'
+            cells:
+            - '1414'
+            - '-39.2'
+            - '1380'
+            - '-39.0'
+            - '1398'
+            - '-38.6'
+          - row: '61'
+            cells:
+            - '1443'
+            - '-38.1'
+            - '1461'
+            - '-38.0'
+            - '1440'
+            - '-38.3'
+          - row: '62'
+            cells:
+            - '1420'
+            - '-38.6'
+            - '1389'
+            - '-38.7'
+            - ''
+            - ''
+        - table_key: p002-t02
+          rows_as_printed:
+          - row: '3'
+            cells:
+            - '1388'
+            - '41.2'
+            - '1415'
+            - '41.4'
+            - '1433'
+            - '41.4'
+          - row: '4'
+            cells:
+            - '1457'
+            - '41.2'
+            - '1476'
+            - '41.7'
+            - '1454'
+            - '41.1'
+          - row: '5'
+            cells:
+            - '1404'
+            - '41.5'
+            - '1397'
+            - '41.1'
+            - '1434'
+            - '41.3'
+          - row: '6'
+            cells:
+            - '1459'
+            - '41.4'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '7'
+            cells:
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 65SiO_{2} \cdot 5Al_{2}O_{3}$
+          - row: '8'
+            cells:
+            - '1486'
+            - '115'
+            - '1457'
+            - '113'
+            - '1440'
+            - '113'
+          - row: '9'
+            cells:
+            - '1414'
+            - '113'
+            - '1387'
+            - '112'
+            - '1408'
+            - '113'
+          - row: '10'
+            cells:
+            - '1432'
+            - '113'
+            - '1455'
+            - '114'
+            - '1418'
+            - '110'
+          - row: '11'
+            cells:
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 70SiO_{2} \cdot 5Al_{2}O_{3}$
+          - row: '12'
+            cells:
+            - '1443'
+            - '199'
+            - '1457'
+            - '200'
+            - '1419'
+            - '197'
+          - row: '13'
+            cells:
+            - '1404'
+            - '196'
+            - '1370'
+            - '194'
+            - '1394'
+            - '197'
+          - row: '14'
+            cells:
+            - '1406'
+            - '198'
+            - '1443'
+            - '198'
+            - ''
+            - ''
+          - row: '15'
+            cells:
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 75SiO_{2} \cdot 5Al_{2}O_{3}$
+          - row: '16'
+            cells:
+            - '1401'
+            - '237'
+            - '1430'
+            - '241'
+            - '1405'
+            - '238'
+          - row: '17'
+            cells:
+            - '1365'
+            - '236'
+            - '1441'
+            - '242'
+            - '1431'
+            - '241'
+          - row: '18'
+            cells:
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $45Na_{2}O \cdot 45SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '19'
+            cells:
+            - '1408'
+            - '-165'
+            - '1473'
+            - '-162'
+            - '1425'
+            - '-165'
+          - row: '20'
+            cells:
+            - '1430'
+            - '-167'
+            - '1485'
+            - '-168'
+            - '1449'
+            - '-167'
+          - row: '21'
+            cells:
+            - '1420'
+            - '-165'
+            - '1380'
+            - '-162'
+            - '1441'
+            - '-165'
+          - row: '22'
+            cells:
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 50SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '23'
+            cells:
+            - '1465'
+            - '-106'
+            - '1437'
+            - '-106'
+            - '1410'
+            - '-104'
+          - row: '24'
+            cells:
+            - '1368'
+            - '-99'
+            - '1401'
+            - '-102'
+            - '1443'
+            - '-103'
+          - row: '25'
+            cells:
+            - '1474'
+            - '-106'
+            - '1445'
+            - '-105'
+            - '1405'
+            - '-102'
+          - row: '26'
+            cells:
+            - '1387'
+            - '-101'
+            - '1432'
+            - '-102'
+            - ''
+            - ''
+          - row: '27'
+            cells:
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 55SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '28'
+            cells:
+            - '1469'
+            - '4.1'
+            - '1449'
+            - '3.7'
+            - '1413'
+            - '3.0'
+          - row: '29'
+            cells:
+            - '1382'
+            - '2.9'
+            - '1396'
+            - '3.6'
+            - '1429'
+            - '4.6'
+          - row: '30'
+            cells:
+            - '1458'
+            - '3.6'
+            - '1435'
+            - '2.7'
+            - '1399'
+            - '2.1'
+          - row: '31'
+            cells:
+            - '1425'
+            - '3.0'
+            - '1467'
+            - '3.9'
+            - ''
+            - ''
+          - row: '32'
+            cells:
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 60SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '33'
+            cells:
+            - '1466'
+            - '79.2'
+            - '1448'
+            - '78.0'
+            - '1438'
+            - '78.0'
+          - row: '34'
+            cells:
+            - '1421'
+            - '77.4'
+            - '1410'
+            - '77.5'
+            - '1436'
+            - '78.7'
+          - row: '35'
+            cells:
+            - '1422'
+            - '77.7'
+            - '1402'
+            - '77.2'
+            - '1384'
+            - '77.2'
+          - row: '36'
+            cells:
+            - '1423'
+            - '78.0'
+            - '1448'
+            - '78.2'
+            - '1457'
+            - '78.2'
+          - row: '37'
+            cells:
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $25Na_{2}O \cdot 65SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '38'
+            cells:
+            - '1470'
+            - '146'
+            - '1442'
+            - '142'
+            - '1404'
+            - '141'
+          - row: '39'
+            cells:
+            - '1436'
+            - '143'
+            - '1452'
+            - '143'
+            - '1485'
+            - '144'
+          - row: '40'
+            cells:
+            - '1446'
+            - '137'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '41'
+            cells:
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+            - $20Na_{2}O \cdot 70SiO_{2} \cdot 10Al_{2}O_{3}$
+          - row: '42'
+            cells:
+            - '1471'
+            - '217'
+            - '1450'
+            - '215'
+            - '1431'
+            - '213'
+          - row: '43'
+            cells:
+            - '1382'
+            - '208'
+            - '1399'
+            - '211'
+            - '1435'
+            - '214'
+          - row: '44'
+            cells:
+            - '1462'
+            - '215'
+            - '1438'
+            - '213'
+            - '1473'
+            - '217'
+          - row: '45'
+            cells:
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $40Na_{2}O \cdot 45SiO_{2} \cdot 15Al_{2}O_{3}$
+          - row: '46'
+            cells:
+            - '1426'
+            - '-128'
+            - '1381'
+            - '-126'
+            - '1421'
+            - '-126'
+          - row: '47'
+            cells:
+            - '1436'
+            - '-125'
+            - '1455'
+            - '-124'
+            - '1481'
+            - '-124'
+          - row: '48'
+            cells:
+            - '1430'
+            - '-126'
+            - '1396'
+            - '-126'
+            - '1432'
+            - '-125'
+          - row: '49'
+            cells:
+            - '1477'
+            - '-126'
+            - '1434'
+            - '-127'
+            - '1400'
+            - '-127'
+          - row: '50'
+            cells:
+            - '1436'
+            - '-126'
+            - '1452'
+            - '-127'
+            - ''
+            - ''
+          - row: '51'
+            cells:
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $35Na_{2}O \cdot 50SiO_{2} \cdot 15Al_{2}O_{3}$
+          - row: '52'
+            cells:
+            - '1478'
+            - '-42'
+            - '1430'
+            - '-43'
+            - '1412'
+            - '-43'
+          - row: '53'
+            cells:
+            - '1386'
+            - '-44'
+            - '1428'
+            - '-42'
+            - '1454'
+            - '-42'
+          - row: '54'
+            cells:
+            - '1465'
+            - '-41'
+            - '1444'
+            - '-42'
+            - '1393'
+            - '-44'
+          - row: '55'
+            cells:
+            - '1461'
+            - '-42'
+            - ''
+            - ''
+            - ''
+            - ''
+          - row: '56'
+            cells:
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+            - $30Na_{2}O \cdot 55SiO_{2} \cdot 15Al_{2}O_{3}$
+          - row: '57'
+            cells:
+            - '1410'
+            - '45'
+            - '1386'
+            - '44'
+            - '1412'
+            - '46'
+          - row: '58'
+            cells:
+            - '1432'
+            - '46'
+            - '1455'
+            - '47'
+            - '1476'
+            - '47'
+          - row: '59'
+            cells:
+            - '1446'
+            - '45'
+            - '1434'
+            - '45'
+            - '1405'
+            - '43'
+          - row: '60'
+            cells:
+            - '1383'
+            - '43'
+            - '1467'
+            - '47'
+            - ''
+            - ''
+    - observation_id: itoh_yokokawa_1984_fig1_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 882
+        figure: '1'
+      phase: l
+      units: as printed on axes
+      values:
+        quantity: Na2O thermodynamic basicity
+        species_formula: Na2O
+        method_class: measured_reduced
+        caption: Basicity of various binary melts containing Na2O as functions of Na2O composition.
+        panel: whole figure
+        axes_as_printed: -pO = log alpha_Na2O versus X_Na2O
+        temperature_as_printed: not stated
+        series:
+        - present Na2O-SiO2 data
+        - reported binary melt data, including Na2O-B2O3
+        marker_count_per_series:
+          present Na2O-SiO2 data: not enumerated; no figure digitisation
+          reported binary melt data, including Na2O-B2O3: not enumerated; no figure digitisation
+        attribution_as_printed: this work and cited literature; see legend
+        digitisation: deferred to a figure pass
+    - observation_id: itoh_yokokawa_1984_fig2_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 882
+        figure: '2'
+      phase: l
+      units: as printed on axes
+      values:
+        quantity: relative partial molar Gibbs energy
+        species_formula: Na2O
+        method_class: measured_reduced
+        caption: Partial molar free energy of Na2O in Na2O-SiO2-Al2O3 melts, referring to 40Na2O·60SiO2 at 1400 K.
+        panel: whole figure
+        axes_as_printed: Delta G*(Na2O) versus composition
+        temperature_as_printed: 1400 K
+        series:
+        - Na2O-SiO2-Al2O3 melt series
+        marker_count_per_series:
+          Na2O-SiO2-Al2O3 melt series: not enumerated; no figure digitisation
+        attribution_as_printed: this work
+        digitisation: deferred to a figure pass
+    - observation_id: itoh_yokokawa_1984_fig3_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 882
+        figure: '3'
+      phase: l
+      units: as printed on axes
+      values:
+        quantity: relative partial molar entropy
+        species_formula: Na2O
+        method_class: measured_reduced
+        caption: Partial molar entropy of Na2O in Na2O-SiO2-Al2O3 melts, referring to 40Na2O·60SiO2 at 1400 K.
+        panel: whole figure
+        axes_as_printed: Delta S*(Na2O) versus composition
+        temperature_as_printed: 1400 K
+        series:
+        - Na2O-SiO2-Al2O3 melt series
+        marker_count_per_series:
+          Na2O-SiO2-Al2O3 melt series: not enumerated; no figure digitisation
+        attribution_as_printed: this work
+        digitisation: deferred to a figure pass
+    - observation_id: itoh_yokokawa_1984_fig4_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 883
+        figure: '4'
+      phase: l
+      units: as printed on axes
+      values:
+        quantity: melt expansivity
+        species_formula: Na2O
+        method_class: model_derived
+        caption: Iso-expansivity lines in Na2O-SiO2-Al2O3 melts.
+        panel: whole figure
+        axes_as_printed: composition diagram; expansivity lines
+        temperature_as_printed: not stated
+        series:
+        - iso-expansivity lines
+        marker_count_per_series:
+          iso-expansivity lines: not enumerated; no figure digitisation
+        attribution_as_printed: this work
+        digitisation: deferred to a figure pass
+    - observation_id: itoh_yokokawa_1984_fig5_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 884
+        figure: '5'
+      phase: l
+      units: as printed on axes
+      values:
+        quantity: optical and thermodynamic basicity
+        species_formula: Na2O
+        method_class: model_derived
+        caption: Optical basicity compared with the present thermodynamic basicity.
+        panel: whole figure
+        axes_as_printed: basicity comparison as plotted
+        temperature_as_printed: not stated
+        series:
+        - optical basicity
+        - present thermodynamic basicity
+        marker_count_per_series:
+          optical basicity: not enumerated; no figure digitisation
+          present thermodynamic basicity: not enumerated; no figure digitisation
+        attribution_as_printed: this work
+        digitisation: deferred to a figure pass

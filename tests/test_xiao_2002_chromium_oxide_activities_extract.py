@@ -228,6 +228,111 @@ def test_isolated_migration_resolves_assets_and_preserves_every_identity_axis():
         assert observation.evidence.class_.value.value == "measured_reduced"
 
 
+def test_composition_fallback_keeps_typed_values_broad_and_plain_maps_scoped(tmp_path):
+    document = _document()
+    valence = next(
+        row
+        for container in document["species"].values()
+        for row in container.get("observations", ())
+        if row["values"].get("quantity") == "valence_ratio"
+    )
+    point = valence["values"]["points"][0]
+    plain_components = {
+        "CaO": "54.3",
+        "SiO2": "36.9",
+        "CrO": "6.2",
+        "CrO1.5": "2.6",
+    }
+    point["point_conditions"]["composition"]["state"]["value"] = plain_components
+    point.pop("composition_as_published")
+
+    density = deepcopy(valence)
+    density["observation_id"] += "_density_fallback"
+    density["values"]["quantity"] = "density"
+    density["values"].pop("valence_basis")
+    density["units"] = "kg/m3"
+    density_point = density["values"]["points"][0]
+    density_point["value"] = "2500"
+    density_point.pop("Cr2plus_over_total_Cr_as_published", None)
+
+    activity = next(
+        row
+        for container in document["species"].values()
+        for row in container.get("observations", ())
+        if row["values"].get("quantity") == "activity"
+    )
+    activity_point = activity["values"]["points"][0]
+    activity_unmarked = deepcopy(activity)
+    activity_unmarked["observation_id"] += "_without_mol_pct_marker"
+    activity_unmarked["values"]["points"][0].pop("composition_as_published")
+    activity_plain = deepcopy(activity)
+    activity_plain["observation_id"] += "_plain_map_fallback"
+    activity_plain_point = activity_plain["values"]["points"][0]
+    activity_plain_point["point_conditions"]["composition"]["state"]["value"] = plain_components
+    activity_plain_point.pop("composition_as_published", None)
+
+    # Keep the mol-pct marker for the typed activity case. The unmarked typed
+    # condition must stay out of identity; plain-map fallback remains scoped.
+    document["species"]["Cr"]["observations"].append(density)
+    document["species"]["CrO"]["observations"].append(activity_unmarked)
+    document["species"]["CrO"]["observations"].append(activity_plain)
+    altered_extract = tmp_path / "xiao-composition-fallback.yaml"
+    altered_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(altered_extract)
+    migrator.finalize()
+
+    observations = migrator.result.observations
+    valence_result = next(
+        item
+        for item in observations.values()
+        if f"::{valence['observation_id']}::" in item.observation_id
+    )
+    density_result = next(
+        item
+        for item in observations.values()
+        if f"::{density['observation_id']}::" in item.observation_id
+    )
+    activity_result = next(
+        item
+        for item in observations.values()
+        if f"::{activity['observation_id']}::" in item.observation_id
+    )
+    activity_unmarked_result = next(
+        item
+        for item in observations.values()
+        if f"::{activity_unmarked['observation_id']}::" in item.observation_id
+    )
+    activity_plain_result = next(
+        item
+        for item in observations.values()
+        if f"::{activity_plain['observation_id']}::" in item.observation_id
+    )
+
+    assert valence_result.identity.composition is not None
+    assert valence_result.identity.composition.is_value
+    assert density_result.identity.composition is not None
+    assert density_result.identity.composition.is_value
+    assert activity_result.identity.composition is not None
+    assert activity_result.identity.composition.is_value
+    typed_inventory = activity_result.identity.composition.value
+    assert typed_inventory.amount_basis is AmountBasis.MOL_INVENTORY
+    assert typed_inventory.basis == (
+        "printed_mole_percent_as_moles_per_nominal_100_mol_inventory"
+    )
+    assert dict(typed_inventory.components) == {
+        formula: Decimal(amount)
+        for formula, amount in activity_point["composition_as_published"]["components"].items()
+    }
+    assert activity_unmarked_result.identity.composition is None or (
+        activity_unmarked_result.identity.composition.is_unknown
+    )
+    assert (
+        activity_plain_result.identity.composition is None
+        or activity_plain_result.identity.composition.is_unknown
+    )
+
+
 
 def test_context_and_figure_records_keep_only_unscored_content():
     document = _document()

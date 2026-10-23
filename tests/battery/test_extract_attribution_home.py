@@ -46,7 +46,6 @@ REPAIRED = {
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",
     ("lpi-compendium-65701.yaml", "lpi_compendium_65701_attributed_trace_and_exposure_values"): "Moore et al. (1973); Kerridge et al. (1975); Cirlin and Housley (1981); Wrigley (1973); Walton et al. (1973); Graf (1993), from data by Butler et al. (1973)",
-    ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
     ("tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml", "tachibana_1998_forsterite_prior_experiment_alpha_constraint"): "experiments [1-4]: Hashimoto (1990) [1]; Wang et al. (1993) [2]; Nagahara and Ozawa (1996) [3]; Tsuchiyama et al., in preparation [4]",
     # Stebbins, Carmichael & Weill 1983, printed p. 723: the Table 6 row labels and the Table 7
     # anorthite footnotes 3-4, hoisted in table order from the nested per-estimate sources.
@@ -59,6 +58,7 @@ REPAIRED = {
 
 CONTEXT_REPAIRED = {
     ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
+    ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
 }
 
 TURKDOGAN_REF2 = (

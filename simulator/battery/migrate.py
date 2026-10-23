@@ -18559,36 +18559,40 @@ class Migrator:
                 and located_composition.state.is_value
             ):
                 raw_composition = located_composition.state.value
-                # Activity axes can be partial coordinates. Keep explicit
-                # melt rows and Xiao's marked full inventories; figure axes
-                # and single-coordinate activity points are not compositions.
-                if isinstance(raw_composition, Composition) and (
-                    q_token_point is Quantity.VALENCE_RATIO
-                    or (
-                        q_token_point
-                        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
-                        and isinstance(raw_item, Mapping)
-                        and isinstance(raw_item.get("phase_as_printed"), str)
-                        and "melt"
-                        in raw_item["phase_as_printed"].casefold()
+                if isinstance(raw_composition, Composition):
+                    published_composition = (
+                        raw_item.get("composition_as_published")
+                        if isinstance(raw_item, Mapping)
+                        else None
                     )
-                    or (
-                        isinstance(raw_item, Mapping)
-                        and isinstance(
-                            raw_item.get("composition_as_published"), Mapping
-                        )
-                        and raw_item["composition_as_published"].get("basis")
-                        == "mol pct"
+                    phase_as_printed = (
+                        raw_item.get("phase_as_printed")
+                        if isinstance(raw_item, Mapping)
+                        else None
+                    )
+                    is_printed_mol_inventory = (
+                        isinstance(published_composition, Mapping)
+                        and published_composition.get("basis") == "mol pct"
                         and raw_composition.basis
                         == "printed_mole_percent_as_moles_per_nominal_100_mol_inventory"
                         and raw_composition.amount_basis is AmountBasis.MOL_INVENTORY
                         and len(raw_composition.components) > 1
                     )
-                ):
-                    identity = replace(
-                        identity, composition=State.of(raw_composition)
+                    promotes_typed_composition = (
+                        q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}
+                        or (
+                            q_token_point
+                            in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+                            and isinstance(phase_as_printed, str)
+                            and "melt" in phase_as_printed.casefold()
+                        )
+                        or is_printed_mol_inventory
                     )
-                elif q_token_point is Quantity.VALENCE_RATIO:
+                    if promotes_typed_composition:
+                        identity = replace(
+                            identity, composition=State.of(raw_composition)
+                        )
+                elif q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}:
                     converted_composition = _composition_located_from_plain(
                         {
                             "amount_basis": AmountBasis.MASS_PERCENT.value,
