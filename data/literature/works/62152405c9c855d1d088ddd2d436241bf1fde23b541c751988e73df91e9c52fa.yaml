@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:gornerup-1996-cao-corner-liquidus
+      role: pdf
+      path: raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf
+      sha256:
+        tag: value
+        value: 32751b05dd111df2f13bc0ac3e212418630ca4e4236b7398a0bb24027db4793b
+    - asset_id: pdftotext:gornerup-1996-cao-corner-liquidus
+      role: pdftotext
+      path: text/gornerup-1996-cao-corner-liquidus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:gornerup-1996-cao-corner-liquidus
+      role: table_csv
+      path: tables/gornerup-1996-cao-corner-liquidus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:gornerup-1996-cao-corner-liquidus
       role: pdftotext
       path: unknown

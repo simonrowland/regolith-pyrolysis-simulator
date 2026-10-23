@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:sato-1976-lunar-fo2-apollo-17
+      role: pdf
+      path: raw/sato-1976-lunar-fo2-apollo-17/sato-1976-lunar-fo2-apollo-17.pdf
+      sha256:
+        tag: value
+        value: d8e34f5e74e7e59ad2e63307decd4f22dced4ce0468d307588344060e1bb2e3c
+    - asset_id: pdftotext:sato-1976-lunar-fo2-apollo-17
+      role: pdftotext
+      path: text/sato-1976-lunar-fo2-apollo-17
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:sato-1976-lunar-fo2-apollo-17
       role: pdftotext
       path: unknown

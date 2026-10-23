@@ -4,7 +4,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 ---
 
-**AlphaMELTS** — silicate equilibrium engine based on the MELTS thermodynamic framework; accessed via PetThermoTools or the `engines/alphamelts/run_alphamelts.command` binary. Authoritative for silicate liquidus diagnostics; diagnostic-only (no ledger mutation). See [`docs/melt-backends.md`](melt-backends.md).
+**AlphaMELTS** — silicate equilibrium engine based on the MELTS thermodynamic framework; accessed via PetThermoTools or the configured binary installed under `~/repos/engine-bin/`. Authoritative for silicate liquidus diagnostics; diagnostic-only (no ledger mutation). See [`docs/melt-backends.md`](melt-backends.md).
 
 **AtomLedger** — the canonical mol-native store for all simulator state (`simulator/accounting/ledger.py`). Every balance sheet entry is in mol. Kg numbers are external projections only. See [`docs/architecture.md`](architecture.md).
 
@@ -70,7 +70,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **pO₂** — oxygen partial pressure; the control lever for the SiO₂ ⇌ SiO + ½O₂ equilibrium and for selective oxide reduction via the Ellingham ladder. See [`docs/concepts.md`](concepts.md).
 
-**PetThermoTools** — Python API for alphaMELTS-family calculations; the preferred Python-side bridge to MELTS thermodynamics. Installed as an editable sibling clone by `install-engines.py`. See [`docs/melt-backends.md`](melt-backends.md).
+**PetThermoTools** — Python API for alphaMELTS-family calculations; the preferred Python-side bridge to MELTS thermodynamics. Installed as an editable clone at its locked revision under `~/repos/engine-bin/` by `install-engines.py`. See [`docs/melt-backends.md`](melt-backends.md).
 
 **PySulfSat** — optional Python package for sulfur saturation calculations (SCSS via Smythe 2017, SCAS via Chowdhury & Dasgupta 2019). Gates the Stage 0 sulfur-saturation split when installed. See [`docs/process-model.md`](process-model.md).
 

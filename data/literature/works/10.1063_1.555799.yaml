@@ -12,8 +12,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:lamoreaux-hildenbrand-hildenbrand-1987
+      role: pdf
+      path: raw/lamoreaux-hildenbrand-hildenbrand-1987/lamoreaux-hildenbrand-hildenbrand-1987.pdf
+      sha256:
+        tag: value
+        value: 02ca48d2c8837d9dc8d720b76636c1b8f6795797ba2b1fae047c1c19702e6800
+    - asset_id: pdftotext:lamoreaux-hildenbrand-hildenbrand-1987
+      role: pdftotext
+      path: text/lamoreaux-hildenbrand-hildenbrand-1987
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:lamoreaux-hildenbrand-hildenbrand-1987
       role: pdftotext
       path: unknown

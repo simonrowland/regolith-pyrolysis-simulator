@@ -30,6 +30,7 @@ else:
 
 from collections.abc import Iterator
 
+import json
 import os
 import re
 import secrets
@@ -273,17 +274,226 @@ if os.environ.get("REGOLITH_VAPOROCK_SESSION_WARM") is None:
 
 
 _SESSION_WATCHDOG: SessionWatchdog | None = None
+DOCS_PRIVATE_MANIFEST_STRICT_ENV = "REGOLITH_DOCS_PRIVATE_MANIFEST_STRICT"
+DOCS_PRIVATE_AUDIT_DIR_ENV = "REGOLITH_DOCS_PRIVATE_AUDIT_DIR"
+_DOCS_PRIVATE_AUDIT_ROOT: Path | None = None
+_DOCS_PRIVATE_ACTIVE_TEST_NODEID: str | None = None
+_DOCS_PRIVATE_AUDIT_INSTALLED = False
+_DOCS_PRIVATE_AUDIT_SESSION_DIR: Path | None = None
+
+
+def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
+    if DOCS_PRIVATE_MANIFEST_STRICT_ENV not in os.environ:
+        return
+
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but cannot read "
+            f"docs-private input manifest {manifest_path}: {exc}"
+        ) from exc
+
+    missing: list[str] = []
+    for entry in manifest["entries"]:
+        kind = entry["kind"]
+        path = entry["path"]
+        readers = ", ".join(entry["readers"])
+        input_path = repo_root / path
+        if kind == "file":
+            if not input_path.is_file():
+                missing.append(f"{path} (read by {readers})")
+        elif kind == "directory":
+            if not input_path.is_dir():
+                missing.append(f"{path} (read by {readers})")
+        elif kind == "glob":
+            required = entry["required"]
+            if not required:
+                missing.append(f"{path} (no required named files; read by {readers})")
+                continue
+            matched = {
+                match.relative_to(repo_root).as_posix()
+                for match in repo_root.glob(path)
+            }
+            for required_entry in required:
+                required_path = required_entry["path"]
+                required_readers = ", ".join(required_entry["readers"])
+                if required_path not in matched or not (
+                    repo_root / required_path
+                ).is_file():
+                    missing.append(
+                        f"{required_path} (required by glob {path}; "
+                        f"read by {required_readers})"
+                    )
+        else:
+            raise pytest.UsageError(
+                f"invalid docs-private input kind {kind!r} for {path!r} "
+                f"in {manifest_path}"
+            )
+
+    if missing:
+        details = "\n".join(f"  - {item}" for item in missing)
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but required docs-private "
+            f"inputs are missing or unmatched:\n{details}"
+        )
+
+
+def _record_missing_docs_private_open(event: str, args: tuple[object, ...]) -> None:
+    """Log ordinary opens below docs-private; dir_fd opens are not resolved.
+
+    No repository caller uses ``os.open(..., dir_fd=...)``. The audit hook
+    cannot map that relative path to the repository root without extra state.
+    """
+
+    if event != "open" or not args or _DOCS_PRIVATE_AUDIT_ROOT is None:
+        return
+
+    mode = args[1] if len(args) > 1 else None
+    flags = args[2] if len(args) > 2 else None
+    if isinstance(mode, str) and any(flag in mode for flag in "wax+"):
+        return
+    if mode is None and isinstance(flags, int):
+        if (flags & os.O_ACCMODE) != os.O_RDONLY:
+            return
+
+    try:
+        raw_path = os.fsdecode(os.fspath(args[0]))
+        candidate = (
+            raw_path
+            if os.path.isabs(raw_path)
+            else os.path.join(os.getcwd(), raw_path)
+        )
+        candidate = os.path.abspath(candidate)
+        private_prefix = os.path.abspath(
+            str(_DOCS_PRIVATE_AUDIT_ROOT / "docs-private")
+        )
+        if candidate != private_prefix and not candidate.startswith(
+            private_prefix + os.sep
+        ):
+            return
+        opened = Path(candidate).resolve()
+        private_root = (_DOCS_PRIVATE_AUDIT_ROOT / "docs-private").resolve()
+        if not opened.is_relative_to(private_root) or opened.exists():
+            return
+        relative_path = opened.relative_to(_DOCS_PRIVATE_AUDIT_ROOT).as_posix()
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return
+
+    nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID or "<session setup or collection>"
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None:
+        raise RuntimeError(f"{DOCS_PRIVATE_AUDIT_DIR_ENV} is not set")
+    record_path = Path(audit_dir) / f"{os.getpid()}.jsonl"
+    with record_path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps({"path": relative_path, "nodeid": nodeid}) + "\n")
+
+
+def _install_docs_private_open_audit(repo_root: Path) -> bool:
+    global _DOCS_PRIVATE_AUDIT_ROOT, _DOCS_PRIVATE_AUDIT_INSTALLED
+    if (
+        DOCS_PRIVATE_MANIFEST_STRICT_ENV not in os.environ
+        or _DOCS_PRIVATE_AUDIT_INSTALLED
+    ):
+        return False
+
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None or not Path(audit_dir).is_dir():
+        raise pytest.UsageError(
+            f"{DOCS_PRIVATE_MANIFEST_STRICT_ENV} is set, but "
+            f"{DOCS_PRIVATE_AUDIT_DIR_ENV} is unavailable"
+        )
+    _DOCS_PRIVATE_AUDIT_ROOT = repo_root.resolve()
+    sys.addaudithook(_record_missing_docs_private_open)
+    _DOCS_PRIVATE_AUDIT_INSTALLED = True
+    return True
+
+
+def _fail_on_missing_docs_private_opens(session: pytest.Session) -> str | None:
+    if os.environ.get("PYTEST_XDIST_WORKER"):
+        return None
+
+    audit_dir = os.environ.get(DOCS_PRIVATE_AUDIT_DIR_ENV)
+    if audit_dir is None:
+        return None
+    missing: set[tuple[str, str]] = set()
+    for record_file in sorted(Path(audit_dir).glob("*.jsonl")):
+        with record_file.open(encoding="utf-8") as stream:
+            for line in stream:
+                try:
+                    record = json.loads(line)
+                    path = record["path"]
+                    nodeid = record["nodeid"]
+                    if not isinstance(path, str) or not isinstance(nodeid, str):
+                        raise TypeError("audit record fields must be strings")
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    missing.add(
+                        (f"truncated audit record in {record_file.name}", "<audit log>")
+                    )
+                    continue
+                missing.add((path, nodeid))
+    if not missing:
+        return None
+
+    details = "\n".join(
+        f"  - {path} (opened by {nodeid})"
+        for path, nodeid in sorted(missing)
+    )
+    message = (
+        "strict docs-private audit found missing docs-private inputs:\n"
+        f"{details}\n"
+        "Rerun scripts/derive_docs_private_inputs.py and add the inputs to "
+        "tests/docs_private_inputs.json."
+    )
+    session.exitstatus = pytest.ExitCode.TESTS_FAILED
+    terminalreporter = session.config.pluginmanager.getplugin("terminalreporter")
+    if terminalreporter is None:
+        print(message, file=sys.stderr)
+    else:
+        terminalreporter.write_sep("!", message)
+    return message
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionstart(session: pytest.Session) -> None:
-    del session
     _cleanup_dead_worker_caches(_worker_cache_root())
+    if DOCS_PRIVATE_MANIFEST_STRICT_ENV in os.environ:
+        repo_root = Path(session.config.rootpath)
+        _preflight_docs_private_inputs(
+            repo_root,
+            repo_root / "tests" / "docs_private_inputs.json",
+        )
+        global _DOCS_PRIVATE_AUDIT_SESSION_DIR
+        if not os.environ.get("PYTEST_XDIST_WORKER"):
+            _DOCS_PRIVATE_AUDIT_SESSION_DIR = Path(
+                tempfile.mkdtemp(prefix="regolith-docs-private-audit-")
+            )
+            os.environ[DOCS_PRIVATE_AUDIT_DIR_ENV] = str(
+                _DOCS_PRIVATE_AUDIT_SESSION_DIR
+            )
+        _install_docs_private_open_audit(repo_root)
     if os.environ.get("PYTEST_XDIST_WORKER"):
         return
     global _SESSION_WATCHDOG
     _SESSION_WATCHDOG = SessionWatchdog()
     _SESSION_WATCHDOG.start()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_protocol(
+    item: pytest.Item, nextitem: pytest.Item | None
+) -> Iterator[object]:
+    del nextitem
+    if not _DOCS_PRIVATE_AUDIT_INSTALLED:
+        yield
+        return
+    global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+    previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+    _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
+    try:
+        yield
+    finally:
+        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
 
 
 @pytest.hookimpl(optionalhook=True, tryfirst=True)
@@ -329,7 +539,16 @@ def pytest_sessionfinish(
     session: pytest.Session,
     exitstatus: int | pytest.ExitCode,
 ) -> None:
-    del session, exitstatus
+    global _DOCS_PRIVATE_AUDIT_SESSION_DIR
+    del exitstatus
+    if not os.environ.get("PYTEST_XDIST_WORKER"):
+        try:
+            _fail_on_missing_docs_private_opens(session)
+        finally:
+            if _DOCS_PRIVATE_AUDIT_SESSION_DIR is not None:
+                shutil.rmtree(_DOCS_PRIVATE_AUDIT_SESSION_DIR, ignore_errors=True)
+                _DOCS_PRIVATE_AUDIT_SESSION_DIR = None
+                os.environ.pop(DOCS_PRIVATE_AUDIT_DIR_ENV, None)
     # t-420: close warm engine pools before the b-093 watchdog disarms, so the
     # bounded-cleanup path still runs under session-safety supervision.
     # Drop the process-scoped VapoRock warm-boot cache first so its pools are

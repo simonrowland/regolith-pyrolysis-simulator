@@ -788,15 +788,14 @@ def test_qualification_does_not_launch_sio2_free_melt(
 
 
 def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
-    import io
+    import json
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         run_isolated_cell_worker,
     )
 
     handle, marker = _qualification_handle(tmp_path)
-    protocol = io.StringIO()
-    run_isolated_cell_worker(
+    payload = run_isolated_cell_worker(
         {
             'pot_id': 'cao-tio2-worker',
             'composition_wt_pct': {'CaO': 53.4883, 'TiO2': 46.5117},
@@ -808,13 +807,13 @@ def test_qualification_worker_does_not_launch_sio2_free_melt(tmp_path):
             'timeout_s': 5.0,
             'arm': 'qualification',
         },
-        handles={'alphamelts': handle},
-        protocol_stdout=protocol,
+        handle=handle,
     )
 
+    rendered = json.dumps(payload, default=str)
     assert not marker.exists()
-    assert 'silicate_window' in protocol.getvalue()
-    assert 'subprocess_died' not in protocol.getvalue()
+    assert 'silicate_window' in rendered
+    assert 'subprocess_died' not in rendered
 
 
 def test_qualification_band_miss_with_iron_still_launches(tmp_path):

@@ -146,32 +146,20 @@ observations:
     paragraph: FUNC-5
   read_from: pdf:mendybaev-2017-fun-cai-lab-evaporation
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '11.6'
-          CaO: '7.6'
-          MgO: '37.9'
-          SiO2: '42.9'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-5
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.05976372234900118543359010501'
-          - - CaO
-            - '0.07119321826435993042515170709'
           - - MgO
             - '0.4939703307923544594320550803'
+          - - Al2O3
+            - '0.05976372234900118543359010501'
           - - SiO2
             - '0.3750727285942844247092031078'
+          - - CaO
+            - '0.07119321826435993042515170709'
           amount_basis: mole_fraction
       locator:
         pdf_page_index: 39
@@ -183,38 +171,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.6'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '7.6'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
         - - original_MgO_wt_pct
           - state:
               tag: value
@@ -227,6 +183,22 @@ observations:
           - state:
               tag: value
               value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -247,7 +219,35 @@ observations:
               pdf_page_index: 39
               table: '1'
               paragraph: FUNC-5
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '11.6'
+          CaO: '7.6'
+          MgO: '37.9'
+          SiO2: '42.9'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-10::T=2173.15:row=func-10:h=78e3f117200d
   experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-10
   identity:
@@ -389,18 +389,6 @@ observations:
               table: '1'
               paragraph: FUNC-10
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '33.53'
-          Al2O3: '15.2'
-          SiO2: '40.74'
-          CaO: '10.48'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-10
     composition:
       state:
         tag: value
@@ -491,6 +479,18 @@ observations:
               table: '1'
               paragraph: FUNC-10
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '33.53'
+          Al2O3: '15.2'
+          SiO2: '40.74'
+          CaO: '10.48'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
     mass_kg:
       state:
         tag: value
@@ -687,18 +687,6 @@ observations:
               table: '1'
               paragraph: FUNC-1
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '32.12'
-          Al2O3: '18.16'
-          SiO2: '37.16'
-          CaO: '12.52'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-1
     composition:
       state:
         tag: value
@@ -789,6 +777,18 @@ observations:
               table: '1'
               paragraph: FUNC-1
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '32.12'
+          Al2O3: '18.16'
+          SiO2: '37.16'
+          CaO: '12.52'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
     mass_kg:
       state:
         tag: value
@@ -985,18 +985,6 @@ observations:
               table: '1'
               paragraph: FUNC-3
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '27.36'
-          Al2O3: '21.69'
-          SiO2: '34.24'
-          CaO: '16.72'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-3
     composition:
       state:
         tag: value
@@ -1087,6 +1075,18 @@ observations:
               table: '1'
               paragraph: FUNC-3
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '27.36'
+          Al2O3: '21.69'
+          SiO2: '34.24'
+          CaO: '16.72'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
     mass_kg:
       state:
         tag: value
@@ -1283,18 +1283,6 @@ observations:
               table: '1'
               paragraph: FUNC-4
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '16.51'
-          Al2O3: '32.15'
-          SiO2: '27.32'
-          CaO: '24.03'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-4
     composition:
       state:
         tag: value
@@ -1385,6 +1373,18 @@ observations:
               table: '1'
               paragraph: FUNC-4
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '16.51'
+          Al2O3: '32.15'
+          SiO2: '27.32'
+          CaO: '24.03'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
     mass_kg:
       state:
         tag: value
@@ -1581,51 +1581,6 @@ observations:
               table: '1'
               paragraph: FUNC-5
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000285'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-5
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0285 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0285'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-5
-        output_unit: kg
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '37.9'
-          Al2O3: '11.6'
-          SiO2: '42.9'
-          CaO: '7.6'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-5
     composition:
       state:
         tag: value
@@ -1716,6 +1671,51 @@ observations:
               table: '1'
               paragraph: FUNC-5
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000285'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0285 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0285'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '37.9'
+          Al2O3: '11.6'
+          SiO2: '42.9'
+          CaO: '7.6'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1879,18 +1879,6 @@ observations:
               table: '1'
               paragraph: FUNC-6
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '10.95'
-          Al2O3: '40.16'
-          SiO2: '22.16'
-          CaO: '26.75'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-6
     composition:
       state:
         tag: value
@@ -1981,6 +1969,18 @@ observations:
               table: '1'
               paragraph: FUNC-6
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '10.95'
+          Al2O3: '40.16'
+          SiO2: '22.16'
+          CaO: '26.75'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
     mass_kg:
       state:
         tag: value
@@ -2177,18 +2177,6 @@ observations:
               table: '1'
               paragraph: FUNC-7
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '23.87'
-          Al2O3: '25.3'
-          SiO2: '31.63'
-          CaO: '19.22'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-7
     composition:
       state:
         tag: value
@@ -2279,6 +2267,18 @@ observations:
               table: '1'
               paragraph: FUNC-7
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '23.87'
+          Al2O3: '25.3'
+          SiO2: '31.63'
+          CaO: '19.22'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
     mass_kg:
       state:
         tag: value
@@ -2475,18 +2475,6 @@ observations:
               table: '1'
               paragraph: FUNC-8
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '19.08'
-          Al2O3: '31.35'
-          SiO2: '28.21'
-          CaO: '21.37'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-8
     composition:
       state:
         tag: value
@@ -2577,6 +2565,18 @@ observations:
               table: '1'
               paragraph: FUNC-8
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '19.08'
+          Al2O3: '31.35'
+          SiO2: '28.21'
+          CaO: '21.37'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
     mass_kg:
       state:
         tag: value
@@ -2773,18 +2773,6 @@ observations:
               table: '1'
               paragraph: FUNC-9
         output_unit: K
-    printed_composition:
-      state:
-        tag: value
-        value:
-          MgO: '29.92'
-          Al2O3: '19.78'
-          SiO2: '35.54'
-          CaO: '14.77'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-9
     composition:
       state:
         tag: value
@@ -2875,6 +2863,18 @@ observations:
               table: '1'
               paragraph: FUNC-9
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '29.92'
+          Al2O3: '19.78'
+          SiO2: '35.54'
+          CaO: '14.77'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
     mass_kg:
       state:
         tag: value
