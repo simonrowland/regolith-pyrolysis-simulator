@@ -70,7 +70,7 @@ def test_rys_tables_7_and_9_thermal_cells_migrate_with_composition_and_locators(
         ), parent
     assert all(row.identity.total_pressure_Pa.is_unknown for row in table7 + table9)
     assert all(
-        row.point_conditions["total_pressure_Pa"].locator.page == row.locator.page
+        "total_pressure_Pa" not in (row.point_conditions or {})
         for row in table7 + table9
     )
     assert all(row.value.point is not None for row in table7 + table9)

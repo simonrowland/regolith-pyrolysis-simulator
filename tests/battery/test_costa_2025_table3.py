@@ -115,7 +115,9 @@ def test_costa_table3_migrates_composition_temperature_and_source_conditions(
         assert gas.state.is_value
         assert gas.locator.page == 3
         assert conditions["fO2_Pa"].state.is_unknown
-        assert conditions["total_pressure_Pa"].state.is_unknown
+        assert "total_pressure_Pa" not in conditions
+        pressure = row.identity.total_pressure_Pa
+        assert pressure is None or not pressure.is_value
 
         if "_tg_table3" in row.observation_id or "_tc_table3" in row.observation_id:
             assert row.identity.species.phase.value is Phase.GLASS
