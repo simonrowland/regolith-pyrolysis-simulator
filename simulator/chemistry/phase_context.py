@@ -698,7 +698,7 @@ def _composition_distance(
     species = set(left) | set(right)
     return math.sqrt(
         sum((float(left.get(name, 0.0)) - float(right.get(name, 0.0))) ** 2
-            for name in species)
+            for name in sorted(species))
     )
 
 

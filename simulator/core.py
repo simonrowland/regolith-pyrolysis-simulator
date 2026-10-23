@@ -13427,7 +13427,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if account.startswith('reservoir.')
             or account.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
         )
-        return sum(float(totals.get(account, 0.0)) for account in accounts)
+        return sum(float(totals.get(account, 0.0)) for account in sorted(accounts))
 
     def _finalize_record(self) -> None:
         """Populate final batch ledger fields when a batch completes."""
