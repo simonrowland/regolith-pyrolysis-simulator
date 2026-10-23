@@ -1336,6 +1336,8 @@ def test_psat_channel_refuses_missing_gas_or_condensed_or_rail() -> None:
 
 
 def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
+    from simulator.condensation import _antoine_psat_pa
+
     gas = KeyedTablePoint(
         compilation_id="janaf",
         record_id="Na-005",
@@ -1377,7 +1379,7 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     assert isinstance(na_P, float)
     assert isinstance(mg_P, float)
     # Melt Pref is ~0.15 Pa (Na) / 5e-13 Pa (Mg); sidecar is ~1 bar.
-    assert na_P == pytest.approx(84612.0, rel=0.02)
+    assert na_P == _antoine_psat_pa("Na", NA_NBP_K)
     assert mg_P == pytest.approx(103271.0, rel=0.02)
     assert abs(math.log10(na_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
     assert abs(math.log10(mg_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
@@ -1399,6 +1401,22 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     assert "## Vapour-rail P_sat" in markdown
     assert "Na/Mg boiling-point sanity" in markdown
     assert "pure_component_antoine" in markdown or "sidecar P_sat" in markdown
+
+
+@pytest.mark.parametrize("temperature, band", [
+    (250., (250., 298.15)), (328.453, (300., 350.)),
+    (500., (450., 500.)), (900., (800., 900.)),
+    (1100., (1000., 1100.)), (1400., (1300., 1400.)),
+])
+def test_na_psat_comparison_uses_wall_surface_and_selected_band(temperature, band):
+    from simulator.condensation import _antoine_psat_pa
+
+    assert _evaluate_rail_pressure_Pa("Na", temperature) == _antoine_psat_pa("Na", temperature)
+    assert _sidecar_valid_range_K("Na", temperature) == band
+
+
+def test_na_psat_comparison_keeps_below_surface_refusal():
+    assert _evaluate_rail_pressure_Pa("Na", 249.999) == "rail_row_absent"
 
 
 def test_psat_al_si_scores_the_janaf_node_refit() -> None:

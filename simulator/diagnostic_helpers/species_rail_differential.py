@@ -25,6 +25,11 @@ from typing import Any, Iterator, Mapping, Sequence
 import yaml
 
 from engines.antoine import _antoine_log10_pressure
+from engines.builtin.vapor_pressure import (
+    COEFF_BLOCK_PURE_COMPONENT,
+    vapor_pressure_valid_range_K,
+    wall_condensation_antoine_coefficients,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
@@ -1078,18 +1083,10 @@ def _legacy_species_row(species_id: str) -> Mapping[str, Any]:
 
 
 def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | None:
-    """P_sat in Pa from the catalog's pure_component_antoine sidecar.
+    """Evaluate the owning wall selector's pure-surface relation in Pa."""
 
-    Premise: log10(P/Pa) = A − B/(T+C). Na's A already includes +5 from the
-    NIST bar equation (yaml: log10(P/bar)=2.46077−…, converted to Pa by A+5).
-    Algebra: P_Pa = 10**(A − B/(T+C)).
-    Unit check: A is log10(Pa); B and C are kelvin; T+C is kelvin.
-    Sanity: Na 1156 K → 8.461e4 Pa (log10(P/1e5)=−0.073); Mg 1363 K →
-    1.033e5 Pa (log10(P/1e5)=+0.014). Both within 0.1 dex of the 1-bar NBP.
-    """
-
-    pca = row.get("pure_component_antoine")
-    if not isinstance(pca, Mapping):
+    pca, block = wall_condensation_antoine_coefficients(row, T_K)
+    if block != COEFF_BLOCK_PURE_COMPONENT or not pca:
         return None
     try:
         A = float(pca["A"])
@@ -1165,12 +1162,14 @@ def _pick_condensed_psat(
     return min(solids, key=lambda p: p.delta_fG_kJ_mol)
 
 
-def _sidecar_valid_range_K(species_id: str) -> tuple[float, float] | None:
+def _sidecar_valid_range_K(
+    species_id: str, T_K: float | None = None,
+) -> tuple[float, float] | None:
     row = _legacy_species_row(species_id)
-    pca = row.get("pure_component_antoine")
-    if not isinstance(pca, Mapping):
+    pca, block = wall_condensation_antoine_coefficients(row, T_K)
+    if block != COEFF_BLOCK_PURE_COMPONENT or not pca:
         return None
-    vr = pca.get("valid_range_K")
+    vr = vapor_pressure_valid_range_K(row, block, T_K)
     if not isinstance(vr, Sequence) or isinstance(vr, (str, bytes)) or len(vr) != 2:
         return None
     low, high = float(vr[0]), float(vr[1])
