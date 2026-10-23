@@ -1,12 +1,17 @@
 """Render-grounded checks for Gaillard et al. (2003)."""
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import (
+    Migrator,
+    collect_printed_oxygen,
+    locator_from_mapping,
+)
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
     validate_extract_document,
@@ -131,10 +136,23 @@ def test_extract_validates_and_table2_matches_independent_render() -> None:
     run3 = next(row for row in document["species"]["H2"]["observations"] if row["locator"].get("row") == "3")
     assert run3["locator"]["page"] == run3["locator"]["pdf_page_index"] + 1 == 3
     assert run3["point_conditions"]["fO2_log"]["state"]["value"] == "-19.15"
+    assert run3["point_conditions"]["fO2_log"]["reference_pressure"] == {
+        "value": 1,
+        "units": "bar",
+        "basis": "convention",
+        "printed": False,
+    }
     assert run3["point_conditions"]["fO2_log"]["locator"]["note"].startswith(
         "log fO2 printed without a stated reference; read with the bar convention "
         "(atm would differ by 0.0057 dex)"
     )
+    oxygen = collect_printed_oxygen(
+        ({"point_conditions": run3["point_conditions"]},),
+        locator_from_mapping(run3["locator"]),
+    )
+    assert oxygen.log_fO2_reference_Pa == 100000
+    assert oxygen.log_fO2 is not None
+    assert oxygen.log_fO2.state.value == Decimal("-19.15")
     starting_glass = document["species"]["Fe"]["observations"][0]
     assert starting_glass["point_conditions"]["quench_state"]["state"] == {
         "tag": "value", "value": "not_stated"

@@ -3380,6 +3380,16 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
     "MgO_wt_pct",
     "CaO_wt_pct",
 )
+
+
+def _residue_component_subtype(field_name: str) -> str | None:
+    if field_name == "residue_ppm":
+        return "element_ppm_by_mass"
+    if field_name.endswith("_wt_pct"):
+        return "oxide_wt_percent"
+    return None
+
+
 _COMPOSITION_CONDITION_KEYS = frozenset(
     {
         "T_C",
@@ -12019,6 +12029,26 @@ def _log_fO2_to_pa(
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
+def _fO2_conventional_reference_pressure_pa(condition: object) -> Decimal | None:
+    """Read an explicit non-printed reference pressure from an fO2 condition."""
+
+    if not isinstance(condition, Mapping):
+        return None
+    reference = condition.get("reference_pressure")
+    if not isinstance(reference, Mapping):
+        return None
+    if reference.get("basis") != "convention" or reference.get("printed") is not False:
+        return None
+    amount = _printed_decimal(reference.get("value"))
+    units = str(reference.get("units") or "").strip()
+    if amount is None or not units:
+        return None
+    pressure_pa, _ = convert_pressure_to_pa(amount, units)
+    if pressure_pa is None or pressure_pa <= 0:
+        return None
+    return pressure_pa
+
+
 def _normalize_printed_token(raw: object) -> str:
     return str(raw).strip().replace("−", "-").replace("–", "-").replace(" ", "")
 
@@ -12226,6 +12256,16 @@ def _walk_printed_oxygen(
                 ):
                     rejected_logs.append(True)
                 else:
+                    reference_pressure_pa = (
+                        _fO2_conventional_reference_pressure_pa(condition)
+                    )
+                    if (
+                        isinstance(condition, Mapping)
+                        and "reference_pressure" in condition
+                        and reference_pressure_pa is None
+                    ):
+                        rejected_logs.append(True)
+                        continue
                     logs.append((
                         condition_value,
                         Located(
@@ -12233,7 +12273,7 @@ def _walk_printed_oxygen(
                             locator=located_condition.locator or local,
                             inference=located_condition.inference,
                         ),
-                        _BAR_PA,
+                        reference_pressure_pa or _BAR_PA,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -15436,6 +15476,13 @@ class Migrator:
             values, obs_type, obs.get("units"), quantity=quantity
         )
         if (
+            q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and value_sel.field_name is not None
+        ):
+            subtype = _residue_component_subtype(value_sel.field_name)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
+        if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
             and not _value_has_numeric_value(value)
         ):
@@ -15966,6 +16013,8 @@ class Migrator:
             oxygen_roots.append(values)
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
+        if isinstance(raw_point_conditions, Mapping):
+            oxygen_roots.append({"point_conditions": raw_point_conditions})
         point_conditions = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
@@ -16025,6 +16074,38 @@ class Migrator:
                         atmosphere_note, fo2_locator
                     )
             point_conditions = residue_conditions or None
+            if isinstance(point_conditions, Mapping):
+                for name in ("composition", "total_pressure_Pa", "sample_mass_kg"):
+                    condition = point_conditions.get(name)
+                    if isinstance(condition, Located):
+                        state = condition.state
+                        if state.is_value:
+                            if name == "composition":
+                                if not isinstance(state.value, Composition):
+                                    continue
+                            else:
+                                try:
+                                    state = State.of(as_decimal(state.value))
+                                except (ArithmeticError, TypeError, ValueError):
+                                    continue
+                        ident_kwargs[name] = state
+                duration = point_conditions.get("duration_h")
+                if isinstance(duration, Located):
+                    duration_state = duration.state
+                    if duration_state.is_value:
+                        duration_state = State.of(
+                            duration_state.value * Decimal("3600")
+                        )
+                    elif duration_state.is_unknown:
+                        duration_state = State.unknown(
+                            duration_state.reason or "source duration is unknown"
+                        )
+                    ident_kwargs["exposure"] = State.of(
+                        Exposure(
+                            area_m2=State.unknown("source does not state exposed area"),
+                            duration_s=duration_state,
+                        )
+                    )
         if q_token in PHASE_ROW_QUANTITIES:
             # Parent rows do not otherwise ingest point_conditions. These
             # four quantities do: the printed atmosphere and the printed sum
@@ -16097,6 +16178,30 @@ class Migrator:
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
         )
+        if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            fO2_condition = (point_conditions or {}).get("fO2_log")
+            raw_fO2_condition = (
+                raw_point_conditions.get("fO2_log")
+                if isinstance(raw_point_conditions, Mapping)
+                else None
+            )
+            fO2_reference_pa = (
+                _fO2_conventional_reference_pressure_pa(raw_fO2_condition)
+            )
+            existing_fO2 = ident_kwargs.get("fO2_Pa")
+            if (
+                fO2_reference_pa is not None
+                and isinstance(fO2_condition, Located)
+                and fO2_condition.state.is_value
+                and isinstance(fO2_condition.state.value, Decimal)
+                and (
+                    existing_fO2 is None
+                    or (isinstance(existing_fO2, State) and existing_fO2.is_unknown)
+                )
+            ):
+                ident_kwargs["fO2_Pa"] = State.of(
+                    _log_fO2_to_pa(fO2_condition.state.value, fO2_reference_pa)
+                )
         identity = fill_identity(quantity, species, **ident_kwargs)
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, locator
@@ -17538,10 +17643,9 @@ class Migrator:
             and value_sel is not None
             and value_sel.field_name is not None
         ):
-            if value_sel.field_name == "residue_ppm":
-                ident_kwargs["subtype"] = State.of("element_ppm_by_mass")
-            elif value_sel.field_name.endswith("_wt_pct"):
-                ident_kwargs["subtype"] = State.of("oxide_wt_percent")
+            subtype = _residue_component_subtype(value_sel.field_name)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
         if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
             if source_id == "kems-015-hashimoto-1983":
                 # Hashimoto Table 3 (p. 116) is the recovered spherule's bulk composition;
