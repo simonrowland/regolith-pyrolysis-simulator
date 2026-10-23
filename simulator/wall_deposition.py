@@ -553,6 +553,7 @@ def _wall_deposition_flux_budget_kg_hr(
     flux_mol_m2_s: float,
     surface_area_m2: float,
     formula_registry: Mapping[str, Any] | None = None,
+    molar_mass_kg_mol: float | None = None,
 ) -> float:
     values = {
         "flux_mol_m2_s": flux_mol_m2_s,
@@ -566,10 +567,15 @@ def _wall_deposition_flux_budget_kg_hr(
     # Algebra: m_dot = J*A*M. Unit check:
     # (mol/m2/s)*(m2)*(kg/mol)*(3600 s/h) = kg/h.
     # Sanity: the budget is zero at zero flux/area and linear before supply cap.
-    molar_mass_kg_mol = resolve_species_formula(
-        species,
-        formula_registry,
-    ).molar_mass_kg_per_mol()
+    # Stages already resolve the mass from their vapor-pressure contract
+    # (including aliases/custom rows); walls resolve it from the ledger registry.
+    if molar_mass_kg_mol is None:
+        molar_mass_kg_mol = resolve_species_formula(
+            species,
+            formula_registry,
+        ).molar_mass_kg_per_mol()
+    if not math.isfinite(molar_mass_kg_mol) or molar_mass_kg_mol <= 0.0:
+        raise AccountingError("wall capture molar mass must be finite and positive")
     return (
         flux_mol_m2_s
         * surface_area_m2
