@@ -264,16 +264,22 @@ def test_c0_forecast_context_does_not_retain_loaded_sulfsat_module():
         {"lunar": {"label": "Lunar", "composition_wt_pct": {"SiO2": 100.0}}}
     )
     sim.load_batch("lunar")
-    sulfur_module = ModuleType("forecast_test_sulfsat")
-    sim._sulfsat_gate._module = sulfur_module
-    sim._sulfsat_gate._available = True
+    sulfur_module = _attach_mutable_sulfsat_module(sim)
+    mutable_exports_before = {
+        name: deepcopy(getattr(sulfur_module, name))
+        for name in _PYSULFSAT_MUTABLE_EXPORTS
+    }
 
     context, status = sim._build_c0_forecast_context()
 
     assert status == ""
     assert context is not None
     assert context._sulfsat_gate is None
-    assert sulfur_module.oxide_mass_liq_anhyd == {"SiO2_Liq": [60.0]}
+    assert all(value is not sulfur_module for value in context.__dict__.values())
+    assert {
+        name: getattr(sulfur_module, name)
+        for name in _PYSULFSAT_MUTABLE_EXPORTS
+    } == mutable_exports_before
 
 
 def test_c0_forecast_refuses_post_equilibrium_sulfsat_path():

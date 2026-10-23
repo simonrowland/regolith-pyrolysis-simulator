@@ -410,10 +410,13 @@ class PT0DeterminismStore:
         return self._clone_for_context("replay", persistent_cache=True)
 
     def clone_for_forecast(self) -> "PT0DeterminismStore":
-        """Copy PT0 state without allowing a forecast to write the live DB."""
+        """Capture omits PT1; replay reopens its path.
+
+        Replay initialization may write schema metadata.
+        """
         # Capture forecasts compute cache misses against their detached backend
         # and retain fills only in the copied in-memory store. Replay forecasts
-        # keep the live read path, which does not write to the PT1 database.
+        # reopen the live PT1 path, whose initializer may write schema metadata.
         return self._clone_for_context(
             self.mode,
             persistent_cache=self.replay_enabled,
