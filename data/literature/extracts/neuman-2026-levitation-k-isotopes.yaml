@@ -136647,28 +136647,26 @@ species:
         note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher MMC2
           workbook containing this supplementary table.
         table: S1
-      units: g, mm, ppm, cm2 s-1, mol, cm2, J and timescales as printed
+      units: mm, ppm, cm2 s-1, mol, cm2, J and timescales as printed
       values:
         quantity: sample mass-loss inputs and calculated evaporation numbers
         method_class: measured_tabulated
         candidate_tokens:
-        - mass_loss_fraction
         - residue_component_composition
         - evaporation_rate
-        reason: The 49 rows are transcribed from the registered publisher MMC2 workbook (SHA-256
-          0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e). Starting and ending weights remain
-          context because no registered TABLE_CSV asset exposes those cells as derived_from parents; no mass-loss
-          fraction is computed. The listed calculated K evaporation number, J and timescales are model-derived and
-          remain context.
+        reason: The 49 starting and ending bead masses are transcribed from the registered publisher MMC2 workbook
+          (SHA-256 0f745b41c8f76c6b5c77ba7c44275d59f5a910f4e1f236a93c10632c4358720e). Their CSV cells are inputs to
+          the measured_reduced mass-loss rows (Supplementary Table S1, p. 63). The listed calculated K evaporation
+          number, J and timescales are model-derived and remain context.
         rows:
         - sample: 1–1
           material: Basalt
+          starting_weight_g_as_printed: '0.02088'
+          ending_weight_g_as_printed: '0.02097'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.02088'
-          ending_weight_g: '0.02097'
           diameter_after_mm: '2.46'
           39K_ppm: '14075.175'
           D_cm2_s-1: '0.00011267291545367'
@@ -136731,12 +136729,12 @@ species:
           locator: *id1879
         - sample: 1–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01617'
+          ending_weight_g_as_printed: '0.01579'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01617'
-          ending_weight_g: '0.01579'
           diameter_after_mm: '2.21'
           39K_ppm: '11041.576'
           D_cm2_s-1: '0.00011267291545367'
@@ -136799,12 +136797,12 @@ species:
           locator: *id1880
         - sample: 1–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01550'
+          ending_weight_g_as_printed: '0.01284'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01550'
-          ending_weight_g: '0.01284'
           diameter_after_mm: '2.09'
           39K_ppm: '11244.775'
           D_cm2_s-1: '0.00011267291545367'
@@ -136867,12 +136865,12 @@ species:
           locator: *id1881
         - sample: 1–5
           material: Basalt
+          starting_weight_g_as_printed: '0.01358'
+          ending_weight_g_as_printed: '0.01379'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01358'
-          ending_weight_g: '0.01379'
           diameter_after_mm: '2.19'
           39K_ppm: '8204.803'
           D_cm2_s-1: '0.00011267291545367'
@@ -136935,12 +136933,12 @@ species:
           locator: *id1882
         - sample: 1–10
           material: Basalt
+          starting_weight_g_as_printed: '0.01652'
+          ending_weight_g_as_printed: '0.01623'
           temperature_C: '2000'
           duration_s: '25'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01652'
-          ending_weight_g: '0.01623'
           diameter_after_mm: '2.24'
           39K_ppm: '12791.742'
           D_cm2_s-1: '0.00011267291545367'
@@ -137003,12 +137001,12 @@ species:
           locator: *id1883
         - sample: 1–11
           material: Basalt
+          starting_weight_g_as_printed: '0.01821'
+          ending_weight_g_as_printed: '0.01816'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01821'
-          ending_weight_g: '0.01816'
           diameter_after_mm: '2.33'
           39K_ppm: '14495.381'
           D_cm2_s-1: '0.00011267291545367'
@@ -137071,12 +137069,12 @@ species:
           locator: *id1884
         - sample: 1–12
           material: Basalt
+          starting_weight_g_as_printed: '0.01759'
+          ending_weight_g_as_printed: '0.01763'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01759'
-          ending_weight_g: '0.01763'
           diameter_after_mm: '2.44'
           39K_ppm: '14562.758'
           D_cm2_s-1: '0.00011267291545367'
@@ -137139,12 +137137,12 @@ species:
           locator: *id1885
         - sample: 2–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01853'
+          ending_weight_g_as_printed: '0.01845'
           temperature_C: '2000'
           duration_s: '15'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01853'
-          ending_weight_g: '0.01845'
           diameter_after_mm: '2.34'
           39K_ppm: '13497.628'
           D_cm2_s-1: '0.00011267291545367'
@@ -137207,12 +137205,12 @@ species:
           locator: *id1886
         - sample: 2–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01497'
+          ending_weight_g_as_printed: '0.01470'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01497'
-          ending_weight_g: '0.01470'
           diameter_after_mm: '2.17'
           39K_ppm: '11460.328'
           D_cm2_s-1: '0.00011267291545367'
@@ -137275,12 +137273,12 @@ species:
           locator: *id1887
         - sample: 2–3
           material: Basalt
+          starting_weight_g_as_printed: '0.01824'
+          ending_weight_g_as_printed: '0.01748'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01824'
-          ending_weight_g: '0.01748'
           diameter_after_mm: '2.29'
           39K_ppm: '7278.077'
           D_cm2_s-1: '0.00011267291545367'
@@ -137343,12 +137341,12 @@ species:
           locator: *id1888
         - sample: 2–4
           material: Basalt
+          starting_weight_g_as_printed: '0.02032'
+          ending_weight_g_as_printed: '0.01954'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.02032'
-          ending_weight_g: '0.01954'
           diameter_after_mm: '2.38'
           39K_ppm: '8080.020'
           D_cm2_s-1: '0.00011267291545367'
@@ -137411,12 +137409,12 @@ species:
           locator: *id1889
         - sample: 2–5
           material: Basalt
+          starting_weight_g_as_printed: '0.02086'
+          ending_weight_g_as_printed: '0.01997'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.02086'
-          ending_weight_g: '0.01997'
           diameter_after_mm: '2.40'
           39K_ppm: '6307.550'
           D_cm2_s-1: '0.00011267291545367'
@@ -137479,12 +137477,12 @@ species:
           locator: *id1890
         - sample: 2–6
           material: Basalt
+          starting_weight_g_as_printed: '0.01784'
+          ending_weight_g_as_printed: '0.01767'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01784'
-          ending_weight_g: '0.01767'
           diameter_after_mm: '2.32'
           39K_ppm: '12947.842'
           D_cm2_s-1: '0.00011267291545367'
@@ -137536,12 +137534,12 @@ species:
           locator: *id1891
         - sample: 2–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01807'
+          ending_weight_g_as_printed: '0.01724'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01807'
-          ending_weight_g: '0.01724'
           diameter_after_mm: '2.30'
           39K_ppm: '11408.458'
           D_cm2_s-1: '0.00011267291545367'
@@ -137604,12 +137602,12 @@ species:
           locator: *id1892
         - sample: 2–12
           material: Basalt
+          starting_weight_g_as_printed: '0.0176'
+          ending_weight_g_as_printed: '0.01753'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.0176'
-          ending_weight_g: '0.01753'
           diameter_after_mm: '2.39'
           39K_ppm: '14037.238'
           D_cm2_s-1: '0.00011267291545367'
@@ -137672,12 +137670,12 @@ species:
           locator: *id1893
         - sample: 2–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01792'
+          ending_weight_g_as_printed: '0.01776'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01792'
-          ending_weight_g: '0.01776'
           diameter_after_mm: '2.38'
           39K_ppm: '14594.031'
           D_cm2_s-1: '0.00011267291545367'
@@ -137740,12 +137738,12 @@ species:
           locator: *id1894
         - sample: 2–9
           material: Basalt
+          starting_weight_g_as_printed: '0.01557'
+          ending_weight_g_as_printed: '0.01541'
           temperature_C: '2000'
           duration_s: '15'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01557'
-          ending_weight_g: '0.01541'
           diameter_after_mm: '2.19'
           39K_ppm: '10105.086'
           D_cm2_s-1: '0.00011267291545367'
@@ -137808,12 +137806,12 @@ species:
           locator: *id1895
         - sample: 2–11
           material: Basalt
+          starting_weight_g_as_printed: '0.0194'
+          ending_weight_g_as_printed: '0.01896'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.0194'
-          ending_weight_g: '0.01896'
           diameter_after_mm: '2.35'
           39K_ppm: '10523.663'
           D_cm2_s-1: '0.00011267291545367'
@@ -137876,12 +137874,12 @@ species:
           locator: *id1896
         - sample: 3–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01932'
+          ending_weight_g_as_printed: '0.01908'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01932'
-          ending_weight_g: '0.01908'
           diameter_after_mm: '2.37'
           39K_ppm: '13432.347'
           D_cm2_s-1: '0.00011267291545367'
@@ -137944,12 +137942,12 @@ species:
           locator: *id1897
         - sample: 3–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01983'
+          ending_weight_g_as_printed: '0.01930'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01983'
-          ending_weight_g: '0.01930'
           diameter_after_mm: '2.38'
           39K_ppm: '9315.402'
           D_cm2_s-1: '0.00011267291545367'
@@ -138012,12 +138010,12 @@ species:
           locator: *id1898
         - sample: 3–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01975'
+          ending_weight_g_as_printed: '0.01895'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01975'
-          ending_weight_g: '0.01895'
           diameter_after_mm: '2.35'
           39K_ppm: '6678.732'
           D_cm2_s-1: '0.00011267291545367'
@@ -138080,12 +138078,12 @@ species:
           locator: *id1899
         - sample: 3–5
           material: Basalt
+          starting_weight_g_as_printed: '0.01733'
+          ending_weight_g_as_printed: '0.01640'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01733'
-          ending_weight_g: '0.01640'
           diameter_after_mm: '2.20'
           39K_ppm: '4020.423'
           D_cm2_s-1: '0.00011267291545367'
@@ -138148,12 +138146,12 @@ species:
           locator: *id1900
         - sample: 3–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01935'
+          ending_weight_g_as_printed: '0.01917'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01935'
-          ending_weight_g: '0.01917'
           diameter_after_mm: '2.38'
           39K_ppm: '14359.480'
           D_cm2_s-1: '0.00011267291545367'
@@ -138216,12 +138214,12 @@ species:
           locator: *id1901
         - sample: 3–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01964'
+          ending_weight_g_as_printed: '0.01955'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01964'
-          ending_weight_g: '0.01955'
           diameter_after_mm: '2.29'
           39K_ppm: '14077.975'
           D_cm2_s-1: '0.00011267291545367'
@@ -138284,12 +138282,12 @@ species:
           locator: *id1902
         - sample: 3–9
           material: Basalt
+          starting_weight_g_as_printed: '0.02007'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.02007'
-          ending_weight_g: '0.01973'
           diameter_after_mm: '2.40'
           39K_ppm: '11229.404'
           D_cm2_s-1: '0.00011267291545367'
@@ -138352,12 +138350,12 @@ species:
           locator: *id1903
         - sample: 3–10
           material: Basalt
+          starting_weight_g_as_printed: '0.01878'
+          ending_weight_g_as_printed: '0.01848'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01878'
-          ending_weight_g: '0.01848'
           diameter_after_mm: '2.33'
           39K_ppm: '11737.775'
           D_cm2_s-1: '0.00011267291545367'
@@ -138420,12 +138418,12 @@ species:
           locator: *id1904
         - sample: 3–12
           material: Basalt
+          starting_weight_g_as_printed: '0.01782'
+          ending_weight_g_as_printed: '0.01767'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: IW-1
           log_fO2_as_printed: null
-          starting_weight_g: '0.01782'
-          ending_weight_g: '0.01767'
           diameter_after_mm: '2.35'
           39K_ppm: '13359.321'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138480,12 +138478,12 @@ species:
           locator: *id1905
         - sample: 4–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01961'
+          ending_weight_g_as_printed: '0.01867'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: IW-1
           log_fO2_as_printed: null
-          starting_weight_g: '0.01961'
-          ending_weight_g: '0.01867'
           diameter_after_mm: '2.38'
           39K_ppm: '13073.554'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138540,12 +138538,12 @@ species:
           locator: *id1906
         - sample: 4–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01751'
+          ending_weight_g_as_printed: '0.01716'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: IW-1
           log_fO2_as_printed: null
-          starting_weight_g: '0.01751'
-          ending_weight_g: '0.01716'
           diameter_after_mm: '2.29'
           39K_ppm: '10869.622'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138600,12 +138598,12 @@ species:
           locator: *id1907
         - sample: 4–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01706'
+          ending_weight_g_as_printed: '0.01755'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: IW+3
           log_fO2_as_printed: null
-          starting_weight_g: '0.01706'
-          ending_weight_g: '0.01755'
           diameter_after_mm: '2.27'
           39K_ppm: '13486.937'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138660,12 +138658,12 @@ species:
           locator: *id1908
         - sample: 4–5
           material: Basalt
+          starting_weight_g_as_printed: '0.0175'
+          ending_weight_g_as_printed: '0.01747'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: IW+3
           log_fO2_as_printed: null
-          starting_weight_g: '0.0175'
-          ending_weight_g: '0.01747'
           diameter_after_mm: '2.30'
           39K_ppm: '12363.981'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138720,12 +138718,12 @@ species:
           locator: *id1909
         - sample: 4–6
           material: Basalt
+          starting_weight_g_as_printed: '0.02009'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: IW+3
           log_fO2_as_printed: null
-          starting_weight_g: '0.02009'
-          ending_weight_g: '0.01973'
           diameter_after_mm: '2.39'
           39K_ppm: '10962.636'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138780,12 +138778,12 @@ species:
           locator: *id1910
         - sample: 4–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01945'
+          ending_weight_g_as_printed: '0.01946'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: pure O2
           log_fO2_as_printed: null
-          starting_weight_g: '0.01945'
-          ending_weight_g: '0.01946'
           diameter_after_mm: '2.47'
           39K_ppm: '14545.591'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138840,12 +138838,12 @@ species:
           locator: *id1911
         - sample: 4–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01883'
+          ending_weight_g_as_printed: '0.01825'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: pure O2
           log_fO2_as_printed: null
-          starting_weight_g: '0.01883'
-          ending_weight_g: '0.01825'
           diameter_after_mm: '2.35'
           39K_ppm: '13568.187'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138900,12 +138898,12 @@ species:
           locator: *id1912
         - sample: 4–9
           material: Basalt
+          starting_weight_g_as_printed: '0.01742'
+          ending_weight_g_as_printed: '0.01736'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: pure O2
           log_fO2_as_printed: null
-          starting_weight_g: '0.01742'
-          ending_weight_g: '0.01736'
           diameter_after_mm: '2.29'
           39K_ppm: '13373.206'
           D_cm2_s-1: '6.549860020928438e-05'
@@ -138960,12 +138958,12 @@ species:
           locator: *id1913
         - sample: 5–1
           material: Loess
+          starting_weight_g_as_printed: '0.02019'
+          ending_weight_g_as_printed: '0.02012'
           temperature_C: '2046'
           duration_s: '5'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.02019'
-          ending_weight_g: '0.02012'
           diameter_after_mm: '2.88'
           39K_ppm: '32118.503'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139028,12 +139026,12 @@ species:
           locator: *id1914
         - sample: 5–5
           material: Loess
+          starting_weight_g_as_printed: '0.01702'
+          ending_weight_g_as_printed: '0.01699'
           temperature_C: '2046'
           duration_s: '5'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01702'
-          ending_weight_g: '0.01699'
           diameter_after_mm: '2.50'
           39K_ppm: '30468.006'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139096,12 +139094,12 @@ species:
           locator: *id1915
         - sample: 6–2
           material: Loess
+          starting_weight_g_as_printed: '0.01614'
+          ending_weight_g_as_printed: '0.01600'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01614'
-          ending_weight_g: '0.01600'
           diameter_after_mm: '2.34'
           39K_ppm: '29466.489'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139164,12 +139162,12 @@ species:
           locator: *id1916
         - sample: 6–3
           material: Loess
+          starting_weight_g_as_printed: '0.01710'
+          ending_weight_g_as_printed: '0.01687'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01710'
-          ending_weight_g: '0.01687'
           diameter_after_mm: '2.45'
           39K_ppm: '29641.327'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139232,12 +139230,12 @@ species:
           locator: *id1917
         - sample: 6–4
           material: Loess
+          starting_weight_g_as_printed: '0.01753'
+          ending_weight_g_as_printed: '0.01715'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01753'
-          ending_weight_g: '0.01715'
           diameter_after_mm: '2.37'
           39K_ppm: '28065.917'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139300,12 +139298,12 @@ species:
           locator: *id1918
         - sample: 6–5
           material: Loess
+          starting_weight_g_as_printed: '0.01785'
+          ending_weight_g_as_printed: '0.01740'
           temperature_C: '2046'
           duration_s: '100'
           fO2_target: pure O2
           log_fO2_as_printed: '0'
-          starting_weight_g: '0.01785'
-          ending_weight_g: '0.01740'
           diameter_after_mm: '2.39'
           39K_ppm: '28492.266'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139368,12 +139366,12 @@ species:
           locator: *id1919
         - sample: 6–6
           material: Loess
+          starting_weight_g_as_printed: '0.01758'
+          ending_weight_g_as_printed: '0.01707'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01758'
-          ending_weight_g: '0.01707'
           diameter_after_mm: '2.38'
           39K_ppm: '28877.829'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139436,12 +139434,12 @@ species:
           locator: *id1920
         - sample: 6–7
           material: Loess
+          starting_weight_g_as_printed: '0.01546'
+          ending_weight_g_as_printed: '0.01434'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.01546'
-          ending_weight_g: '0.01434'
           diameter_after_mm: '2.21'
           39K_ppm: '24928.134'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139504,12 +139502,12 @@ species:
           locator: *id1921
         - sample: 6–8
           material: Loess
+          starting_weight_g_as_printed: '0.02141'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: IW+3
           log_fO2_as_printed: '-2.33'
-          starting_weight_g: '0.02141'
-          ending_weight_g: '0.01973'
           diameter_after_mm: '2.50'
           39K_ppm: '24286.577'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139572,12 +139570,12 @@ species:
           locator: *id1922
         - sample: 5–3
           material: Loess
+          starting_weight_g_as_printed: '0.01841'
+          ending_weight_g_as_printed: '0.01814'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01841'
-          ending_weight_g: '0.01814'
           diameter_after_mm: '2.88'
           39K_ppm: '30802.878'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139640,12 +139638,12 @@ species:
           locator: *id1923
         - sample: 6–10
           material: Loess
+          starting_weight_g_as_printed: '0.01700'
+          ending_weight_g_as_printed: '0.01632'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01700'
-          ending_weight_g: '0.01632'
           diameter_after_mm: '2.23'
           39K_ppm: '28129.582'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139708,12 +139706,12 @@ species:
           locator: *id1924
         - sample: 5–2
           material: Loess
+          starting_weight_g_as_printed: '0.01945'
+          ending_weight_g_as_printed: '0.01798'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01945'
-          ending_weight_g: '0.01798'
           diameter_after_mm: '2.34'
           39K_ppm: '25701.041'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139776,12 +139774,12 @@ species:
           locator: *id1925
         - sample: 5–9
           material: Loess
+          starting_weight_g_as_printed: '0.01731'
+          ending_weight_g_as_printed: '0.01597'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01731'
-          ending_weight_g: '0.01597'
           diameter_after_mm: '2.34'
           39K_ppm: '24267.008'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139844,12 +139842,12 @@ species:
           locator: *id1926
         - sample: 5–10
           material: Loess
+          starting_weight_g_as_printed: '0.01778'
+          ending_weight_g_as_printed: '0.01546'
           temperature_C: '2046'
           duration_s: '100'
           fO2_target: IW-1
           log_fO2_as_printed: '-6.33'
-          starting_weight_g: '0.01778'
-          ending_weight_g: '0.01546'
           diameter_after_mm: '2.30'
           39K_ppm: '23686.385'
           D_cm2_s-1: '1.4009630345948353e-05'
@@ -139933,6 +139931,8 @@ species:
         rows:
         - sample: 1–1
           material: Basalt
+          starting_weight_g_as_printed: '0.02088'
+          ending_weight_g_as_printed: '0.02097'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: pure O2
@@ -139992,6 +139992,8 @@ species:
           locator: *id1928
         - sample: 1–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01617'
+          ending_weight_g_as_printed: '0.01579'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: pure O2
@@ -140051,6 +140053,8 @@ species:
           locator: *id1929
         - sample: 1–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01550'
+          ending_weight_g_as_printed: '0.01284'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: pure O2
@@ -140110,6 +140114,8 @@ species:
           locator: *id1930
         - sample: 1–5
           material: Basalt
+          starting_weight_g_as_printed: '0.01358'
+          ending_weight_g_as_printed: '0.01379'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: pure O2
@@ -140169,6 +140175,8 @@ species:
           locator: *id1931
         - sample: 1–10
           material: Basalt
+          starting_weight_g_as_printed: '0.01652'
+          ending_weight_g_as_printed: '0.01623'
           temperature_C: '2000'
           duration_s: '25'
           fO2_target: pure O2
@@ -140228,6 +140236,8 @@ species:
           locator: *id1932
         - sample: 1–11
           material: Basalt
+          starting_weight_g_as_printed: '0.01821'
+          ending_weight_g_as_printed: '0.01816'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: pure O2
@@ -140287,6 +140297,8 @@ species:
           locator: *id1933
         - sample: 1–12
           material: Basalt
+          starting_weight_g_as_printed: '0.01759'
+          ending_weight_g_as_printed: '0.01763'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: pure O2
@@ -140346,6 +140358,8 @@ species:
           locator: *id1934
         - sample: 2–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01853'
+          ending_weight_g_as_printed: '0.01845'
           temperature_C: '2000'
           duration_s: '15'
           fO2_target: pure O2
@@ -140405,6 +140419,8 @@ species:
           locator: *id1935
         - sample: 2–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01497'
+          ending_weight_g_as_printed: '0.01470'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: IW+3
@@ -140464,6 +140480,8 @@ species:
           locator: *id1936
         - sample: 2–3
           material: Basalt
+          starting_weight_g_as_printed: '0.01824'
+          ending_weight_g_as_printed: '0.01748'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: IW+3
@@ -140523,6 +140541,8 @@ species:
           locator: *id1937
         - sample: 2–4
           material: Basalt
+          starting_weight_g_as_printed: '0.02032'
+          ending_weight_g_as_printed: '0.01954'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: IW+3
@@ -140582,6 +140602,8 @@ species:
           locator: *id1938
         - sample: 2–5
           material: Basalt
+          starting_weight_g_as_printed: '0.02086'
+          ending_weight_g_as_printed: '0.01997'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: IW+3
@@ -140641,6 +140663,8 @@ species:
           locator: *id1939
         - sample: 2–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01807'
+          ending_weight_g_as_printed: '0.01724'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW+3
@@ -140700,6 +140724,8 @@ species:
           locator: *id1940
         - sample: 2–12
           material: Basalt
+          starting_weight_g_as_printed: '0.0176'
+          ending_weight_g_as_printed: '0.01753'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: IW+3
@@ -140759,6 +140785,8 @@ species:
           locator: *id1941
         - sample: 2–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01792'
+          ending_weight_g_as_printed: '0.01776'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: IW+3
@@ -140818,6 +140846,8 @@ species:
           locator: *id1942
         - sample: 2–9
           material: Basalt
+          starting_weight_g_as_printed: '0.01557'
+          ending_weight_g_as_printed: '0.01541'
           temperature_C: '2000'
           duration_s: '15'
           fO2_target: IW+3
@@ -140877,6 +140907,8 @@ species:
           locator: *id1943
         - sample: 2–11
           material: Basalt
+          starting_weight_g_as_printed: '0.0194'
+          ending_weight_g_as_printed: '0.01896'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW+3
@@ -140936,6 +140968,8 @@ species:
           locator: *id1944
         - sample: 3–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01932'
+          ending_weight_g_as_printed: '0.01908'
           temperature_C: '2000'
           duration_s: '10'
           fO2_target: IW-1
@@ -140995,6 +141029,8 @@ species:
           locator: *id1945
         - sample: 3–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01983'
+          ending_weight_g_as_printed: '0.01930'
           temperature_C: '2000'
           duration_s: '40'
           fO2_target: IW-1
@@ -141054,6 +141090,8 @@ species:
           locator: *id1946
         - sample: 3–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01975'
+          ending_weight_g_as_printed: '0.01895'
           temperature_C: '2000'
           duration_s: '70'
           fO2_target: IW-1
@@ -141113,6 +141151,8 @@ species:
           locator: *id1947
         - sample: 3–5
           material: Basalt
+          starting_weight_g_as_printed: '0.01733'
+          ending_weight_g_as_printed: '0.01640'
           temperature_C: '2000'
           duration_s: '100'
           fO2_target: IW-1
@@ -141172,6 +141212,8 @@ species:
           locator: *id1948
         - sample: 3–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01935'
+          ending_weight_g_as_printed: '0.01917'
           temperature_C: '2000'
           duration_s: '5'
           fO2_target: IW-1
@@ -141231,6 +141273,8 @@ species:
           locator: *id1949
         - sample: 3–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01964'
+          ending_weight_g_as_printed: '0.01955'
           temperature_C: '2000'
           duration_s: '1'
           fO2_target: IW-1
@@ -141290,6 +141334,8 @@ species:
           locator: *id1950
         - sample: 3–9
           material: Basalt
+          starting_weight_g_as_printed: '0.02007'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW-1
@@ -141349,6 +141395,8 @@ species:
           locator: *id1951
         - sample: 3–10
           material: Basalt
+          starting_weight_g_as_printed: '0.01878'
+          ending_weight_g_as_printed: '0.01848'
           temperature_C: '2000'
           duration_s: '20'
           fO2_target: IW-1
@@ -141408,6 +141456,8 @@ species:
           locator: *id1952
         - sample: 3–12
           material: Basalt
+          starting_weight_g_as_printed: '0.01782'
+          ending_weight_g_as_printed: '0.01767'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: IW-1
@@ -141467,6 +141517,8 @@ species:
           locator: *id1953
         - sample: 4–1
           material: Basalt
+          starting_weight_g_as_printed: '0.01961'
+          ending_weight_g_as_printed: '0.01867'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: IW-1
@@ -141526,6 +141578,8 @@ species:
           locator: *id1954
         - sample: 4–2
           material: Basalt
+          starting_weight_g_as_printed: '0.01751'
+          ending_weight_g_as_printed: '0.01716'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: IW-1
@@ -141585,6 +141639,8 @@ species:
           locator: *id1955
         - sample: 4–4
           material: Basalt
+          starting_weight_g_as_printed: '0.01706'
+          ending_weight_g_as_printed: '0.01755'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: IW+3
@@ -141644,6 +141700,8 @@ species:
           locator: *id1956
         - sample: 4–5
           material: Basalt
+          starting_weight_g_as_printed: '0.0175'
+          ending_weight_g_as_printed: '0.01747'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: IW+3
@@ -141703,6 +141761,8 @@ species:
           locator: *id1957
         - sample: 4–6
           material: Basalt
+          starting_weight_g_as_printed: '0.02009'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: IW+3
@@ -141762,6 +141822,8 @@ species:
           locator: *id1958
         - sample: 4–7
           material: Basalt
+          starting_weight_g_as_printed: '0.01945'
+          ending_weight_g_as_printed: '0.01946'
           temperature_C: '1800'
           duration_s: '10'
           fO2_target: pure O2
@@ -141821,6 +141883,8 @@ species:
           locator: *id1959
         - sample: 4–8
           material: Basalt
+          starting_weight_g_as_printed: '0.01883'
+          ending_weight_g_as_printed: '0.01825'
           temperature_C: '1800'
           duration_s: '40'
           fO2_target: pure O2
@@ -141880,6 +141944,8 @@ species:
           locator: *id1960
         - sample: 4–9
           material: Basalt
+          starting_weight_g_as_printed: '0.01742'
+          ending_weight_g_as_printed: '0.01736'
           temperature_C: '1800'
           duration_s: '70'
           fO2_target: pure O2
@@ -141939,6 +142005,8 @@ species:
           locator: *id1961
         - sample: 5–1
           material: Loess
+          starting_weight_g_as_printed: '0.02019'
+          ending_weight_g_as_printed: '0.02012'
           temperature_C: '2046'
           duration_s: '5'
           fO2_target: pure O2
@@ -141998,6 +142066,8 @@ species:
           locator: *id1962
         - sample: 5–5
           material: Loess
+          starting_weight_g_as_printed: '0.01702'
+          ending_weight_g_as_printed: '0.01699'
           temperature_C: '2046'
           duration_s: '5'
           fO2_target: pure O2
@@ -142057,6 +142127,8 @@ species:
           locator: *id1963
         - sample: 6–2
           material: Loess
+          starting_weight_g_as_printed: '0.01614'
+          ending_weight_g_as_printed: '0.01600'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: pure O2
@@ -142116,6 +142188,8 @@ species:
           locator: *id1964
         - sample: 6–3
           material: Loess
+          starting_weight_g_as_printed: '0.01710'
+          ending_weight_g_as_printed: '0.01687'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: pure O2
@@ -142175,6 +142249,8 @@ species:
           locator: *id1965
         - sample: 6–4
           material: Loess
+          starting_weight_g_as_printed: '0.01753'
+          ending_weight_g_as_printed: '0.01715'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: pure O2
@@ -142234,6 +142310,8 @@ species:
           locator: *id1966
         - sample: 6–5
           material: Loess
+          starting_weight_g_as_printed: '0.01785'
+          ending_weight_g_as_printed: '0.01740'
           temperature_C: '2046'
           duration_s: '100'
           fO2_target: pure O2
@@ -142293,6 +142371,8 @@ species:
           locator: *id1967
         - sample: 6–6
           material: Loess
+          starting_weight_g_as_printed: '0.01758'
+          ending_weight_g_as_printed: '0.01707'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW+3
@@ -142352,6 +142432,8 @@ species:
           locator: *id1968
         - sample: 6–7
           material: Loess
+          starting_weight_g_as_printed: '0.01546'
+          ending_weight_g_as_printed: '0.01434'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: IW+3
@@ -142411,6 +142493,8 @@ species:
           locator: *id1969
         - sample: 6–8
           material: Loess
+          starting_weight_g_as_printed: '0.02141'
+          ending_weight_g_as_printed: '0.01973'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: IW+3
@@ -142470,6 +142554,8 @@ species:
           locator: *id1970
         - sample: 5–3
           material: Loess
+          starting_weight_g_as_printed: '0.01841'
+          ending_weight_g_as_printed: '0.01814'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW-1
@@ -142529,6 +142615,8 @@ species:
           locator: *id1971
         - sample: 6–10
           material: Loess
+          starting_weight_g_as_printed: '0.01700'
+          ending_weight_g_as_printed: '0.01632'
           temperature_C: '2046'
           duration_s: '10'
           fO2_target: IW-1
@@ -142588,6 +142676,8 @@ species:
           locator: *id1972
         - sample: 5–2
           material: Loess
+          starting_weight_g_as_printed: '0.01945'
+          ending_weight_g_as_printed: '0.01798'
           temperature_C: '2046'
           duration_s: '40'
           fO2_target: IW-1
@@ -142647,6 +142737,8 @@ species:
           locator: *id1973
         - sample: 5–9
           material: Loess
+          starting_weight_g_as_printed: '0.01731'
+          ending_weight_g_as_printed: '0.01597'
           temperature_C: '2046'
           duration_s: '70'
           fO2_target: IW-1
@@ -142706,6 +142798,8 @@ species:
           locator: *id1974
         - sample: 5–10
           material: Loess
+          starting_weight_g_as_printed: '0.01778'
+          ending_weight_g_as_printed: '0.01546'
           temperature_C: '2046'
           duration_s: '100'
           fO2_target: IW-1
@@ -143004,3 +143098,2900 @@ species:
         digitisation: deferred to a figure pass
         attribution: Neuman et al. (2026).
         schema_gap: Evaporation number Ev has no matching token and is model-derived.
+  unknown:
+    observations:
+    - observation_id: neuman_2026_supplementary_table_s1_basalt_mass_loss_fraction
+      experiment: neuman-2026-basalt-levitation-evaporation
+      type: mass_loss
+      phase: glass
+      units: fraction of initial bead mass
+      locator:
+        source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+        table: S1
+        note: Input cells from Supplementary Table S1, identified in Neuman et al., p. 63.
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        derived_from:
+        - tables:neuman-2026-levitation-k-isotopes
+        derivation:
+          relation: 1 - m_end/m_start, calculated from the displayed starting and ending grams stored as each point's derivation_parameters.
+          inputs:
+          - tables:neuman-2026-levitation-k-isotopes
+        points:
+        - sample_id: 1-1
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02088'
+            ending_weight_g_as_printed: '0.02097'
+          material: Basalt
+          T_C: 2000
+          duration_s: '10'
+          mass_loss_fraction: '-0.004310344828'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-1; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_001
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–1
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_001
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_001
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–1
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–1
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01617'
+            ending_weight_g_as_printed: '0.01579'
+          material: Basalt
+          T_C: 2000
+          duration_s: '40'
+          mass_loss_fraction: '0.023500309215'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_002
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–2
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_002
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_002
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–2
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-4
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01550'
+            ending_weight_g_as_printed: '0.01284'
+          material: Basalt
+          T_C: 2000
+          duration_s: '70'
+          mass_loss_fraction: '0.171612903226'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-4; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_003
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–4
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_003
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_003
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–4
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–4
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01358'
+            ending_weight_g_as_printed: '0.01379'
+          material: Basalt
+          T_C: 2000
+          duration_s: '100'
+          mass_loss_fraction: '-0.015463917526'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_004
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–5
+            duration_s:
+              state:
+                tag: value
+                value: '100'
+              locator: *s1_004
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_004
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–5
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-10
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01652'
+            ending_weight_g_as_printed: '0.01623'
+          material: Basalt
+          T_C: 2000
+          duration_s: '25'
+          mass_loss_fraction: '0.017554479419'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-10; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_005
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–10
+            duration_s:
+              state:
+                tag: value
+                value: '25'
+              locator: *s1_005
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_005
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–10
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–10
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-11
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01821'
+            ending_weight_g_as_printed: '0.01816'
+          material: Basalt
+          T_C: 2000
+          duration_s: '5'
+          mass_loss_fraction: '0.002745744097'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-11; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_006
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–11
+            duration_s:
+              state:
+                tag: value
+                value: '5'
+              locator: *s1_006
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_006
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–11
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–11
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 1-12
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01759'
+            ending_weight_g_as_printed: '0.01763'
+          material: Basalt
+          T_C: 2000
+          duration_s: '1'
+          mass_loss_fraction: '-0.002274019329'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 1-12; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_007
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 1–12
+            duration_s:
+              state:
+                tag: value
+                value: '1'
+              locator: *s1_007
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_007
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 1–12
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 1–12
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-1
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01853'
+            ending_weight_g_as_printed: '0.01845'
+          material: Basalt
+          T_C: 2000
+          duration_s: '15'
+          mass_loss_fraction: '0.004317323260'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-1; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_008
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–1
+            duration_s:
+              state:
+                tag: value
+                value: '15'
+              locator: *s1_008
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_008
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–1
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–1
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01497'
+            ending_weight_g_as_printed: '0.01470'
+          material: Basalt
+          T_C: 2000
+          duration_s: '10'
+          mass_loss_fraction: '0.018036072144'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_009
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–2
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_009
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_009
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–2
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-3
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01824'
+            ending_weight_g_as_printed: '0.01748'
+          material: Basalt
+          T_C: 2000
+          duration_s: '40'
+          mass_loss_fraction: '0.041666666667'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-3; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_010
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–3
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_010
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_010
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–3
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–3
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-4
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02032'
+            ending_weight_g_as_printed: '0.01954'
+          material: Basalt
+          T_C: 2000
+          duration_s: '70'
+          mass_loss_fraction: '0.038385826772'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-4; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_011
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–4
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_011
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_011
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–4
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–4
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02086'
+            ending_weight_g_as_printed: '0.01997'
+          material: Basalt
+          T_C: 2000
+          duration_s: '100'
+          mass_loss_fraction: '0.042665388303'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_012
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–5
+            duration_s:
+              state:
+                tag: value
+                value: '100'
+              locator: *s1_012
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_012
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–5
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-6
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01784'
+            ending_weight_g_as_printed: '0.01767'
+          material: Basalt
+          T_C: 2000
+          duration_s: '20'
+          mass_loss_fraction: '0.009529147982'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-6; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_013
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–6
+            duration_s:
+              state:
+                tag: value
+                value: '20'
+              locator: *s1_013
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_013
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–6
+        - sample_id: 2-7
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01807'
+            ending_weight_g_as_printed: '0.01724'
+          material: Basalt
+          T_C: 2000
+          duration_s: '20'
+          mass_loss_fraction: '0.045932484781'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-7; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_014
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–7
+            duration_s:
+              state:
+                tag: value
+                value: '20'
+              locator: *s1_014
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_014
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–7
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–7
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-12
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.0176'
+            ending_weight_g_as_printed: '0.01753'
+          material: Basalt
+          T_C: 2000
+          duration_s: '1'
+          mass_loss_fraction: '0.003977272727'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-12; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_015
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–12
+            duration_s:
+              state:
+                tag: value
+                value: '1'
+              locator: *s1_015
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_015
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–12
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–12
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-8
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01792'
+            ending_weight_g_as_printed: '0.01776'
+          material: Basalt
+          T_C: 2000
+          duration_s: '5'
+          mass_loss_fraction: '0.008928571429'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-8; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_016
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–8
+            duration_s:
+              state:
+                tag: value
+                value: '5'
+              locator: *s1_016
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_016
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–8
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–8
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-9
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01557'
+            ending_weight_g_as_printed: '0.01541'
+          material: Basalt
+          T_C: 2000
+          duration_s: '15'
+          mass_loss_fraction: '0.010276172126'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-9; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_017
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–9
+            duration_s:
+              state:
+                tag: value
+                value: '15'
+              locator: *s1_017
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_017
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–9
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–9
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 2-11
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.0194'
+            ending_weight_g_as_printed: '0.01896'
+          material: Basalt
+          T_C: 2000
+          duration_s: '20'
+          mass_loss_fraction: '0.022680412371'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 2-11; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_018
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 2–11
+            duration_s:
+              state:
+                tag: value
+                value: '20'
+              locator: *s1_018
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_018
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 2–11
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 2–11
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-1
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01932'
+            ending_weight_g_as_printed: '0.01908'
+          material: Basalt
+          T_C: 2000
+          duration_s: '10'
+          mass_loss_fraction: '0.012422360248'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-1; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_019
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–1
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_019
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_019
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–1
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–1
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01983'
+            ending_weight_g_as_printed: '0.01930'
+          material: Basalt
+          T_C: 2000
+          duration_s: '40'
+          mass_loss_fraction: '0.026727181039'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_020
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–2
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_020
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_020
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–2
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-4
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01975'
+            ending_weight_g_as_printed: '0.01895'
+          material: Basalt
+          T_C: 2000
+          duration_s: '70'
+          mass_loss_fraction: '0.040506329114'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-4; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_021
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–4
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_021
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_021
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–4
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–4
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01733'
+            ending_weight_g_as_printed: '0.01640'
+          material: Basalt
+          T_C: 2000
+          duration_s: '100'
+          mass_loss_fraction: '0.053664166186'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_022
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–5
+            duration_s:
+              state:
+                tag: value
+                value: '100'
+              locator: *s1_022
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_022
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–5
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-7
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01935'
+            ending_weight_g_as_printed: '0.01917'
+          material: Basalt
+          T_C: 2000
+          duration_s: '5'
+          mass_loss_fraction: '0.009302325581'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-7; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_023
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–7
+            duration_s:
+              state:
+                tag: value
+                value: '5'
+              locator: *s1_023
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_023
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–7
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–7
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-8
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01964'
+            ending_weight_g_as_printed: '0.01955'
+          material: Basalt
+          T_C: 2000
+          duration_s: '1'
+          mass_loss_fraction: '0.004582484725'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-8; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_024
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–8
+            duration_s:
+              state:
+                tag: value
+                value: '1'
+              locator: *s1_024
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_024
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–8
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–8
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-9
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02007'
+            ending_weight_g_as_printed: '0.01973'
+          material: Basalt
+          T_C: 2000
+          duration_s: '20'
+          mass_loss_fraction: '0.016940707524'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-9; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_025
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–9
+            duration_s:
+              state:
+                tag: value
+                value: '20'
+              locator: *s1_025
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_025
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–9
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–9
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-10
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01878'
+            ending_weight_g_as_printed: '0.01848'
+          material: Basalt
+          T_C: 2000
+          duration_s: '20'
+          mass_loss_fraction: '0.015974440895'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-10; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator: &s1_026
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–10
+            duration_s:
+              state:
+                tag: value
+                value: '20'
+              locator: *s1_026
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_026
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 3–10
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–10
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 3-12
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01782'
+            ending_weight_g_as_printed: '0.01767'
+          material: Basalt
+          T_C: 1800
+          duration_s: '10'
+          mass_loss_fraction: '0.008417508418'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 3-12; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_027
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 3–12
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_027
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_027
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_027
+            atmosphere:
+              state:
+                tag: value
+                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 3–12
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-1
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01961'
+            ending_weight_g_as_printed: '0.01867'
+          material: Basalt
+          T_C: 1800
+          duration_s: '40'
+          mass_loss_fraction: '0.047934727180'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-1; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_028
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–1
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_028
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_028
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_028
+            atmosphere:
+              state:
+                tag: value
+                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–1
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01751'
+            ending_weight_g_as_printed: '0.01716'
+          material: Basalt
+          T_C: 1800
+          duration_s: '70'
+          mass_loss_fraction: '0.019988577955'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_029
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–2
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_029
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_029
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_029
+            atmosphere:
+              state:
+                tag: value
+                value: 1.62% 95 vol% Ar + 5 vol% CO2; 98.38% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-4
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01706'
+            ending_weight_g_as_printed: '0.01755'
+          material: Basalt
+          T_C: 1800
+          duration_s: '10'
+          mass_loss_fraction: '-0.028722157093'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-4; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_030
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–4
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_030
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_030
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_030
+            atmosphere:
+              state:
+                tag: value
+                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–4
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.0175'
+            ending_weight_g_as_printed: '0.01747'
+          material: Basalt
+          T_C: 1800
+          duration_s: '40'
+          mass_loss_fraction: '0.001714285714'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_031
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–5
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_031
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_031
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_031
+            atmosphere:
+              state:
+                tag: value
+                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-6
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02009'
+            ending_weight_g_as_printed: '0.01973'
+          material: Basalt
+          T_C: 1800
+          duration_s: '70'
+          mass_loss_fraction: '0.017919362867'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-6; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_032
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–6
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_032
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_032
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_032
+            atmosphere:
+              state:
+                tag: value
+                value: 62.27% 95 vol% Ar + 5 vol% CO2; 37.73% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–6
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-7
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01945'
+            ending_weight_g_as_printed: '0.01946'
+          material: Basalt
+          T_C: 1800
+          duration_s: '10'
+          mass_loss_fraction: '-0.000514138817'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-7; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_033
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–7
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_033
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_033
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_033
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–7
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-8
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01883'
+            ending_weight_g_as_printed: '0.01825'
+          material: Basalt
+          T_C: 1800
+          duration_s: '40'
+          mass_loss_fraction: '0.030801911843'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-8; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_034
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–8
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_034
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_034
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_034
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–8
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 4-9
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01742'
+            ending_weight_g_as_printed: '0.01736'
+          material: Basalt
+          T_C: 1800
+          duration_s: '70'
+          mass_loss_fraction: '0.003444316877'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 4-9; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator: &s1_035
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 4–9
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_035
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_035
+            log_fO2:
+              state:
+                tag: unknown
+                reason: blank cell; no log fO2 value printed for this row
+              locator: *s1_035
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 52
+                table: '1'
+                row: 4–9
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+    - observation_id: neuman_2026_supplementary_table_s1_loess_mass_loss_fraction
+      experiment: neuman-2026-loess-levitation-evaporation
+      type: mass_loss
+      phase: glass
+      units: fraction of initial bead mass
+      locator:
+        source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+        table: S1
+        note: Input cells from Supplementary Table S1, identified in Neuman et al., p. 63.
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_reduced
+        derived_from:
+        - tables:neuman-2026-levitation-k-isotopes
+        derivation:
+          relation: 1 - m_end/m_start, calculated from the displayed starting and ending grams stored as each point's derivation_parameters.
+          inputs:
+          - tables:neuman-2026-levitation-k-isotopes
+        points:
+        - sample_id: 5-1
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02019'
+            ending_weight_g_as_printed: '0.02012'
+          material: Loess
+          T_C: 2046
+          duration_s: '5'
+          mass_loss_fraction: '0.003467062902'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-1; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_036
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–1
+            duration_s:
+              state:
+                tag: value
+                value: '5'
+              locator: *s1_036
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_036
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–1
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–1
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 5-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01702'
+            ending_weight_g_as_printed: '0.01699'
+          material: Loess
+          T_C: 2046
+          duration_s: '5'
+          mass_loss_fraction: '0.001762632197'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_037
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–5
+            duration_s:
+              state:
+                tag: value
+                value: '5'
+              locator: *s1_037
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_037
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–5
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01614'
+            ending_weight_g_as_printed: '0.01600'
+          material: Loess
+          T_C: 2046
+          duration_s: '10'
+          mass_loss_fraction: '0.008674101611'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_038
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–2
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_038
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_038
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–2
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-3
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01710'
+            ending_weight_g_as_printed: '0.01687'
+          material: Loess
+          T_C: 2046
+          duration_s: '40'
+          mass_loss_fraction: '0.013450292398'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-3; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_039
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–3
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_039
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_039
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–3
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–3
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-4
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01753'
+            ending_weight_g_as_printed: '0.01715'
+          material: Loess
+          T_C: 2046
+          duration_s: '70'
+          mass_loss_fraction: '0.021677124929'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-4; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_040
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–4
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_040
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_040
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–4
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–4
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-5
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01785'
+            ending_weight_g_as_printed: '0.01740'
+          material: Loess
+          T_C: 2046
+          duration_s: '100'
+          mass_loss_fraction: '0.025210084034'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-5; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_041
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–5
+            duration_s:
+              state:
+                tag: value
+                value: '100'
+              locator: *s1_041
+            fO2_control:
+              state:
+                tag: value
+                value: pure O2
+              locator: *s1_041
+            log_fO2:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–5
+            atmosphere:
+              state:
+                tag: value
+                value: pure O2
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–5
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-6
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01758'
+            ending_weight_g_as_printed: '0.01707'
+          material: Loess
+          T_C: 2046
+          duration_s: '10'
+          mass_loss_fraction: '0.029010238908'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-6; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_042
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–6
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_042
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_042
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–6
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–6
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-7
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01546'
+            ending_weight_g_as_printed: '0.01434'
+          material: Loess
+          T_C: 2046
+          duration_s: '40'
+          mass_loss_fraction: '0.072445019405'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-7; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_043
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–7
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_043
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_043
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–7
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–7
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-8
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.02141'
+            ending_weight_g_as_printed: '0.01973'
+          material: Loess
+          T_C: 2046
+          duration_s: '70'
+          mass_loss_fraction: '0.078468005605'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-8; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_044
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–8
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_044
+            fO2_control:
+              state:
+                tag: value
+                value: IW+3
+              locator: *s1_044
+            log_fO2:
+              state:
+                tag: value
+                value: '-2.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–8
+            atmosphere:
+              state:
+                tag: value
+                value: 60.90% 95 vol% Ar + 5 vol% CO2; 39.10% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–8
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 5-3
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01841'
+            ending_weight_g_as_printed: '0.01814'
+          material: Loess
+          T_C: 2046
+          duration_s: '10'
+          mass_loss_fraction: '0.014665942423'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-3; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_045
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–3
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_045
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_045
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–3
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–3
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 6-10
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01700'
+            ending_weight_g_as_printed: '0.01632'
+          material: Loess
+          T_C: 2046
+          duration_s: '10'
+          mass_loss_fraction: '0.040000000000'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 6-10; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_046
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 6–10
+            duration_s:
+              state:
+                tag: value
+                value: '10'
+              locator: *s1_046
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_046
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 6–10
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 6–10
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 5-2
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01945'
+            ending_weight_g_as_printed: '0.01798'
+          material: Loess
+          T_C: 2046
+          duration_s: '40'
+          mass_loss_fraction: '0.075578406170'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-2; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_047
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–2
+            duration_s:
+              state:
+                tag: value
+                value: '40'
+              locator: *s1_047
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_047
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–2
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–2
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 5-9
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01731'
+            ending_weight_g_as_printed: '0.01597'
+          material: Loess
+          T_C: 2046
+          duration_s: '70'
+          mass_loss_fraction: '0.077411900635'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-9; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_048
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–9
+            duration_s:
+              state:
+                tag: value
+                value: '70'
+              locator: *s1_048
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_048
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–9
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–9
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
+        - sample_id: 5-10
+          derivation_parameters:
+            starting_weight_g_as_printed: '0.01778'
+            ending_weight_g_as_printed: '0.01546'
+          material: Loess
+          T_C: 2046
+          duration_s: '100'
+          mass_loss_fraction: '0.130483689539'
+          locator:
+            source_path: tables/neuman-2026-levitation-k-isotopes/table-s1.csv
+            table: S1
+            note: Publisher MMC2 Supplementary Table S1 CSV row 5-10; columns starting_weight_g_as_printed and ending_weight_g_as_printed.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2319.15'
+              locator: &s1_049
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: The article's Supplementary Materials notice on physical PDF page 14 identifies the publisher
+                  MMC2 workbook containing this supplementary table.
+                table: S1
+                row: 5–10
+            duration_s:
+              state:
+                tag: value
+                value: '100'
+              locator: *s1_049
+            fO2_control:
+              state:
+                tag: value
+                value: IW-1
+              locator: *s1_049
+            log_fO2:
+              state:
+                tag: value
+                value: '-6.33'
+              locator:
+                page: 14
+                pdf_page_index: 13
+                published_page: 63
+                source_path: supporting/neuman-2026-publisher-mmc2.xlsx
+                note: Printed log fO2; reference unit is unstated and the family convention assumes bar. Authors estimate
+                  fO2 from sample temperature and nominal gas composition.
+                table: S1
+                row: 5–10
+            atmosphere:
+              state:
+                tag: value
+                value: 1.53% 95 vol% Ar + 5 vol% CO2; 98.47% 95 vol% Ar + 5 vol% CO
+              locator:
+                page: 6
+                pdf_page_index: 5
+                published_page: 55
+                table: '2'
+                row: 5–10
+                note: Gas proportions cross-referenced by sample id from the main experimental table.
