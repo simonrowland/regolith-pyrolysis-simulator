@@ -7371,7 +7371,11 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Twelve repeated Fedkin table cells are no longer counted through the retired
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
     # p. 212, DOI 10.1016/j.gca.2005.08.014).
-    assert census.get("evaporation_coefficient_alpha") == 22
+    # 7baaf334b, merged in r17a3 4679aa7d9, then keeps that owner Table 3 as
+    # context, so those 12 cells are not series points either. 5227cb93b had
+    # counted them (34->22). Printed series alphas that remain are Shirai 2000
+    # (6) and Zhang 2021 Table 4 (4).
+    assert census.get("evaporation_coefficient_alpha") == 10
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
