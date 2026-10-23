@@ -163,8 +163,55 @@ def test_readiness_keeps_raw_printed_composition_out_of_sample_charge(source_id)
         experiment,
         sample=replace(experiment.sample, initial_composition=sample_composition),
     )
-    fallback_inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
-    assert fallback_inputs.charges["MgO"].selected is not None
-    assert fallback_inputs.charges["MgO"].selected.inputs == (
-        "experiment.sample.initial_composition",
+    sample_inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
+    assert not sample_inputs.charges
+    assert sample_inputs.charges.absence is not None
+    assert sample_inputs.charges.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert sample_inputs.charges.absence.missing == (
+        f"observation[{observation.observation_id}].point_conditions.composition",
+    )
+    assert sample_inputs.waypoints["normalized_composition"].selected is None
+    assert sample_inputs.waypoints["normalized_composition"].absence is not None
+
+
+def test_unknown_point_composition_suppresses_typed_sample_charge():
+    extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+    migrator.finalize()
+    observation = next(
+        obs
+        for obs in migrator.result.observations.values()
+        if obs.observation_id.endswith(
+            "cottrell_2009_moore_wet_chemistry_quotes::point:3"
+        )
+    )
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = Bench(
+        "work::bench::one",
+        "work",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    experiment_with_sample = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=factories.located(
+                Composition(
+                    "formula",
+                    (("MgO", Decimal("1")),),
+                    AmountBasis.MOL_INVENTORY,
+                )
+            ),
+        ),
+    )
+
+    inputs = collect_consumer_inputs(experiment_with_sample, bench, observation)
+
+    assert not inputs.charges
+    assert inputs.waypoints["normalized_composition"].selected is None
+    absence = inputs.waypoints["normalized_composition"].absence
+    assert absence is not None
+    assert absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert absence.missing == (
+        f"observation[{observation.observation_id}].point_conditions.composition",
     )
