@@ -479,3 +479,231 @@ Foreground re-run on this seat, one file at a time, of the tests those merges to
 - `test_literature_extracts.py`: 738 passed, 1 failed.
 
 No new failure. The one red is `test_markova_1984_apparatus_inputs_migrate_from_the_printed_method` (`assert 0 == 8`), already recorded above. r16 and r17 were left red and were not re-run. None of the merge resolutions needed a physics judgement. The open judgements remain the Markova Table 2 unknown-temperature wording and the Markova apparatus sample mass and total pressure.
+
+## Fix round 2
+
+Scratch regen of `f936e0e85` (migrate write, then `build_index.py --write-store-summary`). Migrate exited 1 because hard_issues is non-zero. The index write exited 0. The store was not committed. `1a9aa1fb5` changes only `tests/battery/test_migrate.py` and `tests/battery/test_score.py`, so that regen is the final tip's migrate. The re-run below copied those two test files onto the regen tree.
+
+Regen versus `d8c894343`: rows 51641→62021 (+10380), observations 128946→148022 (+19076), works 371→604 (+233), experiments 3863→4697 (+834), queue 88695→97181 (+8486), hard issues 3278→3194 (−84).
+
+Hard issues are stored by kind, not by source. The kind census:
+
+| kind | d8c894343 | tip | delta |
+|---|---:|---:|---:|
+| `conditional_field:derived_from` | 2131 | 1824 | −307 |
+| `conditional_field:derivation` | 1143 | 1238 | +95 |
+| `referential_integrity:derived_from` | 0 | 65 | +65 |
+| `referential_integrity:inputs` | 0 | 63 | +63 |
+| `invalid_source:initial_composition` | 4 | 4 | 0 |
+
+The base report omitted the two referential rows. Their appearance on the tip, with the derived_from and derivation moves, is the −84. The report keeps the first 50 hard-issue paths and does not give a per-source hard total.
+
+Observation delta is per extract. 166 extracts changed observations (sum +19076). 100 further extracts changed queue with the same observation count. Compilations did not change.
+
+| source | obs d8c894343 | obs tip | obs delta | rows delta |
+|---|---:|---:|---:|---:|
+| `neuman-2026-levitation-k-isotopes` | 0 | 2307 | +2307 | +80 |
+| `rys-2007-alkali-oxide-thermodynamics` | 0 | 1001 | +1001 | +56 |
+| `cheng-2021-fe-ca-si-o-phase-equilibria` | 0 | 990 | +990 | +990 |
+| `kress-carmichael-1991-iron-redox-calibration` | 0 | 881 | +881 | +881 |
+| `gran-sichen-2012-molten12-ladle-slag-liquidus` | 0 | 876 | +876 | +219 |
+| `klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity` | 0 | 827 | +827 | +14 |
+| `chen-2019-sioch-cp-entropy-gibbs` | 0 | 760 | +760 | +33 |
+| `sineva-2023-ni-sn-zn-slag-copper` | 0 | 696 | +696 | +696 |
+| `wang-2001-solar-melt-evaporation-residues` | 0 | 538 | +538 | +38 |
+| `inoue-1991-n-s-partition-cao-al2o3` | 0 | 446 | +446 | +446 |
+| `henao-2001-ni-cr-mn-co-cu-slag-distribution` | 0 | 431 | +431 | +431 |
+| `hanson-jones-1998-am-cr-partitioning-olivine-liquid` | 0 | 400 | +400 | +98 |
+| `evans-2009-sulfur-mn-ni-w-xanes` | 0 | 381 | +381 | +24 |
+| `tranell-2000-silica-activity-titanium` | 0 | 367 | +367 | +106 |
+| `borisov-2008-k-na-miscible-liquids` | 0 | 332 | +332 | +332 |
+| `holzheid-lodders-2001-copper-solubility` | 0 | 321 | +321 | +321 |
+| `shornikov-2000-titania-melts` | 0 | 301 | +301 | +141 |
+| `shornikov-2026-wollastonite-kems` | 0 | 277 | +277 | +194 |
+| `shornikov-2019-perovskite-evaporation-thermodynamics` | 0 | 263 | +263 | +263 |
+| `xiao-2002-chromium-oxide-activities` | 0 | 261 | +261 | +261 |
+| `berman-1988-internally-consistent-mineral-thermodynamic-data` | 0 | 219 | +219 | +219 |
+| `chen-2022-mgo-sio2-tio2-phase-equilibria` | 0 | 198 | +198 | +198 |
+| `jin-2022-cl-cr-sulfur-glass-solubility` | 0 | 198 | +198 | +13 |
+| `van-ende-2008-mn-cr-slag-steel` | 0 | 189 | +189 | +189 |
+| `lopatin-2023-na-barium-borate-kems` | 0 | 186 | +186 | +10 |
+| `tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems` | 0 | 181 | +181 | +91 |
+| `borisov-2009-alkali-activity-coefficients` | 0 | 169 | +169 | +169 |
+| `yakovlev-2024-cai-vaporization` | 0 | 167 | +167 | +11 |
+| `yakovlev-2017-cai-acidity` | 0 | 166 | +166 | +97 |
+| `shornikov-2020-mgo-feo-melts` | 0 | 146 | +146 | +146 |
+| `taniguchi-1997-feo-cas` | 0 | 141 | +141 | +141 |
+| `ozawa-2012-forsterite-vacuum-evaporation` | 0 | 134 | +134 | +5 |
+| `shornikova-2019-perovskite-thermodynamics` | 0 | 119 | +119 | +119 |
+| `zaitsev-1999-na2o-sio2-pccp` | 0 | 116 | +116 | +11 |
+| `shornikov-2011-titania-melt-evaporation` | 0 | 114 | +114 | +51 |
+| `zaitsev-2000-sodium-silicate-thermodynamics` | 0 | 110 | +110 | +7 |
+| `kems-029-yakovlev-shornikov-2011` | 15 | 122 | +107 | +12 |
+| `shornikov-2000-aluminosilicate-thermodynamics` | 0 | 105 | +105 | +6 |
+| `jeon-lindberg-2023-mg-ca-zn-oxide-equilibria` | 0 | 102 | +102 | +102 |
+| `florin-2025-cu-silicate-evaporation` | 0 | 99 | +99 | +4 |
+| `mendybaev-2013-fun-cai-evaporation` | 0 | 96 | +96 | +2 |
+| `shornikov-2003-mullite-thermodynamics` | 0 | 94 | +94 | +94 |
+| `shornikov-2016-cao-mgo-silicate` | 0 | 85 | +85 | +50 |
+| `saito-2021-fexo-cao-silica-activity` | 0 | 84 | +84 | +84 |
+| `balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems` | 0 | 83 | +83 | +83 |
+| `kambayashi-kato-1984-mgo-sio2-1973k` | 0 | 77 | +77 | +77 |
+| `lu-2026-mercury-sulfur-liquidus` | 0 | 77 | +77 | +77 |
+| `shornikov-2020-cao-mgo-thermodynamics` | 0 | 77 | +77 | +77 |
+| `borisov-behrens-holtz-2015-melt-composition-fe-redox` | 0 | 72 | +72 | +72 |
+| `shornikov-2008-mgo-aluminosilicate-melts` | 0 | 70 | +70 | +70 |
+| `kems-028-yakovlev-1984` | 29 | 98 | +69 | +8 |
+| `jakobsson-tangstad-2015-ca-mg-activities` | 0 | 68 | +68 | +68 |
+| `shornikov-2019-ca-feo-vapor` | 0 | 68 | +68 | +34 |
+| `shornikov-2019-perovskite-evaporation-rjpc` | 0 | 68 | +68 | +6 |
+| `itoh-1989-zno-solid-zinc-silicate` | 0 | 67 | +67 | +67 |
+| `shornikov-2019-mgo-titania-melts` | 0 | 63 | +63 | +63 |
+| `borisov-behrens-holtz-2013-ti-p-fe-redox` | 0 | 62 | +62 | +62 |
+| `morishita-2004-sio2-partial-enthalpy` | 0 | 61 | +61 | +7 |
+| `shornikov-2011-cao-mgo-alumina-melts` | 0 | 60 | +60 | +60 |
+| `tyurnina-2023-sro-al2o3-sio2-vaporization` | 0 | 60 | +60 | +60 |
+| `saini-2023-sulfur-vanadium-borosilicate-structure` | 0 | 59 | +59 | +6 |
+| `borisov-2017-network-modifiers-fe-redox` | 0 | 58 | +58 | +58 |
+| `park-morita-2025-vanadium-activity` | 0 | 56 | +56 | +56 |
+| `shornikov-2025-perovskite-condensation` | 0 | 54 | +54 | +54 |
+| `tachibana-2002-enstatite-evaporation-kinetics` | 0 | 54 | +54 | +6 |
+| `bissbort-2026-depolymerized-silicate-glass-transition-viscosity` | 0 | 53 | +53 | +53 |
+| `shornikov-2015-cai-vaporization-coefficients` | 0 | 53 | +53 | +53 |
+| `gaillard-2003-hydrogen-iron-redox-rate` | 0 | 52 | +52 | +52 |
+| `lee-bruckner-1986-borate-redox-series` | 0 | 52 | +52 | +14 |
+| `kemori-1980-oxygen-liquid-copper` | 0 | 51 | +51 | +31 |
+| `kems-055-kambayashi-1983` | 0 | 50 | +50 | +50 |
+| `shugurov-2026-ceo2-tio2-kems` | 0 | 50 | +50 | +50 |
+| `shornikov-2003-aluminosilicate-solids` | 0 | 47 | +47 | +7 |
+| `shornikov-2005-potassium-germanate` | 0 | 46 | +46 | +46 |
+| `nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization` | 0 | 45 | +45 | +45 |
+| `leister-1999-fe-v-redox-2000c` | 0 | 44 | +44 | +5 |
+| `tranell-1999-unsw-thesis` | 0 | 44 | +44 | +30 |
+| `kems-214-hastie-1980-nbsir-80-2178` | 0 | 43 | +43 | +4 |
+| `ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient` | 0 | 42 | +42 | +1 |
+| `zaitsev-1997-cas-caf2-melts` | 0 | 42 | +42 | +4 |
+| `borisov-2004-karrooite-liquidus-redox` | 0 | 41 | +41 | +41 |
+| `shornikov-2014-sodium-germanate-melts` | 0 | 40 | +40 | +40 |
+| `wright-okamura-1977-makaopuhi-cooling` | 0 | 40 | +40 | +40 |
+| `shornikov-1997-cao-al2o3` | 0 | 37 | +37 | +37 |
+| `renggli-2022-te-evaporation` | 0 | 36 | +36 | +1 |
+| `shi-2024-cr-activity-slag-polymerisation` | 0 | 36 | +36 | +36 |
+| `shornikov-2003-silica-catitanoate-melts` | 0 | 36 | +36 | +36 |
+| `lee-bruckner-1984-cr-mn-glass-redox` | 0 | 35 | +35 | +5 |
+| `shornikov-2008-zinc-phosphate-melts` | 0 | 34 | +34 | +34 |
+| `leister-1999-v-sodium-silicate-high-temperature` | 0 | 32 | +32 | +7 |
+| `metsoc-2019-6005` | 3 | 33 | +30 | +30 |
+| `shornikov-2017-spinel-thermodynamics` | 0 | 30 | +30 | +18 |
+| `shornikov-2002-mullite-thermodynamics` | 0 | 29 | +29 | +29 |
+| `shornikov-2025-ca-al-inclusion-thermodynamics` | 0 | 29 | +29 | +29 |
+| `costa-2025-ree-cmas-glass-melt-thermochemistry` | 0 | 28 | +28 | +28 |
+| `shornikov-2007-cao-aluminosilicate-melts` | 6 | 34 | +28 | +0 |
+| `lu-2024-mgsio3-levitation` | 0 | 27 | +27 | +1 |
+| `shornikov-2015-cai-mineral-thermodynamics` | 0 | 27 | +27 | +27 |
+| `de-abreu-2024-li2o-sio2-thermochemistry` | 0 | 26 | +26 | +26 |
+| `shornikov-2000-silica-gas-equilibria` | 0 | 26 | +26 | +26 |
+| `matsuzaki-1997-feo-tio2-sio2-activities` | 0 | 25 | +25 | +25 |
+| `majzlan-2021-magnesium-silicate-glass-cp` | 0 | 23 | +23 | +23 |
+| `shornikov-1997-cao-alumina-vapor` | 51 | 74 | +23 | +8 |
+| `volovetsky-2010-granitoid-iron-redox` | 0 | 22 | +22 | +22 |
+| `liu-li-2025-se-te-sulfide-silicate` | 0 | 18 | +18 | +18 |
+| `rzehak-2021-ti-isotope-redox-lunar-melts` | 0 | 18 | +18 | +3 |
+| `shornikov-2024-iron-phosphate-melts` | 0 | 17 | +17 | +17 |
+| `bouhifd-2007-basalt-thermochemistry` | 0 | 16 | +16 | +16 |
+| `yokokawa-1984-alumina-carbon-volatilization` | 0 | 16 | +16 | +16 |
+| `kems-213-schneider-1980-nbsir-80-2139` | 0 | 15 | +15 | +15 |
+| `shornikov-1999-silica-partial-vaporization-coefficients` | 0 | 15 | +15 | +15 |
+| `ehrt-2008-sn-redox-aluminosilicate` | 0 | 13 | +13 | +8 |
+| `shornikov-2001-mgalumina-silica-vaporization` | 14 | 27 | +13 | +0 |
+| `shornikov-2024-sodium-phosphate-melts` | 0 | 13 | +13 | +13 |
+| `arutyunyan-2005-magnesium-silicate-activities` | 0 | 12 | +12 | +2 |
+| `borisov-2004-tio2-pd-ni-fe-solubilities` | 0 | 12 | +12 | +57 |
+| `ferkl-2026-waste-glass-thermal-redox` | 0 | 12 | +12 | +2 |
+| `kawashima-1984-soda-flux-chemical-sensors` | 0 | 12 | +12 | +3 |
+| `baborak-2023-alkali-silicate-levitation-evaporation` | 0 | 11 | +11 | +11 |
+| `shornikov-2000-na-zno-phosphate-vaporization` | 0 | 11 | +11 | +11 |
+| `itoh-1985-beta-alumina-na2o-emf` | 0 | 9 | +9 | +9 |
+| `schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu` | 0 | 8 | +8 | +8 |
+| `schreiber-haskin-1976-plsc7-chromium-in-basalts` | 0 | 8 | +8 | +8 |
+| `shornikov-2007-ca-aluminosilicate-activities` | 0 | 8 | +8 | +8 |
+| `shornikov-2023-silica-phosphate-melts` | 0 | 7 | +7 | +7 |
+| `jackson-2005-ferrous-glass-multispectroscopy` | 0 | 6 | +6 | +6 |
+| `beerkens-2001-industrial-glass-evaporation` | 0 | 5 | +5 | +5 |
+| `shornikov-2020-perovskite-chemical-fractionation` | 0 | 5 | +5 | +5 |
+| `shornikov-2023-mgo-phosphate-melts` | 0 | 5 | +5 | +5 |
+| `kems-012-sossi-2019` | 612 | 616 | +4 | -10 |
+| `myers-jacobson-2015-volatile-metal-hydroxides-presentation` | 0 | 4 | +4 | +4 |
+| `raberg-2007-salt-stability-na2s-thermochemistry-thesis` | 0 | 4 | +4 | +4 |
+| `romero-serrano-1999-binary-ternary-silicates` | 0 | 4 | +4 | +4 |
+| `shornikov-2002-aluminosilicate-solid-phases` | 0 | 4 | +4 | +3 |
+| `shornikov-2017-cai-mgo-sio-fugacity` | 0 | 4 | +4 | +4 |
+| `shornikov-2025-lithium-silicate-melts` | 0 | 4 | +4 | +4 |
+| `sugie-2021-sioc-mixed-bond-calorimetry` | 0 | 4 | +4 | +4 |
+| `folstad-2024-metals-cao-dissolution-cas` | 0 | 3 | +3 | +3 |
+| `gribchenkova-2017-al2o3-mgo` | 0 | 3 | +3 | +3 |
+| `rb86-capobianco-navrotsky-1982` | 0 | 3 | +3 | +3 |
+| `schreiber-1977-tetravalent-cr-diopside` | 0 | 3 | +3 | +3 |
+| `shornikov-2022-na2o-al2o3-melts` | 0 | 3 | +3 | +3 |
+| `shornikov-2024-alkali-phosphate` | 0 | 3 | +3 | +3 |
+| `yang-teng-seetharaman-2012-vanadium-evaporation` | 0 | 3 | +3 | +3 |
+| `banya-2004-sulphide-capacity-cao-al2o3` | 0 | 2 | +2 | +2 |
+| `boulliung-wood-2023-sulfur-solubility` | 0 | 2 | +2 | +2 |
+| `connolly-2016-si-o-liquid-vapor-caloric-vdw` | 0 | 2 | +2 | +2 |
+| `he-2017-karrooite-ordering-heat-capacity` | 0 | 2 | +2 | +2 |
+| `leuthold-2023-basalt-partition-fo2` | 0 | 2 | +2 | +2 |
+| `matousek-1998-silicate-vaporization-reactions` | 0 | 2 | +2 | +2 |
+| `shornikov-2025-lithium-phosphate-melts` | 0 | 2 | +2 | +2 |
+| `shyrokykh-2021-vanadium-vaporization` | 0 | 2 | +2 | +2 |
+| `avarmaa-2022-cr-don-smelting` | 0 | 1 | +1 | +1 |
+| `berry-2003-in-situ-cr-xanes-furnace` | 0 | 1 | +1 | +1 |
+| `costa-2015-yb-silicate-silica-activity` | 0 | 1 | +1 | +1 |
+| `matsumaru-1999-plasma-arc-silicate-evaporation` | 0 | 1 | +1 | +1 |
+| `shornikov-2022-k2o-al2o3-melts` | 0 | 1 | +1 | +1 |
+| `zaitsev-2000-ms2000-045` | 33 | 32 | -1 | -1 |
+| `kems-037-richter-2002` | 4 | 0 | -4 | -4 |
+| `kems-026-markova-1984` | 147 | 141 | -6 | -6 |
+| `guo-2021-mgo-activity-cmas-slag` | 16 | 8 | -8 | -1 |
+| `itoh-hino-banya-1998-spinel` | 10 | 2 | -8 | -8 |
+| `kems-010-richter-2007` | 360 | 350 | -10 | -10 |
+| `kems-015-hashimoto-1983` | 681 | 666 | -15 | -15 |
+| `kems-016-stolyarova-1992` | 22 | 0 | -22 | -9 |
+| `kems-005-fedkin-2006` | 27 | 0 | -27 | -14 |
+
+Seat commits after `18e34f680`, one cause each. All of these update tests. No predicate was weakened and no lineage list was deleted.
+
+- `736bfb939` (a) Costa 2025 and Rys 2007. `2ee0a7c72` (first on the seat in F15 `2544107c9`) drops unprinted `total_pressure_Pa` from point conditions. Those sources do not print a total pressure (`tag: unknown`). The heat-of-fusion identity pressure is `not_applicable`, so the assertion is `pressure is None or not pressure.is_value`.
+- `1fc9431ea` (a) m15. The Rys Table 7 census compares the migration to the printed point list instead of the literal 60.
+- `94c45fb17` (a) Richter 2002. `0af2c9718` (merge r17a3 `4679aa7d9`) leaves the 24 context cells at 1.87e-4 bar H2 as points of 18.7 Pa. The experiment pressure stays unknown.
+- `d170a39b8` (a) Stolyarova calculated oxygen columns are quoted (`4e0819f6d`, `3de591b81`, merge `394c37f47`). Quoted counts 26 and 55.
+- `481831b91` (a) same cause, the model-derived residual slice. Those ids are absent from the slice, so both lengths are 0.
+- `a93afbc80` (a) Borisov 2018 composition. `1175b49fc` adds article Table 1 (31 rows, no `composition_mol`). Spreadsheet rows 155–185 are Table 1. The 404 quoted Table 2 rows still carry `composition_mol`.
+- `c7f47eb17` (a) Fedkin Table 3 alphas are context (`7baaf334b`, merge `4679aa7d9`). Langmuir free evaporation does not inherit the chamber pressure. k04 corrupts Shirai 2000's six stored alpha points.
+- `2517e318e` (a) alpha census. `5227cb93b` had left the 12 owner Fedkin cells in the count (34→22). After `7baaf334b` they are not series points. The regen count is Shirai 6 plus Zhang 2021 Table 4's 4, so the pin is 10.
+- `90ec0181a` (a) Chen 2019 Cp printed `J/mol/K` (`07d0feef1`, merge F30 `0b8214859`) is stored as the printed joule cell.
+- `0e2b96af2` (a) Klemme 2011 prints `J/mol K` (`cdad0b3cd`, merge F24 `2bb15e2b0`). `_convert_compilation_amount` drops whitespace, so the census oracle uses the same heat tokens.
+- `5809dfade` (a) DeMaria 1973. `829ce3701` and `243fb508c` record one `initial_composition_conflict` between samples 10017 and 12073. The 61 Table I rows still migrate.
+- `149153728` (a) Shornikov 2020 Table 3 oxygen. `45cea9498` (merge `76c04d3fa`) types those rows `measured_reduced` with a Hertz–Knudsen derivation and no observation inputs, so each row is the selected source-oxygen condition. The exclusion lists `derived_from` and does not set `match` (`9c40ad728`). The sample Ca row still scores.
+- `f936e0e85` (a) residue-oxide green parity. The child stderr was `ImportError: cannot import name phase_for_sample_form`. `e47e33186` adds that name and `81256c01a` imports it; neither is in green pin `a822c275f`. The child binds the worktree package, then installs the green migrate module. `real_total` stays 0. Pytest passed (11.89s on the final copy).
+- `b3a63eb0d` (a) Kress–Carmichael Table 5 (`8cc62e193`, merge `6b0378d4f`) prints Fe2O3 and FeO wt% and stores `fe3_fe2_ratio_from_oxide_wt_pct`. The census oracle now calls that function.
+- `7cc5662e8` (a) isotope census. `82e127173` stores exactly one `<quantity>_*` column. Neuman 2026 (`2751617f2`, merge `d357e86db`) prints `isotope_delta_delta41K_NIST_SRM_3141a_permil` and `isotope_delta_Delta41K_sample_minus_starting_permil` on separate series. Two columns on one row stay unselected. The oracle matches `select_declared_source` for the canonical field, for that Neuman name, and for two columns.
+- `61b58d093` (a) F22 merge `1b5b56761`. Ozawa 2012 (`45765e41f`) adds 42 evaporation-rate, 86 mass-loss fraction, and 6 isotope cells. Wang 2001 (`d2143313b`) adds 90 isotope cells and 432 residue cells.
+- `5e3d8f9ae` (a) Neuman 2026 adds 96 isotope cells and 2160 residue cells. Isotope pin 214 (Sossi 22, Wang 90, Ozawa 6, Neuman 96).
+- `632f2e085` (a) F15 merge `2544107c9` residue cells: Mendybaev 2013 96 (`4e07bd649`), Florin 2025 50 (`0f4e598e4`), Renggli 2022 36 (`7a90bab6a`), Lu 2024 27 (`21d1ee8d7`).
+- `d66957d6d` (a) Yakovlev 2017 residue 34 (`fc7c11533`, merge F20 `23a54e9b3`). Residue pin 4353.
+- `1a9aa1fb5` (a) series-census total. mismatches stays 0. Asserted quantities sum to 5535. The other 2716 cells are cp 1629, S 279, activity 316, delta_fG 148, delta_fH 152, log10_Kf 78, fe3_fe2_ratio 51, valence_ratio 45, and mass_loss_areal_density 18. The pin moves 3136→8251.
+- `a94f2ba00` (a) Sossi Table 4 gamma successors. `dc7eafe24` adds them and `5f44bd3ee` copies the parent derivation, so they migrate as model_derived: 26 Sossi plus 24 ms2000, 50 in all. Union 91→113 and headline 55→77 by that same 22.
+
+Re-run of the 66 previously-new failures on that regen, split by file, with the final tests: 60 passed, 6 failed.
+
+Passed: Costa, Langmuir (`test_kems_background_not_identity`), the evaporation extract, property count, residue parity, Rys (including m15), four source-oxygen cases, nine sweep-gas cases (including Richter H2), 22 `test_migrate_r7` cases, the previously-red path-ratchet node (passed in 66.28s), all nine `test_migrate.py` nodes (Borisov composition, DeMaria, Fedkin alpha, j01 census, k01, k04, Plante, both Stolyarova pins), the score residual node, five of the six literature-extract nodes, and the three current t1225 nodes. The saved t1225 ids still named the old parameter tuple (`…-555-1`). The collected ids are `…-2-1-555`, `…-1-0-983`, and `…-2-1-1370`, and those three passed. The locator split already expects physical `page` and printed `published_page` separately.
+
+Still red:
+
+- r16 and r17, `test_committed_store_has_no_stale_migrate_input_commits`. Left red. d-255: the committed store is stale against migrate inputs. The regen store is dirty and was not committed, so it does not move the commit those tests read.
+- (c) Markova Table 2, `tests/battery/test_migrate_composition.py:2563`. The two zero mass-loss rows stay unknown with reason `no single temperature_K mapped from source`. The test requires `'T_range_K'` in that reason. L1 `40d6a298c` and repair `042d48b56` keep observation-level ranges off. Question: should that unknown-temperature reason name `T_range_K`? I did not assign a temperature.
+- (c) Markova apparatus, `tests/test_literature_extracts.py:2256`. `len(hard_issues)` is 0; the test expects 8. The validation issues on the migrated file are `IDENTITY_INCOMPLETE`, and the failure text shows `required axis sample_mass_kg is unknown`. Question: should those apparatus rows gain a printed sample mass or a total pressure? I did not invent either.
+- (c) Borisov 2018 redox population, `tests/battery/test_redox_extract_scoring.py:398`, `assert None is not None` on the glass-fixture residual numeric. `score.py` was not edited. The refusal measured on this seat is `identity_mismatch` on `fO2_Pa`: the scorer rebuilds the pressure as `Decimal(str(100000.0 * 10.0 ** float(fO2_log)))`, and a quoted row differs from the stored Decimal by about 4.8e-12 Pa. Question: should an fO2_Pa difference of about 4.8e-12 Pa refuse the residual as an identity mismatch? I did not loosen identity equality and I did not change the float cast.
+- (c) Borisov 2018 redox headline, `tests/battery/test_redox_extract_scoring.py:540`. The population set is only `independent_source_accuracy`. The test also expects `calibration_source_overlap_fit_fidelity`. Question: should that calibration-overlap population be emitted when the fO2 identity mismatch leaves the numeric headline counts at zero? I did not add the record.
+
+No (b) regression turned up in this round. The open items above are the ones I am not deciding.
+
