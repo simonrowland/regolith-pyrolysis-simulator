@@ -19,6 +19,7 @@ from simulator.environment import (
     MOON_VACUUM_FLOOR_BAR,
     CoverGasCompositionUnavailable,
     cover_gas_partial_pressures,
+    feedstock_body,
     oxygen_numerical_floor_bar_for_body,
     vacuum_floor_bar_for_body,
     vacuum_floor_bar_for_environment,
@@ -113,12 +114,56 @@ def test_default_unknown_body_preserves_existing_1e_9_transport_floor() -> None:
         DEFAULT_VACUUM_FLOOR_BAR
     )
 
-    sim = _sim()
+    feedstocks = _load_yaml("feedstocks.yaml")
+    feedstocks["lunar_mare_low_ti"].pop("body", None)
+    sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
     assert sim.melt.body == ""
     assert sim._vacuum_floor_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
     assert sim._commanded_pO2_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
+
+
+def test_lunar_feedstock_uses_moon_vacuum_floor() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+
+    assert sim.melt.body == "moon"
+    assert sim._vacuum_floor_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
+    assert sim._oxygen_numerical_floor_bar() == pytest.approx(
+        MOON_VACUUM_FLOOR_BAR
+    )
+
+
+def test_planetary_feedstocks_declare_their_body() -> None:
+    feedstocks = _load_yaml("feedstocks.yaml")
+    expected_body_by_feedstock = {
+        "lunar_mare_low_ti": "moon",
+        "lunar_mare_high_ti": "moon",
+        "lunar_highland": "moon",
+        "lunar_pkt_kreep_average": "moon",
+        "lunar_spa_kreep_influenced": "moon",
+        "targeted_super_kreep_ore": "moon",
+        "lunar_highlands_lhs1": "moon",
+        "lunar_highlands_lhs1_yu_2025_reference": "moon",
+        "lunar_mare_lms1": "moon",
+        "lunar_mare_oprl2n": "moon",
+        "lunar_highlands_nuw_lht_5m": "moon",
+        "lunar_mare_jsc_1a_legacy": "moon",
+        "lunar_eac_1a": "moon",
+        "lunar_mls_1a": "moon",
+        "lunar_highlands_nu_lht_2m": "moon",
+        "mars_global_mgs1": "mars",
+        "mars_basalt": "mars",
+        "mars_sulfate_rich": "mars",
+        "mars_phyllosilicate_clay": "mars",
+        "mars_perchlorate_rich": "mars",
+    }
+
+    assert {
+        feedstock_id: feedstock_body(feedstocks[feedstock_id])
+        for feedstock_id in expected_body_by_feedstock
+    } == expected_body_by_feedstock
 
 
 def test_resolve_transport_po2_wraps_fo2_overflow_as_value_error() -> None:
