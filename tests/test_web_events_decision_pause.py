@@ -276,6 +276,8 @@ def _drive_to_completion(client, *, sid=None, perturb_each_gate=False, timeout=2
         time.sleep(0.02)
     assert completion is not None, (
         'run terminated before simulation_complete: '
+        f'answered gates={decisions!r}; events={dict(counts)!r}; '
+        f'statuses={dict(status_counts)!r}; '
         f'{terminal_status or "no terminal event received"}'
     )
     return decisions, counts, completion, status_counts
