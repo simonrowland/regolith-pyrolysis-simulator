@@ -41,7 +41,11 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
-    rows = list(migrator.result.observations.values())
+    migrated_rows = list(migrator.result.observations.values())
+    rows = [
+        row for row in migrated_rows
+        if row.identity.quantity.value is Quantity.VALENCE_RATIO
+    ]
     assert len(rows) == 4
     assert not migrator.result.validation.hard_issues
     assert {row.value.point for row in rows} == {
@@ -90,59 +94,65 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         "SO3": Decimal("1.36"),
         "Cr2O3": Decimal("0.65"),
     }
-    table_2 = next(
-        row
-        for row in document["species"]["S"]["context"]
+    table2_vectors = {}
+    table2_observations = {}
+    for formula, species_data in document["species"].items():
+        for observation in species_data["observations"]:
+            if observation["type"] != "equilibrium_phase_composition":
+                continue
+            table2_observations[formula] = observation
+            for point in observation["values"]["points"]:
+                table2_vectors.setdefault(point["sample"], {})[formula] = point["value_as_published"]
+
+    assert len(table2_vectors) == 18
+    assert set(table2_vectors["S75-Cr25 (R5)"]) == set(printed_composition)
+    assert {key: Decimal(value) for key, value in table2_vectors["S75-Cr25 (R5)"].items()} == printed_composition
+    assert len(table2_observations) == 12
+    assert all(
+        point["locator"]["page"] == 15
+        and point["locator"]["published_page"] == "not_printed"
+        and point["point_conditions"]["T_C"]["state"]["value"] == "1150"
+        for observation in table2_observations.values()
+        for point in observation["values"]["points"]
+    )
+
+    # Table 4 retains these cells as an identity condition; Table 2 owns their typed observations.
+    for ratio_point in source_observation["values"]["points"]:
+        source_value = ratio_point["point_conditions"]["composition"]["state"]["value"]
+        sample = "".join(ratio_point["sample"].split())
+        table2_sample = next(label for label in table2_vectors if "".join(label.split()) == sample)
+        assert source_value["amount_basis"] == "mass_percent"
+        assert dict(source_value["components_as_printed"]) == table2_vectors[table2_sample]
+        assert ratio_point["point_conditions"]["composition"]["locator"]["note"].startswith("Shared identity condition")
+
+    table2_context = next(
+        row for row in document["species"]["S"]["context"]
         if row["observation_id"] == "jin_2022_table2_glass_compositions"
     )
-    table_lines = table_2["values"]["table_transcription"].splitlines()
+    table_lines = table2_context["values"]["table_transcription"].splitlines()
     table_headers = [cell.strip() for cell in table_lines[0].split("|")]
-    table_rows = {}
     for line in table_lines[1:]:
         if not line.strip() or line.startswith("Dash is"):
             continue
         cells = [cell.strip() for cell in line.split("|")]
-        table_rows["".join(cells[0].split())] = dict(zip(table_headers, cells))
-    table_to_component = {
-        "Al2O3": "Al2O3",
-        "B2O3": "B2O3",
-        "CaO": "CaO",
-        "Fe2O3": "Fe2O3",
-        "MgO": "MgO",
-        "Na2O": "Na2O",
-        "SiO2": "SiO2",
-        "ZnO": "ZnO",
-        "ZrO2": "ZrO2",
-        "SO3 mass%": "SO3",
-        "Cr2O3 mass%": "Cr2O3",
-    }
-    for point in source_observation["values"]["points"]:
-        source_composition = point["point_conditions"]["composition"]
-        source_value = source_composition["state"]["value"]
-        sample_table_row = table_rows["".join(c for c in point["sample"] if not c.isspace())]
-        assert source_composition["locator"]["row"] == sample_table_row["Sample"]
-        expected_row = {
-            component: sample_table_row[column]
-            for column, component in table_to_component.items()
-        }
-        assert source_value["components_as_printed"] == expected_row
-        assert dict(source_value["components"]) == expected_row
+        assert all(value in {"", "-"} for value in cells[1:13])
+        assert len(cells) == len(table_headers)
 
-    source_composition = source_observation["values"]["points"][0]["point_conditions"]["composition"]
-    source_value = source_composition["state"]["value"]
-    assert source_value["amount_basis"] == "mass_percent"
-    assert {
-        key: Decimal(value)
-        for key, value in source_value["components_as_printed"].items()
-    } == printed_composition
-    assert {
-        key: Decimal(value) for key, value in source_value["components"]
-    } == printed_composition
     expected_identity_composition = wt_pct_to_mole_fraction(printed_composition)
     assert s75_point.identity.composition.value.amount_basis is AmountBasis.MOLE_FRACTION
     assert s75_point.identity.composition.value.as_map() == expected_identity_composition.as_map()
     assert s75_point.point_conditions["composition"].locator.page == 15
     assert s75_point.point_conditions["composition"].locator.table == "2"
+    typed_rows = [
+        row for row in migrated_rows
+        if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(typed_rows) == 194
+    assert all(row.identity.temperature_K.value == Decimal("1423.15") for row in typed_rows)
+    assert all(row.point_conditions["T_C"].state.value == Decimal("1150") for row in typed_rows)
+    assert all(row.point_conditions["atmosphere"].state.value == "air" for row in typed_rows)
+    assert all(row.point_conditions["quench"].state.value == "water quench" for row in typed_rows)
+    assert all(row.locator.page == 15 and row.locator.published_page == "not_printed" for row in typed_rows)
     context = document["species"]["Cr"]["context"]
     mckeown = next(
         row for row in context
