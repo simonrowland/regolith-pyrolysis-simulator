@@ -52,6 +52,8 @@ from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
+    _evaporation_flux_selection,
+    _flux_unit_family,
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
@@ -9852,6 +9854,18 @@ def test_t1473_quantity_tokens_match_schema_and_stay_out_of_kinetic_yield() -> N
         state, reason = map_quantity(None, {"quantity": quantity.value})
         assert state.is_value and state.value is quantity and reason is None
     assert set(QUANTITY_UNITS) == set(Quantity)
+
+
+def test_lee_microgram_flux_unit_converts_to_kg_per_m2_second() -> None:
+    """Table 3's printed mass flux uses the exact μg/cm² to kg/m² factor."""
+
+    selection = _evaporation_flux_selection(
+        {"evaporation_flux": "39.9"}, "μg·cm^-2·sec^-1", ()
+    )
+
+    assert selection.amount == Decimal("0.000399")
+    assert selection.unit_trail == "ug_cm2_s_to_kg_m2_s"
+    assert _flux_unit_family("μg·cm^-2·sec^-1") == "kg_m-2_s-1"
 
 
 def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:

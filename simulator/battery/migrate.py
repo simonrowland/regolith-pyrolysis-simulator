@@ -3063,6 +3063,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "kg_per_m2",
         "g_per_cm2",
     ),
+    "ug_cm2_s_to_kg_m2_s": (
+        Decimal("0.00001"),
+        "J_kg_m-2_s-1 = J_ug_cm-2_s-1 × (1e-9 kg / 1e-4 m2)",
+        "kg m^-2 s^-1",
+        "ug cm^-2 s^-1",
+    ),
     "mg_per_cm2_to_kg_per_m2": (
         Decimal("100"),
         "m_kg_per_m2 = m_mg_per_cm2 / 100",
@@ -9161,13 +9167,24 @@ def _split_number_unit(raw: object) -> tuple[str, str] | None:
 
 
 def _flux_unit_family(unit: str | None) -> str | None:
-    """Printed flux unit family. The number is not converted."""
+    """Return the canonical family and conversion for a printed flux unit."""
+
+    spec = _flux_unit_spec(unit)
+    return spec[0] if spec is not None else None
+
+
+def _flux_unit_spec(
+    unit: str | None,
+) -> tuple[str, Decimal, str] | None:
+    """Map a printed flux unit to its stored unit family and exact scale."""
 
     if unit is None or not str(unit).strip():
         return None
     text = str(unit).strip().lower()
     text = (
-        text.replace("⁻", "-")
+        text.replace("μ", "u")
+        .replace("µ", "u")
+        .replace("⁻", "-")
         .replace("−", "-")
         .replace("–", "-")
         .replace("²", "2")
@@ -9175,11 +9192,15 @@ def _flux_unit_family(unit: str | None) -> str | None:
         .replace("·", "")
         .replace("*", "")
     )
+    text = text.replace("sec", "s")
     text = re.sub(r"\s+", "", text).replace("/", "")
     if text in {"molm-2s-1", "molm2-1s-1"}:
-        return "mol_m-2_s-1"
+        return "mol_m-2_s-1", Decimal("1"), "as_published"
     if text in {"kgm-2s-1", "kgm2-1s-1"}:
-        return "kg_m-2_s-1"
+        return "kg_m-2_s-1", Decimal("1"), "as_published"
+    if text in {"ugcm-2s-1", "ugcm2-1s-1"}:
+        # (1e-9 kg) / (1e-4 m2) / s = 1e-5 kg m^-2 s^-1.
+        return "kg_m-2_s-1", Decimal("0.00001"), "ug_cm2_s_to_kg_m2_s"
     return None
 
 
@@ -9408,14 +9429,16 @@ def _evaporation_flux_selection(
             condition_ranges=condition_ranges,
             field_name="evaporation_flux",
         )
-    if _flux_unit_family(unit) is None:
+    spec = _flux_unit_spec(unit)
+    if spec is None:
         return _unavailable_selection(
-            f"printed unit {unit!r} is not mol m-2 s-1 or kg m-2 s-1",
+            f"printed unit {unit!r} is not a supported evaporation_flux unit",
             condition_ranges=condition_ranges,
             field_name="evaporation_flux",
         )
+    _family, factor, unit_trail = spec
     return _point_selection(
-        amount, "evaporation_flux", "as_published", payload, condition_ranges
+        amount * factor, "evaporation_flux", unit_trail, payload, condition_ranges
     )
 
 
@@ -14837,6 +14860,7 @@ class Migrator:
         if (
             q_token in {
                 Quantity.MASS_LOSS_AREAL_DENSITY,
+                Quantity.EVAPORATION_FLUX,
                 Quantity.FUGACITY,
                 Quantity.H_MINUS_H298,
                 Quantity.EVOLVED_GAS_YIELD,
