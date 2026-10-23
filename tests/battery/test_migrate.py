@@ -55,6 +55,7 @@ from simulator.battery.migrate import (
     DuplicateObservationIdError,
     _convert_compilation_amount,
     fe3_fe2_ratio_from_ferric_fraction,
+    fe3_fe2_ratio_from_oxide_wt_pct,
     MigrationResult,
     Migrator,
     UnknownRailSpellingError,
@@ -7028,11 +7029,17 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         return _num(item.get("log10_Kf"))
     if q_token == "fe3_fe2_ratio":
         ratio = _num(item.get("Fe3_over_FeT"))
-        if ratio is None:
-            return None
-        if str(units or "").strip().lower() == "fraction (fe3+/sumfe)":
-            return fe3_fe2_ratio_from_ferric_fraction(ratio)
-        return ratio
+        if ratio is not None:
+            if str(units or "").strip().lower() == "fraction (fe3+/sumfe)":
+                return fe3_fe2_ratio_from_ferric_fraction(ratio)
+            return ratio
+        # 8cc62e193 prints Fe2O3 and FeO wt% and stores
+        # R = 2 (w_Fe2O3/M_Fe2O3)/(w_FeO/M_FeO).
+        w3 = _num(item.get("Fe2O3_wt_pct"))
+        w2 = _num(item.get("FeO_wt_pct"))
+        if w3 is not None and w2 is not None:
+            return fe3_fe2_ratio_from_oxide_wt_pct(w3, w2)
+        return None
     if q_token == "valence_ratio":
         return _num(item.get("value"))
     if q_token == "fugacity":
