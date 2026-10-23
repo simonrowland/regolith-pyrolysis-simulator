@@ -657,6 +657,272 @@ def test_flemetakis_approximate_sample_mass_reaches_value_without_row_growth(
     assert sample_masses[0].approximate is True
 
 
+def test_ueshima_quoted_fe_activity_migrates_with_attribution_and_coordinates(
+    tmp_path: Path,
+) -> None:
+    name = "kems-120-ueshima-1984.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    quoted = next(
+        observation
+        for observation in source_doc["species"]["Fe"]["observations"]
+        if observation.get("observation_id") == "ueshima_1984_quoted_nesmeyanov_a_Fe"
+    )
+    source_doc["species"] = {"Fe": {"observations": [quoted]}}
+    source_doc["fidelity_samples"] = []
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source_doc)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "::ueshima_1984_quoted_nesmeyanov_a_Fe" in observation.observation_id
+    ]
+
+    assert len(rows) == 1
+    observation = rows[0]
+    assert observation.identity.quantity.value is Quantity.ACTIVITY
+    assert observation.identity.species.formula == "Fe"
+    assert observation.identity.temperature_K.value == Decimal("1500.0")
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.865")
+    assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert observation.evidence.attribution == (
+        "A. N. Nesmeyanov and G. Trapp, Russ. Journal of Phys. Chem., "
+        "39 (1965) 2, p. 183 (ref 1)"
+    )
+    conditions = observation.point_conditions
+    assert conditions is not None
+    assert conditions["temperature_K"].state.value == Decimal("1500.0")
+    assert conditions["temperature_K"].locator.page == 7
+    assert conditions["temperature_K"].locator.pdf_page_index == 6
+    assert conditions["W_at_percent"].state.value == Decimal("0.345")
+    assert conditions["W_at_percent"].locator.page == 7
+    assert conditions["W_at_percent"].locator.pdf_page_index == 6
+    assert observation.locator is not None
+    assert observation.locator.page == 7
+    assert observation.locator.pdf_page_index == 6
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+
+def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
+    tmp_path: Path,
+) -> None:
+    name = "kems-012-sossi-2019.yaml"
+    source_id = "kems-012-sossi-2019"
+    predecessors = {
+        "LiO0.5": "sossi_2019_li_table4_gamma_this_work",
+        "RbO0.5": "sossi_2019_rb_table4_gamma_this_work",
+        "CuO0.5": "sossi_2019_cu_table4_gamma_this_work",
+        "AgO0.5": "sossi_2019_ag_table4_gamma_this_work",
+        "ZnO": "sossi_2019_zn_table4_gamma_this_work",
+        "GeO2": "sossi_2019_ge_table4_gamma_this_work",
+        "CdO": "sossi_2019_cd_table4_gamma_this_work",
+        "PbO": "sossi_2019_pb_table4_gamma_this_work",
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        name,
+        use_repository_index_row=True,
+    )
+    all_observations = list(result.observations.values())
+
+    def observations_for(local_id: str):
+        prefix = f"{source_id}::{local_id}"
+        return [
+            observation
+            for observation in all_observations
+            if observation.observation_id == prefix
+            or observation.observation_id.startswith(prefix + "::")
+        ]
+
+    for formula, predecessor_id in predecessors.items():
+        rows = observations_for(predecessor_id)
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].admission.status is AdmissionStatus.SUPERSEDED
+
+    successors = {
+        formula: [f"{predecessor_id}_quoted_20260906"]
+        for formula, predecessor_id in predecessors.items()
+    }
+    successors["PbO"].append(
+        "sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash"
+    )
+    successor_ids = {
+        successor_id
+        for local_ids in successors.values()
+        for successor_id in local_ids
+    }
+    target_ids = set(predecessors.values()) | successor_ids
+    oxide_points = [
+        observation
+        for observation in all_observations
+        if any(
+            observation.observation_id.startswith(f"{source_id}::{successor_id}::")
+            for successor_id in successor_ids
+        )
+        and observation.value.kind is ValueKind.POINT
+    ]
+
+    expected = {
+        ("LiO0.5", "1673.15", "15.4", "LiO0.5 (-8)"),
+        ("RbO0.5", "1673.15", "0.00013", "RbO0.5"),
+        ("RbO0.5", "1773.15", "0.000074", "RbO0.5"),
+        ("RbO0.5", "1823.15", "0.00009", "RbO0.5"),
+        ("CuO0.5", "1573.15", "24.0", "CuO0.5"),
+        ("CuO0.5", "1673.15", "11.8", "CuO0.5"),
+        ("CuO0.5", "1773.15", "8.5", "CuO0.5"),
+        ("CuO0.5", "1823.15", "6.4", "CuO0.5"),
+        ("CuO0.5", "1923.15", "4.2", "CuO0.5"),
+        ("AgO0.5", "1673.15", "0.67", "AgO0.5"),
+        ("ZnO", "1573.15", "0.24", "ZnO"),
+        ("ZnO", "1673.15", "0.51", "ZnO"),
+        ("ZnO", "1773.15", "0.97", "ZnO"),
+        ("ZnO", "1823.15", "1.01", "ZnO"),
+        ("GeO2", "1573.15", "0.04", "GeO2"),
+        ("GeO2", "1673.15", "0.11", "GeO2"),
+        ("GeO2", "1773.15", "0.18", "GeO2"),
+        ("GeO2", "1823.15", "0.19", "GeO2"),
+        ("CdO", "1673.15", "0.15", "CdO"),
+        ("PbO", "1573.15", "0.06", "PbO^"),
+        ("PbO", "1673.15", "0.17", "PbO^"),
+        ("PbO", "1573.15", "0.21", "PbO#"),
+        ("PbO", "1673.15", "0.38", "PbO#"),
+    }
+    actual = set()
+    for observation in oxide_points:
+        assert observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.admission.status is AdmissionStatus.ADMITTED
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert (
+            conditions["temperature_K"].state.value
+            == observation.identity.temperature_K.value
+        )
+        assert conditions["temperature_K"].locator.page == 57
+        assert conditions["temperature_K"].locator.pdf_page_index == 56
+        assert observation.locator is not None
+        assert observation.locator.page == 57
+        assert observation.locator.pdf_page_index == 56
+        locator_note = observation.locator.note or ""
+        assert "printed cell:" in locator_note
+        channel = next(
+            (
+                label
+                for label in ("LiO0.5 (-8)", "PbO^", "PbO#")
+                if label in locator_note
+            ),
+            observation.identity.species.formula,
+        )
+        actual.add(
+            (
+                observation.identity.species.formula,
+                str(observation.identity.temperature_K.value),
+                str(observation.value.point),
+                channel,
+            )
+        )
+
+    assert len(oxide_points) == 23
+    assert actual == expected
+
+    element_species = {"Li", "Rb", "Cu", "Ag", "Zn", "Ge", "Cd", "Pb"}
+    element_keyed_gamma = [
+        observation
+        for observation in all_observations
+        if observation.identity.species.formula in element_species
+        and observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        and any(
+            observation.observation_id.startswith(f"{source_id}::{target_id}")
+            for target_id in target_ids
+        )
+    ]
+    assert not any(
+        observation.admission.status is AdmissionStatus.ADMITTED
+        for observation in element_keyed_gamma
+    )
+
+    for formula, successor_id, value in (
+        ("Na", "sossi_2019_na_table4_gamma_this_work_quoted_20260906", "0.001"),
+        ("K", "sossi_2019_k_table4_gamma_this_work_quoted_20260906", "0.00022"),
+    ):
+        rows = observations_for(successor_id)
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].identity.temperature_K.value == Decimal("1673.15")
+        assert rows[0].value.point == Decimal(value)
+        assert rows[0].admission.status is AdmissionStatus.ADMITTED
+
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    isolated_species = {}
+    for formula, species_doc in source_doc["species"].items():
+        selected = [
+            deepcopy(row)
+            for row in species_doc.get("observations", [])
+            if row.get("observation_id") in target_ids
+        ]
+        if selected:
+            isolated_species[formula] = {"observations": selected}
+    source_doc["species"] = isolated_species
+    source_doc["fidelity_samples"] = []
+    isolated_result = _migrate_real_extract(
+        tmp_path / "isolated",
+        name,
+        extract_doc=source_doc,
+        use_repository_index_row=True,
+    )
+    assert isolated_result.validation is not None
+    assert not isolated_result.validation.hard_issues
+    isolated_observations = list(isolated_result.observations.values())
+    assert len(isolated_observations) == 31
+    for formula, predecessor_id in predecessors.items():
+        rows = [
+            observation
+            for observation in isolated_observations
+            if observation.observation_id == f"{source_id}::{predecessor_id}"
+        ]
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].admission.status is AdmissionStatus.SUPERSEDED
+    isolated_successor_points = [
+        observation
+        for observation in isolated_observations
+        if any(
+            observation.observation_id.startswith(f"{source_id}::{successor_id}::")
+            for successor_id in successor_ids
+        )
+    ]
+    assert len(isolated_successor_points) == 23
+    isolated_actual = set()
+    for observation in isolated_observations:
+        assert observation.value.kind is ValueKind.POINT
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert conditions["temperature_K"].state.value == temperature.value
+        assert conditions["temperature_K"].locator.page == 57
+        assert conditions["temperature_K"].locator.pdf_page_index == 56
+        if observation in isolated_successor_points:
+            assert observation.admission.status is AdmissionStatus.ADMITTED
+            isolated_actual.add(
+                (
+                    observation.identity.species.formula,
+                    str(temperature.value),
+                    str(observation.value.point),
+                )
+            )
+        else:
+            assert observation.admission.status is AdmissionStatus.SUPERSEDED
+    assert isolated_actual == {
+        (formula, temperature, value)
+        for formula, temperature, value, _channel in expected
+    }
+
+
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
     tmp_path: Path,
 ) -> None:
