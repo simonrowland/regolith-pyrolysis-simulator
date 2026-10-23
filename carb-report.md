@@ -411,3 +411,43 @@ Eleven test files exist only on the tip: test_anand_2024, test_arias_2025, test_
 The Markova `T_range_K` failure is new versus d8c894343. It is the L1 resolution: the observation-level ranges stay off, so the assertion that looks for `T_range_K` in the unknown-temperature reason fails. Point rows still carry temperatures.
 
 !COMPLETE: carb-asm-1022 — 3986008f58e925ac7e81e42598055b916c565e68
+
+## Fix round
+
+`carb-classify.tsv` classifies the 66 new failures against a scratch regen of `2535acb42` (migrate write, then `build_index.py --write-store-summary`). All 66 were red before that regen. Eleven g1 absence-claim tests went green: they were reading the stale committed store. The other 55 stayed red. Nothing from that scratch tree was committed.
+
+Seat fixes, one commit per cause:
+
+- `a5ba8a6ac` routes `_named_fraction_bound_selection` and `_printed_scalar_selection` through `_value_from_plain`. `allowed_value` is unchanged.
+- `cf65c323f` gives the Borisov 2008 wt% phase rows `phase_label` and `basis` so the existing `derived_from` parents are emitted. Lineage lists were not deleted. An isolated migrate of that file is 332 observations and 0 hard issues; it had been 73 observations and 2787 hard issues.
+- `5f44bd3ee` restores Sossi `species.Na.context` dropped by merge `4679aa7d9`, keeps the K measurement rows, and copies parent lineage onto quoted model successors.
+- `2f6a9a927` registers `audit_file`, `audit_files`, and `calibration_audit`, and drops dangling `.agent-scratch` CSV values.
+- `caaffbbbe` adds one reviewer-checked fidelity sample each for Shornikov 2000 Fig. 2(c) (`log10_activity` `-1.886`) and Yakovlev 2017 Fig. 2 (`log10_p` `-6.195`).
+- `63524113c` reads printed folios from `published_page`. t-1353 stores the physical PDF page on `locator.page`. Stolyarova Table 3 reference states are unchanged; the content-id pin moved with the page field.
+
+Scratch regen of `63524113c`: rows_in=61218, observations=146627, works=604, experiments=4560, queue=96862, hard_issues=3194. Against the pre-fix regen (61229 / 146379 / 97177 / 6033) that is rows −11, observations +248, queue −315, hard −2839. Migrate exited 1 because hard_issues is non-zero. The index write exited 0. The regenerated store was not committed.
+
+Re-run of the 66 on that regen: 44 pass, 22 still red.
+
+The passes are the 11 stale-store g1 tests, the k01 boundary and its 11 mutants, the Sossi context tests, the path-key ratchet, the four fidelity gates, and the locator-folio pins.
+
+Still red on this regen:
+
+- r16 and r17 freshness. Left red. d-255: the committed store is stale against migrate inputs, and a dirty regen does not move the commit those tests read.
+- Costa 2025 and Rys 2007: `point_conditions` has no `total_pressure_Pa`. Identity pressure on the Rys rows is already unknown.
+- Langmuir free evaporation: no observation inherited the experiment total (`assert []`).
+- Borisov 2018 combined iron: `KeyError: composition_mol` after the row count check.
+- Demaria 1973: one hard issue, an initial-composition conflict between sample-catalog proxies (sample 12073 versus the Table I Na rows).
+- j01 Fedkin alpha: `assert 0 == 12` (no alpha series rows found).
+- j01 census: Chen 2019 Table 5 cp points store a numeric value whose declared quantity has no source field.
+- k04: corrupting stored alpha does not turn the census red (`assert 0 == 9`).
+- Markova Table 2: the two zero mass-loss rows are the printed T=0 initial charge. `temperature_K` stays unknown with reason `no single temperature_K mapped from source`. The test looks for `T_range_K` in that reason. That is the L1 resolution already recorded above: observation-level ranges stay off, and point rows still carry temperatures. I did not assign a temperature. If the unknown reason should name the printed range, that is a wording judgement on top of that L1 choice.
+- Markova apparatus: `assert 0 == 8`. The migrated validation report has no hard issues. The printed method leaves sample mass and total pressure unknown (`IDENTITY_INCOMPLETE`), which is not a hard issue. I did not invent a pressure or a mass.
+- m15 census pin: `test_rys_2007_thermal_effects.py:53` compares a table length with the literal 60, which is in the forbidden census set.
+- Borisov 2018 redox: `KeyError: inference`, and the headline set is missing `calibration_source_overlap_fit_fidelity`.
+- Residue-oxide green parity: the child process exits 1. The parent assertion does not include the child's stderr.
+- Score residuals: `assert 0 == 26` admitted model-derived rows emit no IMCC residuals.
+- Source oxygen, four parameter cases: `KeyError: match`.
+- Richter H2: `assert 0 == 1`. The Sossi sweep cases in the same file pass.
+
+These remaining reds were not patched. Each one still needs its own cause, and several would be a physics or scoring judgement rather than a locator or lineage repair.
