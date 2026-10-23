@@ -691,9 +691,10 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
             },
         )
         return model.route(
-            # One kg/s inlet expressed per hour keeps both collectors below
-            # their supply caps, so the test observes saturation-curve routing.
-            EvaporationFlux(species_kg_hr={"Ca": 3600.0}, total_kg_hr=3600.0),
+            # Both collectors stay below their supply caps, while the removal
+            # budget binds. With d-261, a budget above all sink capacities
+            # cannot redistribute reduced Stage-5 capture into Stage 4.
+            EvaporationFlux(species_kg_hr={"Ca": 20.0}, total_kg_hr=20.0),
             MeltState(temperature_C=1700.0),
         )
 

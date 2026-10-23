@@ -327,8 +327,13 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
     model = _configure_knudsen_policy(
         CondensationModel(CondensationTrain.create_default())
     )
+    # b-1032 (owner ruling pending): hourly capture exhausts a 1 kg/h feed
+    # at Stage 3. Keep vapor available to sample the colder downstream stages.
+    flux = synthetic_sio_stage_authority.flux()
+    flux.species_kg_hr["SiO"] = 3600.0
+    flux.total_kg_hr = 3600.0
     route = model.route(
-        synthetic_sio_stage_authority.flux(),
+        flux,
         MeltState(),
     )
 
