@@ -236,6 +236,35 @@ def log10K_from_delta_fG_kJ_mol(
     return -as_decimal(delta_fG_kJ_mol) / (r_kJ_per_mol_K * t * LN10)
 
 
+def _ideal_gas_ln_pressure_ratio(p_from_Pa: object, p_to_Pa: object) -> Decimal:
+    """ln(p_to / p_from). One expression for the ideal-gas pressure ratio."""
+
+    p1 = as_decimal(p_from_Pa)
+    p2 = as_decimal(p_to_Pa)
+    if p1 <= 0 or p2 <= 0:
+        raise ValueError("standard pressures must be positive")
+    return Decimal(str(math.log(float(p2 / p1))))
+
+
+def ideal_gas_entropy_pressure_shift_J_per_mol_K(
+    p_from_Pa: object,
+    p_to_Pa: object,
+) -> Decimal:
+    """S°(p_to) − S°(p_from) for one mole of ideal gas.
+
+    Premise: an ideal gas has dS = −R dln p at fixed T.
+    Algebra: S°(T, p2) = S°(T, p1) − R ln(p2/p1).
+    Units: J/mol/K on both sides; p2/p1 is dimensionless.
+    Check: p1 = 1 bar = 100000 Pa, p2 = 1 atm = 101325 Pa gives
+    R ln(1.01325) = 8.31446261815324 × 0.0131629865 = 0.1094431594 J/mol/K,
+    so S°(1 atm) = S°(1 bar) − 0.1094431594 J/mol/K. p2 = p1 gives zero.
+    Cp and ideal-gas H(T)−H(298.15) are pressure-independent and do not
+    use this shift. The ΔfG correction is −T Δn_g times this shift.
+    """
+
+    return -R_J_PER_MOL_K * _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
+
+
 def standard_pressure_delta_g_kJ_per_mol(
     delta_n_gas: object,
     T_K: object,
@@ -246,18 +275,16 @@ def standard_pressure_delta_g_kJ_per_mol(
 
     Premise: Kp is defined at a stated p°. Changing p° at fixed T shifts
     ΔfG by the gas-count term only.
-    Algebra: Δ(ΔG) = Δn_g R T ln(P2/P1); R in J/(mol·K), result / 1000 → kJ/mol.
+    Algebra: Δ(ΔG) = Δn_g R T ln(P2/P1) = −T Δn_g ΔS°, with ΔS° from
+    ideal_gas_entropy_pressure_shift_J_per_mol_K. R in J/(mol·K),
+    result / 1000 → kJ/mol.
     Unit check: (1) · (J/(mol·K)) · K = J/mol.
     Sanity: Δn_g = 1, 298.15 K, 101325/100000 → ≈ 0.033 kJ/mol.
     identity_equal does not apply this unless a Derivation records it.
     """
 
-    p1 = as_decimal(p_from_Pa)
-    p2 = as_decimal(p_to_Pa)
-    if p1 <= 0 or p2 <= 0:
-        raise ValueError("standard pressures must be positive")
-    ratio = p2 / p1
-    ln_ratio = Decimal(str(math.log(float(ratio))))
+    # Same factor order as before the shared ln: Δn · R · T · ln(p2/p1).
+    ln_ratio = _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
     joule = as_decimal(delta_n_gas) * R_J_PER_MOL_K * as_decimal(T_K) * ln_ratio
     return joule / Decimal("1000")
 
