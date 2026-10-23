@@ -2206,7 +2206,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ag_f008_table56_residue
           - norris_2016_ag_table52_starting_trace
@@ -2277,7 +2277,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ag_f014_table56_residue
           - norris_2016_ag_table52_starting_trace
@@ -2344,7 +2344,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ag_f018_table56_residue
           - norris_2016_ag_table52_starting_trace
@@ -2411,7 +2411,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ag_f019_table56_residue
           - norris_2016_ag_table52_starting_trace
@@ -2448,67 +2448,6 @@ species:
       derived_from:
       - norris_2016_ag_f019_table56_residue
       - norris_2016_ag_table52_starting_trace
-    - observation_id: norris_2016_ag_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Ag, printed as Ag2O.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '11'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '353'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: &norris_parent_001
-            page: 219
-            pdf_page_index: 218
-            section: 5.4.1
-            note: EBT1 starting glass was prepared in a graphite-capsule piston-cylinder run at 1500 C and 1.5 GPa for 5 min.
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Bi:
     observations:
     - observation_id: norris_2016_bi_f006_table56_residue
@@ -3551,7 +3490,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_bi_f008_table56_residue
           - norris_2016_bi_table52_starting_trace
@@ -3614,7 +3553,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_bi_f014_table56_residue
           - norris_2016_bi_table52_starting_trace
@@ -3677,7 +3616,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_bi_f018_table56_residue
           - norris_2016_bi_table52_starting_trace
@@ -3740,7 +3679,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_bi_f019_table56_residue
           - norris_2016_bi_table52_starting_trace
@@ -3773,63 +3712,6 @@ species:
       derived_from:
       - norris_2016_bi_f019_table56_residue
       - norris_2016_bi_table52_starting_trace
-    - observation_id: norris_2016_bi_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Bi, printed as Bi2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '19'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '226'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Cd:
     observations:
     - observation_id: norris_2016_cd_f006_table56_residue
@@ -4872,7 +4754,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cd_f008_table56_residue
           - norris_2016_cd_table52_starting_trace
@@ -4935,7 +4817,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cd_f014_table56_residue
           - norris_2016_cd_table52_starting_trace
@@ -4998,7 +4880,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cd_f018_table56_residue
           - norris_2016_cd_table52_starting_trace
@@ -5061,7 +4943,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cd_f019_table56_residue
           - norris_2016_cd_table52_starting_trace
@@ -5094,63 +4976,6 @@ species:
       derived_from:
       - norris_2016_cd_f019_table56_residue
       - norris_2016_cd_table52_starting_trace
-    - observation_id: norris_2016_cd_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Cd, printed as CdO.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '50'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '405'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Cr:
     observations:
     - observation_id: norris_2016_cr_f006_table56_residue
@@ -6193,7 +6018,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cr_f008_table56_residue
           - norris_2016_cr_table52_starting_trace
@@ -6256,7 +6081,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cr_f014_table56_residue
           - norris_2016_cr_table52_starting_trace
@@ -6319,7 +6144,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cr_f018_table56_residue
           - norris_2016_cr_table52_starting_trace
@@ -6382,7 +6207,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cr_f019_table56_residue
           - norris_2016_cr_table52_starting_trace
@@ -6415,63 +6240,6 @@ species:
       derived_from:
       - norris_2016_cr_f019_table56_residue
       - norris_2016_cr_table52_starting_trace
-    - observation_id: norris_2016_cr_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Cr, printed as Cr2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '129'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '878'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Cu:
     observations:
     - observation_id: norris_2016_cu_f006_table56_residue
@@ -7514,7 +7282,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cu_f008_table56_residue
           - norris_2016_cu_table52_starting_trace
@@ -7577,7 +7345,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cu_f014_table56_residue
           - norris_2016_cu_table52_starting_trace
@@ -7640,7 +7408,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cu_f018_table56_residue
           - norris_2016_cu_table52_starting_trace
@@ -7703,7 +7471,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_cu_f019_table56_residue
           - norris_2016_cu_table52_starting_trace
@@ -7736,63 +7504,6 @@ species:
       derived_from:
       - norris_2016_cu_f019_table56_residue
       - norris_2016_cu_table52_starting_trace
-    - observation_id: norris_2016_cu_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Cu, printed as Cu2O.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '26'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '349'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Ga:
     observations:
     - observation_id: norris_2016_ga_f006_table56_residue
@@ -8835,7 +8546,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ga_f008_table56_residue
           - norris_2016_ga_table52_starting_trace
@@ -8898,7 +8609,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ga_f014_table56_residue
           - norris_2016_ga_table52_starting_trace
@@ -8961,7 +8672,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ga_f018_table56_residue
           - norris_2016_ga_table52_starting_trace
@@ -9024,7 +8735,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ga_f019_table56_residue
           - norris_2016_ga_table52_starting_trace
@@ -9057,63 +8768,6 @@ species:
       derived_from:
       - norris_2016_ga_f019_table56_residue
       - norris_2016_ga_table52_starting_trace
-    - observation_id: norris_2016_ga_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Ga, printed as Ga2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '125'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '424'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Ge:
     observations:
     - observation_id: norris_2016_ge_f006_table56_residue
@@ -10156,7 +9810,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ge_f008_table56_residue
           - norris_2016_ge_table52_starting_trace
@@ -10219,7 +9873,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ge_f014_table56_residue
           - norris_2016_ge_table52_starting_trace
@@ -10282,7 +9936,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ge_f018_table56_residue
           - norris_2016_ge_table52_starting_trace
@@ -10345,7 +9999,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_ge_f019_table56_residue
           - norris_2016_ge_table52_starting_trace
@@ -10378,63 +10032,6 @@ species:
       derived_from:
       - norris_2016_ge_f019_table56_residue
       - norris_2016_ge_table52_starting_trace
-    - observation_id: norris_2016_ge_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Ge, printed as GeO2.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '176'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '643'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   In:
     observations:
     - observation_id: norris_2016_in_f006_table56_residue
@@ -11477,7 +11074,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_in_f008_table56_residue
           - norris_2016_in_table52_starting_trace
@@ -11540,7 +11137,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_in_f014_table56_residue
           - norris_2016_in_table52_starting_trace
@@ -11603,7 +11200,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_in_f018_table56_residue
           - norris_2016_in_table52_starting_trace
@@ -11666,7 +11263,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_in_f019_table56_residue
           - norris_2016_in_table52_starting_trace
@@ -11699,63 +11296,6 @@ species:
       derived_from:
       - norris_2016_in_f019_table56_residue
       - norris_2016_in_table52_starting_trace
-    - observation_id: norris_2016_in_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for In, printed as In2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '48'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '457'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Mo:
     observations:
     - observation_id: norris_2016_mo_f006_table56_residue
@@ -12798,7 +12338,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_mo_f008_table56_residue
           - norris_2016_mo_table52_starting_trace
@@ -12861,7 +12401,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_mo_f014_table56_residue
           - norris_2016_mo_table52_starting_trace
@@ -12924,7 +12464,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_mo_f018_table56_residue
           - norris_2016_mo_table52_starting_trace
@@ -12987,7 +12527,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_mo_f019_table56_residue
           - norris_2016_mo_table52_starting_trace
@@ -13020,63 +12560,6 @@ species:
       derived_from:
       - norris_2016_mo_f019_table56_residue
       - norris_2016_mo_table52_starting_trace
-    - observation_id: norris_2016_mo_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Mo, printed as MoO2.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '54'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '526'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Pb:
     observations:
     - observation_id: norris_2016_pb_f006_table56_residue
@@ -14119,7 +13602,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_pb_f008_table56_residue
           - norris_2016_pb_table52_starting_trace
@@ -14182,7 +13665,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_pb_f014_table56_residue
           - norris_2016_pb_table52_starting_trace
@@ -14245,7 +13728,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_pb_f018_table56_residue
           - norris_2016_pb_table52_starting_trace
@@ -14308,7 +13791,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_pb_f019_table56_residue
           - norris_2016_pb_table52_starting_trace
@@ -14341,63 +13824,6 @@ species:
       derived_from:
       - norris_2016_pb_f019_table56_residue
       - norris_2016_pb_table52_starting_trace
-    - observation_id: norris_2016_pb_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Pb, printed as PbO.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '22'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '489'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Sb:
     observations:
     - observation_id: norris_2016_sb_f006_table56_residue
@@ -15440,7 +14866,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sb_f008_table56_residue
           - norris_2016_sb_table52_starting_trace
@@ -15503,7 +14929,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sb_f014_table56_residue
           - norris_2016_sb_table52_starting_trace
@@ -15566,7 +14992,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sb_f018_table56_residue
           - norris_2016_sb_table52_starting_trace
@@ -15629,7 +15055,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sb_f019_table56_residue
           - norris_2016_sb_table52_starting_trace
@@ -15662,63 +15088,6 @@ species:
       derived_from:
       - norris_2016_sb_f019_table56_residue
       - norris_2016_sb_table52_starting_trace
-    - observation_id: norris_2016_sb_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Sb, printed as Sb2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '21'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '578'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Sn:
     observations:
     - observation_id: norris_2016_sn_f006_table56_residue
@@ -16761,7 +16130,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sn_f008_table56_residue
           - norris_2016_sn_table52_starting_trace
@@ -16824,7 +16193,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sn_f014_table56_residue
           - norris_2016_sn_table52_starting_trace
@@ -16887,7 +16256,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sn_f018_table56_residue
           - norris_2016_sn_table52_starting_trace
@@ -16950,7 +16319,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_sn_f019_table56_residue
           - norris_2016_sn_table52_starting_trace
@@ -16983,63 +16352,6 @@ species:
       derived_from:
       - norris_2016_sn_f019_table56_residue
       - norris_2016_sn_table52_starting_trace
-    - observation_id: norris_2016_sn_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Sn, printed as SnO2.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '8'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '424'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Tl:
     observations:
     - observation_id: norris_2016_tl_f006_table56_residue
@@ -18082,7 +17394,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_tl_f008_table56_residue
           - norris_2016_tl_table52_starting_trace
@@ -18145,7 +17457,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_tl_f014_table56_residue
           - norris_2016_tl_table52_starting_trace
@@ -18208,7 +17520,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_tl_f018_table56_residue
           - norris_2016_tl_table52_starting_trace
@@ -18271,7 +17583,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_tl_f019_table56_residue
           - norris_2016_tl_table52_starting_trace
@@ -18304,63 +17616,6 @@ species:
       derived_from:
       - norris_2016_tl_f019_table56_residue
       - norris_2016_tl_table52_starting_trace
-    - observation_id: norris_2016_tl_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for Tl, printed as Tl2O.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '14'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '430'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   V:
     observations:
     - observation_id: norris_2016_v_f006_table56_residue
@@ -19403,7 +18658,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_v_f008_table56_residue
           - norris_2016_v_table52_starting_trace
@@ -19466,7 +18721,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_v_f014_table56_residue
           - norris_2016_v_table52_starting_trace
@@ -19529,7 +18784,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_v_f018_table56_residue
           - norris_2016_v_table52_starting_trace
@@ -19592,7 +18847,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_v_f019_table56_residue
           - norris_2016_v_table52_starting_trace
@@ -19625,63 +18880,6 @@ species:
       derived_from:
       - norris_2016_v_f019_table56_residue
       - norris_2016_v_table52_starting_trace
-    - observation_id: norris_2016_v_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for V, printed as V2O3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '113'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '1019'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   W:
     observations:
     - observation_id: norris_2016_w_f006_table56_residue
@@ -20724,7 +19922,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_w_f008_table56_residue
           - norris_2016_w_table52_starting_trace
@@ -20787,7 +19985,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_w_f014_table56_residue
           - norris_2016_w_table52_starting_trace
@@ -20850,7 +20048,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_w_f018_table56_residue
           - norris_2016_w_table52_starting_trace
@@ -20913,7 +20111,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_w_f019_table56_residue
           - norris_2016_w_table52_starting_trace
@@ -20946,63 +20144,6 @@ species:
       derived_from:
       - norris_2016_w_f019_table56_residue
       - norris_2016_w_table52_starting_trace
-    - observation_id: norris_2016_w_table52_starting_trace
-      experiment: EBT1_starting_glass_preparation
-      type: concentration_series
-      locator:
-        page: 220
-        pdf_page_index: 219
-        table: '5.2'
-        note: Table 5.2 starting EBT1 trace concentration for W, printed as WO3.
-      phase: glass
-      units: µg/g in starting EBT1 glass
-      uncertainty:
-        sigma_ppm: '65'
-        note: Printed σ; confidence level not stated.
-      values:
-        quantity: residue_component_composition
-        method_class: measured_direct
-        evidence_class: measured_direct
-        system_class: silicate_melt
-        material: EBT1_starting_glass
-        residue_ppm: '406'
-        T_C: '1500'
-        pressure: 1.5 GPa
-        duration:
-          value: '5'
-          unit: min
-        composition_wt_pct: *norris_ebt1_starting_composition
-        sample_mass:
-          state: not_printed
-        sample_geometry:
-          state: not_printed
-      T_C: '1500'
-      point_conditions:
-        T_C:
-          state:
-            tag: value
-            value: '1500'
-          locator: *norris_parent_001
-        total_pressure_Pa:
-          state:
-            tag: value
-            value:
-              kind: point
-              point: '1500000000'
-          locator: *norris_parent_001
-        duration:
-          state:
-            tag: value
-            value:
-              value: '5'
-              unit: min
-          locator: *norris_parent_001
-        fO2_log:
-          state:
-            tag: unknown
-            reason: starting-material preparation oxygen fugacity not stated
-          locator: *norris_parent_001
-      admission_status: admitted
   Zn:
     observations:
     - observation_id: norris_2016_zn_f006_table56_residue
@@ -22045,7 +21186,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_zn_f008_table56_residue
           - norris_2016_zn_table52_starting_trace
@@ -22108,7 +21249,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_zn_f014_table56_residue
           - norris_2016_zn_table52_starting_trace
@@ -22171,7 +21312,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_zn_f018_table56_residue
           - norris_2016_zn_table52_starting_trace
@@ -22234,7 +21375,7 @@ species:
           state: not_printed
         method_class: author_derived
         derivation:
-          relation: X_final/X_initial (Equation 5.1)
+          relation: "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
           inputs:
           - norris_2016_zn_f019_table56_residue
           - norris_2016_zn_table52_starting_trace
@@ -22267,6 +21408,912 @@ species:
       derived_from:
       - norris_2016_zn_f019_table56_residue
       - norris_2016_zn_table52_starting_trace
+  Ag2O:
+    observations:
+    - observation_id: norris_2016_ag_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Ag, printed as Ag2O.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '11'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Ag2O
+        residue_ppm: '353'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: &norris_parent_001
+            page: 219
+            pdf_page_index: 218
+            section: 5.4.1
+            note: EBT1 starting glass was prepared in a graphite-capsule piston-cylinder run at 1500 C and 1.5 GPa for 5 min.
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Bi2O3:
+    observations:
+    - observation_id: norris_2016_bi_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Bi, printed as Bi2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '19'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Bi2O3
+        residue_ppm: '226'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  CdO:
+    observations:
+    - observation_id: norris_2016_cd_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Cd, printed as CdO.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '50'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: CdO
+        residue_ppm: '405'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Cr2O3:
+    observations:
+    - observation_id: norris_2016_cr_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Cr, printed as Cr2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '129'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Cr2O3
+        residue_ppm: '878'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Cu2O:
+    observations:
+    - observation_id: norris_2016_cu_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Cu, printed as Cu2O.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '26'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Cu2O
+        residue_ppm: '349'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Ga2O3:
+    observations:
+    - observation_id: norris_2016_ga_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Ga, printed as Ga2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '125'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Ga2O3
+        residue_ppm: '424'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  GeO2:
+    observations:
+    - observation_id: norris_2016_ge_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Ge, printed as GeO2.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '176'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: GeO2
+        residue_ppm: '643'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  In2O3:
+    observations:
+    - observation_id: norris_2016_in_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for In, printed as In2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '48'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: In2O3
+        residue_ppm: '457'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  MoO2:
+    observations:
+    - observation_id: norris_2016_mo_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Mo, printed as MoO2.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '54'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: MoO2
+        residue_ppm: '526'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  PbO:
+    observations:
+    - observation_id: norris_2016_pb_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Pb, printed as PbO.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '22'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: PbO
+        residue_ppm: '489'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Sb2O3:
+    observations:
+    - observation_id: norris_2016_sb_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Sb, printed as Sb2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '21'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Sb2O3
+        residue_ppm: '578'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  SnO2:
+    observations:
+    - observation_id: norris_2016_sn_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Sn, printed as SnO2.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '8'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: SnO2
+        residue_ppm: '424'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  Tl2O:
+    observations:
+    - observation_id: norris_2016_tl_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for Tl, printed as Tl2O.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '14'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: Tl2O
+        residue_ppm: '430'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  V2O3:
+    observations:
+    - observation_id: norris_2016_v_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for V, printed as V2O3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '113'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: V2O3
+        residue_ppm: '1019'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  WO3:
+    observations:
+    - observation_id: norris_2016_w_table52_starting_trace
+      experiment: EBT1_starting_glass_preparation
+      type: concentration_series
+      locator:
+        page: 220
+        pdf_page_index: 219
+        table: '5.2'
+        note: Table 5.2 starting EBT1 trace concentration for W, printed as WO3.
+      phase: glass
+      units: µg/g in starting EBT1 glass
+      uncertainty:
+        sigma_ppm: '65'
+        note: Printed σ; confidence level not stated.
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        evidence_class: measured_direct
+        system_class: silicate_melt
+        material: EBT1_starting_glass
+        component_as_printed: WO3
+        residue_ppm: '406'
+        T_C: '1500'
+        pressure: 1.5 GPa
+        duration:
+          value: '5'
+          unit: min
+        composition_wt_pct: *norris_ebt1_starting_composition
+        sample_mass:
+          state: not_printed
+        sample_geometry:
+          state: not_printed
+      T_C: '1500'
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *norris_parent_001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1500000000'
+          locator: *norris_parent_001
+        duration:
+          state:
+            tag: value
+            value:
+              value: '5'
+              unit: min
+          locator: *norris_parent_001
+        fO2_log:
+          state:
+            tag: unknown
+            reason: starting-material preparation oxygen fugacity not stated
+          locator: *norris_parent_001
+      admission_status: admitted
+  ZnO:
+    observations:
     - observation_id: norris_2016_zn_table52_starting_trace
       experiment: EBT1_starting_glass_preparation
       type: concentration_series
@@ -22286,6 +22333,7 @@ species:
         evidence_class: measured_direct
         system_class: silicate_melt
         material: EBT1_starting_glass
+        component_as_printed: ZnO
         residue_ppm: '666'
         T_C: '1500'
         pressure: 1.5 GPa
@@ -22438,55 +22486,7 @@ species:
           value: '100.66'
           sigma: '0.43'
         oxide_composition_and_sigma:
-          Ag2O:
-            composition: '353'
-            sigma: '11'
-          Bi2O3:
-            composition: '226'
-            sigma: '19'
-          CdO:
-            composition: '405'
-            sigma: '50'
-          Cr2O3:
-            composition: '878'
-            sigma: '129'
-          Cu2O:
-            composition: '349'
-            sigma: '26'
-          Ga2O3:
-            composition: '424'
-            sigma: '125'
-          GeO2:
-            composition: '643'
-            sigma: '176'
-          In2O3:
-            composition: '457'
-            sigma: '48'
-          MoO2:
-            composition: '526'
-            sigma: '54'
           Ni2O:
             composition: '98'
             sigma: '7'
-          PbO:
-            composition: '489'
-            sigma: '22'
-          Sb2O3:
-            composition: '578'
-            sigma: '21'
-          SnO2:
-            composition: '424'
-            sigma: '8'
-          Tl2O:
-            composition: '430'
-            sigma: '14'
-          V2O3:
-            composition: '1019'
-            sigma: '113'
-          WO3:
-            composition: '406'
-            sigma: '65'
-          ZnO:
-            composition: '666'
-            sigma: '16'
         note: Starting material EBT1; these are sample inputs, not independent experiments.

@@ -56,6 +56,24 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         row for row in all_source_rows
         if row["values"].get("quantity") == "element_fraction_remaining"
     ]
+    expected_starting_oxides = {
+        "Ag": ("Ag2O", "353", "11"),
+        "Bi": ("Bi2O3", "226", "19"),
+        "Cd": ("CdO", "405", "50"),
+        "Cr": ("Cr2O3", "878", "129"),
+        "Cu": ("Cu2O", "349", "26"),
+        "Ga": ("Ga2O3", "424", "125"),
+        "Ge": ("GeO2", "643", "176"),
+        "In": ("In2O3", "457", "48"),
+        "Mo": ("MoO2", "526", "54"),
+        "Pb": ("PbO", "489", "22"),
+        "Sb": ("Sb2O3", "578", "21"),
+        "Sn": ("SnO2", "424", "8"),
+        "Tl": ("Tl2O", "430", "14"),
+        "V": ("V2O3", "1019", "113"),
+        "W": ("WO3", "406", "65"),
+        "Zn": ("ZnO", "666", "16"),
+    }
     assert len(table57_rows) == 64
     assert not any(
         row["observation_id"] == "norris_2016_table57_volatility_factors"
@@ -67,21 +85,36 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
     assert all(row["values"]["method_class"] == "author_derived" for row in table57_rows)
     assert all(len(row["derived_from"]) == 2 for row in table57_rows)
     assert all(
-        row["values"]["derivation"]["relation"] == "X_final/X_initial (Equation 5.1)"
+        row["values"]["derivation"]["relation"]
+        == "X_final/X_initial (Equation 5.1); authors use mole fraction single cation oxide basis, conversion not recomputed"
         for row in table57_rows
     )
-    starting_trace_rows = [
-        row for row in all_source_rows
+    starting_trace_rows = {
+        species_name: row
+        for species_name, item in source["species"].items()
+        for row in item.get("observations", [])
         if row["observation_id"].endswith("table52_starting_trace")
-    ]
+    }
     assert len(starting_trace_rows) == 16
-    assert all(row["values"]["quantity"] == "residue_component_composition" for row in starting_trace_rows)
-    assert all(row["T_C"] == "1500" for row in starting_trace_rows)
+    for element, (oxide, value, sigma) in expected_starting_oxides.items():
+        row = starting_trace_rows[oxide]
+        assert row["observation_id"] == f"norris_2016_{element.lower()}_table52_starting_trace"
+        assert row["values"]["component_as_printed"] == oxide
+        assert row["values"]["residue_ppm"] == value
+        assert row["uncertainty"]["sigma_ppm"] == sigma
+    assert all(row["values"]["quantity"] == "residue_component_composition" for row in starting_trace_rows.values())
+    assert all(row["T_C"] == "1500" for row in starting_trace_rows.values())
     assert all(
         row["point_conditions"]["total_pressure_Pa"]["state"]["value"]["point"] == "1500000000"
-        for row in starting_trace_rows
+        for row in starting_trace_rows.values()
     )
-    assert all(row["values"]["duration"] == {"value": "5", "unit": "min"} for row in starting_trace_rows)
+    assert all(row["values"]["duration"] == {"value": "5", "unit": "min"} for row in starting_trace_rows.values())
+    table52_context = next(
+        row for row in source["species"]["basaltic_silicate_melt"]["context"]
+        if row["locator"].get("table") == "5.2"
+    )
+    assert set(table52_context["values"]["oxide_composition_and_sigma"]) == {"Ni2O"}
+    assert "Ni" not in expected_starting_oxides
     expected_table57 = {
         "norris_2016_ag_f008_table57_fraction_remaining": ("0.646", "0.117"),
         "norris_2016_cr_f014_table57_fraction_remaining": ("1.192", "0.179"),
@@ -168,7 +201,8 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
         assert row.uncertainty.verbatim["sigma"] == sigma
         assert len(row.derived_from) == 2
         assert row.derivation.relation == (
-            "X_final/X_initial (Equation 5.1); "
+            "X_final/X_initial (Equation 5.1); authors use mole fraction "
+            "single cation oxide basis, conversion not recomputed; "
             "identity.composition=wt_pct_to_mole_fraction"
         )
 
@@ -181,6 +215,12 @@ def test_norris_2016_table56_residue_rows_and_render_pins() -> None:
     assert all(row.admission.status.value == "admitted" for row in migrated_starting_trace)
     assert all(row.identity.temperature_K.value == Decimal("1773.15") for row in migrated_starting_trace)
     assert all(row.identity.total_pressure_Pa.value == Decimal("1500000000") for row in migrated_starting_trace)
+    for row in migrated_starting_trace:
+        element = row.observation_id.split("::")[-1].split("_")[2].capitalize()
+        oxide, value, sigma = expected_starting_oxides[element]
+        assert row.identity.species.formula == oxide
+        assert row.value.point == Decimal(value)
+        assert row.uncertainty.verbatim["sigma_ppm"] == sigma
 
     migrated_by_id = {row.observation_id: row for row in residue_rows}
     for observation_id, (value, _) in expected.items():
