@@ -283,6 +283,8 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     sim = session.simulator
     hot_hours = set()
     c6_releases = []
+    c6_hours = 0
+    c6_redox_outcomes = {}
     c6_moves_toward_gas_split = False
     transition_count = len(sim.atom_ledger.transitions)
     for result in drive_session(session, 400, DecisionPolicy.AUTO_APPLY):
@@ -294,6 +296,18 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
                 sim.melt.p_total_mbar / 1000.0,
             )
         if sim.melt.campaign == CampaignPhase.C6:
+            c6_hours += 1
+            for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
+                outcome = tuple(
+                    str(diagnostic.get(key, ""))
+                    for key in (
+                        "status",
+                        "respeciation_status",
+                        "direction",
+                        "reason",
+                    )
+                )
+                c6_redox_outcomes[outcome] = c6_redox_outcomes.get(outcome, 0) + 1
             for transition in sim.atom_ledger.transitions[transition_count:]:
                 if transition.name == "fe_redox_respeciation":
                     # Following passive exchange, reduction returns O2 to its
@@ -331,7 +345,10 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
         transition_count = len(sim.atom_ledger.transitions)
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    assert c6_releases
+    assert c6_releases, (
+        "expected C6 Fe-redox O2 credits; "
+        f"c6_hours={c6_hours}, c6_redox_outcomes={c6_redox_outcomes}"
+    )
     assert c6_moves_toward_gas_split
 
 
