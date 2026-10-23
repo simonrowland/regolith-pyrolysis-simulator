@@ -19,6 +19,26 @@ from typing import Any
 from simulator.vapour_rail.activity import SourceReactionActivity
 
 
+def _carrier_numerical_floor(species, frozen_carriers, ordinary_floor):
+    """Apply numerical admission once, then retain positive fixed-set flows.
+
+    This does not alter the catalog request, authority, stock, or conservation
+    rules. None means ordinary admission; species=None addresses a sum of
+    already-admitted carriers. C7 freezes admission at step start, like bulk
+    and removal; C8 will couple those decisions within the interval.
+    """
+    if frozen_carriers is None:
+        return ordinary_floor
+    return 0.0 if species is None or species in frozen_carriers else float('inf')
+
+
+def _carrier_pressure_floor(species, frozen_carriers, ordinary_floor):
+    # Publishing an inactive channel must retain its ordinary pressure and
+    # authority audit. Only admitted channels need subthreshold continuation;
+    # exclusion happens at source admission, never by narrowing the batch.
+    return min(ordinary_floor, _carrier_numerical_floor(species, frozen_carriers, ordinary_floor))
+
+
 class IncompleteVapourBatchError(KeyError):
     """Raised when a requested channel is absent from the exact-key batch."""
 

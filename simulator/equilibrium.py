@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import math
+from simulator.vapour_rail.batch import _carrier_pressure_floor
+
 from collections.abc import Mapping
 from typing import Any
 
@@ -885,7 +887,9 @@ class EquilibriumMixin:
                         species=species,
                         field="P_effective_pO2",
                     )
-                if P_effective_Pa > 1e-15:
+                if P_effective_Pa > _carrier_pressure_floor(
+                    species,
+                    getattr(self, '_frozen_evaporation_carriers', None), 1e-15):
                     vapor_pressures[species] = P_effective_Pa
                     source_label = vapor_pressure_source_label(
                         'builtin_authoritative',
@@ -988,7 +992,9 @@ class EquilibriumMixin:
                     species=species,
                     field="P_effective_liquid_oxide_standard_reaction",
                 )
-                if P_effective_Pa > 1e-15:
+                if P_effective_Pa > _carrier_pressure_floor(
+                    species,
+                    getattr(self, '_frozen_evaporation_carriers', None), 1e-15):
                     vapor_pressures[species] = P_effective_Pa
                     source_label = (
                         "builtin_authoritative:liquid_oxide_standard_reaction"
@@ -1108,7 +1114,9 @@ class EquilibriumMixin:
                     species=species,
                     field="P_effective_gas_rail_standard_reaction",
                 )
-                if P_effective_Pa > 1e-15:
+                if P_effective_Pa > _carrier_pressure_floor(
+                    species,
+                    getattr(self, '_frozen_evaporation_carriers', None), 1e-15):
                     vapor_pressures[species] = P_effective_Pa
                     source_label = (
                         "builtin_authority_limited:"
@@ -1273,7 +1281,9 @@ class EquilibriumMixin:
                 field="P_effective_Pa",
             )
 
-            if P_effective_Pa > 1e-15:
+            if P_effective_Pa > _carrier_pressure_floor(
+                species,
+                getattr(self, '_frozen_evaporation_carriers', None), 1e-15):
                 vapor_pressures[species] = P_effective_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
                 fit_extrapolated = (
@@ -1449,7 +1459,7 @@ class EquilibriumMixin:
                     field="P_sat_suppressed",
                 )
 
-            if P_sat > 1e-15:
+            if P_sat > _carrier_pressure_floor(name, getattr(self, '_frozen_evaporation_carriers', None), 1e-15):
                 vapor_pressures[name] = P_sat
                 vapor_pressure_sources[name] = vapor_pressure_source_label(
                     'builtin_authoritative',

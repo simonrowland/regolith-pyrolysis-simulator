@@ -191,3 +191,111 @@ def test_non_evaporating_step_uses_published_intrinsic_oxygen(campaign):
         assert sim.melt.hour == 1
     finally:
         close_test_owned_magemin_backend(sim)
+
+
+def test_fixed_admission_preserves_subfloor_carrier_and_oxygen_legs():
+    from simulator.state import EvaporationFlux
+    sim = simulation()
+    try:
+        tiny = EvaporationFlux(species_kg_hr={'Na': 2e-14, 'K': 2e-14})
+        assert sim._apply_analytic_evaporation_depletion(tiny).species_kg_hr == {}
+        sim._frozen_evaporation_carriers = frozenset({'Na'})
+        continued = sim._apply_analytic_evaporation_depletion(tiny)
+        assert set(continued.species_kg_hr) == {'Na'}
+        assert 0 < continued.species_kg_hr['Na'] <= 2e-14
+        before = {element: math.fsum(sim.atom_ledger.atom_moles_by_account(account).get(element, 0.0)
+                  for account in sim.atom_ledger.mol_by_account()) for element in ('Na', 'O')}
+        _, transition = sim._credit_evaporation_transition(
+            'Na', continued.species_kg_hr['Na'], continued.species_kg_hr['Na'],
+            sim.vapor_pressures['metals']['Na'], return_transition=True)
+        assert transition is not None
+        # The actual balanced transition, including its smaller oxygen leg,
+        # must reach the ledger; a carrier-only continuation is insufficient.
+        receipt, _ = sim._evaporation_signed_amounts(len(sim.atom_ledger.transitions)-1,
+            sim.atom_ledger.mol_by_account('reservoir.fo2_buffer').get('O2', 0.0))
+        assert receipt['carrier:Na'] > 0.0
+        assert receipt['source:Na'] > 0.0
+        after = {element: math.fsum(sim.atom_ledger.atom_moles_by_account(account).get(element, 0.0)
+                 for account in sim.atom_ledger.mol_by_account()) for element in before}
+        for element in before:
+            assert abs(after[element] - before[element]) <= math.fsum(
+                (math.ulp(before[element]), math.ulp(after[element])))
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+@pytest.mark.parametrize('disabled_p4', (False, True))
+def test_cold_admission_jump_accepts_zero_and_flags_positive_side_limit(disabled_p4, monkeypatch):
+    sim = simulation('lunar_mare_low_ti', 'C0')
+    try:
+        # Hour three of the existing C0 ramp formerly jumped across the P4
+        # numerical cutoff inside the log solve.
+        sim.melt.temperature_C = 170.0
+        if disabled_p4:
+            monkeypatch.setitem(sim.vapor_pressures['oxide_vapors']['P4'],
+                                'evaporation_alpha', {'value': 0.0})
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._establish_melt_redox_gate_authority_for_current_hour()
+        sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        solved = sim._solve_evaporative_oxygen_boundary()
+        projected = solved.payload[2]
+        assert projected._frozen_evaporation_carriers == frozenset()
+        assert solved.reaction_pO2_bar == 0.0
+        assert not any(solved.balance_terms)
+        admitted = {item['species'] for item in projected._carrier_admission_flips
+                    if item['direction'] == 'admitted'}
+        assert ('P4' in admitted) is not disabled_p4
+        assert ('P2' in admitted) is disabled_p4
+        # Si3's seed pressure is positive but its HK rate underflows. Its
+        # stronger inverse power still dominates Si2 in the exact limit.
+        assert 'Si3' in admitted and 'Si2' not in admitted
+        assert any('carrier admission flips at the solved surface oxygen; frozen-set solution used'
+                   in notice for notice in projected._carrier_admission_notices)
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_zero_limit_keeps_dominant_parent_channel_and_ordinary_stock_gates():
+    sim = simulation()
+    try:
+        parent = sim.atom_ledger.kg_by_account('process.cleaned_melt')['P2O5']
+        stoich = sim._evaporation_stoich('P4', sim.vapor_pressures['oxide_vapors']['P4'])
+        rates = sim._analytic_evaporation_depletion_rates(
+            {'P4': 1e-280, 'P2': 1e-140, 'PO2': 1e-40}, dt_hr=1.0,
+            phase_scalar=1.0, cleaned_melt_kg={'P2O5': parent}, available_o2_kg=0.0,
+            zero_oxygen_exponents={'P4': -5.0, 'P2': -2.5, 'PO2': -0.25})
+        assert set(rates) == {'P4'}
+        # Conservation bounds the unique leading channel by its complete
+        # parent inventory in this one-hour interval.
+        assert rates['P4'] * stoich['oxide_per_product_kg'] == pytest.approx(parent)
+        assert sim._analytic_evaporation_depletion_rates(
+            {'P4': 1e-280}, dt_hr=1.0, phase_scalar=1.0,
+            cleaned_melt_kg={'P2O5': 1e-14}, available_o2_kg=0.0,
+            zero_oxygen_exponents={'P4': -5.0}) == {}
+    finally:
+        close_test_owned_magemin_backend(sim)
+
+
+def test_bulk_film_retains_species_without_an_active_source(monkeypatch):
+    from simulator.chemistry.kernel import ChemistryIntent
+    sim = simulation()
+    try:
+        sim.melt.temperature_C = 875.0
+        sim._reaction_pO2_bar = 1e-9
+        sim._melt_headspace_composition_mbar = {'Na': 0.01}
+        eq = sim._get_equilibrium()
+        sim._frozen_evaporation_carriers = frozenset({'K'})
+        eq.vapor_pressures_Pa = {'K': eq.vapor_pressures_Pa['K']}
+        seen = []
+        dispatch = sim._dispatch_only
+        def observe(intent, **kwargs):
+            if intent is ChemistryIntent.EVAPORATION_FLUX:
+                seen.append(kwargs['control_inputs'])
+            return dispatch(intent, **kwargs)
+        monkeypatch.setattr(sim, '_dispatch_only', observe)
+        sim._calculate_evaporation(eq)
+        # 0.01 mbar * 100 Pa/mbar = 1 Pa, even with no current Na source.
+        assert seen[0]['overhead_partials_Pa']['Na'] == 1.0
+        assert seen[0]['overhead_pressure_pa'] >= 1.0
+    finally:
+        close_test_owned_magemin_backend(sim)

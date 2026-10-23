@@ -10374,8 +10374,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'simulation_hour': simulation_hour,
             }
+        frozen = getattr(self, '_frozen_evaporation_carriers', None)
         dispatch_kwargs = {
             'control_inputs': {
+                '_frozen_carriers': tuple(sorted(frozen)) if frozen is not None else None,
                 'pO2_bar': pO2_bar,
                 **({'pO2_admission': 'surface_closure'}
                    if getattr(self, '_reaction_pO2_bar', None) is not None else {}),
@@ -14360,6 +14362,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.paused_for_decision:
             return self._make_snapshot()
         self._reaction_pO2_bar = None
+        self._frozen_evaporation_carriers = None
         self._last_surface_oxygen_diagnostic = {}
         self._last_imcc_activity_shadow = {}
         o2_bubbler_refusal = self._o2_bubbler_control_refusal()
@@ -14508,6 +14511,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         boundary = self._solve_evaporative_oxygen_boundary() if evaporation_campaign else None
         if boundary is not None:
             self._reaction_pO2_bar = boundary.reaction_pO2_bar
+            self._frozen_evaporation_carriers = boundary.payload[2]._frozen_evaporation_carriers
         equilibrium = self._get_equilibrium()
         evap_flux = EvaporationFlux()
         capacity_result = None
@@ -14535,10 +14539,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen_flux_mol_m2_s': boundary.oxygen_flux_mol_m2_s,
                 'relative_residual': abs(boundary.residual) / gross if gross else 0.0,
                 'oxygen_series': oxygen_series,
+                'frozen_carriers': sorted(self._frozen_evaporation_carriers),
+                'carrier_admission_flips': projected._carrier_admission_flips,
+                'notices': projected._carrier_admission_notices,
                 'oxygen_alpha_source': 'declared alpha_O2=1 sensitivity; unmeasured',
                 'melt_resistance_status': 'R_melt=0 upper bound; missing species/state inputs',
-                'coupling': 'C7 frozen pre-batch bulk/removal; C8 transient unresolved',
+                'coupling': 'C7 frozen step-start carrier admission and pre-batch bulk/removal; C8 transient unresolved',
             }
+            equilibrium.warnings.extend(projected._carrier_admission_notices)
             from simulator.thermal_train import FiniteCapacity
             capacity, cold_train = self._cold_train_capacity_policy()
             if self._overhead_headspace_enabled() and isinstance(capacity, FiniteCapacity):

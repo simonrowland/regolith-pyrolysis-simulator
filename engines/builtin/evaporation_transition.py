@@ -66,6 +66,8 @@ same-tick Fe redox re-speciation chain.
 from __future__ import annotations
 
 import math
+from simulator.vapour_rail.batch import _carrier_numerical_floor
+
 from collections.abc import Mapping
 from typing import Any
 
@@ -205,8 +207,12 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         O2_kg = rate_kg_hr * dt_hr * O2_per_product_kg
 
         if (
-            oxide_removed <= _NUMERICAL_FLOOR_KG
-            or available_kg <= _NUMERICAL_FLOOR_KG
+            oxide_removed <= _carrier_numerical_floor(
+                species,
+                controls.get("_frozen_carriers"), _NUMERICAL_FLOOR_KG)
+            or available_kg <= _carrier_numerical_floor(
+                species,
+                controls.get("_frozen_carriers"), _NUMERICAL_FLOOR_KG)
         ):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
@@ -291,7 +297,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         subfloor_legs = {
             name: kg
             for name, kg in coupled_leg_kg.items()
-            if 0.0 < kg <= _NUMERICAL_FLOOR_KG
+            if 0.0 < kg <= _carrier_numerical_floor(species, controls.get("_frozen_carriers"), _NUMERICAL_FLOOR_KG)
         }
         if subfloor_legs:
             return IntentResult(

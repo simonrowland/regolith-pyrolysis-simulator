@@ -52,6 +52,8 @@ the VAPOR_PRESSURE provider declares, and the same one the legacy
 from __future__ import annotations
 
 import math
+from simulator.vapour_rail.batch import _carrier_numerical_floor
+
 from collections.abc import Mapping
 from typing import Any
 
@@ -675,7 +677,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     * melt_surface_area_m2
                     * 3600.0
                 )
-                if hkl_upper_bound_rate_kg_hr <= _NONTRIVIAL_FLUX_KG_HR:
+                if hkl_upper_bound_rate_kg_hr <= _carrier_numerical_floor(
+                    species,
+                    controls.get("_frozen_carriers"), _NONTRIVIAL_FLUX_KG_HR):
                     continue
                 if (
                     alpha_is_unmeasured
@@ -820,6 +824,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         computable_transport_species: set[str] = set()
 
         for species, P_eq_Pa in vapor_pressures.items():
+            frozen = controls.get("_frozen_carriers")
+            if frozen is not None and species not in frozen:
+                continue
             P_eq_Pa = float(P_eq_Pa)
             if P_eq_Pa <= 0:
                 continue
@@ -1016,7 +1023,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             rate_kg_hr = J_kg_s_m2 * melt_surface_area_m2 * 3600.0
 
-            if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
+            if rate_kg_hr > _carrier_numerical_floor(
+                species,
+                controls.get("_frozen_carriers"), _NONTRIVIAL_FLUX_KG_HR):
                 if (
                     alpha_authority_status
                     == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS

@@ -44,6 +44,8 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
+from simulator.vapour_rail.batch import _carrier_pressure_floor
+
 from collections.abc import Mapping
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
@@ -3073,7 +3075,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     )
                 if P_eq_Pa > 0.0 and (
                     retain_analytical_channel
-                    or P_eq_Pa > 1e-15
+                    or P_eq_Pa > _carrier_pressure_floor(species, controls.get("_frozen_carriers"), 1e-15)
                     or retain_high_t_openimcc_carriers
                 ):
                     vapor_pressures[species] = P_eq_Pa
@@ -3207,7 +3209,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
                 if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                    P_eq_Pa > _carrier_pressure_floor(
+                        species,
+                        controls.get("_frozen_carriers"), 1e-15) or retain_high_t_openimcc_carriers
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3352,7 +3356,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     field="P_eq_gas_rail_standard_reaction",
                 )
                 if P_eq_Pa > 0.0 and (
-                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                    P_eq_Pa > _carrier_pressure_floor(
+                        species,
+                        controls.get("_frozen_carriers"), 1e-15) or retain_high_t_openimcc_carriers
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
@@ -3573,7 +3579,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="P_eq_Pa",
             )
             if P_eq_Pa > 0.0 and (
-                P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                P_eq_Pa > _carrier_pressure_floor(
+                    species,
+                    controls.get("_frozen_carriers"), 1e-15) or retain_high_t_openimcc_carriers
             ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
@@ -3992,7 +4000,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             if P_eq_Pa > 0.0 and (
                 retain_analytical_channel
-                or P_eq_Pa > 1e-15
+                or P_eq_Pa > _carrier_pressure_floor(name, controls.get("_frozen_carriers"), 1e-15)
                 or retain_high_t_openimcc_carriers
             ):
                 vapor_pressures[name] = P_eq_Pa

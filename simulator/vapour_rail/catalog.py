@@ -958,6 +958,12 @@ class CompiledPressureEvaluator:
                 return term
         return None
 
+    def _unbounded_at_zero_oxygen(self):
+        # p = C(T)*a^n*(x/x_ref)^e, with positive source activity and C.
+        # Thus e<0 gives p -> +infinity as the supplied oxygen x -> 0+.
+        # The caller owns which physical plane supplies that oxygen input.
+        return self.pO2_exponent < 0.0
+
     def evaluate(
         self,
         temperature_K: float,
