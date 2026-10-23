@@ -3034,6 +3034,23 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
     silicon = vapor_pressure_legacy_view(
         load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
     )["metals"]["Si"]
+    liquid_segment = next(
+        segment
+        for segment in silicon["pure_component_antoine"]["segments"]
+        if segment["name"] == "liquid_janaf"
+    )
+    # Si(cr) is certified through the 1685 K melting join. Si(l) is certified
+    # from 1700 K. 1690 K is above that join, so the extension is the liquid
+    # segment. The Antoine value below is the segment's own formula, read
+    # from the yaml, not a stored pressure.
+    expected_1690 = 10.0 ** (
+        float(liquid_segment["A"])
+        - float(liquid_segment["B"]) / (1690.0 + float(liquid_segment["C"]))
+    )
+    expected_1700 = 10.0 ** (
+        float(liquid_segment["A"])
+        - float(liquid_segment["B"]) / (1700.0 + float(liquid_segment["C"]))
+    )
     for selector in (
         wall_condensation_antoine_coefficients,
         vapor_pressure_antoine_coefficients,
@@ -3041,29 +3058,93 @@ def test_static_equilibrium_antoine_refuses_reservoir_phase_and_phase_boundary_g
         selected, block = selector(silicon, 1690.0)
         assert block == "pure_component_antoine"
         assert selected["selection_refusal"] == "antoine-gap-crosses-phase-boundary"
-        assert "A" not in selected
+        assert selected["authority_level"] == "extrapolated"
+        assert selected["name"] == "liquid_janaf"
+        assert selected["segment_used"] == "liquid_janaf"
+        assert selected["segment_choice"] == "liquid_above_declared_transition"
+        assert float(selected["transition_temperature_K"]) == 1685.0
+        assert [float(value) for value in selected["certified_band_K"]] == [
+            1700.0,
+            3500.0,
+        ]
+        assert [float(value) for value in selected["gap_band_K"]] == [1685.0, 1700.0]
+        assert [float(value) for value in selected["left_segment_band_K"]] == [
+            100.0,
+            1685.0,
+        ]
+        assert [float(value) for value in selected["right_segment_band_K"]] == [
+            1700.0,
+            3500.0,
+        ]
+        assert float(selected["A"]) == float(liquid_segment["A"])
         crystal, _ = selector(silicon, 1500.0)
         liquid, _ = selector(silicon, 1800.0)
         assert crystal["name"] == "crystal_janaf"
         assert liquid["name"] == "liquid_janaf"
+        assert "selection_refusal" not in crystal
+        assert "selection_refusal" not in liquid
 
-    # The gap marker has no A/B/C. Wall deposition must record that typed
-    # refusal and continue. It must not raise DepositionInputRefusal by
-    # coercing the missing coefficient.
-    from simulator.condensation import _try_antoine_psat_pa
+    # The gap is out of domain, not a missing fit. Wall deposition predicts
+    # the liquid extension, flags it, and keeps a nonzero driving pressure.
+    # The row metadata band [1400, 2273.15] is not either segment's band.
+    from simulator.condensation import (
+        _try_antoine_psat_pa,
+        _wall_deposition_driving_pressure_pa,
+    )
 
+    vapor = load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
     extrapolations: dict = {}
     pressure, refused = _try_antoine_psat_pa(
         "Si",
         1690.0,
-        vapor_pressure_data=load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+        vapor_pressure_data=vapor,
         antoine_extrapolations=extrapolations,
     )
-    assert pressure is None and refused is True
-    record = extrapolations["Si#wall:1690.0"]
-    assert record["refusal_type"] == "WallSaturationPressureRefusal"
-    assert record["band_scope"] == "antoine-gap-crosses-phase-boundary"
-    assert "antoine-gap-crosses-phase-boundary" in record["reason"]
+    assert refused is False
+    assert pressure is not None and pressure > 0.0
+    assert abs(pressure - expected_1690) / expected_1690 < 1e-12
+    records = [
+        record
+        for record in extrapolations.values()
+        if record.get("authority_level") == "extrapolated"
+        and float(record.get("temperature_K", -1)) == 1690.0
+    ]
+    assert len(records) == 1
+    record = records[0]
+    assert record["reason"] == "antoine-gap-crosses-phase-boundary"
+    assert record["segment_used"] == "liquid_janaf"
+    assert [float(value) for value in record["valid_range_K"]] == [1700.0, 3500.0]
+    assert [float(value) for value in record["certified_band_K"]] == [1700.0, 3500.0]
+    assert [float(value) for value in record["gap_band_K"]] == [1685.0, 1700.0]
+    assert [float(value) for value in record["left_segment_band_K"]] == [100.0, 1685.0]
+    assert [float(value) for value in record["right_segment_band_K"]] == [
+        1700.0,
+        3500.0,
+    ]
+    edge_pressure, edge_refused = _try_antoine_psat_pa(
+        "Si",
+        1700.0,
+        vapor_pressure_data=vapor,
+        antoine_extrapolations={},
+    )
+    assert edge_refused is False
+    assert edge_pressure is not None
+    assert abs(edge_pressure - expected_1700) / expected_1700 < 1e-12
+    diagnostic: dict = {}
+    driving = _wall_deposition_driving_pressure_pa(
+        "Si",
+        expected_1690 * 10.0,
+        1690.0,
+        vapor_pressure_data=vapor,
+        reactive_product_backstop=False,
+        diagnostic_out=diagnostic,
+    )
+    assert driving > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    assert diagnostic["wall_saturation_pressure_pa"] > 0.0
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == "antoine-gap-crosses-phase-boundary"
 
 
 _GAS_MAP_PARTIAL_PA = Decimal("1234.5")
