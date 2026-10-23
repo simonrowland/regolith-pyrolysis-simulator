@@ -7381,10 +7381,13 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # files, so their series went uncounted: evaporation_rate 21->25,
     # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
     # data became visible, not because a check was relaxed - mismatches stays 0.
-    assert census.get("evaporation_rate") == 25
+    # F22 merge 1b5b56761. Ozawa 2012 (45765e41f) adds 42 printed
+    # evaporation-rate cells: 25->67.
+    assert census.get("evaporation_rate") == 67
     # Re-pinned after the loader-survival regeneration: Richter +50 measured
     # mass_loss_pct / 100 singleton series; mismatches remains 0.
-    assert census.get("mass_loss_fraction") == 69
+    # The same Ozawa 2012 extract adds 86 printed mass-loss fraction cells: 69->155.
+    assert census.get("mass_loss_fraction") == 155
     assert census.get("mass_loss_rate", 0) == 0
     # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
     # adds 58 printed T_C points, routed as transition_temperature. The
@@ -7407,7 +7410,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # because the data was added, not because a check was relaxed; mismatches
     # stays 0.
     # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
-    assert census.get("residue_component_composition") == 1518
+    # Wang 2001 (d2143313b, same F22 merge) adds 432 printed residue cells: 1518->1950.
+    assert census.get("residue_component_composition") == 1950
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -7440,7 +7444,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Measured on the b146r2 merge regen: isotope_delta 0->22 and n_numeric
     # 3114->3136. mismatches stays 0; the count moved because those rows
     # became visible, not because a check was relaxed.
-    assert census.get("isotope_delta") == 22
+    # F22 also adds Wang 2001's 90 canonical isotope_delta cells and Ozawa's 6.
+    # Sossi remains 22, so this pin is 118 before Neuman's decorated columns.
+    assert census.get("isotope_delta") == 118
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
