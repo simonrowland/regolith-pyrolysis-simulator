@@ -395,7 +395,10 @@ def test_catalog_entropy_shifts_between_one_atm_and_one_bar(tmp_path: Path) -> N
     assert entropy_atm.refusal_reason is None
     assert entropy_bar.refusal_reason is None
     expected = -Decimal(str(GAS_CONSTANT)) * Decimal(str(math.log(1.01325)))
-    assert entropy_atm.value - entropy_bar.value == expected
+    # The shift is added to an entropy of about 195 J/mol/K under the default
+    # 28-digit Decimal context, so (raw + shift) - raw drops digits past ~1e-25.
+    # 1e-12 J/mol/K still rejects a missing 0.109 J/mol/K correction.
+    assert abs(entropy_atm.value - entropy_bar.value - expected) < Decimal("1e-12")
     for cell in (heat, enthalpy):
         at_atm = _attempt(Engine.VAPOROCK, cell)
         at_bar = _attempt(Engine.VAPOROCK, _at_pressure(cell, one_bar))
