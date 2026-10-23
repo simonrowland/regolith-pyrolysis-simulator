@@ -213,6 +213,31 @@ def test_independent_overlap_after_cancellation_is_rejected(tmp_path):
     assert 'OVERLAP {"artifact":' in result.stdout
 
 
+def test_review_cancelled_chain_with_disjoint_measurement_base():
+    repro = ROOT / "tests/fixtures/golden_sections/step3-ror-repro"
+    # Pin the reviewer's measured, individually valid offers before the fix.
+    for base, tip, offers in [("g", "u-tip", ("U",)), ("g", "a-tip", ("A",)),
+                              ("a-tip", "g", ("cancel",)), ("u-tip", "final", ("C",))]:
+        result = _check(repro / base, repro / tip,
+                        *(repro / offer / "expected.json" for offer in offers))
+        assert result.returncode == 0, result.stdout + result.stderr
+    result = _check(repro / "g", repro / "final",
+                    *(repro / offer / "expected.json" for offer in ("U", "A", "cancel", "C")))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "D=2 E=2 exact=yes" in result.stdout
+    assert "OVERLAP: count=0" in result.stdout
+
+
+@pytest.mark.parametrize("status", ["refused", "unavailable"])
+def test_review_cancelled_non_ok_intermediate(status):
+    repro = ROOT / "tests/fixtures/golden_sections/step3-ror-repro"
+    result = _check(repro / "g", repro / "g",
+                    *(repro / f"intermediate-{status}-{i}" / "expected.json" for i in (0, 1)))
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "D=0 E=0 exact=yes" in result.stdout
+    assert "CANCELLED: count=1" in result.stdout
+
+
 def test_revision_extra_fixture_is_rejected(tmp_path):
     def git(*args, raw=None):
         return subprocess.check_output(["git", *args], input=raw, cwd=ROOT)
