@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.migrate import _log_fO2_to_pa
 from tests.battery.test_migrate import _migrate_real_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -333,3 +334,22 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
     assert all(row["derived_from"] for row in gammas)
     assert len([row for row in document["species"]["SiO2"]["context"] if row["type"] == "figure_record"]) == 10
     assert all(row["values"]["numeric_points"] == "none" for row in document["species"]["SiO2"]["context"] if row["type"] == "figure_record")
+
+
+def test_wt_percent_row_copies_printed_fo2_and_total_pressure_onto_identity(tmp_path):
+    document = _document()
+    source = _observations(document)["borisov2008_t3_csa6na_3_sio2"][1]
+    printed_log = Decimal(source["point_conditions"]["fO2_log"]["state"]["value"])
+    printed_pa = Decimal(source["point_conditions"]["total_pressure_Pa"]["state"]["value"])
+    result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("borisov2008_t3_csa6na_3_sio2")
+    )
+    assert observation.identity.fO2_Pa is not None
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(printed_log)
+    assert observation.identity.total_pressure_Pa is not None
+    assert observation.identity.total_pressure_Pa.is_value
+    assert observation.identity.total_pressure_Pa.value == printed_pa
