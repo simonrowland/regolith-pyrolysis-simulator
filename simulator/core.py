@@ -9519,7 +9519,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'consuming account-scoped metal/gas inputs; got {unsupported}'
             )
 
-    def _get_equilibrium(self):
+    def _get_equilibrium(self, *, run_post_equilibrium_sulfsat: bool = True):
         """
         Query backend with the mol inventory from the atom ledger.
 
@@ -9532,6 +9532,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         and the raised-exception handlers, exactly as before.  Status
         surfaces existing state at the consumption point; it does not
         introduce a new control-flow branch.
+
+        A forecast can disable the post-equilibrium SulfSat hook because its
+        candidate temperatures are not realized run steps.
         """
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'replay_enabled', False):
@@ -9550,7 +9553,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'reduced-real cache miss requires a live backend; '
                     'no backend is configured'
                 )
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
         if self._backend_failed:
             if cache_write_through:
                 raise RuntimeError(
@@ -9562,7 +9568,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self._last_backend_error
                     or 'configured backend is disabled after failure'
                 )
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
         if not self.backend.is_available():
             if cache_write_through:
                 raise RuntimeError(
@@ -9574,7 +9583,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self._last_backend_error
                     or f'{type(self.backend).__name__} is unavailable'
                 )
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
 
         diagnostic_silicate_equilibrium = False
         try:
@@ -9715,7 +9727,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise
             if not self._backend_allows_internal_analytical_fallback():
                 raise
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
         except ValueError as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
@@ -9723,7 +9738,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise
             if not self._backend_allows_internal_analytical_fallback():
                 raise
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
 
         transition = getattr(result, 'ledger_transition', None)
         if (
@@ -9749,7 +9767,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._disable_backend_after_failure()
             if not allows_fallback:
                 raise RuntimeError(self._last_backend_error)
-            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
+            return self._record_equilibrium_status(
+                self._internal_analytical_equilibrium(),
+                run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+            )
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
             balances_before = self.atom_ledger.kg_by_account()
@@ -9762,11 +9783,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 balances_before,
             )
             self._project_cleaned_melt_from_atom_ledger()
-        return self._record_equilibrium_status(result)
+        return self._record_equilibrium_status(
+            result,
+            run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+        )
 
-    def _record_equilibrium_status(self, result):
-        """Record the per-call backend outcome and run the post-equilibrium
-        SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
+    def _record_equilibrium_status(
+        self,
+        result,
+        *,
+        run_post_equilibrium_sulfsat: bool = True,
+    ):
+        """Record backend status and optionally run the post-equilibrium gate."""
         if self._feedstock_fe_redox_split_unknown:
             diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
             diagnostics['feedstock_iron_notice'] = {
@@ -9810,7 +9838,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
         # ledger (the gate has no LedgerTransition authority).
-        self._attach_post_equilibrium_sulfsat(result)
+        if run_post_equilibrium_sulfsat:
+            self._attach_post_equilibrium_sulfsat(result)
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_equilibrium(self, result)
@@ -13717,8 +13746,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         temperature_range = cfg.get('temp_range_C')
-        if not isinstance(temperature_range, (list, tuple)) or len(temperature_range) != 2:
-            raise ValueError('C0.temp_range_C must contain exactly two values')
+        if (
+            not isinstance(temperature_range, (list, tuple))
+            or len(temperature_range) != 2
+        ):
+            return {
+                'T_exit_C': None,
+                't_evac_hr': None,
+                'Na_plus_K_to_train_kg': None,
+                'Na_plus_K_feed_loss_fraction': None,
+                'alkali_retention_budget_fraction': budget,
+                'budget_authority': 'owner:d-244',
+                'budget_provenance': 'owner d-244, purity limit',
+                'prediction_status': 'unavailable_invalid_temperature_range',
+            }
         low_C = float(temperature_range[0])
         high_C, ramp_C_per_hr = self.campaign_mgr._configured_temperature_ramp(
             CampaignPhase.C0
@@ -13770,6 +13811,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.background_gas_species,
             self.melt.campaign,
         )
+        forecast_diagnostic_names = (
+            '_last_backend_error',
+            '_backend_failed',
+            '_last_backend_status',
+            '_last_backend_diagnostics',
+            '_last_out_of_domain_diagnostics',
+            '_last_vapor_pressures_source',
+            '_last_vapor_pressure_diagnostic',
+            '_last_evaporation_flux_diagnostic',
+            '_last_partial_melt_offgassing_diagnostic',
+            '_last_vapour_batch',
+            '_last_vapour_batch_report',
+            '_last_vapour_batch_flux_overlay',
+            '_last_vapour_batch_resolve_error',
+            '_last_imcc_activity_shadow',
+            '_unmeasured_alpha_fallback_species_engaged',
+            '_last_high_t_melt_activity_temperature_K',
+            '_last_high_t_melt_activity',
+            '_last_reduced_real_cache_state',
+        )
+        forecast_diagnostics = {
+            name: (hasattr(self, name), getattr(self, name, None))
+            for name in forecast_diagnostic_names
+        }
+        degraded_path_engagement = copy.deepcopy(
+            self._degraded_path_engagement
+        )
+        condensation_model = getattr(self, 'condensation_model', None)
+        wall_pressure_notices = (
+            copy.deepcopy(
+                condensation_model.last_sticking_alpha_provenance_notice
+            )
+            if condensation_model is not None
+            else None
+        )
+        backend_status_history = self._backend_status_history
+        backend_status_history_length = len(backend_status_history)
+        commissioning_steps = self._engine_commissioning_steps
+        commissioning_steps_length = len(commissioning_steps)
         self.melt.atmosphere = Atmosphere.ARGON_FLOW
         self.melt.background_gas_species = 'Ar'
         self.melt.p_total_mbar = total_pressure_mbar
@@ -13783,7 +13863,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else Atmosphere.ARGON_FLOW
             )
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
-            equilibrium = self._get_equilibrium()
+            equilibrium = self._get_equilibrium(
+                run_post_equilibrium_sulfsat=False
+            )
             flux = self._calculate_evaporation(equilibrium)
             inlet = self._subsolidus_transport_inlet_flux(flux)
             demand_kg_hr = float(inlet.total_kg_hr)
@@ -14002,6 +14084,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.melt.background_gas_species,
                 self.melt.campaign,
             ) = original_state
+            for name, (was_present, value) in forecast_diagnostics.items():
+                if was_present:
+                    setattr(self, name, value)
+                elif hasattr(self, name):
+                    delattr(self, name)
+            self._degraded_path_engagement = degraded_path_engagement
+            if condensation_model is not None:
+                condensation_model.last_sticking_alpha_provenance_notice = (
+                    wall_pressure_notices
+                )
+            del backend_status_history[backend_status_history_length:]
+            del commissioning_steps[commissioning_steps_length:]
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
     def _cap_c0_joint_release_to_pipe_capacity(
@@ -14533,9 +14627,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'throttle_reason': str(
                         getattr(self, '_last_throttle_reason', '') or ''
                     ),
-                    'target_inventory_diagnostic': dict(
-                        getattr(self, '_last_target_inventory_diagnostic', {})
-                        or {}
+                    **(
+                        {
+                            'target_inventory_diagnostic': dict(
+                                getattr(
+                                    self,
+                                    '_last_target_inventory_diagnostic',
+                                    {},
+                                )
+                                or {}
+                            )
+                        }
+                        if self.melt.campaign == CampaignPhase.C0
+                        else {}
                     ),
                 },
             )
