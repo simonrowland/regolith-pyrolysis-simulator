@@ -341,6 +341,7 @@ def test_vapour_rail_tick_panel_keeps_channel_index_without_full_answers():
 
 
 def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
+    trace_context = web_events._b950_trace_context()
     captured_tasks = _force_internal_analytical(monkeypatch)
     original_drive_session = web_events.drive_session
     original_emit = app_module.socketio.emit
@@ -438,9 +439,11 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
             },
         )
         rounds = 0
+        harness_exit_path = None
         while len(tick_samples) < 12 and rounds < 40:
             rounds += 1
             if not captured_tasks:
+                harness_exit_path = 'captured_task_queue_drained'
                 break
             target = captured_tasks.pop(0)
             target()
@@ -451,6 +454,21 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
                         "make_decision",
                         {"choice": decision.get("recommendation")},
                     )
+        if harness_exit_path is None:
+            harness_exit_path = (
+                'tick_target_reached'
+                if len(tick_samples) >= 12
+                else 'round_limit_reached'
+            )
+        if trace_context is not None:
+            trace_context['hour'] = tick_samples[-1][0] if tick_samples else None
+            trace_context['tick_count'] = len(tick_samples)
+        web_events._b950_trace_write(
+            trace_context,
+            event='exit',
+            exit_path=f'test_harness_{harness_exit_path}',
+            reason=f'rounds={rounds}',
+        )
         assert len(tick_samples) >= 12, tick_samples
         for event, hour, size, _serialized in wire_samples:
             assert size < 120_000, (event, hour, size)
@@ -567,6 +585,22 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         assert wall_detail.status_code == 200
         assert "zones" in wall_detail.get_json()
         assert mismatches == []
+    except BaseException as exc:
+        reason = f'{type(exc).__name__}: {exc}'
+        if trace_context is not None:
+            trace_context['hour'] = tick_samples[-1][0] if tick_samples else None
+            trace_context['tick_count'] = len(tick_samples)
+        web_events._b950_trace_write(
+            trace_context,
+            event='exit',
+            exit_path=(
+                'pytest_timeout'
+                if 'timeout' in reason.lower()
+                else 'test_harness_exception'
+            ),
+            reason=reason,
+        )
+        raise
     finally:
         if client.is_connected():
             client.disconnect()

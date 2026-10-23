@@ -1,8 +1,10 @@
 """SocketIO event handlers for the simulator interface."""
 
+import asyncio
 import copy
 import json
 import math
+import os
 import threading
 import time
 import uuid
@@ -3047,6 +3049,58 @@ def _available_runner_payload(
     return payload
 
 
+def _b950_trace_context():
+    if not os.environ.get('B950_TRACE'):
+        return None
+    return {
+        'started_wall': time.perf_counter(),
+        'started_cpu': time.process_time(),
+        'hour': None,
+        'tick_count': 0,
+    }
+
+
+def _b950_trace_write(
+    context,
+    *,
+    event: str,
+    exit_path: str | None = None,
+    reason: str | None = None,
+):
+    trace_path = os.environ.get('B950_TRACE')
+    if context is None or not trace_path:
+        return
+    try:
+        task = asyncio.current_task()
+    except RuntimeError:
+        task = None
+    task_state = None
+    if task is not None:
+        cancelling = getattr(task, 'cancelling', None)
+        task_state = {
+            'state': getattr(task, '_state', 'unknown'),
+            'done': task.done(),
+            'cancelled': task.cancelled(),
+            'cancelling': cancelling() if callable(cancelling) else None,
+        }
+    record = {
+        'event': event,
+        'exit_path': exit_path,
+        'hour': context['hour'],
+        'tick_count': context['tick_count'],
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'wall_seconds': time.perf_counter() - context['started_wall'],
+        'process_cpu_seconds': time.process_time() - context['started_cpu'],
+        'asyncio_task_state': task_state,
+        'reason': reason,
+    }
+    try:
+        with open(trace_path, 'a', encoding='utf-8') as trace_file:
+            trace_file.write(json.dumps(record, default=str) + '\n')
+    except Exception:  # noqa: BLE001 -- tracing must not change run behavior
+        pass
+
+
 def _start_background_loop(
     socketio,
     sid: str,
@@ -3056,10 +3110,16 @@ def _start_background_loop(
     backend_status: str,
     backend_authoritative: bool,
 ):
+    trace_context = None
     with _simulations_guard:
         current = _simulations.get(sid)
         if current is None or current.get('run_id') != run_id:
             return
+        trace_context = current.get('_b950_trace_context')
+        if trace_context is None:
+            trace_context = _b950_trace_context()
+            if trace_context is not None:
+                current['_b950_trace_context'] = trace_context
         loop_generation = int(current.get('loop_generation', 0)) + 1
         current['loop_generation'] = loop_generation
         current['loop_exited'] = False
@@ -3210,6 +3270,14 @@ def _start_background_loop(
             finally:
                 _finish_terminal_state(sid, run_id)
 
+    trace_exit_path = 'loop_return'
+    trace_exit_reason = None
+
+    def mark_loop_exit(path: str, reason: str | None = None) -> None:
+        nonlocal trace_exit_path, trace_exit_reason
+        trace_exit_path = path
+        trace_exit_reason = reason
+
     def run_loop():
         while True:
             state, _ = _current_simulation_state(sid, run_id)
@@ -3217,6 +3285,11 @@ def _start_background_loop(
                 state is None
                 or not state['running']
             ):
+                mark_loop_exit(
+                    'simulation_state_missing' if state is None else 'stop_flag',
+                    'simulation state is missing' if state is None
+                    else 'running flag is false',
+                )
                 break
             if state['paused']:
                 socketio.sleep(0.1)
@@ -3231,6 +3304,11 @@ def _start_background_loop(
                     state is None
                     or not state['running']
                 ):
+                    mark_loop_exit(
+                        'simulation_state_missing' if state is None else 'stop_flag',
+                        'simulation state is missing' if state is None
+                        else 'running flag is false',
+                    )
                     break
                 if state['paused']:
                     continue
@@ -3251,6 +3329,10 @@ def _start_background_loop(
                                 'reason': 'persistence_failed',
                                 'message': 'Run completed but its report was not saved',
                             })
+                            mark_loop_exit(
+                                'session_complete_persistence_failed',
+                                'terminal artifact was not persisted',
+                            )
                             break
                         if artifact.get('execution_status') != 'ok':
                             stop_with_status({
@@ -3258,9 +3340,17 @@ def _start_background_loop(
                                 'reason': 'terminal_run_failed',
                                 'message': 'Run finished with a failed terminal result',
                             })
+                            mark_loop_exit(
+                                'session_complete_terminal_failed',
+                                'terminal artifact execution_status was not ok',
+                            )
                             break
                     except Exception as exc:  # noqa: BLE001 -- loop boundary
                         stop_for_failure(exc, session, sim)
+                        mark_loop_exit(
+                            'session_complete_error',
+                            f'{type(exc).__name__}: {exc}',
+                        )
                         break
                     try:
                         _finish_terminal_state(
@@ -3282,11 +3372,20 @@ def _start_background_loop(
                             'reason': 'completion_emit_failed',
                             'message': str(exc),
                         })
+                        mark_loop_exit(
+                            'completion_emit_error',
+                            f'{type(exc).__name__}: {exc}',
+                        )
                         break
                     if not emitted:
                         _finish_terminal_state(sid, run_id)
+                        mark_loop_exit(
+                            'completion_emit_not_current',
+                            'simulation_complete event was not emitted for current run',
+                        )
                         break
                     _finish_terminal_state(sid, run_id)
+                    mark_loop_exit('session_complete', 'session.is_complete()')
                     break
 
                 decision_policy = (
@@ -3310,6 +3409,8 @@ def _start_background_loop(
                             decision_payload = _decision_payload(decision)
                     elif isinstance(step_result.per_hour_summary, Mapping):
                         hour = step_result.per_hour_summary.get('hour')
+                        if trace_context is not None and hour is not None:
+                            trace_context['hour'] = hour
                         ledger = getattr(sim, 'atom_ledger', None)
                         mol_by_account = getattr(ledger, 'mol_by_account', None)
                         if hour is not None and callable(mol_by_account):
@@ -3335,6 +3436,8 @@ def _start_background_loop(
                             backend_error=step_result.backend_error,
                             backend_status_reason=step_backend_status_reason,
                         )
+                        if trace_context is not None:
+                            trace_context['hour'] = tick_data.get('hour')
                         if isinstance(step_result.per_hour_summary, Mapping):
                             tick_data['per_hour_summary_delta'] = (
                                 _per_hour_summary_entry(
@@ -3379,11 +3482,20 @@ def _start_background_loop(
                             'reason': 'persistence_failed',
                             'message': 'Run was refused but its report was not saved',
                         })
+                        mark_loop_exit(
+                            'typed_refusal_persistence_failed',
+                            f'{exc.reason}: terminal artifact was not persisted',
+                        )
                         break
                     stop_with_status(error_payload)
+                    mark_loop_exit('typed_refusal', exc.reason)
                     break
                 except Exception as exc:
                     stop_for_failure(exc, session, sim)
+                    mark_loop_exit(
+                        'drive_session_error',
+                        f'{type(exc).__name__}: {exc}',
+                    )
                     break
 
             if step_result is None:
@@ -3396,6 +3508,15 @@ def _start_background_loop(
                             session,
                             sim,
                         )
+                        mark_loop_exit(
+                            'auto_apply_no_progress',
+                            'AUTO_APPLY made no simulation progress',
+                        )
+                    else:
+                        mark_loop_exit(
+                            'no_pending_decision',
+                            'drive_session returned no step or pending decision',
+                        )
                     break
                 with _simulations_guard:
                     current = _simulations.get(sid)
@@ -3404,6 +3525,10 @@ def _start_background_loop(
                         or current.get('run_id') != run_id
                         or not current['running']
                     ):
+                        mark_loop_exit(
+                            'decision_state_stopped',
+                            'simulation state changed before decision handling',
+                        )
                         break
                     viewerless = bool(
                         current.get('http_owned')
@@ -3419,6 +3544,7 @@ def _start_background_loop(
                 _emit_if_current(
                     socketio, sid, run_id, 'decision_required', decision_payload
                 )
+                mark_loop_exit('decision_required', 'operator decision is pending')
                 break
 
             sim = session.simulator
@@ -3426,7 +3552,19 @@ def _start_background_loop(
                 if not _emit_if_current(
                     socketio, sid, run_id, 'simulation_tick', tick_data
                 ):
+                    mark_loop_exit(
+                        'tick_emit_not_current',
+                        'simulation_tick was not emitted for current run',
+                    )
                     break
+                if trace_context is not None:
+                    trace_context['tick_count'] += 1
+                    _b950_trace_write(
+                        trace_context,
+                        event='tick',
+                        exit_path='tick_emitted',
+                        reason='simulation_tick emitted',
+                    )
 
                 if not _emit_if_current(
                     socketio,
@@ -3435,6 +3573,10 @@ def _start_background_loop(
                     'per_hour_summary',
                     step_result.per_hour_summary,
                 ):
+                    mark_loop_exit(
+                        'summary_emit_not_current',
+                        'per_hour_summary was not emitted for current run',
+                    )
                     break
 
                 if step_result.campaign_summary is not None:
@@ -3445,9 +3587,17 @@ def _start_background_loop(
                         'campaign_complete_summary',
                         step_result.campaign_summary,
                     ):
+                        mark_loop_exit(
+                            'campaign_summary_emit_not_current',
+                            'campaign summary was not emitted for current run',
+                        )
                         break
             except Exception as exc:  # noqa: BLE001 -- loop boundary
                 stop_for_failure(exc, session, sim)
+                mark_loop_exit(
+                    'event_emit_error',
+                    f'{type(exc).__name__}: {exc}',
+                )
                 break
 
             campaign_summary = step_result.campaign_summary
@@ -3528,6 +3678,10 @@ def _start_background_loop(
                             or not current['running']
                             or current.get('artifact_persisted')
                         ):
+                            mark_loop_exit(
+                                'campaign_refusal_state_stopped',
+                                'state missing, stopped, or artifact already persisted',
+                            )
                             break
                         artifact = persist_terminal(
                             session,
@@ -3553,8 +3707,13 @@ def _start_background_loop(
                                     campaign_refusal
                                 )
                             stop_with_status(persistence_payload)
+                            mark_loop_exit(
+                                'campaign_refusal_persistence_failed',
+                                f'{reason}: terminal artifact was not persisted',
+                            )
                             break
                         stop_with_status(refusal_payload)
+                        mark_loop_exit('campaign_refusal', reason)
                     break
 
             if step_result.decision_event is not None:
@@ -3565,6 +3724,10 @@ def _start_background_loop(
                         or current.get('run_id') != run_id
                         or not current['running']
                     ):
+                        mark_loop_exit(
+                            'decision_state_stopped',
+                            'simulation state changed before decision handling',
+                        )
                         break
                     viewerless = bool(
                         current.get('http_owned')
@@ -3583,6 +3746,7 @@ def _start_background_loop(
                         'decision_required',
                         step_result.decision_event,
                     )
+                    mark_loop_exit('decision_required', 'operator decision is pending')
                     break
 
             viewerless = bool(
@@ -3600,9 +3764,20 @@ def _start_background_loop(
         try:
             run_loop()
         except BaseException as exc:  # noqa: BLE001 -- worker liveness boundary
+            cancelled = isinstance(exc, asyncio.CancelledError)
+            mark_loop_exit(
+                'task_cancelled' if cancelled else 'worker_exception',
+                f'{type(exc).__name__}: {exc}',
+            )
             reconcile_worker_crash(exc)
             raise
         finally:
+            _b950_trace_write(
+                trace_context,
+                event='exit',
+                exit_path=trace_exit_path,
+                reason=trace_exit_reason,
+            )
             restart = False
             resume = None
             with _simulations_guard:
@@ -3642,7 +3817,13 @@ def _start_background_loop(
 
     try:
         thread = socketio.start_background_task(run_task)
-    except Exception:
+    except Exception as exc:
+        _b950_trace_write(
+            trace_context,
+            event='exit',
+            exit_path='background_task_start_error',
+            reason=f'{type(exc).__name__}: {exc}',
+        )
         with _simulations_guard:
             current = _simulations.get(sid)
             if (
