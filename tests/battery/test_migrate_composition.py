@@ -2559,8 +2559,11 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
     assert len(zero_rows) == 2
     for row in zero_rows:
         assert row["admission"]["status"] == "pending"
-        assert row["identity"]["temperature_K"]["tag"] == "unknown"
-        assert "T_range_K" in row["identity"]["temperature_K"]["reason"]
+        temperature = row["identity"]["temperature_K"]
+        assert temperature["tag"] == "unknown"
+        assert temperature["reason"] == "no single temperature_K mapped from source"
+        assert "value" not in temperature
+        assert (row.get("point_conditions") or {}).get("temperature_K") is None
     assert {
         Decimal(row["value"]["point"])
         for row in mass_loss_rows.values()
