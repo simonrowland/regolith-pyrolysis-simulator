@@ -94,6 +94,10 @@ from simulator.transport_constants import CARRIER_GAS_PROPERTIES
 
 O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> kg/mol
 
+# Error control for the two-state capacity-limited sweep (A, residence seconds).
+SWEEP_BALANCE_RTOL = 1e-9
+SWEEP_BALANCE_ATOL = (1e-9, 1e-12)
+
 # 0.5.4 W7 (CW5 historical-audit closure, 2026-05-28): default
 # mean molar mass for the pipe-conductance ideal-gas density when
 # the live species mixture is unavailable (e.g., zero-flux warmup
@@ -353,7 +357,7 @@ def continuous_sweep_balance(
                              or demand > capacities[0])
             solution = solve_ivp(rhs, (0.0, duration), (0.0, 0.0), method='Radau',
                                  events=requested_inventory if drain_to_hold else None,
-                                 rtol=1e-9, atol=(1e-9, 1e-12))
+                                 rtol=SWEEP_BALANCE_RTOL, atol=SWEEP_BALANCE_ATOL)
             if (not solution.success or not all(math.isfinite(x) and x >= 0.0
                                                 for x in solution.y[:, -1])
                     or solution.y[1, -1] > duration * (1.0 + 1e-9)):
