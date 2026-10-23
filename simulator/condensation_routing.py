@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
+
+STAGE3_ROUTES = ('divert', 'through')
+STAGE3_BYPASS_SEGMENT_NAME = 'stage_2_to_stage_4_bypass'
+
 
 STAGE_KEY_BY_NUMBER: dict[int, str] = {
     1: 'stage_1_fe_condenser',
@@ -116,6 +122,18 @@ def designated_stage_number(species: str) -> int | None:
     """Return canonical condenser stage for vapor species, if any."""
 
     return stage_number_for_destination(DESIGNATED_STAGE.get(species))
+
+
+def active_collector_stage_number(species: str, stage_numbers: Iterable[int]) -> int | None:
+    """First eligible physical collector at/after the designated stage.
+
+    Bypassing silica sends SiO toward Stage 4 under the existing allocation
+    law; its bypass wall therefore remains upstream of the active collector.
+    """
+    designated = designated_stage_number(species)
+    if designated is None:
+        return None
+    return min((number for number in stage_numbers if number >= designated), default=None)
 
 
 def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:

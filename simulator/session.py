@@ -635,7 +635,15 @@ class SimSession:
                 raise ValueError(
                     "campaign_override requires campaign and field keywords"
                 )
-            if field_name == "stir_factor":
+            if field_name == "stage3_route":
+                from simulator.condensation_routing import STAGE3_ROUTES
+                sim.campaign_mgr._refuse_unknown_override_fields(
+                    campaign_name, {field_name: value})
+                if value not in STAGE3_ROUTES:
+                    raise ValueError("stage3_route must be divert or through")
+                sim.campaign_mgr.overrides.setdefault(campaign_name, {})[field_name] = value
+                sim.campaign_mgr.apply_collection_route(sim.melt, sim.train)
+            elif field_name == "stir_factor":
                 sim.campaign_mgr._refuse_unknown_override_fields(
                     campaign_name,
                     {field_name: value},

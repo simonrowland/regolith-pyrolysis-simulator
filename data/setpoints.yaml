@@ -56,6 +56,7 @@ campaigns:
   # C0 -- Dry Inert Bakeoff & Volatile Recovery
   # --------------------------------------------------------------------------
   C0:
+    stage3_route: divert
     label: "Dry Inert Bakeoff & Volatile Recovery"
     temp_range_C: [20, 950]
     # Owner d-240's provisional ramp; release curves remain uncertified
@@ -88,6 +89,7 @@ campaigns:
   # C0b -- Standardised P-Cleanup (mild oxidative hold)
   # --------------------------------------------------------------------------
   C0b_p_cleanup:
+    stage3_route: divert
     label: "Standardised P-Cleanup (Mild Oxidative Hold)"
     activation_condition: >
       default_recommended_for_all_lunar OR P2O5_wt_pct > 0.04
@@ -129,6 +131,7 @@ campaigns:
   #        Replaces deprecated separate C1 + C2A entries.
   # --------------------------------------------------------------------------
   C2A_continuous:
+    stage3_route: divert
     label: "Continuous Adaptive pN2 Ramp -- Na/K + Fe + SiO2 Co-Extraction (Path A)"
     activation_condition: "Path_A AND NOT preserving_CMAS_glass_for_glass_or_ceramics"
     preferred_default: false
@@ -200,6 +203,7 @@ campaigns:
       (wicking/centrifugal condensers).
 
   C2A_staged:
+    stage3_route: divert
     label: "Staged pN2 Bakeout -- Alkali / SiO / Fe Hold / Cool Na Cleanup"
     activation_condition: "Path_A_staged AND sequential_product_collection"
     preferred_default: true
@@ -229,6 +233,7 @@ campaigns:
     termination_class: "A"
     stages:
       - name: alkali_early_fe
+        stage3_route: divert
         target_C: 1250
         ramp_rate_C_per_hr: 600
         duration_h: 4
@@ -245,6 +250,7 @@ campaigns:
             Fe: 0.00
             SiO: 0.00
       - name: sio_window
+        stage3_route: through
         target_C: 1600
         ramp_rate_C_per_hr: 175
         duration_h: 3
@@ -259,6 +265,7 @@ campaigns:
             Engine ladder shows Fe/SiO/Mg overlap above ~1600 C; this stage
             isolates the first SiO pulse but cannot make a pure SiO window.
       - name: fe_hot_hold
+        stage3_route: divert
         ramp_rate_C_per_hr: 150
         duration_h: 1
         target_species: ["Fe"]
@@ -273,6 +280,7 @@ campaigns:
             FeO_residual: 20.3
             thermal_Fe_pct: 88.0
       - name: cool_for_na_shuttle
+        stage3_route: divert
         target_C: 1150
         ramp_rate_C_per_hr: 600
         duration_h: 1
@@ -318,6 +326,7 @@ campaigns:
   # C2B -- pO2-Managed Fe Pyrolysis (Path B)
   # --------------------------------------------------------------------------
   C2B:
+    stage3_route: divert
     label: "pO2-Managed Fe Pyrolysis (Path B)"
     activation_condition: "Path_B -- preserving CMAS glass for Material 1 or terminal ceramics"
     temp_range_C: [1320, 1480]
@@ -355,6 +364,7 @@ campaigns:
   # C3 -- Na/K Metallothermic Polish (Shuttle Cycles)
   # --------------------------------------------------------------------------
   C3:
+    stage3_route: divert
     label: "Deprecated Na/K Metallothermic Polish"
     JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
@@ -369,6 +379,7 @@ campaigns:
       Na_kg: 0.0
       K_kg: 0.0
     K_phase:
+      stage3_route: divert
       name: "Deprecated K FeO reduction diagnostic"
       T_inject_C: [760, 820]
       T_bakeout_C: [1520, 1680]
@@ -381,6 +392,7 @@ campaigns:
       Fe_reduction_per_cycle_pct: [0, 0]
       Si_conditioned_kg: [20, 40]
     Na_phase:
+      stage3_route: divert
       name: "Cool Fe cleanup or refused Cr/Ti diagnostic"
       T_inject_C: [1050, 1150]
       T_bakeout_C: [1520, 1680]
@@ -421,6 +433,7 @@ campaigns:
   # C4 -- Mg Selective Pyrolysis (Branch Two)
   # --------------------------------------------------------------------------
   C4:
+    stage3_route: divert
     label: "Mg Selective Pyrolysis (Branch Two)"
     temp_range_C: [1580, 1670]
     max_target_acquisition_hr: 60       # 42 h nominal preheat from 1160 C at 10 C/h, plus latent-cooling margin
@@ -510,6 +523,7 @@ campaigns:
   # C5 -- Limited MRE Under O2 Backpressure
   # --------------------------------------------------------------------------
   C5:
+    stage3_route: divert
     label: "Limited MRE Under O2 Backpressure"
     temp_range_C: [1500, 1650]
     dT_dt_C_per_hr: null                 # electrochemical; not ramp-driven
@@ -553,6 +567,7 @@ campaigns:
       longevity and energy budget.
 
   mre_baseline:
+    stage3_route: divert
     pO2_mbar_default: 50.0
     p_total_mbar_default: 50.0
     max_hold_hr: 120
@@ -567,6 +582,7 @@ campaigns:
   # C6 -- Mg Thermite Reduction (Separate Solar Furnace)
   # --------------------------------------------------------------------------
   C6:
+    stage3_route: divert
     label: "Mg Thermite Reduction (Separate Solar Furnace)"
     temp_range_C: [1380, 1450]
     default_hold_T_C: 1400
@@ -670,6 +686,7 @@ campaigns:
   # C7 -- Aluminothermic Ca Recovery (Optional / Default Off)
   # --------------------------------------------------------------------------
   C7:
+    stage3_route: divert
     label: "Aluminothermic Ca Recovery (Optional)"
     enabled: false
     objective: "ree_enrichment"
@@ -974,6 +991,12 @@ completion_contracts:
 # 2. CONDENSATION TRAIN
 # ============================================================================
 condensation_train:
+  stage3_bypass:
+    liner_material: hot_wall_refractory_liner
+    length_m: 1.0
+    inner_diameter_m: 0.12
+    wall_temperature_C: 1500
+    # Maintained hot duct and ideal valve isolation are engineering assumptions.
 
   # 0.5.4.1 B1-tunable (CW3 follow-on, 2026-05-28): per-species
   # condensation temperature overrides. The simulator's hardcoded

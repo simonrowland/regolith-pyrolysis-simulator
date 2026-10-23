@@ -1466,6 +1466,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Campaign manager ---
         from simulator.campaigns import CampaignManager
         self.campaign_mgr = CampaignManager(setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
 
         # --- Subsystem models (lazy imports to avoid circular deps) ---
         self._condensation_model = None
@@ -1504,6 +1505,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @property
     def condensation_model(self):
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is None:
             from simulator.condensation import CondensationModel
             # 0.5.4.1 review-cluster-C (P2 #1, 2026-05-28):
@@ -1529,6 +1531,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._condensation_model.configure_lab_geometry(
                     self.lab_geometry
                 )
+        # Include all retained vapor, including parcels absent from fresh flux.
+        self._condensation_model.retained_vapor_mol = dict(
+            self.atom_ledger.mol_by_account('process.overhead_gas'))
         return self._condensation_model
 
     @property
@@ -1689,8 +1694,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Reset condensation train
         self.train = CondensationTrain.create_default(self.setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is not None:
             self._condensation_model.train = self.train
+            self._condensation_model.last_stage3_route_diagnostic = {}
+            self._condensation_model.cold_spot_history[:] = [
+                item for item in self._condensation_model.cold_spot_history
+                if 'stage3_route' not in item]
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -13117,6 +13127,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(
             campaign,

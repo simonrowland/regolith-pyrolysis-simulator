@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.condensation_routing import COLLECTOR_STAGE_KEY_BY_NUMBER
+from simulator.condensation_routing import COLLECTOR_STAGE_KEY_BY_NUMBER, STAGE3_ROUTES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -285,10 +285,31 @@ def resolve_collector_bands_C(
     return bands
 
 
+def _validate_collection_commands(setpoints: Mapping[str, Any]) -> None:
+    """Complete recipe files declare each campaign and substage's diverter."""
+    bypass = setpoints.get('condensation_train', {}).get('stage3_bypass')
+    required = ('liner_material', 'length_m', 'inner_diameter_m', 'wall_temperature_C')
+    if not isinstance(bypass, Mapping) or any(key not in bypass for key in required):
+        from simulator.recipe_errors import MalformedRecipeError
+        raise MalformedRecipeError('missing required stage3_bypass equipment inputs')
+    for phase, cfg in setpoints.get('campaigns', {}).items():
+        if not isinstance(cfg, Mapping) or 'temp_range_C' not in cfg:
+            continue
+        commands = [(phase, cfg)]
+        commands.extend((f'{phase}.{name}', cfg[name])
+                        for name in ('Na_phase', 'K_phase') if name in cfg)
+        commands.extend((f'{phase}.{stage.get("name")}', stage)
+                        for stage in cfg.get('stages', []) if isinstance(stage, Mapping))
+        for name, command in commands:
+            if command.get('stage3_route') not in STAGE3_ROUTES:
+                raise ValueError(f'{name}.stage3_route must be divert or through')
+
+
 def _load_setpoints_file(path: Path) -> dict[str, Any]:
     """Read complete setpoints without inheriting missing collector inputs."""
     setpoints, _ = _load_required_yaml(path, functional_digest=True)
     resolve_collector_bands_C(setpoints, require_complete=True)
+    _validate_collection_commands(setpoints)
     return setpoints
 
 
@@ -342,6 +363,7 @@ def load_config_bundle(
             loaded["vapor_pressures"]
         )
     resolve_collector_bands_C(loaded["setpoints"], require_complete=True)
+    _validate_collection_commands(loaded["setpoints"])
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],
