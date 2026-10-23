@@ -326,8 +326,13 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
         assert prediction.refusal_reason is RefusalReason.OPENIMCC_NOT_IMPORTABLE
         return
     assert calls, prediction.refusal_detail
-    assert calls[0][0][0].get("Fe", 0.0) > 0.0
-    assert calls[0][2] == "imposed"
+    args, kwargs = calls[0]
+    assert args[0].get("Fe", 0.0) > 0.0
+    assert args[2] == "imposed"
+    assert kwargs["lambda_imposed"] == pytest.approx(
+        float(row.point_conditions["fO2_log"].state.value) * math.log(10.0),
+        rel=1e-15,
+    )
 
 
 def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
@@ -352,6 +357,42 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
         "input": "printed_fO2",
     }
     assert prediction.coefficient_sources == ()
+
+
+def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
+    """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
+
+    ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
+    Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
+    composition. The row is not a mass-percent stand-in. OpenIMCC must
+    not open or equilibrate a cell.
+    """
+
+    row4 = _borisov_row4()
+
+    def _boom(*_args, **_kwargs):
+        raise AssertionError("OpenIMCC redox must not open or equilibrate a cell")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _boom,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _boom,
+    )
+    prediction = predict_with_engine(Engine.OPENIMCC, row4)
+
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal("1.6414352204105178")
+    assert prediction.unit == "dimensionless"
+    assert prediction.authority is Authority.BRIDGE
+    assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
+    assert prediction.version == "openimcc-redox"
+    assert prediction.coefficient_sources == (
+        "openimcc-redox-pack:sha256:"
+        "cae887f4e7cc537d330396767911a817f68503219ff723af2162829031819cec",
+    )
 
 
 def test_openimcc_redox_predicts_and_flags_temperature_extrapolation():
