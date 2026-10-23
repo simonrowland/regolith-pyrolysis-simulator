@@ -4084,7 +4084,10 @@ def test_t155_bubbler_context_must_match_resolved_patch_b151(
     )
 
     with pytest.raises(
-        EvaluationInputError, match="conditional_mask does not match resolved patch"
+        # d-203 retires C6 oxygen controls before conditional-mask validation.
+        RecipeValidationError if campaign == "C6" else EvaluationInputError,
+        match=("d-203" if campaign == "C6"
+               else "conditional_mask does not match resolved patch"),
     ):
         _build_eval_inputs(
             patch,
