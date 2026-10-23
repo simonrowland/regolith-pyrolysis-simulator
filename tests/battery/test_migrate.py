@@ -1198,7 +1198,11 @@ def test_plante_1992_table2_activities_migrate_with_table1_ancestry(
     for observation in scored:
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.value == Decimal("1973")
-        assert temperature.locator.page == 1278
+        # t-1353 stores the physical PDF page on locator.page. Table 2 is
+        # printed on folio 1278, which is PDF page 3.
+        assert temperature.locator.page == 3
+        assert temperature.locator.published_page == 1278
+        assert temperature.locator.pdf_page_index == 2
     ratios = [
         observation
         for observation in scored
@@ -9667,9 +9671,9 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         ).encode()
     ).hexdigest()
-    # Adding the published point compositions changes content-stable point ids. This pin
-    # keeps their migrated ids and the existing reference states stable from this extract shape.
-    assert digest == "1c09862823fb9dd8daebaf6ed44053644f4330d5fec0dd0023cba7a32d564259"
+    # t-1353 stores the physical PDF page on locator.page, so the content-stable
+    # point ids move. The reference states in this payload are unchanged.
+    assert digest == "979291d9c0a3171046d7bc98ee762e85687eb2b937c1d1fa4405b9493f15bf97"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -9792,7 +9796,10 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         condition = obs.point_conditions["composition"]
         assert condition.state.is_value
         assert condition.locator is not None
-        assert condition.locator.page in {20, 23}
+        # t-1353 stores the physical PDF page on locator.page. Table 2 is
+        # folio 20 (PDF page 6) and Table 3 is folio 23 (PDF page 9).
+        assert condition.locator.published_page in {20, 23}
+        assert condition.locator.page in {6, 9}
         assert condition.locator.table in {"2", "3"}
 
     table2_cao = next(
