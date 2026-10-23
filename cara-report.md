@@ -281,6 +281,45 @@ Regenerating at the gate, relative to a regeneration of offer 20 r9:
 - hard_issues 3278 → 3223 (-55), all of it `stolyarova-1996-cao-alumina-silica-kems` 192 → 137
 - observations move only inside Kelley-King table 6: record 0003 loses one, record 0004 gains one
 
-The committed tree already carries stranded's clean-merged regen and the base side of every derived-store conflict. This lane did not commit another regeneration.
+The committed tree already carries stranded's clean-merged regen and the base side of every derived-store conflict. This lane did not commit another regeneration. The fix round below does not change migration, so this prediction still stands.
 
-!COMPLETE: cara-asm-1022 — f991f3b58f6f648f7814555ae9c695944b55bb99
+## Fix round
+
+Controller review of `355fce660` required the four combination reds. One commit per code change. The Kelley-King claim has no source-file change.
+
+### 1. Kelley-King table-006-0003 entropy_other_sources
+
+The harvest record and the manifest correction agree. `table-006-0003` (Al(g)) has an empty printed token for `entropy_other_sources`. The OCR token `-76±10` was realigned onto `table-006-0004` (Al+++(aq)). The migrator census for 0003 is `entropy_other_sources: 0 numeric cells`. The committed observations-v2 reason still says 1. That sentence is the only difference from the regenerated census.
+
+Splicing the regenerated 0 into a copy of `compilations-kelley-king-1961-usbm-b592.yaml` and running `_count_claim_audit` gave judged 16231, which is `_EXPECTED_COUNT_CLAIMS` for that file, and `bad` empty. The copy was deleted. The claim lives only in the derived store. It was not committed. The seat test stays red until the gate regen. The test predicate was not changed.
+
+### 2. Holzheid Table 2 at 1677 K — `c3f91611b`
+
+The extract files are unchanged from offer 20 r9. Row AD 10 prints `log_fO2: -10.31`. The PDF column header is `log fO2` with no unit. The extract's `log_fO2_scale_and_control` says the scale was not published. Stranded's bare-log converter maps an empty unit to bar: `fO2_Pa = 1e5 * 10^-10.31 = 0.000004897788193684461959103085614` Pa, which is the migrated value. The stub copies that identity, so the old `fO2_Pa`-only `IDENTITY_UNKNOWN` does not fire.
+
+Of the 96 FeO rows, 57 now have a dex residual and `DECISION_RULE_MISSING` / `unparseable_printed_uncertainty` (Table 2 prints no per-row gamma uncertainty). 15 still refuse on `composition`. 24 still refuse on `species.phase`. `tests/battery/test_t1243_feo_reference.py` passed (the file, 4 tests, inside the 52-test run below).
+
+### 3. Stolyarova cell-material stratum — `861da8c49`
+
+`_key_for_fo2_mode` appends `::fo2_mode=shared_ladder` when a notice carries that mode. `flagged_stratum_payloads` treated the last `::` field as the engine, so the row was filtered out and `strata[0]` raised IndexError. The cell-material notice itself was still on the residual. The suffix is stripped before the four-field split and before every production read of an engine from a residual key. `test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice` passed.
+
+`tests/battery/test_score.py` and `tests/battery/test_compilation_tier.py` together: 4 failed, 429 passed, 603.30s. The four failures are the pre-existing handle-close `1 == 2` and the three LiquidMelts `NameError`s. They were not edited.
+
+### 4. Sweep-gas payload — `85e25758b`
+
+Base payload 4444 bytes, sha256 `bffc8e9c562bb69d558d776abf9204b2c22d2c81ca5d9064afc3f7c5a675da4c`. Tip payload 4476 bytes, sha256 `f7d3bb2458192701fc7479d3a8a216cfd60e930a602b21aace50cca7fa3b2401`. The only additions are `"references":[]` on `pressure_environment.total_pressure_Pa.inference` (`atm_to_Pa`) and on `sample.initial_composition.inference` (wt% to mole fraction). Empty `parameters` lists were already serialized, so an empty `references` list is the same rule. No printed value changed. The pin moved to 4476 and that hash. `tests/battery/test_sweep_gas.py` passed.
+
+The targeted run of the t1243 file, the sweep-gas file, the Stolyarova cell test, and the two flagged-stratum classifier tests was 52 passed in 23.79s.
+
+### Effusion timeouts, re-run and not edited
+
+Serial foreground re-run, each test in its own process:
+
+- `test_steurer_effusion_row_has_a_numeric_internal_residual`: failed in 37.42s. `equilibrate exceeded hard timeout of 5s`.
+- `test_costa_and_stolyarova_effusion_numbers_match_6f90106c6`: failed in 42.91s. Same 5s timeout.
+
+An earlier isolated re-run had passed Steurer. This one did not. Neither test was edited.
+
+### Still red, outside this fix round
+
+r16/r17 freshness, the handle-close count, the Plante defaulted-row fO2 fence, the legacy bench digest, LiquidMelts, the OpenIMCC hash pin, the Sossi worker-start failure, and the migrate-census timeouts. The store prediction above is unchanged.
