@@ -16095,9 +16095,7 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
-        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION and _is_printed_phase_row(
-            q_token, values
-        ):
+        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             # A closed phase basis was already stored by the phase-row reader.
             # Do not replace it with the equilibrium-ratio unknown fallback.
             published = values.get("basis_as_published")
