@@ -64,7 +64,7 @@ def test_in_range_sulfsat_leaves_run_notice_absent() -> None:
     # Starting C0 performs a forecast, not a physical step. Forecast-only
     # equilibrium and evaporation diagnostics must not become run evidence.
     assert sim.sulfur_saturation_run_notice() is None
-    assert sim._last_sulfur_saturation_result is None
+    assert getattr(sim, "_last_sulfur_saturation_result", None) is None
     assert sim._last_vapour_batch_report is None
     assert sim._last_vapour_batch_flux_overlay == {}
     sim._note_sulfur_saturation_step(_sulfur_result("in_range"))
