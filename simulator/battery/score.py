@@ -2493,6 +2493,23 @@ def fusion_comparison_reference(
     if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
         return reference
 
+    # A source that records the solid but not its polymorph is a missing
+    # comparison input for every engine; do not let an engine-specific
+    # reference contract replace that reason with a generic mismatch.
+    if (
+        observed_reference_phase is Phase.CR
+        and standard_state.endmember.polymorph is not None
+        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
+    ):
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="fusion_source_reference_phase_unprinted",
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires the source-named solid polymorph",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
@@ -2540,24 +2557,6 @@ def fusion_comparison_reference(
         _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
-
-    # d-165: a source that records the solid but not its polymorph stays on the
-    # printed number. polymorph is None is not that record — the melt-activity
-    # benchmark's pure-solid identity never set the axis, and the stable JANAF
-    # crystal still converts it onto the liquid basis.
-    if (
-        observed_reference_phase is Phase.CR
-        and standard_state.endmember.polymorph is not None
-        and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
-    ):
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason="fusion_source_reference_phase_unprinted",
-            origin=reference.observation_id,
-            band="JANAF fusion conversion requires the source-named solid polymorph",
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
@@ -9781,11 +9780,12 @@ def compile_residual(
         ),
         None,
     )
-    if (
-        unprinted_reference_phase is not None
-        and engine is Engine.INTERNAL_ANALYTICAL
-    ):
-        if experiment is not None and experiment.method.is_unknown:
+    if unprinted_reference_phase is not None:
+        if (
+            engine is Engine.INTERNAL_ANALYTICAL
+            and experiment is not None
+            and experiment.method.is_unknown
+        ):
             return _refused(
                 RefusalReason.METHOD_UNKNOWN,
                 {
