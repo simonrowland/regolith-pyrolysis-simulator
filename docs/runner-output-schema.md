@@ -47,6 +47,14 @@ campaign-pressure refusals populate that generic field only, while Knudsen
 refusals populate it and the transport-specific
 `knudsen_regime_diagnostic` compatibility field.
 
+`run_metadata.c0_exit.forecast_engine` is optional and records the closed
+engine identity used for a computed C0 exit forecast (`internal-analytical`,
+`alphamelts`, `thermoengine`, or `cached-real`). Older run records without this
+nested field remain valid, and absence carries no meaning. This additive
+run-metadata field does not change the exact top-level runner envelope or the
+artifact envelope, so `RUNNER_SCHEMA_VERSION` remains `1.9.0` and
+`ARTIFACT_SCHEMA_VERSION` remains `0.2.0`.
+
 Run the CLI as:
 
 ```bash
@@ -264,6 +272,11 @@ schema 1.3.2. Making them unconditional completes that existing contract;
 it does not introduce a new schema version.
 
 ## Run metadata
+
+The optional `c0_exit` notice records C0 exit bounds and remaining volatile
+inventory. Its `forecast_engine` member appears only when the detached forecast
+has a recognized engine identity; consumers must tolerate older notices that
+omit it.
 
 ```jsonc
 "run_metadata": {

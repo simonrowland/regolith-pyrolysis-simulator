@@ -57,6 +57,11 @@ from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
 from engines.antoine import _antoine_log10_pressure
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    C0_FORECAST_ENGINE_NAMES,
+    canonical_backend_name,
+)
 
 class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
@@ -13766,22 +13771,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'release_curves': 'uncertified (t-1417)',
                 'prediction_status': unavailable_status,
             }
-        return context._evaluate_c0_exit_forecast(
+        prediction = context._evaluate_c0_exit_forecast(
             alkali_retention_budget_fraction=(
                 alkali_retention_budget_fraction
             ),
             p_total_mbar=p_total_mbar,
             pO2_mbar=pO2_mbar,
         )
+        forecast_engine = getattr(context, '_c0_forecast_engine', None)
+        if forecast_engine is not None:
+            prediction['forecast_engine'] = forecast_engine
+        return prediction
 
     @staticmethod
-    def _c0_forecast_engine_name(backend: Any) -> str:
+    def _c0_forecast_engine_name(backend: Any) -> str | None:
         if backend is None:
-            return 'internal-analytical'
+            return ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
         name = getattr(backend, 'backend_name', None)
         if not name or str(name).strip().lower() == 'unknown':
             name = getattr(backend, 'name', None)
-        return str(name or type(backend).__name__)
+        if not name:
+            return None
+        canonical_name = canonical_backend_name(str(name))
+        if canonical_name not in C0_FORECAST_ENGINE_NAMES:
+            return None
+        return canonical_name
 
     def _build_c0_forecast_context(
         self,
@@ -13793,26 +13807,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # backend=None is the live internal-analytical execution path;
                 # keep the forecast on that same path, not another engine.
                 forecast_backend = None
-                forecast_engine = 'internal-analytical'
+                forecast_engine = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
             elif type(self.backend) is InternalAnalyticalBackend:
                 # This backend delegates equilibrium to the same core
                 # internal-analytical model, so give the forecast a fresh handle.
                 forecast_backend = InternalAnalyticalBackend()
                 forecast_backend.initialize({})
-                forecast_engine = 'internal-analytical'
+                forecast_engine = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
             elif callable(backend_factory):
                 forecast_backend = backend_factory()
+                forecast_engine = self._c0_forecast_engine_name(
+                    forecast_backend
+                )
+                live_engine = self._c0_forecast_engine_name(self.backend)
                 if (
                     forecast_backend is None
                     or forecast_backend is self.backend
                     or type(forecast_backend) is not type(self.backend)
-                    or self._c0_forecast_engine_name(forecast_backend)
-                    != self._c0_forecast_engine_name(self.backend)
+                    or forecast_engine is None
+                    or live_engine is None
+                    or forecast_engine != live_engine
                 ):
                     return None, 'unavailable_forecast_backend'
-                forecast_engine = self._c0_forecast_engine_name(
-                    forecast_backend
-                )
             else:
                 return None, 'unavailable_forecast_backend'
         except Exception:
@@ -13821,7 +13837,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_store = getattr(self, '_pt0_determinism_store', None)
         forecast_store = None
         if live_store is not None:
-            clone_store = getattr(live_store, 'clone_for_replay', None)
+            clone_store = getattr(live_store, 'clone_for_forecast', None)
             if not callable(clone_store):
                 return None, 'unavailable_forecast_cache'
             try:

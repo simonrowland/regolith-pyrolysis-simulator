@@ -141,7 +141,7 @@ class _ForecastReplayStore:
         self.replay_calls = 0
         self.entries = {"equilibrium": []}
 
-    def clone_for_replay(self):
+    def clone_for_forecast(self):
         clone = _ForecastReplayStore()
         clone.replay_calls = self.replay_calls
         clone.entries = deepcopy(self.entries)
@@ -331,7 +331,7 @@ def test_c0_cached_replay_forecast_preserves_live_sulfur_and_authority_state():
     class ReplayStore:
         replay_enabled = True
 
-        def clone_for_replay(self):
+        def clone_for_forecast(self):
             return ReplayStore()
 
         def replay_equilibrium(self, forecast_sim):

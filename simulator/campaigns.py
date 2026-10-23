@@ -25,6 +25,7 @@ from typing import Dict, List, Optional, Tuple
 
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
+from simulator.backend_names import C0_FORECAST_ENGINE_NAMES
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
@@ -277,7 +278,14 @@ def c0_exit_record(
             for target in raw_targets
             if isinstance(target, Mapping)
         ]
-    return {
+    prediction_payload = dict(prediction)
+    forecast_engine = prediction_payload.pop("forecast_engine", None)
+    if forecast_engine is not None and (
+        not isinstance(forecast_engine, str)
+        or forecast_engine not in C0_FORECAST_ENGINE_NAMES
+    ):
+        raise ValueError(f"unknown C0 forecast engine {forecast_engine!r}")
+    record = {
         "outcome": "incomplete",
         "backstop": backstop,
         "kinetics": kinetics,
@@ -293,7 +301,7 @@ def c0_exit_record(
         "ramp_C_per_hr": ramp,
         "ramp_authority": "owner_fiat",
         "ramp_model_bounded": False,
-        **dict(prediction),
+        **prediction_payload,
         "evacuation_bound_backstop_fired": bool(
             backstop == "maximum_hold"
             and prediction.get("evacuation_bound_unmet") is True
@@ -301,6 +309,9 @@ def c0_exit_record(
         "unreleased_inventory_at_exit": {"targets": unreleased_targets},
         "sulfates_routed_to": "melt_or_C0b",
     }
+    if forecast_engine is not None:
+        record["forecast_engine"] = forecast_engine
+    return record
 
 
 def c0_exit_run_notice(sim: object) -> dict[str, object] | None:
