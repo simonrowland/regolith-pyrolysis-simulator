@@ -14,13 +14,14 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.waypoints import (
     GapReason,
     ReadinessStatus,
     WaypointAuthority,
     consumer_readiness,
+    normalized_composition,
     oxygen_condition,
     pressure_boundary,
     thermal_path,
@@ -215,3 +216,47 @@ def test_unknown_point_composition_suppresses_typed_sample_charge():
     assert absence.missing == (
         f"observation[{observation.observation_id}].point_conditions.composition",
     )
+
+
+def test_raw_point_map_suppresses_sample_printed_composition():
+    extract = REPO_ROOT / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
+    migrator = factories.migrate_one_extract(REPO_ROOT, extract)
+    migrator.finalize()
+    observation_id = (
+        "cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::"
+        "T=1623.15:row=aii_-35:h=c7e50fa38368"
+    )
+    observation = migrator.result.observations[observation_id]
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = Bench(
+        "work::bench::one",
+        "work",
+        BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+    )
+    experiment_with_sample_print = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=factories.located({
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [["SiO2", "60"], ["MgO", "40"]],
+            }),
+        ),
+    )
+
+    composition = normalized_composition(
+        experiment_with_sample_print, bench, observation
+    )
+    assert composition.selected is None
+    assert composition.absence is not None
+    assert composition.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert composition.absence.missing == (
+        f"observation[{observation_id}].point_conditions.composition",
+    )
+    engine_point = next(
+        row
+        for row in consumer_readiness(experiment_with_sample_print, bench, observation)
+        if row.consumer == "engine_point" and row.engine == "internal-analytical"
+    )
+    assert engine_point.status is ReadinessStatus.GAP

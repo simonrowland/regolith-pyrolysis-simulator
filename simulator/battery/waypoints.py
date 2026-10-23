@@ -800,7 +800,10 @@ def normalized_composition(
             field == "initial_composition"
             and key in point
             and located is not None
-            and not located.state.is_value
+            and (
+                not located.state.is_value
+                or not isinstance(located.state.value, Composition)
+            )
         ):
             return WaypointResult(
                 "normalized_composition",
