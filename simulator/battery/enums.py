@@ -106,6 +106,9 @@ class Quantity(StrEnum):
     DISTRIBUTION_RATIO = "distribution_ratio"
     SULFIDE_CAPACITY = "sulfide_capacity"
     CHLORIDE_CAPACITY = "chloride_capacity"
+    CONDENSATION_COEFFICIENT = "condensation_coefficient"
+    EVAPORATION_FLUX = "evaporation_flux"
+    ELEMENT_FRACTION_REMAINING = "element_fraction_remaining"
 
 
 class EvidenceClass(StrEnum):
@@ -545,6 +548,9 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.DISTRIBUTION_RATIO: "dimensionless",
     Quantity.SULFIDE_CAPACITY: "dimensionless",
     Quantity.CHLORIDE_CAPACITY: "dimensionless",
+    Quantity.CONDENSATION_COEFFICIENT: "dimensionless",
+    Quantity.EVAPORATION_FLUX: "subtype_defined",
+    Quantity.ELEMENT_FRACTION_REMAINING: "dimensionless",
 }
 
 MEASURED_EVIDENCE = frozenset(
