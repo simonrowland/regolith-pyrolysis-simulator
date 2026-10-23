@@ -5523,6 +5523,22 @@ def _source_oxygen_pressure_for_score(observation: Observation) -> Decimal | Non
     return pressure
 
 
+def _openimcc_element_inventory(
+    composition_weight_percent: Mapping[str, float],
+) -> dict[str, float]:
+    """Convert oxide weight percentages to OpenIMCC elemental mole totals."""
+
+    from simulator.accounting.formulas import parse_formula
+
+    inventory: dict[str, float] = {}
+    for oxide, weight_percent in composition_weight_percent.items():
+        formula = parse_formula(oxide, species=oxide)
+        oxide_moles = weight_percent / formula.molar_mass_g_mol
+        for element, atom_moles in formula.atom_moles(oxide_moles).items():
+            inventory[element] = inventory.get(element, 0.0) + atom_moles
+    return inventory
+
+
 def _predict_fe_redox(
     engine: Engine, observation: Observation, identity: Identity, channel: str
 ) -> EnginePrediction:
@@ -5670,16 +5686,7 @@ def _predict_fe_redox(
         if input_refusal is not None:
             return input_refusal
         try:
-            from simulator.accounting.formulas import parse_formula
-
-            inventory: dict[str, float] = {}
-            for oxide, weight_percent in composition_wt.items():
-                formula = parse_formula(oxide, species=oxide)
-                oxide_moles = weight_percent / formula.molar_mass_g_mol
-                for element, atom_moles in formula.atom_moles(oxide_moles).items():
-                    inventory[element] = (
-                        inventory.get(element, 0.0) + atom_moles
-                    )
+            inventory = _openimcc_element_inventory(composition_wt)
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
                 RefusalReason.INVALID_IDENTITY,
