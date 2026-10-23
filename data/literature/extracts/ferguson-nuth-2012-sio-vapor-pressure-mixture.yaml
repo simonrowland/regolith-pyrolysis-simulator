@@ -11,7 +11,7 @@ extraction:
     4–5. Apparent Table 1 pressure is kept raw and is not treated as equilibrium or total pressure. The Table 2
     equilibrium pressure over Si(s)+SiO2(s) is retained as a typed refusal because the current p_sat identity cannot
     encode that two-solid system. Printed alpha points use the existing coefficient quantity; they are reported
-    as quoted_attributed because the fit-input parents are not represented as typed stored observations.
+    as measured_reduced from the authors’ weighted FITEXY reduction of their Table 1 effusion measurements.
   date: '2026-10-23'
   worker: wave53b-F68
   review_status: draft
@@ -1576,12 +1576,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1433 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0040 as printed; confidence level not stated
       values:
         alpha: '0.0089'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0089'
         alpha_as_printed: 0.0089 ± 0.0040
@@ -1597,12 +1601,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1443 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0020 as printed; confidence level not stated
       values:
         alpha: '0.0082'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0082'
         alpha_as_printed: 0.0082 ± 0.0020
@@ -1618,12 +1626,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1453 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0021 as printed; confidence level not stated
       values:
         alpha: '0.0086'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0086'
         alpha_as_printed: 0.0086 ± 0.0021
@@ -1639,12 +1651,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1462 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0021 as printed; confidence level not stated
       values:
         alpha: '0.0086'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0086'
         alpha_as_printed: 0.0086 ± 0.0021
@@ -1660,12 +1676,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1472 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0021 as printed; confidence level not stated
       values:
         alpha: '0.0082'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0082'
         alpha_as_printed: 0.0082 ± 0.0021
@@ -1681,12 +1701,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1481 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0025 as printed; confidence level not stated
       values:
         alpha: '0.0085'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0085'
         alpha_as_printed: 0.0085 ± 0.0025
@@ -1702,12 +1726,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1491 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0020 as printed; confidence level not stated
       values:
         alpha: '0.0069'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0069'
         alpha_as_printed: 0.0069 ± 0.0020
@@ -1723,12 +1751,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1500 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0019 as printed; confidence level not stated
       values:
         alpha: '0.0070'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0070'
         alpha_as_printed: 0.0070 ± 0.0019
@@ -1744,12 +1776,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1510 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0019 as printed; confidence level not stated
       values:
         alpha: '0.0068'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0068'
         alpha_as_printed: 0.0068 ± 0.0019
@@ -1765,12 +1801,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1520 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0018 as printed; confidence level not stated
       values:
         alpha: '0.0067'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0067'
         alpha_as_printed: 0.0067 ± 0.0018
@@ -1786,12 +1826,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1530 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0018 as printed; confidence level not stated
       values:
         alpha: '0.0066'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0066'
         alpha_as_printed: 0.0066 ± 0.0018
@@ -1807,12 +1851,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1540 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0018 as printed; confidence level not stated
       values:
         alpha: '0.0068'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0068'
         alpha_as_printed: 0.0068 ± 0.0018
@@ -1828,12 +1876,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1549 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0017 as printed; confidence level not stated
       values:
         alpha: '0.0064'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0064'
         alpha_as_printed: 0.0064 ± 0.0017
@@ -1849,12 +1901,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1560 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0017 as printed; confidence level not stated
       values:
         alpha: '0.0067'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0067'
         alpha_as_printed: 0.0067 ± 0.0017
@@ -1870,12 +1926,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1570 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0028 as printed; confidence level not stated
       values:
         alpha: '0.0063'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0063'
         alpha_as_printed: 0.0063 ± 0.0028
@@ -1891,12 +1951,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1579 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0027 as printed; confidence level not stated
       values:
         alpha: '0.0059'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0059'
         alpha_as_printed: 0.0059 ± 0.0027
@@ -1912,12 +1976,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1589 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0027 as printed; confidence level not stated
       values:
         alpha: '0.0059'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0059'
         alpha_as_printed: 0.0059 ± 0.0027
@@ -1933,12 +2001,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1598 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0027 as printed; confidence level not stated
       values:
         alpha: '0.0056'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0056'
         alpha_as_printed: 0.0056 ± 0.0027
@@ -1954,12 +2026,16 @@ species:
         page: 5
         pdf_page_index: 4
         note: Table 2 row at 1608 K; SiO(g) over Si(s)+SiO2(s)
+      derived_from: [ferguson_nuth_2012_table1_raw_effusion_rows]
+      derivation:
+        relation: "Weighted FITEXY fit of a Whitmann–Motzfeldt plot from the authors’ Table 1 effusion measurements at this temperature"
+        inputs: [ferguson_nuth_2012_table1_raw_effusion_rows]
+        output_unit: dimensionless
       uncertainty:
         note: ±0.0027 as printed; confidence level not stated
       values:
         alpha: '0.0054'
-        method_class: quoted_attributed
-        attribution: Ferguson and Nuth (2012), Table 2; reported fitted coefficient
+        method_class: measured_reduced
         system_as_published: Si(s)+SiO2(s)
         value: '0.0054'
         alpha_as_printed: 0.0054 ± 0.0027
