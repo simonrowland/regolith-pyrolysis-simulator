@@ -9404,7 +9404,9 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
     )
 
     assert prediction.value is not None
-    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
+    # 2064476: D066-v4 re-references Mg2SiO4/MgSiO3 to measured SiO2(l) Cp.
+    # Recomputed through the production resolver at the same sample composition.
+    assert float(prediction.value).hex() == "0x1.a4b00bf72eb44p-5"
     assert prediction.refusal_reason is None
     assert prediction.requested_composition is not None
     assert prediction.requested_composition.is_value

@@ -3841,7 +3841,9 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     points = tuple(point for _residual, point in selected)
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+    # 2064476's SiO2 standards change D066-v4/Mo-cell pressure predictions:
+    # the production 22-point slope crosses the 6.385 rounding boundary.
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.39")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -3865,7 +3867,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("6.38")
+    ) == Decimal("6.39")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -8462,7 +8464,9 @@ def test_inference_notice_reaches_a_numeric_residual() -> None:
             "Al2O3",
             Decimal("2400"),
             Decimal("0.3583233854709349838426386125"),
-            Decimal("0.021519916602154066"),
+            # 2064476: SiO2(l) Cp refits Al6Si2O13 in D066-v4; only the
+            # model residuals move in both Al rows. JANAF references stay fixed.
+            Decimal("0.019388096380820435"),
             "Al-096",
             "Al-096",
             "Al-100",
@@ -8477,7 +8481,7 @@ def test_inference_notice_reaches_a_numeric_residual() -> None:
             "Al2O3",
             Decimal("2500"),
             Decimal("0.4337601535097755115490675312"),
-            Decimal("-0.037220177900394995"),
+            Decimal("-0.039373253652128154"),
             "Al-096",
             "Al-098",
             "Al-100",
