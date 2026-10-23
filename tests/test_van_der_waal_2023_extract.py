@@ -1,4 +1,4 @@
-"""Pins the bounded, explicitly unscored table evidence for Van et al. (2023)."""
+"""Pins the compiled, unscored activity-coefficient ranges for Van et al. (2023)."""
 
 from pathlib import Path
 
@@ -24,11 +24,33 @@ def test_van_der_waal_2023_context_and_isolated_migration() -> None:
     table_415 = by_id["van_der_waal_2023_table_4_15_activity_coefficients"]
     assert table_415["locator"]["page"] == 163
     assert table_415["locator"]["pdf_page_index"] == 162
-    assert len(table_415["values"]["rows"]) == 16
-    assert table_415["values"]["rows"][3]["gamma_as_printed"] == (
-        "1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13"
+    assert table_415["values"]["reason"] == (
+        "compiled literature ranges; no per-value T or melt composition and endpoints "
+        "not mapped to sources (quoted, second-hand). Primaries listed below"
     )
-    assert table_415["values"]["rows"][3]["sources"] == "1, 4, 5"
+    assert table_415["values"]["reference_state_as_printed"] == "not stated"
+    expected_rows = [
+        ("Li", "1.8 ± 0.2 – 15.4 ± 3.1", "5"),
+        ("V", "4.8 ± 0.32", "4"),
+        ("Cu", "3.5 – 11.8 ± 1.7", "2, 3, 4, 5"),
+        ("Zn", "1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13", "1, 4, 5"),
+        ("Ga", "1.82 ± 0.53", "4"),
+        ("Ge", "3.7·10^-3 ± 1·10^-3 – 0.11 ± 0.01", "4, 5"),
+        ("As", "—", "—"),
+        ("Rb", "1.3·10^-4 ± 1.5·10^-5", "5"),
+        ("Ag", "0.11 ± 0.023 – 0.67", "4, 5"),
+        ("Cd", "0.15 – 1561 ± 206", "4, 5"),
+        ("In", "0.02 – 0.039 ± 8.5·10^-3", "3, 4"),
+        ("Sn", "1.6·10^-4 ± 3.6·10^-4", "4"),
+        ("Sb", "1.90 ± 0.43", "4"),
+        ("Cs", "3.4·10^-5", "*"),
+        ("Tl", "2535 ± 146", "4"),
+        ("Pb", "0.17 – 0.50 ± 0.11", "3, 4, 5"),
+    ]
+    assert [
+        (row["element"], row["gamma_as_printed"], row["sources"])
+        for row in table_415["values"]["rows"]
+    ] == expected_rows
 
     table_21 = by_id["van_der_waal_2023_table_2_1_experimental_redox_conditions"]
     assert table_21["values"]["row_count"] == 8
