@@ -6,7 +6,7 @@ source:
   corpus_asset: raw/kems-212-schneider-1980-nbsir-80-2059/kems-212-schneider-1980-nbsir-80-2059.pdf
   sha256: 08ef68ee74434a719eb7dad6bb8636ef97c7cecb1ac48919f6a8506e6ce683bb
 extraction:
-  method: 'All 66 pages rendered with pdftoppm at 220 dpi. All four table CSVs and every carried printed number, sign, exponent, unit and locator rechecked against page images in fix round 1. Missing printed prose facts and model equations carried in located context. Figure 2 measured markers digitized only for 2116–2160 K; other curves remain undigitized.'
+  method: 'All 66 pages rendered with pdftoppm at 220 dpi. All four table CSVs and every carried printed number, sign, exponent, unit and locator rechecked against page images in fix round 1. Missing printed prose facts and model equations carried in located context. Figure 2 marker centres were re-read on a 500 dpi render of PDF page 16 against the printed ticks. One centre falls in 2116–2160 K; two other read centres lie below that window and are stored unrounded. Other curves remain undigitized.'
   date: '2026-10-23'
   worker: codex
 review_status: draft
@@ -15,9 +15,9 @@ fidelity_samples:
     observation_id: schneider_1980_k_psat_figure2_high_temperature_digitized
     field: points
     value:
-      - {T_K: 2157, invT_times_1e4_K_inv: 4.64, p_atm: 3.0e-5, series: D, bulk_K2O_composition_range_wt_pct: [14.9, 14.5], marker_pixel_250dpi: [215, 777]}
-      - {T_K: 2116, invT_times_1e4_K_inv: 4.73, p_atm: 1.9e-5, series: D, bulk_K2O_composition_range_wt_pct: [14.9, 14.5], marker_pixel_250dpi: [273, 883]}
-      - {T_K: 2129, invT_times_1e4_K_inv: 4.70, p_atm: 1.0e-5, series: G, bulk_K2O_composition_range_wt_pct: [10.8, 10.7], marker_pixel_250dpi: [260, 1190]}
+      - {T_K: 2150.4, invT_times_1e4_K_inv: 4.650, p_atm: 3.08e-5, series: F, bulk_K2O_composition_range_wt_pct: [11.6, 11.4], marker_pixel_250dpi: [222.14, 773.55]}
+      - {T_K: 2112.6, invT_times_1e4_K_inv: 4.733, p_atm: 2.04e-5, series: F, bulk_K2O_composition_range_wt_pct: [11.6, 11.4], marker_pixel_250dpi: [275.33, 886.61]}
+      - {T_K: 2115.2, invT_times_1e4_K_inv: 4.728, p_atm: 6.68e-6, series: G, bulk_K2O_composition_range_wt_pct: [10.8, 10.7], marker_pixel_250dpi: [271.73, 1192.75]}
     locator: {page: 12, figure: '2'}
 benches:
   - id: schneider-1980-plante-kcas-kems
@@ -151,8 +151,8 @@ species:
       - observation_id: schneider_1980_k_psat_figure2_high_temperature_digitized
         experiment: schneider-1980-kalsio4-vaporization
         type: psat_series
-        locator: {figure: '2', published_page: 12, pdf_page_index: 15, note: 'Marker-center digitization from the 250 dpi PDF p. 16 render; points restricted to 2116–2160 K.'}
-        T_range_K: [2116, 2157]
+        locator: {figure: '2', published_page: 12, pdf_page_index: 15, note: 'Marker centres read on the 500 dpi render of PDF page 16. The 10^4/T axis is calibrated from the printed 5.0 and 7.0 ticks; pressure is calibrated from the printed logarithmic ticks. Reading uncertainty is about 1 K (about 1.5 K for the hotter triangle, which touches the pressure axis) and about 1 percent in pressure. Values are marker centres and are not snapped to gridlines.'}
+        T_range_K: [2150.4, 2150.4]
         phase: gas
         units: 'atm as printed on Figure 2; temperature derived from the printed 10^4/T axis'
         point_conditions:
@@ -166,24 +166,24 @@ species:
           admission_status: typed_refusal
           refusal_reason: 'No pointwise full melt composition is printed; the curve-level K2O ranges have no closed composition identity form.'
           points:
-            - T_K: 2157
-              invT_times_1e4_K_inv: 4.64
-              p_atm: 3.0e-5
-              series: D
-              bulk_K2O_composition_range_wt_pct: [14.9, 14.5]
-              marker_pixel_250dpi: [215, 777]
-            - T_K: 2116
-              invT_times_1e4_K_inv: 4.73
-              p_atm: 1.9e-5
-              series: D
-              bulk_K2O_composition_range_wt_pct: [14.9, 14.5]
-              marker_pixel_250dpi: [273, 883]
-            - T_K: 2129
-              invT_times_1e4_K_inv: 4.70
-              p_atm: 1.0e-5
+            - T_K: 2150.4
+              invT_times_1e4_K_inv: 4.650
+              p_atm: 3.08e-5
+              series: F
+              bulk_K2O_composition_range_wt_pct: [11.6, 11.4]
+              marker_pixel_250dpi: [222.14, 773.55]
+            - T_K: 2112.6
+              invT_times_1e4_K_inv: 4.733
+              p_atm: 2.04e-5
+              series: F
+              bulk_K2O_composition_range_wt_pct: [11.6, 11.4]
+              marker_pixel_250dpi: [275.33, 886.61]
+            - T_K: 2115.2
+              invT_times_1e4_K_inv: 4.728
+              p_atm: 6.68e-6
               series: G
               bulk_K2O_composition_range_wt_pct: [10.8, 10.7]
-              marker_pixel_250dpi: [260, 1190]
+              marker_pixel_250dpi: [271.73, 1192.75]
     context:
       - observation_id: schneider_1980_kalsio4_figure1_pressure
         type: figure_only
@@ -216,8 +216,8 @@ species:
           curves_not_fully_digitized: true
           digitized_temperature_window_K: [2116, 2160]
           digitized_observation_id: schneider_1980_k_psat_figure2_high_temperature_digitized
-          digitized_marker_count: 3
-          digitization_locator: {published_page: 12, pdf_page_index: 15, note: 'Measured marker centers digitized from PDF p. 16 render at 250 dpi; only points in 2116–2160 K are included.'}
+          digitized_marker_count: 1
+          digitization_locator: {published_page: 12, pdf_page_index: 15, note: 'Measured marker centres from the 500 dpi render of PDF page 16. digitized_marker_count is the number of those centres inside 2116-2160 K. The two cooler centres are stored and lie below that window.'}
           composition_origin: measured_reduced
           composition_derivation:
             locator: {published_page: 3, pdf_page_index: 6}
