@@ -295,6 +295,71 @@ def _stage_product_composition_report(sim) -> dict[int, dict]:
     return report
 
 
+def _assert_stage_product_composition_contract(sim) -> dict[int, dict]:
+    report = _stage_product_composition_report(sim)
+    assert set(report) == {int(stage.stage_number) for stage in sim.train.stages}
+    for stage in sim.train.stages:
+        stage_report = report[int(stage.stage_number)]
+        assert "non_si_cation_mass_fraction" in stage_report
+        assert "free_si_fraction_of_free_si_plus_sio2" in stage_report
+        assert sum(
+            stage_report["element_mass_kg_by_element"].values()
+        ) == pytest.approx(
+            stage_report["total_deposit_kg"], rel=1e-12, abs=1e-12
+        ), f"element mass did not close for stage {stage.stage_number}"
+        if stage_report["total_cation_mass_kg"] > 0.0:
+            fraction = stage_report["non_si_cation_mass_fraction"]
+            assert fraction is not None
+            assert fraction == pytest.approx(
+                stage_report["non_si_cation_mass_kg"]
+                / stage_report["total_cation_mass_kg"]
+            )
+            assert 0.0 <= fraction <= 1.0
+        si_product_mass = (
+            stage_report["free_si_product_kg"] + stage_report["sio2_product_kg"]
+        )
+        if si_product_mass > 0.0:
+            fraction = stage_report[
+                "free_si_fraction_of_free_si_plus_sio2"
+            ]
+            assert fraction is not None
+            assert fraction == pytest.approx(
+                stage_report["free_si_product_kg"] / si_product_mass
+            )
+            assert 0.0 <= fraction <= 1.0
+
+    assert report[3]["non_si_cation_mass_fraction"] is not None
+    assert report[3]["free_si_fraction_of_free_si_plus_sio2"] is not None
+    return report
+
+
+def _stage_capture_history_kg(sim, stage_number: int) -> dict[str, float]:
+    # AtomLedger's condensation_train account is run-wide; hourly snapshots
+    # retain the stage key needed to check a stage projection independently.
+    history: dict[str, float] = {}
+    for snapshot in sim.record.snapshots:
+        for (number, species), mass_kg in (
+            snapshot.condensed_by_stage_species_delta.items()
+        ):
+            if int(number) == stage_number:
+                history[species] = history.get(species, 0.0) + float(mass_kg)
+    return history
+
+
+def _assert_stage_projection_matches_capture_history(
+    stage_number: int,
+    collected_kg: dict[str, float],
+    capture_history_kg: dict[str, float],
+) -> None:
+    assert set(collected_kg) == set(capture_history_kg), (
+        f"stage {stage_number} collected species differ from capture history"
+    )
+    for species, history_kg in capture_history_kg.items():
+        assert collected_kg[species] == pytest.approx(
+            history_kg, rel=1e-12, abs=1e-12
+        ), f"stage {stage_number} {species} differs from capture history"
+
+
 def _assert_transitional_kn_hours_are_flagged(
     transport_diagnostics: list[tuple[int, dict]],
 ) -> list[int]:
@@ -396,6 +461,28 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     assert max(s.temperature_C for s in shuttle_snapshots) < 1200.0
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT
     assert _cumulative_transition_imbalance_kg(sim) < 1e-6
+    composition_report = _assert_stage_product_composition_contract(sim)
+    stage3 = sim.train.stages[3]
+    stage3_capture_history = _stage_capture_history_kg(sim, 3)
+    _assert_stage_projection_matches_capture_history(
+        3, stage3.collected_kg, stage3_capture_history
+    )
+
+    # Mutation check: removing a captured carrier from the stage projection
+    # must fail against the independent per-hour capture history.
+    dropped_species_projection = dict(stage3.collected_kg)
+    dropped_species = max(
+        dropped_species_projection, key=dropped_species_projection.get
+    )
+    dropped_species_projection.pop(dropped_species)
+    with pytest.raises(AssertionError, match="stage 3 collected species"):
+        _assert_stage_projection_matches_capture_history(
+            3, dropped_species_projection, stage3_capture_history
+        )
+
+    assert composition_report[3]["total_deposit_kg"] == pytest.approx(
+        sum(stage3_capture_history.values()), rel=1e-12, abs=1e-12
+    )
     assert _assert_transitional_kn_hours_are_flagged(transport_diagnostics)
 
 
@@ -422,49 +509,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     continuous_products = continuous.product_ledger()
     staged_sio_stage = first.train.stages[3].collected_kg
     continuous_sio_stage = continuous.train.stages[3].collected_kg
-    composition_report = _stage_product_composition_report(first)
-
-    assert set(composition_report) == {
-        int(stage.stage_number) for stage in first.train.stages
-    }
-    for stage in first.train.stages:
-        stage_report = composition_report[int(stage.stage_number)]
-        assert "non_si_cation_mass_fraction" in stage_report
-        assert "free_si_fraction_of_free_si_plus_sio2" in stage_report
-        assert sum(
-            stage_report["element_mass_kg_by_element"].values()
-        ) == pytest.approx(
-            stage_report["total_deposit_kg"], rel=1e-12, abs=1e-12
-        ), f"element mass did not close for stage {stage.stage_number}"
-        assert stage_report["total_deposit_kg"] == pytest.approx(
-            stage.total_collected_kg(), rel=1e-12, abs=1e-12
-        )
-        if stage_report["total_cation_mass_kg"] > 0.0:
-            fraction = stage_report["non_si_cation_mass_fraction"]
-            assert fraction is not None
-            assert fraction == pytest.approx(
-                stage_report["non_si_cation_mass_kg"]
-                / stage_report["total_cation_mass_kg"]
-            )
-            assert 0.0 <= fraction <= 1.0
-        if stage_report["free_si_product_kg"] + stage_report["sio2_product_kg"] > 0.0:
-            free_si_fraction = stage_report[
-                "free_si_fraction_of_free_si_plus_sio2"
-            ]
-            assert free_si_fraction is not None
-            assert free_si_fraction == pytest.approx(
-                stage_report["free_si_product_kg"]
-                / (
-                    stage_report["free_si_product_kg"]
-                    + stage_report["sio2_product_kg"]
-                )
-            )
-            assert 0.0 <= free_si_fraction <= 1.0
-
-    assert composition_report[3]["non_si_cation_mass_fraction"] is not None
-    assert composition_report[3][
-        "free_si_fraction_of_free_si_plus_sio2"
-    ] is not None
+    _assert_stage_product_composition_contract(first)
     staged_silica = staged_sio_stage.get("Si", 0.0) + staged_sio_stage.get(
         "SiO2", 0.0
     )
