@@ -45,7 +45,8 @@ species:
       values:
         method_class: quoted_attributed
         caption: 'Range of activity coefficients compiled from literature. Sources: Reyes and Gaskell (1983), Holzheid and Lodders (2001), Wood and Wade (2013), Norris (2016), and Sossi et al. (2019). *Extrapolated.'
-        reason: 'Retained as context because the table combines ranges and multiple source attributions without mapping each endpoint to a source.'
+        reason: 'compiled literature ranges; no per-value T or melt composition and endpoints not mapped to sources (quoted, second-hand). Primaries listed below'
+        reference_state_as_printed: not stated
         rows:
         - {element: Li, gamma_as_printed: '1.8 ± 0.2 – 15.4 ± 3.1', sources: '5'}
         - {element: V, gamma_as_printed: '4.8 ± 0.32', sources: '4'}
