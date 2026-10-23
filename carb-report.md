@@ -451,3 +451,31 @@ Still red on this regen:
 - Richter H2: `assert 0 == 1`. The Sossi sweep cases in the same file pass.
 
 These remaining reds were not patched. Each one still needs its own cause, and several would be a physics or scoring judgement rather than a locator or lineage repair.
+
+## Prep merges
+
+After the fix-round regen, five reviewed car-B prep commits were merged with `git merge --no-ff`, in order:
+
+- `6b0378d4ff4706bf3d9790413cffac23e6e4748f` t-1442 Kress-Carmichael dedup `8cc62e193`.
+- `329658d6e153e1ba2dae913efc8fed3f40bdb511` t-1442 Mendybaev dedup `8a3d0ce7c`.
+- `9c71a44438a484172b5ae4498cf7e1e3ff2ccbe0` F31 re-type `0f98dfab6`. The merge also brought the Evans 2009, Jin 2022, and Saini 2023 extracts that sit on that tip's ancestry.
+- `4e30031f7beeafb56171f71b565fdf558a08ab92` F35 Taniguchi re-type `d9368f82a`.
+- `a95fa19909a8c1af910a42a55e0864cc8dbce88e` F37 Henao/Van Ende re-type `3e54199c8`.
+
+The first four merged clean. F37 conflicted only in `henao-2001-ni-cr-mn-co-cu-slag-distribution.yaml`, three context rows. The resolution keeps the retyped remainder `printed_rows_csv` (blanks, bounds, and calculated activity columns) and leaves out the three `input_csv` values under `.agent-scratch/F37-tables/`. Those pointers are the dangling scratch paths the path-key commit removed. No derived store file was in the conflict.
+
+Foreground re-run on this seat, one file at a time, of the tests those merges touched plus `tests/test_literature_extracts.py` and the path ratchet:
+
+- `test_kress_carmichael_1991_iron_redox_extract.py`: 4 passed.
+- `test_mendybaev_2013_fun_cai_extract.py`: 6 passed.
+- `test_evans_2009_sulfur_mn_ni_w_xanes_extract.py`: 1 passed.
+- `test_jin_2022_cl_cr_sulfur_glass.py`: 1 passed.
+- `test_saini_2023_sulfur_vanadium_borosilicate_extract.py`: 1 passed.
+- `test_taniguchi_1997_feo_cas_extract.py`: 2 passed.
+- `tests/battery/test_phase_composition_rows.py`: 13 passed.
+- `test_henao_2001_ni_cr_mn_co_cu_slag_distribution_extract.py`: 2 passed.
+- `test_van_ende_2008_mn_cr_slag_steel_extract.py`: 2 passed.
+- `test_absolute_path_ratchet.py`: 247 passed.
+- `test_literature_extracts.py`: 738 passed, 1 failed.
+
+No new failure. The one red is `test_markova_1984_apparatus_inputs_migrate_from_the_printed_method` (`assert 0 == 8`), already recorded above. r16 and r17 were left red and were not re-run. None of the merge resolutions needed a physics judgement. The open judgements remain the Markova Table 2 unknown-temperature wording and the Markova apparatus sample mass and total pressure.
