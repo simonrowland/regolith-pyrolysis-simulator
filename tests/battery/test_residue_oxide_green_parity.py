@@ -270,7 +270,17 @@ def test_printed_residue_migrations_match_green_a822c275f(tmp_path: Path) -> Non
 
 
 if __name__ == "__main__":
+    import sys
+
     green_src = Path(os.environ["PARITY_GREEN_SRC"]).resolve()
+    # e47e33186 adds phase_for_sample_form; 81256c01a imports it from migrate.
+    # Bind that name from the worktree module before a822c275f, which does
+    # not define it, replaces simulator.battery.migrate.
+    import simulator.battery as battery_pkg
+
+    sys.modules.pop("simulator.battery.migrate", None)
+    if hasattr(battery_pkg, "migrate"):
+        delattr(battery_pkg, "migrate")
     _install_green_migrate(str(green_src))
     _rebind_green_paths()
     import simulator.battery.migrate as migrate
