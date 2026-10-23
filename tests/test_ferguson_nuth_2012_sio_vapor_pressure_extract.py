@@ -1,8 +1,9 @@
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, StateTag, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, StateTag, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 
@@ -49,9 +50,38 @@ def test_ferguson_nuth_table_rows_and_printed_alpha_migrate() -> None:
     alpha_rows = [row for row in migrated if "ferguson_nuth_2012_alpha_T" in row.observation_id]
     pressure_rows = [row for row in migrated if "table2_equilibrium_pressure_rows" in row.observation_id]
     assert (len(table1_rows), len(alpha_rows), len(pressure_rows)) == (71, 19, 19)
+    for row in migrated:
+        assert row.identity.temperature_K.tag is StateTag.VALUE
+        temperature_condition = row.point_conditions["temperature_K"]
+        assert temperature_condition.state.tag is StateTag.VALUE
+        assert temperature_condition.locator is not None
     assert all(row.identity.quantity.tag is StateTag.UNKNOWN for row in table1_rows)
     assert all(row.identity.quantity.tag is StateTag.UNKNOWN for row in pressure_rows)
     assert all(row.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA for row in alpha_rows)
+
+    alpha_rows_by_id = {
+        row.observation_id.rsplit("::", 1)[-1]: row for row in alpha_rows
+    }
+    printed_alpha = {
+        source["observation_id"]: Decimal(
+            source["values"]["alpha_as_printed"].split(" ±", 1)[0]
+        )
+        for source in alpha_source_rows
+    }
+    for index in (0, len(alpha_source_rows) // 2, -1):
+        source = alpha_source_rows[index]
+        expected = printed_alpha[source["observation_id"]]
+        assert alpha_rows_by_id[source["observation_id"]].value.point == expected
+        assert Decimal(source["values"]["alpha"]) == expected
+    assert {
+        row.observation_id.rsplit("::", 1)[-1]: row.value.point
+        for row in alpha_rows
+    } == printed_alpha
+    assert all(
+        row.evidence.class_.tag is StateTag.VALUE
+        and row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        for row in alpha_rows
+    )
 
     # Every run carries only printed T and orifice geometry as conditions.
     # Apparent pressure and fitted equilibrium pressure are not total pressure.
