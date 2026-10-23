@@ -194,14 +194,15 @@ ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED = (
 ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH = (
     'subprocess_cao_sio2_binary_crash'
 )
-# t-1469. Other measured Fe-free silicates SIGSEGV only when absolute
-# fO2 is imposed. Matching scope is these three sets, not every Fe-free
-# melt and not the alkali or CaO-SiO2 families above.
-ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH = (
-    'subprocess_fe_free_silicate_absolute_fo2_crash'
+# t-1469. These three Fe-free silicate sets SIGSEGV when the fO2
+# resolver imposes a path, absolute or buffered, and compute when it
+# does not. Not every Fe-free melt, and not the alkali or CaO-SiO2
+# families above.
+ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH = (
+    'subprocess_fe_free_silicate_imposed_fo2_crash'
 )
 _CAO_SIO2_BINARY = frozenset({'CaO', 'SiO2'})
-_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH_FAMILIES = (
+_FE_FREE_SILICATE_IMPOSED_FO2_CRASH_FAMILIES = (
     frozenset({'Al2O3', 'CaO', 'SiO2'}),
     frozenset({'Al2O3', 'SiO2'}),
     frozenset({'CaO', 'Na2O', 'SiO2'}),
@@ -305,7 +306,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH: 'engine_crash',
     ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH: 'engine_crash',
-    ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH: 'engine_crash',
+    ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH: 'engine_crash',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -363,19 +364,21 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ),
     ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH: (
         'AlphaMELTS subprocess crash family: two-component CaO-SiO2. '
-        'The binary SIGABRTs on this composition with and without an '
-        'imposed absolute fO2. This is not the Na2O/K2O-SiO2 '
+        'The binary SIGABRTs on this composition with an imposed fO2 '
+        'path and with no fO2 path. Measured with Absolute, with FMQ, '
+        'and with the path omitted. This is not the Na2O/K2O-SiO2 '
         'absolute-fO2 family.'
     ),
-    ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH: (
+    ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH: (
         'AlphaMELTS subprocess crash family: Fe-free silicate with an '
-        'imposed absolute fO2. Matching scope is the measured '
-        'Al2O3-CaO-SiO2, Al2O3-SiO2, and CaO-Na2O-SiO2 sets. The '
-        'two-component Na2O/K2O-SiO2 family keeps '
+        'imposed fO2 path, absolute or buffered. Matching scope is the '
+        'measured Al2O3-CaO-SiO2, Al2O3-SiO2, and CaO-Na2O-SiO2 sets. '
+        'Absolute, FMQ, NNO, IW, and HM SIGSEGV; the same melts compute '
+        'when the resolver writes no path. The two-component '
+        'Na2O/K2O-SiO2 family keeps '
         'subprocess_fe_free_absolute_fo2_crash. The two-component '
         'CaO-SiO2 family is subprocess_cao_sio2_binary_crash and dies '
-        'without imposed fO2 as well. Fe-free melts without imposed '
-        'absolute fO2 can compute.'
+        'with no imposed path as well.'
     ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
@@ -3473,6 +3476,11 @@ class _MELTSBackendSupport(MeltBackend):
                 active_components=active_components,
                 diagnostics=diagnostics,
             )
+        # Resolver owns fO2 validity. The crash guards below see its result.
+        fO2_path, fO2_offset = self._subprocess_fo2_constraint(
+            fO2_log,
+            redox_mode=redox_mode,
+        )
         if active_components == _CAO_SIO2_BINARY:
             return self._subprocess_crash_family_result(
                 requested_temperature_C,
@@ -3486,29 +3494,34 @@ class _MELTSBackendSupport(MeltBackend):
                     'independent_of_imposed_fo2': True,
                     'measured_signal': 'SIGABRT',
                     'not_the_predicate': 'no_Fe',
+                    'resolved_fo2_path': fO2_path,
+                    'resolved_fo2_offset': fO2_offset,
                 },
                 diagnostics=diagnostics,
             )
         if (
-            redox_mode != REDOX_MODE_NOT_AN_INPUT
-            and fO2_log is not None
-            and active_components in _FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH_FAMILIES
+            fO2_path is not None
+            and active_components in (
+                _FE_FREE_SILICATE_IMPOSED_FO2_CRASH_FAMILIES
+            )
         ):
             return self._subprocess_crash_family_result(
                 requested_temperature_C,
                 requested_pressure_bar,
                 fO2_log,
-                reason_code=ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH,
+                reason_code=(
+                    ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH
+                ),
                 active_components=active_components,
                 guard={
-                    'predicate': 'fe_free_silicate_and_imposed_absolute_fo2',
+                    'predicate': 'fe_free_silicate_and_imposed_fo2',
                     'matching_scope': (
                         'al2o3_cao_sio2_al2o3_sio2_cao_na2o_sio2'
                     ),
                     'component_sets': [
                         sorted(components)
                         for components in (
-                            _FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH_FAMILIES
+                            _FE_FREE_SILICATE_IMPOSED_FO2_CRASH_FAMILIES
                         )
                     ],
                     'measured_signal': 'SIGSEGV',
@@ -3516,13 +3529,11 @@ class _MELTSBackendSupport(MeltBackend):
                     'separate_family': (
                         ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH
                     ),
+                    'resolved_fo2_path': fO2_path,
+                    'resolved_fo2_offset': fO2_offset,
                 },
                 diagnostics=diagnostics,
             )
-        fO2_path, fO2_offset = self._subprocess_fo2_constraint(
-            fO2_log,
-            redox_mode=redox_mode,
-        )
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
             melts_path = Path(tmpdir) / 'input.melts'

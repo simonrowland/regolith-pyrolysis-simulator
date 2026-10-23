@@ -3193,7 +3193,7 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
             "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
             "subprocess_fe_free_absolute_fo2_crash (two-component Na2O/K2O-SiO2, imposed absolute fO2)",
             "subprocess_cao_sio2_binary_crash (two-component CaO-SiO2, with or without imposed fO2)",
-            "subprocess_fe_free_silicate_absolute_fo2_crash (measured Al2O3-CaO-SiO2, Al2O3-SiO2, CaO-Na2O-SiO2, imposed absolute fO2)",
+            "subprocess_fe_free_silicate_imposed_fo2_crash (measured Al2O3-CaO-SiO2, Al2O3-SiO2, CaO-Na2O-SiO2, imposed absolute or buffered fO2)",
         ],
     }
 

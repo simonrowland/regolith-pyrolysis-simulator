@@ -339,8 +339,8 @@ def test_real_subprocess_projection_closes_dry_alkali_silica_oxygen_balance(
 # getattr falls back to that value until the constant exists, so this module
 # still collects; the launch assertion is what fails while the guard is absent.
 _CAO_SIO2_BINARY_CRASH = 'subprocess_cao_sio2_binary_crash'
-_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH = (
-    'subprocess_fe_free_silicate_absolute_fo2_crash'
+_FE_FREE_SILICATE_IMPOSED_FO2_CRASH = (
+    'subprocess_fe_free_silicate_imposed_fo2_crash'
 )
 
 
@@ -419,6 +419,8 @@ def test_cao_sio2_binary_refuses_before_launch_with_imposed_fo2(tmp_path):
     assert guard['predicate'] == 'two_component_cao_sio2'
     assert guard['matching_scope'] == 'cao_sio2_binary'
     assert guard['independent_of_imposed_fo2'] is True
+    assert guard['resolved_fo2_path'] == 'Absolute'
+    assert guard['resolved_fo2_offset'] == -9.0
     assert guard['measured_signal'] == 'SIGABRT'
     assert guard['active_components'] == ['CaO', 'SiO2']
     assert 'CaO-SiO2' in result.warnings[0]
@@ -450,6 +452,8 @@ def test_cao_sio2_binary_refuses_before_launch_without_imposed_fo2(tmp_path):
         'CaO',
         'SiO2',
     ]
+    assert result.diagnostics['subprocess_input_guard']['resolved_fo2_path'] is None
+    assert result.diagnostics['subprocess_input_guard']['resolved_fo2_offset'] is None
 
 
 @pytest.mark.parametrize(
@@ -474,12 +478,12 @@ def test_cao_sio2_binary_refuses_before_launch_without_imposed_fo2(tmp_path):
         ),
     ),
 )
-def test_measured_fe_free_silicate_absolute_fo2_refuses_before_launch(
+def test_measured_fe_free_silicate_imposed_fo2_refuses_before_launch(
     tmp_path,
     label: str,
     moles: dict[str, float],
 ):
-    """SIGSEGV only when absolute fO2 is imposed. Not the alkali reason.
+    """SIGSEGV when an fO2 path is imposed. Not the alkali reason.
 
     mullite: shornikov-1994 / shults-1994, 34 rows.
     cas: stolyarova-1996, 142 rows.
@@ -493,8 +497,8 @@ def test_measured_fe_free_silicate_absolute_fo2_refuses_before_launch(
     assert not marker.exists()
     assert result.status == 'not_converged'
     reason = _crash_reason(
-        'ALPHAMELTS_REASON_FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH',
-        _FE_FREE_SILICATE_ABSOLUTE_FO2_CRASH,
+        'ALPHAMELTS_REASON_FE_FREE_SILICATE_IMPOSED_FO2_CRASH',
+        _FE_FREE_SILICATE_IMPOSED_FO2_CRASH,
     )
     assert result.diagnostics['backend_status_reason'] == reason
     assert result.diagnostics['backend_status_reason'] != (
@@ -502,7 +506,9 @@ def test_measured_fe_free_silicate_absolute_fo2_refuses_before_launch(
     )
     assert result.diagnostics['backend_failure_category'] == 'engine_crash'
     guard = result.diagnostics['subprocess_input_guard']
-    assert guard['predicate'] == 'fe_free_silicate_and_imposed_absolute_fo2'
+    assert guard['predicate'] == 'fe_free_silicate_and_imposed_fo2'
+    assert guard['resolved_fo2_path'] == 'Absolute'
+    assert guard['resolved_fo2_offset'] == -9.0
     assert guard['measured_signal'] == 'SIGSEGV'
     assert guard['not_the_predicate'] == 'no_Fe'
     assert guard['active_components'] == sorted(moles)
@@ -650,6 +656,29 @@ def test_resolved_buffer_on_measured_fe_free_silicate_refuses_before_launch(
     assert guard['resolved_fo2_path'] == resolved_path
     assert guard['resolved_fo2_offset'] == 0.0
     assert guard['measured_signal'] == 'SIGSEGV'
+
+
+def test_resolved_buffer_on_cao_sio2_stays_cao_sio2_crash(tmp_path):
+    """CaO-SiO2 dies with a resolved buffer too. Invalid fO2 still raises first."""
+    backend, marker = _marker_backend(tmp_path)
+    backend._redox_buffer = 'QFM'
+    backend._fo2_offset = 0.0
+
+    result = _equilibrate_kg(
+        backend,
+        {'CaO': 0.5, 'SiO2': 0.5},
+        fO2_log=-9.0,
+    )
+
+    assert not marker.exists()
+    assert result.diagnostics['backend_status_reason'] == _crash_reason(
+        'ALPHAMELTS_REASON_CAO_SIO2_BINARY_CRASH',
+        _CAO_SIO2_BINARY_CRASH,
+    )
+    guard = result.diagnostics['subprocess_input_guard']
+    assert guard['resolved_fo2_path'] == 'FMQ'
+    assert guard['resolved_fo2_offset'] == 0.0
+    assert guard['independent_of_imposed_fo2'] is True
 
 
 def _qualification_handle(tmp_path: Path):
