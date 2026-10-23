@@ -388,10 +388,9 @@ def _analytical_vapor_pressures_from_activities(
             A, B, C = _read_antoine_coefficients(antoine)
         except _AntoineCoefficientRefusal as exc:
             if not _is_missing_antoine_intercept(exc):
-                _raise_invalid_antoine_coefficient(
+                _raise_invalid_antoine_for_volatility_diagnostic(
                     exc,
                     species=str(species),
-                    field="P_reference_Antoine_Pa",
                 )
             _append_antoine_skip_notice(
                 warnings,
@@ -527,10 +526,9 @@ def _analytical_vapor_pressures_from_activities(
             A, B, C = _read_antoine_coefficients(antoine)
         except _AntoineCoefficientRefusal as exc:
             if not _is_missing_antoine_intercept(exc):
-                _raise_invalid_antoine_coefficient(
+                _raise_invalid_antoine_for_volatility_diagnostic(
                     exc,
                     species=str(species),
-                    field="P_reference_Antoine_Pa",
                 )
             _append_antoine_skip_notice(
                 warnings,
@@ -960,6 +958,20 @@ def _finite_number(value: float, *, species: str, field: str) -> float:
             f"species={species} field={field} value={value!r}"
         )
     return numeric
+
+
+def _raise_invalid_antoine_for_volatility_diagnostic(
+    refusal: _AntoineCoefficientRefusal,
+    *,
+    species: str,
+) -> None:
+    if refusal.invalid_kind == "nonfinite":
+        _raise_invalid_antoine_coefficient(
+            refusal,
+            species=species,
+            field="P_reference_Antoine_Pa",
+        )
+    raise ValueError(str(refusal)) from refusal
 
 
 def _pow10(log10_value: float, *, species: str) -> float:

@@ -6010,6 +6010,7 @@ def _antoine_psat_pa(
             exc.input_category,
         ) from exc
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
+    # Pinned by test_coating_rate::test_unavailable_wall_saturation_does_not_hide_invalid_input.
     if T_K <= 0.0 or A <= 0.0:
         raise DepositionInputRefusal(
             coefficient_block,
