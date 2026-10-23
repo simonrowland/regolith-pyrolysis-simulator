@@ -7,7 +7,7 @@ source:
   year: 1958
 extraction:
   method: MinerU machine tables transcribed and checked against rendered PDF pages 5–6; comma decimals retained
-    as decimal points and printed pressure scale retained without multiplication
+    as decimal points; printed mantissas retained alongside scaled Torr values
   date: '2026-10-22'
   worker: codex-resume-85228-1792707932
   audit: Tabellen 1 and 3 each contain 18 data rows. Every temperature, pressure, experiment number and orifice
@@ -15,9 +15,7 @@ extraction:
     transcription. The standalone tools/mineru_table_draft.py (offer-21 line) compare reports 12 exact matches and
     24 comma-decimal mismatches; all 24
     mismatches were resolved against the PDF renders, and row/column assignments were checked against the renders.
-    The pressure column is printed p·10^4
-    [Torr], so the pressure cells below are preserved as printed and are not multiplied by 10^-4. The migrator lacks
-    a pressure field for this scaled printed form; numerical pressures remain typed-refused pending a schema token.
+    The pressure columns are printed p·10^4 [Torr]; pressure_as_printed retains each mantissa, while numeric P/value fields apply the printed 10^-4 scale and migrate through the existing Torr conversion.
     The SiO orifice area is kept per point as printed. Figure 5 is figure-only and excluded.
 review_status: draft
 fidelity_samples:
@@ -42,24 +40,20 @@ species:
         table: '1'
         pdf_page: 5
       phase: gas
-      units: p·10^4 [Torr] as printed; T [K]
+      units: Torr
       values:
         quantity: p_sat
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: typed_refusal
         gas_species: SiO
         condensed_phase_as_published: solid SiO body, amorphous
         condensed_phase_note: The paper states that the SiO body partly decomposes back into Si + SiO2 at the evaporation
           temperatures (p. 13, footnote 4).
-        pressure_scale_as_published: p·10^4 [Torr] (stored values must be multiplied by 10^-4 Torr to obtain p)
-        refusal_reason: No migrator/schema token represents a pressure value with the printed 10^-4 Torr scale;
-          pressure is retained verbatim and not pre-multiplied.
-        status: typed_refusal
+        pressure_scale_as_published: p·10^4 [Torr]; numeric Torr value equals printed mantissa × 10^-4
         points:
         - experiment_number: '1'
           T_K: 1468
-          P: 1300.0
+          P: 0.1300
           pressure_as_printed: '1300'
           orifice_area_as_printed: '4.1'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -88,10 +82,10 @@ species:
             table: '1'
             note: Versuch 1
             pdf_page: 5
-          value: 1300.0
+          value: 0.1300
         - experiment_number: '2'
           T_K: 1520
-          P: 3690.0
+          P: 0.3690
           pressure_as_printed: '3690'
           orifice_area_as_printed: '4.1'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -120,10 +114,10 @@ species:
             table: '1'
             note: Versuch 2
             pdf_page: 5
-          value: 3690.0
+          value: 0.3690
         - experiment_number: '3'
           T_K: 1307
-          P: 22.4
+          P: 0.00224
           pressure_as_printed: '22.4'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -152,10 +146,10 @@ species:
             table: '1'
             note: Versuch 3
             pdf_page: 5
-          value: 22.4
+          value: 0.00224
         - experiment_number: '7'
           T_K: 1329
-          P: 41.0
+          P: 0.00410
           pressure_as_printed: '41.0'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -184,10 +178,10 @@ species:
             table: '1'
             note: Versuch 7
             pdf_page: 5
-          value: 41.0
+          value: 0.00410
         - experiment_number: '6'
           T_K: 1339
-          P: 50.7
+          P: 0.00507
           pressure_as_printed: '50.7'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -216,10 +210,10 @@ species:
             table: '1'
             note: Versuch 6
             pdf_page: 5
-          value: 50.7
+          value: 0.00507
         - experiment_number: '8'
           T_K: 1359
-          P: 89.0
+          P: 0.00890
           pressure_as_printed: '89.0'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -248,10 +242,10 @@ species:
             table: '1'
             note: Versuch 8
             pdf_page: 5
-          value: 89.0
+          value: 0.00890
         - experiment_number: '4'
           T_K: 1366
-          P: 110.0
+          P: 0.0110
           pressure_as_printed: '110'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -280,10 +274,10 @@ species:
             table: '1'
             note: Versuch 4
             pdf_page: 5
-          value: 110.0
+          value: 0.0110
         - experiment_number: '5'
           T_K: 1392
-          P: 195.0
+          P: 0.0195
           pressure_as_printed: '195'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -312,10 +306,10 @@ species:
             table: '1'
             note: Versuch 5
             pdf_page: 5
-          value: 195.0
+          value: 0.0195
         - experiment_number: '9'
           T_K: 1419
-          P: 377.0
+          P: 0.0377
           pressure_as_printed: '377'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -344,10 +338,10 @@ species:
             table: '1'
             note: Versuch 9
             pdf_page: 5
-          value: 377.0
+          value: 0.0377
         - experiment_number: '10'
           T_K: 1439
-          P: 632.0
+          P: 0.0632
           pressure_as_printed: '632'
           orifice_area_as_printed: '17.6'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -376,10 +370,10 @@ species:
             table: '1'
             note: Versuch 10
             pdf_page: 5
-          value: 632.0
+          value: 0.0632
         - experiment_number: '17'
           T_K: 1202
-          P: 0.98
+          P: 0.000098
           pressure_as_printed: '0.98'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -408,10 +402,10 @@ species:
             table: '1'
             note: Versuch 17
             pdf_page: 5
-          value: 0.98
+          value: 0.000098
         - experiment_number: '15'
           T_K: 1245
-          P: 3.44
+          P: 0.000344
           pressure_as_printed: '3.44'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -440,10 +434,10 @@ species:
             table: '1'
             note: Versuch 15
             pdf_page: 5
-          value: 3.44
+          value: 0.000344
         - experiment_number: '16'
           T_K: 1249
-          P: 4.35
+          P: 0.000435
           pressure_as_printed: '4.35'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -472,10 +466,10 @@ species:
             table: '1'
             note: Versuch 16
             pdf_page: 5
-          value: 4.35
+          value: 0.000435
         - experiment_number: '18'
           T_K: 1257
-          P: 5.26
+          P: 0.000526
           pressure_as_printed: '5.26'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -504,10 +498,10 @@ species:
             table: '1'
             note: Versuch 18
             pdf_page: 5
-          value: 5.26
+          value: 0.000526
         - experiment_number: '14'
           T_K: 1303
-          P: 23.2
+          P: 0.00232
           pressure_as_printed: '23.2'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -536,10 +530,10 @@ species:
             table: '1'
             note: Versuch 14
             pdf_page: 5
-          value: 23.2
+          value: 0.00232
         - experiment_number: '11'
           T_K: 1309
-          P: 20.7
+          P: 0.00207
           pressure_as_printed: '20.7'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -568,10 +562,10 @@ species:
             table: '1'
             note: Versuch 11
             pdf_page: 5
-          value: 20.7
+          value: 0.00207
         - experiment_number: '12'
           T_K: 1335
-          P: 44.1
+          P: 0.00441
           pressure_as_printed: '44.1'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -600,10 +594,10 @@ species:
             table: '1'
             note: Versuch 12
             pdf_page: 5
-          value: 44.1
+          value: 0.00441
         - experiment_number: '13'
           T_K: 1361
-          P: 99.0
+          P: 0.00990
           pressure_as_printed: '99.0'
           orifice_area_as_printed: '58.5'
           orifice_area_unit_as_printed: 10^-3 cm^2
@@ -632,8 +626,81 @@ species:
             table: '1'
             note: Versuch 13
             pdf_page: 5
-          value: 99.0
-      admission_status: typed_refusal
+          value: 0.00990
+    - observation_id: gunther_1958_table2_cc_schaefer_hoernle
+      type: psat_series
+      locator: {page: 5, published_page: 13, table: '2', note: 'SCHÄFER u. HÖRNLE [9]'}
+      units: 'log p = A − B/T'
+      values:
+        quantity: p_sat
+        gas_species: SiO
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: SCHÄFER u. HÖRNLE [9]
+        printed_equation: 'log p = A − B/T'
+        source_form: log10(P_Torr) = A - B/T_K
+        coefficients: {A: 11.00, B: 16800}
+    - observation_id: gunther_1958_table2_cc_geld_kochnev
+      type: psat_series
+      locator: {page: 5, published_page: 13, table: '2', note: 'GELD u. KOCHNEV [10]'}
+      units: 'log p = A − B/T'
+      values:
+        quantity: p_sat
+        gas_species: SiO
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: GELD u. KOCHNEV [10]
+        printed_equation: 'log p = A − B/T'
+        source_form: log10(P_Torr) = A - B/T_K
+        coefficients: {A: 10.203, B: 16660}
+    - observation_id: gunther_1958_table2_cc_tombs_welch
+      type: psat_series
+      locator: {page: 5, published_page: 13, table: '2', note: 'TOMBS u. WELCH [11]'}
+      units: 'log p = A − B/T'
+      values:
+        quantity: p_sat
+        gas_species: SiO
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: TOMBS u. WELCH [11]
+        printed_equation: 'log p = A − B/T'
+        source_form: log10(P_Torr) = A - B/T_K
+        coefficients: {A: 8.42, B: 12730}
+    - observation_id: gunther_1958_table2_cc_own_measurements
+      type: psat_series
+      locator: {page: 5, published_page: 13, table: '2', note: eigene Messungen}
+      units: 'log p = A − B/T'
+      derived_from: &gunther_table1_fit_inputs
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1202:h=dda5816b8684
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1245:h=97e2f285ca8c
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1249:h=06f7191be88f
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1257:h=35a0ba1d89e0
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1303:h=9ce8515c602f
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1307:h=8a92fc0efbfe
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1309:h=49dad1f4430a
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1329:h=fbdbe77d66a6
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1335:h=1a17a17d4645
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1339:h=8045832a3cbb
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1359:h=9dbfa726ff97
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1361:h=a09f2236937d
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1366:h=8f1dce45772f
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1392:h=07471acdd826
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1419:h=a85dbc1a7f86
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1439:h=857f24ac46d1
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1468:h=4e1b9b9c6a34
+      - gunther-1958-vapor-pressure-evaporation::gunther_1958_table1_sio_pressure::T=1520:h=664d7f3ab835
+      values:
+        quantity: p_sat
+        gas_species: SiO
+        method_class: model_derived
+        evidence_class: model_derived
+        printed_equation: 'log p = A − B/T'
+        source_form: log10(P_Torr) = A - B/T_K
+        coefficients: {A: 13.28, B: 20800}
+        derivation:
+          relation: authors_clausius_clapeyron_fit_of_table_1_sio_vapor_pressure
+          inputs: *gunther_table1_fit_inputs
+          output_unit: A and B coefficients in the printed logarithmic pressure equation
   B2O3:
     observations:
     - observation_id: gunther_1958_table3_b2o3_pressure
@@ -646,23 +713,19 @@ species:
         table: '3'
         pdf_page: 6
       phase: gas
-      units: p·10^4 [Torr] as printed; T [K]
+      units: Torr
       values:
         quantity: p_sat
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: typed_refusal
         gas_species: B2O3
         condensed_phase_as_published: B2O3 body
-        pressure_scale_as_published: p·10^4 [Torr] (stored values must be multiplied by 10^-4 Torr to obtain p)
-        refusal_reason: No migrator/schema token represents a pressure value with the printed 10^-4 Torr scale;
-          pressure is retained verbatim and not pre-multiplied.
+        pressure_scale_as_published: p·10^4 [Torr]; numeric Torr value equals printed mantissa × 10^-4
         orifice_area_as_published: 17.6·10^-3 cm^2
-        status: typed_refusal
         points:
         - experiment_number: '10'
           T_K: 1268
-          P: 1.42
+          P: 0.000142
           pressure_as_printed: '1.42'
           point_conditions:
             temperature_K:
@@ -689,10 +752,10 @@ species:
             table: '3'
             note: Versuch 10
             pdf_page: 6
-          value: 1.42
+          value: 0.000142
         - experiment_number: '18'
           T_K: 1273
-          P: 1.63
+          P: 0.000163
           pressure_as_printed: '1.63'
           point_conditions:
             temperature_K:
@@ -719,10 +782,10 @@ species:
             table: '3'
             note: Versuch 18
             pdf_page: 6
-          value: 1.63
+          value: 0.000163
         - experiment_number: '9'
           T_K: 1300
-          P: 3.56
+          P: 0.000356
           pressure_as_printed: '3.56'
           point_conditions:
             temperature_K:
@@ -749,10 +812,10 @@ species:
             table: '3'
             note: Versuch 9
             pdf_page: 6
-          value: 3.56
+          value: 0.000356
         - experiment_number: '17'
           T_K: 1313
-          P: 4.75
+          P: 0.000475
           pressure_as_printed: '4.75'
           point_conditions:
             temperature_K:
@@ -779,10 +842,10 @@ species:
             table: '3'
             note: Versuch 17
             pdf_page: 6
-          value: 4.75
+          value: 0.000475
         - experiment_number: '11'
           T_K: 1348
-          P: 13.4
+          P: 0.00134
           pressure_as_printed: '13.4'
           point_conditions:
             temperature_K:
@@ -809,10 +872,10 @@ species:
             table: '3'
             note: Versuch 11
             pdf_page: 6
-          value: 13.4
+          value: 0.00134
         - experiment_number: '8'
           T_K: 1350
-          P: 9.65
+          P: 0.000965
           pressure_as_printed: '9.65'
           point_conditions:
             temperature_K:
@@ -839,10 +902,10 @@ species:
             table: '3'
             note: Versuch 8
             pdf_page: 6
-          value: 9.65
+          value: 0.000965
         - experiment_number: '16'
           T_K: 1368
-          P: 16.4
+          P: 0.00164
           pressure_as_printed: '16.4'
           point_conditions:
             temperature_K:
@@ -869,10 +932,10 @@ species:
             table: '3'
             note: Versuch 16
             pdf_page: 6
-          value: 16.4
+          value: 0.00164
         - experiment_number: '12'
           T_K: 1382
-          P: 33.3
+          P: 0.00333
           pressure_as_printed: '33.3'
           point_conditions:
             temperature_K:
@@ -899,10 +962,10 @@ species:
             table: '3'
             note: Versuch 12
             pdf_page: 6
-          value: 33.3
+          value: 0.00333
         - experiment_number: '1'
           T_K: 1388
-          P: 21.6
+          P: 0.00216
           pressure_as_printed: '21.6'
           point_conditions:
             temperature_K:
@@ -929,10 +992,10 @@ species:
             table: '3'
             note: Versuch 1
             pdf_page: 6
-          value: 21.6
+          value: 0.00216
         - experiment_number: '7'
           T_K: 1418
-          P: 35.3
+          P: 0.00353
           pressure_as_printed: '35.3'
           point_conditions:
             temperature_K:
@@ -959,10 +1022,10 @@ species:
             table: '3'
             note: Versuch 7
             pdf_page: 6
-          value: 35.3
+          value: 0.00353
         - experiment_number: '15'
           T_K: 1433
-          P: 66.8
+          P: 0.00668
           pressure_as_printed: '66.8'
           point_conditions:
             temperature_K:
@@ -989,10 +1052,10 @@ species:
             table: '3'
             note: Versuch 15
             pdf_page: 6
-          value: 66.8
+          value: 0.00668
         - experiment_number: '2'
           T_K: 1453
-          P: 67.1
+          P: 0.00671
           pressure_as_printed: '67.1'
           point_conditions:
             temperature_K:
@@ -1019,10 +1082,10 @@ species:
             table: '3'
             note: Versuch 2
             pdf_page: 6
-          value: 67.1
+          value: 0.00671
         - experiment_number: '13'
           T_K: 1468
-          P: 129.0
+          P: 0.0129
           pressure_as_printed: '129'
           point_conditions:
             temperature_K:
@@ -1049,10 +1112,10 @@ species:
             table: '3'
             note: Versuch 13
             pdf_page: 6
-          value: 129.0
+          value: 0.0129
         - experiment_number: '6'
           T_K: 1498
-          P: 186.0
+          P: 0.0186
           pressure_as_printed: '186'
           point_conditions:
             temperature_K:
@@ -1079,10 +1142,10 @@ species:
             table: '3'
             note: Versuch 6
             pdf_page: 6
-          value: 186.0
+          value: 0.0186
         - experiment_number: '3'
           T_K: 1510
-          P: 177.0
+          P: 0.0177
           pressure_as_printed: '177'
           point_conditions:
             temperature_K:
@@ -1109,10 +1172,10 @@ species:
             table: '3'
             note: Versuch 3
             pdf_page: 6
-          value: 177.0
+          value: 0.0177
         - experiment_number: '14'
           T_K: 1533
-          P: 384.0
+          P: 0.0384
           pressure_as_printed: '384'
           point_conditions:
             temperature_K:
@@ -1139,10 +1202,10 @@ species:
             table: '3'
             note: Versuch 14
             pdf_page: 6
-          value: 384.0
+          value: 0.0384
         - experiment_number: '4'
           T_K: 1560
-          P: 436.0
+          P: 0.0436
           pressure_as_printed: '436'
           point_conditions:
             temperature_K:
@@ -1169,10 +1232,10 @@ species:
             table: '3'
             note: Versuch 4
             pdf_page: 6
-          value: 436.0
+          value: 0.0436
         - experiment_number: '5'
           T_K: 1593
-          P: 845.0
+          P: 0.0845
           pressure_as_printed: '845'
           point_conditions:
             temperature_K:
@@ -1199,5 +1262,4 @@ species:
             table: '3'
             note: Versuch 5
             pdf_page: 6
-          value: 845.0
-      admission_status: typed_refusal
+          value: 0.0845
