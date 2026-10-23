@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+      value: 0d5432dcaaffdcae3d879cde3559857d827c63f3
     files:
     - asset_id: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
       role: pdf
@@ -17,6 +17,12 @@ work:
       sha256:
         tag: value
         value: a3e15c6ca6f3f644c04faddddebc6387c965309768725d5586200ca1e6132ee9
+    - asset_id: pdftotext:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdftotext
+      path: text/seki-2011-ca-o-solubility-fe-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:seki-2011-ca-o-solubility-fe-cao-al2o3
       role: pdftotext
       path: unknown

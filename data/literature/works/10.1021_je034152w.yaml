@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+      value: 0d5432dcaaffdcae3d879cde3559857d827c63f3
     files:
+    - asset_id: pdf:ferguson-2004-iron-vapor-pressure
+      role: pdf
+      path: raw/ferguson-2004-iron-vapor-pressure/ferguson-2004-iron-vapor-pressure.pdf
+      sha256:
+        tag: value
+        value: d03caf212ba5c8c3bbe602d006ac882e8797c49c7a29739ebe1033d6687910a5
+    - asset_id: pdftotext:ferguson-2004-iron-vapor-pressure
+      role: pdftotext
+      path: text/ferguson-2004-iron-vapor-pressure
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:ferguson-2004-iron-vapor-pressure
       role: pdftotext
       path: unknown
