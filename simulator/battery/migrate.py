@@ -16095,7 +16095,9 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
-        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION and _is_printed_phase_row(
+            q_token, values
+        ):
             # A closed phase basis was already stored by the phase-row reader.
             # Do not replace it with the equilibrium-ratio unknown fallback.
             published = values.get("basis_as_published")
@@ -16489,6 +16491,43 @@ class Migrator:
                     **(point_conditions or {}),
                     **explicit_conditions,
                 }
+        if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            experiment = self.result.experiments.get(experiment_id)
+            printed = (
+                experiment.sample.printed_composition
+                if experiment is not None
+                else None
+            )
+            if (
+                printed is not None
+                and printed.state.is_value
+                and isinstance(printed.state.value, Mapping)
+            ):
+                components = tuple(
+                    (str(formula), amount)
+                    for formula, raw_amount in printed.state.value.items()
+                    if (amount := _as_dec_or_none(raw_amount)) is not None
+                )
+                current_composition = ident_kwargs.get("composition")
+                if components and "composition" not in (point_conditions or {}) and not (
+                    isinstance(current_composition, State)
+                    and current_composition.is_value
+                ):
+                    # The run's printed phase vector is identity context, not
+                    # an inferred starting charge or a second scored value.
+                    composition = Composition(
+                        basis="printed_phase_composition",
+                        components=components,
+                        amount_basis=AmountBasis.MASS_PERCENT,
+                    )
+                    located_composition = Located(
+                        State.of(composition), locator=printed.locator
+                    )
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "composition": located_composition,
+                    }
+                    ident_kwargs["composition"] = State.of(composition)
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
