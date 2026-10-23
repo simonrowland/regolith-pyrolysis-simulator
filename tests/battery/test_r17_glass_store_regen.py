@@ -6,8 +6,8 @@ quoted, but did not regenerate ``observations-v2``. Store consumers
 (``load_migrated_store``) still saw ``phase.value=l`` on all 128
 ``transition_temperature:glass-liquid`` tables (R17 P1).
 
-These tests pin the committed store: those series are unknown (never ``l``),
-Mg-013 / W-003 quote their printed markers, and no migrate-input commit is
+These landing-gate tests pin the regenerated committed store. Those series
+are unknown (never ``l``), Mg-013 / W-003 quote their printed markers, and no migrate-input commit is
 newer than the last store-output touch (STALE half of
 ``check_store_freshness``). Generator-only coverage stays in
 ``test_janaf_generator.py``.
@@ -136,11 +136,14 @@ def test_committed_store_mg013_and_w003_quote_printed_glass_markers() -> None:
 
 
 def test_committed_store_has_no_stale_migrate_input_commits() -> None:
-    """Reject unacknowledged post-regen migrate-input commits."""
+    """At the train gate, reject unacknowledged post-regen migrate inputs.
+
+    Offers may report stale before the train regen under d-255.
+    """
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
     freshness = _load_freshness()
-    neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
+    neutral = freshness.store_neutral_input_commits("HEAD")
     require_git_history(REPO_ROOT, *sorted(neutral))
     for revision in neutral:
         if subprocess.run(
@@ -228,3 +231,16 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     stale = freshness.stale_input_commits(head, last_store)
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
     assert any("950c88655" in k for k in stale), stale
+
+
+def test_train_ack_files_are_read_from_the_checked_tree(monkeypatch) -> None:
+    freshness = _load_freshness()
+    monkeypatch.setattr(
+        freshness,
+        "_git",
+        lambda *args: "scripts/store_neutral_acks/123456789abcdef.txt\n"
+        "scripts/store_neutral_acks/README.md\n",
+    )
+    neutral = freshness.store_neutral_input_commits("gate-tip")
+    assert "123456789" in neutral
+    assert "README" not in neutral

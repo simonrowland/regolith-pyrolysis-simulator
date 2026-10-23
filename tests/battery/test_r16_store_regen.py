@@ -6,8 +6,8 @@ printed per-run log fO2 (``d4f91337f``) and migrate hardenings (``22cf80906``,
 (``load_migrated_store``, readiness, score) read the committed extracts-v2,
 so the tip advertised landings that readiness never saw.
 
-These tests pin the committed store: the four fO2 source stems carry
-``fO2_log`` in extracts-v2, and no migrate-input commit is newer than the
+These landing-gate tests pin the regenerated committed store. The four fO2
+source stems carry ``fO2_log`` in extracts-v2, and no migrate-input commit is newer than the
 last store-output touch (the STALE half of ``check_store_freshness``).
 UNTRACED extracts (no v2 sibling and no queue entry) are out of scope —
 they predate this series' fo2 hole.
@@ -92,8 +92,9 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     """No migrate-input commit may land after the last store-output touch.
 
     Mirrors the STALE half of ``scripts/check_store_freshness.py`` so a
-    mid-series regen followed by extract/migrate edits without a tip regen
-    fails in CI. Does not assert UNTRACED (pre-existing, out of R16 P1).
+    train regen followed by extract/migrate edits without another gate regen
+    fails in CI. Offers may be stale before this gate regen under d-255.
+    Does not assert UNTRACED (pre-existing, out of R16 P1).
     """
     freshness = _load_freshness()
     head = _git("rev-parse", "HEAD").strip()

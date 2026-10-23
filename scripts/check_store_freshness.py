@@ -8,8 +8,13 @@ cheap half of that assertion: it finds the newest commit that touched store
 outputs and fails if any later commit touched migrate inputs.
 
 It cannot prove byte equality — that needs a full regen + diff (minutes,
-nightly-tier). It proves two cheaper facts: nobody changed an input and walked
-away without touching the store, and no extract silently lacks a store trace.
+nightly-tier). At the train gate, run it after the batch regen: it proves two
+cheaper facts, that no unacknowledged input changed after the store and no
+extract silently lacks a store trace. Under d-255, offers carry extracts and
+code without regenerated store outputs, so an offer with migrate-input changes
+is expected to report STALE before the train gate. The train regenerates once
+per batch and records fixed-point store-neutral inputs under
+scripts/store_neutral_acks/.
 
 Exit 0: store is at least as new as every migrate input, and every extract
 has an extracts-v2 sibling or a migration-queue entry.
@@ -58,7 +63,7 @@ CODE_INPUTS = (
 )
 
 
-# Migrate-input commits that are PROVEN store-neutral: a full regen on a tree
+# Historical migrate-input commits that are PROVEN store-neutral: a full regen on a tree
 # containing them leaves every STORE_OUTPUT byte-identical, so no regen commit
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
@@ -219,6 +224,26 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
 })
 
 
+def store_neutral_input_commits(head: str) -> frozenset[str]:
+    """Return historical receipts plus train ack filenames present at ``head``.
+
+    d-255 records new fixed-point acknowledgements as
+    ``scripts/store_neutral_acks/<sha>.txt``. Their filenames identify the
+    migrate-input commits; the files themselves cite the gate regen evidence.
+    """
+    paths = _git(
+        "ls-tree", "-r", "--name-only", head, "--", "scripts/store_neutral_acks"
+    ).splitlines()
+    recorded = {
+        Path(path).stem[:9]
+        for path in paths
+        if path.startswith("scripts/store_neutral_acks/")
+        and Path(path).suffix == ".txt"
+        and len(Path(path).stem) >= 9
+    }
+    return STORE_NEUTRAL_INPUT_COMMITS | recorded
+
+
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
@@ -283,7 +308,8 @@ def _untraced_extracts(head: str) -> list[str]:
 
 def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
     """Migrate-input commits after the last store-output commit, keyed
-    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
+    "<sha9> <subject>", minus recorded store-neutral receipts."""
+    neutral_commits = store_neutral_input_commits(head)
     stale: dict[str, list[str]] = {}
     log = _git(
         "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
@@ -297,7 +323,7 @@ def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
         elif (
             line.strip()
             and commit is not None
-            and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
+            and commit[:9] not in neutral_commits
             and _is_input(line.strip())
         ):
             stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
@@ -329,8 +355,11 @@ def main(argv: list[str] | None = None) -> int:
         for title, paths in stale.items():
             sample = ", ".join(paths[:3]) + (" ..." if len(paths) > 3 else "")
             print(f"  {title}\n    {sample}")
-        print("regenerate: .venv/bin/python scripts/battery_migrate.py && "
-              "data/literature/build_index.py --write-store-summary")
+        print("d-255: offers intentionally omit regenerated store outputs, so this is the "
+              "expected pre-gate state when offer commits change migrate inputs. The train "
+              "regenerates once per batch; if stale remains after regen, investigate the "
+              "gate result. For fixed-point inputs, the train records "
+              "scripts/store_neutral_acks/<sha>.txt citing the regen.")
     if untraced:
         print(f"UNTRACED: {len(untraced)} extract(s) have no extracts-v2 sibling and "
               "no migration-queue entry:")
