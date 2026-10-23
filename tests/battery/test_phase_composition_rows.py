@@ -49,6 +49,7 @@ from simulator.battery.score import (
     ScoreContext,
     _ScorePayloadAccumulator,
     _alignment_axes,
+    _phase_component_reference_wt_percent,
     _residual_engine_observable,
     compute_metric,
     metric_operation_for_identity,
@@ -77,6 +78,19 @@ SULFIDE_EXPONENT_ON_CHLORIDE = (
 )
 T_C = 1400
 P_O2_PA = 10
+
+
+def test_mass_ppm_phase_reference_converts_to_wt_percent() -> None:
+    identity = _phase_identity(
+        "O",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="element_ppm_by_mass",
+    )
+    assert _phase_component_reference_wt_percent(identity, Decimal("250")) == Decimal("0.025")
+    assert _phase_component_reference_wt_percent(
+        replace(identity, subtype=State.of("wt_percent")), Decimal("250")
+    ) == Decimal("250")
 
 
 def _located(value: object, *, table: str, page: int) -> dict:
