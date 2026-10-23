@@ -287,14 +287,20 @@ def resolve_collector_bands_C(
 
 def _validate_collection_commands(setpoints: Mapping[str, Any]) -> None:
     """Complete recipe files declare each campaign and substage's diverter."""
+    from simulator.condensation_routing import STAGE3_PURITY_FIELDS, validate_stage3_purity
+    for field in STAGE3_PURITY_FIELDS:
+        validate_stage3_purity(setpoints.get('condensation_train', {}).get(field), field)
     bypass = setpoints.get('condensation_train', {}).get('stage3_bypass')
     required = ('liner_material', 'length_m', 'inner_diameter_m', 'wall_temperature_C')
     if not isinstance(bypass, Mapping) or any(key not in bypass for key in required):
         from simulator.recipe_errors import MalformedRecipeError
         raise MalformedRecipeError('missing required stage3_bypass equipment inputs')
     for phase, cfg in setpoints.get('campaigns', {}).items():
-        if not isinstance(cfg, Mapping) or 'temp_range_C' not in cfg:
+        if not isinstance(cfg, Mapping):
             continue
+        for field in STAGE3_PURITY_FIELDS:
+            if field in cfg:
+                validate_stage3_purity(cfg[field], field)
         commands = [(phase, cfg)]
         commands.extend((f'{phase}.{name}', cfg[name])
                         for name in ('Na_phase', 'K_phase') if name in cfg)

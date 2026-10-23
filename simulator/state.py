@@ -837,7 +837,7 @@ class CondensationTrain:
     stages: List[CondensationStage] = field(default_factory=list)
 
     # Ideal isolation of both ends of the fused-silica cartridge.
-    collection_route: dict[str, str] = field(
+    collection_route: dict[str, Any] = field(
         default_factory=lambda: {"stage3_route": "divert"})
 
     @property

@@ -56,7 +56,9 @@ from simulator.backends import (
 from simulator.config import ConfigBundle, _load_setpoints_file, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import iron_oxide_values
-from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignManager, CampaignPressureSetpointRefusal, parse_campaign_override_value,
+)
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
@@ -5431,20 +5433,20 @@ def _parse_runtime_campaign_overrides_json(
     raw_json: str | None,
     *,
     flag_name: str,
-) -> dict[str, dict[str, float]] | None:
+) -> dict[str, dict[str, Any]] | None:
     if raw_json is None:
         return None
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise RunnerError(f"{flag_name} must decode to an object")
-    parsed: dict[str, dict[str, float]] = {}
+    parsed: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise RunnerError(
                 f"{flag_name}[{campaign!r}] must decode to an object"
             )
         parsed[str(campaign)] = {
-            str(field): float(value)
+            str(field): parse_campaign_override_value(str(field), value)
             for field, value in fields.items()
         }
     return parsed

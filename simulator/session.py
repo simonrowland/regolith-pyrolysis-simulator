@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-import math
 from typing import Any, Callable, Iterable, Mapping
 
 from simulator.backend_names import (
@@ -26,7 +25,9 @@ from simulator.backends import (
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
+from simulator.campaigns import parse_campaign_override_value
+from simulator.condensation_routing import STAGE3_PURITY_FIELDS
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.state import (
     DecisionPoint,
@@ -35,18 +36,6 @@ from simulator.state import (
     clamp_stir_factor,
     clamp_stir_state,
 )
-
-
-def _finite_float(value: Any, label: str) -> float:
-    try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        number = float(value)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"{label} must be numeric") from exc
-    if not math.isfinite(number):
-        raise ValueError(f"{label} must be finite")
-    return number
 
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
@@ -457,8 +446,8 @@ class SimSession:
                 if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
                     target[str(field_name)] = normalize_lab_schedule(value)
                 else:
-                    target[str(field_name)] = _finite_float(
-                        value,
+                    target[str(field_name)] = parse_campaign_override_value(
+                        str(field_name), value,
                         f"runtime_campaign_overrides[{campaign!r}].{field_name}",
                     )
 
@@ -595,15 +584,7 @@ class SimSession:
                 raise ValueError(
                     "campaign_override requires campaign and field keywords"
                 )
-            if field_name == "stage3_route":
-                from simulator.condensation_routing import STAGE3_ROUTES
-                sim.campaign_mgr._refuse_unknown_override_fields(
-                    campaign_name, {field_name: value})
-                if value not in STAGE3_ROUTES:
-                    raise ValueError("stage3_route must be divert or through")
-                sim.campaign_mgr.overrides.setdefault(campaign_name, {})[field_name] = value
-                sim.campaign_mgr.apply_collection_route(sim.melt, sim.train)
-            elif field_name == "stir_factor":
+            if field_name == "stir_factor":
                 sim.campaign_mgr._refuse_unknown_override_fields(
                     campaign_name,
                     {field_name: value},
@@ -646,8 +627,8 @@ class SimSession:
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
             else:
-                finite_value = _finite_float(
-                    value,
+                finite_value = parse_campaign_override_value(
+                    field_name, value,
                     f"campaign_override {campaign_name}.{field_name}",
                 )
                 sim.campaign_mgr._refuse_unknown_override_fields(
@@ -658,6 +639,8 @@ class SimSession:
                     raise ValueError("pO2_mbar must be non-negative")
                 target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = finite_value
+            if field_name == "stage3_route" or field_name in STAGE3_PURITY_FIELDS:
+                sim.campaign_mgr.apply_collection_route(sim.melt, sim.train)
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 # 0.5.4 W5 (post-push P2 convergent finding, codex
                 # review + codex challenge 2026-05-28): mirror the

@@ -1995,14 +1995,18 @@ class CondensationRouteResult:
             for stage_species in self.condensed_by_stage_species.values()
         )
 
+    def silica_capture_kg(self, stage_number: int | None = None) -> float:
+        """SiO2 product from the existing 2SiO -> Si + SiO2 split."""
+        sio_condensed_kg = (self.condensed_for_species('SiO') if stage_number is None
+            else self.condensed_by_stage_species.get(stage_number, {}).get('SiO', 0.0))
+        return sio_condensed_kg * 0.5 * MOLAR_MASS['SiO2'] / MOLAR_MASS['SiO']
+
     def silica_fume_fraction_of_feedstock(self, feedstock_kg: float) -> float:
         """Return SiO-derived SiO2 condensate mass divided by feedstock mass."""
 
         if feedstock_kg <= 0.0:
             return 0.0
-        sio_condensed_kg = self.condensed_for_species('SiO')
-        sio_to_sio2 = 0.5 * MOLAR_MASS['SiO2'] / MOLAR_MASS['SiO']
-        return (sio_condensed_kg * sio_to_sio2) / feedstock_kg
+        return self.silica_capture_kg() / feedstock_kg
 
 
 class CondensationModel:
@@ -2695,54 +2699,86 @@ class CondensationModel:
                 for segment in self.pipe_segments
                 if segment.upstream_stage != 'stage_3']
 
-    def _admit_stage3_route(self, evap_flux: EvaporationFlux) -> None:
+    def _admit_stage3_route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        from simulator.condensation_routing import STAGE3_PURITY_FIELDS, validate_stage3_purity
         route = dict(self.train.collection_route)
         diagnostic: dict[str, Any] = {**route, 'findings': []}
         self.last_stage3_route_diagnostic = diagnostic
         if route['stage3_route'] == 'divert':
-            return
+            return self._route(evap_flux, melt)
         if route['stage3_route'] != 'through':
             raise DepositionInputRefusal('stage3_route', route, 'unknown route')
-        # Conservative zero-contact interlock, NOT an established SiO window.
-        # For 4Na(g)+O2 -> 2Na2O(silicate), Q=a_Na2O^2/(p_Na^4*pO2).
-        # Q<K implies pO2 > a_Na2O^2/(K*p_Na^4), ON at realistic pO2;
-        # pressures here are normalized to the same standard pressure as K.
-        # No dew-point or numerical-zero exception establishes safe contact.
-        # F_A=sum(a_i*n_dot_i): atom count a_i is dimensionless, mol/s of
-        # carrier gives mol alkali atoms/s. Zero incoming gives zero contact.
-        # Incoming supply is a conservative upper bound: proposed upstream
-        # capture can fail its committed floor, so cannot prove local zero.
+        purities = {field: validate_stage3_purity(route.get(field,
+            _CONFIG_BUNDLE.setpoints['condensation_train'][field]), field)
+            for field in STAGE3_PURITY_FIELDS}
+        # Conservative interim: until chunk 4 owns cumulative product purity
+        # and committed receipts, each parcel must meet p_product by itself.
+        # Chunk 4 then activates p_inst as the separate burst ceiling.
+        purity = purities['stage3_product_purity']
+        # Conservative reactive-sink interlock: 4Na(g)+O2 -> 2Na2O(silicate),
+        # Q<K when pO2 > a_Na2O^2/(K*p_Na^4), ON at realistic pO2 (same
+        # standard pressure as K). Credit only live Stage-3 SiO2 capture S.
+        # Purity P=S/(S+A) >= p gives A <= S*(1-p)/p. S and A are kg/h,
+        # on a SiO2 vs Na2O+K2O equivalent mass basis, not atomic alkali mass.
+        # Each two Na/K atoms supply one oxide formula unit. Retained mol are
+        # conservatively charged over this model's one-hour parcel interval.
+        # p -> 1 gives strict zero; S=0 gives zero allowance. Incoming alkali
+        # is an upper bound, without credit for uncommitted upstream removal.
         carriers = {}
         unknown = []
+        oxide_rate = 0.0
         for source, supplies in (('fresh_kg_hr', evap_flux.species_kg_hr),
                                  ('retained_mol', self.retained_vapor_mol)):
             for species, raw in supplies.items():
                 try:
+                    formula = resolve_species_formula(species, self.species_formula_registry)
+                    atoms = formula.elements.get('Na', 0) + formula.elements.get('K', 0)
+                    if not atoms:
+                        continue  # Known non-alkali roundoff is not alkali exposure.
                     amount = _finite_nonnegative_value(raw, label=species)
                     if amount == 0.0:
                         continue
-                    formula = resolve_species_formula(species, self.species_formula_registry)
-                    atoms = formula.elements.get('Na', 0) + formula.elements.get('K', 0)
-                    if atoms:
-                        record = carriers.setdefault(species, {})
-                        record[source] = amount
-                        if source == 'fresh_kg_hr':
-                            record['alkali_atom_mol_s'] = (
-                                atoms * amount / formula.molar_mass_kg_per_mol() / 3600.0)
-                        else:
-                            record['retained_alkali_atom_mol'] = atoms * amount
+                    mol_hr = (amount / formula.molar_mass_kg_per_mol()
+                              if source == 'fresh_kg_hr' else amount)
+                    equivalent_kg_hr = sum(
+                        formula.elements.get(atom, 0) * mol_hr * 0.5
+                        * resolve_species_formula(oxide, self.species_formula_registry).molar_mass_kg_per_mol()
+                        for atom, oxide in (('Na', 'Na2O'), ('K', 'K2O')))
+                    record = carriers.setdefault(species, {})
+                    record[source] = amount
+                    record['alkali_oxide_kg_hr'] = record.get('alkali_oxide_kg_hr', 0.0) + equivalent_kg_hr
+                    if source == 'fresh_kg_hr':
+                        record['alkali_atom_mol_s'] = atoms * mol_hr / 3600.0
+                    else:
+                        record['retained_alkali_atom_mol'] = atoms * amount
+                    oxide_rate += equivalent_kg_hr
                 except (ValueError, TypeError) as exc:
                     unknown.append({'species': species, 'source': source, 'detail': str(exc)})
-        if carriers or unknown:
-            finding = {
-                'key': 'silica_exposed_to_alkali', 'type': 'silica_exposed_to_alkali',
-                'carriers': carriers, 'unavailable': unknown,
-                'allowed_alkali_atom_mol_s': 0.0, **route,
-            }
+        # _route proposes allocation only; the ledger owner commits after this
+        # method returns. A refused proposal cannot deposit onto the cartridge.
+        result = (self._route(evap_flux, melt)
+                  if not unknown and evap_flux.species_kg_hr.get('SiO', 0.0) > 0.0
+                  else None)
+        silica_rate = result.silica_capture_kg(3) if result is not None else 0.0
+        allowed = silica_rate * (1.0 - purity) / purity
+        diagnostic.update({
+            **purities,
+            'effective_instantaneous_purity': purity,
+            'silica_capture_kg_hr': silica_rate,
+            'alkali_oxide_kg_hr': oxide_rate,
+            'allowed_alkali_oxide_kg_hr': allowed,
+            'capture_purity': silica_rate / (silica_rate + oxide_rate)
+                if silica_rate + oxide_rate > 0.0 else None,
+            'carriers': carriers, 'unavailable': unknown,
+        })
+        if oxide_rate > allowed or unknown:
+            finding = {**diagnostic,
+                'key': 'silica_exposed_to_alkali', 'type': 'silica_exposed_to_alkali'}
             diagnostic['findings'] = [finding]
             diagnostic['silica_exposed_to_alkali_findings'] = [finding]
             self.cold_spot_history.append(copy.deepcopy(diagnostic))
             raise Stage3SilicaExposureRefusal(diagnostic)
+        return result if result is not None else self._route(evap_flux, melt)
 
     def _build_default_pipe_segments(
         self,
@@ -2925,15 +2961,14 @@ class CondensationModel:
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """Route one flux batch with mutation-checked catalog reuse."""
-        self._admit_stage3_route(evap_flux)
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
-            return self._route(evap_flux, melt)
+            return self._admit_stage3_route(evap_flux, melt)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
         data._route_catalog = None
         try:
-            return self._route(evap_flux, melt)
+            return self._admit_stage3_route(evap_flux, melt)
         finally:
             if previous is missing:
                 del data._route_catalog

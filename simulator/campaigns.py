@@ -16,14 +16,14 @@ Each campaign has:
 
 from __future__ import annotations
 
-from simulator.condensation_routing import STAGE3_ROUTES
+from simulator.condensation_routing import STAGE3_ROUTES, STAGE3_PURITY_FIELDS, validate_stage3_purity
 
 import ast
 import math
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from simulator import mre_ladder
 from simulator.accounting import UnknownSpeciesError, resolve_species_formula
@@ -64,6 +64,21 @@ from simulator.state import (
     clamp_stir_factor,
     clamp_stir_state,
 )
+
+
+def parse_campaign_override_value(
+    field: str, value: Any, label: str | None = None,
+) -> float | str:
+    """Parse scalar override values at every runtime boundary by field type."""
+    from simulator.scalar_boundary import require_finite_float
+    if field == 'stage3_route':
+        if value not in STAGE3_ROUTES:
+            raise ValueError('stage3_route must be divert or through')
+        return value
+    if field in STAGE3_PURITY_FIELDS:
+        return validate_stage3_purity(value, field)
+    return require_finite_float(value, label or str(field))
+
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
 C2A_STAGED_DEPLETION_YIELD_FLOOR_MOL = 1.0e-12
@@ -379,6 +394,7 @@ class CampaignManager:
         'ramp_rate_C_per_hr',
         'setpoints',
         'stage3_route',
+        *STAGE3_PURITY_FIELDS,
         'stir_factor',
         'stir_state',
         'temperature_ramp_C_per_h',
@@ -1474,10 +1490,22 @@ class CampaignManager:
                 command = stage.get('stage3_route', command)
         ovr = self._campaign_overrides(campaign)
         command = ovr.get('stage3_route', command)
+        purity_defaults = {field: cfg.get(field,
+            self.setpoints['condensation_train'][field]) for field in STAGE3_PURITY_FIELDS}
+        # Literal reads keep both consumers visible to the override-field guard.
+        purities = {
+            'stage3_product_purity': ovr.get('stage3_product_purity',
+                purity_defaults['stage3_product_purity']),
+            'stage3_instantaneous_purity': ovr.get('stage3_instantaneous_purity',
+                purity_defaults['stage3_instantaneous_purity']),
+        }
+        purities = {field: validate_stage3_purity(value, field)
+                    for field, value in purities.items()}
         if command not in STAGE3_ROUTES:
             raise ValueError('stage3_route must be divert or through')
         train.collection_route = {
             'stage3_route': command,
+            **purities,
             'campaign': campaign.name,
             'substage': substage,
         }
