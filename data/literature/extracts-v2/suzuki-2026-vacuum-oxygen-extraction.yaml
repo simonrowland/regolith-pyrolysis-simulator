@@ -646,6 +646,16 @@ observations:
     section: Results
   read_from: unknown:suzuki-2026-vacuum-oxygen-extraction
   point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 9
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 8
+        section: Vacuum heating experiment
+        note: Total pressure is 10^-8 atm as printed.
     temperature_K:
       state:
         tag: value

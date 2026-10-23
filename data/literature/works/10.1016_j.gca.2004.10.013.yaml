@@ -1,0 +1,76 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2004.10.013
+  citation: Sutton, S. R., Karner, J., Papike, J., Delaney, J. S., Shearer, C., Newville, M., Eng, P., Rivers, M. & Dyar,
+    M. D. (2005), "Vanadium K edge XANES of synthetic and natural basaltic glasses and application to microscale oxygen barometry",
+    Geochimica et Cosmochimica Acta 69:2333-2348.
+  source_ids:
+  - sutton-2005-vanadium-xanes
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:sutton-2005-vanadium-xanes
+      role: pdf
+      path: raw/sutton-2005-vanadium-xanes/sutton-2005-vanadium-xanes.pdf
+      sha256:
+        tag: value
+        value: 63b72aca1a234b3eb0e6e770b7725c26cccc1e92005838d403d70fd7fd8ab65a
+    - asset_id: pdftotext:sutton-2005-vanadium-xanes
+      role: pdftotext
+      path: text/sutton-2005-vanadium-xanes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:sutton-2005-vanadium-xanes
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2004.10.013
+experiments:
+- experiment_id: 10.1016/j.gca.2004.10.013::sutton-2005-vanadium-xanes
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2004.10.013
+  locator:
+    published_page: 2339
+    pdf_page_index: 6
+    table: '2'
+  apparatus:
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: I = -153 + 199(V*) - 106(V*)^2 + 22.4(V*)^3; Schreiber calibration, Eq. 2
+        locator:
+          published_page: 2339
+          pdf_page_index: 6
+          table: '2'

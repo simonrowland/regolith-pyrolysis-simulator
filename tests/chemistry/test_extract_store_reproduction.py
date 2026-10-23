@@ -176,7 +176,10 @@ def test_store_yields_adopted_target_type_observations(
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
     # Offer19 store growth: 37 new KEMS extract files add 732 observations;
     # edits across existing KEMS extracts add a net 35 more (1133 -> 1900).
-    assert len(kems) == 1900
+    # Offer 20 adds 51 Richter 2007 Table 1 residue rate_series rows
+    # (kems-010-richter-2007, richter_2007_residue_table1_*). The aluminum
+    # quoted non-loss bound stays on species Al (1900 -> 1951).
+    assert len(kems) == 1951
     # Active KEMS source IDs grew from 45 to 81 (+36); source IDs and added
     # extract files are distinct counts (37 files were added).
     assert len({obs.source_id for obs in kems}) == 81
@@ -1787,14 +1790,16 @@ def test_coverage_ledger_is_observation_first_and_exact(
     # point counts. The rollup's “Extrapolated-alpha” label counts all
     # extrapolated findings: eight Fedkin SiO alpha/rate findings disappear
     # as model-fit duplicates, and one Si NBP finding resolves after 3e54afda8.
+    # Offer 20's 51 Richter Table 1 residue rows are skipped rate_hkl gaps
+    # (1996 -> 2047 observations, 1973 -> 2024 skipped, 1977 -> 2028 gap points).
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 1996
+    ) == 2047
     assert coverage["comparable"] == 23
-    assert coverage["skipped"] == 1973
+    assert coverage["skipped"] == 2024
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
     assert coverage["comparable_points"] == 34
-    assert coverage["gap_points"] == 1977
+    assert coverage["gap_points"] == 2028
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1820,7 +1825,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "alpha": (93, 4, 89, 14),
         "gibbs_table": (314, 0, 314, 0),
         "psat_series": (239, 1, 238, 2),
-        "rate_series": (754, 2, 752, 2),
+        "rate_series": (805, 2, 803, 2),
         "transition_point": (111, 15, 96, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
@@ -1835,7 +1840,7 @@ def test_coverage_ledger_is_observation_first_and_exact(
         "ordering_activity": (120, 0, 0),
         "ordering_bound": (163, 2, 2),
         "psat_series": (239, 1, 2),
-        "rate_hkl": (590, 0, 0),
+        "rate_hkl": (641, 0, 0),
         "relative_volatility": (1, 0, 0),
         "transition_point": (111, 15, 15),
     }

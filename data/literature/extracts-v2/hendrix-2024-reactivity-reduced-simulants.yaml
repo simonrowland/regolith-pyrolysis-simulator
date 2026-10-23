@@ -188,6 +188,226 @@ observations:
     table: '1'
     section: Lunar Simulants Used in this Study
   read_from: pdf:hendrix-2024-reactivity-reduced-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5019273754959485256059605166'
+          - - TiO2
+            - '0.0151204859576503122933284367'
+          - - Al2O3
+            - '0.1145970381214175396205240754'
+          - - FeO
+            - '0.1017602195393827206893823004'
+          - - MnO
+            - '0.001748360679193541966579041272'
+          - - MgO
+            - '0.1112651361493619955135143363'
+          - - CaO
+            - '0.109768426249842835297065069'
+          - - Na2O
+            - '0.03507142553401207213083266896'
+          - - K2O
+            - '0.005890319140152531727887411837'
+          - - P2O5
+            - '0.002851213133037925154926143533'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+        section: Lunar Simulants Used in this Study
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.85'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.9'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '11.2'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.19'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.87'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.43'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.33'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.85'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.62'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+              section: Lunar Simulants Used in this Study
+        output_unit: mole_fraction
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table1_lhs1_composition_and_mineralogy
   experiment_id: 10.1111/maps.14228::experiment::lhs-1-h2-reduction
   identity:
@@ -256,6 +476,223 @@ observations:
     pdf_page_index: 4
     table: '1'
   read_from: pdf:hendrix-2024-reactivity-reduced-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4669992349950984169629596274'
+          - - TiO2
+            - '0.006282213072100561041042790607'
+          - - Al2O3
+            - '0.1634465442754120558150116059'
+          - - Cr2O3
+            - '0.00008357171863732212777885587198'
+          - - FeO
+            - '0.0268735565400503195554214637'
+          - - MnO
+            - '0.0004476504073919290558530923613'
+          - - MgO
+            - '0.1768018372199496758380341473'
+          - - CaO
+            - '0.1316022829409398621610312201'
+          - - Na2O
+            - '0.02356831702786512030017569884'
+          - - K2O
+            - '0.003101482119559391409528144493'
+          - - SO3
+            - '0.0007933096829953457331633528703'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.18'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.79'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26.24'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.02'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '3.04'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.22'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.62'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.3'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.46'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        output_unit: mole_fraction
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table1_lms1_composition_and_mineralogy
   experiment_id: 10.1111/maps.14228::experiment::lms-1-h2-reduction
   identity:
@@ -326,6 +763,241 @@ observations:
     pdf_page_index: 4
     table: '1'
   read_from: pdf:hendrix-2024-reactivity-reduced-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4224796031900914959088866673'
+          - - TiO2
+            - '0.03430027544084375013966780395'
+          - - Al2O3
+            - '0.08217205252383718263265581725'
+          - - Cr2O3
+            - '0.0008192542323231418791527865095'
+          - - FeO
+            - '0.0649525724745881005936110711'
+          - - MnO
+            - '0.001253805873350061734356251891'
+          - - MgO
+            - '0.2779047281718872044413072741'
+          - - CaO
+            - '0.06280783178931742513703609024'
+          - - Na2O
+            - '0.04706910054146280647527514887'
+          - - K2O
+            - '0.003588032489204471071689482924'
+          - - P2O5
+            - '0.001838028668534934141292715136'
+          - - SO3
+            - '0.0008147146045594258450688911424'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 2489
+        pdf_page_index: 4
+        table: '1'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.81'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '4.62'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.13'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.21'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.87'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.15'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '18.89'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '5.94'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '4.92'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.57'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.44'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '0.11'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              published_page: 2489
+              pdf_page_index: 4
+              table: '1'
+        output_unit: mole_fraction
 - observation_id: hendrix-2024-reactivity-reduced-simulants::hendrix_2024_table4_jsc1a_grain_size_and_bet_area
   experiment_id: 10.1111/maps.14228::experiment::jsc-1a-h2-reduction
   identity:

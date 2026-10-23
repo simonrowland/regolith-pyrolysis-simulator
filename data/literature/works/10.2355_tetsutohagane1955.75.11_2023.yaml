@@ -9,8 +9,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:nagata-1989-emf-calcium-aluminates
+      role: pdf
+      path: raw/nagata-1989-emf-calcium-aluminates/nagata-1989-emf-calcium-aluminates.pdf
+      sha256:
+        tag: value
+        value: 22250de41b832f54aa5a3a7dba0169d699c4a2ebe995aafa68436d3d25cf8d21
+    - asset_id: pdftotext:nagata-1989-emf-calcium-aluminates
+      role: pdftotext
+      path: text/nagata-1989-emf-calcium-aluminates
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:nagata-1989-emf-calcium-aluminates
       role: pdftotext
       path: unknown

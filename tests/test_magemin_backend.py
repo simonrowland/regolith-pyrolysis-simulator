@@ -3236,10 +3236,13 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
 # ----------------------------------------------------------------------
 
 # Resolve a real binary at collection time so the guard is a true
-# pytest.mark.skipif rather than a runtime branch. MAGEMin v1.9.3 is built
-# locally as a sibling clone (../MAGEMin/MAGEMin); _locate_binary also
-# checks engines/magemin/{,bin/}MAGEMin and PATH.
-_LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
+# pytest.mark.skipif rather than a runtime branch. Include the configured local
+# binary because this seat uses an untracked engines.local.toml path.
+from simulator.engine_local_config import configured_magemin_binary_path
+
+_LIVE_MAGEMIN_BINARY = (
+    configured_magemin_binary_path() or MAGEMinBackend._locate_binary(None)
+)
 
 
 @pytest.mark.skipif(
@@ -3301,6 +3304,124 @@ def test_magemin_live_smoke_runs_real_binary(request):
     # Shadow posture: MAGEMin holds no AtomLedger authority, ever.
     assert result.ledger_transition is None
     assert backend.ledger_account_policies() == ()
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_native_activity_matches_direct_same_point_output(request):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    composition = {
+        "SiO2": 49.0,
+        "TiO2": 1.5,
+        "Al2O3": 14.0,
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 2.5,
+        "K2O": 0.8,
+        "Cr2O3": 0.2,
+    }
+    temperature_C = 1429.85
+    pressure_bar = 1e-6
+    fO2_log = -8.0
+    result = backend.equilibrate(
+        temperature_C,
+        composition_kg=composition,
+        fO2_log=fO2_log,
+        pressure_bar=pressure_bar,
+        native_activity_formula="MgO",
+        call_timeout_s=20.0,
+    )
+    assert result.status == "ok", result.warnings
+
+    projection = backend._build_db_bulk_projection(composition)
+    pressure_kbar = backend._GPa_to_kbar(
+        backend._pressure_bar_to_GPa(pressure_bar)
+    )
+    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
+        temperature_C=temperature_C,
+        fO2_log=fO2_log,
+    )
+    direct_args = [
+        str(_LIVE_MAGEMIN_BINARY.resolve()),
+        "--Verb=1",
+        "--db=ig",
+        f"--Temp={temperature_C:.6f}",
+        f"--Pres={pressure_kbar:.6f}",
+        "--sys_in=wt",
+        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
+        f"--buffer={buffer_name}",
+        f"--buffer_n={buffer_n:.6f}",
+        "--out_matlab=1",
+    ]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        completed = subprocess.run(
+            direct_args,
+            cwd=tmpdir,
+            capture_output=True,
+            text=True,
+            timeout=20.0,
+            check=False,
+        )
+        assert completed.returncode == 0, completed.stderr
+        matlab_text = (Path(tmpdir) / "output" / "_matlab_output.txt").read_text()
+
+    direct_fields = backend._parse_subprocess_native_activities(matlab_text)
+    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
+        direct_activity = direct_fields[field]
+        adapted_activity = result.activity_coefficients[formula]
+        assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
+    assert result.diagnostics["magemin_solver_status"] == 0
+    assert result.diagnostics["magemin_native_phase"]
+    assert result.diagnostics["magemin_iterations"] > 0
+
+
+def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
+    monkeypatch,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/fake/MAGEMin")
+    backend._database = "ig"
+    backend._config = {"database": "ig", "timeout_s": 1.0}
+    backend._magemin_module = None
+
+    def fake_run(_args, *, cwd, **_kwargs):
+        output = Path(cwd) / "output"
+        output.mkdir()
+        (output / "_matlab_output.txt").write_text(
+            "aMgO nan\naSiO2 +8.9e-1\n"
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout="Status : 0 [success]\nPhase : liq\nMode  : 1.000000\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    result = backend.equilibrate(
+        1200.0,
+        composition_kg={"SiO2": 49.0, "MgO": 9.0, "Al2O3": 42.0},
+        pressure_bar=1e-6,
+        native_activity_formula="MgO",
+        call_timeout_s=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["backend_status_reason"] == "engine_not_converged"
+    assert result.diagnostics["magemin_native_activity_invalid"] is True
+    assert result.diagnostics["magemin_solver_status"] == 0
+    assert result.diagnostics["magemin_native_phase"] == ("liq",)
+    assert result.activity_coefficients == {}
 
 
 @pytest.mark.skipif(

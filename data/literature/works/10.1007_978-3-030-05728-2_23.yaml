@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
     - asset_id: pdf:shornikov-2019-perovskite-evaporation
       role: pdf
@@ -17,6 +17,18 @@ work:
       sha256:
         tag: value
         value: 925a4c0786aaaa45522001352be29d483c74c5bd13bcd678aefddb3d05ba00af
+    - asset_id: pdftotext:shornikov-2019-perovskite-evaporation
+      role: pdftotext
+      path: text/shornikov-2019-perovskite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2019-perovskite-evaporation
+      role: table_csv
+      path: tables/shornikov-2019-perovskite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-2019-perovskite-evaporation
       role: pdftotext
       path: unknown

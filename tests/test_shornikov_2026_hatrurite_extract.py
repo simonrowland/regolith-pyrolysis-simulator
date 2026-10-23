@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import REPO_ROOT, convert_pressure_to_pa
+from simulator.battery.migrate import Migrator, REPO_ROOT, convert_pressure_to_pa
 from simulator.battery.enums import EvidenceClass, IdentityEqualKind, Quantity
 from simulator.battery.identity import identity_equal
 from tests.battery.factories import migrate_one_extract
@@ -49,6 +49,10 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
         (("phase",), "missing phase"),
     ]
     assert not result.registry_issues
+    assert not result.validation.hard_issues
+    assert not validator.validate_extract_document(
+        document, expected_source_id="shornikov-2026-hatrurite-evaporation"
+    )
 
     pressure_records = [
         record
@@ -108,6 +112,61 @@ def test_table_2_all_points_migrate_with_temperature_pressure_and_conditions():
             assert condition.locator.table == "2"
             assert condition.locator.pdf_page_index == 10
             assert record.locator.published_page == 306
+
+
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    result = migrator.result
+
+    bench = next(iter(result.benches.values()))
+    assert [material.state.value for material in bench.cell_materials] == ["Mo"]
+    for formula, gas_formula in (
+        ("Ca", "Ca"),
+        ("CaO", "CaO"),
+        ("CaSiO3", "CaSiO3"),
+    ):
+        row = next(
+            item
+            for item in document["species"][formula]["observations"]
+            if item["observation_id"].startswith("shornikov_2026_table2_")
+        )
+        assert row["values"]["reservoir_formula"] == "Ca3SiO5"
+        assert row["values"]["standard_state"] == f"partial pressure of {gas_formula}(g)"
+        migrated = [
+            record
+            for record in result.observations.values()
+            if record.identity.species.formula == formula
+            and record.identity.quantity.value is Quantity.P_PARTIAL
+        ]
+        assert migrated
+        assert all(
+            record.identity.species.phase.is_value
+            and record.identity.species.phase.value.value == "g"
+            and record.identity.composition.is_value
+            and record.identity.reservoir is not None
+            and record.identity.reservoir.is_value
+            and record.identity.reservoir.value.formula == "Ca3SiO5"
+            and record.identity.reservoir.value.phase.value == "cr"
+            for record in migrated
+        )
+        if formula == "CaSiO3":
+            for record in migrated:
+                reaction = record.identity.reaction
+                assert reaction is not None and reaction.is_value
+                assert {
+                    (
+                        term.species.formula,
+                        term.species.phase.value.value,
+                        term.coefficient,
+                    )
+                    for term in reaction.value.terms
+                } == {
+                    ("Ca3SiO5", "cr", -1),
+                    ("CaSiO3", "g", 1),
+                    ("CaO", "g", 2),
+                }
 
     # A closed Knudsen cell does not state oxygen fugacity or in-cell total
     # pressure. Composition, temperature, and gas species are known.

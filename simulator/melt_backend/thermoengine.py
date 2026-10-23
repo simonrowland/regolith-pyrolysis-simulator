@@ -330,6 +330,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         ] = None,
         species_formula_registry: Optional[Mapping[str, object]] = None,
         redox_mode: Optional[str] = None,
+        call_timeout_s: Optional[float] = None,
         vapor_transport_pO2_bar: Optional[float] = None,
         vapor_transport_floor_bar: Optional[float] = None,
         vapor_transport_pO2_admission: str = 'environment',
@@ -343,6 +344,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             composition_mol_by_account=composition_mol_by_account,
             species_formula_registry=species_formula_registry,
             redox_mode=redox_mode,
+            call_timeout_s=call_timeout_s,
             vapor_transport_pO2_bar=vapor_transport_pO2_bar,
             vapor_transport_floor_bar=vapor_transport_floor_bar,
             vapor_transport_pO2_admission=vapor_transport_pO2_admission,
@@ -357,6 +359,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         pressure_bar: float,
         warnings: List[str],
         crash_diagnostics: Optional[Mapping[str, object]] = None,
+        call_timeout_s: Optional[float] = None,
         **_unused: object,
     ) -> EquilibriumResult:
         # t-894: certified SiO2/T band is notice+run via the shared
@@ -369,6 +372,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             fO2_log,
             pressure_bar,
             warnings,
+            call_timeout_s=call_timeout_s,
             commissioning_diagnostics=_commissioning_notice_fields(
                 crash_diagnostics
             ),
@@ -381,6 +385,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         fO2_log: Optional[float],
         pressure_bar: float,
         warnings: Optional[List[str]] = None,
+        call_timeout_s: Optional[float] = None,
         commissioning_diagnostics: Optional[Mapping[str, object]] = None,
     ) -> EquilibriumResult:
         """Use ENKI ThermoEngine MELTS for equilibrium + first-class mu."""
@@ -401,12 +406,17 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     warnings=warnings,
                 )
             )
+            equilibrate_kwargs = {
+                'temperature_C': temperature_C,
+                'pressure_bar': solved_pressure_bar,
+                'comp_wt': comp_wt,
+                'fO2_log': fO2_log,
+                'warnings': tuple(result_warnings),
+            }
+            if call_timeout_s is not None:
+                equilibrate_kwargs['call_timeout_s'] = call_timeout_s
             payload = self._thermoengine_transport.equilibrate(
-                temperature_C=temperature_C,
-                pressure_bar=solved_pressure_bar,
-                comp_wt=comp_wt,
-                fO2_log=fO2_log,
-                warnings=tuple(result_warnings),
+                **equilibrate_kwargs,
             )
             solved_fO2_log = (
                 None

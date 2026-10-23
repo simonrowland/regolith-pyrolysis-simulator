@@ -93,7 +93,7 @@ observations:
     published_page: 52
     pdf_page_index: 74
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
 - observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_lime_activity_rejected
   experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
   identity:
@@ -195,29 +195,18 @@ observations:
     published_page: 63
     pdf_page_index: 98
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '41.3'
-          CaO: '52'
-          SiO2: '6.7'
-      locator:
-        published_page: 63
-        pdf_page_index: 98
-        section: Thermodynamic Discussion
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.280538204213996810562048883'
           - - CaO
             - '0.6422301465203623770678523739'
+          - - Al2O3
+            - '0.280538204213996810562048883'
           - - SiO2
             - '0.07723164926564081237009874296'
           amount_basis: mole_fraction
@@ -231,22 +220,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '41.3'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
         - - original_CaO_wt_pct
           - state:
               tag: value
@@ -259,6 +232,22 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               published_page: 63
               pdf_page_index: 98
@@ -280,6 +269,17 @@ observations:
               pdf_page_index: 98
               section: Thermodynamic Discussion
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '41.3'
+          CaO: '52'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
   derived_from:
   - unknown:gibbons-1963-thesis-cas-slags-cas
   derivation:
@@ -390,29 +390,18 @@ observations:
     published_page: 63
     pdf_page_index: 98
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '41.3'
-          CaO: '52'
-          SiO2: '6.7'
-      locator:
-        published_page: 63
-        pdf_page_index: 98
-        section: Thermodynamic Discussion
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.280538204213996810562048883'
           - - CaO
             - '0.6422301465203623770678523739'
+          - - Al2O3
+            - '0.280538204213996810562048883'
           - - SiO2
             - '0.07723164926564081237009874296'
           amount_basis: mole_fraction
@@ -426,22 +415,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '41.3'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
         - - original_CaO_wt_pct
           - state:
               tag: value
@@ -454,6 +427,22 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               published_page: 63
               pdf_page_index: 98
@@ -475,6 +464,17 @@ observations:
               pdf_page_index: 98
               section: Thermodynamic Discussion
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '41.3'
+          CaO: '52'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
   derived_from:
   - unknown:gibbons-1963-thesis-cas-slags-cas
   derivation:
@@ -575,7 +575,7 @@ observations:
     published_page: 52
     pdf_page_index: 74
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
 - observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_lime_activity
   experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
   identity:
@@ -677,29 +677,18 @@ observations:
     published_page: 63
     pdf_page_index: 98
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '43.7'
-          CaO: '49.6'
-          SiO2: '6.7'
-      locator:
-        published_page: 63
-        pdf_page_index: 98
-        section: Thermodynamic Discussion
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.3008537330735824033704007649'
           - - CaO
             - '0.6208705027889803394347788003'
+          - - Al2O3
+            - '0.3008537330735824033704007649'
           - - SiO2
             - '0.07827576413743725719482043514'
           amount_basis: mole_fraction
@@ -713,22 +702,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '43.7'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
         - - original_CaO_wt_pct
           - state:
               tag: value
@@ -741,6 +714,22 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '43.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               published_page: 63
               pdf_page_index: 98
@@ -762,6 +751,17 @@ observations:
               pdf_page_index: 98
               section: Thermodynamic Discussion
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '43.7'
+          CaO: '49.6'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
   derived_from:
   - unknown:gibbons-1963-thesis-cas-slags-cas
   derivation:
@@ -872,29 +872,18 @@ observations:
     published_page: 63
     pdf_page_index: 98
     section: Thermodynamic Discussion
-  read_from: unknown:gibbons-1963-thesis-cas-slags-cas
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '43.7'
-          CaO: '49.6'
-          SiO2: '6.7'
-      locator:
-        published_page: 63
-        pdf_page_index: 98
-        section: Thermodynamic Discussion
     composition:
       state:
         tag: value
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.3008537330735824033704007649'
           - - CaO
             - '0.6208705027889803394347788003'
+          - - Al2O3
+            - '0.3008537330735824033704007649'
           - - SiO2
             - '0.07827576413743725719482043514'
           amount_basis: mole_fraction
@@ -908,22 +897,6 @@ observations:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '43.7'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 63
-              pdf_page_index: 98
-              section: Thermodynamic Discussion
         - - original_CaO_wt_pct
           - state:
               tag: value
@@ -936,6 +909,22 @@ observations:
           - state:
               tag: value
               value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '43.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
             locator:
               published_page: 63
               pdf_page_index: 98
@@ -957,6 +946,17 @@ observations:
               pdf_page_index: 98
               section: Thermodynamic Discussion
         output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '43.7'
+          CaO: '49.6'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
   derived_from:
   - unknown:gibbons-1963-thesis-cas-slags-cas
   derivation:

@@ -1,0 +1,385 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.epsl.2017.11.032
+  citation: Berry, A. J., Stewart, G. A., O'Neill, H. St. C., Mallmann, G. & Mosselmans, J. F. W. (2018), A re-assessment
+    of the oxidation state of iron in MORB glasses, Earth and Planetary Science Letters 483, 114-123.
+  source_ids:
+  - berry-2018-morb-iron-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:berry-2018-morb-iron-redox
+      role: pdf
+      path: raw/berry-2018-morb-iron-redox/berry-2018-morb-iron-redox.pdf
+      sha256:
+        tag: value
+        value: 83a1c2e556f6d71acb959b6d79f95f35ecda8fd613c21a8986a7ca46ba52612f
+    - asset_id: pdftotext:berry-2018-morb-iron-redox
+      role: pdftotext
+      path: text/berry-2018-morb-iron-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:berry-2018-morb-iron-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.epsl.2017.11.032
+experiments:
+- experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.epsl.2017.11.032
+  locator:
+    page: 5
+    published_page: 118
+    pdf_page_index: 4
+    section: Results
+- experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '16.1'
+          CaO: '12.4'
+          FeO: '10'
+          MgO: '8.2'
+          SiO2: '52'
+          TiO2: '1.3'
+      locator:
+        page: 6
+        published_page: 119
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.epsl.2017.11.032
+  locator:
+    page: 2
+    published_page: 115
+    pdf_page_index: 1
+    section: Experimental
+context:
+- observation_id: berry_2018_synthetic_morb_experimental_conditions
+  type: laboratory_conditions
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 115
+    section: Experimental
+  units: wt.% composition; temperature in C; pressure in Pa.
+  values:
+    quantity: Synthetic MORB standard preparation and run conditions
+    nominal_composition_wt_pct:
+      SiO2: '52'
+      Al2O3: '16.1'
+      CaO: '12.4'
+      FeO: '10'
+      MgO: '8.2'
+      TiO2: '1.3'
+    nominal_composition_note: Reagent-grade starting materials; CaCO3 reported as CaO and Fe2O3 reported as FeO; no Na, K,
+      or P were included.
+    equilibration_temperature_C: 1400
+    equilibration_temperature_uncertainty_C: 2
+    gas_mixing_furnace_pressure_Pa: 101325
+    gas_mixing_furnace_pressure_as_published: 1 atm
+    oxidized_sample_pressure_Pa: 1000000000
+    oxidized_sample_pressure_as_published: 1.0 GPa in a sealed Pt capsule with PtO2.
+    gas_control_as_published: CO/CO2 or O2/CO2 mixtures; gas ratios are not reported per sample.
+    quench_statement: The gas-furnace melts were quenched in water after approximately 24 h. The separate 1.0 GPa sample was
+      held for approximately 4 h; its quench procedure is not detailed separately. The source does not state whether Fe valence
+      is preserved or altered by quenching.
+  context_id: berry-2018-morb-iron-redox::context::berry_2018_synthetic_morb_experimental_conditions
+  work_id: 10.1016/j.epsl.2017.11.032
+  source_id: berry-2018-morb-iron-redox
+  species: Fe
+- observation_id: berry_2018_table1_mossbauer_hyperfine_parameters
+  type: characterization
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 117
+    table: '1'
+  units: Fraction in percent; isomer shift and quadrupole splitting in mm/s; correlation angle in degrees.
+  values:
+    quantity: Table 1 Gaussian Mössbauer hyperfine fit parameters
+    printed_body_rows: 9
+    fit_conditions:
+    - row: 1
+      log_fO2: '4.8'
+      delta_QFM: '11.2'
+      fit: null
+      component: D1
+      fraction_percent: '77.9'
+      delta_mm_s: '0.288'
+      sigma_delta_mm_s: '0.021'
+      quadrupole_splitting_mm_s: '1.244'
+      sigma_quadrupole_splitting_mm_s: '0.459'
+      theta_deg: '-1.5'
+    - row: 2
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: D2
+      fraction_percent: '22.1'
+      delta_mm_s: '0.311'
+      sigma_delta_mm_s: '0.014'
+      quadrupole_splitting_mm_s: '1.882'
+      sigma_quadrupole_splitting_mm_s: '0.534'
+      theta_deg: null
+    - row: 3
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: Average
+      delta_mm_s: '0.293'
+      delta_as_published: 0.293(2)
+      delta_uncertainty: '0.002'
+      sigma_delta_mm_s: '0.019'
+      sigma_delta_as_published: 0.019(5)
+      sigma_delta_uncertainty: '0.005'
+      quadrupole_splitting_mm_s: '1.39'
+      quadrupole_as_published: 1.39(5)
+      quadrupole_uncertainty: '0.05'
+      sigma_quadrupole_splitting_mm_s: '0.48'
+      sigma_quadrupole_as_published: 0.48(3)
+      sigma_quadrupole_uncertainty: '0.03'
+      theta_deg: null
+    - row: 4
+      log_fO2: '-11'
+      delta_QFM: '-4.6'
+      fit: A
+      component: D1
+      fraction_percent: '89.4'
+      delta_mm_s: '1.077'
+      sigma_delta_mm_s: '0.159'
+      quadrupole_splitting_mm_s: '1.897'
+      sigma_quadrupole_splitting_mm_s: '0.414'
+      theta_deg: 5
+    - row: 5
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: D2
+      fraction_percent: '10.6'
+      delta_mm_s: '0.65'
+      sigma_delta_mm_s: '0.031'
+      quadrupole_splitting_mm_s: '1.445'
+      sigma_quadrupole_splitting_mm_s: '0.354'
+      theta_deg: null
+    - row: 6
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: Average
+      delta_mm_s: '1.03'
+      delta_as_published: 1.03(2)
+      delta_uncertainty: '0.02'
+      sigma_delta_mm_s: '0.15'
+      sigma_delta_as_published: 0.15(1)
+      sigma_delta_uncertainty: '0.01'
+      quadrupole_splitting_mm_s: '1.85'
+      quadrupole_as_published: 1.85(4)
+      quadrupole_uncertainty: '0.04'
+      sigma_quadrupole_splitting_mm_s: '0.41'
+      sigma_quadrupole_as_published: 0.41(1)
+      sigma_quadrupole_uncertainty: '0.01'
+      theta_deg: null
+    - row: 7
+      log_fO2: null
+      delta_QFM: null
+      fit: B
+      component: D1
+      fraction_percent: '89.5'
+      delta_mm_s: '1.047'
+      sigma_delta_mm_s: '0.1'
+      quadrupole_splitting_mm_s: '1.955'
+      sigma_quadrupole_splitting_mm_s: '0.459'
+      theta_deg: 5
+    - row: 8
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: D2
+      fraction_percent: '10.5'
+      delta_mm_s: '0.888'
+      sigma_delta_mm_s: '0.03'
+      quadrupole_splitting_mm_s: '0.956'
+      sigma_quadrupole_splitting_mm_s: '0.349'
+      theta_deg: null
+    - row: 9
+      log_fO2: null
+      delta_QFM: null
+      fit: null
+      component: Average
+      delta_mm_s: '1.03'
+      delta_as_published: 1.03(2)
+      delta_uncertainty: '0.02'
+      sigma_delta_mm_s: '0.1'
+      sigma_delta_as_published: 0.10(1)
+      sigma_delta_uncertainty: '0.01'
+      quadrupole_splitting_mm_s: '1.85'
+      quadrupole_as_published: 1.85(4)
+      quadrupole_uncertainty: '0.04'
+      sigma_quadrupole_splitting_mm_s: '0.45'
+      sigma_quadrupole_as_published: 0.45(1)
+      sigma_quadrupole_uncertainty: '0.01'
+      theta_deg: null
+    notes:
+    - Empty cells remain null; Table 1's visually grouped fO2 and delta-QFM labels were not promoted to following component
+      or average rows.
+    - Table 1 is unscored Mössbauer fit context, not redox rail observations.
+  context_id: berry-2018-morb-iron-redox::context::berry_2018_table1_mossbauer_hyperfine_parameters
+  work_id: 10.1016/j.epsl.2017.11.032
+  source_id: berry-2018-morb-iron-redox
+  species: Fe
+- observation_id: berry_2018_table2_xanes_centroid_and_edge
+  type: characterization
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 119
+    table: '2'
+  units: centroid and edge in eV.
+  values:
+    quantity: Table 2 XANES pre-edge centroid and absorption-edge energies
+    printed_body_rows: 13
+    centroid_uncertainty_eV: '0.022'
+    edge_uncertainty_eV: '0.05'
+    centroid_edge_rows:
+    - row: 1
+      centroid_eV: '7114.566'
+      edge_eV: '7126.529'
+    - row: 2
+      centroid_eV: '7114.414'
+      edge_eV: '7125.336'
+    - row: 3
+      centroid_eV: '7114.295'
+      edge_eV: '7124.603'
+    - row: 4
+      centroid_eV: '7114.103'
+      edge_eV: '7123.971'
+    - row: 5
+      centroid_eV: '7113.862'
+      edge_eV: '7123.347'
+    - row: 6
+      centroid_eV: '7113.509'
+      edge_eV: null
+      edge_as_published: –
+    - row: 7
+      centroid_eV: '7113.319'
+      edge_eV: '7121.95'
+    - row: 8
+      centroid_eV: '7113.17'
+      edge_eV: '7121.581'
+    - row: 9
+      centroid_eV: '7113.101'
+      edge_eV: '7121.355'
+    - row: 10
+      centroid_eV: '7113.04'
+      edge_eV: '7121.185'
+    - row: 11
+      centroid_eV: '7112.992'
+      edge_eV: '7121.094'
+    - row: 12
+      centroid_eV: '7112.977'
+      edge_eV: '7121.033'
+    - row: 13
+      centroid_eV: '7112.958'
+      edge_eV: '7121.036'
+    mean_glass_composition_wt_pct_n_50:
+      SiO2:
+        value: '52.1'
+        uncertainty: '0.4'
+        as_published: 52.10(40)
+      Al2O3:
+        value: '15.87'
+        uncertainty: '0.22'
+        as_published: 15.87(22)
+      CaO:
+        value: '12.33'
+        uncertainty: '0.17'
+        as_published: 12.33(17)
+      FeOTotal:
+        value: '9.4'
+        uncertainty: '0.22'
+        as_published: 9.40(22)
+      MgO:
+        value: '7.77'
+        uncertainty: '0.09'
+        as_published: 7.77(9)
+      TiO2:
+        value: '1.27'
+        uncertainty: '0.03'
+        as_published: 1.27(3)
+    model_a_footnote_as_published:
+      centroid_eV: 7112.935 + 2.687 (Fe3+/SumFe) − 1.000 (Fe3+/SumFe)^2
+      edge_eV: 7120.998 + 5.613 (Fe3+/SumFe)
+      centroid_uncertainty_eV: '0.022'
+      edge_uncertainty_eV: '0.05'
+      coefficient_uncertainties: highly correlated; source reports errors for the value rather than individual terms.
+    notes:
+    - Table 2 reports mean analysed glass composition as characterization; row conditions use the nominal synthetic MORB recipe
+      reported in the experimental section.
+    - The mean glass composition is retained as printed; no missing oxide is inferred or normalized.
+    - The prose-printed natural-glass centroid and polynomial means, VG2 and JDF-D2 standards, and n=19 edge and centroid
+      means are stored as measured_reduced; their unstated fO2, pressure, temperature, and composition axes remain unknown.
+    - Individual natural-glass values from Supplementary Table 1 are not invented or transcribed. Values found only in Figures
+      1 and 7 remain unextracted figure-read candidates.
+  context_id: berry-2018-morb-iron-redox::context::berry_2018_table2_xanes_centroid_and_edge
+  work_id: 10.1016/j.epsl.2017.11.032
+  source_id: berry-2018-morb-iron-redox
+  species: Fe

@@ -1592,7 +1592,7 @@ def test_cached_real_live_fill_rejects_engine_upgrade_without_authorization(
         name="alphamelts",
         version=(
             "alphamelts2 2.3.2 (server=macbook) "
-            "(path=/Users/simon/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
+            "(path=/opt/alphamelts-app-2.3.1-macos-arm64/alphamelts2) "
             "(digest=sha256:stale)"
         ),
     )

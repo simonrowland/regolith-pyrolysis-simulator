@@ -96,7 +96,11 @@ def test_ichise_table2_activities_are_points_at_printed_values(tmp_path: Path) -
         assert composition.locator is not None
         assert composition.locator.table == "2"
         assert row.point_conditions["fO2_Pa"].state.is_unknown
-        assert row.point_conditions["total_pressure_Pa"].state.is_unknown
+        assert "total_pressure_Pa" not in row.point_conditions
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.total_pressure_Pa.reason == (
+            "no total_pressure_Pa mapped from source"
+        )
         assert row.value.approximate is False
 
 
