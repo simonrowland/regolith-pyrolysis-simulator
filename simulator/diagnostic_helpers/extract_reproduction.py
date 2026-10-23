@@ -32,7 +32,10 @@ from typing import Any, Mapping, Sequence
 
 from engines.antoine import _antoine_log10_pressure
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
-from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    _evaluate_extracted_arrhenius_alpha,
+)
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.comparability_verdict import verdict_from_membership
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1182,24 +1185,7 @@ def _literature_alpha_points(
         out = []
         for idx, T_K in enumerate(temperatures):
             try:
-                if alpha_form.get("A") is not None and alpha_form.get("B_K") is not None:
-                    alpha = float(alpha_form["A"]) * math.exp(
-                        -float(alpha_form["B_K"]) / T_K
-                    )
-                    sigma = None
-                else:
-                    prefactor = float(
-                        alpha_form.get("gamma_o", alpha_form.get("c0"))
-                    )
-                    activation = float(alpha_form["E_J_per_mol"])
-                    gas_constant = float(alpha_form.get("R_J_per_mol_K") or 8.314462618)
-                    alpha = prefactor * math.exp(-activation / (gas_constant * T_K))
-                    sigma_E = alpha_form.get("E_uncertainty_J_per_mol")
-                    sigma = (
-                        abs(alpha) * float(sigma_E) / (gas_constant * T_K)
-                        if sigma_E is not None
-                        else None
-                    )
+                alpha, sigma = _evaluate_extracted_arrhenius_alpha(alpha_form, T_K)
             except (KeyError, TypeError, ValueError, OverflowError):
                 return None, "alpha_form_not_evaluable", drops
             out.append(
@@ -1625,7 +1611,7 @@ def _engine_melt_psat_pa(
     )
     cache_key = (
         round(float(T_K), 6),
-        round(float(pO2_bar), 12),
+        float(pO2_bar),
         tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
     )
     cached_surface = _MELT_PSAT_CACHE.get(cache_key)
@@ -1638,9 +1624,11 @@ def _engine_melt_psat_pa(
                 species_formula_registry={},
             ),
             temperature_C=float(T_K) - 273.15,
-            pressure_bar=max(float(pO2_bar), 1.0e-30),
-            fO2_log=math.log10(max(float(pO2_bar), 1.0e-30)),
-            control_inputs={"pO2_bar": float(pO2_bar)},
+            pressure_bar=float(pO2_bar),
+            fO2_log=math.log10(float(pO2_bar)),
+            control_inputs={
+                "pO2_bar": float(pO2_bar), "pO2_admission": "observation",
+            },
         )
         try:
             result = provider.dispatch(request)

@@ -216,6 +216,8 @@ def test_sossi_worker_start_failure_is_recorded_as_transport_error(
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
 
+    assert residue._OPENIMCC_EVALUATION_WORKER is None
+
     spawn_context = multiprocessing.get_context("spawn")
     connections = []
 

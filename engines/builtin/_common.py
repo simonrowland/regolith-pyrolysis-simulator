@@ -346,10 +346,19 @@ def resolve_transport_pO2_bar(
     *,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Resolve vapor-transport pO2 without hiding invalid explicit controls."""
+    """Resolve transport oxygen; observations bypass simulated-headspace floors.
+
+    ``pO2_admission='observation'`` admits only finite positive oxygen, as
+    measured/commanded. It does not change intrinsic/source pressure controls
+    or an engine's calibration notices.
+    """
 
     controls = request.control_inputs or {}
-    floor_bar = resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
+    observation = controls.get('pO2_admission') == 'observation'
+    floor_bar = (
+        0.0 if observation
+        else resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
+    )
     if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
         raw_pO2 = controls.get("pO2_bar")
         try:
@@ -401,6 +410,8 @@ def resolve_transport_pO2_bar(
             )
         return pO2_bar
 
+    if observation:
+        raise ValueError('observation oxygen requires pO2_bar or fO2_log')
     return floor_bar
 
 

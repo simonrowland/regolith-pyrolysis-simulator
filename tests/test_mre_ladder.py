@@ -225,6 +225,18 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     assert mg_high < al_high
 
 
+@pytest.mark.xfail(strict=True, reason="b-848: Cr2O3 liquid-standard fusion correction is missing")
+def test_cr2o3_mre_voltage_includes_fusion_correction_at_1500_c():
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "Cr2O3",
+        temperature_K=1773.15,
+    )
+
+    assert ref is not None
+    assert ref.raw_graph_voltage_V is not None
+    assert ref.voltage == pytest.approx(ref.raw_graph_voltage_V - 0.067, abs=0.001)
+
+
 def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
     ref = mre_ladder.mre_decomposition_voltage_reference(
         "MgO",

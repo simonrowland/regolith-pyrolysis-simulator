@@ -208,6 +208,34 @@ def normalize_backend_capabilities(value: Any = None) -> Dict[str, bool]:
     return capabilities
 
 
+def battery_adapter_class(engine_name: str) -> type | None:
+    """Adapter class for one battery engine name, or None.
+
+    This is the class that declares ``models_dissolved_sulfur`` and
+    ``models_dissolved_chloride``. It does not open the engine.
+    """
+
+    if engine_name == "alphamelts":
+        from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+        return AlphaMELTSBackend
+    if engine_name == "thermoengine":
+        from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+        return ThermoEngineBackend
+    if engine_name == "magemin":
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return MAGEMinBackend
+    if engine_name == "vaporock":
+        from simulator.melt_backend.vaporock import VapoRockBackend
+
+        return VapoRockBackend
+    if engine_name == "internal-analytical":
+        return InternalAnalyticalBackend
+    return None
+
+
 # Cleaned silicate melt is the only ledger account the silicate-oxide
 # adapters (VapoRock, MAGEMin) may consume; every other account is
 # filtered out before the upstream library is called (binding spec §7).
@@ -651,6 +679,13 @@ class MeltBackend(ABC):
 
     backend_name = 'unknown'
     supports_intrinsic_fO2 = False
+    # Dissolved S or Cl in the silicate liquid at an imposed gas fugacity.
+    # equilibrate must accept sulfur_fugacity_bar or chloride_fugacity_bar
+    # (bar, the printed pS2 or pCl2) and return that solute's weight percent
+    # on the phase composition. Sulfide-matte and a bulk sulfur column are
+    # not this capability. False until an adapter does both.
+    models_dissolved_sulfur: ClassVar[bool] = False
+    models_dissolved_chloride: ClassVar[bool] = False
 
     def _not_an_input_redox_refusal(
         self,

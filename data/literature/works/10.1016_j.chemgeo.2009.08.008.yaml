@@ -1,0 +1,246 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.chemgeo.2009.08.008
+  citation: Cottrell, E., Kelley, K. A., Lanzirotti, A., and Fischer, R. A. (2009). High-precision determination of iron oxidation
+    state in silicate glasses using XANES. Chemical Geology 268, 167-179.
+  source_ids:
+  - cottrell-2009-iron-xanes
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
+    files:
+    - asset_id: pdf:cottrell-2009-iron-xanes
+      role: pdf
+      path: raw/cottrell-2009-iron-xanes/cottrell-2009-iron-xanes.pdf
+      sha256:
+        tag: value
+        value: 5b0a5b8b655d04ceb185e0931329b78b6b888ed4552949ebc82ab4622419a652
+    - asset_id: pdftotext:cottrell-2009-iron-xanes
+      role: pdftotext
+      path: text/cottrell-2009-iron-xanes
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:cottrell-2009-iron-xanes
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.chemgeo.2009.08.008
+experiments:
+- experiment_id: 10.1016/j.chemgeo.2009.08.008::cottrell-2009-iron-xanes
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.chemgeo.2009.08.008
+  locator:
+    page: 3
+    published_page: '170'
+    section: 3.1 Mössbauer spectroscopy
+    note: Fe3+/SumFe is the fitted ferric doublet area divided by the full resonant absorption envelope; no recoil-free-fraction
+      correction is applied.
+context:
+- observation_id: cottrell_2009_basalt_centroid_calibration
+  type: recalculation_table
+  locator:
+    page: 9
+    table: '3'
+    published_page: '175'
+    row: Basalt centroid fit
+  phase: quenched silicate glass
+  units: calibration coefficients as printed
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: calibration fit spans reference runs at different temperatures
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    log_fO2:
+      state:
+        tag: unknown
+        reason: calibration fit spans multiple oxygen fugacity conditions
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: calibration fit spans reference runs
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    composition:
+      state:
+        tag: unknown
+        reason: baseline basalt fit spans LW and AII reference glass compositions
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+  values:
+    method_class: model_derived
+    quantity: xanes_centroid_fe3_sumfe_calibration_as_published
+    admission_status: typed_refusal
+    d-126_reason: No closed schema quantity represents this composition-specific calibration polynomial; coefficients and
+      equation are preserved as printed.
+    fit:
+      x_as_published: cross-session drift-corrected centroid energy (eV)
+      mu_eV_as_published: '7112.45876'
+      centroid_a_as_published: '22.99081'
+      centroid_b_as_published: '43.91273'
+      centroid_c_as_published: '14.68104'
+      centroid_a_sigma_1sigma_as_published: '0.4075'
+      centroid_b_sigma_1sigma_as_published: '1.3163'
+      centroid_c_sigma_1sigma_as_published: '2.6737'
+      average_1sigma_Fe3_sumFe_times_100_as_published: '0.45'
+      equation_as_published: Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2
+  derived_from:
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+  - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+  derivation:
+    relation: Least-squares SVD second-order fit of the stored Mössbauer Fe3+/SumFe fractions against the stored cross-session
+      centroid energies.
+    inputs:
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+    - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+    output_unit: as_published
+  context_id: cottrell-2009-iron-xanes::context::cottrell_2009_basalt_centroid_calibration
+  work_id: 10.1016/j.chemgeo.2009.08.008
+  source_id: cottrell-2009-iron-xanes
+  species: Fe
+- observation_id: cottrell_2009_rhyolite_centroid_calibration
+  type: recalculation_table
+  locator:
+    page: 9
+    table: '3'
+    published_page: '175'
+    row: Rhyolite centroid fit
+  phase: quenched silicate glass
+  units: calibration coefficients as printed
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: calibration fit spans multiple temperatures and external rhyolite experiments
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    log_fO2:
+      state:
+        tag: unknown
+        reason: calibration fit spans multiple oxygen fugacity conditions
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: calibration fit spans reference runs with unreported pressures
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+    composition:
+      state:
+        tag: unknown
+        reason: composition-specific rhyolite fit spans VG568 and NZC-4 compositions
+      locator:
+        page: 9
+        table: '3'
+        published_page: '175'
+  values:
+    method_class: model_derived
+    quantity: xanes_centroid_fe3_sumfe_calibration_as_published
+    admission_status: typed_refusal
+    d-126_reason: No closed schema quantity represents this composition-specific calibration polynomial; coefficients and
+      equation are preserved as printed.
+    fit:
+      x_as_published: single-session drift-corrected centroid energy (eV) for the rhyolites
+      mu_eV_as_published: '7113.17147'
+      centroid_a_as_published: '50.17519'
+      centroid_b_as_published: '86.65910'
+      centroid_c_as_published: '72.29489'
+      centroid_a_sigma_1sigma_as_published: '1.7320'
+      centroid_b_sigma_1sigma_as_published: '5.0297'
+      centroid_c_sigma_1sigma_as_published: '19.9389'
+      average_1sigma_Fe3_sumFe_times_100_as_published: '1.89'
+      equation_as_published: Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2
+  derived_from:
+  - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
+  - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
+  derivation:
+    relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; y is footnote-f wet chemistry
+      for the six Moore glasses and the Mössbauer Fe3_over_FeT value for 568_2.
+    inputs:
+    - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
+    - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
+    output_unit: as_published
+  context_id: cottrell-2009-iron-xanes::context::cottrell_2009_rhyolite_centroid_calibration
+  work_id: 10.1016/j.chemgeo.2009.08.008
+  source_id: cottrell-2009-iron-xanes
+  species: Fe

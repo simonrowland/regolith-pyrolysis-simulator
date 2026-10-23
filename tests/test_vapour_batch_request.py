@@ -1227,7 +1227,12 @@ def test_t568_shadow_computation_is_lazy_until_explicitly_enabled(
     assert diagnostic.melt_activity_shadow is not None
 
 
-def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority() -> None:
+@pytest.mark.parametrize(
+    "oxygen,oxygen_decades", [(1e-8, 2.0), (1e-31, 7.75), (1000.0, -0.75)]
+)
+def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority(
+    oxygen, oxygen_decades,
+) -> None:
     payload = _minimal_family("K", validation_status="pending_validation")
     catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
     evaluator = catalog._species["K"].evaluator
@@ -1248,7 +1253,7 @@ def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority() -> No
         target_standard_state=_TEST_ACTIVITY_STANDARD_STATE,
     )
     kwargs = {
-        "pO2_bar": 1.0e-8,
+        "pO2_bar": oxygen,
         "expected_component_id": "KO0.5",
         "expected_standard_state": _TEST_ACTIVITY_STANDARD_STATE,
         "expected_state_fingerprint": "state:test",
@@ -1259,6 +1264,15 @@ def test_t568_typed_evaluator_refuses_wrong_target_and_claimed_authority() -> No
         **kwargs,
     )
     assert valid_result["status"] == "shadow_only_no_behavior_authority"
+    # The fixture's K reaction has oxygen exponent -1/4: -8, -31 and +3
+    # oxygen decades contribute +2, +7.75 and -0.75 pressure decades.
+    assert valid_result["oxygen_term_ln"] / math.log(10.0) == pytest.approx(oxygen_decades)
+    if oxygen != 1e-8:
+        notice = valid_result["extrapolation_notice"]
+        assert notice["reason"] == "pO2_outside_evaluator_band"
+        assert notice["pO2_bar_used"] == oxygen
+        assert notice["certified_band"]["pO2_bar"] == (1e-30, 100.0)
+        assert notice["was_clamped"] is False
 
     wrong_target = replace(
         activity,

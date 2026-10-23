@@ -170,6 +170,7 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
         ).r_melt
         for axial in (0.0, 1.0, 4.0, MAX_STIR_FACTOR, 1000.0)
     ]
+    assert melt_by_axial == [melt_by_axial[0]] * len(melt_by_axial)
     assert melt_by_axial == [0.0] * 5
 
     gas_by_radial = [
@@ -416,3 +417,14 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
     assert result.diagnostic["alpha_used_by_species"]["Cr"] == pytest.approx(0.9)
     assert "missing_alpha" not in result.diagnostic
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
+
+
+# Merge preservation: retain the distinct cb13f9f92 case and its assertions.
+def test_transition_and_free_molecular_regimes_do_not_apply_continuum_gas_film():
+    transitional = _evap(knudsen_number=1.0)
+    free_molecular = _evap(knudsen_number=FREE_MOLECULAR_KNUDSEN_MIN)
+
+    assert transitional.r_gas == 0.0
+    assert free_molecular.r_gas == 0.0
+    assert transitional.gas_resistance_weight == 0.0
+    assert free_molecular.gas_resistance_weight == 0.0

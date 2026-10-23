@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from simulator.accounting import load_species_formulas
+from simulator.accounting import load_species_formulas, resolve_species_formula
 
 
 FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
@@ -20,6 +20,18 @@ FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
     r"terminal\.oxygen_stored",
     r"terminal\.oxygen_vented_to_vacuum",
 ]
+
+OXIDE_MASS_TABLE_ALLOWLIST = {
+    # Keep the independent REF-001 Kress91 input-conversion reference separate
+    # from the runtime formula owner so the anchor can catch mass drift.
+    ("tests/test_sulfsat_gate.py", frozenset(
+        {"SiO2", "TiO2", "Al2O3", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5"}
+    )): "published Kress91 input-conversion reference",
+    # These precise values construct a package-envelope boundary fixture.
+    ("tests/test_openimcc_battery_engine.py", frozenset({"K2O", "Na2O", "SiO2"})): (
+        "OpenIMCC packaged-envelope boundary input"
+    ),
+}
 
 
 def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
@@ -66,6 +78,87 @@ def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
     violations = _forbidden_internal_kg_mutation_hits(repo / "simulator")
     assert not violations, "\n".join(violations)
+
+
+def test_composition_projection_has_no_literal_oxide_molar_mass_tables():
+    repo = Path(__file__).parent.parent
+    projector_callers = (
+        "engines/builtin/overhead_gas_equilibrium.py",
+        "simulator/core.py",
+        "engines/builtin/electrolysis_step.py",
+        "benchmarks/melt_activity_benchmark.py",
+        "tests/chemistry/test_corpus_anchored_parity.py",
+    )
+    missing_callers = [
+        relative
+        for relative in projector_callers
+        if "project_oxide_composition" not in (repo / relative).read_text()
+    ]
+    assert not missing_callers, "composition paths bypass formula projector: " + ", ".join(
+        missing_callers
+    )
+
+    roots = ("simulator", "engines", "benchmarks", "scripts", "tests")
+    violations = []
+    for root_name in roots:
+        for path in (repo / root_name).rglob("*.py"):
+            relative = path.relative_to(repo).as_posix()
+            tree = ast.parse(path.read_text(), filename=relative)
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Dict) or not _is_oxide_molar_mass_table(node):
+                    continue
+                if relative == "simulator/accounting/formulas.py":
+                    continue
+                table_keys = frozenset(
+                    key.value for key in node.keys if isinstance(key, ast.Constant)
+                )
+                if (relative, table_keys) in OXIDE_MASS_TABLE_ALLOWLIST:
+                    continue
+                violations.append(f"{relative}:{node.lineno}")
+
+    assert not violations, "literal oxide molar-mass tables: " + ", ".join(violations)
+
+
+def _is_oxide_molar_mass_table(node: ast.Dict) -> bool:
+    if not node.keys or any(
+        not isinstance(key, ast.Constant) or not isinstance(key.value, str)
+        for key in node.keys
+    ):
+        return False
+    entries = list(zip(node.keys, node.values, strict=True))
+    for key_node, value_node in entries:
+        species = key_node.value
+        try:
+            formula = resolve_species_formula(species)
+            expected_mass = formula.molar_mass_g_per_mol()
+        except (TypeError, ValueError):
+            return False
+        if "O" not in formula.elements or len(formula.elements) < 2:
+            return False
+        if not isinstance(value_node, ast.Constant) or not isinstance(
+            value_node.value, (int, float)
+        ):
+            return False
+        value = float(value_node.value)
+        if abs(value - expected_mass) > max(0.01, expected_mass * 0.001):
+            return False
+    return True
+
+
+@pytest.mark.parametrize(
+    ("literal", "is_mass_table"),
+    [
+        ('molar_mass = {"SiO2": 60.0843, "MnO": 70.9375}', True),
+        ('ordinary = {"SiO2": 50.0, "MnO": 0.2}', False),
+    ],
+)
+def test_oxide_molar_mass_table_guard_uses_contents_not_names(
+    literal: str, is_mass_table: bool
+) -> None:
+    assignment = ast.parse(literal).body[0]
+    assert isinstance(assignment, ast.Assign)
+    assert isinstance(assignment.value, ast.Dict)
+    assert _is_oxide_molar_mass_table(assignment.value) is is_mass_table
 
 
 def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:

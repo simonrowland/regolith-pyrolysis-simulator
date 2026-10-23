@@ -7,7 +7,6 @@ import re
 import shutil
 import subprocess
 from functools import lru_cache
-from pathlib import Path
 
 import pytest
 from tests.helpers.corpus_paths import regolith_corpus_root

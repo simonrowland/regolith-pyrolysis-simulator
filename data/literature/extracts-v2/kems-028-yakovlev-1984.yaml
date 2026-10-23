@@ -236,7 +236,7 @@ observations:
     - pdf:kems-028-yakovlev-1984
     parameters: []
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2293.15:row=murchison:h=a3f009ee6200
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2293.15:row=murchison:h=555e720a2d52
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -314,7 +314,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.00018665079999999998'
+    point: '0.0001866513157894736842105263158'
     approximate: false
   uncertainty:
     kind: printed
@@ -354,6 +354,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -391,13 +399,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000014'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000014'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2345.15:row=murchison:h=e3f187e7a005
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2345.15:row=murchison:h=cfffb8b5e624
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -475,7 +532,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.0002133152'
+    point: '0.0002133157894736842105263157894'
     approximate: false
   uncertainty:
     kind: printed
@@ -515,6 +572,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -552,13 +617,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000016'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000016'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=efremovka_type_a:h=20200e241a48
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=efremovka_type_a:h=d1a4eea0cdf8
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -636,7 +750,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.0026664400000000004'
+    point: '0.002666447368421052631578947368'
     approximate: false
   uncertainty:
     kind: printed
@@ -676,6 +790,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -713,13 +835,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00002'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00002'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=efremovka_type_b:h=3ea8a038e41f
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=efremovka_type_b:h=7580b25b1633
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -797,7 +968,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.045329480000000005'
+    point: '0.04532960526315789473684210526'
     approximate: false
   uncertainty:
     kind: printed
@@ -837,6 +1008,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -874,13 +1053,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00034'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00034'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=murchison:h=b7bc08fba7ea
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2403.15:row=murchison:h=ff2e72ea8510
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -958,7 +1186,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.000199983'
+    point: '0.0001999835526315789473684210526'
     approximate: false
   uncertainty:
     kind: printed
@@ -998,6 +1226,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1035,13 +1271,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000015'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000015'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2453.15:row=efremovka_type_a:h=e74b4b958308
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2453.15:row=efremovka_type_a:h=43ceb44be845
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1119,7 +1404,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.0006266134'
+    point: '0.0006266151315789473684210526315'
     approximate: false
   uncertainty:
     kind: printed
@@ -1159,6 +1444,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1196,13 +1489,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000047'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000047'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2478.15:row=efremovka_type_a:h=fa5e7bf79b72
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2478.15:row=efremovka_type_a:h=73e4f8cc2e81
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1280,7 +1622,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.0004799592'
+    point: '0.0004799605263157894736842105262'
     approximate: false
   uncertainty:
     kind: printed
@@ -1320,6 +1662,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1357,13 +1707,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000036'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000036'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2478.15:row=efremovka_type_b:h=9c2a181b1634
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2478.15:row=efremovka_type_b:h=281fd411922c
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1441,7 +1840,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.037330159999999994'
+    point: '0.03733026315789473684210526315'
     approximate: false
   uncertainty:
     kind: printed
@@ -1481,6 +1880,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1518,13 +1925,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00028'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00028'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2540.15:row=efremovka_type_a:h=028b7eecb86e
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2540.15:row=efremovka_type_a:h=5175979dfda9
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1602,7 +2058,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.00733271'
+    point: '0.007332730263157894736842105262'
     approximate: false
   uncertainty:
     kind: printed
@@ -1642,6 +2098,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1679,13 +2143,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000055'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000055'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2540.15:row=efremovka_type_b:h=57c3decfaf25
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2540.15:row=efremovka_type_b:h=dc515a0225e7
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1763,7 +2276,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.005466202'
+    point: '0.005466217105263157894736842104'
     approximate: false
   uncertainty:
     kind: printed
@@ -1803,6 +2316,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -1840,13 +2361,62 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000041'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000041'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
-- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2621.15:row=efremovka_type_a:h=75ead51e411c
+- observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2621.15:row=efremovka_type_a:h=b4b9f795ec72
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
@@ -1924,7 +2494,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: point
-    point: '0.025331180000000002'
+    point: '0.02533125'
     approximate: false
   uncertainty:
     kind: printed
@@ -1964,6 +2534,14 @@ observations:
       of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: numerical_bulk_composition_not_published
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
     temperature_K:
       state:
         tag: value
@@ -2001,11 +2579,60 @@ observations:
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
                 and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
+  derived_from:
+  - pdf:kems-028-yakovlev-1984
   derivation:
-    relation: identity:Pa
+    relation: Authors calculated p(O2) from the printed equilibria AlO=Al+O and O2=2O.
     inputs:
     - pdf:kems-028-yakovlev-1984
-    parameters: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00019'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00019'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                published_page: 946
+                pdf_page_index: 2
+                table: Po2
+                note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
+                  and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
+          output_unit: Pa
+    - - factor
+      - state:
+          tag: value
+          value: '133.3223684210526315789473684'
+        locator:
+          published_page: 946
+          pdf_page_index: 2
+          table: Po2
+          note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and
+            CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
     output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_fig1_murchison_psat_figure_only
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984

@@ -225,7 +225,7 @@ def sso2_owner_recipe_evidence(
     active_constraints = constraints or PhysicsConstraintSet()
     trace = getattr(run_execution, "trace", None)
     purity_margin = active_constraints.delivered_stream_purity(trace)
-    coating_margin = active_constraints.coating(trace)
+    coating_margin = active_constraints.coating(run_execution)
     stage_species_kg, trace_status, trace_reason = _stage_species_kg_from_trace(trace)
     stage3_kg = {
         species: kg
@@ -1058,7 +1058,7 @@ def _kg_to_mol(run_execution: Any, species: str, kg: float) -> float:
 
 
 def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
-    return {
+    payload = {
         "gate": margin.gate,
         "feasible": margin.feasible,
         "margin": _json_number(margin.margin),
@@ -1068,9 +1068,27 @@ def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
         ),
         "detail": margin.detail,
         "status": margin.status,
+        "authoritative": margin.authoritative,
+        "output_status": margin.output_status,
         "status_reason": margin.status_reason,
         "threshold": _threshold_payload(margin.threshold),
     }
+    if margin.gate == "coating":
+        if "coating_verdict" in margin.status_payload:
+            payload["coating_verdict"] = margin.status_payload["coating_verdict"]
+        if "coating_unavailable_reason" in margin.status_payload:
+            payload["coating_unavailable_reason"] = margin.status_payload[
+                "coating_unavailable_reason"
+            ]
+        payload["coating_violation_reasons"] = list(
+            margin.status_payload.get("coating_violation_reasons", ())
+        )
+        payload["coating_positive_deposit_tolerance_kg_per_campaign"] = (
+            margin.status_payload.get(
+                "coating_positive_deposit_tolerance_kg_per_campaign"
+            )
+        )
+    return payload
 
 
 def _threshold_payload(threshold: Any) -> dict[str, Any]:

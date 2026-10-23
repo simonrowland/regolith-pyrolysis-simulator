@@ -1810,10 +1810,10 @@ def _cell_from_observation(
     decision_band=None,
     derive_eligible: bool = True,
 ) -> _TierCell:
-    from simulator.battery.score import _decision_band_kind
+    from simulator.battery.score import NO_HEADLINE_RAIL_TOKEN, _decision_band_kind
 
     quantity = "unknown"
-    rail = "none"
+    rail = NO_HEADLINE_RAIL_TOKEN
     if isinstance(observation.identity, Identity):
         token = quantity_token(observation.identity)
         quantity = token.value if token is not None else "unknown"
@@ -1855,10 +1855,10 @@ def _tier_cell_from_payload(
     origins: Mapping[str, str] | None,
     derive_eligible: bool,
 ) -> _TierCell:
-    from simulator.battery.score import rail_for_quantity
+    from simulator.battery.score import NO_HEADLINE_RAIL_TOKEN, rail_for_quantity
 
     token = quantity_token(observation.identity) if isinstance(observation.identity, Identity) else None
-    rail = "none"
+    rail = NO_HEADLINE_RAIL_TOKEN
     if isinstance(observation.identity, Identity):
         headline_rail = rail_for_quantity(
             token, species_formula=observation.identity.species.formula
@@ -2539,6 +2539,7 @@ def compilation_tier_census(
         is_sf04_workbook,
         predict_with_engine,
         rail_for_quantity,
+        NO_HEADLINE_RAIL_TOKEN,
     )
     from simulator.battery.enums import ExecutionState
 
@@ -2553,7 +2554,7 @@ def compilation_tier_census(
         quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
         formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
         rail = rail_for_quantity(quantity, species_formula=formula)
-        measured["none" if rail is None else rail.value] += 1
+        measured[NO_HEADLINE_RAIL_TOKEN if rail is None else rail.value] += 1
 
     series_cells = 0
     banded_series_cells = 0

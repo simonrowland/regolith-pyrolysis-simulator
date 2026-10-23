@@ -689,8 +689,13 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
     # retained; this digest still excludes only the cache-sensitive block
     # above.
+    # 2026-10-20 b-585 d-045: wall-deposit sticking authority now records
+    # inapplicable carriers (phosphorus vapours and Bi on this lunar C0)
+    # under not_applicable_* instead of the refused/non-authoritative lists.
+    # Every numeric leaf of this payload is unchanged, including the ledger
+    # pin 7cc5144f.... The digest move is those authority fields only.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "a1cab1a260b1d0c2c4925cf15c4bd884a363cb82866dd90654c0954d59823900"
+        "64045a5e11246bc8f4dac0e63102970fe5b58da8c8aeaea061d15d2b5116be58"
     )
 
 

@@ -14,9 +14,11 @@ from simulator.engine_local_config import (
     cache_version_for,
     config_path,
     is_legacy_cache_version,
+    load_engine_lock,
     load_config,
     render_toml,
     setup_thermoengine_dylib_path,
+    thermoengine_artifact_names,
     warn_legacy_once,
     write_config,
 )
@@ -32,7 +34,7 @@ from scripts.rekey_cache_engine_identity import rekey_cache
 def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLocalConfig:
     dylib_dir = tmp_path / "lib"
     dylib_dir.mkdir()
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(load_engine_lock()):
         (dylib_dir / name).write_bytes(b"dylib-" + name.encode())
 
     alpha_bin = tmp_path / "alphamelts2"
@@ -121,13 +123,10 @@ def test_config_absent_legacy_fallback_emits_warning(
 
 
 def test_warn_legacy_once_is_single_shot() -> None:
-    from simulator import engine_local_config as module
-
-    module._LEGACY_WARNED.clear()
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        warn_legacy_once("alphamelts", "legacy once")
-        warn_legacy_once("alphamelts", "legacy once")
+        warn_legacy_once("test-warn-legacy-once", "legacy once")
+        warn_legacy_once("test-warn-legacy-once", "legacy once")
     assert len(caught) == 1
 
 
@@ -157,7 +156,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
 ) -> None:
     dylib_dir = tmp_path / "lib"
     dylib_dir.mkdir()
-    for name in ("libphaseobjc.dylib", "libswimdew.dylib", "libspeciation.dylib"):
+    for name in thermoengine_artifact_names(load_engine_lock()):
         (dylib_dir / name).write_bytes(b"x")
 
     config = EngineLocalConfig(
@@ -177,7 +176,7 @@ def test_thermoengine_dylib_dir_sets_dyld_fallback(
 
 
 def test_is_legacy_cache_version_detects_path_identity() -> None:
-    legacy = "alphaMELTS subprocess (/Users/me/alphamelts2)"
+    legacy = "alphaMELTS subprocess (/opt/alphamelts2)"
     modern = "alphaMELTS 2.3.1 (digest=sha256:deadbeef)"
     assert is_legacy_cache_version(legacy) is True
     assert is_legacy_cache_version(modern) is False
@@ -189,7 +188,7 @@ def test_rekey_migration_round_trip_and_idempotency(
 ) -> None:
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
-    legacy_version = "alphaMELTS subprocess (/Users/me/alphamelts2)"
+    legacy_version = "alphaMELTS subprocess (/opt/alphamelts2)"
     # VR-3 (be07c4d5) retired the June redox-v3 corpus: optimizer identity
     # dropped data/provider fingerprints and bumped corpus_version to
     # analytical-corpus-2026-07-31-vapour-rail-key-v2, declared

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from concurrent.futures import Future, ProcessPoolExecutor
 from dataclasses import replace
 import json
@@ -428,6 +429,37 @@ def _store_rejected_evaluate(
     )
 
 
+def _thermal_refusal_then_fake_evaluate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    *,
+    profile: dict[str, object],
+    candidate_id: str | None = None,
+    output_dir: str,
+    **kwargs: object,
+) -> ScoredResult:
+    if candidate_id in {"over-limit", "lab-over-limit", "over-max-hold"}:
+        return evaluate_module.evaluate(
+            patch,
+            feedstock_id,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            constraints=kwargs.get("constraints"),
+            schema=kwargs.get("schema"),
+        )
+    return _fake_evaluate(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
+
 def _engine_bug_evaluate(
     patch: RecipePatch,
     feedstock_id: str,
@@ -798,7 +830,7 @@ def _spec(
         recipe_id=patch.recipe_id(recipe_schema_version="pool-test-schema"),
         feedstock_recipe_digest="feedstock-recipe-digest",
         feedstock_id=feedstock_id,
-        profile_id=str(profile["id"]),
+        profile_id=str(profile.get("profile_id") or profile["id"]),
         fidelity=fidelity,
         code_version="pool-test-code",
         data_digests=_DATA_DIGESTS,
@@ -922,6 +954,194 @@ def test_pool_preserves_input_order_under_reversed_completion(tmp_path: Path) ->
     )
 
     assert [result.candidate_id for result in results] == ["slow", "fast"]
+
+
+def test_pool_records_thermal_admission_refusals_and_continues(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from simulator.config import load_config_bundle
+
+    bundle = load_config_bundle()
+    setpoints = dict(bundle.setpoints)
+    setpoints.update({
+        "furnace_material": "dense_alumina_continuous",
+        "furnace_max_T_C": 2200.0,
+    })
+    monkeypatch.setattr(
+        evaluate_module,
+        "load_config_bundle",
+        lambda *args, **kwargs: replace(bundle, setpoints=setpoints),
+    )
+    monkeypatch.setattr(pool_module, "_is_picklable", lambda value: False)
+
+    def direct_supervisor(
+        task: pool_module._PoolTask,
+        evaluate_fn: Callable[..., ScoredResult],
+        *,
+        warm_runtime_spec: object,
+        per_eval_timeout_seconds: float | None,
+    ) -> dict[str, object]:
+        del warm_runtime_spec, per_eval_timeout_seconds
+        result = evaluate_fn(
+            task.patch,
+            task.feedstock_id,
+            task.fidelity,
+            profile=task.profile,
+            candidate_id=task.candidate_id,
+            output_dir=task.output_dir,
+            constraints=task.constraints,
+            schema=task.schema,
+            **dict(task.evaluator_kwargs or {}),
+        )
+        return {"kind": "result", "index": task.index, "result": result}
+
+    monkeypatch.setattr(pool_module, "_evaluate_task_supervised", direct_supervisor)
+
+    def profile(
+        high_C: float | None,
+        *,
+        lab_schedule: dict[str, object] | None = None,
+    ) -> dict[str, object]:
+        campaign_patch: dict[str, object] = {"p_total_mbar_default": 10.0}
+        if high_C is not None:
+            campaign_patch.update({
+                "temp_range_C": [1600.0, high_C],
+                "duration_h": 18,
+            })
+        run_options: dict[str, object] = {
+            "campaign": "C2A_continuous",
+            "hours": 18 if lab_schedule is None else int(float(lab_schedule["duration_h"])),
+            "mass_kg": 1000.0,
+            "backend_name": "internal-analytical",
+        }
+        if lab_schedule is not None:
+            run_options["lab_schedule"] = lab_schedule
+        return {
+            "profile_id": (
+                f"pool-c2a-window-{high_C:g}"
+                if high_C is not None
+                else "pool-c2a-lab-schedule"
+            ),
+            "profile_schema_version": "profile-schema-v1",
+            "feedstock": "lunar_mare_low_ti",
+            "objectives": [
+                {
+                    "metric": "oxygen_kg",
+                    "sense": "maximize",
+                    "units": "kg",
+                    "weight": 1.0,
+                    "rationale": "test oxygen objective evidence",
+                }
+            ],
+            "constraints": {"gates": ["delivered_stream_purity"]},
+            "seed_recipes": [
+                {
+                    "id": "seed",
+                    "source_campaign": "C2A_continuous",
+                    "patch": {
+                        "campaigns": {
+                            "C2A_continuous": campaign_patch
+                        }
+                    },
+                }
+            ],
+            "run": run_options,
+            "fidelities": {
+                "internal-analytical": {"backend_name": "internal-analytical"}
+            },
+        }
+
+    lab_schedule: dict[str, object] = {
+        "id": "pool-lab-schedule",
+        "duration_h": 2.0,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "assumption_with_sensitivity_marker",
+        "interpolation_citation_id": "test",
+        "interpolation_extraction_note": "test-declared piecewise schedule",
+        "furnace_ceiling_C": 1800.0,
+        "melt_temperature_C": [
+            {"t_h": 0.0, "value": 25.0, "unit": "C"},
+            {"t_h": 1.0, "value": 1800.0, "unit": "C"},
+            {"t_h": 2.0, "value": 1600.0, "unit": "C"},
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": 0.0, "value": 13.0, "unit": "mbar"},
+            {"t_h": 1.0, "value": 14.0, "unit": "mbar"},
+            {"t_h": 2.0, "value": 15.0, "unit": "mbar"},
+        ],
+        "gas_boundary": {
+            "background_gas": {
+                "species": "Ar",
+                "mole_fraction": 1.0,
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "imposed_flow": {
+                "value": 0.3,
+                "unit": "NL_min",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+            "pressure_control": {
+                "mode": "flow_through_with_pump",
+                "source_class": "literature_sidecar",
+                "source_ref": "test-methods",
+            },
+        },
+    }
+
+    requests = [
+        PoolEvaluationRequest(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(1800.0),
+            candidate_id="over-limit",
+        ),
+        PoolEvaluationRequest(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(None, lab_schedule=lab_schedule),
+            candidate_id="lab-over-limit",
+        ),
+        PoolEvaluationRequest(
+            RecipePatch({("campaigns", "C2A_continuous", "max_hold_hr"): 18}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(1600.0),
+            candidate_id="over-max-hold",
+        ),
+        PoolEvaluationRequest(
+            _patch(2),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile=profile(1600.0),
+            candidate_id="within-limit",
+        ),
+    ]
+
+    results = evaluate_batch(
+        requests,
+        max_workers=2,
+        output_root=tmp_path,
+        evaluate_fn=_thermal_refusal_then_fake_evaluate,
+    )
+
+    assert [result.candidate_id for result in results] == [
+        "over-limit",
+        "lab-over-limit",
+        "over-max-hold",
+        "within-limit",
+    ]
+    for result in results[:3]:
+        assert result.failure_category is FailureCategory.INVALID_PATCH
+        assert result.eval_spec is None
+        assert result.objectives is None
+    assert "lab_schedule_temperature_exceeds_furnace_material" in results[1].notes[0]
+    assert "thermal_window_recipe_local_max_hold_hr refusal" in results[2].notes[0]
+    assert results[3].feasible is True
 
 
 @pytest.mark.timeout(10)

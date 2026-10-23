@@ -102,12 +102,22 @@ def _canonical_energy_cost_totals(
     process_electrical_kWh = totals["energy_electrical_kWh"]
     pumping_diagnostic = None
     cost_rollup = run_metadata.get("cost_rollup_diagnostic")
+    cost_rollup_unavailable_reason = None
     if isinstance(cost_rollup, Mapping):
-        pumping_diagnostic = cost_rollup.get("pumping_diagnostic")
+        if cost_rollup.get("status") == "unavailable":
+            section = str(
+                cost_rollup.get("section") or "cost_rollup_diagnostic"
+            )
+            reason = str(cost_rollup.get("reason") or "no reason provided")
+            cost_rollup_unavailable_reason = (
+                f"upstream section {section} unavailable: {reason}"
+            )
+        else:
+            pumping_diagnostic = cost_rollup.get("pumping_diagnostic")
 
     pumping_electrical_kWh = None
     pumping_status = None
-    pumping_unavailable_reason = None
+    pumping_unavailable_reason = cost_rollup_unavailable_reason
     pumping_notice: Mapping[str, Any] | None = None
     if isinstance(pumping_diagnostic, Mapping):
         raw_status = pumping_diagnostic.get("status")

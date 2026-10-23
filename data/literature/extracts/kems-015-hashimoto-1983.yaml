@@ -4858,6 +4858,7 @@ species:
         chamber_pressure:
           value: 0.0001
           units: Torr
+          kind: about_nominal
           note: vacuum level in the chamber was about 10^-4 Torr during the experiments
           locator:
             published_page: 118
@@ -5524,6 +5525,7 @@ species:
         note: Fe2O3 dashes on olivine/glass are true absence, not 0.
       equipment: *hashimoto_1983_equipment
     - observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         table: '5'
@@ -5539,6 +5541,10 @@ species:
       units: mol/s as published (not a Hertz-Knudsen area flux)
       values:
         <<: *hashimoto_1983_lab_harvest
+        composition_role: &hashimoto_table1_start
+          value: initial_charge_only
+          locator: {published_page: 113, pdf_page_index: 3, table: '1', note: 'Table 1 row (1) Ave.'}
+          quote: 'SiO2 35.43; Al2O3 3.16; FeO 35.04; MgO 23.84; CaO 2.53'
         quantity: initial_stage_vaporization_rate_F
         method_class: derived_from_figure_8_linear_portion
         semantics: mol_s_rate_not_hkl_area_flux
@@ -6860,6 +6866,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7080,6 +7087,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7488,6 +7496,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7708,6 +7717,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7930,6 +7940,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8152,6 +8163,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8560,6 +8572,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8780,6 +8793,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9002,6 +9016,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9406,6 +9421,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9628,6 +9644,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10033,6 +10050,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10255,6 +10273,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10475,6 +10494,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10881,6 +10901,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11103,6 +11124,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11325,6 +11347,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11545,6 +11568,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11765,6 +11789,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11987,6 +12012,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -12209,6 +12235,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -12431,6 +12458,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -12651,6 +12679,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -12873,6 +12902,7 @@ species:
         composition_derivation: >-
           Table 1 row (1) Ave. prints the starting oxide composition in wt%.
           Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
+        composition_role: *hashimoto_table1_start
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt

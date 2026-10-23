@@ -831,19 +831,57 @@ class ReactionThermoInputs:
 # ---------------------------------------------------------------------------
 
 
-def clamp_physical_pO2_bar(pO2_bar: float) -> float:
-    """Physical melt/transport pO2 envelope (b-148)."""
+def validate_physical_pO2_bar(pO2_bar: float) -> float:
+    """Admit the actual finite-positive oxygen scalar for O2 evaluation."""
 
     if not is_declared_real_scalar(pO2_bar, allow_numeric_str=True):
         raise TypeError("pO2_bar must be numeric")
     oxygen = float(pO2_bar)
     if not math.isfinite(oxygen) or oxygen <= 0.0:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
-    if oxygen < MELT_DISSOCIATION_PO2_MIN_BAR:
-        return MELT_DISSOCIATION_PO2_MIN_BAR
-    if oxygen > MELT_DISSOCIATION_PO2_MAX_BAR:
-        return MELT_DISSOCIATION_PO2_MAX_BAR
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        import warnings
+
+        warnings.warn(str(notice), UserWarning, stacklevel=2)
     return oxygen
+
+
+def _pO2_evaluation_notice(oxygen: float) -> dict[str, Any] | None:
+    # The stated evaluator band limits evidence, not the supplied oxygen.
+    # Mass action uses p/p_ref (bar/bar): a decade in p changes log10(P)
+    # by the reaction exponent. Projecting to either edge would erase that
+    # dependence outside the band; at either edge this remains continuous.
+    if not MELT_DISSOCIATION_PO2_MIN_BAR <= oxygen <= MELT_DISSOCIATION_PO2_MAX_BAR:
+        return {
+            "reason": "pO2_outside_evaluator_band",
+            "authority_level": "extrapolated",
+            "certified_band": {
+                "pO2_bar": (
+                    MELT_DISSOCIATION_PO2_MIN_BAR,
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+            },
+            "pO2_bar_used": oxygen,
+            "was_clamped": False,
+        }
+    return None
+
+
+def _log_oxygen_ratio(
+    oxygen: float, reference: float, *, base10: bool = False,
+) -> float:
+    """Log of a positive bar/bar ratio without losing finite oxygen to division."""
+
+    logarithm = math.log10 if base10 else math.log
+    ratio = oxygen / reference
+    # Keep existing IEEE results whenever the ratio is representable. Otherwise
+    # log(p/p_ref) = log(p)-log(p_ref); both logs remain finite for positive
+    # finite inputs even if their dimensionless quotient under/overflows.
+    return (
+        logarithm(ratio) if 0.0 < ratio < math.inf
+        else logarithm(oxygen) - logarithm(reference)
+    )
 
 
 def o2_potential_from_pO2_bar(
@@ -857,19 +895,19 @@ def o2_potential_from_pO2_bar(
 ) -> GasChannelPotential:
     """Wrap a legacy scalar pO2 into the typed O2 channel (1-bar standard state).
 
-    The channel stores ``reduced_potential_ln = ln(p_clamped / 1 bar)`` against
+    The channel stores ``reduced_potential_ln = ln(p / 1 bar)`` against
     the design's 1-bar ideal-gas standard state.  The legacy
     ``pO2_reference_bar`` is retained on the potential so the evaluator can
     apply the bit-identical ratio form
 
-        e · log10(p_clamped / p_ref)
+        e · log10(p / p_ref)
 
     which is algebraically identical to the rebased composition
 
-        e · log10(p_clamped / 1) − e · log10(p_ref / 1)
+        e · log10(p / 1) − e · log10(p_ref / 1)
 
-    (design §7.2).  Using the ratio form preserves IEEE identity with the
-    pre-t-571 evaluator for every catalog row.
+    (design §7.2). Within the stated evaluator band, the ratio form preserves
+    IEEE identity with the pre-t-571 evaluator for every catalog row.
     """
 
     if reaction_plane not in REACTION_PLANES:
@@ -902,35 +940,21 @@ def o2_potential_from_pO2_bar(
         owner_id="legacy_pO2_adapter",
         source_kind=SOURCE_KIND_LEGACY_SCALAR_ADAPTER,
     )
-    oxygen = clamp_physical_pO2_bar(pO2_bar)
+    oxygen = validate_physical_pO2_bar(pO2_bar)
     # 1-bar ideal-gas standard state: (μ-μ0)/(R T) = ln(f / 1 bar).
     reduced = math.log(oxygen / 1.0)
     delta_mu = GAS_CONSTANT * temperature_K * reduced
     receipt: dict[str, Any] = {
         "kind": "legacy_pO2_bar",
         "pO2_bar_input": float(pO2_bar),
+        # Historical receipt key retained; the value is now the actual input.
         "pO2_bar_clamped": oxygen,
         "pO2_reference_bar": p_ref,
         "standard_state_bar": 1.0,
     }
-    if oxygen == MELT_DISSOCIATION_PO2_MIN_BAR and float(pO2_bar) < MELT_DISSOCIATION_PO2_MIN_BAR:
-        from engines.builtin.vapor_pressure import (
-            MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
-            MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
-        )
-
-        receipt["extrapolation_notice"] = {
-            "reason": MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
-            "authority_level": "extrapolated",
-            "certified_band": {
-                "pO2_bar": (
-                    MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
-                    MELT_DISSOCIATION_PO2_MAX_BAR,
-                )
-            },
-            "pO2_bar_used": oxygen,
-            "was_clamped": True,
-        }
+    notice = _pO2_evaluation_notice(oxygen)
+    if notice is not None:
+        receipt["extrapolation_notice"] = notice
     return GasChannelPotential(
         channel_id=CHANNEL_O2,
         gas_formula="O2",
@@ -1006,8 +1030,8 @@ def channel_log10_contribution(
         if p_ref is None:
             p_ref = 1.0
         # Exact pre-t-571 expression.
-        return float(term.derived_exponent) * math.log10(
-            float(potential.legacy_pO2_bar) / float(p_ref)
+        return float(term.derived_exponent) * _log_oxygen_ratio(
+            float(potential.legacy_pO2_bar), float(p_ref), base10=True
         )
 
     if potential.reduced_potential_ln is None:
@@ -1025,7 +1049,7 @@ def channel_linear_mass_action_factor(
     term: CompiledReactionTerm,
     potential: GasChannelPotential,
 ) -> float:
-    """Linear-space mass-action factor ``(f_clamped / f_ref) ** e``.
+    """Linear-space mass-action factor ``(f / f_ref) ** e``.
 
     Migration aid for the legacy linear-space composers in
     ``engines/builtin/vapor_pressure.py`` (design §12 Phase 1): those rails
@@ -1037,12 +1061,11 @@ def channel_linear_mass_action_factor(
         factor = (legacy_pO2_bar / legacy_pO2_reference_bar) ** e
 
     Derivation: premise — the legacy rail computes
-    ``P_eq = P_ref · a^ea · (p_clamped / p_ref)^e`` with
-    ``p_clamped = min(max(pO2, MIN), MAX)``; ``legacy_pO2_bar`` on the
-    potential is exactly that clamped value (``clamp_physical_pO2_bar``) and
-    ``term.derived_exponent = -(-e)/1 = e`` bit-for-bit, so the factor is
-    identical to the pre-migration expression for every input.  Units:
-    bar/bar is dimensionless.
+    ``P_eq = P_ref · a^ea · (p / p_ref)^e``. ``legacy_pO2_bar`` on the
+    potential is the validated input, and ``term.derived_exponent = -(-e)/1
+    = e`` bit-for-bit. Units: bar/bar is dimensionless. Within the stated
+    evaluator band this is identical to the pre-migration expression; beyond
+    it the actual oxygen is used and the potential carries a domain notice.
 
     Fail-closed: only the O2 channel carried by the legacy scalar adapter is
     linear-composable; every other channel / source kind must use the
@@ -1076,10 +1099,13 @@ def channel_linear_mass_action_factor(
             f"source_kind={potential.source_kind}"
         )
     # Exact pre-t-571 linear expression (bit-identity bar).
-    return (
-        float(potential.legacy_pO2_bar)
-        / float(potential.legacy_pO2_reference_bar)
-    ) ** float(term.derived_exponent)
+    oxygen = float(potential.legacy_pO2_bar)
+    reference = float(potential.legacy_pO2_reference_bar)
+    ratio = oxygen / reference
+    exponent = float(term.derived_exponent)
+    if 0.0 < ratio < math.inf:
+        return ratio ** exponent
+    return math.exp(exponent * _log_oxygen_ratio(oxygen, reference))
 
 
 # ---------------------------------------------------------------------------
@@ -1819,7 +1845,7 @@ __all__ = [
     "REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING",
     "REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING",
     "REFUSAL_CARBON_SIDE_OWNER_MISSING",
-    "clamp_physical_pO2_bar",
+    "validate_physical_pO2_bar",
     "o2_potential_from_pO2_bar",
     "channel_log10_contribution",
     "channel_linear_mass_action_factor",

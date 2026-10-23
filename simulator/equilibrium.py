@@ -6,7 +6,11 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
-from engines.antoine import _antoine_log10_pressure
+from engines.antoine import (
+    _antoine_skip_notices_for_omitted_species,
+    _append_antoine_skip_notice,
+    _antoine_log10_pressure,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -397,8 +401,8 @@ class EquilibriumMixin:
         SiO vapor uses a separate equilibrium pathway because it
         evaporates as an oxide gas (SiO₂ → SiO + ½O₂), not as a
         metal. The Antoine row is the reference pressure; a √pO₂
-        suppression is applied only above the row's pO₂ reference
-        (see the oxide-vapor loop).  [THERMO-8]
+        factor continues on both sides of the row's pO₂ reference
+        (see the shared SiO pressure owner).  [THERMO-8]
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
@@ -469,11 +473,12 @@ class EquilibriumMixin:
         ellingham_extrapolations = {}
         vapor_pressure_authority_limits = {}
         warnings = []
+        antoine_skip_notice_keys: set[tuple[str, str, str]] = set()
         # b-149 instance 3: typed notes on the `_sz_omit` paths in this
         # method (missing activity, activity-threshold skip, P <= 1e-15 Pa).
         # Those omissions keep status='ok' with a note. Other continues in
         # this method (inactive row, missing parent, A<=0, oxide-vapor
-        # outside valid_range_K) still omit without a note.
+        # outside valid_range_K) omit without a typed silent-zero note.
         from simulator.silent_zero import (
             CATEGORY_PROVEN_ZERO,
             CATEGORY_REFUSE,
@@ -737,6 +742,15 @@ class EquilibriumMixin:
                 B = antoine.get('B', 0)
                 C = antoine.get('C', 0)
                 if P_reference_Pa is None and not (A > 0 and T_K > 300):
+                    if not A > 0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine,
+                            species=species,
+                            site="equilibrium.internal_analytical.metal_antoine",
+                            temperature_K=T_K,
+                        )
                     continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -893,6 +907,18 @@ class EquilibriumMixin:
                 B_l = float(antoine_liq.get("B", 0.0) or 0.0)
                 C_l = float(antoine_liq.get("C", 0.0) or 0.0)
                 if not (A_l > 0.0 and T_K > 300.0):
+                    if not A_l > 0.0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine_liq,
+                            species=species,
+                            site=(
+                                "equilibrium.internal_analytical."
+                                "liquid_oxide_antoine"
+                            ),
+                            temperature_K=T_K,
+                        )
                     continue
                 valid_liq = _range_tuple(liquid_rxn.get("valid_range_K"))
                 if valid_liq is not None:
@@ -980,6 +1006,15 @@ class EquilibriumMixin:
                 B_g = float(antoine_gas.get("B", 0.0) or 0.0)
                 C_g = float(antoine_gas.get("C", 0.0) or 0.0)
                 if not (A_g > 0.0 and T_K > 300.0):
+                    if not A_g > 0.0:
+                        _append_antoine_skip_notice(
+                            warnings,
+                            antoine_skip_notice_keys,
+                            antoine_gas,
+                            species=species,
+                            site="equilibrium.internal_analytical.gas_rail_antoine",
+                            temperature_K=T_K,
+                        )
                     continue
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
@@ -1338,6 +1373,18 @@ class EquilibriumMixin:
             else:
                 # Out-of-range or A <= 0: omit without a silent-zero note
                 # on this path (the `_sz_omit` helpers are not called).
+                if not A > 0:
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine,
+                        species=name,
+                        site=(
+                            "equilibrium.internal_analytical."
+                            "oxide_vapor_antoine"
+                        ),
+                        temperature_K=T_K,
+                    )
                 continue
 
             parent_oxide = data.get('parent_oxide', '')
@@ -1379,19 +1426,8 @@ class EquilibriumMixin:
                     field="P_sat_pO2",
                 )
 
-            # SiO pO2 correction is piecewise around the calibration
-            # reference, not a global 1/sqrt(pO2) law.
-            # Premise: SiO2(melt) → SiO(g) + 1/2 O2(g) has
-            #   K = p_SiO * pO2^{1/2} / a_SiO2  (reduced pressures).
-            # Algebra: p_SiO = K a_SiO2 / sqrt(pO2). Relative to the
-            # fitted reference p_ref:
-            #   P = P_ref * sqrt(p_ref / pO2)   when pO2 > p_ref.
-            # Unit check: p_ref/pO2 is bar/bar, dimensionless.
-            # Sanity: 100× higher pO2 above p_ref cuts p_SiO by 10.
-            # At pO2 <= p_ref this branch does not run, so p_SiO stays
-            # at the reference-calibrated value (no 1/sqrt enhancement).
-            # Body vacuum floors below p_ref therefore do not retune
-            # the SiO fit; they also do not raise p_SiO.
+            # The declared reaction reference stays fixed as environmental
+            # oxygen changes; the shared pressure owner continues both sides.
             sio_reference_bar = vacuum_floor_bar
             if name == 'SiO':
                 sio_reference_bar = max(
@@ -1401,9 +1437,10 @@ class EquilibriumMixin:
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(sio_reference_bar / pO2_bar)
+                from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
+
+                suppression = _sio_oxygen_pressure_factor(pO2_bar, sio_reference_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,
@@ -1471,7 +1508,10 @@ class EquilibriumMixin:
             },
             activity_coefficients=activities,
             fO2_log=intrinsic_fO2_log,
-            warnings=warnings,
+            warnings=_antoine_skip_notices_for_omitted_species(
+                warnings,
+                vapor_pressures,
+            ),
             status='ok',
             diagnostics=_eq_diagnostics,
         )

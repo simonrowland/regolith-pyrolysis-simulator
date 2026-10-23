@@ -2562,6 +2562,24 @@ class JANAFFusionEnergy:
     crystal_table: str
     liquid_table: str
     source_sha256: tuple[str, str]
+    sigma_delta_g_fus_kJ_per_mol: Decimal | None = None
+    uncertainty_locator: Locator | None = None
+
+    def __post_init__(self) -> None:
+        if self.sigma_delta_g_fus_kJ_per_mol is None:
+            if self.uncertainty_locator is not None:
+                raise ValueError("JANAF fusion uncertainty locator requires a printed uncertainty")
+            return
+        sigma = Decimal(str(self.sigma_delta_g_fus_kJ_per_mol))
+        if not sigma.is_finite() or sigma <= 0:
+            raise ValueError("JANAF fusion uncertainty must be a finite positive value")
+        if self.uncertainty_locator is None or not (
+            self.uncertainty_locator.page
+            or self.uncertainty_locator.published_page
+            or self.uncertainty_locator.table
+        ):
+            raise ValueError("JANAF fusion uncertainty requires a page/table locator")
+        object.__setattr__(self, "sigma_delta_g_fus_kJ_per_mol", sigma)
 
 
 _FUSION_TABLES = {

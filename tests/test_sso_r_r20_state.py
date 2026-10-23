@@ -3329,6 +3329,9 @@ def test_native_fe_saturation_uses_upstream_total_pressure(
         fe3_over_sigma_fe=0.1,
     )
 
+    assert seen_pressure_bar == pytest.approx(
+        [seen_pressure_bar[0]] * len(seen_pressure_bar)
+    )
     assert seen_pressure_bar == pytest.approx([0.005, 0.005])
 
 
@@ -3419,6 +3422,94 @@ def test_c7_and_native_fe_predict_and_flag_at_transitional_kn_probe() -> None:
     )
     assert series["p_bulk_transport_domain"] == "out_of_domain_transitional"
     assert series["ledger_yields_authorized"] is True
+    assert "transport_model_validity_domain" in series["framing"]
+
+    # --- viscous floor: P=100 Pa, Kn≈0.0036 — normal behavior ---
+    sim.melt.p_total_mbar = 1.0  # 100 Pa
+    cfg_viscous = dict(cfg)
+    cfg_viscous["p_total_mbar"] = 1.0
+    extent_v, c7_v = sim._c7_transport_extent_mol(cfg_viscous, ca_per_extent=3.0)
+    # Outside C7 shell envelope (0.01–0.1 mbar) — ordinary envelope refusal,
+    # NOT the transitional domain label.
+    assert extent_v == pytest.approx(0.0)
+    assert c7_v["c7_transport_refusal"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert c7_v.get("ledger_yields_authorized") is not False
+    assert c7_v.get("reason") != "viscous_p_bulk_transport_out_of_domain"
+    assert c7_v.get("p_bulk_transport_domain") != "out_of_domain_transitional"
+
+    native_v = sim._native_fe_partition_diagnostic(100.0)
+    assert native_v["native_fe_vapor_mol"] > 0.0
+    assert native_v.get("ledger_yields_authorized") is not False
+    assert native_v.get("reason") != "viscous_p_bulk_transport_out_of_domain"
+    series_v = native_v["series_resistance"]
+    assert series_v["authority_class"] == "upper-bound"
+    assert series_v["authority_reason"] == (
+        "missing-species-state-dependent-melt-transfer-inputs"
+    )
+    assert series_v.get("ledger_yields_authorized") is not False
+
+
+# Merge preservation: retain the distinct cb13f9f92 case and its assertions.
+def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:
+    """Bug B residual teeth: reverify probe (T=2023.15 K, D=0.12 m, P=3.632 Pa).
+
+    Both the C7 ledger path and native-Fe partition must soft-suppress
+    ledger-authoritative yields with the typed validity vocabulary
+    (not a Kn safety/coating gate). At P=100 Pa (Kn≈0.0036, 0.6.3 floor)
+    both paths behave normally — no domain suppression.
+    """
+    # --- transitional probe: Kn≈0.1 ---
+    sim = _make_sim()
+    sim.melt.temperature_C = 1750.0
+    sim.melt.p_total_mbar = 0.03632  # 3.632 Pa
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead.headspace_temperature_K = 2023.15
+
+    cfg = dict(sim._c7_campaign_config())
+    cfg.update(
+        active_ca_condensation_route=True,
+        dedicated_ca_condenser=True,
+        hold_temp_C=1750.0,
+        p_total_mbar=0.03632,
+        ca_route_surface_area_m2=0.2,
+        hold_time_h=1.0,
+        stir_factor=1.0,
+        radial_stir_factor=1.0,
+    )
+    extent, c7_diag = sim._c7_transport_extent_mol(cfg, ca_per_extent=3.0)
+
+    assert extent == pytest.approx(0.0)
+    assert c7_diag["transport_ca_mol"] == pytest.approx(0.0)
+    assert c7_diag["c7_ca_flux_kg_s_m2"] == pytest.approx(0.0)
+    assert c7_diag["c7_transport_refusal"] == (
+        "viscous_p_bulk_transport_out_of_domain"
+    )
+    assert c7_diag["ledger_yields_authorized"] is False
+    assert c7_diag["authority_class"] == "diagnostic-limited"
+    assert c7_diag["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert c7_diag["p_bulk_transport_domain"] == "out_of_domain_transitional"
+    assert c7_diag["knudsen_number"] == pytest.approx(0.100002, rel=1e-3)
+    assert "transport_model_validity_domain" in c7_diag["framing"]
+    assert "not_kn_safety_gate" in c7_diag["framing"]
+    assert "not_coating_gate" in c7_diag["framing"]
+
+    native = sim._native_fe_partition_diagnostic(1.0)
+    assert native["native_fe_vapor_mol"] == pytest.approx(0.0)
+    assert native["native_fe_tap_mol"] == pytest.approx(1.0)
+    assert native["ledger_yields_authorized"] is False
+    assert native["authority_class"] == "diagnostic-limited"
+    assert native["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert native["p_bulk_transport_domain"] == "out_of_domain_transitional"
+    assert "transport_model_validity_domain" in native["framing"]
+    series = native["series_resistance"]
+    assert series["authority_class"] == "diagnostic-limited"
+    assert series["authority_reason"] == (
+        "viscous_p_bulk_transport_out_of_domain"
+    )
+    assert series["p_bulk_transport_domain"] == "out_of_domain_transitional"
+    assert series["ledger_yields_authorized"] is False
     assert "transport_model_validity_domain" in series["framing"]
 
     # --- viscous floor: P=100 Pa, Kn≈0.0036 — normal behavior ---

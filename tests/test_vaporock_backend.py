@@ -1863,6 +1863,7 @@ def test_pressure_bar_remains_diagnostic_only(monkeypatch):
         assert result.diagnostics["pressure_control_authoritative"] is False
 
     # Upstream default P only; adapter never passes requested total pressure.
+    assert pressures == pytest.approx([pressures[0]] * len(pressures))
     assert pressures == pytest.approx([1e-10, 1e-10])
 
 

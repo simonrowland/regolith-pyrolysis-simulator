@@ -133,11 +133,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
-    # d-210: regenerated from resolved setpoints with C6 Kr default and floor metadata.
-    # d-231: production-resolved digest after removing exactly the three
-    # historical fixed-throat keys; remaining resolved values are identical.
+    # d-210/d-231: C6 Kr default/floor metadata and removal of fixed throats.
+    # Merge b151 t-1441: also retain its four stirring description changes.
+    # Recomputed from the combined production-resolved setpoints; no numeric
+    # setpoint or pressure/film expectation is changed to resolve this digest.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "0ed1d88bb7ddc5a1dd335870aa174a597229931a21f1d0334ebfb71981b4ac2e"
+        "dfcc5ab93969b1f5e0ae0be4bba7d10906d657c050d2f192e0143cbf2aa9c034"
     )
     # d-215: regenerated with the production schema/search identity producers;
     # sweep is now area-normalized, and the Mars fallback is resolved setpoints data.
@@ -717,7 +718,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
     # 2026-09-30 C7d removed the physics-gate version and class from this digest.
-    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
+    # 2026-10-20 b-585 d-045: the default physics_constraints digest now includes
+    # coating_max_upstream_wall_deposit_fraction_per_campaign = 5e-4. Removing
+    # that one threshold from the default constraint payload restores
+    # f6d1c88b.... recipe_id is unchanged. The key carries no run result.
+    assert cache_key(spec) == "368ca7f8131d3652aea965f3106bad89afeab89a35478a660eeb0c61fd8fc6d4"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

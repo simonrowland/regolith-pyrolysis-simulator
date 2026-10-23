@@ -136,8 +136,8 @@ def test_o2_term_matches_scalar_pO2_exponent():
         (1.0e-9, 1.0e-9, -0.5),
         (1.0e-12, 1.0e-9, -0.5),
         (50.0, 1.0, 1.0),
-        (1.0e-35, 1.0, -0.25),  # clamps to min
-        (1.0e6, 1.0, -0.5),  # clamps to max
+        (1.0e-35, 1.0, -0.25),  # below evaluator band
+        (1.0e6, 1.0, -0.5),  # above evaluator band
     ],
 )
 def test_o2_channel_contribution_bit_identical_to_legacy(pO2_bar, p_ref, exponent):
@@ -159,10 +159,6 @@ def test_o2_channel_contribution_bit_identical_to_legacy(pO2_bar, p_ref, exponen
         term, pot, legacy_pO2_reference_bar=p_ref
     )
     oxygen = float(pO2_bar)
-    if oxygen < MELT_DISSOCIATION_PO2_MIN_BAR:
-        oxygen = MELT_DISSOCIATION_PO2_MIN_BAR
-    elif oxygen > MELT_DISSOCIATION_PO2_MAX_BAR:
-        oxygen = MELT_DISSOCIATION_PO2_MAX_BAR
     legacy = exponent * math.log10(oxygen / p_ref)
     assert contrib == legacy  # bit-identical
 
@@ -172,11 +168,45 @@ def test_o2_channel_contribution_bit_identical_to_legacy(pO2_bar, p_ref, exponen
 # ---------------------------------------------------------------------------
 
 _T_GRID_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0)
-# P3 fold (probe clamp-edge coverage): the grid spans the physical envelope
-# edges — 1e-35 clamps to MELT_DISSOCIATION_PO2_MIN_BAR (1e-30) and 1e3
-# clamps to MELT_DISSOCIATION_PO2_MAX_BAR (100) — so the clamp itself is
-# differential-probed, not just the in-envelope interior.
+# Include both sides of the stated evaluator band: typed and scalar paths
+# must use the same actual oxygen, including out-of-domain predictions.
 _PO2_GRID_BAR = (1.0e-35, 1.0e-12, 1.0e-9, 1.0e-6, 1.0e-3, 1.0e-1, 1.0, 1.0e3)
+
+
+def test_b984_oxygen_evaluation_consolidation_pin(production_catalog):
+    """Keep the in-band numeric pin unchanged after removing substitution."""
+
+    evaluator = production_catalog.evaluator_for("SiO")
+    assert tuple(
+        evaluator.evaluate(1873.15, source_activity=1.0, pO2_bar=oxygen).pressure_pa.hex()
+        for oxygen in (1e-30, 1e-29, 100.0)
+    ) == (
+        "0x1.4b3935311084ep+36",
+        "0x1.a2f7dddea5af0p+34",
+        "0x1.2a56ee89ef987p-17",
+    )
+
+
+@pytest.mark.parametrize(
+    "oxygen,reference,expected_log10",
+    [(1e308, 1e-9, -158.5), (1e-310, 1e30, 170.0)],
+)
+def test_o2_ratio_remains_finite_when_division_overflows(oxygen, reference, expected_log10):
+    term = compile_o2_channel_term(
+        signed_nu_o2=0.5, target_nu=1.0,
+        reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+    )
+    potential = o2_potential_from_pO2_bar(
+        pO2_bar=oxygen, pO2_reference_bar=reference,
+        temperature_K=1873.15, reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+    )
+    # The -1/2 reaction exponent gives -317/2=-158.5 and -(-340)/2=170
+    # decades, respectively. bar/bar is dimensionless; both factors fit float64
+    # even though the unpowered quotients do not.
+    assert channel_log10_contribution(term, potential) == pytest.approx(expected_log10)
+    assert channel_linear_mass_action_factor(term, potential) == pytest.approx(
+        10.0 ** expected_log10, rel=1e-12, abs=0.0
+    )
 
 
 def test_catalog_o2_channel_bit_identity_differential(production_catalog):
@@ -859,8 +889,8 @@ def test_production_catalog_emits_only_o2_terms(production_catalog):
         (1.0e-9, 1.0e-9, -0.5),
         (1.0e-12, 1.0e-9, -1.0),
         (50.0, 1.0, 0.25),
-        (1.0e-35, 1.0, -0.75),  # clamps to MIN (1e-30)
-        (1.0e6, 1.0, -0.25),  # clamps to MAX (100)
+        (1.0e-35, 1.0, -0.75),  # below evaluator band
+        (1.0e6, 1.0, -0.25),  # above evaluator band
         (MELT_DISSOCIATION_PO2_MIN_BAR, 1.0, -0.5),  # exact MIN edge
         (MELT_DISSOCIATION_PO2_MAX_BAR, 1.0, 0.5),  # exact MAX edge
     ],
@@ -882,10 +912,7 @@ def test_channel_linear_mass_action_factor_bit_identical(pO2_bar, p_ref, exponen
     factor = channel_linear_mass_action_factor(term, pot)
     # Pre-migration inline expression from _standard_reaction_pressure_Pa.
     p_ref_legacy = max(1e-30, float(p_ref) or 1.0)
-    oxygen = min(
-        max(float(pO2_bar), MELT_DISSOCIATION_PO2_MIN_BAR),
-        MELT_DISSOCIATION_PO2_MAX_BAR,
-    )
+    oxygen = float(pO2_bar)
     legacy = (oxygen / p_ref_legacy) ** float(exponent)
     assert factor == legacy  # bit-identical, not approx
 

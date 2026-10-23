@@ -1255,6 +1255,7 @@ print('ok')
         comp_wt: Mapping[str, float],
         fO2_log: Optional[float] = None,
         warnings: tuple[str, ...] = (),
+        call_timeout_s: Optional[float] = None,
     ) -> ThermoEnginePayload:
         """Equilibrate with a hard deadline around all native solve calls."""
         if self._worker.process is None and self._worker.start_count == 0:
@@ -1270,7 +1271,11 @@ print('ok')
             'warnings': tuple(warnings),
         }
         try:
-            return self._worker.call(kwargs)
+            if call_timeout_s is None:
+                return self._worker.call(kwargs)
+            return self._worker.call(
+                kwargs, timeout_s=max(0.001, float(call_timeout_s))
+            )
         except EngineWorkerRemoteError as exc:
             exc_name = exc.exc_name
             detail = exc.detail
@@ -1757,12 +1762,16 @@ print('ok')
                     f'{liquid_phase!r} but composition_of_phase returned '
                     'an empty payload; falling back to bulk composition.',
                 )
-            liquid_components = self._finite_mapping(
+            # Preserve invalid native fractions so the activity adapter can
+            # return a typed refusal instead of silently dropping or clamping
+            # them through _finite_mapping.
+            liquid_components = dict(
                 _thermoengine_native_call(
                     lambda: melts.get_composition_of_phase(
                         root, liquid_phase, 'component'
                     )
                 )
+                or {}
             )
         else:
             # No liquid phase: leave composition + activities + Fe redox
@@ -2262,16 +2271,52 @@ print('ok')
             return {}
 
         endmember_names = tuple(str(name) for name in liq_phase.endmember_names)
-        mol = [
-            float(component_mole_fraction.get(name, 0.0) or 0.0)
-            for name in endmember_names
-        ]
-        if sum(mol) <= 0.0:
+        try:
+            mol = [
+                float(component_mole_fraction.get(name, 0.0) or 0.0)
+                for name in endmember_names
+            ]
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ThermoEngineNotConvergedError(
+                f'ThermoEngine liquid endmember fractions are invalid: {exc}'
+            ) from exc
+        if any(not math.isfinite(value) for value in mol):
+            raise ThermoEngineNonFiniteField(
+                'ThermoEngine liquid endmember fractions are not finite'
+            )
+        if any(value < 0.0 for value in mol):
+            raise ThermoEngineNotConvergedError(
+                'ThermoEngine liquid endmember fractions contain a negative value'
+            )
+        try:
+            total = math.fsum(mol)
+        except OverflowError as exc:
+            raise ThermoEngineNonFiniteField(
+                'ThermoEngine liquid endmember fraction total is not finite'
+            ) from exc
+        if not math.isfinite(total):
+            raise ThermoEngineNonFiniteField(
+                'ThermoEngine liquid endmember fraction total is not finite'
+            )
+        if total <= 0.0:
             mol = self._endmember_moles_from_wt(comp_wt, endmember_names)
-        total = sum(value for value in mol if value > 0.0)
+            if any(not math.isfinite(value) for value in mol):
+                raise ThermoEngineNonFiniteField(
+                    'ThermoEngine liquid endmember fractions are not finite'
+                )
+            try:
+                total = math.fsum(mol)
+            except OverflowError as exc:
+                raise ThermoEngineNonFiniteField(
+                    'ThermoEngine liquid endmember fraction total is not finite'
+                ) from exc
+            if not math.isfinite(total):
+                raise ThermoEngineNonFiniteField(
+                    'ThermoEngine liquid endmember fraction total is not finite'
+                )
         if total <= 0.0:
             return {}
-        mol = [max(0.0, value) / total for value in mol]
+        mol = [value / total for value in mol]
 
         import numpy as np
 
@@ -2300,6 +2345,18 @@ print('ok')
             if len(mu0_values) == 0:
                 continue
             try:
+                # For a MELTS liquid component, mu_i - mu_i^0 = RT ln(a_i):
+                # chem_potential supplies mu_i and gibbs_energy at pure i,
+                # the same T and P, supplies mu_i^0. Both are J/mol and R is
+                # J/(mol K), so the exponent is dimensionless. This is the
+                # pure-liquid-endmember standard state. Parent-oxide identity
+                # mapping belongs to
+                # engines.alphamelts.domain.melts_endmember_to_parent_oxide_activity,
+                # and solid measurements reach this liquid basis through
+                # simulator.battery.score.fusion_comparison_reference. Keep the
+                # direct engine result: its pure-SiO2 limit is 1.00003004
+                # (1.3e-5 dex), also seen in the MELTS-v1 VapoRock cross-check;
+                # 1e-4 dex is negligible beside the rail's 0.1-0.8 dex residuals.
                 activity = self._activity_converter(
                     float(mu_values[idx]),
                     float(mu0_values[0]),

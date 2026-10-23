@@ -584,11 +584,12 @@ def test_core_inline_kress91_full_split_regression_pins() -> None:
     assert split['fe2o3_over_feo_molar'] == pytest.approx(
         0.020159198364662897, rel=0, abs=1.0e-15
     )
+    # Formula-mass projection (SC-333 S333-04) changes only the final wt% basis.
     assert split['fe2o3_equiv_wt_pct'] == pytest.approx(
-        0.585472552554371, rel=0, abs=1.0e-12
+        0.5854828394288029, rel=0, abs=1.0e-12
     )
     assert split['feo_equiv_wt_pct'] == pytest.approx(
-        13.066348090398607, rel=0, abs=1.0e-12
+        13.066577668850247, rel=0, abs=1.0e-12
     )
 
 

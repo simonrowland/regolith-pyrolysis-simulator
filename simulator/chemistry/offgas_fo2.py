@@ -96,12 +96,12 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Mapping, Sequence
 
+from simulator.physical_constants import PA_PER_BAR
 from simulator.vapour_rail.nasa_cea import (
     Nasa9Segment,
     NasaCeaPolynomial,
     reaction_equilibrium_constant,
 )
-from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 #: Species whose CEA records this module needs. Both couples plus O2.
@@ -693,7 +693,7 @@ def co2_dissociation_partials_bar(
             )
         return result
     polys = load_buffer_polynomials()
-    reference_bar = polys["O2"].reference_pressure_Pa / 100_000.0
+    reference_bar = polys["O2"].reference_pressure_Pa / PA_PER_BAR
     if any(polys[s].reference_pressure_Pa != polys["O2"].reference_pressure_Pa
            for s in ("CO", "CO2")):
         raise OffgasFO2Unavailable("CO2/CO/O2 records have different standard pressures")

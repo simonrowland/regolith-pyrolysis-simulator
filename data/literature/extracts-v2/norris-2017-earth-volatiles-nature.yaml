@@ -155,6 +155,186 @@ observations:
               figure: '2'
               note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
         output_unit: K
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5226508780512647327686871688'
+          - - TiO2
+            - '0.007450970521666675864658847771'
+          - - Al2O3
+            - '0.09186126415983606031527388527'
+          - - FeO
+            - '0.08360483248003905551512051168'
+          - - MnO
+            - '0.001747652234872601342381195539'
+          - - MgO
+            - '0.1368799899499452779858934599'
+          - - CaO
+            - '0.1357412059451461588276430933'
+          - - Na2O
+            - '0.01960256253777322478085063111'
+          - - K2O
+            - '0.0004606441194562125994912063457'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 15
+        figure: '2'
+        note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.66'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.96'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.11'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '9.69'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.9'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.28'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '1.96'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 15
+              figure: '2'
+              note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+        output_unit: mole_fraction
     fO2_log:
       state:
         tag: value

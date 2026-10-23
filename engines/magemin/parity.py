@@ -25,8 +25,8 @@ from dataclasses import dataclass, field
 import math
 from typing import Any, List, Mapping, Optional, Tuple
 
-from engines.magemin.domain import _is_finite
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.scalar_boundary import is_finite
 
 # Tolerances match the binding spec §4 MAGEMin entry.
 LIQUIDUS_TOLERANCE_K = 50.0
@@ -229,8 +229,8 @@ def _state_point_warnings(
             )
             continue
         if (
-            not _is_finite(auth_value)
-            or not _is_finite(shadow_value)
+            not is_finite(auth_value)
+            or not is_finite(shadow_value)
             or not math.isclose(
                 auth_value,
                 shadow_value,
@@ -270,7 +270,7 @@ def _extract_liquidus_K(result: Any) -> Optional[float]:
         if value is not None:
             try:
                 number = float(value)
-                if _is_finite(number):
+                if is_finite(number):
                     return number
             except (TypeError, ValueError):
                 continue
@@ -280,7 +280,7 @@ def _extract_liquidus_K(result: Any) -> Optional[float]:
         if value is not None:
             try:
                 number = float(value) + CELSIUS_TO_KELVIN_OFFSET
-                if _is_finite(number):
+                if is_finite(number):
                     return number
             except (TypeError, ValueError):
                 continue
@@ -299,7 +299,7 @@ def _extract_phase_modes_wt_pct(result: Any) -> Mapping[str, float]:
         return {
             str(name): float(value)
             for name, value in modes.items()
-            if _is_finite(value)
+            if is_finite(value)
         }
 
     masses = _lookup(result, 'phase_masses_kg')
@@ -307,13 +307,13 @@ def _extract_phase_modes_wt_pct(result: Any) -> Mapping[str, float]:
         total = sum(
             float(value)
             for value in masses.values()
-            if _is_finite(value)
+            if is_finite(value)
         )
         if total > 0:
             return {
                 str(name): float(value) / total * 100.0
                 for name, value in masses.items()
-                if _is_finite(value) and float(value) > 0.0
+                if is_finite(value) and float(value) > 0.0
             }
 
     return {}
