@@ -1214,7 +1214,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             1,
             1550.0,
             3.123653392791531,
-            1390584.7638444814,
+            # t-1396/d-254: zero commanded pressure has no finite ceiling
+            # utilization; the source and remaining tuple entries stay pinned.
+            0.0,
             994.9920372838491,
         ),
         rel=1.0e-12,

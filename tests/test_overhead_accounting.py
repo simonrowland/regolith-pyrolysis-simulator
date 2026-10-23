@@ -2067,13 +2067,15 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account_b151():
     # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
     # supersaturated on the first two walls; segment-local depletion then
     # leaves 0.913341865141524 kg for terminal conversion.
+    # t-1396 (d-254 approved stack): mixed-regime pressure changes wall allocation.
+    # Fresh production output: reconcile-evidence/physics-values.log.
     assert wall_cro2_by_account_kg == pytest.approx(
         {
             "process.wall_deposit_segment_stage_0_to_stage_1": (
-                0.04078029875692986
+                0.08126048984599996
             ),
             "process.wall_deposit_segment_stage_1_to_stage_2": (
-                0.045877836101546096
+                0.09141805107674994
             ),
         },
         rel=1e-12,

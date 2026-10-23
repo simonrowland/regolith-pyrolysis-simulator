@@ -1451,7 +1451,8 @@ def test_bleed_provider_does_not_apply_downstream_capacity_twice() -> None:
         {"Fe": 1.0}, total_mol=1.0, total_kg=0.055845,
         controls={**base, "p_downstream_bar": 0.8},
     )
-    assert finite["Fe"] == pytest.approx(vacuum["Fe"] * (1.0 - 0.8 ** 2))
+    # t-1396: capacity already includes both pressures; never derate twice.
+    assert finite["Fe"] == pytest.approx(vacuum["Fe"])
 
 
 def test_core_headspace_volume_refuses_missing_or_invalid_live_volume() -> None:
