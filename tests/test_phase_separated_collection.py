@@ -16,8 +16,9 @@ from simulator.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
 
 
-def _model(route="divert"):
+def _model(route="divert", *, hard_gate=True):
     model = CondensationModel(CondensationTrain.create_default())
+    model.hard_stage3_gate = hard_gate
     model.train.collection_route["stage3_route"] = route
     model.configure_operating_conditions(
         overhead_pressure_mbar=1.0,
@@ -72,7 +73,7 @@ def test_divert_excludes_silica_from_stages_budget_walls_supply_and_sampling(mon
 
 
 def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
-    model = _model("through")
+    model = _model("through", hard_gate=False)
     evaluated = []
     original = model._condensation_efficiency
 
@@ -140,6 +141,7 @@ def test_schedule_override_precedence_reset_and_lazy_train():
 def test_campaign_recipe_through_during_alkali_refuses_and_preserves_ledger():
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.condensation_model.hard_stage3_gate = True
     sim.melt.campaign = CampaignPhase.C2A_STAGED
     sim.campaign_mgr.configure_campaign(sim.melt, sim.melt.campaign)
     sim.campaign_mgr.overrides["C2A_STAGED"] = {"stage3_route": "through"}
@@ -165,6 +167,7 @@ def test_recipe_route_vocabulary_and_invalid_enum():
 def test_refusal_keeps_finding_after_hour_stops(monkeypatch):
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.condensation_model.hard_stage3_gate = True
     sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
     before = copy.deepcopy(sim.atom_ledger.mol_by_account())
 
@@ -184,6 +187,7 @@ def test_refusal_keeps_finding_after_hour_stops(monkeypatch):
 def test_runtime_reads_retained_overhead_on_each_parcel():
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.condensation_model.hard_stage3_gate = True
     sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
     model = sim.condensation_model
     sim.atom_ledger.load_external_mol("process.overhead_gas", {"K": 1e-9},
@@ -227,6 +231,7 @@ def test_session_override_accepts_literal_route_and_rejects_unknown_enum():
 def test_admission_keeps_prior_committed_vapor_and_prevents_replay(monkeypatch):
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.condensation_model.hard_stage3_gate = True
     sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
     ledger = sim.atom_ledger
     ledger.load_external_mol("process.metal_phase", {"Na": 1e-6}, material_origin="reagent")
@@ -265,6 +270,7 @@ def test_run_executor_preserves_typed_silica_refusal_and_coating_finding(monkeyp
     from simulator.optimize.physics import _coating_runtime_diagnostics
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.condensation_model.hard_stage3_gate = True
     sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
     session = SimSession()
     session._sim = sim
@@ -471,3 +477,106 @@ def test_interim_gate_uses_product_grade_before_chunk4_burst_ceiling(monkeypatch
     assert diag["stage3_product_purity"] == 0.999
     assert diag["stage3_instantaneous_purity"] == 0.99
     assert diag["effective_instantaneous_purity"] == 0.999
+
+
+def test_refused_opening_routes_same_parcel_as_divert_and_isolates_whole_hour():
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.campaign_mgr.overrides["C0"] = {"stage3_route": "through"}
+    model = _model("through", hard_gate=False)
+    model.train = sim.train
+    sim._condensation_model = model
+    flux = EvaporationFlux({"Na": 1.0, "SiO": 1.0})
+    result = sim.condensation_model.route(flux, sim.melt)
+    reference = model.route(flux, sim.melt)
+    assert result.condensed_by_stage_species == reference.condensed_by_stage_species
+    assert result.wall_deposit_by_segment_species == reference.wall_deposit_by_segment_species
+    assert result.remaining_by_species == reference.remaining_by_species
+    assert 3 not in result.condensed_by_stage_species
+    # Re-accessing the lazy model reapplies the campaign command. It must
+    # not reopen the cartridge for a later, even alkali-free parcel this hour.
+    assert sim.condensation_model.train.collection_route["stage3_route"] == "divert"
+    sim.condensation_model.route(EvaporationFlux({"SiO": 1.0}), sim.melt)
+    events = [d for d in model.cold_spot_history
+              if d.get("event") == "stage3_opening_refused"]
+    assert len(events) == 1
+    assert events[0]["hour"] == 0
+    sim.melt.hour += 1
+    assert sim.condensation_model.train.collection_route["stage3_route"] == "through"
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    assert not [d for d in model.cold_spot_history
+                if d.get("event") == "stage3_opening_refused"]
+
+
+@pytest.mark.nightly
+@pytest.mark.xdist_group("magemin_fullrun_b")
+@pytest.mark.timeout(1800)  # Includes live diagnostic liquidus engine calls.
+def test_default_lunar_staged_120h_completes_with_refused_window():
+    import json
+    from simulator.run_executor import RunExecutor
+    from simulator.session import SimSession, SimSessionConfig
+    from simulator.condensation import stage_purity_report
+    from simulator.optimize.physics import _coating_runtime_diagnostics, PhysicsConstraintSet
+    bundle = load_config_bundle()
+    session = SimSession()
+    session.start(SimSessionConfig(
+        feedstock_id="lunar_mare_low_ti", mass_kg=1.0, campaign="C2A_staged",
+        feedstocks=bundle.feedstocks, setpoints=bundle.setpoints,
+        vapor_pressures=bundle.vapor_pressures, backend_name="internal-analytical"))
+    execution = RunExecutor().execute_session(session, hours=120)
+    assert execution.status == "ok", execution.error_message
+    assert execution.failure_exception is None
+    assert execution.simulator.melt.hour == 120
+    assert len(execution.snapshots) == 120
+    events = [e for e in execution.shadow_trace
+              if e.get("event") == "stage3_opening_refused"]
+    # The default schedule requests SiO collection at elapsed hours 4, 5, 6.
+    assert [e["hour"] for e in events] == [4, 5, 6]
+    for event in events:
+        assert event["campaign"] == "C2A_STAGED"
+        assert event["substage"] == "sio_window"
+        assert event["alkali_oxide_kg_hr"] > event["allowed_alkali_oxide_kg_hr"]
+        assert event["silica_capture_kg_hr"] >= 0.0
+        assert event["stage3_product_purity"] == 0.999
+        assert event["reason"] == "alkali_purity_exceeded"
+        assert event["resolved_stage3_route"] == "divert"
+    product = stage_purity_report(execution.simulator.train)["stage_3_sio_zone"]
+    assert product["total_kg"] == 0.0
+    assert product["purity_fraction"] is None
+    # The event survives JSON artifacts and alone makes the requested window
+    # infeasible even when there is no actual silica contact or wall deposit.
+    artifact = json.loads(json.dumps({"shadow_trace": execution.shadow_trace}))
+    diagnostics = _coating_runtime_diagnostics(artifact)
+    assert len(diagnostics["silica_exposed_to_alkali_findings"]) == 3
+    margin = PhysicsConstraintSet(active_gates=("coating",)).coating_from_fouling_report({
+        "campaigns_to_resinter_total": float("inf"),
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative", "status_reason": "",
+        "feedstock_charge_mass_kg": 1.0,
+        "coating_constraint_mode": "upstream_deposit_fraction",
+        "wall_deposit_kg_per_campaign": 0.0,
+        "sticking_alpha_authority": {"authoritative_for_deposit_mass": True},
+        **artifact,
+    })
+    assert not margin.feasible
+    assert margin.status != "unavailable"
+    assert any(r["reason"] == "silica_exposed_to_alkali"
+               and r["finding"]["event"] == "stage3_opening_refused"
+               for r in margin.status_payload["coating_violation_reasons"])
+
+
+def test_refused_proposal_does_not_record_hypothetical_silica_surfaces():
+    through = _model("through", hard_gate=False)
+    diverted = _model("through", hard_gate=False)
+    # Both have the same configured input history; only their actual parcel
+    # route differs before admission. Configuration records the prior command.
+    diverted.train.collection_route["stage3_route"] = "divert"
+    flux = EvaporationFlux({"Na": 1.0, "SiO": 1.0})
+    melt = MeltState(temperature_C=1650)
+    through.route(flux, melt)
+    diverted.route(flux, melt)
+    assert through.last_sticking_alpha_provenance_notice == diverted.last_sticking_alpha_provenance_notice
+    actual_history = [d for d in through.cold_spot_history
+                      if d.get("event") != "stage3_opening_refused"]
+    assert actual_history == diverted.cold_spot_history
+    assert through.operating_history == diverted.operating_history
