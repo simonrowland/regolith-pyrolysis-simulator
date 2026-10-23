@@ -22447,13 +22447,13 @@ species:
         page: 220
         pdf_page_index: 219
         table: '5.2'
-        note: EBT1 starting composition; major oxides are on every experiment sample and this context preserves
-          their printed standard deviations, trace oxides, and total.
+        note: EBT1 starting composition; major oxides are on every experiment sample. This context retains their
+          printed standard deviations, the reported total, and Ni2O; the other 16 trace oxides are typed observations.
       units: major oxides wt%; trace oxides µg/g; total wt%
       values:
         quantity: starting_composition_table
         admission_status: typed_refusal
-        reason: Table 5.2 combines major-oxide mass percentages and trace-oxide concentrations; preserve its full transcription as context while sample starting composition carries the mapped major oxides.
+        reason: Table 5.2 combines major-oxide mass percentages, trace-oxide concentrations, and a total. Major oxides and total remain in context; 16 trace oxides are typed as oxide-species observations, with Ni2O retained here because Ni is not in Table 5.7.
         major_oxide_composition_and_sigma:
           SiO2:
             composition_wt_pct: '50.66'
